@@ -317,7 +317,7 @@ name of each input with that input's hash."
                              (make-derivation-input hash sub-drvs))))
                         inputs)))
        (make-derivation outputs
-                        (sort inputs
+                        (sort (delete-duplicates inputs)
                               (lambda (drv1 drv2)
                                 (string<? (derivation-input-derivation drv1)
                                           (derivation-input-derivation drv2))))
@@ -353,7 +353,6 @@ long-running processes that know what they're doing.  Use with care!"
   ;; Typically this is meant to be used by Cuirass and Hydra, which can clear
   ;; caches when they start evaluating packages for another architecture.
   (invalidate-memoization! derivation->bytevector)
-  (invalidate-memoization! derivation-base16-hash)
 
   ;; FIXME: Comment out to work around <https://bugs.gnu.org/36487>.
   ;; (hash-clear! %derivation-cache)
