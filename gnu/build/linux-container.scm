@@ -99,7 +99,14 @@ for the process."
 
   ;; The container's file system is completely ephemeral, sans directories
   ;; bind-mounted from the host.
-  (mount "none" root "tmpfs")
+  ;; Make this private in the container namespace so everything mounted under
+  ;; it is local to this namespace.
+  (mount "none" "/" "none" (logior MS_REC MS_PRIVATE))
+  (let ((current-perms (stat:perms (stat root))))
+    (mount "none" root "tmpfs" 0 (string-append "mode="
+                                                (number->string current-perms
+                                                                8))))
+
 
   ;; A proc mount requires a new pid namespace.
   (when mount-/proc?
