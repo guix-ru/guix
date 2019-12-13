@@ -36,6 +36,7 @@
   #:use-module (srfi srfi-26)
   #:use-module (rnrs io ports)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 vlist)
   #:use-module (system foreign)
   #:export (sql-schema
             %default-database-file
@@ -46,7 +47,10 @@
             register-items
             registered-derivation-outputs
             %epoch
-            reset-timestamps))
+            reset-timestamps
+            outputs-exist?
+            file-closure
+            all-transitive-inputs))
 
 ;;; Code for working with the store database directly.
 
@@ -403,3 +407,76 @@ it')."
                               (register db item)
                               (report))
                             items)))))))))
+
+(define output-path-id-sql
+  "SELECT id FROM ValidPaths WHERE path IN (SELECT path FROM DerivationOutputs
+WHERE DerivationOutputs.id = :id AND drv IN (SELECT id FROM ValidPaths WHERE
+path = :drvpath))")
+
+(define* (outputs-exist? drv-path outputs
+                         #:optional (database %default-database-file))
+  "Determine whether all output labels in OUTPUTS exist as built outputs of
+DRV-PATH."
+  (with-database database db
+    (let ((stmt (sqlite-prepare db output-path-id-sql)))
+      (sqlite-bind-arguments stmt #:drvpath drv-path)
+      (let ((result (every (lambda (out-id)
+                             (sqlite-reset stmt)
+                             (sqlite-bind-arguments stmt #:id out-id)
+                             (sqlite-step stmt))
+                           outputs)))
+        (sqlite-finalize stmt)
+        result))))
+
+(define references-sql
+  "SELECT path FROM ValidPaths WHERE id IN (SELECT reference FROM Refs WHERE
+referrer IN (SELECT id FROM ValidPaths WHERE path = :path))")
+
+(define* (file-closure path #:key
+                       (database %default-database-file)
+                       (list-so-far vlist-null))
+  "Return a vlist containing the store paths referenced by PATH, the store
+paths referenced by those paths, and so on."
+  (with-database database db
+    (let ((get-references (sqlite-prepare db references-sql)))
+      ;; to make it possible to go depth-first we need to get all the
+      ;; references of an item first or we'll have re-entrancy issues with
+      ;; the get-references statement.
+      (define (references-of path)
+        ;; There are no problems with resetting an already-reset
+        ;; statement.
+        (sqlite-reset get-references)
+        (sqlite-bind-arguments get-references #:path path)
+        (sqlite-fold (lambda (row prev)
+                       (cons (vector-ref row 0) prev))
+                     '()
+                     get-references))
+
+      (let ((result
+             (let %file-closure ((path path)
+                                 (references-vlist list-so-far))
+               (if (vhash-assoc path references-vlist)
+                   references-vlist
+                   (fold %file-closure
+                         (vhash-cons path #t references-vlist)
+                         (references-of path))))))
+        (sqlite-finalize get-references)
+        result))))
+
+(define (all-input-output-paths drv)
+  "Return a list containing the output paths this derivation's inputs need to
+provide."
+  (apply append (map derivation-input-output-paths
+                     (derivation-inputs drv))))
+
+(define (all-transitive-inputs drv)
+  "Produce a list of all inputs and all of their references."
+  (let ((input-paths (all-input-output-paths drv)))
+    (vhash-fold (lambda (key val prev)
+                  (cons key prev))
+                '()
+                (fold (lambda (input list-so-far)
+                        (file-closure input #:list-so-far list-so-far))
+                      vlist-null
+                      `(,@(derivation-sources drv)
+                        ,@input-paths)))))
