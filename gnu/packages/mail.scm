@@ -40,6 +40,7 @@
 ;;; Copyright © 2020 Oleg Pykhalov <go.wigust@gmail.com>
 ;;; Copyright © 2020 B. Wilson <elaexuotee@wilsonb.com>
 ;;; Copyright © 2020 divoplade <d@divoplade.fr>
+;;; Copyright © 2020 Brant Gardner <brantcgardner@brantware.com>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;; Copyright © 2021 Benoit Joly <benoit@benoitj.ca>
 ;;; Copyright © 2021 Morgan Smith <Morgan.J.Smith@outlook.com>
@@ -4964,3 +4965,109 @@ features:
     ;; <https://lists.sr.ht/~rjarry/aerc-devel/%3Cb5cb213a7d0c699a886971658c2476
     ;; 1073eb2391%40disroot.org%3E>
     (license license:gpl3+)))
+
+(define-public postfix-minimal
+  (package
+    (name "postfix-minimal")
+    (version "3.4.8")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "http://cdn.postfix.johnriley.me/"
+                                  "mirrors/postfix-release/official/"
+                                  "postfix-" version ".tar.gz"))
+              (sha256
+               (base32
+                "0hw9kbr05qdzvfqhxi4dp4n3s9xvdh0gr0la08a4bip06ybl4pcd"))))
+    (build-system gnu-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (add-before 'build 'patch-/bin/sh
+           (lambda _
+             (substitute* (find-files "." "^Makefile.in")
+               (("/bin/sh") (which "sh")))))
+         ;; allow us to find the bdb headers
+         (add-before 'build 'patch-/usr/include
+           (lambda* (#:key inputs #:allow-other-keys)
+             (substitute* '("makedefs")
+               (("/usr/include") (string-append (assoc-ref inputs "bdb")
+                                                "/include")))))
+         (add-before 'build 'set-up-environment
+           (lambda* (#:key outputs #:allow-other-keys)
+             ;; os detection on Guix System does not provide this
+             (setenv "AUXLIBS" "-lnsl")
+             ;; have to set this here, so that we get the correct
+             ;; location in the compiled binaries
+             (setenv "shlib_directory" (assoc-ref outputs "out"))))
+         ;; do not allow writes to the configuration directory,
+         ;; so that we can keep that in the store
+         (add-before 'build 'disable-postconf-edit
+           (lambda _
+             (substitute* "src/postconf/postconf_edit.c"
+               (("pcf_set_config_dir\\(\\);") "return 0;"))))
+         (add-before 'build 'configure-compile
+           (lambda _
+             (invoke "make" "makefiles" "pie=yes" "dynamicmaps=yes")))
+         (add-before 'install 'fix-postfix-scripts-path
+           (lambda _
+             (for-each
+              (lambda (command)
+                (substitute* '("postfix-install" "conf/post-install" "conf/postfix-script")
+                  (((string-append command " ")) (string-append (which command) " "))))
+              '("awk" "chmod" "chown" "chgrp" "cp" "find" "ln" "mkdir" "mv" "rm" "sed"
+                "sleep" "sort" "touch" "uname"))))
+         (add-before 'install 'configure-install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let ((out (assoc-ref outputs "out")))
+               (setenv "sendmail_path" (string-append out "/sendmail"))
+               (setenv "newaliases_path" (string-append out "/newaliases"))
+               (setenv "mailq_path" (string-append out "/mailq"))
+               (setenv "command_directory" out)
+               (setenv "config_directory" out)
+               (setenv "daemon_directory" out)
+               (setenv "data_directory" out)
+               (setenv "html_directory" out)
+               (setenv "queue_directory" out)
+               (setenv "manpage_directory" out)
+               (setenv "sample_directory" out)
+               (setenv "meta_directory" out)
+               (setenv "readme_directory" out))
+             (setenv "tempdir" "/tmp")))
+         ;; done in the service activation snippet
+         ;; we don't have the account here
+         (add-before 'fix-postfix-scripts-path 'disable-chown
+           (lambda _
+             (substitute* "postfix-install"
+               (("chown") (which "true")))
+             (substitute* "postfix-install"
+               (("chgrp") (which "true")))))
+         ;; disable writing the configuration files (service provides these)
+         ;; disable chowning (does not matter, stuff ends up in the store)
+         ;; and disable live update code (we always install to a clean directory)
+         (add-after 'configure-install 'disable-postinstall
+           (lambda _
+             (substitute* "postfix-install"
+               (("# we're sorry.") "exit 0"))))
+         ;; postfix by default uses an interactive installer
+         ;; replacing it with the upgrade target allows for
+         ;; a non-interactive install.
+         (replace 'install
+           (lambda _ (invoke "make" "upgrade")))
+         (delete 'configure)
+         (delete 'check))))
+    (inputs
+     (list bdb libnsl))
+    (native-inputs
+     (list coreutils
+           findutils
+           gawk
+           m4
+           sed))
+    (home-page "https://www.postfix.org")
+    (synopsis "Wietse Venema's mail server")
+    (description "Postfix is Wietse Venema's mail server that started life at
+IBM research as an alternative to the widely-used Sendmail program.  Now at
+Google, Wietse continues to support Postfix.  Postfix attempts to be fast, easy
+to administer, and secure. The outside has a definite Sendmail-ish flavor, but
+the inside is completely different.")
+    (license license:ibmpl1.0)))
