@@ -41,6 +41,7 @@
 ;;; Copyright © 2020 B. Wilson <elaexuotee@wilsonb.com>
 ;;; Copyright © 2020 divoplade <d@divoplade.fr>
 ;;; Copyright © 2020 Brant Gardner <brantcgardner@brantware.com>
+;;; Copyright © 2020 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;; Copyright © 2021 Benoit Joly <benoit@benoitj.ca>
 ;;; Copyright © 2021 Morgan Smith <Morgan.J.Smith@outlook.com>
@@ -4980,7 +4981,10 @@ features:
                 "1k2mxx9yx8lif804ff7zjyllizv4najfv3dca912k6j46fbr5b12"))))
     (build-system gnu-build-system)
     (arguments
-     '(#:phases
+     '(#:modules ((srfi srfi-26)
+                  (guix build utils)
+                  (guix build gnu-build-system))
+       #:phases
        (modify-phases %standard-phases
          (add-before 'build 'patch-/bin/sh
            (lambda _
@@ -5009,13 +5013,19 @@ features:
            (lambda _
              (invoke "make" "makefiles" "pie=yes" "dynamicmaps=yes")))
          (add-before 'install 'fix-postfix-scripts-path
-           (lambda _
-             (for-each
-              (lambda (command)
-                (substitute* '("postfix-install" "conf/post-install" "conf/postfix-script")
-                  (((string-append command " ")) (string-append (which command) " "))))
-              '("awk" "chmod" "chown" "chgrp" "cp" "find" "ln" "mkdir" "mv" "rm" "sed"
-                "sleep" "sort" "touch" "uname"))))
+           (lambda* (#:key inputs #:allow-other-keys)
+             (let ((path (string-join
+                          (map (compose (cute string-append <> "/bin")
+                                        (cute assoc-ref inputs <>))
+                               '("bash" "coreutils" "findutils" "gawk" "grep"
+                                 "sed"))
+                          ":")))
+               (substitute* '("postfix-install"
+                              "conf/post-install"
+                              "conf/postfix-script")
+                 (("^SHELL=/bin/sh")
+                  (string-append "PATH=" path "\n"
+                                 "SHELL=" (assoc-ref inputs "bash") "/bin/sh"))))))
          (add-before 'install 'configure-install
            (lambda* (#:key outputs #:allow-other-keys)
              (let ((out (assoc-ref outputs "out")))
