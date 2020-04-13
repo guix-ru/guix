@@ -27,7 +27,8 @@
   #:use-module (ice-9 rdelim)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 vlist)
-  #:export (store-info?
+  #:export (<store-info>
+            store-info?
             store-info
             store-info-item
             store-info-deriver

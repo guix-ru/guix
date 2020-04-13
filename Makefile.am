@@ -312,7 +312,8 @@ STORE_MODULES =					\
   guix/store/database.scm			\
   guix/store/deduplication.scm			\
   guix/store/roots.scm				\
-  guix/store/environment.scm
+  guix/store/environment.scm			\
+  guix/store/build-derivations.scm
 
 MODULES += $(STORE_MODULES)
 
