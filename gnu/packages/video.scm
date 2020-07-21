@@ -1672,6 +1672,7 @@ operate properly.")
             libcaca
             libcdio-paranoia
             libdrm
+            libgme
             libplacebo
             libtheora
             libva
@@ -1719,7 +1720,6 @@ operate properly.")
       ;;   --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
       ;;   --enable-libflite        enable flite (voice synthesis) support via
       ;;                            libflite [no]
-      ;;   --enable-libgme          enable Game Music Emu via libgme [no]
       ;;   --enable-libgsm          enable GSM de/encoding via libgsm [no]
       ;;   --enable-libiec61883     enable iec61883 via libiec61883 [no]
       ;;   --enable-libilbc         enable iLBC de/encoding via libilbc [no]
@@ -1772,6 +1772,7 @@ operate properly.")
          "--enable-libcdio"
          "--enable-libdav1d"
          "--enable-libfreetype"
+         "--enable-libgme"
          "--enable-libmp3lame"
          "--enable-libopus"
          "--enable-libplacebo"
