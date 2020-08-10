@@ -48,5 +48,7 @@
                               (permit-root-login #t)
                               (allow-empty-passwords? #t)
                               (password-authentication? #t)))
+                          (service mail-aliases-service-type
+                                   '(("postmaster" "root")))
                           (service postfix-service-type))
                     %base-services)))
