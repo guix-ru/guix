@@ -6,6 +6,7 @@
 ;;; Copyright © 2019 Kristofer Buffington <kristoferbuffington@gmail.com>
 ;;; Copyright © 2020 Jonathan Brielmaier <jonathan.brielmaier@web.de>
 ;;; Copyright © 2020 Gábor Boskovits <boskovits@gmail.com>
+;;; Copyright © 2020 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -2112,9 +2113,17 @@ inet_protocols = ipv4
   (match-record config <postfix-configuration>
     (postfix)
     (let* ((postfix-binary (file-append postfix "/postfix"))
+           (postalias-binary (file-append postfix "/postalias"))
            (postfix-action
             (lambda (action)
               #~(lambda _
+                  (when (or (not (file-exists? "/etc/aliases.db"))
+                            (> (stat:mtime (stat "/etc/aliases"))
+                               (stat:mtime (stat "/etc/aliases.db"))))
+                    (invoke #$postalias-binary
+                            "-c"
+                            #$(postfix-configuration-directory config)
+                            "/etc/aliases"))
                   (invoke #$postfix-binary "-c"
                           #$(postfix-configuration-directory config)
                           #$action)))))
@@ -2130,6 +2139,7 @@ inet_protocols = ipv4
    (name 'postfix)
    (extensions (list (service-extension account-service-type postfix-accounts)
                      (service-extension activation-service-type postfix-activation)
-                     (service-extension shepherd-root-service-type postfix-shepherd-service)))
+                     (service-extension shepherd-root-service-type postfix-shepherd-service)
+                     (service-extension mail-aliases-service-type (const '()))))
    (description "Run the Postfix MTA.")
    (default-value (postfix-configuration))))
