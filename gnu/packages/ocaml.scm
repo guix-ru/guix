@@ -186,7 +186,7 @@ functional, imperative and object-oriented styles of programming.")
 
 (define-public ocaml-4.07
   (package
-    (inherit ocaml-4.09)
+    (inherit ocaml-4.11)
     (version "4.07.1")
     (source (origin
               (method url-fetch)
