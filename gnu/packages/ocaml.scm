@@ -132,10 +132,10 @@
                          "/lib/ocaml/site-lib"))
     #:phases (modify-phases %standard-phases (delete 'configure))))
 
-(define-public ocaml-4.09
+(define-public ocaml-4.11
   (package
     (name "ocaml")
-    (version "4.09.0")
+    (version "4.11.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -144,7 +144,7 @@
                     "/ocaml-" version ".tar.xz"))
               (sha256
                (base32
-                "1v3z5ar326f3hzvpfljg4xj8b9lmbrl53fn57yih1bkbx3gr3yzj"))))
+                "04b13yfismkqh21ag641q9dl0i602khgh4427g1a7pb77c4skr7z"))))
     (build-system gnu-build-system)
     (native-search-paths
      (list (search-path-specification
@@ -165,31 +165,16 @@
     (arguments
      `(#:phases
        (modify-phases %standard-phases
-         (add-after 'unpack 'patch-/bin/sh-references
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let* ((sh (string-append (assoc-ref inputs "bash")
-                                       "/bin/sh"))
-                    (quoted-sh (string-append "\"" sh "\"")))
-               (with-fluids ((%default-port-encoding #f))
-                 (for-each
-                  (lambda (file)
-                    (substitute* file
-                      (("\"/bin/sh\"")
-                       (begin
-                         (format (current-error-port) "\
-patch-/bin/sh-references: ~a: changing `\"/bin/sh\"' to `~a'~%"
-                                 file quoted-sh)
-                         quoted-sh))))
-                  (find-files "." "\\.ml$"))
-                 #t))))
          (replace 'build
            (lambda _
-             (invoke "make" "-j" (number->string (parallel-job-count))
-                     "world.opt")))
+             (invoke "make" "-j"
+                     (number->string (parallel-job-count))
+                     "world.opt")
+             #t))
          (replace 'check
            (lambda _
-             (with-directory-excursion "testsuite"
-               (invoke "make" "all")))))))
+             (invoke "make" "tests")
+             #t)))))
     (home-page "https://ocaml.org/")
     (synopsis "The OCaml programming language")
     (description
@@ -197,10 +182,7 @@ patch-/bin/sh-references: ~a: changing `\"/bin/sh\"' to `~a'~%"
 an emphasis on expressiveness and safety.  Developed for more than 20 years at
 Inria it benefits from one of the most advanced type systems and supports
 functional, imperative and object-oriented styles of programming.")
-    ;; The compiler is distributed under qpl1.0 with a change to choice of
-    ;; law: the license is governed by the laws of France.  The library is
-    ;; distributed under lgpl2.0.
-    (license (list license:qpl license:lgpl2.0))))
+    (license license:lgpl2.1)))
 
 (define-public ocaml-4.07
   (package
