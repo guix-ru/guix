@@ -974,29 +974,30 @@ compilers that can directly deal with packages.")
      `(("m4" ,m4)
        ("ocaml" ,ocaml-4.07)))))
 
-;; note that some tests may hang for no obvious reason.
-(define-public ocaml-ounit
+(define-public ocaml-ounit2
   (package
-    (name "ocaml-ounit")
-    (version "2.0.8")
-    (source (origin
-              (method url-fetch)
-              (uri (ocaml-forge-uri "ounit" version 1749))
-              (sha256
-               (base32
-                "03ifp9hjcxg4m5j190iy373jcn4039d3vy10kmd8p4lfciwzwc1f"))))
-    (build-system ocaml-build-system)
+    (name "ocaml-ounit2")
+    (version "2.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/gildor478/ounit")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "12bsyk5g64rsa94khyl32pjj3fvc58av4vxqrjb3jy14cqyh95y1"))))
+    (build-system dune-build-system)
     (native-inputs
-     `(("libxml2" ,libxml2)           ; for xmllint
+     `(("libxml2" ,libxml2)
        ("ocamlbuild" ,ocamlbuild)))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (delete 'check))))             ; tests are run during build
-    (home-page "http://ounit.forge.ocamlcore.org")
+     `(#:package "ounit"))
+    (home-page "https://github.com/gildor478/ounit")
     (synopsis "Unit testing framework for OCaml")
-    (description "Unit testing framework for OCaml.  It is similar to JUnit and
-other XUnit testing frameworks.")
+    (description "Unit testing framework for OCaml.
+It is similar to JUnit and other XUnit testing frameworks.")
     (license license:expat)))
 
 (define-public camlzip
