@@ -264,7 +264,7 @@ for building OCaml library and programs.")
        (modify-phases %standard-phases
          (delete 'configure))))
     (native-inputs
-      `(("ocaml-cppo" ,ocaml-cppo)))
+     `(("ocaml-cppo" ,ocaml-cppo)))
     (home-page "https://github.com/ygrek/ocaml-extlib")
     (synopsis "Complete and small extension for OCaml standard library")
     (description "This library adds new functions to OCaml standard library
