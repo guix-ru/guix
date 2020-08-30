@@ -239,13 +239,13 @@ functional, imperative and object-oriented styles of programming.")
        #:phases
        (modify-phases %standard-phases
          (delete 'configure))
-       ; some failures because of changes in OCaml's error message formating
+       ;; some failures because of changes in OCaml's error message formating
        #:tests? #f))
     (home-page "https://github.com/ocaml/ocamlbuild")
     (synopsis "OCaml build tool")
     (description "OCamlbuild is a generic build tool, that has built-in rules
 for building OCaml library and programs.")
-    (license license:lgpl2.1+)))
+    (license license:lgpl2.0)))
 
 (define-public ocaml-extlib
   (package
