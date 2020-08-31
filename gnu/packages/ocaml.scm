@@ -171,6 +171,8 @@
                      (number->string (parallel-job-count))
                      "world.opt")
              #t))
+         ;; FIXME: Test phases are not run.
+         ;; "-find-test-dirs: command not found"
          (replace 'check
            (lambda _
              (invoke "make" "tests")
