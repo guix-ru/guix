@@ -37,6 +37,19 @@ if test "x$guix_build_daemon" = "xyes"; then
   AC_DEFINE_UNQUOTED([SYSTEM], ["$guix_system"],
     [Guix host system type--i.e., platform and OS kernel tuple.])
 
+  dnl On GNU/Hurd guix-daemon depends on libfshelp.
+  case "$guix_system" in
+    *-gnu)
+      AC_CHECK_LIB([fshelp], [fshelp_start_translator])
+      if test "x$ac_cv_lib_fshelp_fshelp_start_translator" != "xyes"; then
+        AC_MSG_ERROR([libfshelp (GNU Hurd) could not be found])
+      fi
+      HURD_LIBS="-lfshelp";;
+    *)
+      HURD_LIBS="";;
+  esac
+  AC_SUBST([HURD_LIBS])
+
   case "$LIBGCRYPT_PREFIX" in
     no)
       LIBGCRYPT_CFLAGS=""
