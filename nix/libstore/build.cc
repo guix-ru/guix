@@ -52,7 +52,13 @@
 #endif
 
 
-#define CHROOT_ENABLED HAVE_CHROOT && HAVE_SYS_MOUNT_H && defined(MS_BIND) && defined(MS_PRIVATE)
+/* Chroot builds are supported both on GNU/Linux and on GNU/Hurd.  */
+#if defined __linux__ || defined __GNU__
+# define CHROOT_ENABLED 1
+#else
+# error unsupported operating system
+#endif
+
 #define CLONE_ENABLED defined(CLONE_NEWNS)
 
 #if defined(SYS_pivot_root)
@@ -2015,6 +2021,7 @@ void DerivationGoal::runChild()
             if (setdomainname(domainname, sizeof(domainname)) == -1)
                 throw SysError("cannot set domain name");
 
+#ifdef __linux__
             /* Make all filesystems private.  This is necessary
                because subtrees may have been mounted as "shared"
                (MS_SHARED).  (Systemd does this, for instance.)  Even
@@ -2031,27 +2038,30 @@ void DerivationGoal::runChild()
                different filesystem from /, as needed for pivot_root. */
             if (mount(chrootRootDir.c_str(), chrootRootDir.c_str(), 0, MS_BIND, 0) == -1)
                 throw SysError(format("unable to bind mount ‘%1%’") % chrootRootDir);
+#endif
 
             /* Set up a nearly empty /dev, unless the user asked to
                bind-mount the host /dev. */
             Strings ss;
             if (dirsInChroot.find("/dev") == dirsInChroot.end()) {
+#ifdef __linux__
                 createDirs(chrootRootDir + "/dev/shm");
                 createDirs(chrootRootDir + "/dev/pts");
-                ss.push_back("/dev/full");
-#ifdef __linux__
-                if (pathExists("/dev/kvm"))
-                    ss.push_back("/dev/kvm");
-#endif
-                ss.push_back("/dev/null");
-                ss.push_back("/dev/random");
-                ss.push_back("/dev/tty");
-                ss.push_back("/dev/urandom");
-                ss.push_back("/dev/zero");
                 createSymlink("/proc/self/fd", chrootRootDir + "/dev/fd");
                 createSymlink("/proc/self/fd/0", chrootRootDir + "/dev/stdin");
                 createSymlink("/proc/self/fd/1", chrootRootDir + "/dev/stdout");
                 createSymlink("/proc/self/fd/2", chrootRootDir + "/dev/stderr");
+                ss.push_back("/dev/tty");
+                if (pathExists("/dev/kvm"))
+                    ss.push_back("/dev/kvm");
+#elif __GNU__
+		ss.push_back("/servers");
+#endif
+                ss.push_back("/dev/full");
+                ss.push_back("/dev/null");
+                ss.push_back("/dev/random");
+                ss.push_back("/dev/urandom");
+                ss.push_back("/dev/zero");
             }
 
             /* Fixed-output derivations typically need to access the
@@ -2073,7 +2083,7 @@ void DerivationGoal::runChild()
                 struct stat st;
                 Path source = i->second;
                 Path target = chrootRootDir + i->first;
-                if (source == "/proc") continue; // backwards compatibility
+
                 if (stat(source.c_str(), &st) == -1)
                     throw SysError(format("getting attributes of path `%1%'") % source);
                 if (S_ISDIR(st.st_mode))
@@ -2082,10 +2092,11 @@ void DerivationGoal::runChild()
                     createDirs(dirOf(target));
                     writeFile(target, "");
                 }
-                if (mount(source.c_str(), target.c_str(), "", MS_BIND, 0) == -1)
+                if (firmlink(source, target) == -1)
                     throw SysError(format("bind mount from `%1%' to `%2%' failed") % source % target);
             }
 
+#ifdef __linux__
             /* Bind a new instance of procfs on /proc to reflect our
                private PID namespace. */
             createDirs(chrootRootDir + "/proc");
@@ -2113,11 +2124,16 @@ void DerivationGoal::runChild()
                    Linux versions, it is created with permissions 0.  */
                 chmod_(chrootRootDir + "/dev/pts/ptmx", 0666);
             }
+#elif __GNU__
+	    /* Do not mount things that are implemented in user land: /proc,
+	       /dev/shm, /dev/pts, etc.  */
+#endif
 
             /* Do the chroot(). */
             if (chdir(chrootRootDir.c_str()) == -1)
                 throw SysError(format("cannot change directory to '%1%'") % chrootRootDir);
 
+#ifdef __linux__
             if (mkdir("real-root", 0) == -1)
                 throw SysError("cannot create real-root directory");
 
@@ -2132,8 +2148,13 @@ void DerivationGoal::runChild()
 
             if (rmdir("real-root") == -1)
                 throw SysError("cannot remove real-root directory");
-        }
+#elif __GNU__
+            if (chroot(".") == -1)
+                throw SysError(format("cannot change root directory to '%1%'") % chrootRootDir);
+
 #endif
+        }
+#endif	// CHROOT_ENABLED
 
         if (chdir(tmpDirInSandbox.c_str()) == -1)
             throw SysError(format("changing into `%1%'") % tmpDir);

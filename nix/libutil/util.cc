@@ -23,6 +23,41 @@
 #include <sys/prctl.h>
 #endif
 
+#if HAVE_SYS_MOUNT_H
+#include <sys/mount.h>
+#endif
+
+#ifdef __GNU__
+
+extern "C" {
+
+/* XXX: <idvec.h> uses 'new' as a parameter name.  Work around it.  */
+# define new new_param
+
+# include <hurd.h>
+# include <hurd/paths.h>
+# include <hurd/fsys.h>
+# include <argz.h>
+
+# undef new
+
+/* XXX: <fshelp.h> is not C++-compatible.  Copy these declarations to work
+   around it.  */
+
+typedef error_t (*fshelp_open_fn_t) (int flags,
+				     file_t *node,
+				     mach_msg_type_name_t *node_type,
+				     task_t, void *cookie);
+
+extern error_t
+fshelp_start_translator (fshelp_open_fn_t underlying_open_fn, void *cookie,
+			 char *name, char *argz, int argz_len,
+			 int timeout, fsys_t *control);
+
+}
+
+# define _HURD_FIRMLINK  _HURD "firmlink"
+#endif
 
 extern char * * environ;
 
@@ -214,6 +249,89 @@ bool isLink(const Path & path)
     return S_ISLNK(st.st_mode);
 }
 
+#if __linux__
+
+int firmlink(const Path &source, const Path &target)
+{
+    return mount(source.c_str(), target.c_str(), "", MS_BIND, 0);
+}
+
+#elif __GNU__
+
+static error_t return_node (int flags,
+			    mach_port_t *underlying,
+			    mach_msg_type_name_t *underlying_type,
+			    task_t task, void *node)
+{
+    *underlying = * (mach_port_t *) node;
+    *underlying_type = MACH_MSG_TYPE_COPY_SEND;
+
+    return ESUCCESS;
+}
+
+int firmlink(const Path &source, const Path &target)
+{
+    static char firmlink[] = _HURD_FIRMLINK;
+    char *arg_vec[] = { firmlink, (char *) source.c_str (), NULL };
+    char *args = NULL;
+    size_t args_len;
+
+    error_t err;
+    file_t target_file = MACH_PORT_NULL;
+
+    printMsg (lvlChatty, format("creating firmlink from '%1%' to '%2%'")
+	      % source % target);
+
+    target_file = file_name_lookup (target.c_str (), O_NOTRANS, 0);
+    if (! MACH_PORT_VALID (target_file)) {
+	printMsg (lvlChatty, format("firmlink target '%s' unavailable: %s")
+		  % target % strerror (errno));
+	goto fail;
+    }
+
+    err = argz_create (arg_vec, &args, &args_len);
+    if (err != 0) goto fail;
+
+    mach_port_t control;
+    err = fshelp_start_translator (return_node, &target_file,
+				   firmlink, args, args_len,
+				   3000, &control);
+    if (err) {
+	printMsg (lvlChatty, format("failed to start '%s' translator: %s") %
+		  firmlink % strerror(errno));
+	goto fail;
+    }
+
+    free ((void *) args);
+    args = NULL;
+
+    err = (error_t) file_set_translator (target_file, 0, FS_TRANS_SET, 0,
+					 NULL, 0,
+					 control, MACH_MSG_TYPE_COPY_SEND);
+    mach_port_deallocate (mach_task_self (), control);
+    mach_port_deallocate (mach_task_self (), target_file);
+
+    if (err) {
+	printMsg (lvlChatty, format("failed to set '%s' translator on node '%s': %s") %
+		  firmlink % target % strerror(errno));
+	goto fail;
+    }
+
+    return err;
+
+fail:
+    int saved_errno = errno;
+    if (MACH_PORT_VALID (target_file))
+	mach_port_deallocate (mach_task_self (), target_file);
+    if (args != NULL)
+	free ((void *) args);
+    errno = saved_errno;
+    return -1;
+}
+
+#elif
+# error unsupported operating system
+#endif
 
 static DirEntries readDirectory(DIR *dir)
 {
@@ -325,6 +443,27 @@ static void _deletePath(const Path & path, unsigned long long & bytesFreed, size
     checkInterrupt();
 
     printMsg(lvlVomit, format("%1%") % path);
+
+#ifdef __GNU__
+    /* Check whether there's an active translator on PATH--typically
+       /hurd/firmlink.  If there is one, let it go away.  */
+    {
+	file_t file = file_name_lookup (path.c_str (), O_NOTRANS, 0);
+	if (MACH_PORT_VALID (file)) {
+	    fsys_t fsys;
+	    int err = file_get_translator_cntl (file, &fsys);
+	    mach_port_deallocate (mach_task_self (), file);
+	    if (err == 0) {
+		/* There's a translator, tell it to leave.  */
+		err = fsys_goaway (fsys, FSYS_GOAWAY_FORCE | FSYS_GOAWAY_RECURSE);
+		mach_port_deallocate (mach_task_self (), fsys);
+		if (err != 0) {
+		    throw SysError(format("removing translator from '%1%'") % path);
+		}
+	    }
+	}
+    }
+#endif
 
 #ifdef HAVE_STATX
 # define st_mode stx_mode
