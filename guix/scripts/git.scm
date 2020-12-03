@@ -38,7 +38,7 @@ Operate on Git repositories.\n"))
   (newline)
   (show-bug-report-information))
 
-(define %sub-commands '("authenticate"))
+(define %sub-commands '("authenticate" "log"))
 
 (define (resolve-sub-command name)
   (let ((module (resolve-interface
