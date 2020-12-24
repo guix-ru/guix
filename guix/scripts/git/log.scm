@@ -18,19 +18,22 @@
 
 (define-module (guix scripts git log)
   #:use-module (git)
-  #:use-module ((guix channels)
-                #:select (%default-guix-channel
-                          channel-url))
+  #:use-module (guix channels)
   #:use-module ((guix git) #:select (url-cache-directory))
   #:use-module (guix scripts)
+  #:use-module (guix scripts pull)
   #:use-module (guix ui)
   #:use-module (ice-9 format)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-37)
   #:export (guix-git-log))
 
+
+(define %formats
+  '("oneline" "medium" "full"))
 
 (define %options
   (list (option '(#\h "help") #f #f
@@ -38,9 +41,16 @@
                   (show-help)
                   (exit 0)))
 
-        (option '("checkout-path") #f #f
+        (option '("channel-cache-path") #f #t
                 (lambda (opt name arg result)
-                  (alist-cons 'checkout-path? #t result)))
+                  (alist-cons 'channel-cache-path
+                              (if arg (string->symbol arg) 'guix)
+                              result)))
+        (option '("format") #t #f
+                (lambda (opt name arg result)
+                  (unless (member arg %formats)
+                    (leave (G_ "~a: invalid format~%") arg))
+                  (alist-cons 'format (string->symbol arg) result)))
         (option '("oneline") #f #f
                 (lambda (opt name arg result)
                   (alist-cons 'oneline? #t result)))))
@@ -52,7 +62,10 @@
   (display (G_ "Usage: guix git log [OPTIONS...]
 Show Guix commit logs.\n"))
   (display (G_ "
-      --checkout-path    show checkout path"))
+      --channel-cache-path[=CHANNEL]
+                         show checkout path from CHANNEL"))
+  (display (G_ "
+      --format=FORMAT    show log according to FORMAT"))
   (display (G_ "
       --oneline          show short hash and summary of five first commits"))
   (display (G_ "
@@ -60,39 +73,92 @@ Show Guix commit logs.\n"))
   (newline)
   (show-bug-report-information))
 
-(define (show-checkout-path)
-  (display (url-cache-directory (channel-url %default-guix-channel)))
-  (newline))
+(define (show-channel-cache-path channel)
+  (define channels (channel-list '()))
+
+  (let ((found-channel (find (lambda (element)
+                               (equal? channel (channel-name element)))
+                             channels)))
+    (if found-channel
+        (format #t "~a~%" (url-cache-directory (channel-url found-channel)))
+        (leave (G_ "~a: channel not found~%") (symbol->string channel)))))
 
 (define commit-short-id
   (compose (cut string-take <> 7) oid->string commit-id))
 
-(define (show-commit commit)
-    (format #t (G_ "~a ~a~%") (commit-short-id commit) (commit-summary commit)))
+;; --oneline = show-commit 'oneline #t
+(define (show-commit commit fmt abbrev-commit)
+  (match fmt
+         ('oneline
+          (format #t "~a ~a~%"
+                  (if abbrev-commit
+                      (commit-short-id commit)
+                      (oid->string (commit-id commit)))
+                  (commit-summary commit)))
+         ('medium
+          (let ((author (commit-author commit))
+                (merge-commit (if (> (commit-parentcount commit) 1) #t #f)))
+            (format #t "commit ~a~[~%Merge:~]~{ ~a~}~%Author: ~a <~a>~%Date:   ~a~%~%~a~%"
+                    (if abbrev-commit
+                        (commit-short-id commit)
+                        (oid->string (commit-id commit)))
+                    (if merge-commit 0 1) ;; show "Merge:"
+                    (if merge-commit (map commit-short-id (commit-parents commit)) '())
+                    (signature-name  author)
+                    (signature-email author)
+                    (date->string
+                     (time-utc->date
+                      (make-time time-utc 0
+                                 (time-time (signature-when author)))
+                      (* 60 (time-offset (signature-when author))))
+                     "~a ~b ~e ~H:~M:~S ~Y ~z")
+                    (commit-message commit))))
+         ('full
+          (let ((merge-commit (if (> (commit-parentcount commit) 1) #t #f))
+                (author    (commit-author commit))
+                (committer (commit-committer commit)))
+            (format #t "commit ~a~[~%Merge:~]~{ ~a~}~%Author: ~a <~a>~%Commit: ~a <~a>~%~%~a~%"
+                    (if abbrev-commit
+                        (commit-short-id commit)
+                        (oid->string (commit-id commit)))
+                    (if merge-commit 0 1) ;; show "Merge:"
+                    (if merge-commit (map commit-short-id (commit-parents commit)) '())
+                    (signature-name  author)
+                    (signature-email author)
+                    (signature-name  committer)
+                    (signature-email committer)
+                    (commit-message commit))))))
 
-;; currently showing 5 latest commits
+;; returns a list of commits from path
 (define (get-commits path)
   (let* ((repository (repository-open path))
          (latest-commit (commit-lookup repository (reference-target (repository-head repository)))))
-    (for-each show-commit (take
-                           (let loop ((commit latest-commit)
-                                      (res (list latest-commit)))
-                             (match (commit-parents commit)
-                                    (() (reverse res))
-                                    ((head . tail)
-                                     (loop head (cons head res)))))
-                           5))))
+    (define commits (let loop ((commit latest-commit)
+                               (res (list latest-commit)))
+                      (match (commit-parents commit)
+                             (() (reverse res))
+                             ((head . tail)
+                              (loop head (cons head res))))))
+    commits))
 
 (define (guix-git-log . args)
   (define options
     (parse-command-line args %options (list %default-options)))
 
-  (let ((checkout-path? (assoc-ref options 'checkout-path?))
-        (oneline?       (assoc-ref options 'oneline?)))
+  (let ((channel-cache      (assoc-ref options 'channel-cache-path))
+        (oneline?           (assoc-ref options 'oneline?))
+        (format-type        (assoc-ref options 'format)))
     (with-error-handling
       (cond
-       (checkout-path?
-        (show-checkout-path))
+       (channel-cache
+        (show-channel-cache-path channel-cache))
        (oneline?
         (let ((cache (url-cache-directory (channel-url %default-guix-channel))))
-          (get-commits cache)))))))
+          (for-each (lambda (commit-list)
+                      (show-commit commit-list 'oneline #t))
+                    (take (get-commits cache) 5))))
+       (format-type
+        (let ((cache (url-cache-directory (channel-url %default-guix-channel))))
+          (for-each (lambda (commit-list)
+                      (show-commit commit-list format-type #f))
+                    (take (get-commits cache) 5))))))))
