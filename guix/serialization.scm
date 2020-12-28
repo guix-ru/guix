@@ -50,6 +50,7 @@
 
             write-file
             write-file-tree
+            filter/sort-directory-entries
             fold-archive
             restore-file
             dump-file))
