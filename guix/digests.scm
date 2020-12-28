@@ -39,7 +39,9 @@
             store-deduplication-link
             file-tree-digest
             file-digest
-            restore-digest))
+            restore-digest
+
+            digest->sexp))
 
 ;;; Commentary:
 ;;;
@@ -211,3 +213,22 @@ false."
        (symlink source target)
        (utime target 1 1 0 0 AT_SYMLINK_NOFOLLOW)
        missing))))
+
+(define (digest->sexp digest)
+  "Return an sexp serialization of DIGEST."
+  (define (->sexp digest)
+    (match digest
+      (($ <digest> 'directory _ entries)
+       `(d ,@(map (match-lambda
+                    (($ <digest-entry> name digest)
+                     `(,name ,(->sexp digest))))
+                  entries)))
+      (($ <digest> (and type (or 'executable 'regular)) size
+                   (algorithm hash))
+       `(,(if (eq? type 'executable) 'x 'f) ,size
+         (,algorithm ,(bytevector->nix-base32-string hash))))
+      (($ <digest> 'symlink _ target)
+       `(l ,target))))
+
+  `(digest (version 0)
+           ,(->sexp digest)))

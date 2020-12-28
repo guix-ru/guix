@@ -53,6 +53,8 @@
   #:use-module (guix workers)
   #:use-module (guix store)
   #:use-module ((guix serialization) #:select (write-file))
+  #:autoload   (guix digests) (store-deduplication-link
+                               file-digest digest->sexp)
   #:use-module (zlib)
   #:autoload   (lzlib) (call-with-lzip-output-port
                         make-lzip-output-port)
@@ -405,6 +407,13 @@ appropriate duration.  NAR-PATH specifies the prefix for nar URLs."
                                   #:compressions compressions)
                   <>)))))
 
+(define* (render-digest store request hash)
+  (let ((item (hash-part->path store hash)))
+    (if (string-null? item)
+        (not-found request #:phrase "")
+        (values `((content-type . (application/x-guix-digest)))
+                (object->string (digest->sexp (file-digest item)))))))
+
 (define* (nar-cache-file directory item
                              #:key (compression %no-compression))
   (string-append directory "/"
@@ -746,6 +755,21 @@ has the given HASH of type ALGO."
             (not-found request)))
       (not-found request)))
 
+(define* (render-content-addressed-data request algo hash
+                                        #:key (compression %no-compression))
+  "Return the file with HASH, a nar hash, from the content-addressed store."
+  (if (and (eq? algo 'sha256) (= 32 (bytevector-length hash)))
+      (let* ((file (store-deduplication-link hash))
+             (stat (stat file #f)))
+        (if stat
+            (values `((content-type . (application/octet-stream
+                                       (charset . "ISO-8859-1")))
+                      ;; TODO: Set 'Content-Encoding' to COMPRESSION.
+                      (x-raw-file . ,file))
+                    #f)
+            (not-found request)))
+      (not-found request)))
+
 (define (render-log-file store request name)
   "Render the log file for NAME, the base name of a store item.  Don't attempt
 to compress or decompress the log file; just return it as-is."
@@ -1006,13 +1030,26 @@ methods, return the applicable compression."
                                #:ttl narinfo-ttl
                                #:nar-path nar-path
                                #:compressions compressions)))
-          ;; /nar/file/NAME/sha256/HASH
+          ;; /file/NAME/sha256/HASH
           (("file" name "sha256" hash)
            (guard (c ((invalid-base32-character? c)
                       (not-found request)))
              (let ((hash (nix-base32-string->bytevector hash)))
                (render-content-addressed-file store request
                                               name 'sha256 hash))))
+
+          ;; /content/sha256/HASH
+          (("content" "sha256" hash)
+           (guard (c ((invalid-base32-character? c)
+                      (not-found request)))
+             (let ((hash (nix-base32-string->bytevector hash)))
+               (render-content-addressed-data request 'sha256 hash
+                                              #:compression
+                                              (first compressions)))))
+
+          ;; /digest/HASH
+          (("digest" hash)
+           (render-digest store request hash))
 
           ;; /log/OUTPUT
           (("log" name)
