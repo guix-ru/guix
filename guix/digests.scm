@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2020 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2020, 2021 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -41,7 +41,8 @@
             file-digest
             restore-digest
 
-            digest->sexp))
+            digest->sexp
+            sexp->digest))
 
 ;;; Commentary:
 ;;;
@@ -232,3 +233,25 @@ false."
 
   `(digest (version 0)
            ,(->sexp digest)))
+
+(define (sexp->digest sexp)
+  "Return a digest deserialized from SEXP."
+  (define (->digest sexp)
+    (match sexp
+      (('x size (algorithm hash) _ ...)
+       (digest 'executable size (list algorithm hash)))
+      (('f size (algorithm hash) _ ...)
+       (digest 'regular size
+               (list algorithm (nix-base32-string->bytevector hash))))
+      (('d entries ...)
+       (digest 'directory 0
+               (map (match-lambda
+                      ((name digest)
+                       (digest-entry name (->digest digest))))
+                    entries)))
+      (('l target)
+       (digest 'symlink 0 target))))
+
+  (match sexp
+    (('digest ('version 0) sexp)
+     (->digest sexp))))

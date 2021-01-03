@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2014 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2018 Kyle Meyer <kyle@kyleam.com>
 ;;;
@@ -28,7 +28,8 @@
   #:use-module (guix records)
   #:use-module (guix diagnostics)
   #:use-module (guix i18n)
-  #:use-module ((guix serialization) #:select (restore-file dump-file))
+  #:use-module ((guix serialization)
+                #:select (restore-file write-file dump-file dump-port*))
   #:autoload   (guix store deduplication) (dump-file/deduplicate)
   #:autoload   (guix scripts discover) (read-substitute-urls)
   #:use-module (gcrypt hash)
@@ -43,7 +44,7 @@
                           (open-connection-for-uri
                            . guix:open-connection-for-uri)
                           store-path-abbreviation byte-count->string))
-  #:use-module (guix progress)
+  #:use-module ((guix progress) #:hide (dump-port*))
   #:use-module ((guix build syscalls)
                 #:select (set-thread-name))
   #:use-module (ice-9 rdelim)
@@ -66,6 +67,8 @@
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (guix http-client)
+  #:autoload   (guix digests) (digest->sexp sexp->digest restore-digest
+                               digest-type digest-size digest-content)
   #:export (narinfo-signature->canonical-sexp
 
             narinfo?
@@ -433,6 +436,19 @@ entry is stored in a sub-directory specific to CACHE-URL."
                     (bytevector->base32-string (sha256 (string->utf8 cache-url)))
                     "/" hash-part))))
 
+(define (digest-cache-file cache-url path)
+  "Return the name of the local file that contains an entry for PATH.  The
+entry is stored in a sub-directory specific to CACHE-URL."
+  ;; The daemon does not sanitize its input, so PATH could be something like
+  ;; "/gnu/store/foo".  Gracefully handle that.
+  (match (store-path-hash-part path)
+    (#f
+     (leave (G_ "'~a' does not name a store item~%") path))
+    ((? string? hash-part)
+     (string-append %narinfo-cache-directory "/"
+                    (bytevector->base32-string (sha256 (string->utf8 cache-url)))
+                    "/" hash-part ".digest"))))
+
 (define (cached-narinfo cache-url path)
   "Check locally if we have valid info about PATH coming from CACHE-URL.
 Return two values: a Boolean indicating whether we have valid cached info, and
@@ -495,6 +511,23 @@ indicates that PATH is unavailable at CACHE-URL."
   "Return an HTTP request for the narinfo of PATH at CACHE-URL."
   (let ((url (string-append cache-url "/" (store-path-hash-part path)
                             ".narinfo"))
+        (headers '((User-Agent . "GNU Guile"))))
+    (build-request (string->uri url) #:method 'GET #:headers headers)))
+
+(define (cache-digest! cache-url path data)
+  "Cache DATA, a bytevector, as the digest for PATH obtained from CACHE-URL."
+  (define now
+    (current-time time-monotonic))
+
+  (let ((file (digest-cache-file cache-url path)))
+    (mkdir-p (dirname file))
+    (with-atomic-file-output file
+      (lambda (out)
+        (put-bytevector out data)))))
+
+(define (digest-request cache-url path)
+  "Return an HTTP request for the digest of PATH at CACHE-URL."
+  (let ((url (string-append cache-url "/digest/" (store-path-hash-part path)))
         (headers '((User-Agent . "GNU Guile"))))
     (build-request (string->uri url) #:method 'GET #:headers headers)))
 
@@ -686,20 +719,45 @@ port to it, or, if connection failed, print a warning and return #f.  Pass
                                 %narinfo-transient-error-ttl))
             result))))
 
+  (define %not-slash
+    (char-set-complement (char-set #\/)))
+
+  (define (handle-digest-response request response port result)
+    (when (= 200 (response-code response))
+      (let ((len (response-content-length response)))
+        (match (string-tokenize (uri-path (request-uri request))
+                                %not-slash)
+          (("digest" hash-part)
+           (let* ((data   (if len
+                              (get-bytevector-n port len)
+                              (read-to-eof port)))
+                  (digest (sexp->digest
+                           (read (open-bytevector-input-port data)))))
+             (cache-digest! url (hash-part->path hash-part) data)))
+          (_ #f))))
+    result)
+
+  (define (handle-response request response port result)
+    (if (string-contains (uri-path (request-uri request))
+                         "/digest/")
+        (handle-digest-response request response port result)
+        (handle-narinfo-response request response port result)))
+
   (define (do-fetch uri)
     (case (and=> uri uri-scheme)
       ((http https)
        ;; Note: Do not check HTTPS server certificates to avoid depending
        ;; on the X.509 PKI.  We can do it because we authenticate
        ;; narinfos, which provides a much stronger guarantee.
-       (let* ((requests (map (cut narinfo-request url <>) paths))
+       (let* ((requests (append (map (cut narinfo-request url <>) paths)
+                                (map (cut digest-request url <>) paths)))
               (result   (call-with-cached-connection uri
                           (lambda (port)
                             (if port
                                 (begin
                                   (update-progress!)
                                   (http-multiple-get uri
-                                                     handle-narinfo-response '()
+                                                     handle-response '()
                                                      requests
                                                      #:open-connection
                                                      open-connection-for-uri/cached
@@ -805,6 +863,18 @@ was found."
   (match (lookup-narinfos/diverse caches (list path) authorized?)
     ((answer) answer)
     (_        #f)))
+
+(define (lookup-digest cache-url path)
+  "Return the digest for PATH in CACHE-URL or #f if it could not be found in
+cache."
+  (catch 'system-error
+    (lambda ()
+      (call-with-input-file (digest-cache-file cache-url path)
+        (compose sexp->digest read)))
+    (lambda args
+      (if (= ENOENT (system-error-errno args))
+          #f
+          (apply throw args)))))
 
 (define (cached-narinfo-expiration-time file)
   "Return the expiration time for FILE, which is a cached narinfo."
@@ -1065,18 +1135,14 @@ server certificates."
   "Bind PORT with EXP... to a socket connected to URI."
   (call-with-cached-connection uri (lambda (port) exp ...)))
 
-(define* (process-substitution store-item destination
-                               #:key cache-urls acl
-                               deduplicate? print-build-trace?)
+(define* (process-substitution/nar store-item narinfo destination
+                                   #:key cache-urls
+                                   deduplicate? print-build-trace?)
   "Substitute STORE-ITEM (a store file name) from CACHE-URLS, and write it to
 DESTINATION as a nar file.  Verify the substitute against ACL, and verify its
 hash against what appears in the narinfo.  When DEDUPLICATE? is true, and if
 DESTINATION is in the store, deduplicate its files.  Print a status line on
 the current output port."
-  (define narinfo
-    (lookup-narinfo cache-urls store-item
-                    (cut valid-narinfo? <> acl)))
-
   (define destination-in-store?
     (string-prefix? (string-append (%store-prefix) "/")
                     destination))
@@ -1159,6 +1225,115 @@ the current output port."
                     (hash-algorithm-name algorithm)
                     (bytevector->nix-base32-string expected)
                     (bytevector->nix-base32-string actual)))))))
+
+(define (http-fetch-files base-url files+digests)
+  "Fetch the files in FILES+DIGESTS, a list of file name/digest pairs as
+returned by 'restore-digest'.scm"
+  (define (content-uri digest)
+    (match (digest-content digest)
+      (((algorithm hash) _ ...)
+       (string->uri
+        (string-append base-url "/content/" algorithm "/"
+                       (bytevector->base32-string hash))))))
+
+  (define (content-request digest)
+    (build-request (content-uri digest)
+                   #:method 'GET
+                   #:headers '((User-Agent . "GNU Guile"))))
+
+  (define request->file
+    (fold (lambda (file+digest result)
+            (match file+digest
+              ((file . digest)
+               (vhash-consq (content-request digest) file
+                            result))))
+          vlist-null
+          files+digests))
+
+  (define total-size
+    (match files+digests
+      (((_ . digests) ...)
+       (fold (lambda (digest size)
+               (+ size (digest-size digest)))
+             0
+             digests))))
+
+  ;; TODO: decompression
+  ;; TODO: progress report
+  (http-multiple-get (string->uri base-url)
+                     (lambda (request response port result)
+                       (match (vhash-assq request request->file)
+                         ((digest . file)
+                          ;; TODO: deduplicate
+                          (with-atomic-file-output file
+                            (lambda (output)
+                              (let ((len (response-content-length response)))
+                                (dump-port* port output len))))
+                          (chmod file (if (eq? (digest-type digest) 'regular)
+                                          #o444
+                                          #o555))
+                          (utime file 1 1 0 0))))
+                     #t
+                     (vhash-fold-right (lambda (file request result)
+                                         (cons request result))
+                                       '()
+                                       request->file)))
+
+(define (nar-hash file algorithm)
+  "Return the ALGORITHM hash of FILE."
+  (let-values (((port get-hash) (open-hash-port algorithm)))
+    (write-file file port)
+    (force-output port)
+    (let ((hash (get-hash)))
+      (close-port port)
+      hash)))
+
+(define* (process-substitution/digest store-item narinfo destination
+                                      #:key digest
+                                      deduplicate? print-build-trace?)
+  (define destination-in-store?
+    (string-prefix? (string-append (%store-prefix) "/")
+                    destination))
+
+  (let ((missing-files (restore-digest digest destination)))
+    (unless (null? missing-files)
+      (http-fetch-files (narinfo-uri-base narinfo) missing-files)))
+
+
+  (let*-values (((algorithm expected)
+                 (narinfo-hash-algorithm+value narinfo))
+                ((actual) (nar-hash destination algorithm)))
+    (if (bytevector=? actual expected)
+        ;; Tell the daemon that we're done.
+        (format (current-output-port) "success ~a ~a~%"
+                (narinfo-hash narinfo) (narinfo-size narinfo))
+        ;; The actual data has a different hash than that in NARINFO.
+        (format (current-output-port) "hash-mismatch ~a ~a ~a~%"
+                (hash-algorithm-name algorithm)
+                (bytevector->nix-base32-string expected)
+                (bytevector->nix-base32-string actual)))))
+
+(define* (process-substitution store-item destination
+                               #:key cache-urls acl
+                               deduplicate? print-build-trace?)
+  (define narinfo
+    (lookup-narinfo cache-urls store-item
+                    (cut valid-narinfo? <> acl)))
+
+  (define digest
+    (and narinfo
+         (lookup-digest (narinfo-uri-base narinfo) store-item)))
+
+
+  (if digest
+      (process-substitution/digest store-item narinfo destination
+                                   #:digest digest
+                                   #:deduplicate? deduplicate?
+                                   #:print-build-trace? print-build-trace?)
+      (process-substitution/nar store-item narinfo destination
+                                #:cache-urls cache-urls
+                                #:deduplicate? deduplicate?
+                                #:print-build-trace? print-build-trace?)))
 
 
 ;;;
@@ -1301,6 +1476,11 @@ default value."
                                         cached-narinfo-files
                                         #:entry-expiration
                                         cached-narinfo-expiration-time
+                                        #:delete-entry
+                                        (lambda (file)
+                                          (delete-file* file)
+                                          (delete-file*
+                                           (string-append file ".digest")))
                                         #:cleanup-period
                                         %narinfo-expired-cache-entry-removal-delay)
     (check-acl-initialized)
