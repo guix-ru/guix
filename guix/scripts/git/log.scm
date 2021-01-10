@@ -19,9 +19,10 @@
 (define-module (guix scripts git log)
   #:use-module (git)
   #:use-module (guix channels)
-  #:use-module ((guix git) #:select (url-cache-directory))
+  #:use-module (guix git)
   #:use-module (guix scripts)
   #:use-module (guix scripts pull)
+  #:use-module (guix sets)
   #:use-module (guix ui)
   #:use-module (ice-9 format)
   #:use-module (ice-9 match)
@@ -43,9 +44,10 @@
 
         (option '("channel-cache-path") #f #t
                 (lambda (opt name arg result)
-                  (alist-cons 'channel-cache-path
-                              (if arg (string->symbol arg) 'guix)
-                              result)))
+                  (if arg
+                      (alist-cons 'channel-cache-path
+                                  (string->symbol arg) result)
+                      (list-channels))))
         (option '("format") #t #f
                 (lambda (opt name arg result)
                   (unless (member arg %formats)
@@ -57,6 +59,14 @@
 
 (define %default-options
   '())
+
+(define (list-channels)
+  (define channels (channel-list '()))
+  (for-each (lambda (channel)
+              (format #t "~a~%  ~a~%"
+                      (channel-name channel)
+                      (url-cache-directory (channel-url channel))))
+            channels))
 
 (define (show-help)
   (display (G_ "Usage: guix git log [OPTIONS...]
@@ -82,6 +92,7 @@ Show Guix commit logs.\n"))
     (if found-channel
         (format #t "~a~%" (url-cache-directory (channel-url found-channel)))
         (leave (G_ "~a: channel not found~%") (symbol->string channel)))))
+
 
 (define commit-short-id
   (compose (cut string-take <> 7) oid->string commit-id))
@@ -129,17 +140,18 @@ Show Guix commit logs.\n"))
                     (signature-email committer)
                     (commit-message commit))))))
 
-;; returns a list of commits from path
-(define (get-commits path)
-  (let* ((repository (repository-open path))
-         (latest-commit (commit-lookup repository (reference-target (repository-head repository)))))
-    (define commits (let loop ((commit latest-commit)
-                               (res (list latest-commit)))
-                      (match (commit-parents commit)
-                             (() (reverse res))
-                             ((head . tail)
-                              (loop head (cons head res))))))
-    commits))
+;; returns a list with commits from all channels
+(define (get-commits)
+  (define channels (channel-list '()))
+
+  (fold (lambda (channel commit-list)
+          (let* ((channel-path (url-cache-directory (channel-url channel)))
+                 (repository (repository-open channel-path))
+                 (latest-commit
+                  (commit-lookup repository(reference-target
+                                            (repository-head repository)))))
+            (append (set->list (commit-closure latest-commit))
+                    commit-list))) '() channels))
 
 (define (guix-git-log . args)
   (define options
@@ -152,13 +164,11 @@ Show Guix commit logs.\n"))
       (cond
        (channel-cache
         (show-channel-cache-path channel-cache))
-       (oneline?
-        (let ((cache (url-cache-directory (channel-url %default-guix-channel))))
+      (oneline?
           (for-each (lambda (commit-list)
                       (show-commit commit-list 'oneline #t))
-                    (take (get-commits cache) 5))))
+                    (take (get-commits) 5)))
        (format-type
-        (let ((cache (url-cache-directory (channel-url %default-guix-channel))))
           (for-each (lambda (commit-list)
                       (show-commit commit-list format-type #f))
-                    (take (get-commits cache) 5))))))))
+                    (take (get-commits) 5)))))))
