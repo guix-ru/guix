@@ -26,6 +26,7 @@
   #:use-module (guix ui)
   #:use-module (ice-9 format)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
@@ -55,7 +56,10 @@
                   (alist-cons 'format (string->symbol arg) result)))
         (option '("oneline") #f #f
                 (lambda (opt name arg result)
-                  (alist-cons 'oneline? #t result)))))
+                  (alist-cons 'oneline? #t result)))
+        (option '("pretty") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'pretty arg result)))))
 
 (define %default-options
   '())
@@ -79,9 +83,34 @@ Show Guix commit logs.\n"))
   (display (G_ "
       --oneline          show short hash and summary of five first commits"))
   (display (G_ "
+      --pretty=<string>  show log according to string"))
+  (display (G_ "
   -h, --help             display this help and exit"))
   (newline)
   (show-bug-report-information))
+
+(define commit-short-id
+  (compose (cut string-take <> 7) oid->string commit-id))
+
+(define placeholders-regex "%([Hhsb]|(an)|(cn))")
+
+(define information-placeholders `(("%b"  . ,commit-body)
+                                   ("%H"  . ,(compose oid->string commit-id))
+                                   ("%h"  . ,commit-short-id)
+                                   ("%s"  . ,commit-summary)
+                                   ("%an" . ,(compose signature-name commit-author))))
+
+(define (replace-regex string)
+  (regexp-substitute/global #f placeholders-regex string 'pre "~a" 'post))
+
+(define (procedure-list string)
+  (let* ((placeholders-in-the-string
+          (map match:substring (list-matches placeholders-regex string))))
+    (map (lambda (commit)
+           (assoc-ref information-placeholders commit)) placeholders-in-the-string)))
+
+(define (pretty-show-commit string commit)
+  (format #t "~?~%" (replace-regex string) (map (lambda (f) (f commit)) (procedure-list string))))
 
 (define (show-channel-cache-path channel)
   (define channels (channel-list '()))
@@ -92,10 +121,6 @@ Show Guix commit logs.\n"))
     (if found-channel
         (format #t "~a~%" (url-cache-directory (channel-url found-channel)))
         (leave (G_ "~a: channel not found~%") (symbol->string channel)))))
-
-
-(define commit-short-id
-  (compose (cut string-take <> 7) oid->string commit-id))
 
 ;; --oneline = show-commit 'oneline #t
 (define (show-commit commit fmt abbrev-commit)
@@ -148,7 +173,7 @@ Show Guix commit logs.\n"))
           (let* ((channel-path (url-cache-directory (channel-url channel)))
                  (repository (repository-open channel-path))
                  (latest-commit
-                  (commit-lookup repository(reference-target
+                  (commit-lookup repository (reference-target
                                             (repository-head repository)))))
             (append (set->list (commit-closure latest-commit))
                     commit-list))) '() channels))
@@ -159,16 +184,20 @@ Show Guix commit logs.\n"))
 
   (let ((channel-cache      (assoc-ref options 'channel-cache-path))
         (oneline?           (assoc-ref options 'oneline?))
-        (format-type        (assoc-ref options 'format)))
+        (format-type        (assoc-ref options 'format))
+        (pretty-string      (assoc-ref options 'pretty)))
     (with-error-handling
       (cond
        (channel-cache
         (show-channel-cache-path channel-cache))
-      (oneline?
-          (for-each (lambda (commit-list)
-                      (show-commit commit-list 'oneline #t))
-                    (take (get-commits) 5)))
+       (oneline?
+        (for-each (lambda (commit-list)
+                    (show-commit commit-list 'oneline #t))
+                  (take (get-commits) 5)))
        (format-type
-          (for-each (lambda (commit-list)
-                      (show-commit commit-list format-type #f))
-                    (take (get-commits) 5)))))))
+        (for-each (lambda (commit-list)
+                    (show-commit commit-list format-type #f))
+                  (take (get-commits) 5)))
+       (pretty-string
+        (let ((pretty-show (cut pretty-show-commit pretty-string <>)))
+          (for-each pretty-show (take (get-commits) 5))))))))
