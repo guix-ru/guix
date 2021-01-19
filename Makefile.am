@@ -341,6 +341,7 @@ MODULES =					\
   guix/scripts/size.scm				\
   guix/scripts/git.scm				\
   guix/scripts/git/authenticate.scm		\
+  guix/scripts/git/log.scm			\
   guix/scripts/graph.scm			\
   guix/scripts/weather.scm			\
   guix/scripts/container.scm			\

@@ -58,6 +58,9 @@
                   (unless (member arg %formats)
                     (leave (G_ "~a: invalid format~%") arg))
                   (alist-cons 'format (string->symbol arg) result)))
+        (option '("grep") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'grep arg result)))
         (option '("oneline") #f #f
                 (lambda (opt name arg result)
                   (alist-cons 'oneline? #t result)))
@@ -86,7 +89,9 @@ Show Guix commit logs.\n"))
   (display (G_ "
       --format=FORMAT    show log according to FORMAT"))
   (display (G_ "
-      --oneline          show short hash and summary of five first commits"))
+      --grep=REGEXP      show commits whose message matches REGEXP"))
+  (display (G_ "
+      --oneline          show short hash and summary of commits"))
   (display (G_ "
       --pretty=<string>  show log according to string"))
   (newline)
@@ -195,11 +200,14 @@ id instead of the 40-character one."
           (let* ((channel-path (url-cache-directory (channel-url channel)))
                  (repository (repository-open channel-path))
                  (latest-commit
-                  (commit-lookup repository (object-id (revparse-single repository "origin/master")))))
+                  (commit-lookup repository
+                                 (object-id
+                                  (revparse-single
+                                   repository "origin/master")))))
             (begin
               (hashq-set! %channels-repositories channel-path repository)
               (append (set->list (commit-closure latest-commit))
-                    commit-list)))) '() channels))
+                      commit-list)))) '() channels))
 
 (define (guix-git-log . args)
   (define options
@@ -208,19 +216,31 @@ id instead of the 40-character one."
   (let ((channel-cache      (assoc-ref options 'channel-cache-path))
         (oneline?           (assoc-ref options 'oneline?))
         (format-type        (assoc-ref options 'format))
-        (pretty-string      (assoc-ref options 'pretty)))
+        (pretty-string      (assoc-ref options 'pretty))
+        (regexp             (assoc-ref options 'grep)))
     (with-error-handling
       (cond
        (channel-cache
         (show-channel-cache-path channel-cache))
        (oneline?
-        (for-each (lambda (commit-list)
-                    (show-commit commit-list 'oneline #t))
-                  (get-commits)))
+        (leave-on-EPIPE
+         (for-each (lambda (commit)
+                     (when (or (not regexp)
+                               (string-match regexp (commit-message commit)))
+                       (show-commit commit 'oneline #t)))
+                   (get-commits))))
        (format-type
-          (for-each (lambda (commit-list)
-                      (show-commit commit-list format-type #f))
-                  (get-commits)))
+        (leave-on-EPIPE
+         (for-each (lambda (commit)
+                     (when (or (not regexp)
+                               (string-match regexp (commit-message commit)))
+                       (show-commit commit format-type #f)))
+                   (get-commits))))
        (pretty-string
         (let ((pretty-show (cut pretty-show-commit pretty-string <>)))
-          (for-each pretty-show (get-commits))))))))
+          (leave-on-EPIPE
+           (for-each (lambda (commit)
+                       (when (or (not regexp)
+                                 (string-match regexp (commit-message commit)))
+                         (pretty-show commit)))
+                     (get-commits)))))))))
