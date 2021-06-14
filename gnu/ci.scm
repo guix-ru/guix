@@ -80,6 +80,35 @@
 ;;;
 ;;; Code:
 
+;; Backport from (guix channels) module.
+(define* (sexp->channel sexp #:optional (name 'channel))
+  "Read SEXP, a provenance sexp as created by 'channel-instance->sexp'; use
+NAME as the channel name if SEXP does not specify it.  Return #f if the sexp
+does not have the expected structure."
+  (match sexp
+    (('repository ('version 0)
+                  ('url url)
+                  ('branch branch)
+                  ('commit commit)
+                  rest ...)
+     ;; Historically channel sexps did not include the channel name.  It's OK
+     ;; for channels created by 'channel-instances->manifest' because the
+     ;; entry name is the channel name, but it was missing for entries created
+     ;; by 'manifest-entry-with-provenance'.
+     (channel (name (match (assq 'name rest)
+                      (#f name)
+                      (('name name) name)))
+              (url url)
+              (branch branch)
+              (commit commit)
+              (introduction
+               (match (assq 'introduction rest)
+                 (#f #f)
+                 (('introduction intro)
+                  (sexp->channel-introduction intro))))))
+
+    (_ #f)))
+
 (define* (derivation->job name drv
                           #:key
                           (max-silent-time 3600)
