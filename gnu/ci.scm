@@ -109,6 +109,27 @@ does not have the expected structure."
 
     (_ #f)))
 
+;; Backport from (guix describe) module.
+(define (package-channels package)
+  "Return the list of channels providing PACKAGE or an empty list if it could
+not be determined."
+  (match (and=> (package-location package) location-file)
+    (#f '())
+    (file
+     (let ((file (if (string-prefix? "/" file)
+                     file
+                     (search-path %load-path file))))
+       (if (and file
+                (string-prefix? (%store-prefix) file))
+           (filter-map
+            (lambda (entry)
+              (let ((item (manifest-entry-item entry)))
+                (and (or (string-prefix? item file)
+                         (string=? "guix" (manifest-entry-name entry)))
+                     (manifest-entry-channel entry))))
+            (current-profile-entries))
+           '())))))
+
 (define* (derivation->job name drv
                           #:key
                           (max-silent-time 3600)
