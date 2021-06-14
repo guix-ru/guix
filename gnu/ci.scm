@@ -3,6 +3,7 @@
 ;;; Copyright © 2017, 2020 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2018, 2019 Clément Lassieur <clement@lassieur.org>
 ;;; Copyright © 2020 Julien Lepiller <julien@lepiller.eu>
+;;; Copyright © 2020, 2021 Mathieu Othacehe <othacehe@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -20,7 +21,9 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu ci)
+  #:use-module (guix channels)
   #:use-module (guix config)
+  #:use-module (guix describe)
   #:use-module (guix store)
   #:use-module (guix grafts)
   #:use-module (guix profiles)
@@ -61,67 +64,73 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
-  #:export (%cross-targets
+  #:export (derivation->job
+            image->job
+
+            %core-packages
+            %cross-targets
             channel-source->package
-            hydra-jobs))
+
+            arguments->systems
+            cuirass-jobs))
 
 ;;; Commentary:
 ;;;
-;;; This file defines build jobs for the Hydra and Cuirass continuation
-;;; integration tools.
+;;; This file defines build jobs for Cuirass.
 ;;;
 ;;; Code:
 
-(define* (package->alist store package system
-                         #:optional (package-derivation package-derivation))
-  "Convert PACKAGE to an alist suitable for Hydra."
-  (parameterize ((%graft? #f))
-    (let ((drv (package-derivation store package system
-                                   #:graft? #f)))
-      `((derivation . ,(derivation-file-name drv))
-        (log . ,(log-file store (derivation-file-name drv)))
-        (outputs . ,(filter-map (lambda (res)
-                                  (match res
-                                    ((name . path)
-                                     `(,name . ,path))))
-                                (derivation->output-paths drv)))
-        (nix-name . ,(derivation-name drv))
-        (system . ,(derivation-system drv))
-        (description . ,(package-synopsis package))
-        (long-description . ,(package-description package))
+(define* (derivation->job name drv
+                          #:key
+                          (max-silent-time 3600)
+                          (timeout 3600))
+  "Return a Cuirass job called NAME and describing DRV.
 
-        ;; XXX: Hydra ignores licenses that are not a <license> structure or a
-        ;; list thereof.
-        (license . ,(let loop ((license (package-license package)))
-                      (match license
-                        ((? license?)
-                         (license-name license))
-                        ((lst ...)
-                         (map loop license)))))
+MAX-SILENT-TIME and TIMEOUT are build options passed to the daemon when
+building the derivation."
+  `((#:job-name . ,name)
+    (#:derivation . ,(derivation-file-name drv))
+    (#:inputs . ,(map (compose derivation-file-name
+                               derivation-input-derivation)
+                      (derivation-inputs drv)))
+    (#:outputs . ,(filter-map
+                   (lambda (res)
+                     (match res
+                       ((name . path)
+                        `(,name . ,path))))
+                   (derivation->output-paths drv)))
+    (#:nix-name . ,(derivation-name drv))
+    (#:system . ,(derivation-system drv))
+    (#:max-silent-time . ,max-silent-time)
+    (#:timeout . ,timeout)))
 
-        (home-page . ,(package-home-page package))
-        (maintainers . ("bug-guix@gnu.org"))
-        (max-silent-time . ,(or (assoc-ref (package-properties package)
-                                           'max-silent-time)
-                                3600))              ;1 hour by default
-        (timeout . ,(or (assoc-ref (package-properties package) 'timeout)
-                        72000))))))                  ;20 hours by default
-
-(define (package-job store job-name package system)
+(define* (package-job store job-name package system
+                      #:key cross? target)
   "Return a job called JOB-NAME that builds PACKAGE on SYSTEM."
-  (let ((job-name (symbol-append job-name (string->symbol ".")
-                                 (string->symbol system))))
-    `(,job-name . ,(cut package->alist store package system))))
+  (let ((job-name (string-append job-name "." system)))
+    (parameterize ((%graft? #f))
+      (let* ((drv (if cross?
+                      (package-cross-derivation store package target system
+                                                #:graft? #f)
+                      (package-derivation store package system
+                                          #:graft? #f)))
+             (max-silent-time (or (assoc-ref (package-properties package)
+                                             'max-silent-time)
+                                  3600))
+             (timeout (or (assoc-ref (package-properties package)
+                                     'timeout)
+                          72000)))
+        (derivation->job job-name drv
+                         #:max-silent-time max-silent-time
+                         #:timeout timeout)))))
 
 (define (package-cross-job store job-name package target system)
   "Return a job called TARGET.JOB-NAME that cross-builds PACKAGE for TARGET on
 SYSTEM."
-  `(,(symbol-append (string->symbol target) (string->symbol ".") job-name
-                    (string->symbol ".") (string->symbol system)) .
-    ,(cute package->alist store package system
-           (lambda* (store package system #:key graft?)
-             (package-cross-derivation store package target system
-                                       #:graft? graft?)))))
+  (let ((name (string-append target "." job-name "." system)))
+    (package-job store name package system
+                 #:cross? #t
+                 #:target target)))
 
 (define %core-packages
   ;; Note: Don't put the '-final' package variants because (1) that's
@@ -149,6 +158,7 @@ SYSTEM."
     "arm-linux-gnueabihf"
     "aarch64-linux-gnu"
     "powerpc-linux-gnu"
+    "powerpc64le-linux-gnu"
     "riscv64-linux-gnu"
     "i586-pc-gnu"                                 ;aka. GNU/Hurd
     "i686-w64-mingw32"
@@ -197,6 +207,22 @@ SYSTEM."
               (remove (either from-32-to-64? same? pointless?)
                       %cross-targets)))
 
+(define* (guix-jobs store systems #:key source commit)
+  "Return a list of jobs for Guix itself."
+  (define build
+    (primitive-load (string-append source "/build-aux/build-self.scm")))
+
+  (map
+   (lambda (system)
+     (let ((name (string->symbol
+                  (string-append "guix." system)))
+           (drv (run-with-store store
+                  (build source #:version commit #:system system
+                         #:pull-version 1
+                         #:guile-version "2.2"))))
+       (derivation->job name drv)))
+   systems))
+
 ;; Architectures that are able to build or cross-build Guix System images.
 ;; This does not mean that other architectures are not supported, only that
 ;; they are often not fast enough to support Guix System images building.
@@ -207,63 +233,51 @@ SYSTEM."
   (list hurd-barebones-qcow2-image
         pine64-barebones-raw-image))
 
+(define (hours hours)
+  (* 3600 hours))
+
+(define* (image->job store image
+                     #:key name system)
+  "Return the job for IMAGE on SYSTEM.  If NAME is passed, use it as job name,
+otherwise use the IMAGE name."
+  (let* ((image-name (or name
+                         (symbol->string (image-name image))))
+         (name (string-append image-name "." system))
+         (drv (run-with-store store
+                (mbegin %store-monad
+                  (set-guile-for-build (default-guile))
+                  (lower-object (system-image image))))))
+    (parameterize ((%graft? #f))
+      (derivation->job name drv))))
+
 (define (image-jobs store system)
   "Return a list of jobs that build images for SYSTEM."
-  (define (->alist drv)
-    `((derivation . ,(derivation-file-name drv))
-      (log . ,(log-file store (derivation-file-name drv)))
-      (outputs . ,(filter-map (lambda (res)
-                                (match res
-                                  ((name . path)
-                                   `(,name . ,path))))
-                              (derivation->output-paths drv)))
-      (nix-name . ,(derivation-name drv))
-      (system . ,(derivation-system drv))
-      (description . "Stand-alone image of the GNU system")
-      (long-description . "This is a demo stand-alone image of the GNU
-system.")
-      (license . ,(license-name gpl3+))
-      (max-silent-time . 600)
-      (timeout . 3600)
-      (home-page . ,%guix-home-page-url)
-      (maintainers . ("bug-guix@gnu.org"))))
-
-  (define (->job name drv)
-    (let ((name (symbol-append name (string->symbol ".")
-                               (string->symbol system))))
-      `(,name . ,(lambda ()
-                   (parameterize ((%graft? #f))
-                     (->alist drv))))))
-
-  (define (build-image image)
-    (run-with-store store
-      (mbegin %store-monad
-        (set-guile-for-build (default-guile))
-        (lower-object (system-image image)))))
-
   (define MiB
     (expt 2 20))
 
   (if (member system %guix-system-supported-systems)
-      `(,(->job 'usb-image
-                (build-image
-                 (image
-                  (inherit efi-disk-image)
-                  (operating-system installation-os))))
-        ,(->job 'iso9660-image
-                (build-image
-                 (image
-                  (inherit (image-with-label
-                             iso9660-image
-                             (string-append "GUIX_" system "_"
-                                            (if (> (string-length %guix-version) 7)
-                                                (substring %guix-version 0 7)
-                                                %guix-version))))
-                  (operating-system installation-os))))
+      `(,(image->job store
+                     (image
+                      (inherit efi-disk-image)
+                      (operating-system installation-os))
+                     #:name "usb-image"
+                     #:system system)
+        ,(image->job
+          store
+          (image
+           (inherit (image-with-label
+                     iso9660-image
+                     (string-append "GUIX_" system "_"
+                                    (if (> (string-length %guix-version) 7)
+                                        (substring %guix-version 0 7)
+                                        %guix-version))))
+           (operating-system installation-os))
+          #:name "iso9660-image"
+          #:system system)
         ;; Only cross-compile Guix System images from x86_64-linux for now.
         ,@(if (string=? system "x86_64-linux")
-              (map (lambda (image)
-                     (->job (image-name image) (build-image image)))
+              (map (cut image->job store <>
+                        #:system system)
                    %guix-system-images)
               '()))
       '()))
@@ -311,39 +325,17 @@ system.")
 (define* (system-test-jobs store system
                            #:key source commit)
   "Return a list of jobs for the system tests."
-  (define (test->thunk test)
-    (lambda ()
-      (define drv
-        (run-with-store store
-          (mbegin %store-monad
-            (set-current-system system)
-            (set-grafting #f)
-            (set-guile-for-build (default-guile))
-            (system-test-value test))))
-
-      `((derivation . ,(derivation-file-name drv))
-        (log . ,(log-file store (derivation-file-name drv)))
-        (outputs . ,(filter-map (lambda (res)
-                                  (match res
-                                    ((name . path)
-                                     `(,name . ,path))))
-                                (derivation->output-paths drv)))
-        (nix-name . ,(derivation-name drv))
-        (system . ,(derivation-system drv))
-        (description . ,(format #f "Guix '~a' system test"
-                                (system-test-name test)))
-        (long-description . ,(system-test-description test))
-        (license . ,(license-name gpl3+))
-        (max-silent-time . 600)
-        (timeout . 3600)
-        (home-page . ,%guix-home-page-url)
-        (maintainers . ("bug-guix@gnu.org")))))
-
   (define (->job test)
-    (let ((name (string->symbol
-                 (string-append "test." (system-test-name test)
-                                "." system))))
-      (cons name (test->thunk test))))
+    (let ((name (string-append "test." (system-test-name test)
+                               "." system))
+          (drv (run-with-store store
+                 (mbegin %store-monad
+                   (set-current-system system)
+                   (set-grafting #f)
+                   (set-guile-for-build (default-guile))
+                   (system-test-value test)))))
+
+      (derivation->job name drv)))
 
   (if (member system %guix-system-supported-systems)
       ;; Override the value of 'current-guix' used by system tests.  Using a
@@ -356,63 +348,45 @@ system.")
       '()))
 
 (define (tarball-jobs store system)
-  "Return Hydra jobs to build the self-contained Guix binary tarball."
-  (define (->alist drv)
-    `((derivation . ,(derivation-file-name drv))
-      (log . ,(log-file store (derivation-file-name drv)))
-      (outputs . ,(filter-map (lambda (res)
-                                (match res
-                                  ((name . path)
-                                   `(,name . ,path))))
-                              (derivation->output-paths drv)))
-      (nix-name . ,(derivation-name drv))
-      (system . ,(derivation-system drv))
-      (description . "Stand-alone binary Guix tarball")
-      (long-description . "This is a tarball containing binaries of Guix and
-all its dependencies, and ready to be installed on \"foreign\" distributions.")
-      (license . ,(license-name gpl3+))
-      (home-page . ,%guix-home-page-url)
-      (maintainers . ("bug-guix@gnu.org"))))
-
+  "Return jobs to build the self-contained Guix binary tarball."
   (define (->job name drv)
-    (let ((name (symbol-append name (string->symbol ".")
-                               (string->symbol system))))
-      `(,name . ,(lambda ()
-                   (parameterize ((%graft? #f))
-                     (->alist drv))))))
+    (let ((name (string-append name "." system)))
+      (parameterize ((%graft? #f))
+        (derivation->job name drv))))
 
   ;; XXX: Add a job for the stable Guix?
-  (list (->job 'binary-tarball
-               (run-with-store store
-                 (mbegin %store-monad
-                   (set-guile-for-build (default-guile))
-                   (>>= (profile-derivation (packages->manifest (list guix)))
-                        (lambda (profile)
-                          (self-contained-tarball "guix-binary" profile
-                                                  #:localstatedir? #t
-                                                  #:compressor
-                                                  (lookup-compressor "xz")))))
-                 #:system system))))
+  (list
+   (->job "binary-tarball"
+          (run-with-store store
+            (mbegin %store-monad
+              (set-guile-for-build (default-guile))
+              (>>= (profile-derivation (packages->manifest (list guix)))
+                   (lambda (profile)
+                     (self-contained-tarball "guix-binary" profile
+                                             #:profile-name "current-guix"
+                                             #:localstatedir? #t
+                                             #:compressor
+                                             (lookup-compressor "xz")))))
+            #:system system))))
 
 (define job-name
   ;; Return the name of a package's job.
-  (compose string->symbol
-           (cut package-full-name <> "-")))
+  package-name)
 
 (define package->job
   (let ((base-packages
          (delete-duplicates
           (append-map (match-lambda
-                       ((_ package _ ...)
-                        (match (package-transitive-inputs package)
-                          (((_ inputs _ ...) ...)
-                           inputs))))
+                        ((_ package _ ...)
+                         (match (package-transitive-inputs package)
+                           (((_ inputs _ ...) ...)
+                            inputs))))
                       (%final-inputs)))))
     (lambda (store package system)
       "Return a job for PACKAGE on SYSTEM, or #f if this combination is not
 valid."
       (cond ((member package base-packages)
-             (package-job store (symbol-append 'base. (job-name package))
+             (package-job store (string-append "base." (job-name package))
                           package system))
             ((supported-package? package system)
              (let ((drv (package-derivation store package system
@@ -446,14 +420,15 @@ valid."
                           packages)))
                  #:select? (const #t)))           ;include hidden packages
 
-(define (arguments->manifests arguments)
+(define (arguments->manifests arguments channels)
   "Return the list of manifests extracted from ARGUMENTS."
-  (map (match-lambda
-         ((input-name . relative-path)
-          (let* ((checkout (assq-ref arguments (string->symbol input-name)))
-                 (base (assq-ref checkout 'file-name)))
-            (in-vicinity base relative-path))))
-       (assq-ref arguments 'manifests)))
+  (map (lambda (manifest)
+         (any (lambda (checkout)
+                (let ((path (in-vicinity checkout manifest)))
+                  (and (file-exists? path)
+                       path)))
+              (map channel-url channels)))
+       arguments))
 
 (define (manifests->packages store manifests)
   "Return the list of packages found in MANIFESTS."
@@ -469,100 +444,123 @@ valid."
                              load-manifest)
                     manifests))))
 
-(define (find-current-checkout arguments)
-  "Find the first checkout of ARGUMENTS that provided the current file.
-Return #f if no such checkout is found."
-  (let ((current-root
-         (canonicalize-path
-          (string-append (dirname (current-filename)) "/.."))))
-    (find (lambda (argument)
-            (and=> (assq-ref argument 'file-name)
-                   (lambda (name)
-                     (string=? name current-root)))) arguments)))
+(define (arguments->systems arguments)
+  "Return the systems list from ARGUMENTS."
+  (match (assoc-ref arguments 'systems)
+    (#f              %cuirass-supported-systems)
+    ((lst ...)       lst)
+    ((? string? str) (call-with-input-string str read))))
 
 
 ;;;
-;;; Hydra entry point.
+;;; Cuirass entry point.
 ;;;
 
-(define (hydra-jobs store arguments)
-  "Return Hydra jobs."
+(define (cuirass-jobs store arguments)
+  "Register Cuirass jobs."
   (define subset
-    (match (assoc-ref arguments 'subset)
-      ("core" 'core)                              ; only build core packages
-      ("hello" 'hello)                            ; only build hello
-      (((? string?) (? string?) ...) 'list)       ; only build selected list of packages
-      ("manifests" 'manifests)                    ; only build packages in the list of manifests
-      (_ 'all)))                                  ; build everything
+    (assoc-ref arguments 'subset))
 
   (define systems
-    (match (assoc-ref arguments 'systems)
-      (#f              %hydra-supported-systems)
-      ((lst ...)       lst)
-      ((? string? str) (call-with-input-string str read))))
+    (arguments->systems arguments))
 
-  (define checkout
-    (or (find-current-checkout arguments)
-        (assq-ref arguments 'superior-guix-checkout)))
+  (define channels
+    (let ((channels (assq-ref arguments 'channels)))
+      (map sexp->channel channels)))
+
+  (define guix
+    (find guix-channel? channels))
 
   (define commit
-    (assq-ref checkout 'revision))
+    (channel-commit guix))
 
   (define source
-    (assq-ref checkout 'file-name))
+    (channel-url guix))
 
   ;; Turn off grafts.  Grafting is meant to happen on the user's machines.
   (parameterize ((%graft? #f))
     ;; Return one job for each package, except bootstrap packages.
-    (append-map (lambda (system)
-                  (format (current-error-port)
-                          "evaluating for '~a' (heap size: ~a MiB)...~%"
-                          system
-                          (round
-                           (/ (assoc-ref (gc-stats) 'heap-size)
-                              (expt 2. 20))))
-                  (invalidate-derivation-caches!)
-                  (case subset
-                    ((all)
-                     ;; Build everything, including replacements.
-                     (let ((all (all-packages))
-                           (job (lambda (package)
-                                  (package->job store package
-                                                system))))
-                       (append (filter-map job all)
-                               (image-jobs store system)
-                               (system-test-jobs store system
-                                                 #:source source
-                                                 #:commit commit)
-                               (tarball-jobs store system)
-                               (cross-jobs store system))))
-                    ((core)
-                     ;; Build core packages only.
-                     (append (map (lambda (package)
-                                    (package-job store (job-name package)
-                                                 package system))
-                                  %core-packages)
-                             (cross-jobs store system)))
-                    ((hello)
-                     ;; Build hello package only.
-                     (let ((hello (specification->package "hello")))
-                       (list (package-job store (job-name hello) hello system))))
-                    ((list)
-                     ;; Build selected list of packages only.
-                     (let* ((names (assoc-ref arguments 'subset))
-                            (packages (map specification->package names)))
-                       (map (lambda (package)
-                              (package-job store (job-name package)
-                                           package system))
-                            packages)))
-                    ((manifests)
-                     ;; Build packages in the list of manifests.
-                     (let* ((manifests (arguments->manifests arguments))
-                            (packages (manifests->packages store manifests)))
-                       (map (lambda (package)
-                              (package-job store (job-name package)
-                                           package system))
-                            packages)))
-                    (else
-                     (error "unknown subset" subset))))
-                systems)))
+    (append-map
+     (lambda (system)
+       (format (current-error-port)
+               "evaluating for '~a' (heap size: ~a MiB)...~%"
+               system
+               (round
+                (/ (assoc-ref (gc-stats) 'heap-size)
+                   (expt 2. 20))))
+       (invalidate-derivation-caches!)
+       (match subset
+         ('all
+          ;; Build everything, including replacements.
+          (let ((all (all-packages))
+                (job (lambda (package)
+                       (package->job store package system))))
+            (append
+             (filter-map job all)
+             (cross-jobs store system))))
+         ('core
+          ;; Build core packages only.
+          (append
+           (map (lambda (package)
+                  (package-job store (job-name package)
+                               package system))
+                %core-packages)
+           (cross-jobs store system)))
+         ('guix
+          ;; Build Guix modules only.
+          (guix-jobs store systems
+                     #:source source
+                     #:commit commit))
+         ('hello
+          ;; Build hello package only.
+          (let ((hello (specification->package "hello")))
+            (list (package-job store (job-name hello)
+                               hello system))))
+         ('images
+          ;; Build Guix System images only.
+          (image-jobs store system))
+         ('system-tests
+          ;; Build Guix System tests only.
+          (system-test-jobs store system
+                            #:source source
+                            #:commit commit))
+         ('tarball
+          ;; Build Guix tarball only.
+          (tarball-jobs store system))
+         (('custom . modules)
+          ;; Build custom modules jobs only.
+          (append-map
+           (lambda (module)
+             (let ((proc (module-ref
+                          (resolve-interface module)
+                          'cuirass-jobs)))
+               (proc store arguments)))
+           modules))
+         (('channels . channels)
+          ;; Build only the packages from CHANNELS.
+          (let ((all (all-packages)))
+            (filter-map
+             (lambda (package)
+               (any (lambda (channel)
+                      (and (member (channel-name channel) channels)
+                           (package->job store package system)))
+                    (package-channels package)))
+             all)))
+         (('packages . rest)
+          ;; Build selected list of packages only.
+          (let ((packages (map specification->package rest)))
+            (map (lambda (package)
+                   (package-job store (job-name package)
+                                package system))
+                 packages)))
+         (('manifests . rest)
+          ;; Build packages in the list of manifests.
+          (let* ((manifests (arguments->manifests rest channels))
+                 (packages (manifests->packages store manifests)))
+            (map (lambda (package)
+                   (package-job store (job-name package)
+                                package system))
+                 packages)))
+         (else
+          (error "unknown subset" subset))))
+     systems)))
