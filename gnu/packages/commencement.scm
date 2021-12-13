@@ -486,7 +486,7 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
             (files '("")))))))
 
 (define tcc-boot0
-  ;; Pristine tcc cannot be built by MesCC, we are keeping a delta of 11
+  ;; Pristine tcc cannot be built by MesCC, we are keeping a delta of 30
   ;; patches.  In a very early and rough form they were presented to the
   ;; TinyCC developers, who at the time showed no interest in supporting the
   ;; bootstrappable effort; we will try again later.  These patches have been
@@ -495,17 +495,20 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
   (package
     (inherit tcc)
     (name "tcc-boot0")
-    (version "0.9.26-1103-g6e62e0e")
+    (version "0.9.26-1136-g1b4f281f")
     (source (origin
               (method url-fetch)
-              (uri (string-append
-                    "http://lilypond.org/janneke/mes/20191117/"
-                    "/tcc-" version ".tar.gz"))
+              (uri (list
+                    (string-append "mirror://gnu/guix/mirror/"
+                                   "tcc-" version ".tar.gz")
+                    (string-append "https://lilypond.org/janneke/tcc/"
+                                   "tcc-" version ".tar.gz")))
               (sha256
                (base32
-                "1qbybw7mxbgkv3sazvz1v7c8byq998vk8f1h25ik8w3d2l63lxng"))))
+                "0n8nb2yv1r9cxc00ryam16p0v5ix4jgwc73bdwjif9pdnr0yqmrh"))))
     (build-system gnu-build-system)
-    (supported-systems '("i686-linux" "x86_64-linux"))
+    (supported-systems '("armhf-linux" "aarch64-linux"
+                         "i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
     (native-inputs
@@ -528,18 +531,17 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                (with-directory-excursion ".."
                  (invoke "tar" "-xvf" nyacc-source)))))
          (replace 'configure
-           (lambda* (#:key outputs #:allow-other-keys)
+           (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((out (assoc-ref %outputs "out"))
                     (dir (with-directory-excursion ".." (getcwd)))
-                    (interpreter "/lib/mes-loader"))
-
-               (setenv "prefix" out)
-               (setenv "GUILE_LOAD_PATH"
-                       (string-append dir "/nyacc-0.99.0/module"))
-
+                    (interpreter "/lib/mes-loader")
+                    (mes (assoc-ref inputs "mes"))
+                    (mescc (string-append mes "/bin/mescc")))
                (substitute* "conftest.c"
                  (("volatile") ""))
-
+               (setenv "prefix" out)
+               (setenv "GUILE_LOAD_PATH"
+                       (string-append dir "/nyacc-1.00.2/module"))
                (invoke "sh" "configure"
                        "--cc=mescc"
                        (string-append "--prefix=" out)
@@ -549,7 +551,7 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
          (replace 'build
            (lambda _
              (substitute* "bootstrap.sh" ; Show some progress
-               (("^( *)((cp|ls|mkdir|rm|[.]/tcc|[.]/[$][{PROGRAM_PREFIX[}]tcc) [^\"]*[^\\])\n" all space cmd)
+               (("^( *)((cp|ls|mkdir|rm|[.]/tcc|[.]/[$][{program_prefix[}]tcc) [^\"]*[^\\])\n" all space cmd)
                 (string-append space "echo \"" cmd "\"\n"
                                space cmd "\n")))
              (invoke "sh" "bootstrap.sh")))
@@ -769,8 +771,8 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                                   (string-append out "/include"))
                 (copy-recursively (string-append tcc "/lib")
                                   (string-append out "/lib"))
-                (invoke "tcc" "-D" "TCC_TARGET_I386=1" "-c" "-o" "libtcc1.o" "lib/libtcc1.c")
-                (invoke "tcc" "-ar" "rc" "libtcc1.a" "libtcc1.o")
+                (invoke "./tcc" "-D" "TCC_TARGET_I386=1" "-c" "-o" "libtcc1.o" "lib/libtcc1.c")
+                (invoke "./tcc" "-ar" "rc" "libtcc1.a" "libtcc1.o")
                 (copy-file "libtcc1.a" (string-append out "/lib/libtcc1.a"))
                 (delete-file (string-append out "/lib/tcc/libtcc1.a"))
                 (copy-file "libtcc1.a"
