@@ -639,7 +639,9 @@ for `sh' in $PATH, and without nscd, and with static NSS modules."
     (name "mes-minimal")
     (native-inputs (list guile-3.0))
     (arguments
-     `(#:system "i686-linux"
+     `(#:system ,(match (%current-system)
+                   ((or "i686-linux" "x86_64-linux") "i686-linux")
+                   ((or "armhf-linux" "aarch64-linux") "armhf-linux"))
        #:strip-binaries? #f
        #:configure-flags '("--mes")
        #:phases
