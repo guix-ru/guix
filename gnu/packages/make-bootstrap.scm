@@ -598,10 +598,13 @@ for `sh' in $PATH, and without nscd, and with static NSS modules."
     (inherit mescc-tools)
     (name "mescc-tools-static")
     (arguments
-     `(#:system "i686-linux"
+     `(#:system ,(match (%current-system)
+                   ((or "i686-linux" "x86_64-linux") "i686-linux")
+                   ((or "armhf-linux" "aarch64-linux") "armhf-linux"))
        ,@(substitute-keyword-arguments (package-arguments mescc-tools)
            ((#:make-flags flags)
-            `(cons "CC=gcc -static" ,flags)))))))
+            '(list (string-append "PREFIX=" (assoc-ref %outputs "out"))
+                   "CC=gcc -static")))))))
 
 ;; ... next remove store references.
 (define %mescc-tools-static-stripped
