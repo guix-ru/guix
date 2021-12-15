@@ -283,7 +283,6 @@ pure Scheme to Tar and decompression in one easy step.")
   (package
     (inherit mes)
     (name "bootstrap-mes-rewired")
-    (version "0.19")
     (source #f)
     (native-inputs `(("mes" ,%bootstrap-mes)
                      ("gash" ,gash-boot)))
@@ -291,6 +290,8 @@ pure Scheme to Tar and decompression in one easy step.")
     (propagated-inputs '())
     (outputs '("out"))
     (build-system trivial-build-system)
+    (supported-systems '("armhf-linux" "aarch64-linux"
+                         "i686-linux" "x86_64-linux"))
     (arguments
      `(#:guile ,%bootstrap-guile
        #:modules ((guix build utils))
@@ -327,7 +328,9 @@ pure Scheme to Tar and decompression in one easy step.")
                                ;; Cannot easily rewire "mes" because it
                                ;; contains NUL characters; would require
                                ;; remove-store-references alike trick
-                               (filter (negate (cut string-suffix? "/mes" <>))
+                               (filter (negate (compose
+                                                (cute member <> '("mes" "mes-gcc"))
+                                                basename))
                                        (find-files bin)))
                      (rewire (string-append module "/mes/boot-0.scm"))
 
@@ -347,18 +350,22 @@ export MES MES_PREFIX
 
 MES_ARENA=${MES_REWIRED_ARENA-10000000}
 MES_MAX_ARENA=${MES_REWIRED_ARENA-10000000}
-MES_STACK=${MES_REWIRED_STACK-1000000}
+MES_STACK=${MES_REWIRED_STACK-2000000}
 export MES_ARENA MES_MAX_ARENA MES_STACK
 
 $MES -e '(mescc)' module/mescc.scm -- \"$@\"
 "))))
                      (chmod mescc #o555)
 
-                     (with-directory-excursion module
-                       (chmod "mes/base.mes" #o644)
-                       (copy-file "mes/base.mes" "mes/base.mes.orig")
-                       (let ((base.mes (open-file "mes/base.mes" "a")))
-                         (display "
+                     (when (member ,(%current-system)
+                                   '("i686-linux" "x86_64-linux"))
+                       ;; The x86 bootstrap uses a %bootstrap-mes v0.19
+                       ;; which needs some additional fixups.
+                       (with-directory-excursion module
+                         (chmod "mes/base.mes" #o644)
+                         (copy-file "mes/base.mes" "mes/base.mes.orig")
+                         (let ((base.mes (open-file "mes/base.mes" "a")))
+                           (display "
 ;; A fixed map, from Mes 0.21, required to bootstrap Mes 0.21
 (define (map f h . t)
   (if (or (null? h)
@@ -371,20 +378,21 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                   (cons (f (car h) (caar t) (caadr t)) (map f (cdr h) (cdar t) (cdadr t)))
                   (error 'unsupported (cons* 'map-4: f h t))b )))))
 " base.mes)
-                         (close base.mes))
+                           (close base.mes))
 
-                       (chmod "mes/guile.mes" #o644)
-                       (copy-file "mes/guile.mes" "mes/guile.mes.orig")
-                       (let ((guile.mes (open-file "mes/guile.mes" "a")))
-                         (display "
+                         (chmod "mes/guile.mes" #o644)
+                         (copy-file "mes/guile.mes" "mes/guile.mes.orig")
+                         (let ((guile.mes (open-file "mes/guile.mes" "a")))
+                           (display "
 ;; After booting guile.scm; use Mes 0.21; especially: MesCC 0.21
 (let* ((self (car (command-line)))
        (prefix (dirname (dirname self))))
   (set! %moduledir (string-append prefix \"/mes/module/\"))
+  ;; For MesCC-Tools v0.5.2
   (setenv \"%numbered_arch\" \"true\"))
 
 " guile.mes)
-                         (close guile.mes)))
+                           (close guile.mes))))
                      #t))))))
 
 (define mes-boot
