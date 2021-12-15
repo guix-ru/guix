@@ -968,17 +968,25 @@ exec ~a/bin/.gcc-wrapped -B~a/lib \
           (origin
             (method url-fetch)
             (uri (map
-                  (cute string-append <>
-                        "/i686-linux/20190815/"
-                        "mescc-tools-static-stripped-0.5.2-i686-linux.tar.xz")
+                  (cut string-append <> (%current-system) "/"
+                       (match (%current-system)
+                         ((or "armhf-linux" "aarch64-linux")
+                          "20201219/mescc-tools-static-stripped-0.7.0-armhf-linux.tar.xz")
+                         ((or "i686-linux" "x86_64-linux")
+                          "20190815/mescc-tools-static-stripped-0.5.2-i686-linux.tar.xz")))
                   %bootstrap-base-urls))
             (sha256
              (base32
-              "0c3kklgghzh4q2dbpl6asb74cimp7hp6jscdwqwmzxbapgcl6582")))))))
+              (match (%current-system)
+                ((or "armhf-linux" "aarch64-linux")
+                 "0yzg93r0x18f7v264pxh7gjcav68aiw1irz1mqmfh5hphbhfk5nv")
+                ((or "i686-linux" "x86_64-linux")
+                 "0c3kklgghzh4q2dbpl6asb74cimp7hp6jscdwqwmzxbapgcl6582")))))))))
     (synopsis "Bootstrap binaries of MesCC Tools")
     (description synopsis)
     (home-page #f)
-    (supported-systems '("i686-linux" "x86_64-linux"))
+    (supported-systems '("armhf-linux" "aarch64-linux"
+                         "i686-linux" "x86_64-linux"))
     (license gpl3+)))
 
 (define %bootstrap-mes
