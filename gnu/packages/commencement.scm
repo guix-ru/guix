@@ -399,22 +399,24 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
   (package
     (inherit mes)
     (name "mes-boot")
-    (version "0.22")
+    (version "0.23.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/mes/"
                                   "mes-" version ".tar.gz"))
               (sha256
                (base32
-                "0p1jsrrmcbc0zrvbvnjbb6iyxr0in71km293q8qj6gnar6bw09av"))))
+                "0hbnqgjiajs8wq03dkvr9aswrzk8kl98dm6245xhlgqis8d2yhqd"))))
     (inputs '())
     (propagated-inputs '())
     (native-inputs
-     `(("nyacc-source" ,(origin (inherit (package-source nyacc-0.99))
+     `(("nyacc-source" ,(origin (inherit (package-source nyacc-1.00.2))
                                 (snippet #f)))
        ("mes" ,%bootstrap-mes-rewired)
        ("mescc-tools" ,%bootstrap-mescc-tools)
        ,@(%boot-gash-inputs)))
+    (supported-systems '("armhf-linux" "aarch64-linux"
+                         "i686-linux" "x86_64-linux"))
     (arguments
      `(#:implicit-inputs? #f
        #:tests? #f
@@ -439,10 +441,14 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                (setenv "GUILE_LOAD_PATH"
                        (string-append
                         mes "/share/mes/module"
-                        ":" dir "/nyacc-0.99.0/module"))
+                        ":" dir "/nyacc-1.00.2/module"))
                (invoke "gash" "configure.sh"
                        (string-append "--prefix=" out)
-                       (string-append "--host=i686-linux-gnu")))))
+                       (string-append ,(match (%current-system)
+                                         ((or "armhf-linux" "aarch64-linux")
+                                          "--host=arm-linux")
+                                         ((or "i686-linux" "x86_64-linux")
+                                          "--host=i686-linux-gnu")))))))
          (replace 'build
            (lambda _
              (invoke "sh" "bootstrap.sh")))
@@ -478,7 +484,6 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
             (variable "MES_PREFIX")
             (separator #f)
             (files '("")))))))
-
 
 (define tcc-boot0
   ;; Pristine tcc cannot be built by MesCC, we are keeping a delta of 11
