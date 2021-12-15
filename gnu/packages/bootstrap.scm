@@ -1025,14 +1025,22 @@ exec ~a/bin/.gcc-wrapped -B~a/lib \
           (origin
             (method url-fetch)
             (uri (map
-                  (cute string-append <>
-                        "/i686-linux/20190815/"
-                        "mes-minimal-stripped-0.19-i686-linux.tar.xz")
+                  (cute string-append <> (%current-system) "/"
+                       (match (%current-system)
+                         ((or "armhf-linux" "aarch64-linux")
+                          "20201217/mes-minimal-stripped-0.22-115-gdacaed9fe-armhf-linux.tar.xz")
+                         ((or "i686-linux" "x86_64-linux")
+                          "20190815/mes-minimal-stripped-0.19-i686-linux.tar.xz")))
                   %bootstrap-base-urls))
             (sha256
              (base32
-              "1q4xjpx6nbn44kxnilpgl12bhpmwy2bblzwszc2ci7xkf400jcpv")))))))
-    (supported-systems '("i686-linux" "x86_64-linux"))
+              (match (%current-system)
+                ((or "armhf-linux" "aarch64-linux")
+                 "0daz658r9psmqxjkayvr8ymql6h4gf11gwdd4k3mdv7czc5ak399")
+                ((or "i686-linux" "x86_64-linux")
+                 "1q4xjpx6nbn44kxnilpgl12bhpmwy2bblzwszc2ci7xkf400jcpv")))))))))
+    (supported-systems '("armhf-linux" "aarch64-linux"
+                         "i686-linux" "x86_64-linux"))
     (synopsis "Bootstrap binaries of Mes")
     (description synopsis)
     (home-page #f)
