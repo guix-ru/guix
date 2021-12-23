@@ -964,6 +964,11 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
   ;; library, such as dir.h/struct DIR/readdir, locales, signals...  Also,
   ;; with gcc-2.95.3, binutils (2.14.0, 2.20.1a) and glibc-2.2.5 we found a
   ;; GNU toolchain triplet "that works".
+  (let ((triplet (match (%current-system)
+                   ((or "armhf-linux" "aarch64-linux")
+                    "arm-unknown-linux-gnu")
+                   ((or "i686-linux" "x86_64-linux")
+                    "i686-unknown-linux-gnu"))))
   (package
     (inherit gcc)
     (name "gcc-core-mesboot0")
@@ -978,7 +983,8 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
               (sha256
                (base32
                 "1xvfy4pqhrd5v2cv8lzf63iqg92k09g6z9n2ah6ndd4h17k1x0an"))))
-    (supported-systems '("i686-linux" "x86_64-linux"))
+    (supported-systems '("armhf-linux" "aarch64-linux"
+                         "i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
     (native-inputs `(("binutils" ,binutils-mesboot0)
@@ -995,8 +1001,9 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                `("--enable-static"
                  "--disable-shared"
                  "--disable-werror"
-                 "--build=i686-unknown-linux-gnu"
-                 "--host=i686-unknown-linux-gnu"
+                 ,(string-append "--build=" ,triplet)
+                 ,(string-append "--host=" ,triplet)
+                  ;; (string-append "--target=" ,triplet)
                  ,(string-append "--prefix=" out)))
            #:make-flags
            #~`("CC=tcc -static -D __GLIBC_MINOR__=6"
@@ -1021,7 +1028,12 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                    (let ((patch-file
                           #$(local-file
                              (search-patch "gcc-boot-2.95.3.patch"))))
-                     (invoke "patch" "--force" "-p1" "-i" patch-file))))
+                     (invoke "patch" "--force" "-p1" "-i" patch-file))
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((patch-file
+                          #$(local-file
+                             (search-patch "gcc-boot-2.95.3-arm.patch"))))
+                     (invoke "patch" "--force" "-p1" "-i" patch-file)))))
                (add-before 'configure 'setenv
                  (lambda* (#:key outputs #:allow-other-keys)
                    (let* ((out (assoc-ref outputs "out"))
@@ -1053,33 +1065,33 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (add-after 'install 'install2
                  (lambda* (#:key outputs #:allow-other-keys)
                    (let* ((tcc (assoc-ref %build-inputs "tcc"))
-                          (tcc-lib (string-append tcc "/lib/x86-mes-gcc"))
                           (out (assoc-ref outputs "out"))
                           (gcc-dir (string-append
-                                    out "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3")))
+                                    out "/lib/gcc-lib/" ,triplet "/2.95.3")))
                      (mkdir-p "tmp")
                      (with-directory-excursion "tmp"
                        (invoke "ar" "x" (string-append "../gcc/libgcc2.a"))
-                       (invoke "ar" "x" (string-append tcc "/lib/libtcc1.a"))
-                       (apply invoke "ar" "r" (string-append gcc-dir "/libgcc.a")
-                              (find-files "." "\\.o")))
-                     (copy-file "gcc/libgcc2.a" (string-append out "/lib/libgcc2.a"))
-                     (copy-file (string-append tcc "/lib/libtcc1.a")
+                   (invoke "ar" "x" (string-append tcc "/lib/tcc/libtcc1.a"))
+                   (copy-file "../gcc/libgcc.a" "libgcc.a")
+                   (apply invoke "ar" "r" "libgcc.a" (find-files "." "\\.o"))
+                   (copy-file "libgcc.a" (string-append gcc-dir "/libgcc.a")))
+                 (copy-file "gcc/libgcc2.a"
+                            (string-append out "/lib/libgcc2.a"))
+                 (copy-file (string-append tcc "/lib/tcc/libtcc1.a")
                                 (string-append out "/lib/libtcc1.a"))
-                     (invoke "ar" "x" (string-append tcc "/lib/libtcc1.a"))
+                 (invoke "ar" "x" (string-append tcc "/lib/tcc/libtcc1.a"))
                      (invoke "ar" "x" (string-append tcc "/lib/libc.a"))
                      (invoke "ar" "r" (string-append gcc-dir "/libc.a")
                              "libc.o" "libtcc1.o")))))))
     (native-search-paths
      (list (search-path-specification
             (variable "C_INCLUDE_PATH")
-            (files '("include"
-
+            (files `("include"
                      ;; Needed to get things like GCC's <stddef.h>.
-                     "lib/gcc-lib/i686-unknown-linux-gnu/2.95.3/include")))
+                     ,(string-append "lib/gcc-lib/" triplet "/2.95.3/include"))))
            (search-path-specification
             (variable "LIBRARY_PATH")
-            (files '("lib")))))))
+            (files '("lib"))))))))
 
 (define (%boot-mesboot-core-inputs)
   `(("binutils" ,binutils-mesboot0)
