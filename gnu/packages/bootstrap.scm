@@ -971,7 +971,7 @@ exec ~a/bin/.gcc-wrapped -B~a/lib \
                   (cut string-append <> (%current-system) "/"
                        (match (%current-system)
                          ((or "armhf-linux" "aarch64-linux")
-                          "20201219/mescc-tools-static-stripped-0.7.0-armhf-linux.tar.xz")
+                          "20221016/mescc-tools-static-stripped-1.4.0-armhf-linux.tar.xz")
                          ((or "i686-linux" "x86_64-linux")
                           "20190815/mescc-tools-static-stripped-0.5.2-i686-linux.tar.xz")))
                   %bootstrap-base-urls))
@@ -979,7 +979,7 @@ exec ~a/bin/.gcc-wrapped -B~a/lib \
              (base32
               (match (%current-system)
                 ((or "armhf-linux" "aarch64-linux")
-                 "0yzg93r0x18f7v264pxh7gjcav68aiw1irz1mqmfh5hphbhfk5nv")
+                 "0ldpxi17c6bgxi8sp84k0f49q0s4xn2nbg89qav594slhq3px9lv")
                 ((or "i686-linux" "x86_64-linux")
                  "0c3kklgghzh4q2dbpl6asb74cimp7hp6jscdwqwmzxbapgcl6582")))))))))
     (synopsis "Bootstrap binaries of MesCC Tools")
