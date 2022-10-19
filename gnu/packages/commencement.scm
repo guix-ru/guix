@@ -1046,6 +1046,7 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                      (setenv "CC" (string-append "tcc" cppflags))
                      (setenv "CC_FOR_BUILD" (string-append "tcc" cppflags))
                      (setenv "CPP" (string-append "tcc -E" cppflags))
+                     (setenv "enable_threads" "single")
                      (with-output-to-file "config.cache"
                        (lambda _
                          (display "
