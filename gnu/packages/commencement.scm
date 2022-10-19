@@ -1029,11 +1029,10 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                           #$(local-file
                              (search-patch "gcc-boot-2.95.3.patch"))))
                      (invoke "patch" "--force" "-p1" "-i" patch-file))
-                 (lambda* (#:key inputs #:allow-other-keys)
                    (let ((patch-file
                           #$(local-file
                              (search-patch "gcc-boot-2.95.3-arm.patch"))))
-                     (invoke "patch" "--force" "-p1" "-i" patch-file)))))
+                     (invoke "patch" "--force" "-p1" "-i" patch-file))))
                (add-before 'configure 'setenv
                  (lambda* (#:key outputs #:allow-other-keys)
                    (let* ((out (assoc-ref outputs "out"))
