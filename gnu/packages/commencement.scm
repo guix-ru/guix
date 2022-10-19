@@ -1001,9 +1001,9 @@ $MES -e '(mescc)' module/mescc.scm -- \"$@\"
                `("--enable-static"
                  "--disable-shared"
                  "--disable-werror"
-                 ,(string-append "--build=" ,triplet)
-                 ,(string-append "--host=" ,triplet)
-                  ;; (string-append "--target=" ,triplet)
+                 ,(string-append "--build=" #$triplet)
+                 ,(string-append "--host=" #$triplet)
+                  ;; (string-append "--target=" #$triplet)
                  ,(string-append "--prefix=" out)))
            #:make-flags
            #~`("CC=tcc -static -D __GLIBC_MINOR__=6"
@@ -1067,7 +1067,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                    (let* ((tcc (assoc-ref %build-inputs "tcc"))
                           (out (assoc-ref outputs "out"))
                           (gcc-dir (string-append
-                                    out "/lib/gcc-lib/" ,triplet "/2.95.3")))
+                                    out "/lib/gcc-lib/" #$triplet "/2.95.3")))
                      (mkdir-p "tmp")
                      (with-directory-excursion "tmp"
                        (invoke "ar" "x" (string-append "../gcc/libgcc2.a"))
