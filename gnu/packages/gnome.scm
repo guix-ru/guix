@@ -3604,8 +3604,7 @@ for dealing with different structured file formats.")
               ;; https://gitlab.gnome.org/GNOME/librsvg/-/issues/955).
               (substitute* "gdk-pixbuf-loader/librsvg.thumbnailer.in"
                 (("@bindir@/gdk-pixbuf-thumbnailer")
-                 (string-append #$(this-package-input "gdk-pixbuf")
-                                "/bin/gdk-pixbuf-thumbnailer")))))
+                 (search-input-file inputs "bin/gdk-pixbuf-thumbnailer")))))
           (add-after 'unpack 'prepare-for-build
             (lambda _
               ;; Something about the build environment resists building
