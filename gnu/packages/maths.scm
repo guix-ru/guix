@@ -5424,8 +5424,13 @@ access to BLIS implementations via traditional BLAS routine calls.")
            (lambda _
              (invoke "python" "setup.py" "build_ext" "--inplace"
                      "-j" (number->string (parallel-job-count))))))))
-    (propagated-inputs (list python-numpy))
-    (native-inputs (list python-cython python-pytest))
+    (native-inputs
+     (list python-cython
+           python-pytest
+           python-setuptools
+           python-wheel))
+    (propagated-inputs
+     (list python-numpy))
     (home-page "https://github.com/explosion/cython-blis")
     (synopsis "Blis as a self-contained C-extension for Python")
     (description
