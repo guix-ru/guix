@@ -4970,7 +4970,7 @@ features:
 (define-public postfix-minimal
   (package
     (name "postfix-minimal")
-    (version "3.7.2")
+    (version "3.7.5")
     (source (origin
               (method url-fetch)
               (uri (string-append "http://cdn.postfix.johnriley.me/"
@@ -4978,7 +4978,7 @@ features:
                                   "postfix-" version ".tar.gz"))
               (sha256
                (base32
-                "05nldrd7kbfldfha4zppmb0ny5m94k8hq3xyq1rji81455ngg19p"))))
+                "1frxn51ygginycqkfkl7zgdl0dfm3kdl95r9qk9cn1acxllkbsic"))))
     (build-system gnu-build-system)
     (arguments
      (list
