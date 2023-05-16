@@ -4981,90 +4981,90 @@ features:
                 "05nldrd7kbfldfha4zppmb0ny5m94k8hq3xyq1rji81455ngg19p"))))
     (build-system gnu-build-system)
     (arguments
-     '(#:modules ((srfi srfi-26)
+     (list
+      #:modules '((srfi srfi-26)
                   (guix build utils)
                   (guix build gnu-build-system))
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'patch-/bin/sh
-           (lambda _
-             (substitute* (find-files "." "^Makefile.in")
-               (("/bin/sh") (which "sh")))))
-         ;; allow us to find the bdb headers
-         (add-before 'build 'patch-/usr/include
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* '("makedefs")
-               (("/usr/include") (string-append (assoc-ref inputs "bdb")
-                                                "/include")))))
-         (add-before 'build 'set-up-environment
-           (lambda* (#:key outputs #:allow-other-keys)
-             ;; os detection on Guix System does not provide this
-             (setenv "AUXLIBS" "-lnsl")
-             ;; have to set this here, so that we get the correct
-             ;; location in the compiled binaries
-             (setenv "shlib_directory" (assoc-ref outputs "out"))))
-         ;; do not allow writes to the configuration directory,
-         ;; so that we can keep that in the store
-         (add-before 'build 'disable-postconf-edit
-           (lambda _
-             (substitute* "src/postconf/postconf_edit.c"
-               (("pcf_set_config_dir\\(\\);") "return 0;"))))
-         (add-before 'build 'configure-compile
-           (lambda _
-             (invoke "make" "makefiles" "pie=yes" "dynamicmaps=yes")))
-         (add-before 'install 'fix-postfix-scripts-path
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let ((path (string-join
-                          (map (compose (cute string-append <> "/bin")
-                                        (cute assoc-ref inputs <>))
-                               '("bash" "coreutils" "findutils" "gawk" "grep"
-                                 "sed"))
-                          ":")))
-               (substitute* '("postfix-install"
-                              "conf/post-install"
-                              "conf/postfix-script")
-                 (("^SHELL=/bin/sh")
-                  (string-append "PATH=" path "\n"
-                                 "SHELL=" (assoc-ref inputs "bash") "/bin/sh"))))))
-         (add-before 'install 'configure-install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (setenv "sendmail_path" (string-append out "/sendmail"))
-               (setenv "newaliases_path" (string-append out "/newaliases"))
-               (setenv "mailq_path" (string-append out "/mailq"))
-               (setenv "command_directory" out)
-               (setenv "config_directory" out)
-               (setenv "daemon_directory" out)
-               (setenv "data_directory" out)
-               (setenv "html_directory" out)
-               (setenv "queue_directory" out)
-               (setenv "manpage_directory" out)
-               (setenv "sample_directory" out)
-               (setenv "meta_directory" out)
-               (setenv "readme_directory" out))
-             (setenv "tempdir" "/tmp")))
-         ;; done in the service activation snippet
-         ;; we don't have the account here
-         (add-before 'fix-postfix-scripts-path 'disable-chown
-           (lambda _
-             (substitute* "postfix-install"
-               (("chown") (which "true")))
-             (substitute* "postfix-install"
-               (("chgrp") (which "true")))))
-         ;; disable writing the configuration files (service provides these)
-         ;; disable chowning (does not matter, stuff ends up in the store)
-         ;; and disable live update code (we always install to a clean directory)
-         (add-after 'configure-install 'disable-postinstall
-           (lambda _
-             (substitute* "postfix-install"
-               (("# we're sorry.") "exit 0"))))
-         ;; postfix by default uses an interactive installer
-         ;; replacing it with the upgrade target allows for
-         ;; a non-interactive install.
-         (replace 'install
-           (lambda _ (invoke "make" "upgrade")))
-         (delete 'configure)
-         (delete 'check))))
+      #:tests? #false ;no check target
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'patch-/bin/sh
+            (lambda _
+              (substitute* (find-files "." "^Makefile.in")
+                (("/bin/sh") (which "sh")))))
+          ;; allow us to find the bdb headers
+          (add-before 'build 'patch-/usr/include
+            (lambda _
+              (substitute* '("makedefs")
+                (("/usr/include") (string-append #$(this-package-input "bdb")
+                                                 "/include")))))
+          (add-before 'build 'set-up-environment
+            (lambda _
+              ;; os detection on Guix System does not provide this
+              (setenv "AUXLIBS" "-lnsl")
+              ;; have to set this here, so that we get the correct
+              ;; location in the compiled binaries
+              (setenv "shlib_directory" #$output)))
+          ;; do not allow writes to the configuration directory,
+          ;; so that we can keep that in the store
+          (add-before 'build 'disable-postconf-edit
+            (lambda _
+              (substitute* "src/postconf/postconf_edit.c"
+                (("pcf_set_config_dir\\(\\);") "return 0;"))))
+          (add-before 'build 'configure-compile
+            (lambda _
+              (invoke "make" "makefiles" "pie=yes" "dynamicmaps=yes")))
+          (add-before 'install 'fix-postfix-scripts-path
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((path (string-join
+                           (map (compose (cute string-append <> "/bin")
+                                         (cute assoc-ref inputs <>))
+                                '("bash" "coreutils" "findutils" "gawk" "grep"
+                                  "sed"))
+                           ":")))
+                (substitute* '("postfix-install"
+                               "conf/post-install"
+                               "conf/postfix-script")
+                  (("^SHELL=/bin/sh")
+                   (string-append "PATH=" path "\n"
+                                  "SHELL=" (assoc-ref inputs "bash") "/bin/sh"))))))
+          (add-before 'install 'configure-install
+            (lambda _
+              (setenv "sendmail_path" (string-append #$output "/sendmail"))
+              (setenv "newaliases_path" (string-append #$output "/newaliases"))
+              (setenv "mailq_path" (string-append #$output "/mailq"))
+              (setenv "command_directory" #$output)
+              (setenv "config_directory" #$output)
+              (setenv "daemon_directory" #$output)
+              (setenv "data_directory" #$output)
+              (setenv "html_directory" #$output)
+              (setenv "queue_directory" #$output)
+              (setenv "manpage_directory" #$output)
+              (setenv "sample_directory" #$output)
+              (setenv "meta_directory" #$output)
+              (setenv "readme_directory" #$output)
+              (setenv "tempdir" "/tmp")))
+          ;; done in the service activation snippet
+          ;; we don't have the account here
+          (add-before 'fix-postfix-scripts-path 'disable-chown
+            (lambda _
+              (substitute* "postfix-install"
+                (("chown") (which "true")))
+              (substitute* "postfix-install"
+                (("chgrp") (which "true")))))
+          ;; disable writing the configuration files (service provides these)
+          ;; disable chowning (does not matter, stuff ends up in the store)
+          ;; and disable live update code (we always install to a clean directory)
+          (add-after 'configure-install 'disable-postinstall
+            (lambda _
+              (substitute* "postfix-install"
+                (("# we're sorry.") "exit 0"))))
+          ;; postfix by default uses an interactive installer
+          ;; replacing it with the upgrade target allows for
+          ;; a non-interactive install.
+          (replace 'install
+            (lambda _ (invoke "make" "upgrade")))
+          (delete 'configure))))
     (inputs
      (list bdb libnsl))
     (native-inputs
