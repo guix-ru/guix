@@ -843,11 +843,11 @@ bookkeeping."
   (let ((host-name    (operating-system-host-name os))
         (hosts-file   (%operating-system-hosts-file os))
         (entries      (operating-system-directory-base-entries os)))
-    (list (service system-service-type entries)
-          %boot-service
-          %hurd-startup-service
-          %activation-service
-          (service shepherd-root-service-type)
+    (cons* (service system-service-type entries)
+           %boot-service
+           %hurd-startup-service
+           %activation-service
+           (service shepherd-root-service-type)
 
           (service user-processes-service-type)
           (account-service (append (operating-system-accounts os)
@@ -869,7 +869,8 @@ bookkeeping."
           (service privileged-program-service-type
                    (append (operating-system-privileged-programs os)
                            (operating-system-setuid-programs os)))
-          (service profile-service-type (operating-system-packages os)))))
+          (service profile-service-type (operating-system-packages os))
+          (swap-services os))))
 
 (define* (operating-system-services os)
   "Return all the services of OS, including \"essential\" services."
