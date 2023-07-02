@@ -350,6 +350,333 @@ devices.")
                   (cpe-name . "node.js")
                   (hidden? . #t)))))
 
+(define-public node-12
+  (package
+    (name "node")
+    (version "12.22.12")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://nodejs.org/dist/v" version
+                                  "/node-v" version ".tar.xz"))
+              (sha256
+               (base32
+                "1whl0zi6fs9ay33bhcn2kh9xynran05iipahg1zzr6sv97wbfhmw"))
+              (modules '((guix build utils)))
+              (snippet
+               '(begin
+                  ;; Remove bundled software.
+                  (for-each delete-file-recursively
+                            '("deps/cares"
+                              "deps/http_parser"
+                              "deps/icu-small"
+                              "deps/llhttp"
+                              "deps/nghttp2"
+                              "deps/openssl"
+                              ;"deps/uv"    ; Needed by uvwasi
+                              "deps/zlib"))
+                  (substitute* "Makefile"
+                    ;; Remove references to bundled software.
+                    (("deps/http_parser/http_parser.gyp") "")
+                    (("deps/uv/include/\\*.h") "")
+                    (("deps/uv/uv.gyp") "")
+                    (("deps/zlib/zlib.gyp") ""))))))
+    (build-system gnu-build-system)
+    (arguments
+     `(#:configure-flags
+       (list "--shared-brotli"
+             "--shared-cares"
+             "--shared-http-parser"
+             (string-append "--shared-http-parser-includes="
+                             (assoc-ref %build-inputs "http-parser")
+                             "/include")
+             (string-append "--shared-http-parser-libpath="
+                             (assoc-ref %build-inputs "http-parser")
+                             "/lib")
+             "--shared-libuv"
+             "--shared-nghttp2"
+             "--shared-openssl"
+             "--shared-zlib"
+             "--without-snapshot"
+             "--without-inspector"      ; build without llhttp
+             "--with-intl=system-icu")
+       ;; Run only the CI tests.  The default test target requires additional
+       ;; add-ons from NPM that are not distributed with the source.
+       #:test-target "test-ci-js"
+       ;; Some of the tests can timeout under heavy load.
+       #:parallel-tests? ,(target-x86?)
+       #:modules
+       ((guix build gnu-build-system)
+        (guix build utils)
+        (srfi srfi-1)
+        (ice-9 match))
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'remove-dependency-on-llhttp
+           (lambda _
+             ;; This file unconditionally defines NODE_EXPERIMENTAL_HTTP
+             (substitute* "node.gyp"
+               (("src/node_http_parser_llhttp\\.cc") ""))
+             ;; These unconditionally depend upon/add llhttp.
+             (substitute* '("lib/internal/bootstrap/loaders.js"
+                            "src/node_binding.cc"
+                            "src/node_metadata.h"
+                            "src/node_metadata.cc")
+               ((".*llhttp.*") ""))
+             ;; '--http-parser=legacy' or not, only use http_parser.
+             (substitute* '("lib/_http_common.js"
+                           "test/parallel/test-http-parser-lazy-loaded.js")
+               (("http_parser_llhttp") "http_parser"))
+
+             ;; This test expects to use llhttp.
+             (delete-file "test/sequential/test-set-http-max-http-headers.js")))
+         (add-before 'configure 'patch-hardcoded-program-references
+           (lambda* (#:key inputs #:allow-other-keys)
+
+             ;; Fix hardcoded /bin/sh references.
+             (substitute* '("deps/npm/node_modules/cross-spawn/lib/parse.js"
+                            "deps/npm/node_modules/execa/index.js"
+                            "lib/child_process.js"
+                            "lib/internal/v8_prof_polyfill.js"
+                            "test/parallel/test-child-process-spawnsync-shell.js"
+                            "test/parallel/test-fs-write-sigxfsz.js"
+                            "test/parallel/test-stdio-closed.js"
+                            "test/sequential/test-child-process-emfile.js")
+               (("'/bin/sh'")
+                (string-append "'"  (search-input-file inputs "/bin/sh") "'")))
+
+             ;; Fix hardcoded /usr/bin/env references.
+             (substitute* '("test/parallel/test-child-process-default-options.js"
+                            "test/parallel/test-child-process-env.js"
+                            "test/parallel/test-child-process-exec-env.js")
+               (("'/usr/bin/env'")
+                (string-append "'" (search-input-file inputs "/bin/env") "'")))))
+         (add-after 'patch-hardcoded-program-references 'delete-problematic-tests
+           (lambda* (#:key inputs #:allow-other-keys)
+
+             ;; FIXME: These tests fail in the build container, but they don't
+             ;; seem to be indicative of real problems in practice.
+             (for-each delete-file
+                       '("test/parallel/test-cluster-master-error.js"
+                         "test/parallel/test-cluster-master-kill.js"))
+
+             ;; These require a DNS resolver.
+             (for-each delete-file
+                       '("test/parallel/test-dns.js"
+                         "test/parallel/test-dns-lookupService-promises.js"))
+
+             ;; These tests are timing-sensitive, and fail sporadically on
+             ;; slow, busy, or even very fast machines.
+             (for-each delete-file '("test/parallel/test-fs-utimes.js"
+                                     "test/sequential/test-perf-hooks.js"))
+
+             ;; FIXME: This test fails randomly:
+             ;; https://github.com/nodejs/node/issues/31213
+             (delete-file "test/parallel/test-net-listen-after-destroying-stdin.js")
+
+             ;; VM Modules is an experimental feature
+             (delete-file "test/parallel/test-vm-module-dynamic-import.js")
+
+             ;; These tests need looking into:
+             (for-each delete-file
+                       '("test/async-hooks/test-filehandle-no-reuse.js"
+                         "test/async-hooks/test-graph.http.js"
+                         "test/async-hooks/test-http-agent-handle-reuse.js"
+                         "test/parallel/test-cli-options-precedence.js"
+                         "test/parallel/test-http-methods.js"
+                         "test/parallel/test-process-versions.js"
+                         "test/parallel/test-uv-errno.js"
+                         "test/report/test-report-uv-handles.js"))
+
+             ;; [DEP0131] DeprecationWarning: The legacy HTTP parser is deprecated.
+             ;; These are due to our blocking llhttp.
+             (for-each
+               delete-file
+               '("test/parallel/test-domain-http-server.js"
+                 "test/parallel/test-domain-multi.js"
+                 "test/parallel/test-http-chunked-smuggling.js"
+                 "test/parallel/test-http-client-error-rawbytes.js"
+                 "test/parallel/test-http-client-parse-error.js"
+                 "test/parallel/test-http-deprecated-urls.js"
+                 "test/parallel/test-http-header-overflow.js"
+                 "test/parallel/test-http-outgoing-internal-headernames-getter.js"
+                 "test/parallel/test-http-outgoing-internal-headernames-setter.js"
+                 "test/parallel/test-http-outgoing-internal-headers.js"
+                 "test/parallel/test-http-request-smuggling-content-length.js"
+                 "test/parallel/test-http-server-client-error.js"
+                 "test/parallel/test-http-server-destroy-socket-on-client-error.js"
+                 "test/parallel/test-http-timeout-client-warning.js"
+                 "test/parallel/test-http2-client-http1-server.js"
+                 "test/parallel/test-http2-client-request-listeners-warning.js"
+                 "test/parallel/test-http2-server-set-header.js"
+                 "test/parallel/test-https-simple.js"
+                 "test/parallel/test-https-strict.js"
+                 "test/parallel/test-release-npm.js"))
+
+             ;; These tests have an expiry date: they depend on the validity of
+             ;; TLS certificates that are bundled with the source.  We want this
+             ;; package to be reproducible forever, so remove those.
+             (for-each delete-file
+                       '("test/parallel/test-tls-passphrase.js"
+                         "test/parallel/test-tls-server-verify.js"))))
+         (add-before 'configure 'set-bootstrap-host-rpath
+           (lambda* (#:key native-inputs inputs #:allow-other-keys)
+             (let* ((inputs      (or native-inputs inputs))
+                    (brotli      (assoc-ref inputs "brotli"))
+                    (c-ares      (assoc-ref inputs "c-ares"))
+                    (http-parser (assoc-ref inputs "http-parser"))
+                    (icu4c       (assoc-ref inputs "icu4c"))
+                    (nghttp2     (assoc-ref inputs "nghttp2"))
+                    (openssl     (assoc-ref inputs "openssl"))
+                    (libuv       (assoc-ref inputs "libuv"))
+                    (zlib        (assoc-ref inputs "zlib"))
+                    (host-binaries '("torque"
+                                     "bytecode_builtins_list_generator"
+                                     "gen-regexp-special-case"
+                                     "node_mksnapshot"
+                                     "mksnapshot")))
+               (substitute* '("node.gyp" "tools/v8_gypfiles/v8.gyp")
+                 (((string-append "'target_name': '("
+                                    (string-join host-binaries "|")
+                                    ")',")
+                   target)
+                  (string-append target
+                                 "'ldflags': ['-Wl,-rpath="
+                                 c-ares "/lib:"
+                                 brotli "/lib:"
+                                 http-parser "/lib:"
+                                 icu4c "/lib:"
+                                 nghttp2 "/lib:"
+                                 openssl "/lib:"
+                                 libuv "/lib:"
+                                 zlib "/lib"
+                                 "'],"))))))
+         (replace 'configure
+           ;; Node's configure script is actually a python script, so we can't
+           ;; run it with bash.
+           (lambda* (#:key outputs (configure-flags '()) native-inputs inputs
+                     #:allow-other-keys)
+             (let* ((prefix (assoc-ref outputs "out"))
+                    (xflags ,(if (%current-target-system)
+                                 `'("--cross-compiling"
+                                    ,(string-append
+                                      "--dest-cpu="
+                                      (match (%current-target-system)
+                                        ((? (cut string-prefix? "arm" <>))
+                                         "arm")
+                                        ((? (cut string-prefix? "aarch64" <>))
+                                         "arm64")
+                                        ((? (cut string-prefix? "i686" <>))
+                                         "ia32")
+                                        ((? (cut string-prefix? "x86_64" <>))
+                                         "x64")
+                                        ((? (cut string-prefix? "powerpc64" <>))
+                                         "ppc64")
+                                        ((? (cut string-prefix? "riscv64" <>))
+                                         "riscv64")
+                                        (_ "unsupported"))))
+                                 ''()))
+                    (flags (cons (string-append "--prefix=" prefix)
+                                 (append xflags configure-flags))))
+               (format #t "build directory: ~s~%" (getcwd))
+               (format #t "configure flags: ~s~%" flags)
+               ;; Node's configure script expects the CC environment variable to
+               ;; be set.
+               (setenv "CC_host" "gcc")
+               (setenv "CXX_host" "g++")
+               (setenv "CC" ,(cc-for-target))
+               (setenv "CXX" ,(cxx-for-target))
+               (setenv "PKG_CONFIG" ,(pkg-config-for-target))
+               (apply invoke
+                      (let ((inpts (or native-inputs inputs)))
+                        (with-exception-handler
+                            (lambda (e)
+                              (if (search-error? e)
+                                  (search-input-file inpts "/bin/python2")
+                                  (raise-exception e)))
+                          (lambda ()
+                            (search-input-file inpts "/bin/python"))
+                          #:unwind? #t))
+                      "configure"
+                      flags))))
+         (add-after 'patch-shebangs 'patch-nested-shebangs
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             ;; Based on the implementation of patch-shebangs
+             ;; from (guix build gnu-build-system).
+             (let ((path (append-map (match-lambda
+                                       ((_ . dir)
+                                        (list (string-append dir "/bin")
+                                              (string-append dir "/sbin")
+                                              (string-append dir "/libexec"))))
+                                     (append outputs inputs))))
+               (for-each
+                (lambda (file)
+                  (patch-shebang file path))
+                (find-files (search-input-directory outputs "lib/node_modules")
+                            (lambda (file stat)
+                              (executable-file? file))
+                            #:stat lstat)))))
+         (add-after 'install 'install-npmrc
+           ;; Note: programs like node-gyp only receive these values if
+           ;; they are started via `npm` or `npx`.
+           ;; See: https://github.com/nodejs/node-gyp#npm-configuration
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out")))
+               (with-output-to-file
+                   ;; Use the config file "primarily for distribution
+                   ;; maintainers" rather than "{prefix}/etc/npmrc",
+                   ;; especially because node-build-system uses --prefix
+                   ;; to install things to their store paths:
+                   (string-append out "/lib/node_modules/npm/npmrc")
+                 (lambda ()
+                   ;; Tell npm (mostly node-gyp) where to find our
+                   ;; installed headers so it doesn't try to
+                   ;; download them from the internet:
+                   (format #t "nodedir=~a\n" out)))))))))
+    (native-inputs
+     ;; Runtime dependencies for binaries used as a bootstrap.
+     (list brotli
+           c-ares
+           http-parser
+           icu4c
+           libuv
+           `(,nghttp2 "lib")
+           openssl-1.1
+           zlib
+           ;; Regular build-time dependencies.
+           perl
+           pkg-config
+           procps
+           python-2
+           util-linux))
+    (inputs
+     (list bash-minimal
+           coreutils
+           c-ares
+           http-parser
+           icu4c
+           libuv
+           `(,nghttp2 "lib")
+           openssl-1.1
+           python-wrapper               ;for node-gyp (supports python3)
+           zlib))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "NODE_PATH")
+            (files '("lib/node_modules")))))
+    (synopsis "Evented I/O for V8 JavaScript")
+    (description
+     "Node.js is a platform built on Chrome's JavaScript runtime
+for easily building fast, scalable network applications.  Node.js uses an
+event-driven, non-blocking I/O model that makes it lightweight and efficient,
+perfect for data-intensive real-time applications that run across distributed
+devices.")
+    (home-page "https://nodejs.org/")
+    (license license:expat)
+    (properties '((max-silent-time . 7200)   ;2h, needed on ARM
+                  (timeout . 21600)          ;6h
+                  (hidden? . #t)
+                  (cpe-name . "node.js")))))
+
 ;; Duplicate of node-semver
 (define-public node-semver-bootstrap
   (package
