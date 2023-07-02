@@ -26575,10 +26575,10 @@ index 00000000000..13e91639c98
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/execution/riscv64/frame-constants-riscv64.h b/deps/v8/src/execution/riscv64/frame-constants-riscv64.h
 new file mode 100644
-index 00000000000..f5cb13c4e63
+index 00000000000..2665a963850
 --- /dev/null
 +++ b/deps/v8/src/execution/riscv64/frame-constants-riscv64.h
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,119 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -26600,6 +26600,25 @@ index 00000000000..f5cb13c4e63
 +  // This is the offset to where JSEntry pushes the current value of
 +  // Isolate::c_entry_fp onto the stack.
 +  static constexpr int kCallerFPOffset = -3 * kSystemPointerSize;
++};
++
++class ExitFrameConstants : public TypedFrameConstants {
++ public:
++  static constexpr int kSPOffset = TYPED_FRAME_PUSHED_VALUE_OFFSET(0);
++  DEFINE_TYPED_FRAME_SIZES(1);
++
++  // The caller fields are below the frame pointer on the stack.
++  static constexpr int kCallerFPOffset = +0 * kPointerSize;
++  // The calling JS function is between FP and PC.
++  static constexpr int kCallerPCOffset = +1 * kPointerSize;
++
++  // MIPS-specific: a pointer to the old sp to avoid unnecessary calculations.
++  static constexpr int kCallerSPOffset = +2 * kPointerSize;
++
++  // FP-relative displacement of the caller's SP.
++  static constexpr int kCallerSPDisplacement = +2 * kPointerSize;
++
++  static constexpr int kConstantPoolOffset = 0;  // Not used.
 +};
 +
 +class WasmCompileLazyFrameConstants : public TypedFrameConstants {
@@ -26659,6 +26678,20 @@ index 00000000000..f5cb13c4e63
 +    return kLastPushedFpRegisterOffset +
 +           base::bits::CountPopulation(lower_regs) * kDoubleSize;
 +  }
++};
++
++class JavaScriptFrameConstants : public AllStatic {
++ public:
++  // FP-relative.
++  static constexpr int kLocal0Offset =
++      StandardFrameConstants::kExpressionsOffset;
++  static constexpr int kLastParameterOffset = +2 * kPointerSize;
++  static constexpr int kFunctionOffset =
++      StandardFrameConstants::kFunctionOffset;
++
++  // Caller SP-relative.
++  static constexpr int kParam0Offset = -2 * kPointerSize;
++  static constexpr int kReceiverOffset = -1 * kPointerSize;
 +};
 +
 +}  // namespace internal
