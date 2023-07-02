@@ -361,6 +361,7 @@ devices.")
               (sha256
                (base32
                 "1whl0zi6fs9ay33bhcn2kh9xynran05iipahg1zzr6sv97wbfhmw"))
+              (patches (search-patches "node-12-riscv64-support.patch"))
               (modules '((guix build utils)))
               (snippet
                '(begin
