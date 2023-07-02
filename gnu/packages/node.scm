@@ -513,6 +513,12 @@ devices.")
                  "test/parallel/test-https-strict.js"
                  "test/parallel/test-release-npm.js"))
 
+             ;; Some architecture dependant test failures:
+             (cond
+               (,(target-ppc64le?)
+                (delete-file "test/parallel/test-worker-nearheaplimit-deadlock.js"))
+               (else #t))
+
              ;; These tests have an expiry date: they depend on the validity of
              ;; TLS certificates that are bundled with the source.  We want this
              ;; package to be reproducible forever, so remove those.

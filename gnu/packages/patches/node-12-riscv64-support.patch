@@ -31457,10 +31457,10 @@ index e0bc4b8e323..a46a9ba196d 100644
  #endif
 diff --git a/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.cc b/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.cc
 new file mode 100644
-index 00000000000..ddd7444c255
+index 00000000000..7882d3b978b
 --- /dev/null
 +++ b/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.cc
-@@ -0,0 +1,1269 @@
+@@ -0,0 +1,1289 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -32423,6 +32423,26 @@ index 00000000000..ddd7444c255
 +  return kRISCVImplementation;
 +}
 +
++void RegExpMacroAssemblerRISCV::LoadCurrentCharacterImpl(int cp_offset,
++                                                         Label* on_end_of_input,
++                                                         bool check_bounds,
++                                                         int characters,
++                                                         int eats_at_least) {
++  // It's possible to preload a small number of characters when each success
++  // path requires a large number of characters, but not the reverse.
++  DCHECK_GE(eats_at_least, characters);
++
++  DCHECK(cp_offset < (1<<30));  // Be sane! (And ensure negation works).
++  if (check_bounds) {
++    if (cp_offset >= 0) {
++      CheckPosition(cp_offset + eats_at_least - 1, on_end_of_input);
++    } else {
++      CheckPosition(cp_offset, on_end_of_input);
++    }
++  }
++  LoadCurrentCharacterUnchecked(cp_offset, characters);
++}
++
 +void RegExpMacroAssemblerRISCV::PopCurrentPosition() {
 +  Pop(current_input_offset());
 +}
@@ -32732,10 +32752,10 @@ index 00000000000..ddd7444c255
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.h b/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.h
 new file mode 100644
-index 00000000000..7311d411897
+index 00000000000..35feeb772b2
 --- /dev/null
 +++ b/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.h
-@@ -0,0 +1,214 @@
+@@ -0,0 +1,217 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -32799,6 +32819,9 @@ index 00000000000..7311d411897
 +  virtual IrregexpImplementation Implementation();
 +  virtual void LoadCurrentCharacterUnchecked(int cp_offset,
 +                                             int character_count);
++  virtual void LoadCurrentCharacterImpl(int cp_offset, Label* on_end_of_input,
++                                        bool check_bounds, int characters,
++                                        int eats_at_least);
 +  virtual void PopCurrentPosition();
 +  virtual void PopRegister(int register_index);
 +  virtual void PushBacktrack(Label* label);
