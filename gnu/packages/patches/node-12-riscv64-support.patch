@@ -33062,10 +33062,10 @@ index 766ce71db11..7a1376ce1c0 100644
  #endif
 diff --git a/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
 new file mode 100644
-index 00000000000..837ff0d5718
+index 00000000000..77691b1c433
 --- /dev/null
 +++ b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
-@@ -0,0 +1,2642 @@
+@@ -0,0 +1,2650 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -34393,6 +34393,7 @@ index 00000000000..837ff0d5718
 +  //TurboAssembler::CompareI(dst, lhs.gp(), Operand(rhs.gp()), cond);
 +}
 +
++/*
 +namespace liftoff {
 +
 +inline FPUCondition ConditionToConditionCmpFPU(Condition condition,
@@ -34424,21 +34425,28 @@ index 00000000000..837ff0d5718
 +}
 +
 +}  // namespace liftoff
++*/
 +
 +void LiftoffAssembler::emit_f32_set_cond(Condition liftoff_cond,
 +                                         Register dst, DoubleRegister lhs,
 +                                         DoubleRegister rhs) {
++  /*
 +  bool predicate;
 +  FPUCondition fcond = liftoff::ConditionToConditionCmpFPU(liftoff_cond, &predicate);
 +  TurboAssembler::CompareF32(dst, fcond, lhs, rhs);
++  */
++  bailout(kUnsupportedArchitecture, "emit_f32_set_cond");
 +}
 +
 +void LiftoffAssembler::emit_f64_set_cond(Condition liftoff_cond,
 +                                         Register dst, DoubleRegister lhs,
 +                                         DoubleRegister rhs) {
++  /*
 +  bool predicate;
 +  FPUCondition fcond = liftoff::ConditionToConditionCmpFPU(liftoff_cond, &predicate);
 +  TurboAssembler::CompareF64(dst, fcond, lhs, rhs);
++  */
++  bailout(kUnsupportedArchitecture, "emit_f64_set_cond");
 +}
 +
 +/*
