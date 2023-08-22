@@ -124,8 +124,7 @@ guix_daemon_CPPFLAGS =				\
 
 guix_daemon_LDADD =				\
   libstore.a libutil.a libformat.a -lz		\
-  $(SQLITE3_LIBS) $(LIBGCRYPT_LIBS)		\
-  $(HURD_LIBS)
+  $(SQLITE3_LIBS) $(LIBGCRYPT_LIBS)
 
 guix_daemon_headers =				\
   %D%/nix-daemon/shared.hh
