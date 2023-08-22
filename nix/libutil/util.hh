@@ -63,9 +63,6 @@ Path readLink(const Path & path);
 
 bool isLink(const Path & path);
 
-/* Make TARGET a firmlink (aka. "bind mount") to SOURCE.  */
-int firmlink(const Path & source, const Path & target);
-
 /* Read the contents of a directory.  The entries `.' and `..' are
    removed. */
 struct DirEntry
