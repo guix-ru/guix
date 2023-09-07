@@ -90,9 +90,9 @@
             postfix-configuration-postfix
             postfix-configuration-master-file
             postfix-configuration-main-file
-            postfix-confgiuration-queue-directory
-            postfix-confgiuration-data-directory
-            postfix-confgiuration-user
+            postfix-configuration-queue-directory
+            postfix-configuration-data-directory
+            postfix-configuration-user
 
             postfix-service-type))
 
