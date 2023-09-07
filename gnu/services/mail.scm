@@ -93,6 +93,7 @@
             postfix-configuration-queue-directory
             postfix-configuration-data-directory
             postfix-configuration-user
+            postfix-configuration-group
 
             postfix-service-type))
 
