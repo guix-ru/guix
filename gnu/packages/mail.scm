@@ -5030,19 +5030,30 @@ features:
                                   "SHELL=" (assoc-ref inputs "bash") "/bin/sh"))))))
           (add-before 'install 'configure-install
             (lambda _
-              (setenv "sendmail_path" (string-append #$output "/sendmail"))
-              (setenv "newaliases_path" (string-append #$output "/newaliases"))
-              (setenv "mailq_path" (string-append #$output "/mailq"))
-              (setenv "command_directory" #$output)
-              (setenv "config_directory" #$output)
-              (setenv "daemon_directory" #$output)
-              (setenv "data_directory" #$output)
-              (setenv "html_directory" #$output)
-              (setenv "queue_directory" #$output)
-              (setenv "manpage_directory" #$output)
-              (setenv "sample_directory" #$output)
-              (setenv "meta_directory" #$output)
-              (setenv "readme_directory" #$output)
+              (setenv "command_directory"
+                      (string-append #$output "/sbin"))
+              (setenv "config_directory"
+                      (string-append #$output "/etc/postfix"))
+              (setenv "daemon_directory"
+                      (string-append #$output "/libexec/postfix"))
+              (setenv "data_directory"
+                      (string-append #$output "/var/lib/postfix/data"))
+              (setenv "html_directory"
+                      (string-append #$output "/share/postfix/doc/html"))
+              (setenv "mailq_path"
+                      (string-append #$output "/bin/mailq"))
+              (setenv "manpage_directory"
+                      (string-append #$output "/share/man"))
+              (setenv "meta_directory"
+                      (string-append #$output "/etc/postfix"))
+              (setenv "newaliases_path"
+                      (string-append #$output "/bin/newaliases"))
+              (setenv "queue_directory"
+                      (string-append #$output "/var/lib/postfix/queue"))
+              (setenv "readme_directory"
+                      (string-append #$output "/share/postfix/doc"))
+              (setenv "sendmail_path"
+                      (string-append #$output "/bin/sendmail"))
               (setenv "tempdir" "/tmp")))
           ;; done in the service activation snippet
           ;; we don't have the account here
