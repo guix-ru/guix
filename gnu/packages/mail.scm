@@ -4988,6 +4988,7 @@ features:
       #:tests? #false ;no check target
       #:phases
       #~(modify-phases %standard-phases
+          (delete 'configure)
           (add-before 'build 'patch-/bin/sh
             (lambda _
               (substitute* (find-files "." "^Makefile.in")
@@ -5074,8 +5075,7 @@ features:
           ;; replacing it with the upgrade target allows for
           ;; a non-interactive install.
           (replace 'install
-            (lambda _ (invoke "make" "upgrade")))
-          (delete 'configure))))
+            (lambda _ (invoke "make" "upgrade"))))))
     (inputs
      (list bdb libnsl))
     (native-inputs
