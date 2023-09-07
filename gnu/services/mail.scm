@@ -94,6 +94,7 @@
             postfix-configuration-data-directory
             postfix-configuration-user
             postfix-configuration-group
+            postfix-configuration-setgid-commands?
 
             postfix-service-type))
 
@@ -2025,6 +2026,7 @@ hosts = localhost:5232"))
                   (default "/var/lib/postfix"))
   (meta-directory postfix-configuration-meta-directory
                   (default #f))
+  (setgid-commands? postfix-configuration-setgid-commands? (default #t))
   (user postfix-configuration-user
         (default "postfix"))
   (group postfix-configuration-group
@@ -2135,12 +2137,41 @@ inet_protocols = ipv4
         (start (postfix-action "start"))
         (stop (postfix-action "stop")))))))
 
+(define (postfix-set-gids config)
+  (match-record config <postfix-configuration>
+    (postfix setgid-commands? group)
+    (if setgid-commands?
+        (list
+         (setuid-program
+          (program (file-append postfix "/bin/mailq"))
+          (setuid? #false)
+          (setgid? #true)
+          (group group))
+         (setuid-program
+          (program (file-append postfix "/bin/sendmail"))
+          (setuid? #false)
+          (setgid? #true)
+          (group group))
+         (setuid-program
+          (program (file-append postfix "/sbin/postqueue"))
+          (setuid? #false)
+          (setgid? #true)
+          (group group))
+         (setuid-program
+          (program (file-append postfix "/sbin/postdrop"))
+          (setuid? #false)
+          (setgid? #true)
+          (group group)))
+        '())))
+
 (define postfix-service-type
   (service-type
    (name 'postfix)
-   (extensions (list (service-extension account-service-type postfix-accounts)
-                     (service-extension activation-service-type postfix-activation)
-                     (service-extension shepherd-root-service-type postfix-shepherd-service)
-                     (service-extension mail-aliases-service-type (const '()))))
+   (extensions
+    (list (service-extension account-service-type postfix-accounts)
+          (service-extension activation-service-type postfix-activation)
+          (service-extension shepherd-root-service-type postfix-shepherd-service)
+          (service-extension mail-aliases-service-type (const '()))
+          (service-extension setuid-program-service-type postfix-set-gids)))
    (description "Run the Postfix MTA.")
    (default-value (postfix-configuration))))
