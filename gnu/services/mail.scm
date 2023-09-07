@@ -7,6 +7,7 @@
 ;;; Copyright © 2020 Jonathan Brielmaier <jonathan.brielmaier@web.de>
 ;;; Copyright © 2020 Gábor Boskovits <boskovits@gmail.com>
 ;;; Copyright © 2020 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright © 2023 Ricardo Wurmus <rekado@elephly.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -2006,7 +2007,6 @@ hosts = localhost:5232"))
 
 
 ;;;
-
 ;;; Postfix mail server.
 ;;;
 
