@@ -24,7 +24,7 @@
 ;;; Copyright © 2022, 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2022 Feng Shu <tumashu@163.com>
 ;;; Copyright © 2023 Timo Wilken <guix@twilken.net>
-;;; Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2023-2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2024 jgart <jgart@dismail.de>
 ;;; Copyright © 2025 Kjartan Oli Agustsson <kjartanoli@outlook.com>
 ;;; Copyright © 2025 mstenek <mstenek@disroot.org>
@@ -53,7 +53,6 @@
   #:use-module (guix build-system python)
   #:use-module (guix build-system qt)
   #:use-module (guix download)
-  #:use-module (guix gexp)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module (guix packages)
@@ -109,7 +108,8 @@
   #:use-module (gnu packages time)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages valgrind)
-  #:use-module (gnu packages xml))
+  #:use-module (gnu packages xml)
+  #:use-module (ice-9 format))
 
 (define-public duplicity
   (package
@@ -287,12 +287,17 @@ backups (called chunks) to allow easy burning to CD/DVD.")
            `(,zstd "lib")))
     (arguments
      (list
+      ;; Embed absolute references to inputs to avoid propagation.
       #:configure-flags
-      #~'("--disable-static"
-          ;; Because of the circular dependency, we cannot use openssl here.
-          ;; Explicitly disable openssl to avoid unnecessary dependencies in the
-          ;; pc file.
-          "--without-openssl")
+      #~(list "--disable-static"
+              (format #f "LIBS=~{-L~a/lib~^ ~}"
+                      '#$(map (lambda (x)
+                                (this-package-input (car x)))
+                              (package-inputs this-package)))
+              ;; Because of the circular dependency, we cannot use openssl here.
+              ;; Explicitly disable openssl to avoid unnecessary dependencies in the
+              ;; pc file.
+              "--without-openssl")
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'build 'patch-commands
@@ -327,32 +332,7 @@ backups (called chunks) to allow easy burning to CD/DVD.")
 		    (invoke "./bsdcpio_test" "^test_owner_parse")
 		    (invoke "./bsdtar_test"))
                   ;; Tests may be disabled if cross-compiling.
-                  (format #t "Test suite not run.~%"))))
-          (add-after 'install 'add--L-in-libarchive-pc
-            (lambda* (#:key inputs outputs #:allow-other-keys)
-              (let* ((out     #$output)
-                     (lib     (string-append out "/lib"))
-                     (nettle  (assoc-ref inputs "nettle"))
-                     (libxml2 (assoc-ref inputs "libxml2"))
-                     (xz      (assoc-ref inputs "xz"))
-                     (zlib    (assoc-ref inputs "zlib"))
-                     (zstd    (assoc-ref inputs "zstd"))
-                     (bzip2   (assoc-ref inputs "bzip2")))
-                ;; Embed absolute references to these inputs to avoid propagation.
-                (substitute* (list (string-append lib "/pkgconfig/libarchive.pc")
-                                   (string-append lib "/libarchive.la"))
-                  (("-lnettle")
-                   (string-append "-L" nettle "/lib -lnettle"))
-                  (("-lxml2")
-                   (string-append "-L" libxml2 "/lib -lxml2"))
-                  (("-llzma")
-                   (string-append "-L" xz "/lib -llzma"))
-                  (("-lz")
-                   (string-append "-L" zlib "/lib -lz"))
-                  (("-lzstd")
-                   (string-append "-L" zstd "/lib -lzstd"))
-                  (("-lbz2")
-                   (string-append "-L" bzip2 "/lib -lbz2")))))))))
+                  (format #t "Test suite not run.~%")))))))
     (home-page "https://libarchive.org/")
     (synopsis "Multi-format archive and compression library")
     (description
