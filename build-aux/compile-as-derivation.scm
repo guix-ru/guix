@@ -51,8 +51,7 @@
            (mlet* %store-monad ((source (interned-file source "guix-source"
                                                        #:select? git?
                                                        #:recursive? #t))
-                                (drv    (build source #:pull-version 1
-                                               #:system "i586-gnu")))
+                                (drv    (build source #:pull-version 1)))
              (mbegin %store-monad
                (show-what-to-build* (list drv))
                (built-derivations (list drv))
