@@ -1618,4 +1618,242 @@ interactive environment for the functional language Haskell.")
               (file-pattern ".*\\.conf\\.d$")
               (file-type 'directory)))))))
 
+;;; GHC >= 9.6 must be built using it's new haskell-written Hadrian build
+;;; system. Use this opportunity to cut the inheritance chain to simplify
+;;; understanding what building ghc requires with the new build system.
+
+(define-public ghc-9.8
+  (let ((ghc-bootstrap ghc-9.4))
+    (package
+      (name "ghc-next")
+      (version "9.8.1")
+      (source (origin
+                (method url-fetch)
+                (uri (string-append "https://downloads.haskell.org/~ghc/" version
+                                    "/ghc-" version "-src.tar.xz"))
+                (sha256
+                 (base32
+                  "0l87yb8hmd350klrp6lw2h9hjlla11pgzx1n4jlrfdvkgxmyvy5j"))))
+      (outputs (list "out" "doc"))
+      (arguments
+       (list
+        #:make-flags #~(list "-V" "--docs=no-sphinx")
+       #:configure-flags
+       #~(list
+           (string-append "--with-gmp-libraries="
+                          (assoc-ref %build-inputs "gmp") "/lib")
+           (string-append "--with-gmp-includes="
+                          (assoc-ref %build-inputs "gmp") "/include")
+           "--with-system-libffi"
+           (string-append "--with-ffi-libraries="
+                          (assoc-ref %build-inputs "libffi") "/lib")
+           (string-append "--with-ffi-includes="
+                          (assoc-ref %build-inputs "libffi") "/include")
+           (string-append "--with-curses-libraries="
+                          (assoc-ref %build-inputs "ncurses") "/lib")
+           (string-append "--with-curses-includes="
+                          (assoc-ref %build-inputs "ncurses") "/include"))
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'build 'fix-iserv-rpath
+              (lambda _
+                (mkdir-p "_build")
+                (call-with-output-file
+                 "_build/hadrian.settings"
+                 (lambda (port)
+                   (display
+                    (string-append
+                     "*.iserv.ghc.link.opts += -optl-Wl,-rpath,"
+                     #$output "/lib/ghc-" #$(package-version this-package)
+                     "/lib/" #$(or (%current-target-system)
+                                   (%current-system))
+                     "-ghc-" #$(package-version this-package) "/")
+                    port)))))
+            ;; This phase patches the 'ghc-pkg' command so that it sorts the list
+            ;; of packages in the binary cache it generates.
+            (add-before 'build 'fix-ghc-pkg-nondeterminism
+              (lambda _
+                (substitute* "utils/ghc-pkg/Main.hs"
+                  (("confs = map \\(path </>\\) \\$ filter \\(\".conf\" `isSuffixOf`\\) fs")
+                   "confs = map (path </>) $ filter (\".conf\" `isSuffixOf`) (sort fs)"))))
+            (add-after 'unpack 'unpack-testsuite
+              (lambda* (#:key inputs #:allow-other-keys)
+                (with-directory-excursion ".."
+                  (invoke "tar" "xvf" (assoc-ref inputs "ghc-testsuite")))))
+            (add-after 'unpack-testsuite 'fix-/bin/sh-references
+              (lambda* (#:key inputs #:allow-other-keys)
+                (substitute*
+                 (list "hadrian/src/Rules/BinaryDist.hs"
+                       "hadrian/src/Rules/Test.hs"
+                       "libraries/process/System/Process/Posix.hs"
+                       "libraries/process/jsbits/process.js"
+                       "libraries/unix/cbits/execvpe.c"
+                       "testsuite/tests/driver/T8602/T8602.script"
+                       "testsuite/timeout/timeout.py")
+                 (("/bin/sh") (search-input-file inputs "/bin/sh")))))
+            (add-after 'unpack-testsuite 'fix-cc-reference
+              (lambda* (#:key inputs #:allow-other-keys)
+                (substitute*
+                 (list "utils/hsc2hs/src/Common.hs")
+                 (("\"cc\"") "\"gcc\""))))
+            ;; XXX: something causes ld-wrapper to see test\ \ \ spaces/... and
+            ;; look for the files "test\", "\", "\" and "spaces/...", which obviously
+            ;; don't exist
+            (add-after 'unpack-testsuite 'fix-testsuite
+              (lambda _
+                (substitute*
+                  (list "testsuite/driver/runtests.py")
+                  (("'test   spaces'") "'dont-test-spaces'"))))
+            (add-before 'configure 'set-target-programs
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((binutils (assoc-ref inputs "binutils"))
+                      (gcc (assoc-ref inputs "gcc"))
+                      (ld-wrapper (assoc-ref inputs "ld-wrapper")))
+                  (setenv "CC" (string-append gcc "/bin/gcc"))
+                  (setenv "CXX" (string-append gcc "/bin/g++"))
+                  (setenv "LD" (string-append ld-wrapper "/bin/ld"))
+                  (setenv "NM" (string-append binutils "/bin/nm"))
+                  (setenv "RANLIB" (string-append binutils "/bin/ranlib"))
+                  (setenv "STRIP" (string-append binutils "/bin/strip"))
+                  ;; The 'ar' command does not follow the same pattern.
+                  (setenv "fp_prog_ar" (string-append binutils "/bin/ar")))))
+            (add-before 'build 'build-hadrian
+              (lambda* (#:key (inputs '()) #:allow-other-keys)
+                (invoke "./hadrian/bootstrap/bootstrap.py"
+                        "-s" (assoc-ref inputs "hadrian-bootstrap")
+                        "-w" (which "ghc"))))
+            (add-before 'build-hadrian 'fix-environment
+              (lambda _
+                (unsetenv "GHC_PACKAGE_PATH")
+                (setenv "CONFIG_SHELL" (which "bash"))))
+            (replace 'build
+              (lambda* (#:key (parallel-build? #f) (make-flags '())
+                       #:allow-other-keys)
+                (apply invoke "_build/bin/hadrian"
+                       `("binary-dist-dir"
+                         ,@(if parallel-build?
+                             (list (string-append
+                                    "-j" (number->string
+                                          (parallel-job-count)))))
+                         ,@make-flags))))
+            (replace 'check
+              (lambda* (#:key (tests? #t) (parallel-tests? #f) (make-flags '())
+                        #:allow-other-keys)
+                (if tests?
+                  (apply invoke "_build/bin/hadrian"
+                         `(,@(if parallel-tests?
+                               (list (string-append
+                                      "-j"
+                                      (number->string (parallel-job-count))))
+                               '())
+                           ,@make-flags
+                           "test"
+                           ,(string-append
+                             "--broken-test="
+                             (string-join
+                              (list  "T15904" ; ld-wrapper, apparently
+                                     "T16521" ; no idea
+                                     ;; These fail due to gcc
+                                     ;; -Wincompatible-pointer-types, which
+                                     ;; apparently is not used in GHC's CI
+                                     ;; https://gitlab.haskell.org/ghc/ghc/-/issues/22263
+                                     "hs_try_putmvar001"
+                                     "list_threads_and_misc_roots"
+                                     "testwsdeque")))
+                           "--skip-perf"))
+                  (format #t "test suite not run~%"))))
+            (replace 'install
+              (lambda* (#:key (make-flags '()) #:allow-other-keys)
+                (apply invoke "_build/bin/hadrian"
+                       `("install"
+                         ,@make-flags
+                         ,(string-append "--prefix=" #$output)))))
+           (add-after 'install 'remove-unnecessary-references
+             (lambda* (#:key outputs #:allow-other-keys)
+               (substitute* (find-files (string-append (assoc-ref outputs "out") "/lib/")
+                                        "settings")
+                 (("/gnu/store/.*/bin/(.*)" m program) program))
+
+               ;; Remove references to "doc" output from "out" by rewriting
+               ;; the "haddock-interfaces" fields and removing the optional
+               ;; "haddock-html" field in the generated .conf files.
+               (let ((doc (assoc-ref outputs "doc"))
+                     (out (assoc-ref outputs "out")))
+                 (with-fluids ((%default-port-encoding #f))
+                   (for-each (lambda (config-file)
+                               (substitute* config-file
+                                 (("^haddock-html: .*") "\n")
+                                 (((format #f "^haddock-interfaces: ~a" doc))
+                                  (string-append "haddock-interfaces: " out))))
+                             (find-files (string-append out "/lib") ".conf")))
+                 ;; Move the referenced files to the "out" output.
+                 (for-each (lambda (haddock-file)
+                             (let* ((subdir (string-drop haddock-file (string-length doc)))
+                                    (new    (string-append out subdir)))
+                               (mkdir-p (dirname new))
+                               (rename-file haddock-file new)))
+                           (find-files doc "\\.haddock$")))))
+            (add-after 'install 'replace-$pkgroot
+              (lambda* (#:key outputs #:allow-other-keys)
+                ((@ (srfi srfi-11) let*-values)
+                  (((out) (assoc-ref outputs "out"))
+                   ((_ version) (package-name->name+version
+                                    (strip-store-file-name out))))
+                 ;; We split out the version because we want this to also work
+                 ;; with packages named "ghc-next" instead of "ghc"
+                 (substitute*
+                   (find-files
+                    (string-append (assoc-ref outputs "out") "/lib/ghc-"
+                                   version "/lib/package.conf.d/")
+                    "^.*\\.conf$")
+                   (("\\$\\{pkgroot\\}/")
+                    (string-append (assoc-ref outputs "out") "/lib/ghc-"
+                                   version "/lib/")))))))))
+      (build-system gnu-build-system)
+      (inputs (list bash-minimal gmp ncurses libffi))
+      (native-inputs
+       `(("perl" ,perl)
+         ("python" ,python)
+         ("git" ,git-minimal/pinned)
+         ("which" ,which)
+         ("ghostscript" ,ghostscript)
+         ("autoconf" ,autoconf)
+         ("automake" ,automake)
+
+         ("ghc-bootstrap" ,ghc-bootstrap)
+         ("ghc-alex" ,ghc-alex-bootstrap-for-9.4)
+         ("ghc-happy" ,ghc-happy-bootstrap-for-9.4)
+         ("ghc-testsuite"
+          ,(origin
+             (method url-fetch)
+             (uri (string-append
+                   "https://www.haskell.org/ghc/dist/"
+                   version "/ghc-" version "-testsuite.tar.xz"))
+             (sha256
+              (base32
+               "1hxylm3nhxzl7yidarlavvcg1240w4bk0hy5jnvwna24jyxz69i6"))
+             (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
+         ("hadrian-bootstrap"
+          ,(origin
+             (method url-fetch)
+             (uri (string-append "https://downloads.haskell.org/~ghc/"
+                                 version "/hadrian-bootstrap-sources/"
+                                 "hadrian-bootstrap-sources-"
+                                 (package-version ghc-bootstrap) ".tar.gz"))
+             (sha256
+               (base32
+                 "14dkxif9x4hy85phcj3j0glf95k04g4ab6hfchpw9vxgvk97syi1"))))))
+      (native-search-paths
+       (list (search-path-specification
+              (variable "GHC_PACKAGE_PATH")
+              (files (list (string-append "lib/ghc-" version)))
+              (file-pattern ".*\\.conf\\.d$")
+              (file-type 'directory))))
+      (home-page "https://www.haskell.org/ghc")
+      (synopsis "The Glasgow Haskell Compiler")
+      (description
+        "The Glasgow Haskell Compiler (GHC) is a state-of-the-art compiler and
+interactive environment for the functional language Haskell.")
+      (license license:bsd-3))))
+
 ;;; haskell.scm ends here
