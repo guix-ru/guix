@@ -1505,12 +1505,6 @@ interactive environment for the functional language Haskell.")
               (file-pattern ".*\\.conf\\.d$")
               (file-type 'directory)))))))
 
-;; Versions newer than ghc defined below (i.e. the compiler
-;; haskell-build-system uses) should use ghc-next as their name to
-;; ensure ghc (without version specification) and ghc-* packages are
-;; always compatible. See https://issues.guix.gnu.org/issue/47335.
-(define-public ghc ghc-9.2)
-
 ;; 9.4 is the last version to support the make-based build system,
 ;; but it boot with 9.2, only 9.0 is supported.
 (define ghc-bootstrap-for-9.4 ghc-9.0)
@@ -1574,7 +1568,7 @@ interactive environment for the functional language Haskell.")
   (let ((base ghc-9.2))
     (package
       (inherit base)
-      (name "ghc-next")
+      (name "ghc")
       (version "9.4.3")
       (source (origin
                 (method url-fetch)
@@ -1625,7 +1619,7 @@ interactive environment for the functional language Haskell.")
 (define-public ghc-9.8
   (let ((ghc-bootstrap ghc-9.4))
     (package
-      (name "ghc-next")
+      (name "ghc")
       (version "9.8.1")
       (source (origin
                 (method url-fetch)
@@ -1860,7 +1854,7 @@ interactive environment for the functional language Haskell.")
   (let ((base ghc-9.8))
     (package
       (inherit base)
-      (name "ghc-next")
+      (name "ghc")
       (version "9.10.2")
       (source
         (origin
@@ -1933,5 +1927,11 @@ interactive environment for the functional language Haskell.")
               (files (list (string-append "lib/ghc-" version)))
               (file-pattern ".*\\.conf\\.d$")
               (file-type 'directory)))))))
+
+;; Versions newer than ghc defined below (i.e. the compiler
+;; haskell-build-system uses) should use ghc-next as their name to
+;; ensure ghc (without version specification) and ghc-* packages are
+;; always compatible. See https://issues.guix.gnu.org/issue/47335.
+(define-public ghc ghc-9.10)
 
 ;;; haskell.scm ends here
