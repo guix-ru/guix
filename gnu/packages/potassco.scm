@@ -551,6 +551,7 @@ into Python programs easier.")
                      ;; XXX: Does this cross-compile?
                      (patch-shebang script)))))))
     (propagated-inputs (list python-clingo))
+    (native-inputs (list python-setuptools python-wheel))
     (home-page "https://potassco.org/")
     (synopsis "Solve probabilistic logic programs")
     (description "This package provides a system to solve probabilistic
@@ -651,6 +652,7 @@ as logic programs.")
           python-sphinx-rtd-theme
           python-traitlets
           python-uvicorn))
+   (native-inputs (list python-setuptools python-wheel))
    (home-page "https://github.com/potassco/clingraph")
    (synopsis "Clingo-based interactive UI")
    (description "Clinguin is a graphical user interface toolkit for clingo,
