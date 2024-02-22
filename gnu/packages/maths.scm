@@ -3818,8 +3818,13 @@ bindings to almost all functions of PETSc.")
                (base32
                 "1v6nc0z9dg4am0bibji9pijci9f15z68mwrlv91a28pvawx5czp5"))))
     (build-system pyproject-build-system)
+    (native-inputs
+     (list python-cppy
+           python-pytest
+           python-setuptools
+           python-setuptools-scm
+           python-wheel))
     (propagated-inputs (list python-typing-extensions))
-    (native-inputs (list python-cppy python-pytest python-setuptools-scm))
     (home-page "https://github.com/nucleic/kiwi")
     (synopsis "Fast implementation of the Cassowary constraint solver")
     (description

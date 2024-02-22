@@ -2081,7 +2081,7 @@ of people.")
                (base32
                 "0ysqylpyv17s52634wn3vrwf7y9b5ig7fdfv8vwj1272lvv68qgk"))))
     (build-system pyproject-build-system)
-    (native-inputs (list python-nose2))
+    (native-inputs (list python-nose2 python-setuptools python-wheel))
     (inputs
      (list python-jwcrypto
            python-numpy
@@ -5206,11 +5206,15 @@ their web site.")
                  (string-append indent
                                 "os.utime(os.path.join(root, file), (315619200, 315619200))\n"
                                 line))))))))
+    (native-inputs
+     (list python-setuptools
+           python-wheel))
     (inputs (list python))
     (propagated-inputs
      (list python-boto3
            python-botocore
            python-docutils
+           python-pip
            python-six
            python-virtualenv))
     (home-page "https://github.com/4dn-dcic/python-lambda")
