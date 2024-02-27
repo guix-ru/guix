@@ -23443,6 +23443,7 @@ JPEG2000 and GIF files in pure Python.")
            python-mypy
            python-pexpect
            python-setuptools
+           python-setuptools-scm
            python-wheel
            tcsh
            fish
