@@ -2080,7 +2080,9 @@ Amazon S3 compatible object storage server.")
            python-flaky
            python-nose
            python-pytest
-           python-pytest-xdist))
+           python-pytest-xdist
+           python-setuptools
+           python-wheel))
     (inputs
      (list curl gnutls))
     (home-page "http://pycurl.io/")
