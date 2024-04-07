@@ -1,0 +1,19 @@
+#+title: Readme
+
+* Guix-ru :: Guix
+Зеркало официального репозитория Guix, синхронизируемое каждый час через GitHub Actions.
+
+Если GHA но осиливает checkout, можно отзеркалить локально:
+#+begin_src shell
+make
+#+end_src
+
+* Ссылки
+- Основной сайт проекта https://guix.gnu.org/
+- Основной репозиторий https://git.savannah.gnu.org/cgit/guix.git
+- Сборочные сервера (Substitutce Cuirass) https://ci.guix.gnu.org/, https://guix.bordeaux.inria.fr/
+- Баг трекер https://debbugs.gnu.org/cgi/pkgreport.cgi?package=guix-patches,
+  https://debbugs.gnu.org/cgi/pkgreport.cgi?package=guix
+- Веб морда к баг трекерам https://issues.guix.gnu.org/
+- QA https://qa.guix.gnu.org/patches, https://patches.guix-patches.cbaines.net/,
+  https://data.qa.guix.gnu.org/
