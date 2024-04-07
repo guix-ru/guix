@@ -4,8 +4,7 @@ on:
   push:
   schedule:
   - cron: '0 * * * *'
-permissions:
-  repository-projects: "write"
+permissions: "write-all"
 jobs:
   guix:
     runs-on: "ubuntu-latest"
