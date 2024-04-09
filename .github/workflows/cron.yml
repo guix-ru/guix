@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
       - name: "[cron-mirror|guix] configure git"
         run: |
-          echo CURRENT_REPO="https://${GITHUB_ACTOR}:${{ sercrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" >> ${GITHUB_ENV}
+          echo CURRENT_REPO="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" >> ${GITHUB_ENV}
           git config user.name ${GITHUB_ACTOR}
           git config user.email ${GITHUB_ACTOR}@github.com
       - name: "[cron-mirror|guix] clone"
