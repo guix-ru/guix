@@ -1,5 +1,5 @@
 ---
-name: cron-mirror
+name: cron
 on:
   push:
   schedule:
@@ -23,5 +23,5 @@ jobs:
       - name: "[cron-mirror|guix] push"
         run: |
           cd guix.git
-          git push --mirror ${{ github.repository }}
+          git push --mirror
 ...
