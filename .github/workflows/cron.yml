@@ -15,13 +15,14 @@ jobs:
           fetch-depth: 0
       - name: "[cron-mirror|guix] configure git"
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          echo CURRENT_REPO="https://${GITHUB_ACTOR}:${{ sercrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" >> ${GITHUB_ENV}
+          git config user.name ${GITHUB_ACTOR}
+          git config user.email ${GITHUB_ACTOR}@github.com
       - name: "[cron-mirror|guix] clone"
         run: |
           git clone --mirror https://git.savannah.gnu.org/git/guix.git
       - name: "[cron-mirror|guix] push"
         run: |
           cd guix.git
-          git push --mirror
+          git push --mirror ${CURRENT_REPO}
 ...
