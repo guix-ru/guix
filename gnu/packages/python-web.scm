@@ -6085,7 +6085,7 @@ in various CSS modules.")
        (uri (pypi-uri "cssselect2" version))
        (sha256
         (base32 "1j2fcr217rsvkipsg6zjq03rl64rxnvb5hqqpx0dv58fhspvkywk"))))
-    (build-system python-build-system)
+    (build-system pyproject-build-system)
     (arguments
      `(#:phases
        (modify-phases %standard-phases
@@ -6096,11 +6096,7 @@ in various CSS modules.")
                (("'pytest-flake8',") "")
                (("'pytest-isort',") "")
                (("--flake8") "")
-               (("--isort") ""))))
-         (replace 'check
-           (lambda* (#:key tests? #:allow-other-keys)
-             (when tests?
-               (lambda _ (invoke "pytest"))))))))
+               (("--isort") "")))))))
     (propagated-inputs
      (list python-tinycss2))
     (native-inputs
