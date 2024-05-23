@@ -339,6 +339,7 @@
                          python-pytest-cov
                          python-pytest-mock
                          python-pytest-xdist
+                         python-setuptools
                          python-wheel))
     (home-page "https://github.com/caronc/apprise")
     (synopsis
@@ -545,8 +546,10 @@ design}.")
            python-isort
            python-ipython-genutils
            python-jupyter-server
+           python-pyaml
            python-pytest
-           python-pyaml))
+           python-setuptools
+           python-wheel))
     (propagated-inputs
      (list python-markdown-it-py
            python-mdit-py-plugins
@@ -6201,6 +6204,7 @@ Capabilities include:
               (base32
                "1x620s4dk4d501pivhlfzbi2d1r5fnm9cssqwkn76f7d8sfk9nyg"))))
     (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools python-wheel))
     (home-page "https://pypi.org/project/Unidecode/")
     (synopsis "ASCII transliterations of Unicode text")
     (description
@@ -8519,7 +8523,11 @@ and integrated feature-set for programming Python effectively.")
            python-typed-ast
            python-typing-extensions))
     (native-inputs
-     (list python-pytest python-pytest-aiohttp python-setuptools-scm))
+     (list python-pytest
+           python-pytest-aiohttp
+           python-setuptools
+           python-setuptools-scm
+           python-wheel))
     (home-page "https://github.com/psf/black")
     (synopsis "The uncompromising code formatter")
     (description "Black is the uncompromising Python code formatter.")
@@ -8995,8 +9003,12 @@ objects.")
     (propagated-inputs
      (list python-numba python-numpy python-scipy))
     (native-inputs
-     (list python-dask python-importlib-metadata python-pytest
-           python-pytest-black python-pytest-cov))
+     (list python-dask
+           python-importlib-metadata
+           python-pytest
+           python-pytest-black
+           python-pytest-cov
+           python-setuptools))
     (home-page "https://github.com/pydata/sparse/")
     (synopsis "Library for multi-dimensional sparse arrays")
     (description
@@ -9398,7 +9410,12 @@ parse and apply unified diffs.  It has features such as:
                   ;; TODO: unclear why these fail.
                   "-k" "not test_MyClass and not test_my_function")))
     (propagated-inputs (list python-jinja2 python-sphinx))
-    (native-inputs (list python-matplotlib python-pytest python-pytest-cov))
+    (native-inputs
+     (list python-matplotlib
+           python-pytest
+           python-pytest-cov
+           python-setuptools
+           python-wheel))
     (home-page "https://pypi.org/project/numpydoc/")
     (synopsis "Numpy's Sphinx extensions")
     (description "Sphinx extension to support docstrings in Numpy format.")
@@ -10118,7 +10135,7 @@ e.g. copy examples, fetch data, etc.")
          "1kjrxav572j45xvr1iy60zb2g8zqvrinzdkl4ax36js4vczckl8d"))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list python-pytest python-pytest-cov))
+     (list python-pytest python-pytest-cov python-setuptools python-wheel))
     (home-page "https://github.com/aio-libs/multidict/")
     (synopsis "Multidict implementation")
     (description "Multidict is dict-like collection of key-value pairs
@@ -10139,7 +10156,7 @@ where key might be occurred more than once in the container.")
     (propagated-inputs
      (list python-six))
     (native-inputs
-     (list python-flake8 python-pycodestyle))
+     (list python-flake8 python-pycodestyle python-setuptools python-wheel))
     (home-page "https://github.com/gruns/orderedmultidict")
     (synopsis "Python Ordered Multivalue Dictionary - omdict")
     (description "This package contains a library for ordered multivalue
@@ -11968,6 +11985,7 @@ enforced method signatures and consistent documentation.")
            python-pytest-cov
            python-pytest-flake8
            python-pytest-mypy
+           python-setuptools
            python-setuptools-scm
            python-wheel))
     (propagated-inputs (list python-more-itertools))
@@ -15420,7 +15438,7 @@ pseudo terminal (pty), and interact with both the process and its pty.")
              (invoke "make" "test"))))))
     (build-system python-build-system)
     (native-inputs
-     (list python-coverage which))
+     (list python-coverage python-setuptools python-wheel which))
     (synopsis "Simple testing framework for command line applications")
     (description
      "Cram is a functional testing framework for command line applications.
@@ -16164,8 +16182,9 @@ distribution.  It is not intended as an end-user tool.")
        (uri (pypi-uri "immutables" version))
        (sha256
         (base32 "1x4cinh0xbl6p6p2yfm2s07mxxy3lf0zzai9gqpydk4482bwfdjk"))))
-    (build-system python-build-system)
-    (native-inputs (list python-mypy python-pytest))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-mypy python-pytest python-setuptools python-wheel))
     (home-page "https://github.com/MagicStack/immutables")
     (synopsis "High-performance immutable mapping type for Python")
     (description
@@ -17830,6 +17849,7 @@ time.")
            texlive-collection-basic
            texlive-enumitem
            texlive-environ
+           texlive-etoolbox
            texlive-eurosym
            texlive-etoolbox
            texlive-fancyvrb
@@ -17839,7 +17859,6 @@ time.")
            texlive-grffile
            texlive-hyperref
            texlive-infwarerr
-           texlive-jknapltx
            texlive-jknapltx
            texlive-kvoptions
            texlive-lm
@@ -24617,6 +24636,7 @@ package attempts to address the shortcomings of @code{isodate}.")
            python-hypothesmith
            python-libcst-minimal
            python-natsort
+           python-pip
            python-poetry-core
            python-pylama
            python-pypa-build
@@ -27453,6 +27473,7 @@ submitting it.")
        (sha256
         (base32 "0ymdwrx544a6gn6wm9dixpgzbfrbpxvcj5ys7m41cgb4lvpvx691"))))
     (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools python-wheel))
     (home-page "https://github.com/iwalton3/python-mpv-jsonipc")
     (synopsis "Python API to control MPV using JSON IPC")
     (description "Python MPV JSONIPC implements an interface similar to
@@ -28078,7 +28099,7 @@ library to allow local file system access via @code{file://} URLs.")
              (when tests?
                (invoke "pytest" "-vv")))))))
     (native-inputs
-     (list python-coverage python-pytest))
+     (list python-coverage python-pytest python-setuptools python-wheel))
     (propagated-inputs
      (list python-editdistance))
     (home-page "https://github.com/chriskuehl/identify")
@@ -28177,7 +28198,11 @@ effort to simplify the man pages with practical examples.")
              ;; This test fails. It tries to open a network socket.
              (invoke "pytest" "-vv" "-k" "not test_smoke"))))))
     (native-inputs
-     (list python-coverage python-mock python-pytest))
+     (list python-coverage
+           python-mock
+           python-pytest
+           python-setuptools
+           python-wheel))
     (home-page "https://ekalinin.github.io/nodeenv/")
     (synopsis "Create isolated node.js environments")
     (description
@@ -28285,7 +28310,7 @@ Let's Encrypt.")
              (when tests?
                (invoke "pytest" "-vv")))))))
     (native-inputs
-     (list python-pytest))
+     (list python-pytest python-setuptools python-wheel))
     (home-page "https://github.com/asottile/cfgv")
     (synopsis "Configuration validation library")
     (description
@@ -28524,7 +28549,8 @@ codecs for use in data storage and communication applications.")
            python-pytest-doctestplus
            python-pytest-timeout
            python-pytest-xdist
-           python-setuptools-scm))
+           python-setuptools-scm
+           python-wheel))
     (home-page "https://github.com/zarr-developers/zarr-python")
     (synopsis "Chunked, compressed, N-dimensional arrays for Python")
     (description
@@ -28958,7 +28984,7 @@ they use the same path.")
     (build-system pyproject-build-system)
     (propagated-inputs
      (list python-locket python-numpy python-pandas python-pyzmq python-toolz))
-    (native-inputs (list python-setuptools))
+    (native-inputs (list python-setuptools python-wheel))
     (home-page "https://github.com/dask/partd/")
     (synopsis "Appendable key-value storage")
     (description "Partd stores key-value pairs.  Values are raw bytes.  We
@@ -29108,7 +29134,8 @@ parentdir_prefix = dask-
            python-pytest-rerunfailures
            python-pytest-runner
            python-pytest-xdist
-           python-versioneer))
+           python-versioneer
+           python-wheel))
     (home-page "https://github.com/dask/dask/")
     (synopsis "Parallel computing with task scheduling")
     (description
@@ -29684,7 +29711,7 @@ the Trio framework}.")
           "006vpl19bffy9fn0sssxbfakcvgrx7fhvy6l515fzln7vwpqf7zf"))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list python-freezegun python-pytest))
+     (list python-freezegun python-pytest python-setuptools python-wheel))
     (home-page "https://github.com/jmoiron/humanize")
     (synopsis "Print numerical information in a human-readable form")
     (description "This package provides a Python module that displays numbers
@@ -30235,7 +30262,11 @@ information in various formats.")
      (list python-cairocffi python-cssselect2 python-defusedxml
            python-pillow python-tinycss2))
     (native-inputs
-     (list python-pytest-flake8 python-pytest-isort python-pytest-runner))
+     (list python-pytest-flake8
+           python-pytest-isort
+           python-pytest-runner
+           python-setuptools
+           python-wheel))
     (home-page "https://cairosvg.org/")
     (synopsis "SVG to PDF/PS/PNG converter based on Cairo")
     (description "CairoSVG is a SVG converter based on Cairo.  It can export
@@ -32308,7 +32339,9 @@ and not test_transcript")))
            python-pytest
            python-pytest-cov
            python-pytest-mock
-           python-setuptools-scm))
+           python-setuptools
+           python-setuptools-scm
+           python-wheel))
     (home-page "https://github.com/python-cmd2/cmd2")
     (synopsis "Tool for building interactive command line applications")
     (description
@@ -35102,7 +35135,7 @@ functions defined in POSIX.1-2001 and POSIX.1-2008.")
                                 "python-pyan3-fix-absolute-path-bug.patch"))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list python-pytest python-pytest-cov python-wheel))
+     (list python-pytest python-pytest-cov python-setuptools python-wheel))
     (propagated-inputs
      (list python-jinja2))
     (home-page "https://github.com/Technologicat/pyan")
@@ -36632,7 +36665,13 @@ writing STL files.  It supports both the text and binary forms of STL.")
                 "0hzshd665rl1bkwvaj9va4j3gs8nmb478fbvligx20663xhmzfzp"))))
     (build-system python-build-system)
     (propagated-inputs (list python-six))
-    (native-inputs (list python-pyyaml python-mock python-pytest-cov))
+    (native-inputs
+     (list python-mock
+           python-pytest
+           python-pytest-cov
+           python-pyyaml
+           python-setuptools
+           python-wheel))
     (arguments
      `(#:phases (modify-phases %standard-phases
                   ;; There is a bug in the test_suit specification.
@@ -36720,6 +36759,7 @@ adapted from the @code{packaging} package.")
             python-pytest
             python-pytest-cov
             python-pytest-timeout
+            python-setuptools
             python-setuptools-scm
             python-wheel))
     (home-page "https://github.com/iterative/shtab")

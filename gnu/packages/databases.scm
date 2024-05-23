@@ -5656,6 +5656,7 @@ mechanism of @code{dogpile}.")
      (list python-beautifulsoup4
            python-black
            python-cogapp
+           python-pip
            python-pytest
            python-pytest-asyncio
            python-pytest-runner
