@@ -297,6 +297,8 @@ commands, additional database fields and admin extensions.")
               (if tests?
                   (apply invoke "python" "-m" "django" "test" test-flags)
                   (format #t "test suite not run~%")))))))
+    (native-inputs
+     (list python-setuptools python-wheel))
     (propagated-inputs
      (list python-django python-stdnum))
     (home-page "https://django-localflavor.readthedocs.io/en/latest/")

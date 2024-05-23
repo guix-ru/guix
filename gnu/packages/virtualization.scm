@@ -2092,10 +2092,12 @@ mainly implemented in user space.")
                   (format #t "test suite not run~%")))))))
     (native-inputs
      (list python-avocado-framework
-           python-setuptools-scm
            python-flake8
            python-isort
-           python-pylint))
+           python-pylint
+           python-setuptools
+           python-setuptools-scm
+           python-wheel))
     (propagated-inputs
      (list python-pygments
            python-urwid
@@ -2849,7 +2851,9 @@ use with virtualization provisioning tools")
      (list python-black
            python-mypy
            python-pyhamcrest
-           python-twine))
+           python-setuptools
+           python-twine
+           python-wheel))
     (propagated-inputs
      (list python-beautifultable
            python-click
