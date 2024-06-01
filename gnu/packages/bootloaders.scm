@@ -943,7 +943,6 @@ Info manual.")))
          (modify-inputs (package-native-inputs u-boot)
                           (prepend python-filelock
                                    python-pycryptodomex
-                                   python-coverage
                                    python-pytest
                                    python-pytest-xdist))
            (modify-inputs (package-native-inputs u-boot)
@@ -969,14 +968,6 @@ Info manual.")))
                (("/bin/false") (which "false")))
              (substitute* "tools/dtoc/fdt_util.py"
                (("'cc'") "'gcc'"))
-             (substitute* "tools/u_boot_pylib/test_util.py"
-               ;; python3-coverage is simply called coverage in guix.
-               (("python3-coverage") "coverage")
-
-               ;; Don't require 100% coverage since it's brittle and can
-               ;; fail with newer versions of coverage or dependencies.
-               (("raise ValueError\\('Test coverage failure'\\)")
-                "print('Continuing anyway since Guix does not care :O')"))
              (substitute* "test/run"
                ;; Make it easier to find test failures.
                (("#!/bin/bash") "#!/bin/bash -x")
@@ -989,9 +980,9 @@ Info manual.")))
                 "# run_test \"sandbox_noinst\"")
                (("run_test \"sandbox_vpl\"")
                 "# run_test \"sandbox_vpl\"")
-               ;; FIXME: code coverage not working
-               (("run_test \"binman code coverage\"")
-                "# run_test \"binman code coverage\"")
+               ;; Disable code coverage tests.
+               (("run_test \"(\\w+) code coverage\"" all)
+                (string-append "# " all))
                ;; This test would require internet access.
                (("\\./tools/buildman/buildman") (which "true")))
              (substitute* "test/py/tests/test_sandbox_exit.py"
