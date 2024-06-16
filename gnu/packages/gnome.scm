@@ -9786,7 +9786,7 @@ endpoint and it understands SPARQL.")
 (define-public tracker-miners
   (package
     (name "tracker-miners")
-    (version "3.6.1")
+    (version "3.7.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/tracker-miners/"
@@ -9794,7 +9794,7 @@ endpoint and it understands SPARQL.")
                                   "/tracker-miners-" version ".tar.xz"))
               (sha256
                (base32
-                "13ljx0birrav728ik3bnlwzgas8q6rbhjbvxp7zzwy6ambafiw7f"))))
+                "1zm57pih7csgipw3w2b1sgadvfszik70sbz4gr5pn6aw9caqhhz7"))))
     (build-system meson-build-system)
     (arguments
      `(#:glib-or-gtk? #t
@@ -9804,6 +9804,10 @@ endpoint and it understands SPARQL.")
              (string-append "-Dc_link_args=-Wl,-rpath="
                             (assoc-ref %outputs "out")
                             "/lib/tracker-miners-3.0")
+             ;; TODO: Check if this is only a build-time failure, or add
+             ;; variants to explicitly enable this features, (see:
+             ;; https://gitlab.gnome.org/GNOME/tracker-miners/-/issues/300).
+             "-Dlandlock=disabled"
              ;; TODO: Enable functional tests. Currently, the following error
              ;; appears:
              ;; Exception: The functional tests require DConf to be the default
