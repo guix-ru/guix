@@ -10117,7 +10117,7 @@ beautifying border effects.")
 (define-public dconf-editor
   (package
     (name "dconf-editor")
-    (version "43.0")
+    (version "45.0.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -10125,7 +10125,7 @@ beautifying border effects.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0dli166qzfphqlyvdx4nncg13ys7756sbsdfslyakhkcswnkqnlk"))))
+                "1pa1k510qx4v0ywhqwpj3qfjyz8qiiis4565ghhydnpfg1v2k00i"))))
     (build-system meson-build-system)
     (arguments
      (list #:phases #~(modify-phases %standard-phases
@@ -10134,6 +10134,7 @@ beautifying border effects.")
                             (setenv "DESTDIR" "/"))))))
     (native-inputs
      (list `(,glib "bin")               ;for glib-compile-schemas, gio-2.0
+           desktop-file-utils           ;for update-desktop-database
            `(,gtk "bin")                ;for gtk-update-icon-cache
            intltool
            pkg-config
