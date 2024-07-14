@@ -1796,7 +1796,7 @@ virtualization library.")
            python-requests
            qemu
            spice-gtk
-           vte))
+           vte/gtk+-3))
     (native-inputs
      (list `(,glib "bin")               ; glib-compile-schemas
            gobject-introspection
