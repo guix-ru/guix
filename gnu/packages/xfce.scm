@@ -1120,7 +1120,7 @@ features playback of local media files, DVD/CD and live streams.")
     (native-inputs
      (list pkg-config intltool))
     (inputs
-     (list libxfce4ui vte))
+     (list libxfce4ui vte/gtk+-3))
     (home-page "https://www.xfce.org/")
     (synopsis "Xfce terminal emulator")
     (description
