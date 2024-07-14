@@ -2130,7 +2130,7 @@ to other formats.")
 (define-public gnome-characters
   (package
     (name "gnome-characters")
-    (version "44.0")
+    (version "46.0")
     (source
      (origin
        (method url-fetch)
@@ -2139,7 +2139,7 @@ to other formats.")
                            "/gnome-characters-" version ".tar.xz"))
        (sha256
         (base32
-         "02zm3w43lvsnld3681z9w1428pwdza2gv4k05vwsx461ih15rc85"))))
+         "0z42blzj4kp0vgwqdaf8fip28i3qag6yg94lk55j0j5z232y5s54"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -2152,6 +2152,16 @@ to other formats.")
                           "gtk_update_icon_cache: false")
                          (("update_desktop_database: true")
                           "update_desktop_database: false"))))
+                   (add-after 'unpack 'fix-test-setup
+                     (lambda _
+                       (substitute* "tests/meson.build"
+                         (("'GI_TYPELIB_PATH': (.*)," all path)
+                          (string-append "'GI_TYPELIB_PATH':"
+                                         " ["
+                                         path
+                                         ", '"
+                                         (getenv "GI_TYPELIB_PATH")
+                                         "'],")))))
                    (add-after 'install 'wrap
                      (lambda* (#:key outputs #:allow-other-keys)
                        ;; GNOME Characters needs Typelib files from GTK and
@@ -2163,8 +2173,10 @@ to other formats.")
     (native-inputs
      (list gettext-minimal
            `(,glib "bin")
+           gobject-introspection
            pkg-config
-           python-minimal))
+           xorg-server-for-tests
+           xvfb-run))
     (inputs
      (list bash-minimal  ;for wrap-program
            gjs
