@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2019-2023 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2019-2024 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2020 Björn Höfling <bjoern.hoefling@bjoernhoefling.de>
 ;;; Copyright © 2022 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;;
@@ -34,6 +34,7 @@
              (guix profiles)
              (guix utils)
              (git)
+             (gnu packages)
              (gnu packages base)
              (gnu packages compression)
              (gnu packages gawk)
@@ -52,8 +53,116 @@
 (define file-append*
   (@@ (guix self) file-append*))
 
-(define translated-texi-manuals
-  (@@ (guix self) translate-texi-manuals))
+(define (translated-texi-manuals source)
+  "Return the translated texinfo manuals built from SOURCE."
+  (define po4a
+    (specification->package "po4a"))
+
+  (define gettext-minimal
+    (specification->package "gettext-minimal"))
+
+  (define documentation
+    (file-append* source "doc"))
+
+  (define documentation-po
+    (file-append* source "po/doc"))
+
+  (define build
+    (with-imported-modules '((guix build utils) (guix build po))
+      #~(begin
+          (use-modules (guix build utils) (guix build po)
+                       (ice-9 match) (ice-9 regex) (ice-9 textual-ports)
+                       (ice-9 vlist) (ice-9 threads)
+                       (srfi srfi-1))
+
+          (define (translate-tmp-texi po source output)
+            "Translate Texinfo file SOURCE using messages from PO, and write
+the result to OUTPUT."
+            (invoke #+(file-append po4a "/bin/po4a-translate")
+              "-M" "UTF-8" "-L" "UTF-8" "-k" "0" "-f" "texinfo"
+              "-m" source "-p" po "-l" output))
+
+          (define (canonicalize-whitespace str)
+            ;; Change whitespace (newlines, etc.) in STR to #\space.
+            (string-map (lambda (chr)
+                          (if (char-set-contains? char-set:whitespace chr)
+                              #\space
+                              chr))
+                        str))
+
+          (define* (translate-texi prefix po lang
+                                   #:key (extras '()))
+            "Translate the manual for one language LANG using the PO file.
+PREFIX must be the prefix of the manual, 'guix' or 'guix-cookbook'.  EXTRAS is
+a list of extra files, such as '(\"contributing\")."
+            (for-each (lambda (file)
+                        (translate-tmp-texi po (string-append file ".texi")
+                                            (string-append file "." lang
+                                                           ".texi.tmp")))
+                      (cons prefix extras))
+
+            (for-each (lambda (file)
+                        (let* ((texi (string-append file "." lang ".texi"))
+                               (tmp  (string-append texi ".tmp")))
+                          (copy-file tmp texi)
+                          (translate-cross-references texi po)))
+                      (cons prefix extras)))
+
+          (define (available-translations directory domain)
+            ;; Return the list of available translations under DIRECTORY for
+            ;; DOMAIN, a gettext domain such as "guix-manual".  The result is
+            ;; a list of language/PO file pairs.
+            (filter-map (lambda (po)
+                          (let ((base (basename po)))
+                            (and (string-prefix? (string-append domain ".")
+                                                 base)
+                                 (match (string-split base #\.)
+                                   ((_ ... lang "po")
+                                    (cons lang po))))))
+                        (find-files directory
+                                    "\\.[a-z]{2}(_[A-Z]{2})?\\.po$")))
+
+          (define parallel-jobs
+            ;; Limit thread creation by 'n-par-for-each', mostly to put an
+            ;; upper bound on memory usage.
+            (min (parallel-job-count) 4))
+
+          (mkdir #$output)
+          (copy-recursively #$documentation "."
+                            #:log (%make-void-port "w"))
+
+          (for-each
+            (lambda (file)
+              (copy-file file (basename file)))
+            (find-files #$documentation-po ".*.po$"))
+
+          (setenv "GUIX_LOCPATH"
+                  #+(file-append glibc-utf8-locales "/lib/locale"))
+          (setenv "PATH" #+(file-append gettext-minimal "/bin"))
+          (setenv "LC_ALL" "en_US.UTF-8")
+          (setlocale LC_ALL "en_US.UTF-8")
+
+          (n-par-for-each parallel-jobs
+                          (match-lambda
+                            ((language . po)
+                             (translate-texi "guix" po language
+                                             #:extras '("contributing"))))
+                          (available-translations "." "guix-manual"))
+
+          (n-par-for-each parallel-jobs
+                          (match-lambda
+                            ((language . po)
+                             (translate-texi "guix-cookbook" po language)))
+                          (available-translations "." "guix-cookbook"))
+
+          (for-each (lambda (file)
+                      (install-file file #$output))
+                    (append
+                     (find-files "." "contributing\\..*\\.texi$")
+                     (find-files "." "guix\\..*\\.texi$")
+                     (find-files "." "guix-cookbook\\..*\\.texi$"))))))
+
+  (computed-file "guix-translated-texinfo" build))
 
 (define info-manual
   (@@ (guix self) info-manual))
