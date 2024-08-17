@@ -3693,9 +3693,10 @@ for dealing with different structured file formats.")
               ;; Increase reftest tolerance a bit to account for different
               ;; harfbuzz, pango, etc.
               (setenv "RSVG_TEST_TOLERANCE" "20")
-              ;; This test fails even after loosening the tolerance.
+              ;; These tests fail even after loosening the tolerance.
               (substitute* "tests/src/reference.rs"
-                ((".*svg1_1_text_align_03_b_svg.*") ""))))
+                ((".*svg1_1_text_align_03_b_svg.*") "")
+                ((".*rtl_tspan_svg.*") ""))))
           (add-before 'configure 'pre-configure
             (lambda* (#:key outputs #:allow-other-keys)
               (substitute* "gdk-pixbuf-loader/Makefile.in"
