@@ -1411,6 +1411,7 @@ commit date (an integer)."
                          (setenv "PATH"
                                  (string-append #+tar "/bin:"
                                                 #+xz "/bin:"
+                                                #+zstd "/bin:"
                                                 #+texinfo "/bin"))
                          (invoke "tar" "xf" #$(package-source guile))
                          (mkdir-p (string-append #$output "/en/html_node"))
