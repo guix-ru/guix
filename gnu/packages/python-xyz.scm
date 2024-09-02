@@ -6167,6 +6167,7 @@ visualisation and class tracker statistics.")
 environments and back.")
     (license license:bsd-3)))
 
+;; WARNING: This package is a dependency of mesa.
 (define-public python-pyyaml
   (package
     (name "python-pyyaml")
@@ -21051,6 +21052,7 @@ Protocol) 0-9-1 protocol that tries to stay fairly independent of the underlying
 network support library.")
     (license license:bsd-3)))
 
+;; WARNING: This package is a dependency of mesa.
 (define-public python-ply
   (package
     (name "python-ply")
