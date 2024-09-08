@@ -7976,7 +7976,7 @@ to display dialog boxes from the commandline and shell scripts.")
 (define-public mutter
   (package
     (name "mutter")
-    (version "44.9")
+    (version "46.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -7984,7 +7984,7 @@ to display dialog boxes from the commandline and shell scripts.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0b7wzaj67qzrhgclvqk10fwk4524j4qppl88822mxxlqr40frfnk"))))
+                "1r02fp1z5ikm9ml2m4dvnfdn3nig4wj45cz2gicmdnrak37xj6v1"))))
     ;; NOTE: Since version 3.21.x, mutter now bundles and exports forked
     ;; versions of cogl and clutter.  As a result, many of the inputs,
     ;; propagated-inputs, and configure flags used in cogl and clutter are
@@ -8001,7 +8001,7 @@ to display dialog boxes from the commandline and shell scripts.")
          ;; Otherwise, the RUNPATH will lack the final path component.
          (string-append "-Dc_link_args=-Wl,-rpath="
                         #$output "/lib,-rpath="
-                        #$output "/lib/mutter-12")
+                        #$output "/lib/mutter-14")
          ;; Disable systemd support.
          "-Dsystemd=false"
          ;; Don't install tests.
@@ -8124,19 +8124,20 @@ to display dialog boxes from the commandline and shell scripts.")
            autoconf
            automake
            libtool
-           wayland-protocols
+           wayland-protocols-next
            ;; For tests.
            ;; Warnings are configured to be fatal during the tests; add an icon
            ;; theme to please libxcursor.
            adwaita-icon-theme
+           libei
            libxcursor                   ;for XCURSOR_PATH
            pipewire
            python
            python-dbus
            python-dbusmock))
     (propagated-inputs
-     (list gsettings-desktop-schemas      ;required by libmutter-12.pc
-           ;; mutter-clutter-12.pc and mutter-cogl-12.pc refer to these:
+     (list gsettings-desktop-schemas      ;required by libmutter-14.pc
+           ;; mutter-clutter-14.pc and mutter-cogl-14.pc refer to these:
            at-spi2-core
            cairo
            eudev
@@ -8171,6 +8172,7 @@ to display dialog boxes from the commandline and shell scripts.")
            libxkbfile
            libxrandr
            libxtst
+           linux-libre-headers-6.1      ; for dma_buf_export_sync_file
            pipewire
            startup-notification
            sysprof
