@@ -1644,8 +1644,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/john-the-ripper-jumbo-with-gcc-11.patch	\
   %D%/packages/patches/json-c-0.13-CVE-2020-12762.patch		\
   %D%/packages/patches/json-c-0.12-CVE-2020-12762.patch		\
+  %D%/packages/patches/julia-1.9-build-tweaks.patch		\
   %D%/packages/patches/julia-SOURCE_DATE_EPOCH-mtime.patch	\
-  %D%/packages/patches/julia-Use-MPFR-4.2.patch	                \
   %D%/packages/patches/libcall-ui-make-it-installable.patch	\
   %D%/packages/patches/libcamera-ipa_manager-disable-signature-verification.patch	\
   %D%/packages/patches/libcss-check-format.patch		\

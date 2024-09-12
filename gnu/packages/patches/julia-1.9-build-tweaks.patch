@@ -1,0 +1,152 @@
+Adjust the Julia 1.9 build system to unbundle libraries and otherwise fix things
+here and there.
+
+diff --git a/Make.inc b/Make.inc
+index 5bbb52617a..7e1215a2de 100644
+--- a/Make.inc
++++ b/Make.inc
+@@ -40,33 +40,39 @@ OPENBLAS_USE_THREAD:=1
+ # Flags for using libraries available on the system instead of building them.
+ # Please read the notes around usage of SYSTEM flags in README.md
+ # Issues resulting from use of SYSTEM versions will generally not be accepted.
+-USE_SYSTEM_CSL:=0
+-USE_SYSTEM_LLVM:=0
+-USE_SYSTEM_LIBUNWIND:=0
++USE_SYSTEM_CSL:=1
++USE_SYSTEM_LLVM:=1
++USE_SYSTEM_LIBUNWIND:=1
+ DISABLE_LIBUNWIND:=0
+-USE_SYSTEM_PCRE:=0
++USE_SYSTEM_PCRE:=1
+ USE_SYSTEM_LIBM:=0
+-USE_SYSTEM_OPENLIBM:=0
++USE_SYSTEM_OPENLIBM:=1
+ UNTRUSTED_SYSTEM_LIBM:=0
+-USE_SYSTEM_DSFMT:=0
+-USE_SYSTEM_LIBBLASTRAMPOLINE:=0
+-USE_SYSTEM_BLAS:=0
+-USE_SYSTEM_LAPACK:=0
+-USE_SYSTEM_GMP:=0
+-USE_SYSTEM_MPFR:=0
+-USE_SYSTEM_LIBSUITESPARSE:=0
+-USE_SYSTEM_LIBUV:=0
+-USE_SYSTEM_UTF8PROC:=0
+-USE_SYSTEM_MBEDTLS:=0
+-USE_SYSTEM_LIBSSH2:=0
+-USE_SYSTEM_NGHTTP2:=0
+-USE_SYSTEM_CURL:=0
+-USE_SYSTEM_LIBGIT2:=0
+-USE_SYSTEM_PATCHELF:=0
+-USE_SYSTEM_LIBWHICH:=0
+-USE_SYSTEM_ZLIB:=0
+-USE_SYSTEM_P7ZIP:=0
+-USE_SYSTEM_LLD:=0
++USE_SYSTEM_DSFMT:=1
++USE_SYSTEM_LIBBLASTRAMPOLINE:=1
++USE_SYSTEM_BLAS:=1
++USE_SYSTEM_LAPACK:=1
++USE_SYSTEM_GMP:=1
++USE_SYSTEM_MPFR:=1
++USE_SYSTEM_LIBSUITESPARSE:=1
++USE_SYSTEM_LIBUV:=1
++USE_SYSTEM_UTF8PROC:=1
++USE_SYSTEM_MBEDTLS:=1
++USE_SYSTEM_LIBSSH2:=1
++USE_SYSTEM_NGHTTP2:=1
++USE_SYSTEM_CURL:=1
++USE_SYSTEM_LIBGIT2:=1
++USE_SYSTEM_PATCHELF:=1
++USE_SYSTEM_LIBWHICH:=1
++USE_SYSTEM_ZLIB:=1
++USE_SYSTEM_P7ZIP:=1
++USE_SYSTEM_LLD:=1
++
++# Guix override
++USE_INTEL_JITEVENTS:=0
++USE_PERF_JITEVENTS:=0
++USE_BINARYBUILDER:=0
++
+ 
+ # Link to the LLVM shared library
+ USE_LLVM_SHLIB := 1
+@@ -1124,7 +1130,8 @@ else
+ endif
+ 
+ ifeq ($(USE_SYSTEM_UTF8PROC), 1)
+-  LIBUTF8PROC := -lutf8proc
++  # Point to the static lib in Guix
++  LIBUTF8PROC := GUIX_LIBUTF8PROC
+   UTF8PROC_INC := $(LOCALBASE)/include
+ else
+   LIBUTF8PROC := $(build_libdir)/libutf8proc.a
+diff --git a/Makefile b/Makefile
+index ef0ade09e2..6b9177df60 100644
+--- a/Makefile
++++ b/Makefile
+@@ -11,7 +11,8 @@ all: debug release
+ # sort is used to remove potential duplicates
+ DIRS := $(sort $(build_bindir) $(build_depsbindir) $(build_libdir) $(build_private_libdir) $(build_libexecdir) $(build_includedir) $(build_includedir)/julia $(build_sysconfdir)/julia $(build_datarootdir)/julia $(build_datarootdir)/julia/stdlib $(build_man1dir))
+ ifneq ($(BUILDROOT),$(JULIAHOME))
+-BUILDDIRS := $(BUILDROOT) $(addprefix $(BUILDROOT)/,base src src/flisp src/support src/clangsa cli doc deps stdlib test test/clangsa test/embedding test/gcext test/llvmpasses)
++# FIXME: do not build doc yet
++BUILDDIRS := $(BUILDROOT) $(addprefix $(BUILDROOT)/,base src src/flisp src/support src/clangsa cli deps stdlib test test/clangsa test/embedding test/gcext test/llvmpasses)
+ BUILDDIRMAKE := $(addsuffix /Makefile,$(BUILDDIRS)) $(BUILDROOT)/sysimage.mk
+ DIRS := $(DIRS) $(BUILDDIRS)
+ $(BUILDDIRMAKE): | $(BUILDDIRS)
+@@ -64,6 +65,16 @@ julia-deps: | $(DIRS) $(build_datarootdir)/julia/base $(build_datarootdir)/julia
+ # `julia-stdlib` depends on `julia-deps` so that the fake JLL stdlibs can copy in their Artifacts.toml files.
+ julia-stdlib: | $(DIRS) julia-deps
+ 	@$(MAKE) $(QUIET_MAKE) -C $(BUILDROOT)/stdlib
++	# These files are checked-out during the build phase, but need to be fixed
++	# before the actual build, therefore we sed with a variable we'll fix before
++	# the build phase. It's twisted but it's the only working way I could find.
++	# The " are important to avoid double substitution when doing 'make' then
++	# 'make check'.
++	sed -i 's|"libcholmod"|"GUIX_LIBCHOLMOD"|' usr/share/julia/stdlib/v1.9/SparseArrays/src/solvers/cholmod.jl
++	sed -i 's|:libsuitesparseconfig|"GUIX_LIBSC"|' usr/share/julia/stdlib/v1.9/SparseArrays/src/solvers/cholmod.jl
++	sed -i 's|:libcholmod|"GUIX_LIBCHOLMOD"|' usr/share/julia/stdlib/v1.9/SparseArrays/src/solvers/LibSuiteSparse.jl
++	sed -i 's|:libspqr|"GUIX_LIBSPQR"|' usr/share/julia/stdlib/v1.9/SparseArrays/src/solvers/LibSuiteSparse.jl
++	sed -i 's|:libumfpack|"GUIX_LIBUMFPACK"|' usr/share/julia/stdlib/v1.9/SparseArrays/src/solvers/LibSuiteSparse.jl
+ 
+ julia-base: julia-deps $(build_sysconfdir)/julia/startup.jl $(build_man1dir)/julia.1 $(build_datarootdir)/julia/julia-config.jl
+ 	@$(MAKE) $(QUIET_MAKE) -C $(BUILDROOT)/base
+@@ -236,7 +247,9 @@ define stringreplace
+ endef
+ 
+ 
+-install: $(build_depsbindir)/stringreplace $(BUILDROOT)/doc/_build/html/en/index.html
++# Guix FIXME: building the doc requires internet. We should build them in a
++# separate build phase.
++install: $(build_depsbindir)/stringreplace # $(BUILDROOT)/doc/_build/html/en/index.html
+ 	@$(MAKE) $(QUIET_MAKE) $(JULIA_BUILD_MODE)
+ 	@for subdir in $(bindir) $(datarootdir)/julia/stdlib/$(VERSDIR) $(docdir) $(man1dir) $(includedir)/julia $(libdir) $(private_libdir) $(sysconfdir) $(private_libexecdir); do \
+ 		mkdir -p $(DESTDIR)$$subdir; \
+diff --git a/base/Makefile b/base/Makefile
+index 0ea0359c8c..9cee86aeec 100644
+--- a/base/Makefile
++++ b/base/Makefile
+@@ -239,7 +239,10 @@ endif
+ ifneq (,$(LIBGFORTRAN_VERSION))
+ $(eval $(call symlink_system_library,CSL,libgfortran,$(LIBGFORTRAN_VERSION)))
+ endif
+-$(eval $(call symlink_system_library,CSL,libquadmath,0))
++
++# libquadmath is not available on all architectures.
++# https://github.com/JuliaLang/julia/issues/41613
++$(eval $(call symlink_system_library,CSL,libquadmath,0,ALLOW_FAILURE))
+ $(eval $(call symlink_system_library,CSL,libstdc++,6))
+ # We allow libssp, libatomic and libgomp to fail as they are not available on all systems
+ $(eval $(call symlink_system_library,CSL,libssp,0,ALLOW_FAILURE))
+diff --git a/cli/Makefile b/cli/Makefile
+index 7ba238e0de..6540f6384a 100644
+--- a/cli/Makefile
++++ b/cli/Makefile
+@@ -7,7 +7,7 @@ include $(JULIAHOME)/deps/llvm-ver.make
+ 
+ HEADERS := $(addprefix $(SRCDIR)/,jl_exports.h loader.h) $(addprefix $(JULIAHOME)/src/,julia_fasttls.h support/platform.h support/dirpath.h jl_exported_data.inc jl_exported_funcs.inc)
+ 
+-LOADER_CFLAGS = $(JCFLAGS) -I$(BUILDROOT)/src -I$(JULIAHOME)/src -I$(JULIAHOME)/src/support -I$(build_includedir) -ffreestanding
++LOADER_CFLAGS = -D_GNU_SOURCE $(JCFLAGS) -I$(BUILDROOT)/src -I$(JULIAHOME)/src -I$(JULIAHOME)/src/support -I$(build_includedir) -ffreestanding
+ LOADER_LDFLAGS = $(JLDFLAGS) -ffreestanding -L$(build_shlibdir) -L$(build_libdir)
+ 
+ ifeq ($(OS),WINNT)

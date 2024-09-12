@@ -1,7 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2014, 2016, 2018 Eric Bavier <bavier@member.fsf.org>
 ;;; Copyright © 2015 Mark H Weaver <mhw@netris.org>
-;;; Copyright © 2015, 2017, 2018, 2019, 2020, 2021 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2015, 2017-2021, 2024 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2016 Dennis Mungai <dmngaie@gmail.com>
 ;;; Copyright © 2016, 2018, 2019, 2020, 2021, 2023, 2025 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2017 Roel Janssen <roel@gnu.org>
@@ -2337,22 +2337,36 @@ LLVM."))))
 LLVM bitcode files.")
     (license license:expat)))
 
-(define-public llvm-julia
+(define-public llvm-14-julia
   (package
-    (inherit llvm-13)
+    (inherit llvm-14)
+    (version "14.0.6-3-julia")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference (url "https://github.com/JuliaLang/llvm-project")
+                            (commit "julia-14.0.6-3")))
+        (file-name (git-file-name "llvm-project-julia" "14.0.6-3"))
+        (sha256
+          (base32
+            "16ynl9g4paksvglk6asfxdr15gy21bzvsjdkqb1msbcnkz2x610x"))))
     (arguments
-     (substitute-keyword-arguments (package-arguments llvm-13)
-       ((#:configure-flags flags ''())
+     (substitute-keyword-arguments (package-arguments llvm-14)
+       ((#:configure-flags flags
+         ''())
+        ; FIXME: I think we should basically duplicate
+        ; https://github.com/JuliaLang/julia/blob/master/deps/llvm.mk
         #~(cons* "-DLLVM_BUILD_LLVM_DYLIB=ON"
                  "-DLLVM_LINK_LLVM_DYLIB=ON"
-                 ;; "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=NVPTX"
-                 "-DLLVM_VERSION_SUFFIX:STRING=jl"  ; Perhaps not needed.
-                 #$(string-append "-DLLVM_TARGETS_TO_BUILD="
+                 "-DLLVM_SHLIB_SYMBOL_VERSION:STRING=JL_LLVM_14.0"
+                 "-DLLVM_VERSION_SUFFIX:STRING=jl" ;Perhaps not needed.
+                 #$(string-append "-DLLVM_TARGETS_TO_BUILD=NVPTX;AMDGPU;"
                                   (system->llvm-target))
-                 (delete "-DBUILD_SHARED_LIBS:BOOL=TRUE" #$flags)))
-       ((#:build-type _) "Release")))
-    (properties `((hidden? . #t)
-                  ,@(package-properties llvm-13)))))
+                 (delete "-DBUILD_SHARED_LIBS:BOOL=TRUE"
+                         #$flags)))
+       ((#:build-type _)
+        "Release")))
+    (properties `((hidden? . #t) ,@(package-properties llvm-14)))))
 
 (define llvm-cling-base llvm-16)
 
