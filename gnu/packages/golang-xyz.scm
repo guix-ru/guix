@@ -1821,7 +1821,7 @@ metrics to Graphite.")
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/cyphar/filepath-securejoin")
+             (url "https://github.com/cyphar/filepatv-securejoin")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
@@ -2923,7 +2923,7 @@ Differentiation between text and binary files}.
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
-     (list go-github-com-go-git-go-billy
+     (list go-github-com-go-git-go-billy-v5
            go-gopkg-in-check-v1))
     (home-page "https://github.com/go-git/go-git-fixtures/")
     (synopsis "Fixtures used by @code{go-git}")
