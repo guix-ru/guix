@@ -5743,6 +5743,7 @@ parts of it.")
       #:make-flags
       #~(list (string-append "PREFIX=" #$output)
               "SHELL=bash"
+              "DEBUG=1"                 ; enable debug symbols
               "MAKE_NB_JOBS=0"          ;use jobserver for submakes
               "NO_STATIC=1"             ;avoid a 67 MiB static archive
 
@@ -5795,6 +5796,7 @@ parts of it.")
      (list `(,gfortran "lib")))
     (native-inputs
      (list cunit gfortran perl))
+    (outputs '("out" "debug"))
     (home-page "https://www.openblas.net/")
     (synopsis "Optimized BLAS library based on GotoBLAS")
     (description
