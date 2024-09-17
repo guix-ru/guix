@@ -1313,7 +1313,7 @@ common subexpression elimination.")
 (define-public julia-compat
   (package
     (name "julia-compat")
-    (version "3.39.0")
+    (version "4.16.0")
     (source
      (origin
        (method git-fetch)
@@ -1322,7 +1322,7 @@ common subexpression elimination.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0qzvaqi5gqgc747fnajbvvf5vqbh6cwykwky00c7glvmvdsgk3z0"))))
+        (base32 "1n0s3rv478fwlrpy1v4f5fcydx7lblzljjlmkh6ap7nm2xs1w43c"))))
     (build-system julia-build-system)
     (arguments
      (list
