@@ -14,7 +14,7 @@
 ;;; Copyright © 2021 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2021 Pierre Langlois <pierre.langlois@gmx.com>
 ;;; Copyright © 2022, 2024 Ricardo Wurmus <rekado@elephly.net>
-;;; Copyright © 2022, 2023 Ekaitz Zarraga <ekaitz@elenq.tech>
+;;; Copyright © 2022-2024 Ekaitz Zarraga <ekaitz@elenq.tech>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -498,7 +498,7 @@ MesCC-Tools), and finally M2-Planet.")
   (package
     (inherit tcc)
     (name "tcc-boot0")
-    (version "0.9.26-1149-g46a75d0c")
+    (version "0.9.26-1157-gdd46e018")
     (source (origin
               (method url-fetch)
               (uri (list
@@ -508,7 +508,7 @@ MesCC-Tools), and finally M2-Planet.")
                                    "tcc-" version ".tar.gz")))
               (sha256
                (base32
-                "068x3r55fnz7pdxb6q01s8s26pb4kpxm61q8mwsa4cf6389cxxpl"))))
+                "0bi32a1xdndz4ffway4ghcn2nfcnyd78mwh9vq2khyqyrnmc0j1p"))))
     (build-system gnu-build-system)
     (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
     (inputs '())
