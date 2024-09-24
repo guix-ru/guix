@@ -398,7 +398,7 @@ MesCC-Tools), and finally M2-Planet.")
   (package
     (inherit mes)
     (name "mes-boot")
-    (version "0.25.1")
+    (version "0.26.1")
     (source (origin
               (method url-fetch)
               (uri (list (string-append "mirror://gnu/mes/"
@@ -407,7 +407,7 @@ MesCC-Tools), and finally M2-Planet.")
                                         "mes-" version ".tar.gz")))
               (sha256
                (base32
-                "03np6h4qx94givjdvq2rmhvab38y5f91254n0avg4vq2j0cx78in"))))
+                "1x7wq9cj8pybdl736mn8z48zcwgvyvi9mr9mr9vv9jxzii90sdz1"))))
     (inputs '())
     (propagated-inputs '())
     (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
