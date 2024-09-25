@@ -145,6 +145,16 @@ the checkout from TARBALL, a tarball containing said checkout.
              #:graft? #f
              #:local-build? #t))))))
 
+(define* (commencement-build-target #:optional (system (%current-system)))
+  "Return an architecture triplet for use in various build scripts.  This is
+the supported 32-bit version of the architecture currently being built on."
+  (cond
+    ((target-x86-64?) "i686-unknown-linux-gnu")
+    ((target-aarch64?) "arm-unknown-linux-gnueabihf")
+    (#t (string-replace-substring
+          (platform-system->target system)
+          "-linux" "-unknown-linux"))))
+
 (define bootar
   (package
     (name "bootar")
