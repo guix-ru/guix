@@ -675,14 +675,13 @@ MesCC-Tools), and finally M2-Planet.")
   (package
     (inherit gnu-make)
     (name "make-mesboot0")
-    (version "3.80")
+    (version "3.82")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/make/make-" version ".tar.gz"))
               (sha256
                (base32
-                "1pb7fb7fqf9wz9najm85qdma1xhxzf1rhj5gwrlzdsz2zm0hpcv4"))))
-    (supported-systems '("i686-linux" "x86_64-linux"))
+                "1rs2f9hmvy3q6zkl15jnlmnpgffm0bhw5ax0h5c7q604wqrip69x"))))
     (inputs '())
     (propagated-inputs '())
     (native-inputs `(("tcc" ,tcc-boot0)
@@ -693,8 +692,8 @@ MesCC-Tools), and finally M2-Planet.")
        #:configure-flags '("CC=tcc"
                            "CPP=tcc -E"
                            "LD=tcc"
-                           "--build=i686-unknown-linux-gnu"
-                           "--host=i686-unknown-linux-gnu"
+                           ,(string-append "--build=" (commencement-build-target))
+                           ,(string-append "--host=" (commencement-build-target))
                            "--disable-nls")
        #:modules ((guix build gnu-build-system)
                   (guix build utils)
