@@ -510,8 +510,9 @@ MesCC-Tools), and finally M2-Planet.")
            (search-path-specification
             (variable "MES_PREFIX")
             (separator #f)
-            (files '("")))))))
-
+            (files '("")))))
+    ;; This can take up to 3 days on riscv64-linux.
+    (properties `((timeout . ,(* 3 24 60 60))))))
 
 (define tcc-boot0
   ;; Pristine tcc cannot be built by MesCC, we are keeping a delta of 30
