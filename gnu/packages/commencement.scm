@@ -349,18 +349,18 @@ pure Scheme to Tar and decompression in one easy step.")
 
 (define stage0-posix
   ;; The initial bootstrap package: no binary inputs except those from
-  ;; `bootstrap-seeds, for x86 a 357 byte binary seed: `x86/hex0-seed'.
+  ;; `bootstrap-seeds, for x86 a 190 byte binary seed: `x86/hex0-seed'.
     (package
       (name "stage0-posix")
-      (version "1.6.0")
+      (version "1.7.0")
       (source (origin
                 (method url-fetch)
-                (uri (string-append
-                       "https://github.com/oriansj/" name "/releases/download/"
-                       "Release_" version "/" name "-" version ".tar.gz"))
+                (uri (string-append "https://github.com/oriansj/stage0-posix/"
+                                    "releases/download/Release_" version
+                                    "/stage0-posix-" version ".tar.gz"))
                 (sha256
                  (base32
-                  "0p06wn95y6xbp2kcd81h2fm3wxvldd1qqyxgav0farl34xlzyq4j"))))
+                  "10c79z2c62gvrvpshvj94zz2hczdq1p4g1v0dakx1jiz2fx32vvn"))))
       (supported-systems '("i686-linux" "x86_64-linux"
                            "aarch64-linux"
                            "riscv64-linux"))
@@ -412,7 +412,7 @@ pure Scheme to Tar and decompression in one easy step.")
                 (install-file "M2-Planet" bindir))))))
       (home-page "https://github.com/oriansj/stage0-posix/")
       (synopsis "The initial bootstrap package, builds stage0 up to M2-Planet")
-      (description "Starting from the 357-byte hex0-seed binary provided by
+      (description "Starting from the 190-byte hex0-seed binary provided by
 the bootstrap-seeds, the stage0-posix package first builds hex0 and then all
 the way up: hex1, catm, hex2, M0, cc_x86, M1, M2, get_machine (that's all of
 MesCC-Tools), and finally M2-Planet.")
