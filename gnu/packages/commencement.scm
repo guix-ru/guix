@@ -473,10 +473,9 @@ MesCC-Tools), and finally M2-Planet.")
                 (invoke "gash" "configure.sh"
                         (string-append "--prefix=" out)
                         (string-append "--host="
-                          #$(cond
-                              ((target-x86-64?) "i686-linux-gnu")
-                              (#t (platform-system->target
-                                    (%current-system)))))))))
+                          #$(string-replace-substring
+                              (commencement-build-target)
+                              "-unknown-" "-"))))))
           (replace 'build
             (lambda _
               ;; TODO: GUILE_LOAD_PATH is leaking. We need to clean it.
