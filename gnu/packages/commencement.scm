@@ -1589,7 +1589,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
             (list
              (string-append "--prefix=" out)
              "--disable-obsolete-rpc"
-             "--host=i686-unknown-linux-gnu"
+             (string-append "--host=" #$(commencement-build-target))
              (string-append "--with-headers=" headers "/include")
              "--enable-static-nss"
              "--with-pthread"
