@@ -1343,15 +1343,17 @@ ac_cv_c_float_format='IEEE (little-endian)'
                               "-B" libc "/lib "
                               "-Wl,-dynamic-linker "
                               "-Wl," libc
-                              #$(glibc-dynamic-linker "i686-linux"))))
+                              #$(glibc-dynamic-linker
+                                  (gnu-triplet->nix-system
+                                    (commencement-build-target))))))
                (list (string-append "LDFLAGS=" ldflags)
                      (string-append "LDFLAGS_FOR_TARGET=" ldflags)))
            #:configure-flags
            #~(let ((out (assoc-ref %outputs "out"))
                    (glibc (assoc-ref %build-inputs "libc")))
                (list (string-append "--prefix=" out)
-                     "--build=i686-unknown-linux-gnu"
-                     "--host=i686-unknown-linux-gnu"
+                     (string-append "--build=" #$(commencement-build-target))
+                     (string-append "--host=" #$(commencement-build-target))
                      (string-append "--with-native-system-header-dir=" glibc "/include")
                      (string-append "--with-build-sysroot=" glibc "/include")
                      "--disable-bootstrap"
@@ -1421,7 +1423,9 @@ ac_cv_c_float_format='IEEE (little-endian)'
                           (kernel-headers (assoc-ref %build-inputs "kernel-headers")))
                      (setenv "CONFIG_SHELL" (string-append bash "/bin/sh"))
                      (setenv "C_INCLUDE_PATH" (string-append
-                                               gcc "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3/include"
+                                               gcc "/lib/gcc-lib/"
+                                               #$(commencement-build-target)
+                                               "/2.95.3/include"
                                                ":" kernel-headers "/include"
                                                ":" glibc "/include"
                                                ":" (getcwd) "/mpfr/src"))
