@@ -927,8 +927,8 @@ MesCC-Tools), and finally M2-Planet.")
                  "--disable-nls"
                  "--disable-shared"
                  "--disable-werror"
-                 "--build=i686-unknown-linux-gnu"
-                 "--host=i686-unknown-linux-gnu"
+                 ,(string-append "--build=" #$(commencement-build-target))
+                 ,(string-append "--host=" #$(commencement-build-target))
                  "--with-sysroot=/"))))))
 
 (define gcc-core-mesboot0
