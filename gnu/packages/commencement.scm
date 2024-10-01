@@ -1127,8 +1127,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
                `("--disable-shared"
                  "--enable-static"
                  "--disable-sanity-checks"
-                 "--build=i686-unknown-linux-gnu"
-                 "--host=i686-unknown-linux-gnu"
+                 ,(string-append "--build=" #$(commencement-build-target))
+                 ,(string-append "--host=" #$(commencement-build-target))
                  ,(string-append "--with-headers=" headers "/include")
                  "--enable-static-nss"
                  "--without-__thread"
