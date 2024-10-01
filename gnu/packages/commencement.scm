@@ -1205,7 +1205,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (lambda* (#:key outputs #:allow-other-keys)
                 (let* ((out (assoc-ref outputs "out"))
                        (gcc-dir (string-append
-                                 out "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3")))
+                                 out "/lib/gcc-lib/" #$(commencement-build-target)
+                                 "/2.95.3")))
                   (and
                    (mkdir-p "tmp")
                    (zero? (system (string-append "set -x; cd tmp && ar x ../gcc/libgcc2.a")))
@@ -1215,8 +1216,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
         #~(let ((out (assoc-ref %outputs "out")))
             `("--disable-shared"
               "--disable-werror"
-              "--build=i686-unknown-linux-gnu"
-              "--host=i686-unknown-linux-gnu"
+              ,(string-append "--build=" #$(commencement-build-target))
+              ,(string-append "--host=" #$(commencement-build-target))
               ,(string-append "--prefix=" out))))
        ((#:make-flags make-flags)
         #~(let ((gcc (assoc-ref %build-inputs "gcc")))
