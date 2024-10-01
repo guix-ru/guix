@@ -1242,8 +1242,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
         #~(let ((out (assoc-ref %outputs "out")))
             `("--disable-nls" "--disable-shared"
               "--disable-werror"
-              "--build=i686-unknown-linux-gnu"
-              "--host=i686-unknown-linux-gnu"
+              ,(string-append "--build=" #$(commencement-build-target))
+              ,(string-append "--host=" #$(commencement-build-target))
               "--with-sysroot=/"
               ,(string-append "--prefix=" out))))))))
 
