@@ -771,7 +771,9 @@ MesCC-Tools), and finally M2-Planet.")
                     (interpreter "/mes/loader"))
                (invoke "sh" "configure"
                        (string-append "--cc=tcc")
-                       (string-append "--cpu=i386")
+                        (string-append
+                          "--cpu=" (car (string-split
+                                          ,(commencement-build-target) #\-)))
                        (string-append "--prefix=" out)
                        (string-append "--elfinterp=" interpreter)
                        (string-append "--crtprefix=" tcc "/lib")
@@ -788,7 +790,6 @@ MesCC-Tools), and finally M2-Planet.")
                 "-vvv"
                 "-D" "BOOTSTRAP=1"
                 "-D" "ONE_SOURCE=1"
-                "-D" "TCC_TARGET_I386=1"
                 "-D" "CONFIG_TCC_STATIC=1"
                 "-D" "CONFIG_USE_LIBGCC=1"
                 "-D" (string-append "CONFIG_TCCDIR=\"" out "/lib/tcc\"")
@@ -816,7 +817,6 @@ MesCC-Tools), and finally M2-Planet.")
                      (list
                       "-D" "BOOTSTRAP=1"
                       "-D" "ONE_SOURCE=1"
-                      "-D" "TCC_TARGET_I386=1"
                       "-D" "CONFIG_TCCBOOT=1"
                       "-D" "CONFIG_TCC_STATIC=1"
                       "-D" "CONFIG_USE_LIBGCC=1"
@@ -836,7 +836,7 @@ MesCC-Tools), and finally M2-Planet.")
                                   (string-append out "/include"))
                 (copy-recursively (string-append tcc "/lib")
                                   (string-append out "/lib"))
-                (invoke "./tcc" "-D" "TCC_TARGET_I386=1" "-c" "-o" "libtcc1.o" "lib/libtcc1.c")
+                (invoke "./tcc" "-c" "-o" "libtcc1.o" "lib/libtcc1.c")
                 (invoke "./tcc" "-ar" "rc" "libtcc1.a" "libtcc1.o")
                 (copy-file "libtcc1.a" (string-append out "/lib/libtcc1.a"))
                 (delete-file (string-append out "/lib/tcc/libtcc1.a"))
@@ -846,7 +846,13 @@ MesCC-Tools), and finally M2-Planet.")
                 (delete-file (string-append out "/lib/libc.a"))
                 (apply invoke "./tcc" "-c" "-o" "libc.o"
                        "-I" (string-append tcc "/include")
-                       "-I" (string-append tcc "/include/linux/x86")
+                       "-I" (string-append
+                              tcc "/include/linux/"
+                              ,(match
+                                (car (string-split
+                                       (commencement-build-target) #\-))
+                                ("i686" "x86")
+                                (x x)))
                        (string-append mes "/lib/libc+gnu.c")
                        cppflags)
                 (invoke "./tcc" "-ar" "rc" "libc.a" "libc.o")
