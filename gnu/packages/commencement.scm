@@ -150,10 +150,8 @@ the checkout from TARBALL, a tarball containing said checkout.
 the supported 32-bit version of the architecture currently being built on."
   (cond
     ((target-x86-64?) "i686-unknown-linux-gnu")
-    ((target-aarch64?) "arm-unknown-linux-gnueabihf")
-    (#t (string-replace-substring
-          (platform-system->target system)
-          "-linux" "-unknown-linux"))))
+    ((target-arm?) "arm-unknown-linux-gnu")
+    (#t (nix-system->gnu-triplet system))))
 
 (define bootar
   (package
