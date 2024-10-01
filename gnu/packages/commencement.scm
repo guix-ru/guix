@@ -1724,8 +1724,11 @@ SHELL := " shell "
                         (display (string-append "#! " bash "/bin/bash
 exec " gcc "/bin/" program
 " -Wl,--dynamic-linker"
-;; also for x86_64-linux, we are still on i686-linux
-" -Wl," libc ,(glibc-dynamic-linker "i686-linux")
+" -Wl," libc ,(glibc-dynamic-linker
+                (match (%current-system)
+                       ("x86_64-linux" "i686-linux")
+                       ("aarch64-linux" "armhf-linux")
+                       (_ (%current-system))))
 " -Wl,--rpath"
 " -Wl," libc "/lib"
 " \"$@\"
@@ -1734,9 +1737,9 @@ exec " gcc "/bin/" program
                 '("cpp"
                   "gcc"
                   "g++"
-                  "i686-unknown-linux-gnu-cpp"
-                  "i686-unknown-linux-gnu-gcc"
-                  "i686-unknown-linux-gnu-g++")))))
+                  ,(string-append (commencement-build-target) "-cpp")
+                  ,(string-append (commencement-build-target) "-gcc")
+                  ,(string-append (commencement-build-target) "-g++"))))))
          (replace 'check
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref outputs "out"))
