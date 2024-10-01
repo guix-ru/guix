@@ -1783,8 +1783,8 @@ exec " gcc "/bin/" program
             #~(let ((out (assoc-ref %outputs "out"))
                     (glibc (assoc-ref %build-inputs "libc")))
                 (list (string-append "--prefix=" out)
-                      "--build=i686-unknown-linux-gnu"
-                      "--host=i686-unknown-linux-gnu"
+                      (string-append "--build=" #$(commencement-build-target))
+                      (string-append "--host=" #$(commencement-build-target))
 
                       "--with-host-libstdcxx=-lsupc++"
 
@@ -1833,12 +1833,16 @@ exec " gcc "/bin/" program
                            (kernel-headers (assoc-ref %build-inputs "kernel-headers")))
                       (setenv "CONFIG_SHELL" (string-append bash "/bin/sh"))
                       (setenv "C_INCLUDE_PATH" (string-append
-                                                gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
+                                                gcc "/lib/gcc-lib/"
+                                                #$(commencement-build-target)
+                                                "/4.6.4/include"
                                                 ":" kernel-headers "/include"
                                                 ":" glibc "/include"
                                                 ":" (getcwd) "/mpfr/src"))
                       (setenv "CPLUS_INCLUDE_PATH" (string-append
-                                                    gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
+                                                    gcc "/lib/gcc-lib/"
+                                                    #$(commencement-build-target)
+                                                    "/4.6.4/include"
                                                     ":" kernel-headers "/include"
                                                     ":" glibc "/include"
                                                     ":" (getcwd) "/mpfr/src"))
