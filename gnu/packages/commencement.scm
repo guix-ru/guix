@@ -708,23 +708,30 @@ MesCC-Tools), and finally M2-Planet.")
     ,@(%boot-gash-inputs)))
 
 (define tcc-boot
-  ;; The final tcc.
+ (let ((commit "8cd21e91ccee3baf15ad2f8cba9cbc4b618695a0")
+       (revision "1139")
+       (mes-system
+        (cond ((target-x86-32?) "x86")
+              ((target-x86-64?) "x86_64")
+              ((target-aarch64?) "aarch64")
+              ((target-riscv64?) "riscv64"))))
   (package
     (inherit tcc-boot0)
     (name "tcc-boot")
-    (version "0.9.27")
+    (version (string-append "0.9.27" "." revision "-" (string-take commit 7)))
     (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://savannah/tinycc/tcc-"
-                                  version ".tar.bz2"))
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://repo.or.cz/tinycc")
+                    (commit commit)))
+              (file-name (git-file-name name version))
               (sha256
                (base32
-                "177bdhwzrnqgyrdv1dwvpd04fcxj68s5pm1dzwny6359ziway8yy"))))
+                "05slgpsavjd76pnkhghik3skmmic8d1py1b3jvcklcvkh1jv3s8i"))))
     (build-system gnu-build-system)
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("mes" ,mes-boot)
-                     ,@(%boot-tcc0-inputs)))
+    (native-inputs (%boot-tcc0-inputs))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
@@ -735,103 +742,120 @@ MesCC-Tools), and finally M2-Planet.")
          (add-after 'unpack 'scripted-patch
            (lambda* (#:key inputs #:allow-other-keys)
              (substitute* "libtcc.c"
-               (("s->alacarte_link = 1;" all)
-                (string-append all "
-    s->static_link = 1;")))))
+               (("s->nocommon = 1;" all)
+                (string-append all "\ns->static_link = 1;")))))
          (replace 'configure
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref %outputs "out"))
-                    (tcc (assoc-ref %build-inputs "tcc"))
-                    (libc (assoc-ref %build-inputs "libc"))
-                    (interpreter "/mes/loader"))
-               (invoke "sh" "configure"
-                       (string-append "--cc=tcc")
-                        (string-append
-                          "--cpu=" (car (string-split
-                                          ,(commencement-build-target) #\-)))
-                       (string-append "--prefix=" out)
-                       (string-append "--elfinterp=" interpreter)
-                       (string-append "--crtprefix=" tcc "/lib")
-                       (string-append "--sysincludepaths=" tcc "/include")
-                       (string-append "--libpaths=" tcc "/lib")))))
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((out (assoc-ref outputs "out"))
+                   (tcc (assoc-ref inputs "tcc"))
+                   (libc (assoc-ref inputs "libc"))
+                   (interpreter "/mes/loader"))
+               ;; Our 'cut' program doesn't work well with the configure script
+               ;; so we seed some of our configs in the configure script.
+               (substitute* "configure"
+                 (("cc=\"gcc\"") (string-append "cc=\"" tcc "/bin/tcc\""))
+                 (("cpu=\"\"") (string-append "cpu=\"" ,mes-system "\""))
+                 (("^prefix=\"\"") (string-append "prefix=\"" out "\""))
+                 #;
+                 (("^tcc_elfinterp=\"\"")
+                  (string-append "tcc_elfinterp=\"" interpreter "\""))
+                 (("^tcc_crtprefix=\"\"")
+                  (string-append "tcc_crtprefix=\"" tcc "/lib\""))
+                 (("^tcc_sysincludepaths=\"\"")
+                  (string-append "tcc_sysincludepaths=\"" tcc "/include\""))
+                 (("^tcc_libpaths=\"\"")
+                  (string-append "tcc_libpaths=\"" tcc "/lib\"")))
+               (invoke "sh" "configure"))))
          (replace 'build
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref %outputs "out"))
-                    (tcc (assoc-ref %build-inputs "tcc"))
-                    (libc (assoc-ref %build-inputs "libc"))
-                    (interpreter "/mes/loader"))
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((out (assoc-ref outputs "out"))
+                   (tcc (assoc-ref inputs "tcc"))
+                   (libc (assoc-ref inputs "libc"))
+                   (interpreter "/mes/loader"))
                (invoke
                 "tcc"
                 "-vvv"
-                "-D" "BOOTSTRAP=1"
                 "-D" "ONE_SOURCE=1"
                 "-D" "CONFIG_TCC_STATIC=1"
                 "-D" "CONFIG_USE_LIBGCC=1"
+                "-D" "CONFIG_TCC_SEMLOCK=0"
                 "-D" (string-append "CONFIG_TCCDIR=\"" out "/lib/tcc\"")
                 "-D" (string-append "CONFIG_TCC_CRTPREFIX=\"" out "/lib:{B}/lib:.\"")
-                "-D" (string-append "CONFIG_TCC_CRTPREFIX=\"" out "/lib:{B}/lib:.\"")
                 "-D" (string-append "CONFIG_TCC_ELFINTERP=\"" interpreter "\"")
-                "-D" (string-append "CONFIG_TCC_LIBPATHS=\"" tcc "/lib:{B}/lib:.\"")
+                "-D" (string-append "CONFIG_TCC_LIBPATHS=\""
+                                    tcc "/lib:"
+                                    out "/lib:"
+                                    "{B}/lib:.\"")
                 "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
-                                    tcc "/include" ":/include:{B}/include\"")
+                                    tcc "/include:"
+                                    out "/include:"
+                                    "{B}/include\"")
                 "-D" (string-append "TCC_LIBGCC=\"" tcc "/lib/libc.a\"")
                 "-o" "tcc"
                 "tcc.c"))))
+         (add-after 'build 'build-libtcc1.a
+           (lambda _
+             (invoke "./tcc"
+                     "-g" "-vvv"
+                     "-I" "include"
+                     "-c" "-o" "libtcc1.o" "lib/libtcc1.c")
+             (cond
+               (,(or (target-aarch64?)
+                     (target-riscv64?))
+                 (invoke "./tcc"
+                         "-g" "-vvv"
+                         "-I" "include"
+                         "-c" "-o" "lib-arm64.o" "lib/lib-arm64.c")
+                 (invoke "./tcc" "-ar" "rc" "libtcc1.a" "libtcc1.o" "lib-arm64.o"))
+               (else
+                 (invoke "./tcc" "-ar" "rc" "libtcc1.a" "libtcc1.o")))))
+         (add-after 'build-libtcc1.a 'rebuild-libraries
+           (lambda* (#:key inputs #:allow-other-keys)
+             (let* ((tcc (assoc-ref inputs "tcc"))
+                    (flags (list "-I" (string-append tcc "/include")
+                                 "-I" (string-append tcc "/include/linux/" ,mes-system)
+                                 "-I" "include")))
+               (apply invoke "./tcc" "-g" "-vvv"
+                      "-c" "-o" "libc.o"
+                      (string-append tcc "/share/libc.c")
+                      flags)
+               (invoke "./tcc" "-ar" "rc" "libc.a" "libc.o")
+               (apply invoke "./tcc" "-g" "-vvv"
+                      "-c" "-o" "libgetopt.o"
+                      (string-append tcc "/share/libgetopt.c")
+                      flags)
+               (invoke "./tcc" "-ar" "rc" "libgetopt.a" "libgetopt.o")
+               (apply invoke "./tcc" "-g" "-vvv"
+                      "-c" "-o" "crt1.o"
+                      (string-append tcc "/share/crt1.c")
+                      flags)
+               (copy-file (string-append tcc "/lib/crti.o") "crti.o")
+               (copy-file (string-append tcc "/lib/crtn.o") "crtn.o"))))
          (replace 'check
            (lambda _
              ;; FIXME: add sensible check target (without depending on make)
              ;; ./check.sh ?
              (= 1 (status:exit-val (system* "./tcc" "--help")))))
          (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref %outputs "out"))
-                    (mes (assoc-ref %build-inputs "mes"))
-                    (tcc (assoc-ref %build-inputs "tcc"))
-                    (interpreter "/mes/loader")
-                    (cppflags
-                     (list
-                      "-D" "BOOTSTRAP=1"
-                      "-D" "ONE_SOURCE=1"
-                      "-D" "CONFIG_TCCBOOT=1"
-                      "-D" "CONFIG_TCC_STATIC=1"
-                      "-D" "CONFIG_USE_LIBGCC=1"
-                      "-D" (string-append "CONFIG_TCCDIR=\"" out "/lib/tcc\"")
-                      "-D" (string-append "CONFIG_TCC_CRTPREFIX=\"" out "/lib:{B}/lib:.\"")
-                      "-D" (string-append "CONFIG_TCC_ELFINTERP=\"" interpreter "\"")
-                      "-D" (string-append "CONFIG_TCC_LIBPATHS=\"" tcc "/lib:{B}/lib:{B}/lib/tcc:.\"")
-                      "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
-                                          tcc "/include" ":/include:{B}/include\"")
-                      "-D" (string-append "TCC_LIBGCC=\"" tcc "/lib/libc.a\"")
-                      "-D" (string-append "TCC_LIBTCC1_MES=\"libtcc1-mes.a\""))))
-               (and
-                (mkdir-p (string-append out "/bin"))
-                (copy-file "tcc" (string-append out "/bin/tcc"))
-                (mkdir-p (string-append out "/lib/tcc"))
-                (copy-recursively (string-append tcc "/include")
-                                  (string-append out "/include"))
-                (copy-recursively (string-append tcc "/lib")
-                                  (string-append out "/lib"))
-                (invoke "./tcc" "-c" "-o" "libtcc1.o" "lib/libtcc1.c")
-                (invoke "./tcc" "-ar" "rc" "libtcc1.a" "libtcc1.o")
-                (copy-file "libtcc1.a" (string-append out "/lib/libtcc1.a"))
-                (delete-file (string-append out "/lib/tcc/libtcc1.a"))
-                (copy-file "libtcc1.a"
-                           (string-append out "/lib/tcc/libtcc1.a"))
-
-                (delete-file (string-append out "/lib/libc.a"))
-                (apply invoke "./tcc" "-c" "-o" "libc.o"
-                       "-I" (string-append tcc "/include")
-                       "-I" (string-append
-                              tcc "/include/linux/"
-                              ,(match
-                                (car (string-split
-                                       (commencement-build-target) #\-))
-                                ("i686" "x86")
-                                (x x)))
-                       (string-append mes "/lib/libc+gnu.c")
-                       cppflags)
-                (invoke "./tcc" "-ar" "rc" "libc.a" "libc.o")
-                (copy-file "libc.a" (string-append out "/lib/libc.a")))))))))))
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (bin (string-append out "/bin"))
+                    (lib (string-append out "/lib"))
+                    (tcc (assoc-ref inputs "tcc")))
+               (mkdir-p (string-append out "/share"))
+               (install-file "tcc" bin)
+               (copy-recursively "include"
+                                 (string-append out "/include"))
+               (install-file "libtcc1.a" (string-append lib "/tcc"))
+               (for-each (lambda (file)
+                           (install-file file lib))
+                         '("libtcc1.a" "libc.a" "libgetopt.a"
+                           "crt1.o" "crti.o" "crtn.o"))
+               ;; Install from previous tcc.
+               (copy-recursively (string-append tcc "/include")
+                                 (string-append out "/include"))
+               (copy-recursively (string-append tcc "/share")
+                                 (string-append out "/share")))))))))))
 
 (define patch-mesboot
   ;; The initial patch.
