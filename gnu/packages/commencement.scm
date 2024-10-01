@@ -968,8 +968,8 @@ MesCC-Tools), and finally M2-Planet.")
                `("--enable-static"
                  "--disable-shared"
                  "--disable-werror"
-                 "--build=i686-unknown-linux-gnu"
-                 "--host=i686-unknown-linux-gnu"
+                 ,(string-append "--build=" #$(commencement-build-target))
+                 ,(string-append "--host=" #$(commencement-build-target))
                  ,(string-append "--prefix=" out)))
            #:make-flags
            #~`("CC=tcc -static -D __GLIBC_MINOR__=6"
@@ -1026,10 +1026,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (add-after 'install 'install2
                  (lambda* (#:key outputs #:allow-other-keys)
                    (let* ((tcc (assoc-ref %build-inputs "tcc"))
-                          (tcc-lib (string-append tcc "/lib/x86-mes-gcc"))
                           (out (assoc-ref outputs "out"))
                           (gcc-dir (string-append
-                                    out "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3")))
+                                    out "/lib/gcc-lib/" #$(commencement-build-target)
+                                    "/2.95.3")))
                      (mkdir-p "tmp")
                      (with-directory-excursion "tmp"
                        (invoke "ar" "x" (string-append "../gcc/libgcc2.a"))
@@ -1046,10 +1046,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (native-search-paths
      (list (search-path-specification
             (variable "C_INCLUDE_PATH")
-            (files '("include"
+            (files `("include"
 
                      ;; Needed to get things like GCC's <stddef.h>.
-                     "lib/gcc-lib/i686-unknown-linux-gnu/2.95.3/include")))
+                     "lib/gcc-lib/" ,(commencement-build-target) "/2.95.3/include")))
            (search-path-specification
             (variable "LIBRARY_PATH")
             (files '("lib")))))))
