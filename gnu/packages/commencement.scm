@@ -1055,6 +1055,46 @@ MesCC-Tools), and finally M2-Planet.")
                    (install-file "libtcc1.a" (string-append out "/lib"))
                    (install-file "libtcc1.a" (string-append out "/lib/tcc")))))))))))
 
+(define tcc-musl
+  (package
+    (inherit tcc-boot-musl)
+    (name "tcc-musl")
+    (native-inputs (modify-inputs (package-native-inputs tcc-boot-musl)
+                                  (replace "tcc" tcc-boot-musl)))
+    (arguments
+      (substitute-keyword-arguments (package-arguments tcc-boot-musl)
+        ((#:phases phases)
+         #~(modify-phases #$phases
+             (replace 'build
+               (lambda* (#:key outputs inputs #:allow-other-keys)
+                 (let ((out (assoc-ref outputs "out"))
+                       (libc (assoc-ref inputs "libc"))
+                       (interpreter "/musl/loader"))
+                   (invoke
+                    "tcc"
+                    "-g"
+                    "-vvv"
+                    "-D" "REG_PC=0"
+                    "-D" "REG_S0=8"
+                    "-D" "ONE_SOURCE=1"
+                    "-D" "TCC_VERSION=\"0.9.28rc\""
+                    "-D" "CONFIG_TCC_STATIC=1"
+                    "-D" "CONFIG_USE_LIBGCC=1"
+                    "-D" "CONFIG_TCC_SEMLOCK=0"
+                    "-D" (string-append "CONFIG_TCCDIR=\"" out "/lib/tcc\"")
+                    "-D" (string-append "CONFIG_TCC_CRTPREFIX=\"" libc "/lib\"")
+                    "-D" (string-append "CONFIG_TCC_ELFINTERP=\"" interpreter "\"")
+                    "-D" (string-append "CONFIG_TCC_LIBPATHS=\"" libc "/lib:"
+                                                                 out "/lib:"
+                                                                 "{B}/lib:.\"")
+                    "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
+                                        libc "/include:"
+                                        out "/include:"
+                                        "{B}/include\"")
+                    "-D" (string-append "TCC_LIBGCC=\"" libc "/lib/libc.a\"")
+                    "-o" "tcc"
+                    "tcc.c"))))))))))
+
 (define binutils-mesboot0
   ;; The initial Binutils
   (package
