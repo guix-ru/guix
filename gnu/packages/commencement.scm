@@ -48,6 +48,7 @@
   #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages mes)
+  #:use-module (gnu packages musl)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages python)
   #:use-module (gnu packages linux)
@@ -907,6 +908,101 @@ MesCC-Tools), and finally M2-Planet.")
     ("patch" ,patch-mesboot)
     ("tcc" ,tcc-boot)
     ,@(alist-delete "tcc" (%boot-tcc0-inputs))))
+
+;; The last musl in the 1.1.x series.
+;; For now this starts the riscv64 specific portion of the bootstrap.
+(define musl-boot0
+  (package
+    (inherit musl)
+    (name "musl-boot0")
+    (version "1.1.24")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://www.musl-libc.org/releases/"
+                                  "musl-" version ".tar.gz"))
+              (sha256
+               (base64 "E3DJqBKyzyp9koAlEMygBYzDfmanvt1wBR8KNAFQIqM="))))
+    (native-inputs (%boot-tcc-inputs))
+    (inputs '())
+    (arguments
+     (list
+       #:tests? #f                      ; musl has no tests
+       #:guile %bootstrap-guile
+       #:implicit-inputs? #f
+       #:strip-binaries? #f
+       #:parallel-build? #f             ; Race conditions otherwise
+       #:make-flags
+       #~(list
+           (string-append "SHELL=" #$(this-package-native-input "bash")
+                          "/bin/bash")
+           "CC=tcc"
+           "AR=tcc -ar"
+           "RANLIB=true"
+           "CFLAGS=-DSYSCALL_NO_TLS -D__riscv_float_abi_soft -U__riscv_flen")
+       #:configure-flags
+       #~(let ((bash #$(this-package-native-input "bash")))
+           (list "CC=tcc"
+                 (string-append "CONFIG_SHELL=" bash "/bin/sh")
+                 "--disable-shared"
+                 "--disable-gcc-wrapper"))
+       #:phases
+       #~(modify-phases %standard-phases
+           (add-before 'build 'add-libg
+             (lambda _
+               (substitute* "Makefile"
+                   (("(EMPTY_LIB_NAMES = )(.*)" all var content)
+                    (string-append var "g " content)))))
+           (add-before 'build 'patch-shebang-in-makefile
+             (lambda _
+               (let ((bash #$(this-package-native-input "bash")))
+                 (substitute* "Makefile"
+                   (("#!/bin/sh") (string-append "#!" bash "/bin/bash"))))))
+           (add-after 'configure 'remove-complex
+             (lambda _
+               (delete-file-recursively "src/complex")))
+           ;; We can't use the install script since it doesn't play well with gash.
+           (replace 'install
+             (lambda* (#:key outputs #:allow-other-keys)
+               (let* ((out (assoc-ref outputs "out"))
+                      (bin (string-append out "/bin"))
+                      (lib (string-append out "/lib"))
+                      (incl (string-append out "/include")))
+                 (for-each (lambda (file)
+                             (when (file-exists? file)
+                               (install-file file bin)))
+                           '("obj/ld.musl-clang"
+                             "obj/musl-clang"
+                             "obj/musl-gcc"))
+                 (for-each (lambda (file)
+                             (install-file file lib))
+                           (find-files "lib" "\\.(a|o|so)$"))
+                 (when (file-exists? "lib/musl-gcc.specs")
+                   (install-file "lib/musl-gcc.specs" lib))
+                 (copy-recursively "include" incl)
+                 (for-each (lambda (file)
+                             (install-file file (string-append incl "/bits")))
+                           (append
+                             (find-files
+                               (string-append "arch/"
+                                              #$(cond
+                                                  ((target-x86-32?) "x86")
+                                                  ((target-x86-64?) "x86_64")
+                                                  ((target-aarch64?) "aarch64")
+                                                  ((target-riscv64?) "riscv64")
+                                                  (#t ""))
+                                              "/bits"))
+                             (find-files "arch/generic/bits")
+                             (find-files "obj/include/bits")))
+                 (when (file-exists? (string-append lib "/libc.so"))
+                   (symlink "libc.so"
+                            (string-append lib "/ld-musl-"
+                                           #$(cond
+                                               ((target-x86-32?) "x86")
+                                               ((target-x86-64?) "x86_64")
+                                               ((target-aarch64?) "aarch64")
+                                               ((target-riscv64?) "riscv64")
+                                               (#t ""))
+                                           ".so.1")))))))))))
 
 (define binutils-mesboot0
   ;; The initial Binutils
