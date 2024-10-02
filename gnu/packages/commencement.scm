@@ -979,6 +979,106 @@ MesCC-Tools), and finally M2-Planet.")
                                                (#t ""))
                                            ".so.1")))))))))))
 
+(define tcc-boot-musl
+  (package
+    (inherit tcc-boot)
+    (name "tcc-boot-musl")
+    (native-inputs `(("libc" ,musl-boot0)
+                     ,@(modify-inputs (package-native-inputs tcc-boot)
+                                      (replace "tcc" tcc-boot))))
+    (arguments
+      (substitute-keyword-arguments (package-arguments tcc-boot)
+        ((#:phases phases)
+         #~(modify-phases #$phases
+             ;(delete 'rebuild-libraries)
+             #;
+             (replace 'configure
+               (lambda* (#:key inputs outputs #:allow-other-keys)
+                 (let ((out (assoc-ref outputs "out"))
+                       (tcc (assoc-ref inputs "tcc"))
+                       (libc (assoc-ref inputs "libc"))
+                       (interpreter "/mes/loader"))
+                   ;; Our 'cut' program doesn't work well with the configure script
+                   ;; so we seed some of our configs in the configure script.
+                   (substitute* "configure"
+                     (("cc=\"gcc\"") (string-append "cc=\"" tcc "/bin/tcc\""))
+                     ;(("cpu=\"\"") (string-append "cpu=\"" ,mes-system "\""))
+                     (("^prefix=\"\"") (string-append "prefix=\"" out "\""))
+                     (("^tcc_elfinterp=\"\"")
+                      (string-append "tcc_elfinterp=\"" interpreter "\""))
+                     (("^tcc_crtprefix=\"\"")
+                      (string-append "tcc_crtprefix=\"" tcc "/lib\""))
+                     (("^tcc_sysincludepaths=\"\"")
+                      (string-append "tcc_sysincludepaths=\"" tcc "/include\""))
+                     (("^tcc_libpaths=\"\"")
+                      (string-append "tcc_libpaths=\"" tcc "/lib\"")))
+                   (invoke "sh" "configure"))))
+             (replace 'build
+               (lambda* (#:key outputs inputs #:allow-other-keys)
+                 (let* ((out (assoc-ref outputs "out"))
+                        (libc (assoc-ref inputs "libc"))
+                        (tcc (assoc-ref inputs "tcc"))
+                        (interpreter "/musl/loader"))
+                   (invoke
+                    "tcc"
+                    "-g"
+                    "-vvv"
+                    "-D" "REG_PC=0"
+                    "-D" "REG_S0=8"
+                    "-I" (string-append tcc "/include")
+                    "-L" (string-append tcc "/lib")
+                    "-D" "ONE_SOURCE=1"
+                    "-D" "TCC_VERSION=\"0.9.28rc\""
+                    "-D" "CONFIG_TCC_STATIC=1"
+                    "-D" "CONFIG_USE_LIBGCC=1"
+                    "-D" "CONFIG_TCC_SEMLOCK=0"
+                    "-D" (string-append "CONFIG_TCCDIR=\"" out "/lib/tcc\"")
+                    "-D" (string-append "CONFIG_TCC_CRTPREFIX=\"" libc "/lib\"")
+                    "-D" (string-append "CONFIG_TCC_ELFINTERP=\"" interpreter "\"")
+                    "-D" (string-append "CONFIG_TCC_LIBPATHS=\"" libc "/lib:"
+                                                                 out "/lib:"
+                                                                 "{B}/lib:.\"")
+                    "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
+                                        libc "/include:"
+                                        out "/include:"
+                                        "{B}/include\"")
+                    "-D" (string-append "TCC_LIBGCC=\"" libc "/lib/libc.a\"")
+                    "-o" "tcc"
+                    "tcc.c"))))
+             (replace 'install
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (bin (string-append out "/bin"))
+                    (lib (string-append out "/lib"))
+                    (tcc (assoc-ref inputs "tcc")))
+               (mkdir-p (string-append out "/share"))
+               (install-file "tcc" bin)
+               (copy-recursively "include"
+                                 (string-append out "/include"))
+               (install-file "libtcc1.a" (string-append lib "/tcc"))
+               (for-each (lambda (file)
+                           (when (file-exists? file)
+                             (install-file file lib)))
+                         '("libtcc1.a" "libc.a" "libgetopt.a"
+                           "crt1.o" "crti.o" "crtn.o"))
+               ;; Install from previous tcc.
+               (copy-recursively (string-append tcc "/include")
+                                 (string-append out "/include"))
+               (copy-recursively (string-append tcc "/share")
+                                 (string-append out "/share")))))
+             #;
+             (replace 'install
+               (lambda* (#:key outputs inputs #:allow-other-keys)
+                 (let* ((out (assoc-ref outputs "out"))
+                        (tcc (assoc-ref inputs "tcc")))
+                   (mkdir-p (string-append out "/bin"))
+                   (copy-file "tcc" (string-append out "/bin/tcc"))
+                   (copy-recursively (string-append "include")
+                                     (string-append out "/include"))
+                   (mkdir-p (string-append out "/lib/tcc/"))
+                   (copy-file "libtcc1.a" (string-append out "/lib/libtcc1.a"))
+                   (copy-file "libtcc1.a" (string-append out "/lib/tcc/libtcc1.a")))))))))))
+
 (define binutils-mesboot0
   ;; The initial Binutils
   (package
