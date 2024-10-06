@@ -885,6 +885,7 @@ MesCC-Tools), and finally M2-Planet.")
     ,@(alist-delete "tcc" (%boot-tcc0-inputs))))
 
 ;; The last musl in the 1.1.x series.
+;; For now this starts the riscv64 specific portion of the bootstrap.
 (define musl-boot0
   (package
     (inherit musl)
