@@ -743,28 +743,14 @@ MesCC-Tools), and finally M2-Planet.")
              (substitute* "libtcc.c"
                (("s->nocommon = 1;" all)
                 (string-append all "\ns->static_link = 1;")))))
+         ;; Gash doesn't play well with passing flags to the configure script.
          (replace 'configure
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out"))
-                   (tcc (assoc-ref inputs "tcc"))
-                   (libc (assoc-ref inputs "libc"))
-                   (interpreter "/mes/loader"))
-               ;; Our 'cut' program doesn't work well with the configure script
-               ;; so we seed some of our configs in the configure script.
-               (substitute* "configure"
-                 (("cc=\"gcc\"") (string-append "cc=\"" tcc "/bin/tcc\""))
-                 (("cpu=\"\"") (string-append "cpu=\"" ,mes-system "\""))
-                 (("^prefix=\"\"") (string-append "prefix=\"" out "\""))
-                 #;
-                 (("^tcc_elfinterp=\"\"")
-                  (string-append "tcc_elfinterp=\"" interpreter "\""))
-                 (("^tcc_crtprefix=\"\"")
-                  (string-append "tcc_crtprefix=\"" tcc "/lib\""))
-                 (("^tcc_sysincludepaths=\"\"")
-                  (string-append "tcc_sysincludepaths=\"" tcc "/include\""))
-                 (("^tcc_libpaths=\"\"")
-                  (string-append "tcc_libpaths=\"" tcc "/lib\"")))
-               (invoke "sh" "configure"))))
+           (lambda* (#:key outputs #:allow-other-keys)
+             (call-with-output-file
+                 "config.h"
+                 (lambda (port)
+                   (display "#define TCC_VERSION \"0.9.28rc\" " port)))))
+
          (replace 'build
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let ((out (assoc-ref outputs "out"))
