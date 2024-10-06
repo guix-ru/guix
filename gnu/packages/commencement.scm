@@ -1042,10 +1042,9 @@ MesCC-Tools), and finally M2-Planet.")
          #~(modify-phases #$phases
              (replace 'build
                (lambda* (#:key outputs inputs #:allow-other-keys)
-                 (let* ((out (assoc-ref outputs "out"))
-                        (libc (assoc-ref inputs "libc"))
-                        (tcc (assoc-ref inputs "tcc"))
-                        (interpreter "/musl/loader"))
+                 (let ((out (assoc-ref outputs "out"))
+                       (libc (assoc-ref inputs "libc"))
+                       (interpreter "/musl/loader"))
                    (invoke
                     "tcc"
                     "-g"
@@ -1053,9 +1052,6 @@ MesCC-Tools), and finally M2-Planet.")
                     "-D" "REG_PC=0"
                     "-D" "REG_S0=8"
                     "-D" "ONE_SOURCE=1"
-                    "-I" (string-append tcc "/include")
-                    "-L" (string-append tcc "/lib")
-                    ;"-D" (string-append "TCC_TARGET_" (string-upcase #$(tcc-system)) "=1")
                     "-D" "TCC_VERSION=\"0.9.28rc\""
                     "-D" "CONFIG_TCC_STATIC=1"
                     "-D" "CONFIG_USE_LIBGCC=1"
@@ -1065,11 +1061,13 @@ MesCC-Tools), and finally M2-Planet.")
                     "-D" (string-append "CONFIG_TCC_ELFINTERP=\"" interpreter "\"")
                     "-D" (string-append "CONFIG_TCC_LIBPATHS=\"" libc "/lib:"
                                                                  out "/lib:"
-                                                                 "{B}/lib:.\"")
+                                                                 "{B}:.\"")
                     "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
                                         libc "/include:"
                                         out "/include:"
-                                        "{B}/include\"")
+                                        ;"{B}/include\""
+                                        "\""
+                                        )
                     "-D" (string-append "TCC_LIBGCC=\"" libc "/lib/libc.a\"")
                     "-o" "tcc"
                     "tcc.c"))))))))))
