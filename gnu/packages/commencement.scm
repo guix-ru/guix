@@ -1100,6 +1100,68 @@ MesCC-Tools), and finally M2-Planet.")
     (native-inputs (modify-inputs (package-native-inputs tcc-musl)
                                   (replace "tcc" tcc-musl)))))
 
+(define binutils-muslboot0
+  ;; The initial Binutils
+  (package
+    (inherit binutils)
+    (name "binutils-muslboot0")
+    (version "2.30")
+    (source (bootstrap-origin
+             (origin
+               (method url-fetch)
+               (uri (string-append "mirror://gnu/binutils/binutils-"
+                                   version ".tar.gz"))
+               (sha256
+                (base32
+                 "1sp9g7zrrcsl25hxiqzmmcrdlbm7rbmj0vki18lks28wblcm0f4c")))))
+    (inputs '())
+    (propagated-inputs '())
+    ;(native-inputs (%boot-tcc-musl-inputs))
+    (native-inputs (modify-inputs (package-native-inputs tcc-musl)
+                                  (replace "tcc" tcc-musl)))
+    (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
+    (arguments
+     (list #:implicit-inputs? #f
+           #:guile %bootstrap-guile
+           #:tests? #f          ; runtest: command not found
+           #:parallel-build? #f
+           #:strip-binaries? #f ; no strip yet
+           #:phases
+           #~(modify-phases %standard-phases
+             (add-after 'configure 'fix-build
+               (lambda _
+                 ;; Meslibc doesn't have wchar.h
+                 (substitute* "gas/read.c"
+                   (("#include \"wchar.h\"") ""))
+                 ;; bfd/po doesn't have a Makefile, so the recursive calls just
+                 ;; fail. We add files with the same name Make targets have, to
+                 ;; trick Make into thinking there's nothing to do.
+                 (call-with-output-file "bfd/po/install"
+                   (lambda (p) (display "" p)))
+                 (call-with-output-file "bfd/po/all"
+                   (lambda (p) (display "" p)))
+                 (call-with-output-file "bfd/po/info"
+                   (lambda (p) (display "" p))))))
+           #:configure-flags
+           #~(let ((bash (assoc-ref %build-inputs "bash")))
+               `(,(string-append "CONFIG_SHELL=" bash "/bin/sh")
+                 "CFLAGS=-g"
+                 "CC=tcc"
+                 "LD=tcc"
+                 "AR=tcc -ar"
+                 "MAKEINFO=true"
+                 "RANLIB=true"
+                 "--enable-64-bit-bfd"
+                 "--disable-nls"
+                 "--enable-static"
+                 "--disable-shared"
+                 "--disable-werror"
+                 "--disable-plugins"
+                 "--enable-deterministic-archives"
+                 "--with-sysroot=/"
+                 ,(string-append "--build=" #$(commencement-build-target))
+                 ,(string-append "--host=" #$(commencement-build-target))))))))
+
 (define binutils-mesboot0
   ;; The initial Binutils
   (package
