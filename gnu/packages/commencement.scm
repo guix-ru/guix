@@ -1622,7 +1622,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:parallel-build? #f
        #:configure-flags
        #~(list #$@(if (target-x86?)
-                    #~("MKDIRPROG=\"mkdir -p\"")
+                    #~()
                     #~("CC=tcc"
                        "CFLAGS=-DHAVE_ALLOCA_H"))
                (string-append "--build=" #$(commencement-build-target))
@@ -1630,13 +1630,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
                "--enable-static"
                "--disable-shared"
                "--disable-assembly")
-       ;#:phases
-       ;#~(modify-phases %standard-phases
-       ;    (add-before 'install 'pre-install
-       ;      (lambda _
-       ;        ;; Gash is crashing on mkdir called through install creating %output/share/info
-       ;        (mkdir-p (string-append #$output "/share/info")))))
-       ))))
+       ;; Gash crashes on mkdir called through install creating %output/share/info
+       #:make-flags #~(list "MKDIRPROG=mkdir -p")))))
 
 (define mpfr-boot
   (let ((version "2.4.2"))
