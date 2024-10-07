@@ -1660,12 +1660,36 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:make-flags #~(list "MKDIRPROG=mkdir -p")))))
 
 (define mpfr-boot
-  (let ((version "2.4.2"))
-    (origin
-      (method url-fetch)
-      (uri (string-append "mirror://gnu/mpfr/mpfr-" version ".tar.gz"))
-      (sha256
-       (base32 "0dxn4904dra50xa22hi047lj8kkpr41d6vb9sd4grca880c7wv94")))))
+  (package
+    (inherit mpfr)
+    (outputs '("out"))
+    (name "mpfr-boot")
+    (version "4.1.0")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/mpfr/mpfr-" version ".tar.gz"))
+              (sha256
+               (base32 "1mm2zxjqxxqlacd87cxlyi63pwrxwafqks7lmpqa3wqq6a0zw9ri"))))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot1-inputs)
+                       (%boot-tcc-musl-inputs)))
+    (inputs '())
+    (propagated-inputs (list gmp-boot))
+    (arguments
+     (list
+       #:guile %bootstrap-guile
+       #:tests? #f
+       #:implicit-inputs? #f
+       #:parallel-build? (target-x86?)
+       #:configure-flags
+       #~(list #$@(if (target-x86?)
+                      #~()
+                      #~("CC=tcc"
+                         "CFLAGS=-DHAVE_ALLOCA_H"))
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target))
+               "--enable-static"
+               "--disable-shared")))))
 
 (define mpc-boot
   (let ((version "1.0.3"))
