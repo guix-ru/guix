@@ -1161,6 +1161,15 @@ MesCC-Tools), and finally M2-Planet.")
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target)))))))
 
+(define (%boot-tcc-musl-inputs)
+  `(("tcc" ,tcc-musl)
+    ("binutils" ,binutils-muslboot0)
+    ("kernel-headers" ,%bootstrap-linux-libre-headers)
+    ("libc" ,musl-boot0)
+    ("bash" ,%bootstrap-coreutils&co)
+    ,@(fold alist-delete (%boot-tcc-inputs)
+            '("bash" "tcc"))))
+
 (define binutils-mesboot0
   ;; The initial Binutils
   (package
