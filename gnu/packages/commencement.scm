@@ -1122,7 +1122,7 @@ MesCC-Tools), and finally M2-Planet.")
     (arguments
      (list #:implicit-inputs? #f
            #:guile %bootstrap-guile
-           #:tests? #f          ; runtest: command not found
+           #:tests? #f          ; tests hang forever
            #:parallel-build? #f
            #:strip-binaries? #f ; no strip yet
            #:configure-flags
