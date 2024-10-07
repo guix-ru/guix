@@ -1599,12 +1599,44 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (string-append "--host=" #$(commencement-build-target)))))))
 
 (define gmp-boot
-  (let ((version "4.3.2"))
-    (origin
-      (method url-fetch)
-      (uri (string-append "mirror://gnu/gmp/gmp-" version ".tar.gz"))
-      (sha256
-       (base32 "15rwq54fi3s11izas6g985y9jklm3xprfsmym3v1g6xr84bavqvv")))))
+  (package
+    (inherit gmp)
+    (outputs '("out"))
+    (name "gmp-boot")
+    (version "5.1.3")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/gmp/gmp-" version ".tar.gz"))
+              (sha256
+               (base32 "09w5yzlvdll19fa9zhh0f4y97hv8483cbly0003zvbvyighpzwvi"))))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot1-inputs)
+                       (%boot-tcc-musl-inputs)))
+    (inputs (list m4-boot))
+    (propagated-inputs '())
+    (arguments
+     (list
+       #:guile %bootstrap-guile
+       #:tests? #f
+       #:implicit-inputs? #f
+       #:parallel-build? #f
+       #:configure-flags
+       #~(list #$@(if (target-x86?)
+                    #~("MKDIRPROG=\"mkdir -p\"")
+                    #~("CC=tcc"
+                       "CFLAGS=-DHAVE_ALLOCA_H"))
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target))
+               "--enable-static"
+               "--disable-shared"
+               "--disable-assembly")
+       ;#:phases
+       ;#~(modify-phases %standard-phases
+       ;    (add-before 'install 'pre-install
+       ;      (lambda _
+       ;        ;; Gash is crashing on mkdir called through install creating %output/share/info
+       ;        (mkdir-p (string-append #$output "/share/info")))))
+       ))))
 
 (define mpfr-boot
   (let ((version "2.4.2"))
