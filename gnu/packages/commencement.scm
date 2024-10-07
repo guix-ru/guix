@@ -1673,10 +1673,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (name "mpc-boot")
     (version "1.2.1")
     (source (origin
-      (method url-fetch)
-      (uri (string-append "mirror://gnu/mpc/mpc-" version ".tar.gz"))
-      (sha256
-       (base32 "0n846hqfqvmsmim7qdlms0qr86f1hck19p12nq3g3z2x74n3sl0p"))))
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/mpc/mpc-" version ".tar.gz"))
+              (sha256
+               (base32 "0n846hqfqvmsmim7qdlms0qr86f1hck19p12nq3g3z2x74n3sl0p"))))
     (native-inputs (if (target-x86?)
                        (%boot-mesboot1-inputs)
                        (%boot-tcc-musl-inputs)))
@@ -1696,8 +1696,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
-               "--disable-shared"
-               "--disable-assembly")))))
+               "--disable-shared")))))
 
 (define gcc-core-mesboot1
   ;; GCC 4.6.4 is the latest modular distribution.  This package is not
