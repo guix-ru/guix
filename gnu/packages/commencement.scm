@@ -1016,35 +1016,10 @@ MesCC-Tools), and finally M2-Planet.")
                                                                  "{B}:.\"")
                     "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
                                         libc "/include:"
-                                        out "/include:"
-                                        ;"{B}/include\""
-                                        "\""
-                                        )
+                                        out "/include\"")
                     "-D" (string-append "TCC_LIBGCC=\"" libc "/lib/libc.a\"")
                     "-o" "tcc"
                     "tcc.c"))))
-             #;
-             (replace 'install
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 (let* ((out (assoc-ref outputs "out"))
-                        (bin (string-append out "/bin"))
-                        (lib (string-append out "/lib"))
-                        (tcc (assoc-ref inputs "tcc")))
-                   (mkdir-p (string-append out "/share"))
-                   (install-file "tcc" bin)
-                   (copy-recursively "include"
-                                     (string-append out "/include"))
-                   (install-file "libtcc1.a" (string-append lib "/tcc"))
-                   (for-each (lambda (file)
-                               (when (file-exists? file)
-                                 (install-file file lib)))
-                             '("libtcc1.a" "libc.a" "libgetopt.a"
-                               "crt1.o" "crti.o" "crtn.o"))
-                   ;; Install from previous tcc.
-                   (copy-recursively (string-append tcc "/include")
-                                     (string-append out "/include"))
-                   (copy-recursively (string-append tcc "/share")
-                                     (string-append out "/share")))))
              (replace 'install
                (lambda* (#:key outputs #:allow-other-keys)
                  (let ((out (assoc-ref outputs "out")))
