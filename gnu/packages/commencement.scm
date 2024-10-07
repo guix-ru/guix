@@ -1692,12 +1692,36 @@ ac_cv_c_float_format='IEEE (little-endian)'
                "--disable-shared")))))
 
 (define mpc-boot
-  (let ((version "1.0.3"))
-    (origin
-      (method url-fetch)
-      (uri (string-append "mirror://gnu/mpc/mpc-" version ".tar.gz"))
-      (sha256
-       (base32 "1hzci2zrrd7v3g1jk35qindq05hbl0bhjcyyisq9z209xb3fqzb1")))))
+  (package
+    (inherit mpc)
+    (outputs '("out"))
+    (name "mpc-boot")
+    (version "1.2.1")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/mpc/mpc-" version ".tar.gz"))
+              (sha256
+               (base32 "0n846hqfqvmsmim7qdlms0qr86f1hck19p12nq3g3z2x74n3sl0p"))))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot1-inputs)
+                       (%boot-tcc-musl-inputs)))
+    (inputs '())
+    (propagated-inputs (list gmp-boot mpfr-boot))
+    (arguments
+     (list
+       #:guile %bootstrap-guile
+       #:tests? #f
+       #:implicit-inputs? #f
+       #:parallel-build? (target-x86?)
+       #:configure-flags
+       #~(list #$@(if (target-x86?)
+                      #~()
+                      #~("CC=tcc"
+                         "CFLAGS=-DHAVE_ALLOCA_H"))
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target))
+               "--enable-static"
+               "--disable-shared")))))
 
 (define gcc-core-mesboot1
   ;; GCC 4.6.4 is the latest modular distribution.  This package is not
