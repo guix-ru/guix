@@ -1046,13 +1046,11 @@ MesCC-Tools), and finally M2-Planet.")
                    (copy-recursively (string-append tcc "/share")
                                      (string-append out "/share")))))
              (replace 'install
-               (lambda* (#:key outputs inputs #:allow-other-keys)
+               (lambda* (#:key outputs #:allow-other-keys)
                  (let ((out (assoc-ref outputs "out")))
-                   (mkdir-p (string-append out "/bin"))
                    (install-file "tcc" (string-append out "/bin"))
                    (copy-recursively "include"
                                      (string-append out "/include"))
-                   (mkdir-p (string-append out "/lib/tcc/"))
                    (install-file "libtcc1.a" (string-append out "/lib"))
                    (install-file "libtcc1.a" (string-append out "/lib/tcc")))))))))))
 
