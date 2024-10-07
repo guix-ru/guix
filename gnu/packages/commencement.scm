@@ -1595,6 +1595,34 @@ ac_cv_c_float_format='IEEE (little-endian)'
     ,@(fold alist-delete (%boot-mesboot0-inputs)
             '("binutils" "make"))))
 
+(define m4-boot
+  (package
+    (inherit m4)
+    (name "m4-boot")
+    (version "1.4.18")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/m4/m4-" version ".tar.gz"))
+              (sha256
+               (base32 "1arz972zxmwhnyik9007g6ww9gars8d55xbvg548xlsw3a9369mb"))))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot1-inputs)
+                       (%boot-tcc-musl-inputs)))
+    (inputs '())
+    (propagated-inputs '())
+    (arguments
+     (list
+       #:tests? #f
+       #:guile %bootstrap-guile
+       #:implicit-inputs? #f
+       #:parallel-build? (target-x86?)
+       #:configure-flags
+       #~(list #$@(if (target-x86?)
+                      #~()
+                      #~("CC=tcc"))
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target)))))))
+
 (define gmp-boot
   (let ((version "4.3.2"))
     (origin
