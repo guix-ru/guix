@@ -1125,22 +1125,6 @@ MesCC-Tools), and finally M2-Planet.")
            #:tests? #f          ; runtest: command not found
            #:parallel-build? #f
            #:strip-binaries? #f ; no strip yet
-           #:phases
-           #~(modify-phases %standard-phases
-             (add-after 'configure 'fix-build
-               (lambda _
-                 ;; Meslibc doesn't have wchar.h
-                 (substitute* "gas/read.c"
-                   (("#include \"wchar.h\"") ""))
-                 ;; bfd/po doesn't have a Makefile, so the recursive calls just
-                 ;; fail. We add files with the same name Make targets have, to
-                 ;; trick Make into thinking there's nothing to do.
-                 (call-with-output-file "bfd/po/install"
-                   (lambda (p) (display "" p)))
-                 (call-with-output-file "bfd/po/all"
-                   (lambda (p) (display "" p)))
-                 (call-with-output-file "bfd/po/info"
-                   (lambda (p) (display "" p))))))
            #:configure-flags
            #~(list
                (string-append "CONFIG_SHELL="
