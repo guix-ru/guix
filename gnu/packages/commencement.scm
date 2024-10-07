@@ -1116,10 +1116,12 @@ MesCC-Tools), and finally M2-Planet.")
                  "1sp9g7zrrcsl25hxiqzmmcrdlbm7rbmj0vki18lks28wblcm0f4c")))))
     (inputs '())
     (propagated-inputs '())
-    ;(native-inputs (%boot-tcc-musl-inputs))
-    (native-inputs (modify-inputs (%boot-tcc-inputs)
-                                  (replace "tcc" tcc-musl)
-                                  (prepend %bootstrap-coreutils&co)))
+    (native-inputs
+     ;; We need something a bit more powerful that gash, so unfortunately
+     ;; we need the bootstrap-bash from %bootstrap-coreutils&co.
+     (modify-inputs (%boot-tcc-inputs)
+                    (replace "tcc" tcc-musl)
+                    (prepend %bootstrap-coreutils&co)))
     (arguments
      (list #:implicit-inputs? #f
            #:guile %bootstrap-guile
