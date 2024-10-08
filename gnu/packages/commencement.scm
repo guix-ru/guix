@@ -1590,7 +1590,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:tests? #f
        #:guile %bootstrap-guile
        #:implicit-inputs? #f
-       #:parallel-build? #f
+       #:parallel-build? (target-x86?)
        #:configure-flags
        #~(list #$@(if (target-x86?)
                       #~()
