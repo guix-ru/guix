@@ -1619,14 +1619,15 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:guile %bootstrap-guile
        #:tests? #f
        #:implicit-inputs? #f
-       #:parallel-build? #f
+       #:parallel-build? (target-x86?)
        #:configure-flags
        #~(list #$@(if (target-x86?)
                     #~()
                     #~("CC=tcc"
                        "CFLAGS=-DHAVE_ALLOCA_H"))
-               (string-append "--build=" #$(commencement-build-target))
-               (string-append "--host=" #$(commencement-build-target))
+               ;; These break building on x86_64-linux.
+               ;(string-append "--build=" #$(commencement-build-target))
+               ;(string-append "--host=" #$(commencement-build-target))
                "--enable-static"
                "--disable-shared"
                "--disable-assembly")
