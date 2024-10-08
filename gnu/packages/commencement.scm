@@ -1739,9 +1739,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (sha256
                (base32
                 "173kdb188qg79pcz073cj9967rs2vzanyjdjyxy9v0xb0p5sad75"))))
-    (inputs `(("gmp-source" ,gmp-boot)
-              ("mpfr-source" ,mpfr-boot)
-              ("mpc-source" ,mpc-boot)))
+    (inputs (list gmp-boot mpfr-boot mpc-boot))
     (native-inputs (%boot-mesboot1-inputs))
     (arguments
      (list #:implicit-inputs? #f
@@ -1799,55 +1797,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
                    (let ((patch-file
                           #$(local-file
                              (search-patch "gcc-boot-4.6.4.patch"))))
-                     (invoke "patch" "--force" "-p1" "-i" patch-file))))
-               ;; c&p from commencement.scm:gcc-boot0
-               (add-after 'unpack 'unpack-gmp&co
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
-                         (mpfr (assoc-ref %build-inputs "mpfr-source"))
-                         (mpc  (assoc-ref %build-inputs "mpc-source")))
+                     (invoke "patch" "--force" "-p1" "-i" patch-file)))))))))
 
-                     ;; To reduce the set of pre-built bootstrap inputs, build
-                     ;; GMP & co. from GCC.
-                     (for-each (lambda (source)
-                                 (or (invoke "tar" "xvf" source)
-                                     (error "failed to unpack tarball"
-                                            source)))
-                               (list gmp mpfr mpc))
-
-                     ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
-                     #$@(map (lambda (lib package)
-                               ;; Drop trailing letters, as gmp-6.0.0a unpacks
-                               ;; into gmp-6.0.0.
-                               #~(symlink #$(string-trim-right
-                                             (basename
-                                              (origin-actual-file-name lib)
-                                              ".tar.gz")
-                                             char-set:letter)
-                                          #$package))
-                             (list gmp-boot mpfr-boot mpc-boot)
-                             '("gmp" "mpfr" "mpc")))))
-               (add-before 'configure 'setenv
-                 (lambda* (#:key outputs #:allow-other-keys)
-                   (let* ((out (assoc-ref outputs "out"))
-                          (binutils (assoc-ref %build-inputs "binutils"))
-                          (bash (assoc-ref %build-inputs "bash"))
-                          (gcc (assoc-ref %build-inputs "gcc"))
-                          (glibc (assoc-ref %build-inputs "libc"))
-                          (kernel-headers (assoc-ref %build-inputs "kernel-headers")))
-                     (setenv "CONFIG_SHELL" (string-append bash "/bin/sh"))
-                     (setenv "C_INCLUDE_PATH" (string-append
-                                               gcc "/lib/gcc-lib/"
-                                               #$(commencement-build-target)
-                                               "/2.95.3/include"
-                                               ":" kernel-headers "/include"
-                                               ":" glibc "/include"
-                                               ":" (getcwd) "/mpfr/src"))
-                     (setenv "LIBRARY_PATH" (string-append glibc "/lib"
-                                                           ":" gcc "/lib"))
-                     (format (current-error-port) "C_INCLUDE_PATH=~a\n" (getenv "C_INCLUDE_PATH"))
-                     (format (current-error-port) "LIBRARY_PATH=~a\n"
-                             (getenv "LIBRARY_PATH"))))))))))
 
 (define gcc-mesboot1
   (package
