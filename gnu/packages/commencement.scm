@@ -1799,6 +1799,117 @@ ac_cv_c_float_format='IEEE (little-endian)'
                              (search-patch "gcc-boot-4.6.4.patch"))))
                      (invoke "patch" "--force" "-p1" "-i" patch-file)))))))))
 
+(define gcc-muslboot0
+  (package
+    (inherit gcc-4.7)
+    (name "gcc-muslboot0")
+    (version "4.6.4")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/gcc/gcc-"
+                                  version "/gcc-core-" version ".tar.gz"))
+              (sha256
+               (base32
+                "173kdb188qg79pcz073cj9967rs2vzanyjdjyxy9v0xb0p5sad75"))))
+    (outputs '("out"))
+    (inputs (list gmp-boot mpfr-boot mpc-boot))
+    (native-inputs (%boot-tcc-musl-inputs))
+    (arguments
+     (list #:implicit-inputs? #f
+           #:guile %bootstrap-guile
+           #:tests? #f
+           #:modules '((guix build gnu-build-system)
+                       (guix build utils)
+                       (srfi srfi-1))
+           #:parallel-build? #f             ; for debugging
+           #:configure-flags
+           #~(let ((out  (assoc-ref %outputs "out"))
+                   (libc (assoc-ref %build-inputs "libc"))
+                   (bash (assoc-ref %build-inputs "bash")))
+               (list (string-append "--prefix=" out)
+                     (string-append "--with-build-sysroot=" libc "/include")
+                     (string-append "--with-native-system-header-dir=" libc "/include")
+                     (string-append "--build="
+                                    #$(string-replace-substring
+                                        (commencement-build-target)
+                                        "-gnu" "-musl"))
+                     (string-append "--host="
+                                    #$(string-replace-substring
+                                        (commencement-build-target)
+                                        "-gnu" "-musl"))
+                     "--disable-bootstrap"
+                     "--disable-decimal-float"
+                     "--disable-libatomic"
+                     "--disable-libcilkrts"
+                     "--disable-libgomp"
+                     "--disable-libitm"
+                     "--disable-libmudflap"
+                     "--disable-libquadmath"
+                     "--disable-libsanitizer"
+                     "--disable-libssp"
+                     "--disable-libvtv"
+                     "--disable-lto"
+                     "--disable-lto-plugin"
+                     "--disable-multilib"
+                     "--disable-plugin"
+                     "--disable-threads"
+                     "--enable-languages=c"
+                     "--enable-static"
+                     "--disable-shared"
+                     "--enable-threads=single"
+                     "--disable-libstdcxx-pch"
+                     "--disable-build-with-cxx"))
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'apply-riscv64-patch
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((patch-file
+                          #$(local-file
+                             (search-patch "gcc-boot-4.6.4-riscv64-support.patch"))))
+                     (invoke "patch" "--force" "-p1" "-i" patch-file))))
+               (add-after 'unpack 'fix-alloca
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (substitute* (list "libiberty/alloca.c"
+                                      "include/libiberty.h")
+                     (("C_alloca") "alloca"))))
+               (add-before 'configure 'fix-dynamic-linker-for-musl
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((libc (assoc-ref inputs "libc")))
+                     ;; Fix the dynamic linker's file name.
+                     ;; This should work on gcc-13 for all architectures except loongarch.
+                     (substitute* (find-files "gcc/config"
+                                              "^(aarch64-)?(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
+                       (("(#define MUSL_DYNAMIC_LINKER*).*$" _ dynamic-linker)
+                        ;; TODO: Make this use architecture specific ld-musl-*.so
+                        (string-append dynamic-linker " \"" libc "/lib/libc.so\"")))
+                     ;; We also need to adjust the references made for glibc
+                     ;; to point to the musl linker location
+                     (substitute* (find-files "gcc/config"
+                                              "^(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
+                       (("#define (GLIBC|GNU_USER)_DYNAMIC_LINKER([^ \t]*).*$"
+                         _ gnu-user suffix)
+                        (format #f "#define ~a_DYNAMIC_LINKER~a \"~a\"~%"
+                                gnu-user suffix
+                                (string-append libc "/lib/libc.so")))))))
+               (add-after 'apply-riscv64-patch 'patch-for-modern-libc
+                 (lambda _
+                   (for-each
+                     (lambda (dir)
+                       (substitute* (string-append "gcc/config/"
+                                                   dir "/linux-unwind.h")
+                                    (("struct ucontext") "ucontext_t")))
+                     '("alpha" "bfin" "i386" "pa" "sh" "xtensa" "riscv"))))
+               (add-before 'configure 'setenv
+                 (lambda _
+                   (setenv "CC" "tcc")
+                   (setenv "CFLAGS" "-D HAVE_ALLOCA_H"))))))
+    (native-search-paths
+      (list (search-path-specification
+              (variable "C_INCLUDE_PATH")
+              (files '("include")))
+            (search-path-specification
+              (variable "LIBRARY_PATH")
+              (files '("lib")))))))
 
 (define gcc-mesboot1
   (package
