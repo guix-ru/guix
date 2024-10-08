@@ -1687,7 +1687,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:guile %bootstrap-guile
        #:tests? #f
        #:implicit-inputs? #f
-       #:parallel-build? #f
+       #:parallel-build? (target-x86?)
        #:configure-flags
        #~(list #$@(if (target-x86?)
                     #~()
