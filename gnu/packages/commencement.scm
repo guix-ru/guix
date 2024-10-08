@@ -1319,10 +1319,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
                               "-Wl,-dynamic-linker "
                               "-Wl," libc
                               #$(glibc-dynamic-linker
-                                 (match (%current-system)
-                                        ("x86_64-linux" "i686-linux")
-                                        ("aarch64-linux" "armhf-linux")
-                                        (_ (%current-system)))))))
+                                  (gnu-triplet->nix-system
+                                    (commencement-build-target))))))
                (list (string-append "LDFLAGS=" ldflags)
                      (string-append "LDFLAGS_FOR_TARGET=" ldflags)))
            #:configure-flags
