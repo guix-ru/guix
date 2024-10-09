@@ -1956,6 +1956,42 @@ ac_cv_c_float_format='IEEE (little-endian)'
             (variable "LIBRARY_PATH")
             (files '("lib")))))))
 
+(define musl-boot
+  (package
+    (inherit musl)
+    (name "musl-boot")
+    (native-inputs
+     (modify-inputs (%boot-tcc-musl-inputs)
+                    (replace "gcc" gcc-muslboot0)))
+    (inputs '())
+    (arguments
+     (substitute-keyword-arguments
+       (package-arguments musl-boot0)
+       ((#:guile _) %bootstrap-guile)
+       ((#:implicit-inputs? _ #f) #f)
+       ((#:make-flags _)
+        #~(list (string-append "SHELL=" #$(this-package-native-input "bash")
+                               "/bin/bash")))
+       ((#:configure-flags _ #~'())
+        #~(list (string-append "CONFIG_SHELL="
+                               #$(this-package-native-input "bash")
+                               "/bin/sh")
+                (string-append "--syslibdir=" #$output "/lib")
+                "CC=gcc"
+                "--enable-gcc-wrapper"))
+       ((#:phases phases #~'%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'install 'symlink-dynamic-linker
+              ;; This is a hack to work around not being able to hardcode
+              ;; the location of the dynamic linker for musl in gcc without
+              ;; adding musl as an input for gcc.
+              ;; Because honestly it's easier to add support to musl for
+              ;; (glibc-dynamic-linker) support than to adjust other software
+              ;; to use musl's dynamic-linker location.
+              (lambda _
+                (symlink "libc.so"
+                         (string-append #$output #$(glibc-dynamic-linker)))))))))))
+
 (define (%boot-mesboot2-inputs)
   `(("gcc" ,gcc-mesboot1)
     ,@(alist-delete "gcc" (%boot-mesboot1-inputs))))
