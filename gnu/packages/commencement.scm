@@ -1095,6 +1095,36 @@ MesCC-Tools), and finally M2-Planet.")
                     "-o" "tcc"
                     "tcc.c"))))))))))
 
+;; Gash served us well, but there are known issues on riscv64.
+;; OpenBSD's ksh will do just fine as a replacement until we get to bash.
+(define oksh-muslboot0
+  (package
+    (inherit oksh)
+    (source (bootstrap-origin (package-source oksh)))
+    (arguments
+     (list
+       #:implicit-inputs? #f
+       #:guile %bootstrap-guile
+       #:tests? #f                  ; No tests.
+       #:strip-binaries? #f         ; No strip yet.
+       #:parallel-build? #f         ; Race conditions.
+       #:configure-flags
+       #~(list "--cc=tcc"
+               "--enable-static")
+       #:phases
+       #~(modify-phases %standard-phases
+           ;; make: install: Command not found
+           (replace 'install
+             (lambda _
+               (install-file "oksh" (string-append %output "/bin"))
+               (install-file "oksh.1" (string-append %output "/share/man/man1"))
+               ;; For compatibility and ease of use in later builds.
+               (symlink "oksh" (string-append %output "/bin/sh"))
+               (symlink "oksh" (string-append %output "/bin/bash"))))
+           (delete 'compress-documentation))))
+    (native-inputs (modify-inputs (package-native-inputs tcc-musl)
+                                  (replace "tcc" tcc-musl)))))
+
 (define binutils-mesboot0
   ;; The initial Binutils
   (package
