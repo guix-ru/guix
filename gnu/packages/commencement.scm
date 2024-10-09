@@ -1799,11 +1799,11 @@ ac_cv_c_float_format='IEEE (little-endian)'
            #:parallel-build? #f             ; for debugging
            #:configure-flags
            #~(let ((out  (assoc-ref %outputs "out"))
-                   (musl (assoc-ref %build-inputs "libc"))
+                   (libc (assoc-ref %build-inputs "libc"))
                    (bash (assoc-ref %build-inputs "bash")))
                (list (string-append "--prefix=" out)
-                     (string-append "--with-build-sysroot=" musl "/include")
-                     ;(string-append "--with-native-system-header-dir=" musl "/include")
+                     (string-append "--with-build-sysroot=" libc "/include")
+                     (string-append "--with-native-system-header-dir=" libc "/include")
                      (string-append "--build="
                                     #$(string-replace-substring
                                         (commencement-build-target)
