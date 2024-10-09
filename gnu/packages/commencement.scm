@@ -1725,10 +1725,8 @@ SHELL := " shell "
 exec " gcc "/bin/" program
 " -Wl,--dynamic-linker"
 " -Wl," libc ,(glibc-dynamic-linker
-                (match (%current-system)
-                       ("x86_64-linux" "i686-linux")
-                       ("aarch64-linux" "armhf-linux")
-                       (_ (%current-system))))
+                (gnu-triplet->nix-system
+                  (commencement-build-target)))
 " -Wl,--rpath"
 " -Wl," libc "/lib"
 " \"$@\"
