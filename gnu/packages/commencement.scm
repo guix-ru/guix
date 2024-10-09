@@ -1992,6 +1992,64 @@ ac_cv_c_float_format='IEEE (little-endian)'
                 (symlink "libc.so"
                          (string-append #$output #$(glibc-dynamic-linker)))))))))))
 
+(define gcc-muslboot
+  ;; GCC 4.6.4 is the latest modular distribution. We backported RISC-V support
+  ;; here.
+  (package
+    (inherit gcc-muslboot0)
+    (name "gcc-muslboot")
+    (version "4.6.4")
+    (native-inputs
+     `(("gcc-g++"
+        ,(origin
+           (method url-fetch)
+           (uri (string-append "mirror://gnu/gcc/gcc-"
+                               version "/gcc-g++-" version ".tar.gz"))
+           (sha256
+            (base32
+             "1fqqk5zkmdg4vmqzdmip9i42q6b82i3f6yc0n86n9021cr7ms2k9"))))
+       ,@(modify-inputs (%boot-tcc-musl-inputs)
+                        (replace "gcc" gcc-muslboot0)
+                        (replace "libc" musl-boot))))
+    (arguments
+     (substitute-keyword-arguments (package-arguments gcc-muslboot0)
+       ((#:configure-flags configure-flags)
+        #~(let ((out (assoc-ref %outputs "out")))
+            `("--enable-languages=c,c++"
+              ,(string-append "--with-gmp=" (assoc-ref %build-inputs "gmp-boot"))
+              ,(string-append "--with-mpfr=" (assoc-ref %build-inputs "mpfr-boot"))
+              ,(string-append "--with-mpc=" (assoc-ref %build-inputs "mpc-boot"))
+              ,@(filter
+                 (negate (lambda (x) (string-prefix? "--enable-languages=" x)))
+                 #$configure-flags))))
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (add-before 'unpack 'unpack-g++
+              (lambda _
+                (let ((source-g++ (assoc-ref %build-inputs "gcc-g++")))
+                  (invoke "tar" "xvf" source-g++))))
+            (add-after 'apply-riscv64-patch 'apply-second-riscv64-patch
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((patch-file
+                        #$(local-file
+                            (search-patch
+                              "gcc-boot-4.6.4-riscv64-libstdc++-support.patch"))))
+                  (invoke "patch" "--force" "-p1" "-i" patch-file))))
+            (replace 'setenv
+              (lambda _
+                (setenv "CC" "musl-gcc")
+                (setenv "CPLUS_INCLUDE_PATH" (getenv "C_INCLUDE_PATH"))))))))
+   (native-search-paths
+    (list (search-path-specification
+           (variable "C_INCLUDE_PATH")
+           (files '("include")))
+          (search-path-specification
+           (variable "CPLUS_INCLUDE_PATH")
+           (files '("include/c++" "include")))
+          (search-path-specification
+           (variable "LIBRARY_PATH")
+           (files '("lib")))))))
+
 (define (%boot-mesboot2-inputs)
   `(("gcc" ,gcc-mesboot1)
     ,@(alist-delete "gcc" (%boot-mesboot1-inputs))))
