@@ -1829,15 +1829,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (lambda _
                 (let ((source-g++ (assoc-ref %build-inputs "gcc-g++")))
                   (invoke "tar" "xvf" source-g++))))
-            (replace 'setenv
+            (add-before 'configure 'set-cplus-include-path
               (lambda _
-                (setenv "CONFIG_SHELL" (which "sh"))
-
-                ;; Allow MPFR headers to be found.
-                (setenv "C_INCLUDE_PATH"
-                        (string-append (getcwd) "/mpfr/src:"
-                                       (getenv "C_INCLUDE_PATH")))
-
                 ;; Set the C++ search path so that C headers can be found as
                 ;; libstdc++ is being compiled.
                 (setenv "CPLUS_INCLUDE_PATH" (getenv "C_INCLUDE_PATH"))))))))
