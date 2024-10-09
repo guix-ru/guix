@@ -1840,7 +1840,17 @@ ac_cv_c_float_format='IEEE (little-endian)'
 
                 ;; Set the C++ search path so that C headers can be found as
                 ;; libstdc++ is being compiled.
-                (setenv "CPLUS_INCLUDE_PATH" (getenv "C_INCLUDE_PATH"))))))))))
+                (setenv "CPLUS_INCLUDE_PATH" (getenv "C_INCLUDE_PATH"))))))))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "C_INCLUDE_PATH")
+            (files '("include")))
+           (search-path-specification
+            (variable "CPLUS_INCLUDE_PATH")
+            (files '("include/c++" "include")))
+           (search-path-specification
+            (variable "LIBRARY_PATH")
+            (files '("lib")))))))
 
 (define (%boot-mesboot2-inputs)
   `(("gcc" ,gcc-mesboot1)
