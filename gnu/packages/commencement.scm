@@ -1162,11 +1162,13 @@ MesCC-Tools), and finally M2-Planet.")
                (string-append "--host=" #$(commencement-build-target)))))))
 
 (define (%boot-tcc-musl-inputs)
-  `(("tcc" ,tcc-musl)
+  ;; Adjust the naming so that we can more easily swap for their counterparts
+  ;; later in the bootstrap chain.
+  `(("gcc" ,tcc-musl)
     ("binutils" ,binutils-muslboot0)
     ("kernel-headers" ,%bootstrap-linux-libre-headers)
     ("libc" ,musl-boot0)
-    ("bash" ,%bootstrap-coreutils&co)
+    ("bash" ,oksh-muslboot0)
     ,@(fold alist-delete (%boot-tcc-inputs)
             '("bash" "tcc"))))
 
