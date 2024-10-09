@@ -1065,9 +1065,7 @@ MesCC-Tools), and finally M2-Planet.")
                     "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
                                         libc "/include:"
                                         out "/include:"
-                                        ;"{B}/include\""
-                                        "\""
-                                        )
+                                        "{B}/include\"")
                     "-D" (string-append "TCC_LIBGCC=\"" libc "/lib/libc.a\"")
                     "-o" "tcc"
                     "tcc.c"))))))))))
