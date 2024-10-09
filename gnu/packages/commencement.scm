@@ -1117,8 +1117,9 @@ MesCC-Tools), and finally M2-Planet.")
     (inputs '())
     (propagated-inputs '())
     ;(native-inputs (%boot-tcc-musl-inputs))
-    (native-inputs (modify-inputs (%boot-tcc-musl-inputs)
-                   (prepend %bootstrap-coreutils&co)))
+    (native-inputs (modify-inputs (%boot-tcc-inputs)
+                                  (replace "tcc" tcc-musl)
+                                  (prepend %bootstrap-coreutils&co)))
     (arguments
      (list #:implicit-inputs? #f
            #:guile %bootstrap-guile
