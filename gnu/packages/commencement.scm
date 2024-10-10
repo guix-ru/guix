@@ -1077,27 +1077,26 @@ MesCC-Tools), and finally M2-Planet.")
     (inherit oksh)
     (source (bootstrap-origin (package-source oksh)))
     (arguments
-     (substitute-keyword-arguments (package-arguments oksh)
-       ((#:implicit-inputs? _ #t) #f)
-       ((#:guile _ %bootstrap-guile) %bootstrap-guile)
-       ((#:tests? _ #t) #f)             ; No tests.
-       ((#:strip-binaries? _ #t) #f)
-       ((#:parallel-build? _ #t) #f)    ; Race conditions.
-       ((#:configure-flags cf #~'())
-        #~(cons* "--cc=tcc"
-                 "--enable-static"
-                 #$cf))
-       ((#:phases phases #~%standard-phases)
-        #~(modify-phases #$phases
-            ;; make: install: Command not found
-            (replace 'install
-              (lambda _
-                (install-file "oksh" (string-append %output "/bin"))
-                (install-file "oksh.1" (string-append %output "/share/man/man1"))
-                ;; For compatibility and ease of use in later builds.
-                (symlink "oksh" (string-append %output "/bin/sh"))
-                (symlink "oksh" (string-append %output "/bin/bash"))))
-            (delete 'compress-documentation)))))
+     (list
+       #:implicit-inputs? #f
+       #:guile %bootstrap-guile
+       #:tests? #f                  ; No tests.
+       #:strip-binaries? #f         ; No strip yet.
+       #:parallel-build? #f         ; Race conditions.
+       #:configure-flags
+       #~(list "--cc=tcc"
+               "--enable-static")
+       #:phases
+       #~(modify-phases %standard-phases
+           ;; make: install: Command not found
+           (replace 'install
+             (lambda _
+               (install-file "oksh" (string-append %output "/bin"))
+               (install-file "oksh.1" (string-append %output "/share/man/man1"))
+               ;; For compatibility and ease of use in later builds.
+               (symlink "oksh" (string-append %output "/bin/sh"))
+               (symlink "oksh" (string-append %output "/bin/bash"))))
+           (delete 'compress-documentation))))
     (native-inputs (modify-inputs (package-native-inputs tcc-musl)
                                   (replace "tcc" tcc-musl)))))
 
