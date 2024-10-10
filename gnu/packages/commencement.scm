@@ -329,15 +329,13 @@ pure Scheme to Tar and decompression in one easy step.")
       (name "stage0-posix")
       (version "1.7.0")
       (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/oriansj/stage0-posix")
-                      (commit (string-append "Release_" version))
-                      (recursive? #t)))
-                (file-name (git-file-name name version))
+                (method url-fetch)
+                (uri (string-append "https://github.com/oriansj/stage0-posix/"
+                                    "releases/download/Release_" version
+                                    "/stage0-posix-" version ".tar.gz"))
                 (sha256
                  (base32
-                  "186kzlqzl5xi5yydqhz6v5ii07sq8w2a3j5w884dpm7kj9zxqpyi"))))
+                  "10c79z2c62gvrvpshvj94zz2hczdq1p4g1v0dakx1jiz2fx32vvn"))))
       (supported-systems '("i686-linux" "x86_64-linux"
                            "aarch64-linux"
                            "riscv64-linux"))
@@ -374,7 +372,8 @@ pure Scheme to Tar and decompression in one easy step.")
               (setenv "PATH" (string-append tar "/bin:"
                                             coreutils "/bin:"
                                             bash "/bin"))
-              (copy-recursively source ".")
+              (invoke "tar" "xvf" source)
+              (chdir (string-append "stage0-posix-" #$version))
               (mkdir-p bindir)
               ;; Keep the same capitalization between the file name and the folder.
               (rename-file "kaem.aarch64" "kaem.AArch64")
