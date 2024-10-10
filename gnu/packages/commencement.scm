@@ -720,14 +720,13 @@ MesCC-Tools), and finally M2-Planet.")
     (name "tcc-boot")
     (version (string-append "0.9.27" "." revision "-" (string-take commit 7)))
     (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://repo.or.cz/tinycc")
-                    (commit commit)))
-              (file-name (git-file-name name version))
+              (method url-fetch)
+              (uri (string-append "https://repo.or.cz/tinycc.git/snapshot/"
+                                  commit ".tar.gz"))
+              (file-name (string-append name "-" version ".tar.gz"))
               (sha256
                (base32
-                "05slgpsavjd76pnkhghik3skmmic8d1py1b3jvcklcvkh1jv3s8i"))))
+                "1nrv5ggcsczkw2vib4551c89rwzylf669z178yzm5agnm479cy8j"))))
     (build-system gnu-build-system)
     (inputs '())
     (propagated-inputs '())
