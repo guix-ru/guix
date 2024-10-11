@@ -1061,7 +1061,7 @@ MesCC-Tools), and finally M2-Planet.")
                     "-D" (string-append "CONFIG_TCC_ELFINTERP=\"" interpreter "\"")
                     "-D" (string-append "CONFIG_TCC_LIBPATHS=\"" libc "/lib:"
                                                                  out "/lib:"
-                                                                 "{B}:.\"")
+                                                                 "{B}/lib:.\"")
                     "-D" (string-append "CONFIG_TCC_SYSINCLUDEPATHS=\""
                                         libc "/include:"
                                         out "/include:"
