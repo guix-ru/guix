@@ -857,6 +857,7 @@ GNU_SYSTEM_MODULES =				\
 
 INSTALLER_MODULES =                             \
   %D%/installer.scm      			\
+  %D%/installer/compute.scm			\
   %D%/installer/connman.scm			\
   %D%/installer/dump.scm			\
   %D%/installer/final.scm			\
