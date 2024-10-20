@@ -859,6 +859,7 @@ INSTALLER_MODULES =                             \
   %D%/installer/final.scm			\
   %D%/installer/hardware.scm			\
   %D%/installer/hostname.scm			\
+  %D%/installer/kernel.scm			\
   %D%/installer/keymap.scm			\
   %D%/installer/locale.scm			\
   %D%/installer/newt.scm			\
@@ -877,6 +878,7 @@ INSTALLER_MODULES =                             \
   %D%/installer/newt/final.scm  		\
   %D%/installer/newt/parameters.scm		\
   %D%/installer/newt/hostname.scm		\
+  %D%/installer/newt/kernel.scm			\
   %D%/installer/newt/keymap.scm			\
   %D%/installer/newt/locale.scm			\
   %D%/installer/newt/menu.scm			\
