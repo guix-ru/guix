@@ -1,6 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2018 Mathieu Othacehe <m.othacehe@gmail.com>
-;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -19,8 +18,7 @@
 
 (define-module (gnu installer newt utils)
   #:use-module (ice-9 receive)
-  #:autoload (newt form) (destroy-form)
-  #:autoload (newt window) (pop-window screen-size)
+  #:use-module (newt)
   #:export (screen-columns
             screen-rows
 

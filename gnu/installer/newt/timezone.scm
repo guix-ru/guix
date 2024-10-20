@@ -27,7 +27,7 @@
   #:use-module (srfi srfi-35)
   #:use-module (ice-9 match)
   #:use-module (ice-9 receive)
-  #:autoload (newt listbox) (append-entry-to-listbox)
+  #:use-module (newt)
   #:export (run-timezone-page))
 
 ;; Information textbox width.

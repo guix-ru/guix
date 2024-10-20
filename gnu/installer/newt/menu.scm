@@ -20,7 +20,7 @@
   #:use-module (gnu installer steps)
   #:use-module (gnu installer newt page)
   #:use-module (guix i18n)
-  #:autoload (newt bindings) (newt-finish)
+  #:use-module (newt)
   #:export (run-menu-page))
 
 (define (run-menu-page steps)

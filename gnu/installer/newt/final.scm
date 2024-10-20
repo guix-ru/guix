@@ -20,7 +20,7 @@
 
 (define-module (gnu installer newt final)
   #:use-module (gnu installer final)
-  #:autoload (gnu installer parted) (with-mounted-partitions)
+  #:use-module (gnu installer parted)
   #:use-module (gnu installer steps)
   #:use-module (gnu installer utils)
   #:use-module (gnu installer newt page)
@@ -31,8 +31,7 @@
   #:use-module (srfi srfi-35)
   #:use-module (ice-9 match)
   #:use-module ((ice-9 rdelim) #:select (read-line))
-  #:autoload (newt bindings) (newt-resume newt-suspend)
-  #:autoload (newt window) (clear-screen message-window ternary-window)
+  #:use-module (newt)
   #:export (run-final-page))
 
 (define* (strip-prefix file #:optional (prefix (%installer-target-dir)))

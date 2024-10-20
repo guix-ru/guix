@@ -24,32 +24,7 @@
   #:use-module (gnu installer newt utils)
   #:use-module (gnu installer utils)
   #:use-module (guix i18n)
-  #:autoload (newt components) (FLAG-BORDER
-                                FLAG-PASSWORD
-                                FLAG-ROLE-TOGGLE
-                                FLAG-SCROLL
-                                add-component-callback
-                                components=?
-                                make-button
-                                make-checkbox
-                                make-compact-button
-                                make-label)
-  #:autoload (newt entry) (make-entry
-                           entry-value set-entry-flags set-entry-text)
-  #:autoload (newt form) (make-form
-                          add-components-to-form
-                          run-form
-                          set-current-component)
-  #:autoload (newt grid) (make-grid
-                          GRID-ELEMENT-COMPONENT GRID-ELEMENT-SUBGRID
-                          add-form-to-grid
-                          horizontal-stacked-grid
-                          make-wrapped-grid-window
-                          set-grid-field
-                          vertically-stacked-grid)
-  #:autoload (newt listbox) (make-listbox
-                             append-entry-to-listbox current-listbox-entry)
-  #:autoload (newt textbox) (make-reflowed-textbox reflow-text set-textbox-text)
+  #:use-module (newt)
   #:use-module (ice-9 match)
   #:use-module (ice-9 receive)
   #:use-module (srfi srfi-1)

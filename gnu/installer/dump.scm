@@ -1,6 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2021 Mathieu Othacehe <othacehe@gnu.org>
-;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -28,7 +27,7 @@
   #:use-module (web client)
   #:use-module (web http)
   #:use-module (web response)
-  #:autoload (webutils multipart) (format-multipart-body)
+  #:use-module (webutils multipart)
   #:export (%core-dump
             prepare-dump
             make-dump
