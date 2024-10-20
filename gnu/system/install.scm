@@ -514,6 +514,7 @@ Access documentation at any time by pressing Alt-F2.\x1b[0m
     ;; non-functional:
     ;; <https://lists.gnu.org/archive/html/guix-devel/2019-03/msg00441.html>.
     ;; Thus, blacklist it.
+    (kernel linux-libre-5.15)
     (kernel-arguments '("quiet" "modprobe.blacklist=radeon,amdgpu"))
 
     (file-systems
