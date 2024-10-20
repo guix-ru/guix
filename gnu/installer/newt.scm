@@ -48,7 +48,12 @@
   #:use-module (srfi srfi-35)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
-  #:use-module (newt)
+  #:autoload (newt bindings) (COLORSET-ROOT
+                              newt-finish newt-init
+                              newt-resume
+                              newt-set-color
+                              newt-set-help-callback)
+  #:autoload (newt window) (clear-screen push-help-line)
   #:export (newt-installer))
 
 (define (init)
