@@ -32,6 +32,18 @@
   #:use-module (guix channels)
   #:use-module (guix packages)
   #:use-module (guix git-download)
+
+  #:autoload (gnu installer kernel) (kernel->configuration)
+  #:autoload (gnu installer locale) (locale->configuration)
+  #:autoload (gnu installer newt) (newt-installer)
+  #:autoload (gnu installer newt keymap) (keyboard-layout->configuration)
+  #:autoload (gnu installer parted) (user-partitions->configuration)
+  #:use-module (gnu installer record)
+  #:autoload (gnu installer services) (system-services->configuration)
+  #:autoload (gnu installer steps) (installer-step result-step run-installer-steps)
+  #:autoload (gnu installer timezone) (posix-tz->configuration)
+  #:autoload (gnu installer user) (users->configuration)
+
   #:use-module (gnu installer utils)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
@@ -56,7 +68,9 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (web uri)
-  #:export (installer-program))
+  #:export (installer-program
+            installer-steps
+            run-installer))
 
 (define module-to-import?
   ;; Return true for modules that should be imported.  For (gnu system …) and
@@ -208,7 +222,7 @@ selected keymap."
         (and result (#$apply-keymap result))
         result)))
 
-(define* (installer-steps #:key dry-run?)
+(define* (installer-steps-gexp #:key dry-run?)
   (let ((locale-step (compute-locale-step
                       #:locales-name "locales"
                       #:iso639-languages-name "iso639-languages"
@@ -223,131 +237,147 @@ selected keymap."
             (lambda _
               (#$(compute-keymap-step 'param dry-run?)
                current-installer)))))
-        (list
-         ;; Ask the user to choose a locale among those supported by
-         ;; the glibc.  Install the selected locale right away, so that
-         ;; the user may benefit from any available translation for the
-         ;; installer messages.
-         (installer-step
-          (id 'locale)
-          (description (G_ "Locale"))
-          (compute (lambda _
-                     (#$locale-step current-installer)))
-          (configuration-formatter locale->configuration))
+        (installer-steps current-installer
+                         #:keymap-step #$keymap-step
+                         #:logo-file
+                         #$(local-file "installer/aux-files/logo.txt")
+                         #:locale-step #$locale-step
+                         #:timezone-data #$timezone-data
+                         #:pci-database #$(file-append
+                                           pciutils "/share/hwdata/pci.ids.gz")
+                         #:dry-run? #$dry-run?))))
 
-         ;; Welcome the user and ask them to choose between manual
-         ;; installation and graphical install.
-         (installer-step
-          (id 'welcome)
-          (compute (lambda _
-                     ((installer-welcome-page current-installer)
-                      #$(local-file "installer/aux-files/logo.txt")
-                      #:pci-database
-                      #$(file-append pciutils "/share/hwdata/pci.ids.gz")))))
+(define* (installer-steps current-installer #:key
+                          dry-run?
+                          keymap-step
+                          locale-step
+                          (logo-file "/dev/null")
+                          pci-database
+                          timezone-data)
+  (list
+   ;; Ask the user to choose a locale among those supported by
+   ;; the glibc.  Install the selected locale right away, so that
+   ;; the user may benefit from any available translation for the
+   ;; installer messages.
+   (installer-step
+    (id 'locale)
+    (description (G_ "Locale"))
+    (compute (lambda _
+               (and locale-step
+                    (locale-step current-installer))))
+    (configuration-formatter locale->configuration))
 
-         ;; Ask the user to select a timezone under glibc format.
-         (installer-step
-          (id 'timezone)
-          (description (G_ "Timezone"))
-          (compute (lambda _
-                     ((installer-timezone-page current-installer)
-                      #$timezone-data)))
-          (configuration-formatter posix-tz->configuration))
+   ;; Welcome the user and ask them to choose between manual
+   ;; installation and graphical install.
+   (installer-step
+    (id 'welcome)
+    (compute (lambda _
+               ((installer-welcome-page current-installer)
+                logo-file
+                #:pci-database pci-database))))
 
-         ;; The installer runs in a kmscon virtual terminal where loadkeys
-         ;; won't work. kmscon uses libxkbcommon as a backend for keyboard
-         ;; input. It is possible to update kmscon current keymap by sending
-         ;; it a keyboard model, layout, variant and options, in a somehow
-         ;; similar way as what is done with setxkbmap utility.
-         ;;
-         ;; So ask for a keyboard model, layout and variant to update the
-         ;; current kmscon keymap.  For non-Latin layouts, we add an
-         ;; appropriate second layout and toggle via Alt+Shift.
-         (installer-step
-          (id 'keymap)
-          (description (G_ "Keyboard mapping selection"))
-          (compute (lambda _
-                     (if #$dry-run?
-                         '("en" "US" #f)
-                         (#$(compute-keymap-step 'default dry-run?)
-                       current-installer))))
-          (configuration-formatter keyboard-layout->configuration))
+   ;; Ask the user to select a timezone under glibc format.
+   (installer-step
+    (id 'timezone)
+    (description (G_ "Timezone"))
+    (compute (lambda _
+               (and=> timezone-data
+                      (installer-timezone-page current-installer))))
+    (configuration-formatter posix-tz->configuration))
 
-         ;; Ask the user to input a hostname for the system.
-         (installer-step
-          (id 'hostname)
-          (description (G_ "Hostname"))
-          (compute (lambda _
-                     ((installer-hostname-page current-installer))))
-          (configuration-formatter hostname->configuration))
+   ;; The installer runs in a kmscon virtual terminal where loadkeys
+   ;; won't work. kmscon uses libxkbcommon as a backend for keyboard
+   ;; input. It is possible to update kmscon current keymap by sending
+   ;; it a keyboard model, layout, variant and options, in a somehow
+   ;; similar way as what is done with setxkbmap utility.
+   ;;
+   ;; So ask for a keyboard model, layout and variant to update the
+   ;; current kmscon keymap.  For non-Latin layouts, we add an
+   ;; appropriate second layout and toggle via Alt+Shift.
+   (installer-step
+    (id 'keymap)
+    (description (G_ "Keyboard mapping selection"))
+    (compute (lambda _
+               (if (or dry-run? (not keymap-step))
+                   '("en" "US" #f)
+                   (keymap-step current-installer))))
+    (configuration-formatter keyboard-layout->configuration))
 
-         ;; Ask the user to select the kernel for the system,
-         ;; for x86 systems only.
-         (installer-step
-          (id 'kernel)
-          (description (G_ "Kernel"))
-          (compute (lambda _
-                     (if (target-x86?)
-                         ((installer-kernel-page current-installer))
-                         '())))
-          (configuration-formatter (lambda (result)
-                                     (kernel->configuration result #$dry-run?))))
+   ;; Ask the user to input a hostname for the system.
+   (installer-step
+    (id 'hostname)
+    (description (G_ "Hostname"))
+    (compute (lambda _
+               ((installer-hostname-page current-installer))))
+    (configuration-formatter hostname->configuration))
 
-         ;; Provide an interface above connmanctl, so that the user can select
-         ;; a network susceptible to acces Internet.
-         (installer-step
-          (id 'network)
-          (description (G_ "Network selection"))
-          (compute (lambda _
-                     (if #$dry-run?
-                         '()
-                         ((installer-network-page current-installer))))))
+   ;; Ask the user to select the kernel for the system,
+   ;; for x86 systems only.
+   (installer-step
+    (id 'kernel)
+    (description (G_ "Kernel"))
+    (compute (lambda _
+               (if (target-x86?)
+                   ((installer-kernel-page current-installer))
+                   '())))
+    (configuration-formatter (lambda (result)
+                               (kernel->configuration result dry-run?))))
 
-         ;; Ask whether to enable substitute server discovery.
-         (installer-step
-          (id 'substitutes)
-          (description (G_ "Substitute server discovery"))
-          (compute (lambda _
-                     (if #$dry-run?
-                         '()
-                         ((installer-substitutes-page current-installer))))))
+   ;; Provide an interface above connmanctl, so that the user can select
+   ;; a network susceptible to acces Internet.
+   (installer-step
+    (id 'network)
+    (description (G_ "Network selection"))
+    (compute (lambda _
+               (if dry-run?
+                   '()
+                   ((installer-network-page current-installer))))))
 
-         ;; Prompt for users (name, group and home directory).
-         (installer-step
-          (id 'user)
-          (description (G_ "User creation"))
-          (compute (lambda _
-                     ((installer-user-page current-installer))))
-          (configuration-formatter users->configuration))
+   ;; Ask whether to enable substitute server discovery.
+   (installer-step
+    (id 'substitutes)
+    (description (G_ "Substitute server discovery"))
+    (compute (lambda _
+               (if dry-run?
+                   '()
+                   ((installer-substitutes-page current-installer))))))
 
-         ;; Ask the user to choose one or many desktop environment(s).
-         (installer-step
-          (id 'services)
-          (description (G_ "Services"))
-          (compute (lambda _
-                     ((installer-services-page current-installer))))
-          (configuration-formatter system-services->configuration))
+   ;; Prompt for users (name, group and home directory).
+   (installer-step
+    (id 'user)
+    (description (G_ "User creation"))
+    (compute (lambda _
+               ((installer-user-page current-installer))))
+    (configuration-formatter users->configuration))
 
-         ;; Run a partitioning tool allowing the user to modify
-         ;; partition tables, partitions and their mount points.
-         ;; Do this last so the user has something to boot if any
-         ;; of the previous steps didn't go as expected.
-         (installer-step
-          (id 'partition)
-          (description (G_ "Partitioning"))
-          (compute (lambda _
-                     (if #$dry-run?
-                         '()
-                         ((installer-partitioning-page current-installer)))))
-          (configuration-formatter user-partitions->configuration))
+   ;; Ask the user to choose one or many desktop environment(s).
+   (installer-step
+    (id 'services)
+    (description (G_ "Services"))
+    (compute (lambda _
+               ((installer-services-page current-installer))))
+    (configuration-formatter system-services->configuration))
 
-         (installer-step
-          (id 'final)
-          (description (G_ "Configuration file"))
-          (compute
-           (lambda (result prev-steps)
-             ((installer-final-page current-installer)
-              result prev-steps #$dry-run?))))))))
+   ;; Run a partitioning tool allowing the user to modify
+   ;; partition tables, partitions and their mount points.
+   ;; Do this last so the user has something to boot if any
+   ;; of the previous steps didn't go as expected.
+   (installer-step
+    (id 'partition)
+    (description (G_ "Partitioning"))
+    (compute (lambda _
+               (if dry-run?
+                   '()
+                   ((installer-partitioning-page current-installer)))))
+    (configuration-formatter user-partitions->configuration))
+
+   (installer-step
+    (id 'final)
+    (description (G_ "Configuration file"))
+    (compute
+     (lambda (result prev-steps)
+       ((installer-final-page current-installer)
+        result prev-steps dry-run?))))))
 
 (define (provenance-sexp)
   "Return an sexp representing the currently-used channels, for logging
@@ -367,6 +397,33 @@ purposes."
                             (channel-url channel))))
              `(channel ,(channel-name channel) ,url ,(channel-commit channel))))
           channels))))
+
+(define* (run-installer #:key dry-run?)
+  "To run the installer from Guile without building it:
+    ./pre-inst-env guile -c '((@ (gnu installer) run-installer) #:dry-run? #t)'
+when using #:dry-run? #t, no root access is required and the LOCALE, KEYMAP,
+and PARTITION pages are skipped."
+  (let* ((dry-run? (and dry-run? 'guile))
+         (current-installer newt-installer)
+         (logo-file (string-append "gnu/" %logo-file))
+         (steps (installer-steps current-installer
+                                 #:logo-file logo-file
+                                 #:dry-run? dry-run?)))
+    (catch #t
+      (lambda _
+        ((installer-init current-installer))
+        (parameterize ((%run-command-in-installer dry-run-command))
+          (let* ((results (run-installer-steps
+                           #:rewind-strategy 'menu
+                           #:menu-proc (installer-menu-page current-installer)
+                           #:steps steps
+                           #:dry-run? dry-run?)))
+            (result-step results 'final))))
+      (const #f)
+      (lambda (key . args)
+        ((installer-exit current-installer))
+        (display-backtrace (make-stack #t) (current-error-port))
+        (apply throw key args)))))
 
 (define* (installer-program #:key dry-run?)
   "Return a file-like object that runs the given INSTALLER."
@@ -402,7 +459,7 @@ purposes."
           (lambda ()
             (set-path-environment-variable "PATH" '("bin" "sbin") inputs)))))
 
-  (define steps (installer-steps #:dry-run? dry-run?))
+  (define steps (installer-steps-gexp #:dry-run? dry-run?))
   (define modules
     (scheme-modules*
      (string-append (current-source-directory) "/..")
@@ -425,7 +482,8 @@ purposes."
                                   #:select? module-to-import?)
                                ((guix config) => ,(make-config.scm)))
         #~(begin
-            (use-modules (gnu installer record)
+            (use-modules (gnu installer)
+                         (gnu installer record)
                          (gnu installer keymap)
                          (gnu installer steps)
                          (gnu installer dump)

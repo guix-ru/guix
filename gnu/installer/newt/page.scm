@@ -33,24 +33,74 @@
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-35)
-  #:use-module (newt)
+  #:autoload (newt bindings) (COLORSET-ROOT
+                              newt-refresh
+                              newt-resume
+                              newt-set-color
+                              newt-suspend)
+  #:autoload (newt checkboxtree) (make-checkboxtree
+                                  add-entry-to-checkboxtree
+                                  current-checkbox-selection)
+  #:autoload (newt components) (FLAG-BORDER
+                                FLAG-MULTIPLE
+                                FLAG-NOF12
+                                FLAG-PASSWORD
+                                FLAG-RETURNEXIT
+                                FLAG-ROLE-TOGGLE
+                                FLAG-SCROLL
+                                FLAG-SELECTED
+                                add-component-callback
+                                checkbox-value
+                                components=?
+                                make-button
+                                make-checkbox
+                                make-compact-button)
+  #:autoload (newt entry) (make-entry
+                           entry-value set-entry-flags set-entry-text)
+  #:autoload (newt form) (make-form
+                          FD-EXCEPT FD-READ KEY-DELETE
+                          add-component-to-form
+                          add-components-to-form
+                          draw-form
+                          form-add-hotkey
+                          form-watch-fd
+                          run-form
+                          set-current-component)
+  #:autoload (newt grid) (make-grid
+                          ANCHOR-LEFT
+                          GRID-ELEMENT-COMPONENT GRID-ELEMENT-SUBGRID
+                          add-form-to-grid
+                          horizontal-stacked-grid
+                          make-wrapped-grid-window
+                          set-grid-field
+                          vertically-stacked-grid)
+  #:autoload (newt listbox) (make-listbox
+                             append-entry-to-listbox
+                             current-listbox-entry
+                             listbox-selection
+                             set-current-listbox-entry
+                             set-current-listbox-entry-by-key)
+  #:autoload (newt scale) (make-scale set-scale-value)
+  #:autoload (newt textbox) (make-textbox
+                             make-reflowed-textbox reflow-text set-textbox-text)
+  #:autoload (newt window) (clear-screen)
   #:export (default-listbox-height
 
-            draw-info-page
-            draw-connecting-page
-            run-input-page
-            run-error-page
-            run-confirmation-page
-            run-listbox-selection-page
-            run-scale-page
-            run-checkbox-tree-page
-            run-file-textbox-page
-            %ok-button
-            %exit-button
-            run-textbox-page
-            run-dump-page
+             draw-info-page
+             draw-connecting-page
+             run-input-page
+             run-error-page
+             run-confirmation-page
+             run-listbox-selection-page
+             run-scale-page
+             run-checkbox-tree-page
+             run-file-textbox-page
+             %ok-button
+             %exit-button
+             run-textbox-page
+             run-dump-page
 
-            run-form-with-clients))
+             run-form-with-clients))
 
 ;;; Commentary:
 ;;;
