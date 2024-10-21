@@ -2696,7 +2696,7 @@ exec " gcc "/bin/" program
                    ;; 'posix_spawn'.  Thus, disable it.  See
                    ;; <https://bugs.gnu.org/49367>.
                    ,(match (%current-system)
-                      ((or "i686-linux" "x86_64-linux")
+                      ((or "i686-linux" "x86_64-linux" "riscv64-linux")
                        flags)
                       (_
                        `(cons "--disable-posix-spawn" ,flags)))))
