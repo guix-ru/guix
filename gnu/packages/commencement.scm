@@ -2101,6 +2101,42 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (name "binutils-mesboot")
     (native-inputs (%boot-mesboot2-inputs))))
 
+;; We need to introduce byacc in order to process some pre-generated
+;; files in gawk and possibly elsewhere.
+(define byacc-mesboot
+  (package
+    (inherit byacc)
+    (name "byacc")
+    (version "20240109")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                     "https://invisible-mirror.net/archives/byacc/byacc-"
+                     version ".tgz"))
+              (file-name (string-append name "-" version ".tar.gz"))
+              (sha256
+               (base32
+                "0il4w1vwbglayakywyghiqhcjpg1yvv5ww2p8ylz32bi05wpg2gj"))))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot1-inputs)
+                       (%boot-muslboot2-inputs)))
+    (inputs '())
+    (propagated-inputs '())
+    (arguments
+     `(#:implicit-inputs? #f
+       #:parallel-build? #f
+       #:guile ,%bootstrap-guile
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out  (assoc-ref outputs "out"))
+                    (bin  (string-append out "/bin"))
+                    (man1 (string-append out "/share/man/man1")))
+               (install-file "yacc" bin)
+               (symlink "yacc" (string-append bin "/byacc"))
+               (install-file "yacc.1" man1)))))))))
+
 ;; Sadly we have to introduce Gawk here.  The "versions.awk" script of
 ;; glibc 2.16.0 is too complicated for Gash-Utils.  This is the version
 ;; of Gawk used previously during bootstrap.  It's possible that a newer
