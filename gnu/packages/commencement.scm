@@ -2661,7 +2661,9 @@ exec " gcc "/bin/" program
     ("sed" ,sed-mesboot)
     ("tar" ,tar-mesboot)
     ("xz" ,xz-mesboot)
-    ,@(fold alist-delete (%boot-mesboot5-inputs)
+    ,@(fold alist-delete (if (target-x86?)
+                             (%boot-mesboot5-inputs)
+                             (%boot-muslboot3-inputs))
             '("bash" "coreutils" "bootar" "kernel-headers"))))
 
 (define (%bootstrap-inputs+toolchain)
