@@ -2670,7 +2670,7 @@ exec " gcc "/bin/" program
   ;; The traditional bootstrap-inputs.  For the i686-linux, x86_64-linux
   ;; Scheme-only bootstrap the actual reduced set with bootstrapped toolchain.
   (match (%current-system)
-    ((or "i686-linux" "x86_64-linux")
+    ((or "i686-linux" "x86_64-linux" "riscv64-linux")
      (%boot-mesboot6-inputs))
     (_
      (%bootstrap-inputs))))
