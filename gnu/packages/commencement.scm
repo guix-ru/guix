@@ -2054,6 +2054,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
   `(("gcc" ,gcc-mesboot1)
     ,@(alist-delete "gcc" (%boot-mesboot1-inputs))))
 
+(define (%boot-muslboot2-inputs)
+  `(("gcc" ,gcc-muslboot)
+    ,@(modify-inputs (%boot-tcc-musl-inputs)
+                     (delete "gcc")
+                     (replace "libc" musl-boot))))
+
 (define hello-mesboot
   ;; Check for Scheme-only bootstrap.  Note that newer versions of Hello
   ;; break due to the way that newer versions of Gnulib handle
