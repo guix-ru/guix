@@ -2556,14 +2556,17 @@ exec " gcc "/bin/" program
     (inherit pkg)
     (name name)
     (source (bootstrap-origin (package-source pkg)))
-    (native-inputs (%boot-mesboot5-inputs))
-    (supported-systems '("i686-linux" "x86_64-linux"))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot5-inputs)
+                       (%boot-muslboot3-inputs)))
+    (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
     (inputs '())
     (propagated-inputs '())
     (arguments
      (ensure-keyword-arguments (package-arguments pkg)
                                `(#:implicit-inputs? #f
                                  #:guile ,%bootstrap-guile
+                                 #:parallel-build? ,(not (target-riscv64?))
                                  #:tests? #f)))))
 
 ;; These packages are needed to complete the rest of the bootstrap.
