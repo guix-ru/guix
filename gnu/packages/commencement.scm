@@ -2220,6 +2220,11 @@ ac_cv_c_float_format='IEEE (little-endian)'
     ("gawk" ,gawk-mesboot)
     ,@(alist-delete "binutils" (%boot-mesboot2-inputs))))
 
+;; Mirror the names from the x86 bootstrap path.
+(define (%boot-muslboot3-inputs)
+  `(("gawk" ,mawk-mesboot)
+    ,@(%boot-muslboot2-inputs)))
+
 (define glibc-headers-mesboot
   (package
     (inherit glibc-mesboot0)
