@@ -2076,10 +2076,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
        (sha256
         (base32
          "0ssi1wpaf7plaswqqjwigppsg5fyh99vdlb9kzl7c9lng89ndq1i"))))
-    (supported-systems '("i686-linux" "x86_64-linux"))
+    (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs (%boot-mesboot2-inputs))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot2-inputs)
+                       (%boot-muslboot2-inputs)))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
