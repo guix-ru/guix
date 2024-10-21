@@ -2865,6 +2865,31 @@ exec " gcc "/bin/" program
        #:validate-runpath? #f
        ,@(package-arguments file)))))
 
+(define byacc-boot0
+  (package
+    (inherit byacc)
+    (name "byacc-boot0")
+    (source (bootstrap-origin (package-source byacc)))
+    (native-inputs '())
+    (inputs
+     `(("make" ,gnu-make-boot0)
+       ,@(%bootstrap-inputs+toolchain)))
+    (propagated-inputs '())
+    (arguments
+     `(#:tests? #f
+       #:implicit-inputs? #f
+       #:guile ,%bootstrap-guile
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out  (assoc-ref outputs "out"))
+                    (bin  (string-append out "/bin"))
+                    (man1 (string-append out "/share/man/man1")))
+               (install-file "yacc" bin)
+               (symlink "yacc" (string-append bin "/byacc"))
+               (install-file "yacc.1" man1)))))))))
+
 (define gawk-boot0
   (package
     (inherit gawk)
