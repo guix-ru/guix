@@ -2930,7 +2930,7 @@ exec " gcc "/bin/" program
 
 (define (%boot0-inputs)
   `(,@(match (%current-system)
-        ((or "i686-linux" "x86_64-linux")
+        ((or "i686-linux" "x86_64-linux" "riscv64-linux")
          `(("bzip2" ,bzip2-boot0)
            ("coreutils" ,coreutils-boot0)
            ("gawk" ,gawk-boot0)
