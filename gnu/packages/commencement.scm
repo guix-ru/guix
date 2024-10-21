@@ -2181,6 +2181,40 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (install-file "gawk" bin)
                (symlink "gawk" (string-append bin "/awk"))))))))))
 
+(define mawk-mesboot
+  (package
+    (inherit mawk)
+    (name "mawk-mesboot")
+    (version "1.3.4-20240905")
+    (source (bootstrap-origin
+              (origin
+                (method url-fetch)
+                (uri (string-append "https://invisible-mirror.net/archives/mawk"
+                                    "/mawk-" version ".tgz"))
+                ;; Our gzip and tar don't know how to unpack a '.tgz' file.
+                (file-name (string-append name "-" version ".tar.gz"))
+                (sha256
+                 (base32
+                  "1q4rfcv7ppfw4fra8hp8z0s4qnsv1x598ny4xwb026zsgn96g6d3"))
+                (snippet
+                 #~(begin (delete-file "parse.c"))))))
+    (native-inputs
+     (modify-inputs (if (target-x86?)
+                        (%boot-mesboot2-inputs)
+                        (%boot-muslboot2-inputs))
+                    (append byacc-mesboot)))
+    (inputs '())
+    (propagated-inputs '())
+    (arguments
+     `(#:implicit-inputs? #f
+       #:parallel-build? #f         ; Prevent race condition
+       #:guile ,%bootstrap-guile
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda _
+             (invoke "./mawk" "--version"))))))))
+
 (define (%boot-mesboot3-inputs)
   `(("binutils" ,binutils-mesboot)
     ("gawk" ,gawk-mesboot)
