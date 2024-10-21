@@ -2815,6 +2815,13 @@ exec " gcc "/bin/" program
                          (("^XFAIL_TESTS =")
                           "XFAIL_TESTS = test-fnmatch ")
                          (("test-pthread-thread\\$\\(EXEEXT\\)") "")))
+                     ("riscv64-linux"
+                      '(substitute* "gnulib-tests/Makefile"
+                         ;; These tests fails non-deterministically.
+                         (("test-hard-locale\\$\\(EXEEXT\\)") "")
+                         (("test-sigprocmask\\$\\(EXEEXT\\)") "")
+                         (("test-setlocale_null-mt-all\\$\\(EXEEXT\\)") "")
+                         (("test-pthread_sigmask1\\$\\(EXEEXT\\)") "")))
                      (_
                       ;; XXX: The pthread tests are known to fail at least on
                       ;; ARM; skip them.
@@ -3312,7 +3319,7 @@ exec " gcc "/bin/" program
        #:make-flags `("ARFLAGS=crD"
                       ,,(match (%current-system)
                           ;; ranlib: '-D': No such file
-                          ((or "i686-linux" "x86_64-linux")
+                          ((or "i686-linux" "x86_64-linux" "riscv64-linux")
                            "RANLIB=ranlib")
                           (_
                            "RANLIB=ranlib -D"))
@@ -3322,7 +3329,7 @@ exec " gcc "/bin/" program
        ;; Thus, use the Gnulib replacement instead.  See
        ;; <https://bugs.gnu.org/49367>.
        ,@(match (%current-system)
-           ((or "i686-linux" "x86_64-linux")
+           ((or "i686-linux" "x86_64-linux" "riscv64-linux")
             '())
            (_
             '(#:configure-flags '("gl_cv_func_posix_spawn_works=no"))))
