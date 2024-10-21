@@ -2893,9 +2893,12 @@ exec " gcc "/bin/" program
 (define gawk-boot0
   (package
     (inherit gawk)
-    (source (bootstrap-origin (package-source gawk)))
+    (source (bootstrap-origin
+             (origin (inherit (package-source gawk))
+                     (snippet
+                      #~(begin (delete-file "awkgram.c"))))))
     (name "gawk-boot0")
-    (native-inputs '())
+    (native-inputs (list byacc-boot0))
     (inputs
      `(("make" ,gnu-make-boot0)
        ,@(%bootstrap-inputs+toolchain)))
