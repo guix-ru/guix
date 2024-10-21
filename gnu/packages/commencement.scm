@@ -2838,8 +2838,11 @@ exec " gcc "/bin/" program
     (inherit (@ (gnu packages file) file))
     (arguments
      `(#:configure-flags
-       ;; XXX: List only added to prevent rebuilds!
-       `("--disable-bzlib" ,,@'())))))
+       `("--disable-bzlib"
+         ,,@(match (%current-system)
+              ("riscv64-linux"
+               '("--disable-xzlib"))
+              (_ '())))))))
 
 (define file-boot0
   (package
@@ -2854,7 +2857,10 @@ exec " gcc "/bin/" program
        #:implicit-inputs? #f
        #:guile ,%bootstrap-guile
        #:configure-flags '("--disable-bzlib")
-       #:make-flags '("CFLAGS+=-std=c11")
+       ;; riscv64's gcc-4.6.4 doesn't have full C11 support.
+       #:make-flags ,(if (target-riscv64?)
+                          ''("CFLAGS+=-std=c1x")
+                          ''("CFLAGS+=-std=c11"))
        #:strip-binaries? #f
        #:validate-runpath? #f
        ,@(package-arguments file)))))
