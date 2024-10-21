@@ -2815,6 +2815,15 @@ exec " gcc "/bin/" program
                          (("^XFAIL_TESTS =")
                           "XFAIL_TESTS = test-fnmatch ")
                          (("test-pthread-thread\\$\\(EXEEXT\\)") "")))
+                     ("riscv64-linux"
+                      '(substitute* "gnulib-tests/Makefile"
+                         (("^XFAIL_TESTS =")
+                          (string-append "XFAIL_TESTS = "
+                                         "test-hard-locale "
+                                         "test-sigprocmask "))
+                         ;; This test fails non-deterministically.
+                         (("test-setlocale_null-mt-all\\$\\(EXEEXT\\)") "")
+                         (("test-pthread_sigmask1\\$\\(EXEEXT\\)") "")))
                      (_
                       ;; XXX: The pthread tests are known to fail at least on
                       ;; ARM; skip them.
