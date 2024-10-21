@@ -2153,8 +2153,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (sha256
                (base32
                 "03d5y7jabq7p2s7ys9alay9446mm7i5g2wvy8nlicardgb6b6ii1"))))
-    (native-inputs (%boot-mesboot2-inputs))
-    (supported-systems '("i686-linux" "x86_64-linux"))
+    (native-inputs
+     (if (target-x86?)
+         (%boot-mesboot2-inputs)
+         (%boot-muslboot2-inputs)))
     (inputs '())
     (propagated-inputs '())
     (arguments
