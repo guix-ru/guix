@@ -1512,7 +1512,7 @@ confused with the @code{cpuid} command line utility from package @code{cpuid}.")
         (base32 "1cc95ggs64jqq9lk5c8fm4nk6fdnv1x7lr3k4znamj0vv6w22bcd"))))
     (build-system meson-build-system)
     (native-inputs
-     (list cmake pkg-config))
+     (list cmake-minimal pkg-config))
     (inputs
      (list avahi libtirpc libxml2))
     (home-page "https://lxi-tools.github.io/")
