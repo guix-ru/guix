@@ -71,6 +71,15 @@
       (format #t "running 'cmake' with arguments ~s~%" args)
       (apply invoke "cmake" args))))
 
+(define* (build #:key (parallel-build? #t) #:allow-other-keys)
+  (apply invoke "cmake"
+         `("--build"
+           "."
+           ,@(if parallel-build?
+                 `("-j" ,(number->string (parallel-job-count)))
+                 ;; When unset CMake defers to the build system.
+                 '("-j" "1")))))
+
 (define %test-suite-log-regexp
   ;; Name of test suite log files as commonly found in CMake.
   "^LastTest\\.log$")
@@ -93,10 +102,9 @@
       (format #t "test suite not run~%")))
 
 (define %standard-phases
-  ;; Everything is as with the GNU Build System except for the `configure'
-  ;; and 'check' phases.
   (modify-phases gnu:%standard-phases
     (delete 'bootstrap)
+    (replace 'build build)
     (replace 'check check)
     (replace 'configure configure)))
 
