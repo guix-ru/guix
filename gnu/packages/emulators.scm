@@ -3853,7 +3853,7 @@ graphic filters.  Some of its features include:
                     (("include\\(cmake/")
                      "include(")))))
     (build-system pyproject-build-system)
-    (native-inputs (list cmake pkg-config python-setuptools python-wheel))
+    (native-inputs (list cmake-minimal pkg-config python-setuptools python-wheel))
     (home-page "https://www.unicorn-engine.org")
     (synopsis "Generic CPU emulator framework")
     (description
