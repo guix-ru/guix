@@ -186,7 +186,7 @@ desktop.")
            libical
            libportal))
     (native-inputs
-     (list cmake
+     (list cmake-minimal
            `(,glib "bin") ; for glib-compile-schemas
            gettext-minimal
            pkg-config
