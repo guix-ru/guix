@@ -7269,8 +7269,6 @@ bases are detected.")
                     (bin   (string-append #$output "/bin/")))
                 (mkdir-p bin)
                 (copy-recursively "." share)
-                (delete-file (string-append share "/Chrysalis/build/CMakeFiles/CMakeOutput.log"))
-                (delete-file (string-append share "/Inchworm/build/CMakeFiles/CMakeOutput.log"))
 
                 (wrap-program (string-append share "Trinity")
                   `("R_LIBS_SITE" ":" = (,(getenv "R_LIBS_SITE")))
@@ -7324,7 +7322,7 @@ bases are detected.")
      (list coreutils
            gzip
            which))
-    (native-inputs (list cmake))
+    (native-inputs (list cmake-minimal))
     (home-page "https://github.com/trinityrnaseq/trinityrnaseq/wiki")
     (synopsis "Trinity RNA-Seq de novo transcriptome assembly")
     (description "Trinity assembles transcript sequences from Illumina RNA-Seq
