@@ -5034,7 +5034,7 @@ from the GSettings schemas in gsettings-desktop-schemas.")
     (native-inputs
      (list gettext-minimal
            pkg-config
-           cmake
+           cmake-minimal
            `(,glib "bin")
            desktop-file-utils
            itstool
