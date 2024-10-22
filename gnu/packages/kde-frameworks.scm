@@ -1243,6 +1243,13 @@ or user activity.")
                (base32
                 "173m6h9wr8pl5l70s6wmasm8dimkq737qgn6mlzdm18w3qb3p9s3"))))
     (build-system cmake-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-offscreen-display
+            (lambda _
+              (setenv "QT_QPA_PLATFORM" "offscreen"))))))
     (native-inputs
      (list extra-cmake-modules qttools))
     (inputs
