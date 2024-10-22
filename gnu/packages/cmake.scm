@@ -16,6 +16,7 @@
 ;;; Copyright © 2024 John Kehayias <john.kehayias@protonmail.com>
 ;;; Copyright © 2024 dan <i@dan.games>
 ;;; Copyright © 2024 Charles <charles@charje.net>
+;;; Copyright © 2024 Greg Hogan <code@greghogan.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -131,6 +132,7 @@ using the CMake build system.")
             '("Modules/CompilerId/Xcode-3.pbxproj.in"
               "Modules/Internal/CPack/CPack.RuntimeScript.in"
               "Source/cmGlobalXCodeGenerator.cxx"
+              "Source/cmLocalNinjaGenerator.cxx"
               "Source/cmLocalUnixMakefileGenerator3.cxx"
               "Source/cmExecProgramCommand.cxx"
               "Tests/CMakeLists.txt"
@@ -176,7 +178,7 @@ using the CMake build system.")
 (define-public cmake-bootstrap
   (package
     (name "cmake-bootstrap")
-    (version "3.24.2")
+    (version "3.30.8")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://cmake.org/files/v"
@@ -184,8 +186,7 @@ using the CMake build system.")
                                   "/cmake-" version ".tar.gz"))
               (sha256
                (base32
-                "1ny8y2dzc6fww9gzb1ml0vjpx4kclphjihkxagxigprxdzq2140d"))
-              (patches (search-patches "cmake-curl-certificates-3.24.patch"))))
+                "08374x0ak1wi94ycilp6yhll0wgif72gzy3pppbb8c85lhil4hqh"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -208,7 +209,10 @@ using the CMake build system.")
 
                 ;; By default CMake is built without any optimizations.  Use
                 ;; the recommended Release target for a ~2.5x speedup.
-                "--" "-DCMAKE_BUILD_TYPE=Release"))
+                "--" "-DCMAKE_BUILD_TYPE=Release"
+
+                ;; The debugger creates a circular dependency on cppdap.
+                "-DCMake_ENABLE_DEBUGGER=OFF"))
       #:make-flags
       #~(let ((skipped-tests
                (list #$@%common-disabled-tests
@@ -315,6 +319,8 @@ and workspaces that can be used in the compiler environment of your choice.")
      (list
       #:configure-flags
       #~(list "-DCMAKE_USE_SYSTEM_LIBRARIES=ON"
+              ;; The debugger creates a circular dependency on cppdap.
+              "-DCMake_ENABLE_DEBUGGER=OFF"
               (string-append "-DCMAKE_DOC_DIR=share/doc/cmake-"
                              #$(version-major+minor (package-version
                                                      cmake-bootstrap))))
@@ -346,6 +352,7 @@ and workspaces that can be used in the compiler environment of your choice.")
                       (invoke "ctest" "-j" (if parallel-tests?
                                                (number->string (parallel-job-count))
                                                "1")
+                              "--output-on-failure"
                               "--exclude-regex"
                               (string-append "^(" (string-join skipped-tests "|") ")$")))
                     (format #t "test suite not run~%"))))))
@@ -358,7 +365,7 @@ and workspaces that can be used in the compiler environment of your choice.")
   (package
     (inherit cmake-minimal)
     (name "cmake")
-    (version "3.25.1")
+    (version "3.30.8")
     (source (origin
               (inherit (package-source cmake-minimal))
               (method url-fetch)
@@ -373,8 +380,7 @@ and workspaces that can be used in the compiler environment of your choice.")
                                   ,@rest))))
               (sha256
                (base32
-                "1n4inb3fvk70sni5gmkljqw3cyllalyg3fnr9rlr7x3aa44isl8w"))
-              (patches (search-patches "cmake-curl-certificates-3.24.patch"))))
+                "08374x0ak1wi94ycilp6yhll0wgif72gzy3pppbb8c85lhil4hqh"))))
     (outputs '("out" "doc"))
     (arguments
      (substitute-keyword-arguments (package-arguments cmake-minimal)
@@ -411,7 +417,10 @@ and workspaces that can be used in the compiler environment of your choice.")
                   (delete-file-recursively (string-append #$output html)))))))))
     (inputs
      (modify-inputs (package-inputs cmake-minimal)
-       (prepend ncurses)))              ;required for ccmake
+       (prepend ncurses)                ;required for ccmake
+       ;; Avoid circular dependency with (gnu packages debug).
+       (prepend (module-ref (resolve-interface '(gnu packages debug))
+                            'cppdap))))
     ;; Extra inputs required to build the documentation.
     (native-inputs
      (modify-inputs (package-native-inputs cmake-minimal)
@@ -419,10 +428,10 @@ and workspaces that can be used in the compiler environment of your choice.")
                texinfo)))
     (properties (alist-delete 'hidden? (package-properties cmake-minimal)))))
 
-(define-public cmake-3.30
+(define-public cmake-3.24
   (package
     (inherit cmake)
-    (version "3.30.3")
+    (version "3.24.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://cmake.org/files/v"
@@ -430,14 +439,9 @@ and workspaces that can be used in the compiler environment of your choice.")
                                   "/cmake-" version ".tar.gz"))
               (sha256
                (base32
-                "1r48zym4dy4mvwzk704zh1vx9gb4a910f424ypvis28mcxdy2pbd"))))
-    (native-inputs
-     (modify-inputs (package-native-inputs cmake)
-       ;; Avoid circular dependency with (gnu packages debug).  Note: cppdap
-       ;; is built with cmake, so when the default cmake is updated to this
-       ;; version this circular dependency will need to be worked around.
-       (prepend (module-ref (resolve-interface '(gnu packages debug))
-                            'cppdap))))))
+                "15i2zbxlksqv4czajpwcc1c21smgw2mzpbghsdq71zqfa6cy9j9j"))
+              (patches (search-patches "cmake-curl-certificates-3.24.patch"))))
+    (properties '((hidden? . #t)))))
 
 (define-public cmake-minimal-cross
   (package
