@@ -48,7 +48,8 @@
               (patches (search-patches "tbb-other-arches.patch"))))
     (build-system cmake-build-system)
     (arguments
-     `(#:configure-flags
+     `(#:parallel-tests? #f
+       #:configure-flags
        '(,@(if (or (target-riscv64?)
                    (target-ppc32?))
                '("-DTBB_TEST_LINK_FLAGS=-latomic")

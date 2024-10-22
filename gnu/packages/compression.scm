@@ -2832,7 +2832,8 @@ computations.")
                 "17kqwvw2n6bgzidi8f5906s5hc9wm1lbfbpd491gf7csxjck99sx"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags #~(list "-DBUILD_STATIC=OFF"
+     (list #:parallel-tests? #f
+           #:configure-flags #~(list "-DBUILD_STATIC=OFF"
                                      "-DDEACTIVATE_AVX2=ON"
                                      "-DDEACTIVATE_AVX512=ON"
                                      "-DPREFER_EXTERNAL_LZ4=ON"
