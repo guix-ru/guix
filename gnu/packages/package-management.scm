@@ -1575,6 +1575,8 @@ tools_locations = {
     (native-inputs
      (list autoconf-wrapper
            automake
+           ;; If cmake is replaced with cmake-minimal then Guix errors when
+           ;; listing the dependents of rapidjson.
            cmake
            git-minimal
            libtool
