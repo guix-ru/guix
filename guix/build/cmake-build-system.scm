@@ -35,7 +35,7 @@
 ;; Code:
 
 (define* (configure #:key outputs (configure-flags '()) (out-of-source? #t)
-                    build-type target generator
+                    build-type target generator (tests? #t)
                     #:allow-other-keys)
   "Configure the given package."
   (let* ((out        (assoc-ref outputs "out"))
@@ -50,26 +50,41 @@
       (chdir "../build"))
     (format #t "build directory: ~s~%" (getcwd))
 
-    (let ((args `(,srcdir
-                  ,@(if generator
-                        (list (string-append "-G" generator))
-                        '())
-                  ,@(if build-type
-                        (list (string-append "-DCMAKE_BUILD_TYPE="
-                                             build-type))
-                        '())
-                  ,(string-append "-DCMAKE_INSTALL_PREFIX=" out)
-                  ;; ensure that the libraries are installed into /lib
-                  "-DCMAKE_INSTALL_LIBDIR=lib"
-                  ;; add input libraries to rpath
-                  "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE"
-                  ;; add (other) libraries of the project itself to rpath
-                  ,(string-append "-DCMAKE_INSTALL_RPATH=" out "/lib")
-                  ;; enable verbose output from builds
-                  "-DCMAKE_VERBOSE_MAKEFILE=ON"
-                  ,@configure-flags)))
-      (format #t "running 'cmake' with arguments ~s~%" args)
-      (apply invoke "cmake" args))))
+    (call-with-temporary-output-file
+      (lambda (temp port)
+        (let ((args `(,srcdir
+                      ;; Load variables into the the cache to prevent
+                      ;; warnings about unused manually-specified variables.
+                      ,(string-append "-C " temp)
+                      ,@(if generator
+                            (list (string-append "-G" generator))
+                            '())
+                      ,@configure-flags)))
+
+          (define save-to-cache
+            (lambda* (name value)
+              ;; <type> and <docstring> arguments are used only by CMake GUIs.
+              (format port "set(~a \"~a\" CACHE STRING \"\")~%" name value)))
+
+          (if build-type
+              (save-to-cache "CMAKE_BUILD_TYPE" build-type))
+          (save-to-cache "CMAKE_INSTALL_PREFIX" out)
+          ;; Ensure that the libraries are installed into /lib.
+          (save-to-cache "CMAKE_INSTALL_LIBDIR" "lib")
+          ;; Add input libraries to rpath.
+          (save-to-cache "CMAKE_INSTALL_RPATH_USE_LINK_PATH" "TRUE")
+          ;; Add (other) libraries of the project itself to rpath.
+          (save-to-cache "CMAKE_INSTALL_RPATH" (string-append out "/lib"))
+          ;; Enable verbose output from builds.
+          (save-to-cache "CMAKE_VERBOSE_MAKEFILE" "ON")
+          ;; Enable colored compiler diagnostics.
+          (save-to-cache "CMAKE_COLOR_DIAGNOSTICS" "ON")
+          ;; BUILD_TESTING in an option of CMake's CTest module.
+          (save-to-cache "BUILD_TESTING" (if tests? "ON" "OFF"))
+
+          (close-port port)
+          (format #t "running 'cmake' with arguments ~s~%" args)
+          (apply invoke "cmake" args))))))
 
 (define* (build #:key (parallel-build? #t) #:allow-other-keys)
   (apply invoke "cmake"
