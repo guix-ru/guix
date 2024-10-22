@@ -128,6 +128,7 @@
                    (search-paths '())
                    (make-flags ''())
                    (out-of-source? #t)
+                   (generator "Unix Makefiles")
                    (build-type "RelWithDebInfo")
                    (tests? #t)
                    (test-target "test")
@@ -168,6 +169,7 @@ provides a 'CMakeLists.txt' file as its build system."
                     #:configure-flags #$configure-flags
                     #:make-flags #$make-flags
                     #:out-of-source? #$out-of-source?
+                    #:generator #$generator
                     #:build-type #$build-type
                     #:tests? #$tests?
                     #:test-target #$test-target
@@ -205,6 +207,7 @@ provides a 'CMakeLists.txt' file as its build system."
                          (native-search-paths '())
                          (make-flags ''())
                          (out-of-source? #t)
+                         (generator "Unix Makefiles")
                          (build-type "RelWithDebInfo")
                          (tests? #f)              ; nothing can be done
                          (test-target "test")
@@ -258,6 +261,7 @@ build system."
                     #:configure-flags #$configure-flags
                     #:make-flags #$make-flags
                     #:out-of-source? #$out-of-source?
+                    #:generator #$generator
                     #:build-type #$build-type
                     #:tests? #$tests?
                     #:test-target #$test-target
