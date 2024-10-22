@@ -1552,7 +1552,7 @@ your network, send SCPI commands, and receive responses.")
                 (("update-desktop-database") (which "true"))))))))
     (native-inputs
      (list bash-completion
-           cmake
+           cmake-minimal
            (list glib "bin")
            pkg-config
            python
