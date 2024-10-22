@@ -39943,7 +39943,7 @@ platform using the ActivityPub protocol.")
                (base32
                 "11i6hqmcjh56y554kqhl61698n9v66j2qk1c1g63mv2w07h2z661"))))
     (build-system python-build-system)
-    (native-inputs (list cmake))
+    (native-inputs (list cmake-3.24))
     (arguments
      (list
       #:tests? #f                  ;needs network
