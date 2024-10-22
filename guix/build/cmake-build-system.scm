@@ -84,7 +84,8 @@
   ;; Name of test suite log files as commonly found in CMake.
   "^LastTest\\.log$")
 
-(define* (check #:key (tests? #t) (parallel-tests? #t)
+(define* (check #:key (tests? #t) (test-exclude "")
+                (parallel-tests? #t)
                 (test-suite-log-regexp %test-suite-log-regexp)
                 #:allow-other-keys)
   (if tests?
@@ -95,7 +96,10 @@
                  (gnu:dump-file-contents "." test-suite-log-regexp)
                  (raise c)))
         (apply invoke "ctest" "--output-on-failure"
-               `(,@(if parallel-tests?
+               `(,@(if (string-null? test-exclude)
+                       '()
+                       `("--exclude-regex" ,test-exclude))
+                 ,@(if parallel-tests?
                        `("-j" ,(number->string (parallel-job-count)))
                        ;; When unset CMake defers to the build system.
                        '("-j" "1")))))
