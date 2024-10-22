@@ -32,7 +32,7 @@
   #:use-module (ice-9 match)
   #:use-module (web client)
   #:use-module (web response)
-  #:autoload (newt window) (choice-window)
+  #:use-module (newt)
   #:export (run-network-page))
 
 ;; Maximum length of a technology name.

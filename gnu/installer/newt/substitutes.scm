@@ -20,7 +20,7 @@
   #:use-module (gnu installer substitutes)
   #:use-module (gnu installer utils)
   #:use-module (guix i18n)
-  #:autoload (newt window) (choice-window)
+  #:use-module (newt)
   #:use-module (ice-9 match)
   #:export (run-substitutes-page))
 

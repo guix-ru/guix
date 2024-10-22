@@ -36,18 +36,7 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 match)
   #:use-module (ice-9 receive)
-  #:autoload (newt bindings) (newt-finish)
-  #:autoload (newt components) (FLAG-BORDER FLAG-RETURNEXIT make-compact-button)
-  #:autoload (newt grid) (GRID-ELEMENT-COMPONENT
-                          add-form-to-grid
-                          make-wrapped-grid-window
-                          vertically-stacked-grid)
-  #:autoload (newt form) (make-form)
-  #:autoload (newt listbox) (make-listbox
-                             append-entry-to-listbox current-listbox-entry)
-  #:autoload (newt textbox) (make-textbox
-                             make-reflowed-textbox set-textbox-text)
-  #:autoload (newt window) (choice-window)
+  #:use-module (newt)
   #:export (run-welcome-page))
 
 ;; Expected width and height for the logo.

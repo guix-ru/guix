@@ -33,23 +33,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-35)
-  #:autoload (newt components) (FLAG-BORDER
-                                FLAG-RETURNEXIT FLAG-SCROLL
-                                components=?
-                                make-button)
-  #:autoload (newt form) (make-form
-                          add-components-to-form run-form)
-  #:autoload (newt grid) (make-grid
-                          ANCHOR-TOP
-                          GRID-ELEMENT-COMPONENT
-                          basic-window-grid
-                          make-wrapped-grid-window
-                          set-grid-field)
-  #:autoload (newt listbox) (make-listbox
-                             append-entry-to-listbox
-                             clear-listbox
-                             current-listbox-entry)
-  #:autoload (newt textbox) (make-reflowed-textbox)
+  #:use-module (newt)
   #:export (run-wifi-page))
 
 ;; This record associates a connman service to its key the listbox.

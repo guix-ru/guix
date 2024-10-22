@@ -33,43 +33,8 @@
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-35)
-  #:autoload (newt window) (choice-window)
-  #:autoload (parted disk) (DISK-TYPE-FEATURE-PARTITION-NAME
-                            PARTITION-FLAG-BOOT
-                            PARTITION-FLAG-ESP
-                            disk-commit
-                            disk-new
-                            disk-partitions
-                            disk-probe
-                            disk-remove-all-partitions
-                            disk-remove-partition*
-                            disk-type-check-feature
-                            extended-partition?
-                            freespace-partition?
-                            logical-partition?
-                            metadata-partition?
-                            normal-partition?
-                            partition-get-path
-                            partition-is-flag-available?
-                            partition-set-flag
-                            partition-set-name
-                            partition-set-system)
-  #:autoload (parted filesystem) (filesystem-type-get)
-  #:autoload (parted structs) (device-path
-                               disk?
-                               disk-device
-                               disk-disk-type
-                               geometry-start
-                               partition?
-                               partition-disk
-                               partition-end
-                               partition-length
-                               partition-prev
-                               partition-start)
-  #:autoload (parted unit) (UNIT-SECTOR
-                            unit-format
-                            unit-format-custom
-                            unit-parse)
+  #:use-module (newt)
+  #:use-module (parted)
   #:export (run-partitioning-page))
 
 (define (button-exit-action)
