@@ -9574,6 +9574,10 @@ Autoconf-based packages by default.
 This parameter specifies the
 @url{https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html, CMake generator}
 responsible for writing the input files for the native build system.
+
+@item #:test-exclude
+Tests matching this regular expression are excluded from testing by
+@url{https://cmake.org/cmake/help/latest/manual/ctest.1.html, ctest}.
 @end table
 @end defvar
 
