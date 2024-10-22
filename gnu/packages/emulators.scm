@@ -4222,7 +4222,7 @@ stack-machine, written in ANSI C.  Graphical output is implemented using SDL2.")
         (base32 "1xahdr6bh3dw5swrc2r8kqa8ljhqlb7k2kxv5mrw5rhcmcnzcyig"))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list cmake
+     (list cmake-minimal
            python-setuptools
            python-wheel))
     (home-page "https://www.keystone-engine.org")
