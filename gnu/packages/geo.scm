@@ -1379,13 +1379,8 @@ development.")
         (base32 "0gg5lcshlmn3wwak42xr0b8a8gdr4572d7hrcvxn2291kp2c3096"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:phases
-           #~(modify-phases %standard-phases
-               (replace 'check
-                 (lambda* (#:key tests? #:allow-other-keys)
-                   (when tests?
-                     (invoke "ctest" "-E" ;; This test hangs.
-                             "pdal_io_stac_reader_test")))))))
+     (list #:parallel-tests? #f
+           #:test-exclude "pdal_io_stac_reader_test"))
     (native-inputs (list python))
     (inputs (list gdal
                   h3
