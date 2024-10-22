@@ -724,7 +724,8 @@ from any network device in any of three ASCII graph formats.")
         (base32 "1zr1l9zkai7rpw9cn5j9h4zrv08hgpfmwscwyscf2j4cgwf0rxrr"))))
     (build-system cmake-build-system)
     (arguments
-     `(#:configure-flags
+     `(#:parallel-tests? #f
+       #:configure-flags
        (list
         (string-append "-DCMAKE_INSTALL_BINDIR="
                        (assoc-ref %outputs "out") "/bin")
@@ -3869,7 +3870,10 @@ never see any machines other than the one Dante is running on.")
     (inputs
      (list asio catch-framework openssl))
     (arguments
-     `(#:configure-flags
+     `(;; Running parallel tests results in "bind: Address already in use" error
+       ;; in test service_status_feature_test_suite.
+       #:parallel-tests? #f
+       #:configure-flags
        '("-DBUILD_SSL=NO")
        #:phases
        (modify-phases %standard-phases

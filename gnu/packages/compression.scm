@@ -874,7 +874,8 @@ with the sfArk algorithm.")
                 "0lgx4s4aykxn8x3b4m4c4isasd2608bbyfm4lxc2spcc4xqwhzkz"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags #~(list "-DBUILD_SHARED_LIBS=ON"
+     (list #:parallel-tests? #f
+           #:configure-flags #~(list "-DBUILD_SHARED_LIBS=ON"
                                      "-DMZ_BUILD_TESTS=ON"
                                      "-DMZ_BUILD_UNIT_TESTS=ON")))
     (native-inputs (list googletest pkg-config))
@@ -2825,7 +2826,8 @@ computations.")
                 "17kqwvw2n6bgzidi8f5906s5hc9wm1lbfbpd491gf7csxjck99sx"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags #~(list "-DBUILD_STATIC=OFF"
+     (list #:parallel-tests? #f
+           #:configure-flags #~(list "-DBUILD_STATIC=OFF"
                                      "-DDEACTIVATE_AVX2=ON"
                                      "-DDEACTIVATE_AVX512=ON"
                                      "-DPREFER_EXTERNAL_LZ4=ON"
