@@ -1498,7 +1498,7 @@ tools_locations = {
     (native-inputs
      (list autoconf-wrapper
            automake
-           cmake
+           cmake-minimal
            git-minimal
            libtool
            meson
