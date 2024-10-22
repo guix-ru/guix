@@ -4534,6 +4534,7 @@ typed.")
      (list kcrash kdbusaddons kdoctools ki18n qtbase qtdeclarative))
     (arguments
      (list
+      #:parallel-tests? #f
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch

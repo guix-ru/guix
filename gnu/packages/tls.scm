@@ -983,7 +983,8 @@ number generator")
         (base32 "070i5pxciw04swfqk1rmdprhsafn4cias3dlmkm467pqpjnhb394"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags
+     (list #:parallel-tests? #f
+           #:configure-flags
            #~(list "-DUSE_SHARED_MBEDTLS_LIBRARY=ON"
                    "-DUSE_STATIC_MBEDTLS_LIBRARY=OFF")
            #:phases
