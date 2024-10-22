@@ -243,6 +243,15 @@ direct descendant of NetBSD's Almquist Shell (@command{ash}).")
                 port)
                (close-port port))
              #t))
+         (replace 'check
+           (lambda* (#:key parallel-tests? tests? #:allow-other-keys)
+             (when tests?
+                (let ((job-count (if parallel-tests?
+                                     (number->string (parallel-job-count))
+                                     "1")))
+                  ;; Test artifacts and actions are built and run with the
+                  ;; 'test' target.
+                  (invoke "make" "-j" job-count "test")))))
          ;; Use fish-foreign-env to source /etc/profile.
          (add-before 'install 'source-etc-profile
            (lambda* (#:key inputs #:allow-other-keys)
