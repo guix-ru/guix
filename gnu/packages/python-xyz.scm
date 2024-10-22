@@ -35722,7 +35722,7 @@ used to retry a function a given number of times.")
                 (("\\$\\{SoQt_INCLUDE_DIRS}")
                  "${Coin_INCLUDE_DIR};${SoQt_INCLUDE_DIRS}")))))))
     (native-inputs
-      (list cmake swig))
+      (list cmake-minimal swig))
     (inputs
       (list python-wrapper
             qtbase-5
