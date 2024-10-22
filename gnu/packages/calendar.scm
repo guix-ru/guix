@@ -176,6 +176,7 @@ the <tz.h> library for handling time zones and leap seconds.")
     (build-system cmake-build-system)
     (arguments
      (list
+      #:parallel-tests? #f
       #:configure-flags #~(list "-DSHARED_ONLY=true"
                                 ;; required by evolution-data-server
                                 "-DGOBJECT_INTROSPECTION=true"

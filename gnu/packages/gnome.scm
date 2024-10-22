@@ -8356,6 +8356,7 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
     (build-system cmake-build-system)
     (arguments
      (list
+      #:parallel-tests? #f
       #:configure-flags
       #~(let* ((lib (string-append #$output "/lib"))
                (runpaths (map (lambda (s)
