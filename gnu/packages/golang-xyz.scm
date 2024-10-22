@@ -20528,7 +20528,7 @@ recognizers) at run time.")
      (list
       #:import-path "mvdan.cc/editorconfig"))
     (native-inputs
-     (list cmake))
+     (list cmake-minimal))
     (home-page "https://github.com/mvdan/editorconfig")
     (synopsis "EditorConfig support in Go")
     (description
