@@ -159,7 +159,6 @@ endif()~%~%"
      (build-system cmake-build-system)
      (arguments
       (list
-       #:test-target "check"         ;otherwise some test binaries are missing
        #:disallowed-references (list imagemagick/stable)
        #:imported-modules `(,@%cmake-build-system-modules
                             (guix build glib-or-gtk-build-system))
@@ -359,10 +358,15 @@ as the native format.")
             #$@(if (target-x86-32?)
                    #~()            ;XXX: there are remaining failures on i686
                    #~((replace 'check
+                      ;; Test artifacts and actions are built with the 'check' target.
+                      (lambda* (#:key parallel-tests? tests? #:allow-other-keys)
                         ;; Re-instate the tests disabled in inkscape/stable, now that
                         ;; their ImageMagick requirement is satisfied.
-                        (assoc-ref %standard-phases 'check))))
-
+                        (when tests?
+                          (let ((job-count (if parallel-tests?
+                                               (number->string (parallel-job-count))
+                                               "1")))
+                            (invoke "make" "-j" job-count "check")))))))
             (replace 'wrap-program
               ;; Ensure Python is available at runtime.
               (lambda _
