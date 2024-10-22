@@ -89,7 +89,7 @@
            automake
            bison
            boost
-           cmake
+           cmake-minimal
            emacs-minimal
            flex
            ghostscript                  ;for tests
