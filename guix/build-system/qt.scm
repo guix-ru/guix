@@ -96,6 +96,10 @@
                           `(("source" ,source))
                           '())
                     ,@`(("cmake" ,cmake))
+                    ,@`(("ninja" ,(module-ref
+                                   (resolve-interface
+                                    '(gnu packages ninja))
+                                   'ninja)))
                     ,@`(("qtbase" ,qtbase))
                     ,@native-inputs
                     ,@(if target
