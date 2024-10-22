@@ -20542,7 +20542,7 @@ document.")
                     (invoke "nosetests" "-v" "symengine.tests"))
                   (format #t "test suite not run~%")))))))
     (native-inputs
-     (list cmake python-cython-3 python-nose))
+     (list cmake-minimal python-cython-3 python-nose))
     (inputs
      (list symengine))
     (home-page "https://github.com/symengine/symengine.py")
