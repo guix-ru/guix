@@ -1869,8 +1869,9 @@ build (current-guix) and then store a couple of full system images.")
                         #$marionette)
       (screenshot "installer-services.ppm")
 
-      (marionette-eval* '(choose-kernel installer-socket) #$marionette)
-      (screenshot "installer-kernel.ppm")
+      (when #$(target-x86?)
+        (marionette-eval* '(choose-kernel installer-socket) #$marionette)
+        (screenshot "installer-kernel.ppm"))
 
       (marionette-eval* '(choose-services installer-socket
                                           #:choose-desktop-environment?
