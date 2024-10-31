@@ -1670,8 +1670,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
               (sha256
                (base32
                 "1m5fzhr4gjn9ni8gxx7ag3fkbw1rspjzgv39mnfb0nkm5mw70v3s"))
-              (patches (search-patches "ghc-9.2-grep-warnings.patch"
-                                       "ghc-testsuite-recomp015-execstack.patch"))
+              (patches (search-patches "ghc-9.2-grep-warnings.patch"))
               (modules '((guix build utils)))
               (snippet
                ;; collections.Iterable was moved to collections.abc in Python 3.10.
@@ -2097,8 +2096,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
                (file-name "ghc-testsuite.tar.xz")
                (sha256
                 (base32
-                 "1hxylm3nhxzl7yidarlavvcg1240w4bk0hy5jnvwna24jyxz69i6"))
-               (patches (search-patches "ghc-testsuite-recomp015-execstack.patch")))
+                 "1hxylm3nhxzl7yidarlavvcg1240w4bk0hy5jnvwna24jyxz69i6")))
              (origin
                (method url-fetch)
                (uri (string-append "https://downloads.haskell.org/~ghc/"
@@ -2176,8 +2174,7 @@ interactive environment for the functional language Haskell.")
                     version "/ghc-" version "-testsuite.tar.xz"))
              (sha256
               (base32
-               "143ifc4g3jc6s9hcry5qha913rzwg4hpsvk6pqvxk5r0qigfxjwx"))
-             (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
+               "143ifc4g3jc6s9hcry5qha913rzwg4hpsvk6pqvxk5r0qigfxjwx"))))
          (replace "hadrian-bootstrap-sources.tar.gz"
            (origin
              (method url-fetch)
