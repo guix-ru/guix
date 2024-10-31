@@ -1186,8 +1186,7 @@ interactive environment for the functional language Haskell.")
                  "https://www.haskell.org/ghc/dist/"
                  version "/" name "-" version "-testsuite.tar.xz"))
            (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
-                                    "ghc-testsuite-grep-compat.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
+                                    "ghc-testsuite-grep-compat.patch"))
            (sha256
             (base32
              "0pw9r91g2np3i806g2f4f8z4jfdd7mx226cmdizk4swa7av1qf91"))
@@ -1241,7 +1240,14 @@ interactive environment for the functional language Haskell.")
                (substitute* "libraries/unix/tests/all.T"
                  (("^test\\('T8108'") "# guix skipped: test('T8108'"))
                (substitute* "libraries/unix/tests/libposix/all.T"
-                 (("^test\\('posix010'") "# guix skipped: test('posix010'"))))))))
+                 (("^test\\('posix010'") "# guix skipped: test('posix010'"))))
+           ;; binutils@2.39 warns for execstack deprecation by default, causing
+           ;; some tests to fail ; explicitely disable during linking instead.
+           (add-after 'unpack-testsuite 'fix-tests-with-binutils@2.39
+             (lambda _
+               (substitute* "testsuite/mk/test.mk"
+                 (("^TEST_HC_OPTS = ")
+                  "TEST_HC_OPTS = -optl -Wl,-z,noexecstack "))))))))
     (native-search-paths (list (search-path-specification
                                 (variable "GHC_PACKAGE_PATH")
                                 (files (list
@@ -1269,8 +1275,7 @@ interactive environment for the functional language Haskell.")
                  "https://www.haskell.org/ghc/dist/"
                  version "/ghc-" version "-testsuite.tar.xz"))
            (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
-                                    "ghc-testsuite-grep-compat.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
+                                    "ghc-testsuite-grep-compat.patch"))
            (sha256
             (base32
              "0c55pj2820q26rikhpf636sn4mjgqsxjrl94vsywrh79dxp3k14z"))
@@ -1329,8 +1334,7 @@ interactive environment for the functional language Haskell.")
                  "https://www.haskell.org/ghc/dist/"
                  version "/ghc-" version "-testsuite.tar.xz"))
            (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
-                                    "ghc-testsuite-grep-compat.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
+                                    "ghc-testsuite-grep-compat.patch"))
            (sha256
             (base32
              "1zl25gg6bpx5601k8h3cqnns1xfc0nqgwnh8jvn2s65ra3f2g1nz"))
@@ -1525,8 +1529,7 @@ interactive environment for the functional language Haskell.")
            (sha256
             (base32
              "1m5fzhr4gjn9ni8gxx7ag3fkbw1rspjzgv39mnfb0nkm5mw70v3s"))
-           (patches (search-patches "ghc-9.2-grep-warnings.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
+           (patches (search-patches "ghc-9.2-grep-warnings.patch"))
            (modules '((guix build utils)))
            (snippet
             ;; collections.Iterable was moved to collections.abc in Python 3.10.
@@ -1612,8 +1615,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
              (sha256
               (base32
                "0cmmwhcwv9fjzvmgjj85d354858qqbmqfzaz5160xqj4yl9zk225"))
-             (patches (search-patches "ghc-9.2-grep-warnings.patch"
-                                      "ghc-testsuite-recomp015-execstack.patch"))))
+             (patches (search-patches "ghc-9.2-grep-warnings.patch"))))
          ,@(filter (match-lambda
                      (("ghc-bootstrap" . _) #f)
                      (("ghc-testsuite" . _) #f)
