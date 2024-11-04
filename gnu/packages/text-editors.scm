@@ -1,7 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2012 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2013, 2014 Ludovic Courtès <ludo@gnu.org>
-;;; Copyright © 2015-2022 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2015-2022, 2024 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2016 José Miguel Sánchez García <jmi2k@openmailbox.org>
 ;;; Copyright © 2016 Carlo Zancanaro <carlo@zancanaro.id.au>
 ;;; Copyright © 2016 Rene Saavedra <rennes@openmailbox.org>
@@ -121,14 +121,14 @@
 (define-public ed
   (package
     (name "ed")
-    (version "1.20.1")
+    (version "1.20.2")
     (source (origin
              (method url-fetch)
              (uri (string-append "mirror://gnu/ed/ed-"
                                  version ".tar.lz"))
              (sha256
               (base32
-               "1jmvpbs2mnrmk870js11v7g5qr3z8w0ws7sbdj3zjhd1jyr6795i"))))
+               "08s5l9gpn1yy40ww4g5igc1n5zny0d3hzb1lycbwmhj8iwqwgzk5"))))
     (build-system gnu-build-system)
     (native-inputs (list lzip))
     (arguments
