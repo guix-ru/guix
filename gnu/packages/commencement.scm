@@ -2238,6 +2238,13 @@ ac_cv_c_float_format='IEEE (little-endian)'
                                    ".tar.gz"))
                (patches (search-patches "glibc-boot-2.16.0.patch"
                                         "glibc-bootstrap-system-2.16.0.patch"))
+               (modules '((guix build utils)))
+               (snippet
+                ;; No one should need obstack_compat, it's an unused pre-GNU C macro.
+                ;; Removing this lets us use binutils-2.30.
+                '(begin (substitute* "malloc/obstack.c"
+                          ((".*obstack_compat" all)
+                           (string-append "// " all)))))
                (sha256
                 (base32
                  "0vlz4x6cgz7h54qq4528q526qlhnsjzbsvgc4iizn76cb0bfanx7")))))
