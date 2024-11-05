@@ -2099,7 +2099,50 @@ ac_cv_c_float_format='IEEE (little-endian)'
   (package
     (inherit binutils-mesboot1)
     (name "binutils-mesboot")
-    (native-inputs (%boot-mesboot2-inputs))))
+    (version "2.30")
+    (source (bootstrap-origin
+             (origin
+               (method url-fetch)
+               (uri (string-append "mirror://gnu/binutils/binutils-"
+                                   version ".tar.gz"))
+               (sha256
+                (base32
+                 "1sp9g7zrrcsl25hxiqzmmcrdlbm7rbmj0vki18lks28wblcm0f4c")))))
+    (arguments
+     (list #:implicit-inputs? #f
+           #:guile %bootstrap-guile
+           #:tests? #f                  ; runtest: command not found
+           #:parallel-build? #f
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'configure 'fix-build
+                 (lambda _
+                   ;; bfd/po doesn't have a Makefile, so the recursive calls just
+                   ;; fail. We add files with the same name Make targets have, to
+                   ;; trick Make into thinking there's nothing to do.
+                   (call-with-output-file "bfd/po/install"
+                     (lambda (p) (display "" p)))
+                   (call-with-output-file "bfd/po/all"
+                     (lambda (p) (display "" p)))
+                   (call-with-output-file "bfd/po/info"
+                     (lambda (p) (display "" p))))))
+           #:configure-flags
+           #~(list
+               (string-append "CONFIG_SHELL="
+                              (search-input-file %build-inputs "/bin/bash"))
+               (string-append "SHELL="
+                              (search-input-file %build-inputs "/bin/bash"))
+               "--enable-64-bit-bfd"
+               "--disable-nls"
+               "--disable-shared"
+               "--disable-plugins"
+               "--enable-deterministic-archives"
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target)))))
+    (native-inputs (if (target-x86?)
+                       (%boot-mesboot2-inputs)
+                       (%boot-muslboot2-inputs)))
+    (supported-systems %supported-systems)))
 
 ;; We need to introduce byacc in order to process some pre-generated
 ;; files in gawk and possibly elsewhere.
