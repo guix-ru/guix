@@ -2403,6 +2403,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/zig-0.12-fix-runpath.patch		\
   %D%/packages/patches/zig-0.12-use-baseline-cpu-by-default.patch	\
   %D%/packages/patches/zig-0.12-use-system-paths.patch		\
+  %D%/packages/patches/zig-0.13-fix-runpath.patch		\
   %D%/packages/patches/zsh-egrep-failing-test.patch		\
   %D%/packages/patches/zuo-bin-sh.patch
 
