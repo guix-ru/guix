@@ -3875,7 +3875,6 @@ functionality was designed to be as reusable and portable as possible.")
     (properties `((upstream-name . "libIDL")))
     (license license:lgpl2.0+)))
 
-
 (define-public orbit2
   (package
     (name "orbit2")
@@ -3933,7 +3932,6 @@ featuring mature C, C++ and Python bindings.")
     (license license:gpl2+)
     (properties `((upstream-name . "ORBit2")))))
 
-
 (define-public libbonobo
   (package
     (name "libbonobo")
@@ -3986,7 +3984,6 @@ use in GNOME applications, built on top of CORBA.")
     ;; GPLv2 covers both conditions
     (license license:gpl2+)))
 
-
 (define-public gconf
   (package
     (name "gconf")
@@ -4014,7 +4011,6 @@ use in GNOME applications, built on top of CORBA.")
 is intended for user preferences; not arbitrary data storage.")
     (license license:lgpl2.0+)
     (properties '((upstream-name . "GConf")))))
-
 
 (define-public gnome-mime-data
   (package
@@ -4049,7 +4045,6 @@ and Application database for GNOME.  The data stored by this module is
 designed to be accessed through the MIME functions in GnomeVFS.")
     (license license:gpl2+)))
 
-
 (define-public gnome-vfs
   (package
     (name "gnome-vfs")
@@ -4070,13 +4065,12 @@ designed to be accessed through the MIME functions in GnomeVFS.")
            (lambda _
              (substitute* '("libgnomevfs/Makefile.in"
                             "daemon/Makefile.in")
-               (("-DG_DISABLE_DEPRECATED") "-DGLIB_DISABLE_DEPRECATION_WARNINGS"))
-             #t))
+               (("-DG_DISABLE_DEPRECATED")
+                "-DGLIB_DISABLE_DEPRECATION_WARNINGS"))))
          (add-before 'configure 'patch-test-async-cancel-to-never-fail
            (lambda _
              (substitute* "test/test-async-cancel.c"
-               (("EXIT_FAILURE") "77"))
-             #t)))))
+               (("EXIT_FAILURE") "77")))))))
     (inputs (list libxml2 dbus-glib gconf gnome-mime-data zlib))
     (native-inputs
      (list `(,glib "bin") ; for glib-mkenums, etc.
@@ -4088,8 +4082,6 @@ designed to be accessed through the MIME functions in GnomeVFS.")
 applications.  It provides a file system abstraction which allows applications
 to access local and remote files with a single consistent API.")
     (license license:lgpl2.0+)))
-
-
 
 (define-public libgnome
   (package
@@ -4152,8 +4144,6 @@ files and URIs, and displaying help.")
     (description  "Libart is a 2D drawing library intended as a
 high-quality vector-based 2D library with antialiasing and alpha composition.")
     (license license:lgpl2.0+)))
-
-
 
 (define-public libgnomecanvas
   (package
