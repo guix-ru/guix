@@ -34,14 +34,24 @@
 ;; https://github.com/riverwm/river/blob/master/PACKAGING.md
 (define global-cache-dir "zig-cache")
 
-(define* (set-cc #:rest args)
-  ;; TODO: Zig needs the gcc-toolchain in order to find the libc.
-  ;;       we need to think about how to solve this in the build system
-  ;;       directly: --libc
-  (setenv "CC" "gcc"))
+(define* (configure #:key inputs target #:allow-other-keys)
+  ;; Set cache dir, otherwise Zig looks for `$HOME/.cache'.
+  (setenv "ZIG_GLOBAL_CACHE_DIR" global-cache-dir)
 
-(define* (set-zig-global-cache-dir #:rest args)
-  (setenv "ZIG_GLOBAL_CACHE_DIR" global-cache-dir))
+  ;; Libc paths for target.
+  (let ((libc (assoc-ref inputs (if target "cross-libc" "libc")))
+        (port (open-file "/tmp/guix-zig-libc-paths" "w" #:encoding "utf8")))
+    (display
+     (string-append "\
+include_dir=" libc "/include
+sys_include_dir=" libc "/include
+crt_dir=" libc "/lib
+msvc_lib_dir=
+kernel32_lib_dir=
+gcc_dir=")
+     port)
+    (close-port port))
+  (setenv "ZIG_LIBC" "/tmp/guix-zig-libc-paths"))
 
 (define* (build #:key
                 zig-build-flags
@@ -91,9 +101,7 @@
 (define %standard-phases
   (modify-phases gnu:%standard-phases
     (delete 'bootstrap)
-    (delete 'configure)
-    (add-before 'build 'set-zig-global-cache-dir set-zig-global-cache-dir)
-    (add-before 'build 'set-cc set-cc)
+    (replace 'configure configure)
     (replace 'build build)
     (replace 'check check)
     (replace 'install install)))
