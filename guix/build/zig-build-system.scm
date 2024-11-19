@@ -34,27 +34,59 @@
 ;; Interesting guide here:
 ;; https://github.com/riverwm/river/blob/master/PACKAGING.md
 
+;; `zig fetch --name=<NAME>` overwrites dependency with NAME in build.zig.zon.
+;; Here we assert store file names for Zig dependencies start with "zig-".
+;; NOTE: When dependency names specified by package developer are different
+;; from ours, adjust them in the origin definition.
+(define* (unpack-dependencies #:key inputs skip-build? #:allow-other-keys)
+  "Extract Zig packages from INPUTS and unpack them with their associated
+names."
+  (define (zig-package? name source)
+    (and (not (string=? name "source"))
+         (not (string=? name "zig"))
+         (string-prefix? "zig-" (strip-store-file-name source))))
+  (define (inputs->zig-inputs inputs)
+    (filter (match-lambda
+              ((name . source) (zig-package? name source)))
+            inputs))
+  (define (get-source-path source)
+    (let* ((package (strip-store-file-name source))
+           (path (string-append source "/src/" package)))
+      (if (file-exists? path)
+          path
+          source)))
+  (unless skip-build?
+    (for-each
+     (match-lambda
+       ((name . source)
+        (let ((call `("zig" "fetch" ,(get-source-path source)
+                      ,(string-append "--save=" name))))
+          (format #t "running: ~s~%" call)
+          (apply invoke call))))
+     (inputs->zig-inputs inputs))))
+
 (define* (build #:key
                 zig-build-flags
                 zig-build-target
-                zig-release-type       ;; "safe", "fast" or "small" empty for a
-                                       ;; debug build"
+                ;; "safe", "fast" or "small", empty for a "debug" build.
+                zig-release-type
+                skip-build?
                 #:allow-other-keys)
   "Build a given Zig package."
-
-  (setenv "DESTDIR" "out")
-  (let ((call `("zig" "build"
-                     "--prefix"             ""            ;; Don't add /usr
-                     "--prefix-lib-dir"     "lib"
-                     "--prefix-exe-dir"     "bin"
-                     "--prefix-include-dir" "include"
-                     ,(string-append "-Dtarget=" (zig-target zig-build-target))
-                     ,@(if zig-release-type
-                         (list (string-append "-Drelease-" zig-release-type))
-                         '())
-                     ,@zig-build-flags)))
-  (format #t "running: ~s~%" call)
-  (apply invoke call)))
+  (when (not skip-build?)
+    (setenv "DESTDIR" "out")
+    (let ((call `("zig" "build"
+                  "--prefix"             ""            ;; Don't add /usr
+                  "--prefix-lib-dir"     "lib"
+                  "--prefix-exe-dir"     "bin"
+                  "--prefix-include-dir" "include"
+                  ,(string-append "-Dtarget=" (zig-target zig-build-target))
+                  ,@(if zig-release-type
+                        (list (string-append "-Drelease-" zig-release-type))
+                        '())
+                  ,@zig-build-flags)))
+      (format #t "running: ~s~%" call)
+      (apply invoke call))))
 
 (define* (check #:key tests?
                 zig-test-flags
@@ -72,15 +104,23 @@
         (setenv "DESTDIR" old-destdir)
         (unsetenv "DESTDIR")))))
 
-(define* (install #:key inputs outputs #:allow-other-keys)
+(define* (install #:key outputs install-source? #:allow-other-keys)
   "Install a given Zig package."
-  (let ((out (assoc-ref outputs "out")))
-    (copy-recursively "out" out)))
+  (let* ((out (assoc-ref outputs "out"))
+         (package (strip-store-file-name out))
+         (dest (string-append out "/src/" package)))
+    (when (file-exists? "out")
+      (copy-recursively "out" out)
+      (delete-file-recursively "out"))
+    (when install-source?
+      (mkdir-p dest)
+      (copy-recursively "." dest))))
 
 (define %standard-phases
   (modify-phases gnu:%standard-phases
     (delete 'bootstrap)
     (replace 'configure zig-configure)
+    (add-after 'configure 'unpack-dependencies unpack-dependencies)
     (replace 'build build)
     (replace 'check check)
     (replace 'install install)))

@@ -48,6 +48,8 @@
                     source
                     (tests? #t)
                     (test-target #f)
+                    (install-source? #t)
+                    (skip-build? #f)
                     (zig-build-flags ''())
                     (zig-test-flags ''())
                     (zig-release-type #f)
@@ -68,13 +70,15 @@
                      #:source #+source
                      #:system #$system
                      #:test-target #$test-target
+                     #:install-source? #$install-source?
+                     #:skip-build? #$skip-build?
                      #:zig-build-flags #$zig-build-flags
                      ;; For reproducibility.
                      #:zig-build-target #$(platform-target
                                            (lookup-platform-by-system system))
                      #:zig-test-flags #$zig-test-flags
                      #:zig-release-type #$zig-release-type
-                     #:tests? #$tests?
+                     #:tests? #$(and tests? (not skip-build?))
                      #:phases #$phases
                      #:outputs #$(outputs->gexp outputs)
                      #:search-paths '#$(sexp->gexp
@@ -98,6 +102,8 @@
                           (native-search-paths '())
                           (tests? #t)
                           (test-target #f)
+                          (install-source? #t)
+                          (skip-build? #f)
                           (zig-build-flags ''())
                           (zig-test-flags ''())
                           (zig-destdir "out")
@@ -141,13 +147,15 @@
                      #:native-search-paths '#$(map
                                                 search-path-specification->sexp
                                                 native-search-paths)
+                     #:install-source? #$install-source?
+                     #:skip-build? #$skip-build?
                      #:zig-build-flags #$zig-build-flags
                      #:zig-build-target #$target
                      #:zig-test-flags #$zig-test-flags
                      #:zig-release-type #$zig-release-type
                      #:zig-destdir #$zig-destdir
                      #:zig-test-destdir #$zig-test-destdir
-                     #:tests? #$tests?
+                     #:tests? #$(and tests? (not skip-build?))
                      #:search-paths '#$(sexp->gexp
                                         (map search-path-specification->sexp
                                              search-paths))))))
@@ -164,13 +172,13 @@
 
 (define* (lower name
                 #:key source inputs native-inputs outputs system target
-                (zig (default-zig))
+                (zig (default-zig)) (zig-inputs '())
                 #:allow-other-keys
                 #:rest arguments)
   "Return a bag for NAME."
 
   (define private-keywords
-    '(#:target #:zig #:inputs #:native-inputs #:outputs))
+    '(#:target #:zig #:zig-inputs #:inputs #:native-inputs #:outputs))
 
   (bag
     (name name)
@@ -181,6 +189,7 @@
                         '())
                     ,@`(("zig" ,zig))
                     ,@native-inputs
+                    ,@(if target '() zig-inputs)
                     ,@(if target '() inputs)
                     ,@(if target
                         ;; Use the standard cross inputs of
@@ -189,7 +198,8 @@
                         '())
                     ;; Keep the standard inputs of 'gnu-build-system'.
                     ,@(standard-packages)))
-    (host-inputs (if target inputs '()))
+    (host-inputs `(,@(if target zig-inputs '())
+                   ,@(if target inputs '())))
     (target-inputs (if target
                      (standard-cross-packages target 'target)
                      '()))
