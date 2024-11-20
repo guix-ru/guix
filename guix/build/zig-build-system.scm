@@ -40,6 +40,32 @@
   (zig-source-install-path
    (dirname (dirname (dirname (canonicalize-path input))))))
 
+(define (zig-arguments)
+  (define version-major+minor
+    (let* ((port (open-input-pipe "zig version"))
+           (str  (read-line port)))
+      (close-pipe port)
+      (take (string-split str #\.) 2)))
+  (define (version>=? a b-major b-minor)
+    (let ((a-major (string->number (first a)))
+          (a-minor (string->number (second a))))
+      (or (> a-major b-major)
+          (and (= a-major b-major)
+               (>= a-minor b-minor)))))
+  `(("parallel-jobs" .
+     ,(lambda (jobs)
+        (cond
+         ((version>=? version-major+minor 0 11)
+          (list (string-append "-j" (number->string jobs))))
+         (else '()))))
+    ("release-type" .
+     ,(lambda (type)
+        (cond
+         ((version>=? version-major+minor 0 11)
+          (list (string-append "-Doptimize=Release" (string-capitalize type))))
+         (else
+          (list (string-append "-Drelease-" type))))))))
+
 ;; Use ‘zig fetch --name=NAME’ to overwrite dependency NAME and update hash in
 ;; build.zig.zon.
 (define (unpack-dependencies . args)
@@ -82,34 +108,49 @@ asserts dependency names start with \"zig-\"."
                 zig-build-target
                 ;; "safe", "fast" or "small", empty for a "debug" build.
                 zig-release-type
+                parallel-build?
                 skip-build?
                 #:allow-other-keys)
   "Build a given Zig package."
   (when (not skip-build?)
     (setenv "DESTDIR" "out")
-    (let ((call `("zig" "build"
-                  "--prefix"             ""            ;; Don't add /usr
-                  "--prefix-lib-dir"     "lib"
-                  "--prefix-exe-dir"     "bin"
-                  "--prefix-include-dir" "include"
-                  ,(string-append "-Dtarget=" (zig-target zig-build-target))
-                  ,@(if zig-release-type
-                        (list (string-append "-Drelease-" zig-release-type))
-                        '())
-                  ,@zig-build-flags)))
+    (let* ((arguments (zig-arguments))
+           (call `("zig" "build"
+                   "--prefix"             ""            ;; Don't add /usr
+                   "--prefix-lib-dir"     "lib"
+                   "--prefix-exe-dir"     "bin"
+                   "--prefix-include-dir" "include"
+                   ,(string-append "-Dtarget=" (zig-target zig-build-target))
+                   ,@(if parallel-build?
+                         ((assoc-ref arguments "parallel-jobs")
+                          (parallel-job-count))
+                         ((assoc-ref arguments "parallel-jobs")
+                          1))
+                   ,@(if zig-release-type
+                         ((assoc-ref arguments "release-type")
+                          zig-release-type)
+                         '())
+                   ,@zig-build-flags)))
       (format #t "running: ~s~%" call)
       (apply invoke call))))
 
 (define* (check #:key tests?
                 zig-test-flags
                 target
+                parallel-tests?
                 #:allow-other-keys)
   "Run all the tests"
   (when (and tests? (not target))
     (let ((old-destdir (getenv "DESTDIR")))
       (setenv "DESTDIR" "test-out") ;; Avoid colisions with the build output
-      (let ((call `("zig" "build" "test"
-                    ,@zig-test-flags)))
+      (let* ((arguments (zig-arguments))
+             (call `("zig" "build" "test"
+                     ,@(if parallel-tests?
+                           ((assoc-ref arguments "parallel-jobs")
+                            (parallel-job-count))
+                           ((assoc-ref arguments "parallel-jobs")
+                            1))
+                     ,@zig-test-flags)))
         (format #t "running: ~s~%" call)
         (apply invoke call))
       (if old-destdir
