@@ -322,3 +322,23 @@ Language Server Protocol} for the Zig programming language.")
              #:zig-test-flags
              #~(list #$version-data-path))))
     (inputs (list zig-0.12 zig-diffz zig-known-folders))))
+
+(define-public zig-zls-0.13
+  (let ((base zig-zls-0.12))
+    (package
+      (inherit base)
+      (name "zig-zls")
+      (version "0.13.0")
+      (source (origin
+                (inherit (package-source base))
+                (uri (git-reference
+                      (url "https://github.com/zigtools/zls")
+                      (commit version)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "1dbg06v136yjcs9grc6xwsmv0cm39c0sdkh5vzn7h1qxxka6ixlp"))))
+      (build-system zig-build-system)
+      (inputs
+       (modify-inputs (package-inputs base)
+         (replace "zig" zig-0.13))))))
