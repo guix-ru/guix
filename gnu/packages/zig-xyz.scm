@@ -159,6 +159,38 @@ interface.")
     (home-page "https://codeberg.org/ifreund/zig-wayland")
     (license license:expat)))
 
+(define-public zig-wlroots
+  (package
+    (name "zig-wlroots")
+    (version "0.18.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://codeberg.org/ifreund/zig-wlroots")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0aa9xck8al1n27dzc9zkm7xp88g87x7h5cl2jlpyxjgbgahancr8"))))
+    (build-system zig-build-system)
+    (arguments
+     (list #:zig-build-flags
+           #~(list "-Denable-tests")
+           #:zig-test-flags
+           #~(list "-Denable-tests")))
+    (propagated-inputs
+     (list wlroots
+           zig-pixman
+           zig-wayland
+           zig-xkbcommon))
+    (native-inputs
+     (list pkg-config
+           wlroots))
+    (synopsis "Zig bindings for wlroots")
+    (description "This package provides Zig bindings for @code{wlroots}.")
+    (home-page "https://codeberg.org/ifreund/zig-wlroots")
+    (license license:expat)))
+
 (define-public zig-zls
   (package
     (name "zig-zls")
