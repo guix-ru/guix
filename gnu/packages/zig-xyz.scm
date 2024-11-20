@@ -288,3 +288,37 @@ interface.")
 Language Server Protocol} for the Zig programming language.")
     (home-page "https://github.com/zigtools/zls")
     (license license:expat)))
+
+(define-public zig-zls-0.12
+  (package
+    (inherit zig-zls-0.10)
+    (name "zig-zls")
+    (version "0.12.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/zigtools/zls")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1ini1ifa9b0v2ika3sqsiiv2p7v9npfslss45280yxwn2pjqmn7n"))
+       (snippet
+        (rename-zig-dependencies
+         '(("diffz" . "zig-diffz")
+           ("known_folders" . "zig-known-folders"))))))
+    (build-system zig-build-system)
+    (arguments
+     (let ((version-data-path
+            #~(string-append "-Dversion_data_path="
+                             #+(package-source (this-package-input "zig"))
+                             "/doc/langref.html.in")))
+       (list #:zig (this-package-input "zig")
+             #:install-source? #f
+             #:zig-release-type "safe"
+             #:zig-build-flags
+             #~(list #$version-data-path "-Dpie")
+             #:zig-test-flags
+             #~(list #$version-data-path))))
+    (inputs (list zig-0.12 zig-diffz zig-known-folders))))
