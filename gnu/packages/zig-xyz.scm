@@ -213,7 +213,7 @@ interface.")
     (home-page "https://codeberg.org/ifreund/zig-xkbcommon")
     (license license:expat)))
 
-(define-public zig-zls
+(define-public zig-zls-0.10
   (package
     (name "zig-zls")
     (version "0.10.0")
