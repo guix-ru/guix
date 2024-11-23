@@ -14494,7 +14494,7 @@ or @acronym{RDP, Remote Desktop Protocol}.")
 (define-public lock
   (package
     (name "lock")
-    (version "1.0.0")
+    (version "1.1.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -14502,7 +14502,7 @@ or @acronym{RDP, Remote Desktop Protocol}.")
                     (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
-               (base32 "1sq7mk4j3jzs1gzzql938d58gvrz6cp0ingzaxilffdpbpvj4fn3"))))
+               (base32 "18xyh7g4qqm2nx9wfd5bxf293dk0ahwr1acj4ypwswasv0isxdf9"))))
     (build-system meson-build-system)
     (arguments
      (list
