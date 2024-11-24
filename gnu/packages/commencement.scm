@@ -1010,9 +1010,12 @@ MesCC-Tools), and finally M2-Planet.")
                  (for-each (lambda (file)
                              (install-file file (string-append incl "/bits")))
                            (append
-                             (find-files (string-append "arch/" arch "/bits"))
+                             ;; Instead of checking if the header already exists
+                             ;; install them in a 'backwards' order, so the
+                             ;; preferred one never ends up overridden.
+                             (find-files "obj/include/bits")
                              (find-files "arch/generic/bits")
-                             (find-files "obj/include/bits")))
+                             (find-files (string-append "arch/" arch "/bits"))))
                  (when (file-exists? (string-append lib "/libc.so"))
                    (symlink "libc.so"
                             (string-append lib "/ld-musl-" arch ".so.1")))))))))))
