@@ -1087,8 +1087,15 @@ MesCC-Tools), and finally M2-Planet.")
                     "tcc"
                     "-g"
                     "-vvv"
-                    "-D" "REG_PC=0"
-                    "-D" "REG_S0=8"
+                    ;; Some missed bits from musl in arch/$ARCH/bits/signal.h
+                    #$@(cond
+                         ((target-riscv64?)
+                          #~("-D" "REG_PC=0"
+                             "-D" "REG_S0=8"))
+                         ((target-x86-64?)
+                          #~("-D" "REG_EBP=6"
+                             "-D" "REG_EIP=14"))
+                         (#t #~()))
                     "-D" "ONE_SOURCE=1"
                     "-D" "TCC_VERSION=\"0.9.28rc\""
                     "-D" "CONFIG_TCC_STATIC=1"
