@@ -1173,6 +1173,8 @@ MesCC-Tools), and finally M2-Planet.")
            #:strip-binaries? #f ; no strip yet
            #:phases
            #~(modify-phases %standard-phases
+               ;; bootar-1b/bin/gzip: no such option: --best
+               (delete 'compress-documentation)
                (add-after 'configure 'fix-build
                  (lambda _
                    ;; bfd/po doesn't have a Makefile, so the recursive calls just
