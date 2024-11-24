@@ -960,6 +960,20 @@ MesCC-Tools), and finally M2-Planet.")
            (add-after 'configure 'remove-complex
              (lambda _
                (delete-file-recursively "src/complex")))
+           (add-after 'unpack 'remove-optimized-math
+             ;; TCC does not support the extended asm for float registers.
+             ;; All src/math/{i386,x86_64}/*.c files make use of it.  Luckily
+             ;; musl has an automatic fallback to generic C implementations
+             ;; in src/math.  Therefore we can simply delete these files.
+             (lambda _
+               (for-each (lambda (path)
+                           (for-each delete-file (find-files path "\\.c$")))
+                         '("src/math/i386" "src/math/x86_64"))))
+           (add-after 'unpack 'adjust-i386-setjmp
+             (lambda _
+               ;; TCC has a bug with forward referencing numeric labels.  We
+               ;; remove this file and fallback to the generic C implementation.
+               (delete-file "src/signal/i386/sigsetjmp.s")))
            ;; We can't use the install script since it doesn't play well with gash.
            (replace 'install
              (lambda* (#:key outputs #:allow-other-keys)
