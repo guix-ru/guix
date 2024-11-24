@@ -982,14 +982,13 @@ MesCC-Tools), and finally M2-Planet.")
                       (lib (string-append out "/lib"))
                       (incl (string-append out "/include"))
                       ;; Taken from the ARCH variable in configure.
-                      (arch #$(cond
-                                ((target-x86-32?) "i386")
-                                ((target-x32?) "x32")
-                                ((target-arm32?) "arm")
-                                ((target-ppc64le?) "powerpc64")
-                                (#t (string-take
-                                      (%current-system)
-                                      (string-index (%current-system) #\-))))))
+                      (arch #$(cond ((target-x86-32?) "i386")
+                                    ((target-x32?) "x32")
+                                    ((target-arm32?) "arm")
+                                    ((target-ppc64le?) "powerpc64")
+                                    (#t (string-take
+                                          (%current-system)
+                                          (string-index (%current-system) #\-))))))
                  (for-each (lambda (file)
                              (when (file-exists? file)
                                (install-file file bin)))
