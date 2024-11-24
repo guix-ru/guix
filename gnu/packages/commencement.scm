@@ -960,13 +960,41 @@ MesCC-Tools), and finally M2-Planet.")
            (add-after 'configure 'remove-complex
              (lambda _
                (delete-file-recursively "src/complex")))
+           (add-after 'unpack 'remove-optimized-math
+             ;; TCC does not support the extended asm for float registers.
+             ;; All src/math/{i386,x86_64}/*.c files make use of it.  Luckily
+             ;; musl has an automatic fallback to generic C implementations
+             ;; in src/math.  Therefore we can simply delete these files.
+             (lambda _
+               (for-each (lambda (path)
+                           (for-each delete-file (find-files path "\\.c$")))
+                         '("src/math/i386" "src/math/x86_64"))))
+           (add-after 'unpack 'adjust-i386-setjmp
+             (lambda _
+               ;; We can't just delete the file or we get:
+               ;; tcc: error: undefined symbol 'sigsetjmp'
+               (substitute* "src/signal/i386/sigsetjmp.s"
+                 ;; TCC has a bug with forward referencing numeric labels.  We
+                 ;; move the label and its code to the top.
+                 (("^1:[\t ]*jmp ___setjmp") "")
+                 (("^sigsetjmp:") "1:\tjmp ___setjmp\nsigsetjmp:")
+                 ;; And we turn the forward into a backward reference.
+                 (("jecxz 1f") "jecxz 1b"))))
            ;; We can't use the install script since it doesn't play well with gash.
            (replace 'install
              (lambda* (#:key outputs #:allow-other-keys)
                (let* ((out (assoc-ref outputs "out"))
                       (bin (string-append out "/bin"))
                       (lib (string-append out "/lib"))
-                      (incl (string-append out "/include")))
+                      (incl (string-append out "/include"))
+                      ;; Taken from the ARCH variable in configure.
+                      (arch #$(cond ((target-x86-32?) "i386")
+                                    ((target-x32?) "x32")
+                                    ((target-arm32?) "arm")
+                                    ((target-ppc64le?) "powerpc64")
+                                    (#t (string-take
+                                          (%current-system)
+                                          (string-index (%current-system) #\-))))))
                  (for-each (lambda (file)
                              (when (file-exists? file)
                                (install-file file bin)))
@@ -982,27 +1010,12 @@ MesCC-Tools), and finally M2-Planet.")
                  (for-each (lambda (file)
                              (install-file file (string-append incl "/bits")))
                            (append
-                             (find-files
-                               (string-append "arch/"
-                                              #$(cond
-                                                  ((target-x86-32?) "x86")
-                                                  ((target-x86-64?) "x86_64")
-                                                  ((target-aarch64?) "aarch64")
-                                                  ((target-riscv64?) "riscv64")
-                                                  (#t ""))
-                                              "/bits"))
+                             (find-files (string-append "arch/" arch "/bits"))
                              (find-files "arch/generic/bits")
                              (find-files "obj/include/bits")))
                  (when (file-exists? (string-append lib "/libc.so"))
                    (symlink "libc.so"
-                            (string-append lib "/ld-musl-"
-                                           #$(cond
-                                               ((target-x86-32?) "x86")
-                                               ((target-x86-64?) "x86_64")
-                                               ((target-aarch64?) "aarch64")
-                                               ((target-riscv64?) "riscv64")
-                                               (#t ""))
-                                           ".so.1")))))))))))
+                            (string-append lib "/ld-musl-" arch ".so.1")))))))))))
 
 (define tcc-boot-musl
   (package
