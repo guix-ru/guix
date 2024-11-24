@@ -980,6 +980,11 @@ MesCC-Tools), and finally M2-Planet.")
                  (("^sigsetjmp:") "1:\tjmp ___setjmp\nsigsetjmp:")
                  ;; And we turn the forward into a backward reference.
                  (("jecxz 1f") "jecxz 1b"))))
+           (add-after 'unpack 'use-fallback-ldso-on-riscv64
+             ;; src/ldso/riscv64/tlsdesc.s:13: error: 'add': Expected second source
+             ;; operand that is a register or immediate
+             (lambda _
+               (delete-file "src/ldso/riscv64/tlsdesc.s")))
            ;; We can't use the install script since it doesn't play well with gash.
            (replace 'install
              (lambda* (#:key outputs #:allow-other-keys)
