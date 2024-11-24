@@ -966,7 +966,16 @@ MesCC-Tools), and finally M2-Planet.")
                (let* ((out (assoc-ref outputs "out"))
                       (bin (string-append out "/bin"))
                       (lib (string-append out "/lib"))
-                      (incl (string-append out "/include")))
+                      (incl (string-append out "/include"))
+                      ;; Taken from the ARCH variable in configure.
+                      (arch #$(cond
+                                ((target-x86-32?) "i386")
+                                ((target-x32?) "x32")
+                                ((target-arm32?) "arm")
+                                ((target-ppc64le?) "powerpc64")
+                                (#t (string-take
+                                      (%current-system)
+                                      (string-index (%current-system) #\-))))))
                  (for-each (lambda (file)
                              (when (file-exists? file)
                                (install-file file bin)))
@@ -982,27 +991,12 @@ MesCC-Tools), and finally M2-Planet.")
                  (for-each (lambda (file)
                              (install-file file (string-append incl "/bits")))
                            (append
-                             (find-files
-                               (string-append "arch/"
-                                              #$(cond
-                                                  ((target-x86-32?) "x86")
-                                                  ((target-x86-64?) "x86_64")
-                                                  ((target-aarch64?) "aarch64")
-                                                  ((target-riscv64?) "riscv64")
-                                                  (#t ""))
-                                              "/bits"))
+                             (find-files (string-append "arch/" arch "/bits"))
                              (find-files "arch/generic/bits")
                              (find-files "obj/include/bits")))
                  (when (file-exists? (string-append lib "/libc.so"))
                    (symlink "libc.so"
-                            (string-append lib "/ld-musl-"
-                                           #$(cond
-                                               ((target-x86-32?) "x86")
-                                               ((target-x86-64?) "x86_64")
-                                               ((target-aarch64?) "aarch64")
-                                               ((target-riscv64?) "riscv64")
-                                               (#t ""))
-                                           ".so.1")))))))))))
+                            (string-append lib "/ld-musl-" arch ".so.1")))))))))))
 
 (define tcc-boot-musl
   (package
