@@ -971,9 +971,15 @@ MesCC-Tools), and finally M2-Planet.")
                          '("src/math/i386" "src/math/x86_64"))))
            (add-after 'unpack 'adjust-i386-setjmp
              (lambda _
-               ;; TCC has a bug with forward referencing numeric labels.  We
-               ;; remove this file and fallback to the generic C implementation.
-               (delete-file "src/signal/i386/sigsetjmp.s")))
+               ;; We can't just delete the file or we get:
+               ;; tcc: error: undefined symbol 'sigsetjmp'
+               (substitute* "src/signal/i386/sigsetjmp.s"
+                 ;; TCC has a bug with forward referencing numeric labels.  We
+                 ;; move the label and its code to the top.
+                 (("^1:[\t ]*jmp ___setjmp") "")
+                 (("^sigsetjmp:") "1:\tjmp ___setjmp\nsigsetjmp:")
+                 ;; And we turn the forward into a backward reference.
+                 (("jecxz 1f") "jecxz 1b"))))
            ;; We can't use the install script since it doesn't play well with gash.
            (replace 'install
              (lambda* (#:key outputs #:allow-other-keys)
