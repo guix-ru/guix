@@ -909,19 +909,11 @@ MesCC-Tools), and finally M2-Planet.")
     ("tcc" ,tcc-boot)
     ,@(alist-delete "tcc" (%boot-tcc0-inputs))))
 
-;; The last musl in the 1.1.x series.
 ;; For now this starts the riscv64 specific portion of the bootstrap.
 (define musl-boot0
   (package
     (inherit musl)
     (name "musl-boot0")
-    (version "1.1.24")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://www.musl-libc.org/releases/"
-                                  "musl-" version ".tar.gz"))
-              (sha256
-               (base64 "E3DJqBKyzyp9koAlEMygBYzDfmanvt1wBR8KNAFQIqM="))))
     (native-inputs (%boot-tcc-inputs))
     (inputs '())
     (arguments
