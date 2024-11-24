@@ -1162,7 +1162,7 @@ MesCC-Tools), and finally M2-Planet.")
     (inputs '())
     (propagated-inputs '())
     (native-inputs
-     (modify-inputs (%boot-tcc-inputs)
+     (modify-inputs (package-native-inputs tcc-musl)
                     (replace "tcc" tcc-musl)
                     (replace "bash" oksh-muslboot0)))
     (arguments
