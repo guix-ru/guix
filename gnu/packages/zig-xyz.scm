@@ -133,6 +133,34 @@ mission-critical safety and performance for financial services.")
       (home-page "https://github.com/ziglibs/diffz")
       (license license:expat))))
 
+(define-public zig-doctest
+  (let ((commit "725a93787cb1e24e2a183971d52f4ea12d9e1757")
+        (revision "0"))
+    (package
+      (name "zig-doctest")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/kristoff-it/zig-doctest")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "05xk4vz5lzv3660phlyhnpd7g8j49zlv3hfsa8bl0flj3mvmhvzc"))))
+      (build-system zig-build-system)
+      (arguments
+       (list #:install-source? #f
+             ;; No test suite.
+             #:tests? #f
+             #:zig-release-type "safe"))
+      (synopsis "Tool for testing Zig code snippets")
+      (description
+       "@command{doctest} is a code rendering tool being able to provide
+syntax highlighting and run code snippets to ensure they behave as expected.")
+      (home-page "https://github.com/kristoff-it/zig-doctest")
+      (license license:expat))))
+
 (define-public zig-known-folders
   (let ((commit "1cceeb70e77dec941a4178160ff6c8d05a74de6f")
         (revision "0"))
