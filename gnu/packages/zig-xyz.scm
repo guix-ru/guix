@@ -489,3 +489,37 @@ Language Server Protocol} for the Zig programming language.")
       (inputs
        (modify-inputs (package-inputs base)
          (replace "zig" zig-0.13))))))
+
+(define-public zig-zul
+  ;; No releases.
+  (let ((commit "ae0c27350c0db6b460f22cba30b6b0c4a02d1ffd")
+        (revision "0"))
+    (package
+      (name "zig-zul")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/karlseguin/zul")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "0h0581hhm6xzhb0s43aa357x4c4cxfvfpy24q4f5ss9jrgfc1g52"))
+                (modules '((guix build utils)))
+                (snippet
+                 ;; XXX: Some of the four http.Request/Response tests need to be
+                 ;; skipped, otherwise ConnectionRefused error occurs.  (However
+                 ;; all of them pass when running independently.)
+                 #~(substitute* "src/http.zig"
+                     ((".*http\\.(Request|Response).*" line)
+                      (string-append
+                       line "if (true) return error.SkipZigTest;"))))))
+      (build-system zig-build-system)
+      (home-page "https://www.goblgobl.com/zul/")
+      (synopsis "Zig utility library")
+      (description
+       "@code{zul} enhances Zig's standard library by wrapping common tasks
+(e.g., reading lines from a file) with simpler APIs and adding new functionality
+(e.g., @code{UUID} type).")
+      (license license:expat))))
