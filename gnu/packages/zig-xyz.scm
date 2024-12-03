@@ -245,6 +245,35 @@ across several operating systems.")
       (home-page "https://github.com/ziglibs/known-folders")
       (license license:expat))))
 
+(define-public zig-metrics
+  ;; No releases, latest commit from zig-0.13 branch.
+  (let ((commit "fcf9e94fa54a20f4954e9821801c32e44d407a2f")
+        (revision "0"))
+    (package
+      (name "zig-metrics")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/karlseguin/metrics.zig")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "1vvfy97ak5xwvwv3rkqsgsj644298d3c75645386qf4psija6a25"))
+                (modules '((guix build utils)))
+                (snippet
+                 #~(substitute* "example/lib/metrics.zig"
+                     (("try (Metrics.Active.init)" _ keep) keep)))))
+      (build-system zig-build-system)
+      (home-page "https://github.com/karlseguin/metrics.zig")
+      (synopsis "Prometheus metrics library")
+      (description
+       "@code{metrics} is a Prometheus metrics library with support for
+@code{counters}, @code{gauges} and @code{histograms} metric types and their
+labeled variants.")
+      (license license:expat))))
+
 (define-public zig-pixman
   (package
     (name "zig-pixman")
