@@ -1848,25 +1848,29 @@ exec " gcc "/bin/" program
                                  #:guile ,%bootstrap-guile
                                  #:tests? #f)))))
 
+;; XXX Helper to avoid a boot0-world rebuild for now by removing this
+;; unnecessary gcc-14 fix.
+(define (REMOVEME-clean-bash-configure-flags flags)
+  `(cons*
+    "--disable-shared" "LDFLAGS=-static"
+    (list
+     ,@(fold delete
+             (primitive-eval (gexp->approximate-sexp flags))
+             '("CFLAGS=-g -O2 -Wno-implicit-function-declaration"
+               "--disable-shared" "LDFLAGS=-static")))))
+(define (REMOVEME-undo-bash-minimal-CFLAGS-change bash)
+  (package
+    (inherit bash)
+    (arguments
+     (substitute-keyword-arguments (package-arguments bash)
+       ((#:configure-flags flags)
+        (REMOVEME-clean-bash-configure-flags flags))))))
+
 ;; These packages are needed to complete the rest of the bootstrap.
 ;; In the future, Gash et al. could handle it directly, but it's not
 ;; ready yet.
-(define bash-mesboot
-  (let ((bash (mesboot-package "bash-mesboot" static-bash)))
-    (package
-      (inherit bash)
-      (arguments
-       (substitute-keyword-arguments (package-arguments bash)
-         ;; XXX REMOVEME Avoid a boot0-world rebuild for now by removing this
-         ;; unnecessary gcc-14 fix.
-         ((#:configure-flags flags)
-          `(cons*
-            "--disable-shared" "LDFLAGS=-static"
-            (list
-             ,@(fold delete
-                     (primitive-eval (gexp->approximate-sexp flags))
-                     '("CFLAGS=-g -O2 -Wno-implicit-function-declaration"
-                       "--disable-shared" "LDFLAGS=-static"))))))))))
+(define bash-mesboot (REMOVEME-undo-bash-minimal-CFLAGS-change
+                      (mesboot-package "bash-mesboot" static-bash)))
 (define sed-mesboot (mesboot-package "sed-mesboot" sed))
 
 ;; "sed" from Gash-Utils lacks the 'w' command as of 0.2.0.
@@ -3081,7 +3085,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
        ,@(substitute-keyword-arguments (package-arguments static-bash)
            ((#:configure-flags flags #~'())
             #~(append
-               #$flags
+               #$(REMOVEME-clean-bash-configure-flags flags)
                #$(if (target-linux?)
                      #~'("CFLAGS=-g -O2 -Wno-implicit-function-declaration")
                      #~'())
