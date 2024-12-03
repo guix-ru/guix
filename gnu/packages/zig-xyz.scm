@@ -354,6 +354,28 @@ interface.")
     (home-page "https://codeberg.org/ifreund/zig-wayland")
     (license license:expat)))
 
+(define-public zig-websocket
+  ;; No releases, latest commit from zig-0.13 branch.
+  (let ((commit "cf89cb8b9c61c99982ced19da54890983e226245")
+        (revision "0"))
+    (package
+      (name "zig-websocket")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/karlseguin/websocket.zig")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "1q85pvc1dgyj5zdpk3xav1zgj6857p0nygndz3nc5xlm260hrck8"))))
+      (build-system zig-build-system)
+      (home-page "https://github.com/karlseguin/websocket.zig")
+      (synopsis "WebSocket implementation for Zig")
+      (description "This package provides a Zig WebSocket server.")
+      (license license:expat))))
+
 (define-public zig-wlroots
   (package
     (name "zig-wlroots")
