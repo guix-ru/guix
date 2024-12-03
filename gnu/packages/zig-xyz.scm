@@ -193,6 +193,35 @@ syntax highlighting and run code snippets to ensure they behave as expected.")
       (home-page "https://github.com/kristoff-it/zig-doctest")
       (license license:expat))))
 
+(define-public zig-ini
+  ;; No releases.
+  (let ((commit "e18d36665905c1e7ba0c1ce3e8780076b33e3002")
+        (revision "0"))
+    (package
+      (name "zig-ini")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/ziglibs/ini")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "0b1688g6kvcrbr8pbl3glv09fpd27p5z2bif8jmn6km6myq5fs1y"))))
+      (build-system zig-build-system)
+      (home-page "https://github.com/ziglibs/ini")
+      (synopsis "INI parser library")
+      (description
+       "This package provides an INI parser library with:
+@itemize
+@item Raw record reading.
+@item Leading/trailing whitespace removal.
+@item Comments based on @code{;} and @code{#}.
+@item C and Zig API.
+@end itemize")
+      (license license:expat))))
+
 (define-public zig-known-folders
   (let ((commit "1cceeb70e77dec941a4178160ff6c8d05a74de6f")
         (revision "0"))
