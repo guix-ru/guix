@@ -245,6 +245,35 @@ across several operating systems.")
       (home-page "https://github.com/ziglibs/known-folders")
       (license license:expat))))
 
+(define-public zig-logz
+  ;; No releases, latest commit from zig-0.13 branch.
+  (let ((commit "5d5bbaeb98ad30cda30c60ab0f2d1a7fb4890676")
+        (revision "0"))
+    (package
+      (name "zig-logz")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/karlseguin/log.zig")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "01xihyvyx3rpv0kvjh6mg1b99d6agq683q4iyn39nwqb6ma0i0sz"))
+                (snippet
+                 (rename-zig-dependencies
+                  '(("metrics" . "zig-metrics"))))))
+      (build-system zig-build-system)
+      (propagated-inputs (list zig-metrics))
+      (home-page "https://github.com/karlseguin/log.zig")
+      (synopsis "Structured logger for Zig")
+      (description
+       "@code{logz} is an opinionated structured logger that outputs to stdout,
+stderr, a file or a custom writer using logfmt or JSON.  It aims to minimize
+runtime memory allocation by using a pool of pre-allocated loggers.")
+      (license license:expat))))
+
 (define-public zig-metrics
   ;; No releases, latest commit from zig-0.13 branch.
   (let ((commit "fcf9e94fa54a20f4954e9821801c32e44d407a2f")
