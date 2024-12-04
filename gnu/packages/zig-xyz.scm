@@ -193,6 +193,43 @@ syntax highlighting and run code snippets to ensure they behave as expected.")
       (home-page "https://github.com/kristoff-it/zig-doctest")
       (license license:expat))))
 
+(define-public zig-httpz
+  ;; No releases, latest commit from zig-0.13 branch.
+  (let ((commit "7d2ddae87af9b110783085c0ea6b03985faa4584")
+        (revision "0"))
+    (package
+      (name "zig-httpz")
+      (version (git-version "0.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/karlseguin/http.zig")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "02hixvyx1r04lg0nzvhkyrqwcwm8m8rs8hm01n2nzw6jv935frh8"))
+         (snippet
+          (rename-zig-dependencies
+           '(("metrics" . "zig-metrics")
+             ("websocket" . "zig-websocket"))))))
+      (build-system zig-build-system)
+      (arguments
+       (list #:phases
+             #~(modify-phases %standard-phases
+                 (add-after 'unpack 'fix-paths
+                   (lambda _
+                     (substitute* "example/simple.zig"
+                       (("example/index.html" file)
+                        (string-append
+                         (zig-source-install-path #$output) "/" file))))))))
+      (propagated-inputs (list zig-metrics zig-websocket))
+      (home-page "https://github.com/karlseguin/http.zig")
+      (synopsis "HTTP/1.1 server for Zig")
+      (description "This package provides an HTTP/1.1 server for Zig.")
+      (license license:expat))))
+
 (define-public zig-ini
   ;; No releases.
   (let ((commit "e18d36665905c1e7ba0c1ce3e8780076b33e3002")
