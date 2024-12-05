@@ -335,15 +335,14 @@ output is indexed in many ways to simplify browsing.")
     (inputs
      (list autoconf-wrapper bash-minimal perl))
     (native-inputs
-     (list autoconf-wrapper
-           gcc-11 ;23 compiler tests fail with gcc-14
-           perl))
+     (list autoconf-wrapper perl))
     (native-search-paths
      (list (search-path-specification
             (variable "ACLOCAL_PATH")
             (files '("share/aclocal")))))
     (arguments
      (list
+      #:tests? #f ;with gcc-14, 23 compiler tests fail
       #:modules '((guix build gnu-build-system)
                   (guix build utils)
                   (srfi srfi-1)
@@ -443,10 +442,10 @@ Makefile, simplifying the entire process for the developer.")
                 "146rkdcwri2dkwn3pjrjs9v0wm4xyav9vvq4yw5vj4qy87yc2849"))
               (patches
                (search-patches "automake-skip-amhello-tests.patch"))))
-    (native-inputs
-     (list autoconf-wrapper perl))
     (arguments
      (substitute-keyword-arguments (package-arguments automake-1.16.5)
+       ((#:tests? tests?)
+        #t)
        ((#:phases phases)
         #~(modify-phases #$phases
             (replace 'skip-test
