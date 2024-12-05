@@ -32,7 +32,44 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages llvm-meta)
-  #:use-module (gnu packages web))
+  #:use-module (gnu packages web)
+  #:export (add-build.zig.zon
+            rename-zig-dependencies))
+
+(define (add-build.zig.zon name version dependencies)
+  "Snippet to generate build.zig.zon of DEPENDENCIES for package NAME@VERSION."
+  `(let ((port (open-file "build.zig.zon" "w" #:encoding "utf8")))
+     (format port "\
+.{
+    .name = \"~a\",
+    .version = \"~a\",
+    .paths = .{\"\"},
+    .dependencies = .{
+~{\
+        .@\"~a\" = .{
+            .url = \"\",
+        },
+~}\
+    },
+}~%" ,name ,version (quote ,dependencies))
+     (close-port port)))
+
+(define (rename-zig-dependencies mapping)
+  "Snippet to rename Zig dependencies in build.zig and build.zig.zon."
+  `(begin
+     (use-modules (ice-9 match)
+                  (guix build utils))
+     (for-each
+      (match-lambda
+        ((old-name . new-name)
+         (begin
+           (substitute* "build.zig"
+             (((string-append "([Dd]ependency.\")" old-name) _ prefix)
+              (string-append prefix new-name)))
+           (substitute* "build.zig.zon"
+             (((format #f "\\.(@\")?~a\"?" old-name))
+              (format #f ".@\"~a\"" new-name))))))
+      (quote ,mapping))))
 
 (define (zig-source version commit hash)
   (origin

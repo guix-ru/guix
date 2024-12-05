@@ -35,52 +35,7 @@
   #:use-module (gnu packages wm)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xorg)
-  #:use-module (gnu packages zig)
-  #:export (add-build.zig.zon
-            rename-zig-dependencies))
-
-(define* (add-build.zig.zon name version dependencies)
-  "Snippet to generate build.zig.zon of DEPENDENCIES for package NAME@VERSION."
-  `(begin
-     (when (file-exists? "build.zig.zon")
-       (delete-file "build.zig.zon"))
-     (let ((port (open-file "build.zig.zon" "a" #:encoding "utf8")))
-       (display (format #f "\
-.{
-    .name = \"~a\",
-    .version = \"~a\",
-    .paths=.{\"\"},
-    .dependencies=.{
-~{\
-        .@\"~a\" = .{
-            .url = \"\",
-        },
-~}\
-    },
-}~%" ,name ,version (quote ,dependencies)) port)
-       (close-port port))))
-
-(define (rename-zig-dependencies mapping)
-  "Snippet to rename Zig dependencies in build.zig and build.zig.zon."
-  `(begin
-     (use-modules (ice-9 match)
-                  (guix build utils))
-     (for-each
-      (match-lambda
-        ((old-name . new-name)
-         (begin
-           (substitute* "build.zig"
-             (((string-append "(b\\.dependency.\")" old-name) _ prefix)
-              (string-append prefix new-name)))
-           (substitute* "build.zig.zon"
-             (((format #f "\\.(@\")?~a\"?" old-name))
-              (format #f ".@\"~a\"" new-name))))))
-      (quote ,mapping))))
-
-
-;;;
-;;; Zig packages, in alphabetic order.
-;;;
+  #:use-module (gnu packages zig))
 
 (define-public river
   (package
