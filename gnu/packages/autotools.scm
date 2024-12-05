@@ -320,14 +320,14 @@ output is indexed in many ways to simplify browsing.")
 (define-public automake
   (package
     (name "automake")
-    (version "1.16.5")
+    (version "1.17")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/automake/automake-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "0sdl32qxdy7m06iggmkkvf7j520rmmgbsjzbm7fgnxwxdp6mh7gh"))
+                "146rkdcwri2dkwn3pjrjs9v0wm4xyav9vvq4yw5vj4qy87yc2849"))
               (patches
                (search-patches "automake-skip-amhello-tests.patch"))))
     (build-system gnu-build-system)
@@ -346,7 +346,6 @@ output is indexed in many ways to simplify browsing.")
                   (srfi srfi-1)
                   (srfi srfi-26)
                   (rnrs io ports))
-      #:configure-flags #~'("CFLAGS=-g -O2 -Wno-implicit-function-declaration")
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'patch-source-shebangs 'patch-tests-shebangs
