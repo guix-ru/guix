@@ -3065,13 +3065,17 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 
        ,@(substitute-keyword-arguments (package-arguments static-bash)
            ((#:configure-flags flags #~'())
-            ;; Add a '-L' flag so that the pseudo-cross-ld of
-            ;; BINUTILS-BOOT0 can find libc.a.
-            #~(append #$flags
-                      (list (string-append "LDFLAGS=-static -L"
-                                           (assoc-ref %build-inputs
-                                                      "libc:static")
-                                           "/lib")))))))))
+            #~(append
+               #$flags
+               #$(if (target-linux?)
+                     #~'("CFLAGS=-g -O2 -Wno-implicit-function-declaration")
+                     #~'())
+               ;; Add a '-L' flag so that the pseudo-cross-ld of
+               ;; BINUTILS-BOOT0 can find libc.a.
+               (list (string-append "LDFLAGS=-static -L"
+                                    (assoc-ref %build-inputs
+                                               "libc:static")
+                                    "/lib")))))))))
 
 (define gettext-boot0
   ;; A minimal gettext used during bootstrap.
