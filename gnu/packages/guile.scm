@@ -156,6 +156,32 @@ without requiring the source code to be rewritten.")
    (home-page "https://www.gnu.org/software/guile/")
    (license license:lgpl2.0+)))
 
+(define libffi-previous
+  (package/inherit libffi
+    (name "libffi")
+    (version "3.4.4")
+    (source (origin
+              (method url-fetch)
+              (uri
+               (string-append "https://github.com/libffi/libffi/releases"
+                              "/download/v" version "/"
+                              name "-" version ".tar.gz"))
+              (sha256
+               (base32
+                "0xpn5mqlbdmqgxgp910ba1qj79axpwr8nh7wklmcz0ls4nnmcv6n"))))
+    (arguments
+     `( ;; Prevent the build system from passing -march and -mtune to the
+       ;; compiler.  See "ax_cc_maxopt.m4" and "ax_gcc_archflag.m4".
+       #:configure-flags '("--enable-portable-binary"
+                           "--without-gcc-arch"
+                           ,@(if (or (target-hurd64?)
+                                     (%current-target-system)
+                                     (and (target-x86-64?) (target-linux?)))
+                                 (list (string-append
+                                        "CFLAGS=-g -O2"
+                                        " -Wno-implicit-function-declaration"))
+                                 '()))))))
+
 (define-public guile-2.0
   (package
    (name "guile")
@@ -176,7 +202,7 @@ without requiring the source code to be rewritten.")
                 (list this-package)
                 '())))
    (inputs
-    (append (list libffi libxcrypt)
+    (append (list libffi-previous libxcrypt)
             (libiconv-if-needed)
 
             ;; We need Bash when cross-compiling because some of the scripts
