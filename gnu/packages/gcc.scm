@@ -1034,7 +1034,8 @@ using compilers other than GCC."
                            "#if __GNU__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
                  '())
           #$@(if (and (target-x86-64?) (target-linux?)
-                      (version>=? (package-version gcc) "14"))
+                      (version>=? (package-version gcc) "14")
+                      (not (equal? (package-name gcc) "gcc-cross-boot0")))
                  #~((add-after 'unpack 'patch-x86_64-linux
                       (lambda _
                         (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
