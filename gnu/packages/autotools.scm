@@ -317,17 +317,17 @@ output is indexed in many ways to simplify browsing.")
     (home-page "https://josefsson.org/autobuild/")
     (license gpl3+)))
 
-(define-public automake
+(define-public automake-1.16.5
   (package
     (name "automake")
-    (version "1.17")
+    (version "1.16.5")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/automake/automake-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "146rkdcwri2dkwn3pjrjs9v0wm4xyav9vvq4yw5vj4qy87yc2849"))
+                "0sdl32qxdy7m06iggmkkvf7j520rmmgbsjzbm7fgnxwxdp6mh7gh"))
               (patches
                (search-patches "automake-skip-amhello-tests.patch"))))
     (build-system gnu-build-system)
@@ -361,14 +361,11 @@ output is indexed in many ways to simplify browsing.")
                 (setenv "CONFIG_SHELL" sh))))
           (add-before 'check 'skip-test
             (lambda _
-              (substitute*
-                  ;; This test requires 'etags' and fails if it's missing.
-                  '("t/tags-lisp-space.sh"
-                    ;; This test fails, probably a timestamp thing:
-                    ;; make: Nothing to be done for 'all'.
-                    "t/remake-aclocal-version-mismatch.sh")
-                (("^#!.*" all)
-                 (string-append all "exit 77;\n")))))
+              ;; This test requires 'etags' and fails if it's missing.
+              ;; Skip it.
+              (substitute* "t/tags-lisp-space.sh"
+                (("^required.*" all)
+                 (string-append "exit 77\n" all "\n")))))
 
           #$@(if (%current-target-system)
                  #~((add-after 'install 'patch-non-shebang-references
@@ -429,6 +426,34 @@ standards-compliant Makefiles.  Build requirements are entered in an
 intuitive format and then Automake works with Autoconf to produce a robust
 Makefile, simplifying the entire process for the developer.")
     (license gpl2+)))                      ; some files are under GPLv3+
+
+(define-public automake
+  (package/inherit automake-1.16.5
+    (name "automake")
+    (version "1.17")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/automake/automake-"
+                                  version ".tar.xz"))
+              (sha256
+               (base32
+                "146rkdcwri2dkwn3pjrjs9v0wm4xyav9vvq4yw5vj4qy87yc2849"))
+              (patches
+               (search-patches "automake-skip-amhello-tests.patch"))))
+    (arguments
+     (substitute-keyword-arguments (package-arguments automake-1.16.5)
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (replace 'skip-test
+              (lambda _
+                (substitute*
+                    ;; This test requires 'etags' and fails if it's missing.
+                    '("t/tags-lisp-space.sh"
+                      ;; This test fails, probably a timestamp thing:
+                      ;; make: Nothing to be done for 'all'.
+                      "t/remake-aclocal-version-mismatch.sh")
+                  (("^#!.*" all)
+                   (string-append all "exit 77;\n")))))))))))
 
 (define-public libtool
   (package
