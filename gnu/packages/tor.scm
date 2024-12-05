@@ -13,6 +13,7 @@
 ;;; Copyright © 2021-2023 Danial Behzadi <dani.behzi@ubuntu.com>
 ;;; Copyright © 2022 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2022 Jim Newsome <jnewsome@torproject.org>
+;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -181,13 +182,15 @@ This package only provides a client to the Tor Network.")))
     (native-inputs
      (list autoconf automake libtool))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'build 'absolutize
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "src/bin/torsocks"
-               (("getcap=.*")
-                (string-append "getcap=" (which "getcap") "\n"))))))))
+     (list
+      #:configure-flags
+      #~'("CFLAGS=-g -O2 -Wno-error=implicit-function-declaration")
+      #:phases #~(modify-phases %standard-phases
+                   (add-after 'build 'absolutize
+                     (lambda* (#:key inputs #:allow-other-keys)
+                       (substitute* "src/bin/torsocks"
+                         (("getcap=.*")
+                          (string-append "getcap=" (which "getcap") "\n"))))))))
     (home-page "https://www.torproject.org/")
     (synopsis "Transparently route an application's traffic through Tor")
     (description
