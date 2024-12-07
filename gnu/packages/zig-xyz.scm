@@ -217,7 +217,7 @@ syntax highlighting and run code snippets to ensure they behave as expected.")
        (list #:phases
              #~(modify-phases %standard-phases
                  (add-after 'unpack 'fix-paths
-                   (lambda* (#:key inputs native-inputs #:allow-other-keys)
+                   (lambda _
                      (substitute* "example/simple.zig"
                        (("example/index.html" file)
                         (string-append
