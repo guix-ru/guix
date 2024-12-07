@@ -29,10 +29,14 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (%standard-phases
-            zig-build))
+            zig-build
+            zig-source-install-path))
 
 ;; Interesting guide here:
 ;; https://github.com/riverwm/river/blob/master/PACKAGING.md
+
+(define (zig-source-install-path output)
+  (string-append output "/src/" (strip-store-file-name output)))
 
 (define (zig-arguments)
   (define version-major+minor
@@ -76,10 +80,9 @@ names."
               ((name . source) (zig-package? name source)))
             inputs))
   (define (get-source-path source)
-    (let* ((package (strip-store-file-name source))
-           (path (string-append source "/src/" package)))
-      (if (file-exists? path)
-          path
+    (let ((source-install-path (zig-source-install-path source)))
+      (if (file-exists? source-install-path)
+          source-install-path
           source)))
   (unless skip-build?
     (for-each
@@ -148,14 +151,13 @@ names."
 (define* (install #:key outputs install-source? #:allow-other-keys)
   "Install a given Zig package."
   (let* ((out (assoc-ref outputs "out"))
-         (package (strip-store-file-name out))
-         (dest (string-append out "/src/" package)))
+         (source-install-path (zig-source-install-path out)))
     (when (file-exists? "out")
       (copy-recursively "out" out)
       (delete-file-recursively "out"))
     (when install-source?
-      (mkdir-p dest)
-      (copy-recursively "." dest))))
+      (mkdir-p source-install-path)
+      (copy-recursively "." source-install-path))))
 
 (define %standard-phases
   (modify-phases gnu:%standard-phases

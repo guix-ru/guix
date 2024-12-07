@@ -36,14 +36,18 @@
   #:export (add-build.zig.zon
             rename-zig-dependencies))
 
-(define (add-build.zig.zon name version dependencies)
+(define* (add-build.zig.zon name version dependencies #:optional (paths '("")))
   "Snippet to generate build.zig.zon of DEPENDENCIES for package NAME@VERSION."
   `(let ((port (open-file "build.zig.zon" "w" #:encoding "utf8")))
      (format port "\
 .{
     .name = \"~a\",
     .version = \"~a\",
-    .paths = .{\"\"},
+    .paths = .{
+~{\
+        \"~a\",
+~}\
+    },
     .dependencies = .{
 ~{\
         .@\"~a\" = .{
@@ -51,7 +55,7 @@
         },
 ~}\
     },
-}~%" ,name ,version (quote ,dependencies))
+}~%" ,name ,version (quote ,paths) (quote ,dependencies))
      (close-port port)))
 
 (define (rename-zig-dependencies mapping)
