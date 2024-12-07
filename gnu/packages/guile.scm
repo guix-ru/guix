@@ -960,7 +960,8 @@ Guile's foreign function interface.")
        (sha256
         (base32
          "1whgmwkr1v8m63p4aaqn8blwl9vcrswwhbfv4bm0aghl5a6rryd7"))
-       (patches (search-patches "guile-lzlib-hurd64.patch"))))
+       (patches (search-patches "guile-lzlib-gcc-14.patch"
+                                "guile-lzlib-hurd64.patch"))))
     (build-system gnu-build-system)
     (arguments
      (list
