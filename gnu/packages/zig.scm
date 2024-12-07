@@ -1616,6 +1616,12 @@ toolchain.  Among other features it provides
        (replace "glibc-abi-tool" zig-0.13-glibc-abi-tool)
        (replace "llvm" llvm-18)
        (replace "zig" `(,zig-0.12.0-109 "zig1"))))
+    ;; TODO Add to zig-0.9.
+    (native-search-paths
+     (cons (search-path-specification
+            (variable "GUIX_ZIG_PACKAGE_PATH")
+            (files '("src/zig")))
+           (package-native-search-paths zig-0.12)))
     (properties `((max-silent-time . 9600)
                   ,@(clang-compiler-cpu-architectures "18")))))
 

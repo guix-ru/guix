@@ -22,6 +22,7 @@
   #:use-module (guix build zig-utils)
   #:use-module (ice-9 popen)
   #:use-module (ice-9 rdelim)
+  #:use-module (ice-9 regex)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 format)
   #:use-module (ice-9 match)
@@ -36,7 +37,11 @@
 ;; https://github.com/riverwm/river/blob/master/PACKAGING.md
 
 (define (zig-source-install-path output)
-  (string-append output "/src/" (strip-store-file-name output)))
+  (string-append output "/src/zig/" (strip-store-file-name output)))
+
+(define (zig-input-install-path input)
+  (zig-source-install-path
+   (dirname (dirname (dirname (canonicalize-path input))))))
 
 (define (zig-arguments)
   (define version-major+minor
@@ -64,35 +69,63 @@
          (else
           (list (string-append "-Drelease-" type))))))))
 
-;; `zig fetch --name=<NAME>` overwrites dependency with NAME in build.zig.zon.
-;; Here we assert store file names for Zig dependencies start with "zig-".
-;; NOTE: When dependency names specified by package developer are different
-;; from ours, adjust them in the origin definition.
-(define* (unpack-dependencies #:key inputs skip-build? #:allow-other-keys)
-  "Extract Zig packages from INPUTS and unpack them with their associated
-names."
-  (define (zig-package? name source)
-    (and (not (string=? name "source"))
-         (not (string=? name "zig"))
-         (string-prefix? "zig-" (strip-store-file-name source))))
-  (define (inputs->zig-inputs inputs)
-    (filter (match-lambda
-              ((name . source) (zig-package? name source)))
-            inputs))
-  (define (get-source-path source)
-    (let ((source-install-path (zig-source-install-path source)))
-      (if (file-exists? source-install-path)
-          source-install-path
-          source)))
-  (unless skip-build?
-    (for-each
-     (match-lambda
-       ((name . source)
-        (let ((call `("zig" "fetch" ,(get-source-path source)
-                      ,(string-append "--save=" name))))
-          (format #t "running: ~s~%" call)
-          (apply invoke call))))
-     (inputs->zig-inputs inputs))))
+;; `zig fetch PATH --name=NAME` overwrites dependency NAME in build.zig.zon with
+;; PATH.
+(define* (unpack-dependencies #:key (skip-build? #f) #:allow-other-keys)
+  "Extract Zig dependencies from build.zig.zon, search them in environment
+variable GUIX_ZIG_PACKAGE_PATH and unpack them.  Note that this phase asserts
+dependency names start with \"zig-\"."
+  (define (extract-zig-dependency line)
+    (let* ((pattern1 (string-match "\\.@\"(zig-.*)\" *=" line))
+           (pattern2 (string-match "\\.(zig-.*) *=" line))
+           (matched (or pattern1 pattern2))
+           (extract-line
+            (match-lambda
+              ((start . end)
+               (substring line start end)))))
+      (if matched
+          (list (extract-line (vector-ref matched 2)))
+          '())))
+
+  (define zig-dependencies
+    (if (or (not (file-exists? "build.zig.zon"))
+            skip-build?)
+        '()
+        (let* ((port (open-file "build.zig.zon" "r" #:encoding "utf-8"))
+               (result
+                (let loop ((line (read-line port))
+                           (lines '()))
+                  (if (eof-object? line)
+                      lines
+                      (loop (read-line port)
+                            (append (extract-zig-dependency line) lines))))))
+          (close-port port)
+          result)))
+
+  (define zig-inputs
+    (let ((zig-package-path (getenv "GUIX_ZIG_PACKAGE_PATH")))
+      (if zig-package-path
+          (append-map
+           (lambda (directory)
+             (map (lambda (input-name)
+                    (cons input-name
+                          (string-append directory "/" input-name)))
+                  (scandir directory (negate (cut member <> '("." ".."))))))
+           (string-split zig-package-path #\:))
+          '())))
+
+  (for-each
+   (lambda (dependency-name)
+     (let ((pattern (string-append "^" dependency-name "[-.]?")))
+       (for-each
+        (match-lambda
+          ((input-name . input-path)
+           (when (string-match pattern input-name)
+             (let ((call `("zig" "fetch" ,(zig-input-install-path input-path)
+                           ,(string-append "--save=" dependency-name))))
+               (apply invoke call)))))
+        zig-inputs)))
+   zig-dependencies))
 
 (define* (build #:key
                 zig-build-flags
