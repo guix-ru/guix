@@ -47,6 +47,7 @@
 ;;; Copyright © 2024 Greg Hogan <code@greghogan.com>
 ;;; Copyright © 2024 Brennan Vincent <brennan@umanwizard.com>
 ;;; Copyright © 2024 André Batista <nandre@riseup.net>
+;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
