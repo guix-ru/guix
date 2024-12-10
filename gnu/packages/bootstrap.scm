@@ -787,7 +787,11 @@ $out/bin/guile --version~%"
                      `(("/[^ ]+/lib/(libc|libm|libpthread|ld)" _ prefix)
                        (string-append out "/lib/" prefix))
                      `(("/[^ ]+/lib/(libc|libm|libh|ld)" _ prefix)
-                       (string-append out "/lib/" prefix))))))))))
+                       (string-append out "/lib/" prefix))))
+              ,@(if (target-arm32?)
+                    `((substitute* "lib/libpthread.so"
+                        (("/[^ ]+/lib/libpthread_nonshared\\.a") "")))
+                    `())))))))
     (inputs
      `(("tar" ,(bootstrap-executable "tar" (%current-system)))
        ("xz"  ,(bootstrap-executable "xz" (%current-system)))
