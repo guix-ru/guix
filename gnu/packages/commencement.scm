@@ -3085,7 +3085,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
            ((#:configure-flags flags #~'())
             #~(append
                #$(REMOVEME-clean-bash-configure-flags flags)
-               #$(if (and (target-x86-64?) (target-linux?))
+               #$(if (and (target-x86?) (target-linux?))
                      #~'("CFLAGS=-g -O2 -Wno-implicit-function-declaration")
                      #~'())
                ;; Add a '-L' flag so that the pseudo-cross-ld of
