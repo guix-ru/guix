@@ -22,11 +22,8 @@
   #:use-module (guix build zig-utils)
   #:use-module (ice-9 popen)
   #:use-module (ice-9 rdelim)
-  #:use-module (ice-9 regex)
   #:use-module (ice-9 ftw)
-  #:use-module (ice-9 format)
   #:use-module (ice-9 match)
-  #:use-module (rnrs io ports)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:export (%standard-phases
@@ -71,36 +68,9 @@
 
 ;; `zig fetch --name=NAME` overwrites dependency NAME in build.zig.zon.
 (define* (unpack-dependencies #:key (skip-build? #f) #:allow-other-keys)
-  "Extract Zig dependencies from build.zig.zon, search them from packages
-within GUIX_ZIG_PACKAGE_PATH and unpack.  Note that this phase asserts
-dependency names start with \"zig-\"."
-  (define (extract-zig-dependency line)
-    (let* ((pattern1 (string-match "\\.@\"(zig-.*)\" *=" line))
-           (pattern2 (string-match "\\.(zig-.*) *=" line))
-           (matched (and=> (or pattern1 pattern2)
-                           (cut vector-ref <> 2)))
-           (extract-line
-            (match-lambda
-              ((start . end)
-               (substring line start end)))))
-      (and=> matched extract-line)))
-  (define zig-dependencies
-    (if (and (file-exists? "build.zig.zon")
-             (not skip-build?))
-        (let* ((port (open-file "build.zig.zon" "r" #:encoding "utf-8"))
-               (result
-                (let loop ((line (read-line port))
-                           (lines '()))
-                  (if (eof-object? line)
-                      lines
-                      (loop (read-line port)
-                            (or (and=> (extract-zig-dependency line)
-                                       (cut cons <> lines))
-                                lines))))))
-          (close-port port)
-          result)
-        '()))
-  (define (zig-inputs)
+  "Unpack Zig dependencies from GUIX_ZIG_PACKAGE_PATH.  Note that this phase
+asserts dependency names start with \"zig-\"."
+  (define zig-inputs
     (append-map
      (lambda (directory)
        (map (lambda (input-name)
@@ -110,19 +80,27 @@ dependency names start with \"zig-\"."
      (or (and=> (getenv "GUIX_ZIG_PACKAGE_PATH")
                 (cut string-split <> #\:))
          '())))
+  ;; zig-aaa-0.1.2-3.456789a -> zig-aaa
+  ;; zig-bbb-2.3.3 -> zig-bbb
+  (define (strip-version input)
+    (let* ((name+version (string-split input #\-))
+           (guix-revision?
+            (not (= (length (string-split (last name+version) #\.))
+                    3))))
+      (string-join
+       (drop-right name+version (if guix-revision? 2 1))
+       "-")))
   (for-each
-   (lambda (dependency-name)
-     (let ((pattern (string-append "^" dependency-name "[-.][0-9]")))
-       (for-each
-        (match-lambda
-          ((input-name . input-path)
-           (when (string-match pattern input-name)
-             (let ((call `("zig" "fetch" ,(zig-input-install-path input-path)
-                           ,(string-append "--save=" dependency-name))))
-               (format #t "running: ~s~%" call)
-               (apply invoke call)))))
-        (zig-inputs))))
-   zig-dependencies))
+   (match-lambda
+     ((input-name . input-path)
+      (let ((call `("zig" "fetch"
+                    ;; TODO: When supported, use a valid URL instead.
+                    ;; See also <https://github.com/ziglang/zig/pull/21931>.
+                    ,(zig-input-install-path input-path)
+                    ,(string-append "--save=" (strip-version input-name)))))
+        (format #t "running: ~s~%" call)
+        (apply invoke call))))
+   (reverse zig-inputs)))
 
 (define* (build #:key
                 zig-build-flags
