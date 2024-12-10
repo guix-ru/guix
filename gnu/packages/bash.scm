@@ -268,7 +268,7 @@ without modification.")
 
                ,@(if (or (target-hurd64?)
                          (%current-target-system)
-                         (and (target-x86-64?) (target-linux?)))
+                         (and (target-x86?) (target-linux?)))
                      ;; gcc-14 implictly uses -Wimplicit-function-declaration
                      ;; which together with -Werror causes:
                      ;; ./enable.def:492:11: error: implicit declaration of function ‘dlclose’;
