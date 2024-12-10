@@ -1004,6 +1004,7 @@ types.")
                              "vendor/github.com/beorn7"
                              "vendor/github.com/blang"
                              "vendor/github.com/cenkalti"
+                             "vendor/github.com/ceramicnetwork"
                              "vendor/github.com/cespare"
                              "vendor/github.com/cheggaaa"
                              "vendor/github.com/containerd"
@@ -1134,7 +1135,7 @@ types.")
                   go-github-com-benbjohnson-clock
                   go-github-com-blang-semver-v4
                   go-github-com-cenkalti-backoff-v4
-                  ;;go-github-com-ceramicnetwork-go-dag-jose
+                  go-github-com-ceramicnetwork-go-dag-jose
                   go-github-com-cheggaaa-pb
                   go-github-com-coreos-go-systemd-v22
                   go-github-com-dustin-go-humanize
@@ -1249,7 +1250,6 @@ types.")
                   go-golang-org-x-oauth2                      ; github.com/ipfs/boxo
                   go-golang-org-x-term                        ; github.com/ipfs/go-ipfs-cmds
                   go-golang-org-x-xerrors                     ; github.com/whyrusleeping/cbor-gen
-                  go-gopkg-in-square-go-jose-v2               ; github.com/ceramicnetwork/go-dag-jose
                   ))
     (native-inputs
      (append (if (%current-target-system)
