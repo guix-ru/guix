@@ -781,8 +781,13 @@ $out/bin/guile --version~%"
                                    ''("lib/libc.so" "lib/libpthread.so"))
                                   (else
                                    ''("lib/libc.so")))
-                (("/[^ ]+/lib/(libc|libm|libh|libpthread|ld)" _ prefix)
-                 (string-append out "/lib/" prefix)))))))))
+                ;; These don't need to be separate.
+                ,(if (or (target-x86?)
+                         (target-arm?))
+                     `(("/[^ ]+/lib/(libc|libm|libpthread|ld)" _ prefix)
+                       (string-append out "/lib/" prefix))
+                     `(("/[^ ]+/lib/(libc|libm|libh|ld)" _ prefix)
+                       (string-append out "/lib/" prefix))))))))))
     (inputs
      `(("tar" ,(bootstrap-executable "tar" (%current-system)))
        ("xz"  ,(bootstrap-executable "xz" (%current-system)))
