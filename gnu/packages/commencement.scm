@@ -2448,7 +2448,7 @@ exec " gcc "/bin/" program
                                            char-set:letter)
                                         #$(package-name lib)))
                            (list gmp-6.0 mpfr mpc)))))
-             #$@(if (and (target-linux?) (target-x86-64?))
+             #$@(if (and (target-linux?) (target-x86?))
                     #~((add-after 'unpack 'patch-system.h
                          (lambda _
                            ;; Avoid: missing binary operator before token "("
