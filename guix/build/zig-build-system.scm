@@ -116,13 +116,14 @@ dependency names start with \"zig-\"."
 
   (for-each
    (lambda (dependency-name)
-     (let ((pattern (string-append "^" dependency-name "[-.]?")))
+     (let ((pattern (string-append "^" dependency-name "[-.][0-9]")))
        (for-each
         (match-lambda
           ((input-name . input-path)
            (when (string-match pattern input-name)
              (let ((call `("zig" "fetch" ,(zig-input-install-path input-path)
                            ,(string-append "--save=" dependency-name))))
+               (format #t "running: ~s~%" call)
                (apply invoke call)))))
         zig-inputs)))
    zig-dependencies))
