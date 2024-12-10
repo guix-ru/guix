@@ -1033,7 +1033,7 @@ using compilers other than GCC."
                           (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
                            "#if __GNU__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
                  '())
-          #$@(if (and (target-x86-64?) (target-linux?)
+          #$@(if (and (target-x86?) (target-linux?)
                       (version>=? (package-version gcc) "14"))
                  #~((add-after 'unpack 'patch-x86_64-linux
                       (lambda _
