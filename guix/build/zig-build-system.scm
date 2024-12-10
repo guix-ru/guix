@@ -69,28 +69,24 @@
          (else
           (list (string-append "-Drelease-" type))))))))
 
-;; `zig fetch PATH --name=NAME` overwrites dependency NAME in build.zig.zon with
-;; PATH.
+;; `zig fetch --name=NAME` overwrites dependency NAME in build.zig.zon.
 (define* (unpack-dependencies #:key (skip-build? #f) #:allow-other-keys)
-  "Extract Zig dependencies from build.zig.zon, search them in environment
-variable GUIX_ZIG_PACKAGE_PATH and unpack them.  Note that this phase asserts
+  "Extract Zig dependencies from build.zig.zon, search them from packages
+within GUIX_ZIG_PACKAGE_PATH and unpack.  Note that this phase asserts
 dependency names start with \"zig-\"."
   (define (extract-zig-dependency line)
     (let* ((pattern1 (string-match "\\.@\"(zig-.*)\" *=" line))
            (pattern2 (string-match "\\.(zig-.*) *=" line))
-           (matched (or pattern1 pattern2))
+           (matched (and=> (or pattern1 pattern2)
+                           (cut vector-ref <> 2)))
            (extract-line
             (match-lambda
               ((start . end)
                (substring line start end)))))
-      (if matched
-          (list (extract-line (vector-ref matched 2)))
-          '())))
-
+      (and=> matched extract-line)))
   (define zig-dependencies
-    (if (or (not (file-exists? "build.zig.zon"))
-            skip-build?)
-        '()
+    (if (and (file-exists? "build.zig.zon")
+             (not skip-build?))
         (let* ((port (open-file "build.zig.zon" "r" #:encoding "utf-8"))
                (result
                 (let loop ((line (read-line port))
@@ -98,22 +94,22 @@ dependency names start with \"zig-\"."
                   (if (eof-object? line)
                       lines
                       (loop (read-line port)
-                            (append (extract-zig-dependency line) lines))))))
+                            (or (and=> (extract-zig-dependency line)
+                                       (cut cons <> lines))
+                                lines))))))
           (close-port port)
-          result)))
-
-  (define zig-inputs
-    (let ((zig-package-path (getenv "GUIX_ZIG_PACKAGE_PATH")))
-      (if zig-package-path
-          (append-map
-           (lambda (directory)
-             (map (lambda (input-name)
-                    (cons input-name
-                          (string-append directory "/" input-name)))
-                  (scandir directory (negate (cut member <> '("." ".."))))))
-           (string-split zig-package-path #\:))
-          '())))
-
+          result)
+        '()))
+  (define (zig-inputs)
+    (append-map
+     (lambda (directory)
+       (map (lambda (input-name)
+              (cons input-name
+                    (string-append directory "/" input-name)))
+            (scandir directory (negate (cut member <> '("." ".."))))))
+     (or (and=> (getenv "GUIX_ZIG_PACKAGE_PATH")
+                (cut string-split <> #\:))
+         '())))
   (for-each
    (lambda (dependency-name)
      (let ((pattern (string-append "^" dependency-name "[-.][0-9]")))
@@ -125,7 +121,7 @@ dependency names start with \"zig-\"."
                            ,(string-append "--save=" dependency-name))))
                (format #t "running: ~s~%" call)
                (apply invoke call)))))
-        zig-inputs)))
+        (zig-inputs))))
    zig-dependencies))
 
 (define* (build #:key
