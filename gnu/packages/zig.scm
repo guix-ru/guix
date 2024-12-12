@@ -2,7 +2,7 @@
 ;;; Copyright © 2021 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2021 Sarah Morgensen <iskarian@mgsn.dev>
 ;;; Copyright © 2021 Calum Irwin <calumirwin1@gmail.com>
-;;; Copyright © 2022, 2023 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2022-2024 Efraim Flashner <efraim@flashner.co.il>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -439,6 +439,27 @@ toolchain.  Among other features it provides
        (substitute-keyword-arguments (package-arguments base)
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
+              #$@(if (target-ppc64le?)
+                     ;; CMake and zig disagree about the name of the architecture.
+                     #~((add-after 'unpack 'fix-cmake-processor-detection
+                          (lambda _
+                            (substitute* "CMakeLists.txt"
+                              ;; Starting from 0.10.0-574
+                              (("elseif\\(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL \"arm64\"\\)" all)
+                               (string-append
+                                 "elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL \"ppc64le\")\n"
+                                 "  set(HOST_TARGET_ARCH \"powerpc64le\")\n" all))
+                              ;; Starting from 0.10.0-1081
+                              (("elseif\\(HOST_TARGET_ARCH STREQUAL \"arm64\"\\)" all)
+                               (string-append
+                                 "elseif(HOST_TARGET_ARCH STREQUAL \"ppc64le\")\n"
+                                 "  set(HOST_TARGET_ARCH \"powerpc64le\")\n" all))
+                              ;; Starting from 0.10.0-3937
+                              (("elseif\\(ZIG_HOST_TARGET_ARCH STREQUAL \"arm64\"\\)" all)
+                               (string-append
+                                 "elseif(ZIG_HOST_TARGET_ARCH STREQUAL \"ppc64le\")\n"
+                                 "  set(ZIG_HOST_TARGET_ARCH \"powerpc64le\")\n" all))))))
+                     #~())
               (replace 'prepare-source
                 (lambda* (#:key native-inputs inputs #:allow-other-keys)
                   (install-file (search-input-file
