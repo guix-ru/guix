@@ -2,7 +2,7 @@
 ;;; Copyright © 2021 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2021 Sarah Morgensen <iskarian@mgsn.dev>
 ;;; Copyright © 2021 Calum Irwin <calumirwin1@gmail.com>
-;;; Copyright © 2022, 2023 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2022-2024 Efraim Flashner <efraim@flashner.co.il>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -437,6 +437,17 @@ toolchain.  Among other features it provides
        (substitute-keyword-arguments (package-arguments base)
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
+              (add-after 'unpack 'set-host-triple
+                (lambda _
+                  (substitute* "CMakeLists.txt"
+                    (("(set..*HOST_TARGET_TRIPLE \")(.*)(\".*)"
+                      _ prefix _ suffix)
+                     (string-append
+                      prefix
+                      (zig-target
+                       #$(platform-target
+                          (lookup-platform-by-system (%current-system))))
+                      suffix)))))
               (replace 'prepare-source
                 (lambda* (#:key native-inputs inputs #:allow-other-keys)
                   (install-file (search-input-file
