@@ -154,7 +154,7 @@
                       #+(canonical-package xz)
                       #+(canonical-package sed)
                       #+(canonical-package grep)
-                      #+(canonical-package gzip)
+                      #+(canonical-package pigz)
                       #+(canonical-package tar)))
                (set-path-environment-variable
                 "PYTHONPATH"
@@ -203,17 +203,17 @@
 ;; Update this id with every update to its release date.
 ;; It's used for cache validation and therefore can lead to strange bugs.
 ;; ex: date '+%Y%m%d%H%M%S'
-(define %librewolf-build-id "20241130102406")
+(define %librewolf-build-id "20241215105141")
 
 (define-public librewolf
   (package
     (name "librewolf")
-    (version "133.0-1")
+    (version "133.0.3-1")
     (source
      (make-librewolf-source
       #:version version
-      #:firefox-hash "0q6cqfnwc2x09frdvsndmhck8ixrnbl281j9rqw5w8bd7fd2qas9"
-      #:librewolf-hash "1xf7gx3xm3c7dhch9gwpb0xp11lcyim1nrbm8sjljxdcs7iq9jy4"))
+      #:firefox-hash "06ya18ma1gndci0aygz75hidn3kwa1kji78g8smh7fq0091aad7i"
+      #:librewolf-hash "05mlqqcvsa84h3nagm51hwsxkxsbcn2676fj4bih37ddlgkylf3b"))
     (build-system gnu-build-system)
     (arguments
      (list
