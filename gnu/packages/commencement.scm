@@ -2001,6 +2001,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                 "--enable-gcc-wrapper"))
        ((#:phases phases #~'%standard-phases)
         #~(modify-phases #$phases
+            (delete 'remove-complex)
             (add-after 'install 'symlink-dynamic-linker
               ;; This is a hack to work around not being able to hardcode
               ;; the location of the dynamic linker for musl in gcc without
