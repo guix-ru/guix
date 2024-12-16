@@ -2024,26 +2024,29 @@ libraries.")
 (define-public python-pytest-qt
   (package
     (name "python-pytest-qt")
-    (version "3.3.0")
+    (version "4.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "pytest-qt" version))
        (sha256
-        (base32 "09c9psfn3zigpaw1l1cmynpa3csxa49wc2ih5lzl24skdkw0njvi"))))
-    (build-system python-build-system)
+        (base32 "0i38qp2rqb44grbk9rn7zr5ffjvdlcl6k380759ji920m51632bn"))))
+    (build-system pyproject-build-system)
     (arguments
-     `(#:test-target "pytest"
-       #:phases
-       (modify-phases %standard-phases
+     (list
+      ;;#:test-target "pytest"
+      #:phases
+      '(modify-phases %standard-phases
          (add-before 'check 'set-qpa
-           (lambda _
-             (setenv "QT_QPA_PLATFORM" "offscreen")
-             #t)))))
+           (lambda _ (setenv "QT_QPA_PLATFORM" "offscreen"))))))
     (propagated-inputs
-     (list python-pyqt))
+     (list python-pluggy python-pyqt python-pytest))
     (native-inputs
-     (list python-pytest python-pytest-runner python-setuptools-scm))
+     (list python-pre-commit
+           python-setuptools
+           python-setuptools-scm
+           python-tox
+           python-wheel))
     (home-page "https://github.com/pytest-dev/pytest-qt")
     (synopsis "Pytest support for PyQt and PySide applications")
     (description
