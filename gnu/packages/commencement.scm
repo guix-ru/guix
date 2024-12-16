@@ -3403,12 +3403,35 @@ exec " gcc "/bin/" program
   (package
     (inherit m4)
     (name "m4-boot0")
-    (source (bootstrap-origin (package-source m4)))
+    (version "1.4.18")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/m4/m4-" version ".tar.gz"))
+              (sha256
+               (base32 "1arz972zxmwhnyik9007g6ww9gars8d55xbvg548xlsw3a9369mb"))))
     (inputs (%boot0-inputs))
     (arguments
      `(#:guile ,%bootstrap-guile
        #:implicit-inputs? #f
-       ,@(package-arguments m4)
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'check 'pre-check
+           (lambda* (#:key inputs #:allow-other-keys)
+             (for-each patch-shebang (find-files "tests" "\\.sh$"))
+             (substitute* (find-files "tests" "posix_spawn")
+               (("/bin/sh")
+                (search-input-file inputs "/bin/sh")))))
+         ;; Better to skip some tests instead of all the tests.
+         ,@(if (target-riscv64?)
+               `((add-after 'unpack 'skip-some-tests
+                   (lambda _
+                     (substitute* "tests/Makefile.in"
+                       (("test-canonicalize-lgpl\\$\\(EXEEXT\\) ") "")
+                       (("test-localename\\$\\(EXEEXT\\) ") "")
+                       (("test-mbrtowc5.sh ") "")
+                       (("test-sigprocmask\\$\\(EXEEXT\\) ") "")
+                       ))))
+               `()))
        ;; Ignore test failure in gnulib for armhf/aarch64 and Hurd
        #:tests? ,(and (not (target-arm?))
                       (not (target-hurd?)))))))
