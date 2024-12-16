@@ -1705,8 +1705,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:configure-flags
        #~(list #$@(if (target-x86?)
                       #~()
-                      #~("CC=tcc"
-                         "CFLAGS=-DHAVE_ALLOCA_H"))
+                      #~("CC=tcc"))
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
