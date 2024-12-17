@@ -1823,15 +1823,13 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (inherit gcc-4.7)
     (name "gcc-muslboot0")
     (version "4.6.4")
-    (source
-      (bootstrap-origin
-       (origin
-         (method url-fetch)
-         (uri (string-append "mirror://gnu/gcc/gcc-"
-                             version "/gcc-core-" version ".tar.gz"))
-         (sha256
-          (base32 "173kdb188qg79pcz073cj9967rs2vzanyjdjyxy9v0xb0p5sad75"))
-         (patches (search-patches "gcc-boot-4.6.4-riscv64-support.patch")))))
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/gcc/gcc-"
+                                  version "/gcc-core-" version ".tar.gz"))
+              (sha256
+               (base32
+                "173kdb188qg79pcz073cj9967rs2vzanyjdjyxy9v0xb0p5sad75"))))
     (outputs '("out"))
     (inputs (list gmp-boot mpfr-boot mpc-boot))
     (native-inputs (%boot-tcc-musl-inputs))
@@ -1882,6 +1880,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
                      "--disable-build-with-cxx"))
            #:phases
            #~(modify-phases %standard-phases
+               (add-after 'unpack 'apply-riscv64-patch
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((patch-file
+                          #$(local-file
+                             (search-patch "gcc-boot-4.6.4-riscv64-support.patch"))))
+                     (invoke "patch" "--force" "-p1" "-i" patch-file))))
                (add-after 'unpack 'fix-alloca
                  (lambda* (#:key inputs #:allow-other-keys)
                    (substitute* (list "libiberty/alloca.c"
@@ -1906,7 +1910,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                         (format #f "#define ~a_DYNAMIC_LINKER~a \"~a\"~%"
                                 gnu-user suffix
                                 (string-append libc "/lib/libc.so")))))))
-               (add-after 'unpack 'patch-for-modern-libc
+               (add-after 'apply-riscv64-patch 'patch-for-modern-libc
                  (lambda _
                    (for-each
                      (lambda (dir)
@@ -2069,6 +2073,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
       else
        _cpp_define_builtin (pfile, \"__cplusplus 199711L\");
     }")))))
+            (delete 'apply-riscv64-patch)
             (replace 'setenv
               (lambda _
                 (setenv "CC" "musl-gcc")
