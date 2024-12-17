@@ -2032,13 +2032,17 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (inherit gcc-muslboot0)
     (name "gcc-muslboot")
     (version "4.6.4")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://gnu/gcc/gcc-"
-                                  version "/gcc-" version ".tar.gz"))
-              (sha256
-               (base32
-                "0vvkzxi8wvaj9wzdk0hv12nj9kqymkpjqzasj2ri8nc107dk7pjk"))))
+    (source
+      (bootstrap-origin
+       (origin
+         (method url-fetch)
+         (uri (string-append "mirror://gnu/gcc/gcc-"
+                             version "/gcc-" version ".tar.gz"))
+         (sha256
+          (base32
+           "0vvkzxi8wvaj9wzdk0hv12nj9kqymkpjqzasj2ri8nc107dk7pjk"))
+         (patches (search-patches "gcc-boot-4.6.4-riscv64-support.patch"
+                                  "gcc-boot-4.6.4-riscv64-libstdc++-support.patch")))))
     (native-inputs
      (modify-inputs (%boot-tcc-musl-inputs)
                     (replace "gcc" gcc-muslboot0)
@@ -2069,13 +2073,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
       else
        _cpp_define_builtin (pfile, \"__cplusplus 199711L\");
     }")))))
-            (add-after 'apply-riscv64-patch 'apply-second-riscv64-patch
-              (lambda* (#:key inputs #:allow-other-keys)
-                (let ((patch-file
-                        #$(local-file
-                            (search-patch
-                              "gcc-boot-4.6.4-riscv64-libstdc++-support.patch"))))
-                  (invoke "patch" "--force" "-p1" "-i" patch-file))))
+            (delete 'apply-riscv64-patch)
             (replace 'setenv
               (lambda _
                 (setenv "CC" "musl-gcc")
