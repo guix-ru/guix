@@ -5202,13 +5202,15 @@ task}.")
                           #$(this-package-native-input "python-waf") "/bin/waf")
                          "waf")
               (invoke "python" "waf" "configure" "build"))))))
-    (propagated-inputs
-     (list python-numpy))
     (native-inputs
      (list python-pytest
            python-wheel
+           python-setuptools
            python-setuptools-scm
-           python-waf))
+           python-waf
+           python-wheel))
+    (propagated-inputs
+     (list python-numpy))
     (home-page "https://stscistimage.readthedocs.io/en/latest/")
     (synopsis "STScI image processing")
     (description
