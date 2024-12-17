@@ -1957,6 +1957,21 @@ ac_cv_c_float_format='IEEE (little-endian)'
                  #$configure-flags))))
        ((#:phases phases)
         #~(modify-phases #$phases
+            (add-after 'unpack 'adjust-builtin-cplusplus-variable
+              (lambda _
+                ;; These values are backported from later releases of GCC.
+                ;; See gcc commit 1fb80b0c5359f696aa61d537e25b7901d8b56ff7.
+                ;; See gcc commit 97e3ad20b12a5a317d98085df6f18a87f681f377
+                ;; if we need to recognize other flags.
+                (substitute* "libcpp/init.c"
+                  (("_cpp_define_builtin \\(pfile, \"__cplusplus 1\"\\);")
+                   (string-append "{
+      if (CPP_OPTION (pfile, lang) == CLK_CXX0X
+       || CPP_OPTION (pfile, lang) == CLK_GNUCXX0X)
+       _cpp_define_builtin (pfile, \"__cplusplus 201103L\");
+      else
+       _cpp_define_builtin (pfile, \"__cplusplus 199711L\");
+    }")))))
             (add-before 'configure 'set-cplus-include-path
               (lambda _
                 ;; Set the C++ search path so that C headers can be found as
