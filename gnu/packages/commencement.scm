@@ -1921,7 +1921,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (add-before 'configure 'setenv
                  (lambda _
                    (setenv "CC" "tcc")
-                   (setenv "CFLAGS" "-D HAVE_ALLOCA_H"))))))
+                   (setenv "CFLAGS" "-D HAVE_ALLOCA_H")
+                   ;; We don't have an existing C++ compiler so we need to set
+                   ;; the search path manually.
+                   (setenv "CPLUS_INCLUDE_PATH" (getenv "C_INCLUDE_PATH")))))))
     (native-search-paths
       (list (search-path-specification
               (variable "C_INCLUDE_PATH")
