@@ -1938,16 +1938,15 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (inherit gcc-core-mesboot1)
     (name "gcc-mesboot1")
     (version "4.6.4")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/gcc/gcc-"
+                                  version "/gcc-" version ".tar.gz"))
+              (sha256
+               (base32
+                "0vvkzxi8wvaj9wzdk0hv12nj9kqymkpjqzasj2ri8nc107dk7pjk"))))
     (native-inputs
-     `(("gcc-g++"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append "mirror://gnu/gcc/gcc-"
-                               version "/gcc-g++-" version ".tar.gz"))
-           (sha256
-            (base32
-             "1fqqk5zkmdg4vmqzdmip9i42q6b82i3f6yc0n86n9021cr7ms2k9"))))
-       ,@(package-native-inputs gcc-core-mesboot1)))
+     (package-native-inputs gcc-core-mesboot1))
     (arguments
      (substitute-keyword-arguments (package-arguments gcc-core-mesboot1)
        ((#:configure-flags configure-flags)
@@ -1958,10 +1957,6 @@ ac_cv_c_float_format='IEEE (little-endian)'
                  #$configure-flags))))
        ((#:phases phases)
         #~(modify-phases #$phases
-            (add-before 'unpack 'unpack-g++
-              (lambda _
-                (let ((source-g++ (assoc-ref %build-inputs "gcc-g++")))
-                  (invoke "tar" "xvf" source-g++))))
             (add-before 'configure 'set-cplus-include-path
               (lambda _
                 ;; Set the C++ search path so that C headers can be found as
