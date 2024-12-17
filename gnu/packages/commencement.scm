@@ -3466,7 +3466,7 @@ exec " gcc "/bin/" program
        #:make-flags `("ARFLAGS=crD"
                       ,,(match (%current-system)
                           ;; ranlib: '-D': No such file
-                          ((or "i686-linux" "x86_64-linux")
+                          ((or "i686-linux" "x86_64-linux" "riscv64-linux")
                            "RANLIB=ranlib")
                           (_
                            "RANLIB=ranlib -D"))
@@ -3476,7 +3476,7 @@ exec " gcc "/bin/" program
        ;; Thus, use the Gnulib replacement instead.  See
        ;; <https://bugs.gnu.org/49367>.
        ,@(match (%current-system)
-           ((or "i686-linux" "x86_64-linux")
+           ((or "i686-linux" "x86_64-linux" "riscv64-linux")
             '())
            (_
             '(#:configure-flags '("gl_cv_func_posix_spawn_works=no"))))
