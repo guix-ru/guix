@@ -21767,7 +21767,7 @@ strings.")
      "This package provides the @code{DejaVu} font family for embedding.")
     (license (list license:expat license:asl2.0))))
 
-(define-public rust-demo-hack-0.0
+(define-public rust-demo-hack-0.0.5
   (package
     (name "rust-demo-hack")
     (version "0.0.5")
@@ -21783,14 +21783,14 @@ strings.")
     (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
-       (("rust-demo-hack-impl" ,rust-demo-hack-impl-0.0)
+       (("rust-demo-hack-impl" ,rust-demo-hack-impl-0.0.5)
         ("rust-proc-macro-hack" ,rust-proc-macro-hack-0.5))))
     (home-page "https://github.com/dtolnay/proc-macro-hack")
     (synopsis "Demo of proc-macro-hack")
     (description "Demo of proc-macro-hack.")
     (license (list license:expat license:asl2.0))))
 
-(define-public rust-demo-hack-impl-0.0
+(define-public rust-demo-hack-impl-0.0.5
   (package
     (name "rust-demo-hack-impl")
     (version "0.0.5")
@@ -60511,8 +60511,8 @@ in your code.")
         ("rust-rustversion" ,rust-rustversion-1)
         ("rust-syn" ,rust-syn-1)
         ("rust-trybuild" ,rust-trybuild-1)
-        ("rust-demo-hack" ,rust-demo-hack-0.0)
-        ("rust-demo-hack-impl" ,rust-demo-hack-impl-0.0))))
+        ("rust-demo-hack" ,rust-demo-hack-0.0.5)
+        ("rust-demo-hack-impl" ,rust-demo-hack-impl-0.0.5))))
     (home-page "https://github.com/dtolnay/proc-macro-hack")
     (synopsis
      "Procedural macros in expression position")
