@@ -21878,7 +21878,7 @@ graphviz.")
                                         inputs "bin/python"))))
                      (version (python-version python))
                      (greenlet (string-append
-                                #$(this-package-native-input "python-greenlet")
+                                #$(this-package-input "python-greenlet")
                                 "/include/python" version)))
                 (setenv "C_INCLUDE_PATH"
                         (string-append greenlet "/:"
@@ -21904,13 +21904,12 @@ graphviz.")
                 (invoke "python" "-m" "gevent.tests" "-unone" "--config"
                         "known_failures.py" "--ignore" "skipped_tests.txt")))))))
     (propagated-inputs
-     (list python-zope-event python-zope-interface))
+     (list python-greenlet python-zope-event python-zope-interface))
     (native-inputs
      (list python-cffi
            python-coverage
            python-cython
            python-dnspython
-           python-greenlet
            python-idna
            python-objgraph
            python-psutil
