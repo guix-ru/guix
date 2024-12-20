@@ -17877,6 +17877,7 @@ libmagic.")))
      (list
       #:test-flags
       #~(list "-n" (number->string (parallel-job-count))
+              "-m" "not flaky"
               "-k"
               (string-append
                ;; The two "break_01" tests have been failing on
@@ -17932,8 +17933,6 @@ libmagic.")))
           (add-before 'check 'pre-check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
-                ;; Skip tests that should not be run on build servers
-                (setenv "IS_PYPY" "1")
                 (setenv "PYDEVD_USE_CYTHON" "YES"))))
           (add-after 'install 'install-attach-binary
             (lambda _
