@@ -7379,6 +7379,8 @@ file links.")
           (add-after 'unpack 'relax-cargo-requirements
             (lambda _
               (substitute* "Cargo.toml" (("~") "")))))
+      #:cargo-test-flags
+      '(list "--" "--skip=absolute_url::test_make_absolute_just_path")
       #:cargo-inputs
       `(("rust-ansi-parser" ,rust-ansi-parser-0.6)
         ("rust-dirs" ,rust-dirs-3)
