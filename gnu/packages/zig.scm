@@ -550,6 +550,8 @@ toolchain.  Among other features it provides
                "1iv1wjgj0nfbb19sp3zw4d8hmrhkah4cmklzxm8c32zsg673kv3i"))
       (arguments
        (substitute-keyword-arguments (package-arguments zig-0.10.0-722)
+         ;; zig1.wasm is architecture-independent.
+         ((#:target _ #f) #f)
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
               (replace 'prepare-source
