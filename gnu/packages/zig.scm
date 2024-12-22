@@ -519,6 +519,8 @@ toolchain.  Among other features it provides
          (patches (search-patches "zig-0.10.0-747-CallOptions.patch"))))
       (arguments
        (substitute-keyword-arguments (package-arguments zig-0.10.0-722)
+         ;; zig1.wasm is architecture-independent.
+         ((#:target _ #f) #f)
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
               (replace 'build-zig1
