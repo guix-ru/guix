@@ -440,14 +440,10 @@ toolchain.  Among other features it provides
               (add-after 'unpack 'set-host-triple
                 (lambda _
                   (substitute* "CMakeLists.txt"
-                    (("(set..*HOST_TARGET_TRIPLE \")(.*)(\".*)"
-                      _ prefix _ suffix)
-                     (string-append
-                      prefix
-                      (zig-target
-                       #$(platform-target
-                          (lookup-platform-by-system (%current-system))))
-                      suffix)))))
+                    (("\\$\\{(ZIG_)?HOST_TARGET_TRIPLE\\}")
+                     (zig-target
+                      #$(platform-target
+                         (lookup-platform-by-system (%current-system))))))))
               (replace 'prepare-source
                 (lambda* (#:key native-inputs inputs #:allow-other-keys)
                   (install-file (search-input-file
@@ -1186,6 +1182,13 @@ toolchain.  Among other features it provides
      (substitute-keyword-arguments (package-arguments zig-0.10)
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
+            (add-after 'unpack 'set-host-triple
+              (lambda _
+                (substitute* "CMakeLists.txt"
+                  (("\\$\\{ZIG_HOST_TARGET_TRIPLE\\}")
+                   (zig-target
+                    #$(platform-target
+                       (lookup-platform-by-system (%current-system))))))))
             (add-after 'unpack 'prepare-source
               (lambda* (#:key native-inputs inputs #:allow-other-keys)
                 (install-file (search-input-file
