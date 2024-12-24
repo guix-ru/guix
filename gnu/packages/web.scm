@@ -5540,6 +5540,7 @@ you'd expect.")
     (build-system go-build-system)
     (arguments
      (list #:import-path "github.com/mikefarah/yq/v4"
+           #:test-subdirs #~(list ".") ; XXX: try to enable all tests
            #:phases
            #~(modify-phases %standard-phases
                (add-after 'install 'remove-binary
@@ -5582,6 +5583,7 @@ JSON, XML, properties, CSV and TSV.")
     (arguments
      (list #:install-source? #f
            #:import-path "github.com/mikefarah/yq/v4"
+           #:test-subdirs #~(list ".") ; XXX: try to enable all tests
            #:phases
            #~(modify-phases %standard-phases
                (add-after 'install 'rename-binary
