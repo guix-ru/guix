@@ -2285,6 +2285,7 @@ Open Container Initiative specification.")
   (package
     (name "umoci")
     (version "0.4.7")
+    ;; XXX: Source contain vendor, consider to pack all missing dependencies.
     (source
      (origin
        (method url-fetch)
@@ -2298,6 +2299,7 @@ Open Container Initiative specification.")
     (arguments
      '(#:import-path "github.com/opencontainers/umoci"
        #:install-source? #f
+       #:test-subdirs '(".")
        #:phases
        (modify-phases %standard-phases
          (replace 'unpack
