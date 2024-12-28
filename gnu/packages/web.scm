@@ -347,7 +347,7 @@ and its related documentation.")
 (define-public miniflux
   (package
     (name "miniflux")
-    (version "2.2.3")
+    (version "2.2.4")
     (source
      (origin
        (method git-fetch)
@@ -356,7 +356,7 @@ and its related documentation.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bllgjv7cdqrk3dm98dmp7mx0wmcbh410jcdcvid7z5qkr0fiy07"))))
+        (base32 "15h9ip7a9n64n9fn6ylpriyz79rilbzw2swb6zjr1fwqyrjcx5l7"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -369,12 +369,6 @@ and its related documentation.")
                #$version))
       #:phases
       #~(modify-phases %standard-phases
-          ;; XXX: Replace when go-build-system supports nested path.
-          (replace 'check
-            (lambda* (#:key import-path tests? #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion (string-append "src/" import-path)
-                  (invoke "go" "test" "-v" "./...")))))
           (add-after 'install 'install-manpage
             (lambda* (#:key import-path #:allow-other-keys)
               (let ((man1 (string-append #$output "/share/man/man1/"))
@@ -397,11 +391,11 @@ and its related documentation.")
            go-github-com-tdewolff-minify-v2
            go-github-com-yuin-goldmark
            go-golang-org-x-crypto
+           go-golang-org-x-image
            go-golang-org-x-net
            go-golang-org-x-oauth2
            go-golang-org-x-term
-           go-golang-org-x-text
-           go-mvdan-cc-xurls-v2))
+           go-golang-org-x-text))
     (home-page "https://miniflux.app/")
     (synopsis "Minimalist and opinionated feed reader")
     (description
