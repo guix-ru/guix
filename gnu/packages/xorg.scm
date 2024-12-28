@@ -2431,14 +2431,14 @@ DRI (Direct Rendering Infrastructure) drivers.")
 (define-public xev
   (package
     (name "xev")
-    (version "1.2.5")
+    (version "1.2.6")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://xorg/individual/app/xev-"
                            version ".tar.xz"))
        (sha256
-        (base32 "1hbfwcnbyz4w13fbhnghl0vdhf6w9f9pb7jgjwrhykkii51ilin9"))))
+        (base32 "1mq7332kgisd9yq0w0rv11vhwhgpkmpg7pfdlyn776dc13hcbqb1"))))
     (build-system gnu-build-system)
     (arguments `(#:configure-flags ',(malloc0-flags)))
     (inputs
