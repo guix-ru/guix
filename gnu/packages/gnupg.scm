@@ -237,7 +237,7 @@ generation.")
 (define-public libassuan
   (package
     (name "libassuan")
-    (version "2.5.6")
+    (version "3.0.1")
     (source
      (origin
       (method url-fetch)
@@ -245,7 +245,7 @@ generation.")
                           version ".tar.bz2"))
       (sha256
        (base32
-        "09pllidbv01km8qrls21dcz1qwa22ydqyy1r9r79152kilhjgzg9"))))
+        "1ccly6aqyxv3hgshhls6qw177salcrawp0x4lsqs9ph3c4pg9w68"))))
     (build-system gnu-build-system)
     (arguments (if (%current-target-system)
                    (list #:configure-flags
