@@ -5268,30 +5268,7 @@ draggable titlebars and borders.")
 (define-public xorg-server-for-tests
   (hidden-package
    (package
-     (inherit xorg-server)
-     (version "21.1.1")
-     (source
-      (origin
-        (method url-fetch)
-        (uri (string-append "https://xorg.freedesktop.org/archive/individual"
-                            "/xserver/xorg-server-" version ".tar.xz"))
-        (sha256
-         (base32
-          "0md7dqsc5qb30gym06c4zc2cjsdc5ps8nywk1bkcpix05kppybkq"))
-        (patches
-         (list
-          ;; See:
-          ;;   https://lists.fedoraproject.org/archives/list/devel@lists.
-          ;;      fedoraproject.org/message/JU655YB7AM4OOEQ4MOMCRHJTYJ76VFOK/
-          (origin
-            (method url-fetch)
-            (uri (string-append
-                  "http://pkgs.fedoraproject.org/cgit/rpms/xorg-x11-server.git"
-                  "/plain/06_use-intel-only-on-pre-gen4.diff"))
-            (sha256
-             (base32
-              "0mm70y058r8s9y9jiv7q2myv0ycnaw3iqzm7d274410s0ik38w7q"))
-            (file-name "xorg-server-use-intel-only-on-pre-gen4.diff")))))))))
+     (inherit xorg-server))))
 
 (define-public eglexternalplatform
   (package
