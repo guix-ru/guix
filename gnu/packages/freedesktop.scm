@@ -1907,6 +1907,10 @@ message bus.")
                 (search-input-file inputs "bin/passwd"))
                (("/usr/bin/chage")
                 (search-input-file inputs "bin/chage")))))
+          (add-before 'configure 'setup-build-environment
+            (lambda _
+              (setenv "CFLAGS"
+                      "-g -O2 -Wno-error=implicit-function-declaration")))
          (add-after 'install 'wrap-with-xdg-data-dirs
            ;; This is to allow accountsservice finding extensions, which
            ;; should be installed to the system profile.
