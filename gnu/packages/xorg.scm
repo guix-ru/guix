@@ -3221,6 +3221,9 @@ supported, and the RENDER extension is not accelerated by this driver.")
         (base32 "0sqm1jwjg15sp8v7039y2hsbhph8gpjd2bdzcqqiij2mgbi254s9"))
        (patches (search-patches "xf86-video-nouveau-fixup-ABI.patch"))))
     (build-system gnu-build-system)
+    (arguments
+     (list #:configure-flags
+           #~(list "CFLAGS=-g -O2 -Wno-error=implicit-function-declaration")))
     (inputs (list xorg-server))
     (native-inputs (list pkg-config))
     (home-page "https://nouveau.freedesktop.org")
