@@ -65,6 +65,7 @@
 ;;; Copyright © 2022 Dominic Martinez <dom@dominicm.dev>
 ;;; Copyright © 2024 Alexey Abramov <levenson@mmer.org>
 ;;; Copyright © 2024 James Smith <jsubuntuxp@disroot.org>
+;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -4494,11 +4495,11 @@ some traces for unprivileged users.")
                    license:lgpl2.1+)))) ;for the libsupp subdirectory
 
 (define-public vde2
-  (let ((commit "8c65ebc464b2f986d5f1f4e6ae829ef4480c9d5a")
+  (let ((commit "v2.3.3")
         (revision "0"))
   (package
     (name "vde2")
-    (version (git-version "2.3.2" revision commit))
+    (version (string-drop commit 1))
     (source
      (origin
        (method git-fetch)
@@ -4507,7 +4508,7 @@ some traces for unprivileged users.")
               (commit commit)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0l5xf71sv9zm5zw0wg8xgip58c0wh8zck2bazyc2a8gb67gc3s8y"))))
+        (base32 "0rgsizq6mhmrfc2nm2pdakp3g39b565qaskvv5fqk5grp03r1zk1"))))
     (build-system gnu-build-system)
     (arguments
      `(#:parallel-build? #f))           ; Build fails if #t.
