@@ -1762,4 +1762,48 @@ toolchain.  Among other features it provides
        (modify-inputs (package-native-inputs base)
          (replace "zig" `(,base "out")))))))
 
+(define zig-0.14-glibc-abi-tool
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://github.com/ziglang/glibc-abi-tool")
+          (commit "23fa2936e21ef8573d0a7c244523284fc3a17567")))
+    (file-name "glibc-abi-tool")
+    (sha256
+     (base32 "18s08rqv457fs9jaiqf3smlkqbmpsan2rl0w6p3d59j0v1jf9cvq"))
+    (modules '((guix build utils)))
+    (snippet
+     #~(substitute* "consolidate.zig"
+         (("(const new_inc = ).*" _ prefix)
+          (string-append prefix "Inclusion {"))))))
+
+(define-public zig-0.14
+  (let ((commit "6d67658965bc298a697dc756a4e06bda144427de")
+        (revision "2580"))
+    (package
+      (inherit zig-0.13)
+      (name "zig")
+      (version (git-version "0.13.0" revision commit))
+      (source
+       (origin
+         (inherit (zig-source
+                   version commit
+                   "0cyligjfiy465rx67hk9r2j10fyay46ql5s85d87npm633nx92n8"))
+         (patches
+          (search-patches
+           "zig-0.14-use-baseline-cpu-by-default.patch"
+           "zig-0.14-use-system-paths.patch"
+           "zig-0.14-fix-runpath.patch"))))
+      (inputs
+       (modify-inputs (package-inputs zig-0.13)
+         (replace "clang" clang-19)
+         (replace "lld" lld-19)))
+      (native-inputs
+       (modify-inputs (package-native-inputs zig-0.13)
+         (replace "glibc-abi-tool" zig-0.14-glibc-abi-tool)
+         (replace "llvm" llvm-19)
+         (replace "zig" `(,zig-0.13.0-1952 "zig1"))))
+      (properties `((max-silent-time . 9600)
+                    ,@(clang-compiler-cpu-architectures "19"))))))
+
 (define-public zig zig-0.13)
