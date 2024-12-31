@@ -22,6 +22,7 @@
 ;;; Copyright © 2023 Timotej Lazar <timotej.lazar@araneo.si>
 ;;; Copyright © 2023 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2023 Pierre Langlois <pierre.langlois@gmx.com>
+;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -356,7 +357,7 @@ website for more information about Yubico and the YubiKey.")
 (define-public opensc
   (package
     (name "opensc")
-    (version "0.25.1")
+    (version "0.26.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -364,7 +365,7 @@ website for more information about Yubico and the YubiKey.")
                     version "/opensc-" version ".tar.gz"))
               (sha256
                (base32
-                "0yxk97aj29pybvya6r9ix9xh00hdzcfrc2lcns4vb3kwpplamjr3"))))
+                "0azqfmg9wnjry9qa8q2lsdrnxphf2mb111v8v1h54l718nnswyw3"))))
     (build-system gnu-build-system)
     (arguments
      (list
