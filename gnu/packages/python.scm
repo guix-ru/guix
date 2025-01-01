@@ -183,14 +183,7 @@
      (list
       #:test-target "test"
       #:configure-flags
-      #~(list ;; -fno-semantic-interposition reinstates some optimizations by gcc
-              ;; leading to around 15% speedup. This is the default starting from
-              ;; python 3.10.
-              ;; XXX FIXME: How to add "-Wno-error=implicit-function-declaration"
-              ;; *only* for *this* python-2 package?  It's not needed for any
-              ;; package inheriting from us.
-              "CFLAGS=-Wno-error=incompatible-pointer-types -fno-semantic-interposition"
-              "--enable-shared"          ;allow embedding
+      #~(list "--enable-shared"          ;allow embedding
               "--with-system-expat"      ;for XML support
               "--with-system-ffi"        ;build ctypes
               "--with-ensurepip=install" ;install pip and setuptools
@@ -214,6 +207,13 @@
                         "ac_cv_file__dev_ptmx=no"
                         "ac_cv_file__dev_ptc=no")
                      #~())
+              ;; -fno-semantic-interposition reinstates some optimizations by gcc
+              ;; leading to around 15% speedup. This is the default starting from
+              ;; python 3.10.
+              ;; XXX FIXME: How to add "-Wno-error=implicit-function-declaration"
+              ;; *only* for *this* python-2 package?  It's not needed for any
+              ;; package inheriting from us.
+              "CFLAGS=-Wno-error=incompatible-pointer-types -fno-semantic-interposition"
               (string-append "LDFLAGS=-Wl,-rpath="
                              (assoc-ref %outputs "out") "/lib"
                              " -fno-semantic-interposition")
@@ -454,6 +454,52 @@ data types.")
 ;; Current 2.x version.
 (define-public python-2 python-2.7)
 
+(define %original-python2-configure-flags
+  #~(list "--enable-shared"              ;allow embedding
+          "--with-system-expat"          ;for XML support
+          "--with-system-ffi"            ;build ctypes
+          "--with-ensurepip=install"     ;install pip and setuptools
+          "--with-computed-gotos"  ;main interpreter loop optimization
+          "--enable-unicode=ucs4"
+
+          ;; FIXME: These flags makes Python significantly faster, but
+          ;; leads to non-reproducible binaries.
+          ;; "--with-lto"               ;increase size by 20MB, but 15% speedup
+          ;; "--enable-optimizations"
+
+          ;; Prevent the installed _sysconfigdata.py from retaining a reference
+          ;; to coreutils.
+          "INSTALL=install -c"
+          "MKDIR_P=mkdir -p"
+
+          ;; Disable runtime check failing if cross-compiling, see:
+          ;; https://lists.yoctoproject.org/pipermail/poky/2013-June/008997.html
+          #$@(if (%current-target-system)
+                 #~("ac_cv_buggy_getaddrinfo=no"
+                    "ac_cv_file__dev_ptmx=no"
+                    "ac_cv_file__dev_ptc=no")
+                 #~())
+          ;; -fno-semantic-interposition reinstates some optimizations by gcc
+          ;; leading to around 15% speedup. This is the default starting from
+          ;; python 3.10.
+          "CFLAGS=-fno-semantic-interposition"
+          (string-append "LDFLAGS=-Wl,-rpath="
+                         (assoc-ref %outputs "out") "/lib"
+                         " -fno-semantic-interposition")
+          ;; Add a reference to libxcrypt in LIBS so that the sysconfigdata
+          ;; file records it and propagates it to programs linking against
+          ;; Python.
+          (let ((libxcrypt
+                 (false-if-exception
+                  (dirname
+                   (search-input-file %build-inputs
+                                      "lib/libcrypt.so.1")))))
+            (string-append
+             "LIBS="
+             (if libxcrypt
+                 (string-append "-L" libxcrypt)
+                 "")))))
+
 (define-public python-3.10
   (package
     (inherit python-2)
@@ -487,7 +533,7 @@ data types.")
     (arguments
      (substitute-keyword-arguments (package-arguments python-2)
        ((#:configure-flags flags)
-        #~(append #$flags
+        #~(append #$%original-python2-configure-flags
                   ;; XXX Use quote to avoid world rebuild at this time
                   '("--without-static-libpython")))
        ((#:make-flags _)
@@ -1081,7 +1127,11 @@ data types.")
     ;; is invoked upon 'make install'.  'pip' also expects 'ctypes' and thus
     ;; libffi.  Expat is needed for XML support which is expected by a lot
     ;; of libraries out there.
-    (inputs (list expat libffi zlib))))
+    (inputs (list expat libffi zlib))
+    (arguments
+     (substitute-keyword-arguments (package-arguments python-2)
+       ((#:configure-flags flags '())
+        %original-python2-configure-flags)))))
 
 (define-public python-minimal
   (package/inherit python
