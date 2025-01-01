@@ -108,7 +108,8 @@ HTML and JSON.")
               (base32
                "1arffdwivig88kkx685pldr784njm0249k0rb1f1plwavlrw9zfx"))
              (patches (search-patches "clucene-pkgconfig.patch"
-                                      "clucene-contribs-lib.patch"))))
+                                      "clucene-contribs-lib.patch"
+                                      "clucene-gcc-14.patch"))))
     (build-system cmake-build-system)
     (inputs
      (list boost ; could also use bundled copy
