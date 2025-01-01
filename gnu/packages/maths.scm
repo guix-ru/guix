@@ -6984,6 +6984,11 @@ specifications.")
        #:phases
        (modify-phases %standard-phases
          (delete 'configure)            ; no configure script
+         (add-after 'unpack 'apply-gcc-14-patch
+           (lambda _
+             (substitute* '("lpsolve55/ccc"
+                            "lp_solve/ccc")
+               (("^c=gcc") "c=\"gcc -Wno-error=implicit-int\""))))
          (replace 'build
            (lambda _
              (with-directory-excursion "lpsolve55"
