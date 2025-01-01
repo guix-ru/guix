@@ -9739,6 +9739,13 @@ easy, safe, and automatic.")
           (add-before 'configure 'set-shell
             (lambda _
               (setenv "SHELL" (which "bash"))))
+          (add-before 'configure 'setup-build-environment
+            (lambda _
+              (setenv "CFLAGS"
+                      (string-append
+                       "-g -O2"
+                       " -Wno-error=implicit-function-declaration"
+                       " -Wno-error=incompatible-pointer-types"))))
           (add-before 'configure 'fix-paths
             (lambda* (#:key inputs #:allow-other-keys)
               (let* ((manpage "/etc/asciidoc/docbook-xsl/manpage.xsl")
