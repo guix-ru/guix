@@ -2348,7 +2348,8 @@ for handling arrays and scalars with units,respectively")
     (propagated-inputs
      (list python-matplotlib python-pandas))
     (native-inputs
-     (list python-pytest-runner python-pytest-cov))
+     (list python-pytest-runner python-pytest-cov
+           python-setuptools python-wheel))
     (home-page "https://upsetplot.readthedocs.io")
     (synopsis "Draw UpSet plots with Pandas and Matplotlib")
     (description
