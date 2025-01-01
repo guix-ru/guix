@@ -1253,7 +1253,8 @@ with the Linux kernel.")
     (arguments
      (substitute-keyword-arguments (package-arguments glibc)
        ((#:configure-flags flags #~'())
-        #~(cons* "--enable-crypt"
+        #~(cons* "CFLAGS=-g -O2 -Wno-error=builtin-declaration-mismatch"
+                 "--enable-crypt"
                  ;; We do not want to use the C++ compiler, because its
                  ;; libstdc++ is linked against a newer glibc, and so relies
                  ;; on those newer symbols.  Pretend it doesn't link (the test
