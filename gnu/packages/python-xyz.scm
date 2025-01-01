@@ -7,7 +7,7 @@
 ;;; Copyright © 2014, 2015 Federico Beffa <beffa@fbengineering.ch>
 ;;; Copyright © 2015 Omar Radwan <toxemicsquire4@gmail.com>
 ;;; Copyright © 2015 Pierre-Antoine Rault <par@rigelk.eu>
-;;; Copyright © 2015-2024 Ricardo Wurmus <rekado@elephly.net>
+;;; Copyright © 2015-2025 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2015, 2016, 2020 Christine Lemmer-Webber <cwebber@dustycloud.org>
 ;;; Copyright © 2015 Eric Dvorsak <eric@dvorsak.fr>
 ;;; Copyright © 2015, 2016 David Thompson <davet@gnu.org>
@@ -5406,6 +5406,29 @@ locking..")
 only a chosen subset of the YAML format that is required to parse cookiecutter
 user configuration files.  It does not have support for serializing into YAML
 and is not compatible with JSON.")
+    (license license:expat)))
+
+(define-public python-expandvars
+  (package
+    (name "python-expandvars")
+    (version "0.12.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "expandvars" version))
+       (sha256
+        (base32 "0i6q4i8dzsax85w1l2hc7saymyh3fw43vkifh5flpkr8ayjxy6kx"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatchling python-pytest python-pytest-cov))
+    (home-page "https://pypi.org/project/expandvars/")
+    (synopsis "Expand system variables Unix style")
+    (description "This module is inspired by GNU bash's variable expansion
+features.  It can be used as an alternative to Python's
+@code{os.path.expandvars} function.  A good use case is reading config files
+with the flexibility of reading values from environment variables using
+advanced features like returning a default value if some variable is not
+defined.")
     (license license:expat)))
 
 (define-public python-extension-helpers
