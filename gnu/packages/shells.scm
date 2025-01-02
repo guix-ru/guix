@@ -12,7 +12,7 @@
 ;;; Copyright © 2019 Meiyo Peng <meiyo.peng@gmail.com>
 ;;; Copyright © 2019 Timothy Sample <samplet@ngyro.com>
 ;;; Copyright © 2019 Mathieu Othacehe <m.othacehe@gmail.com>
-;;; Copyright © 2019, 2020, 2023 Janneke Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright © 2019, 2020, 2023, 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2020 Brice Waegeneire <brice@waegenei.re>
 ;;; Copyright © 2020 Ryan Prior <rprior@protonmail.com>
 ;;; Copyright © 2020, 2022, 2024 Efraim Flashner <efraim@flashner.co.il>
@@ -499,7 +499,8 @@ history mechanism, job control and a C-like syntax.")
               (patches (search-patches "zsh-egrep-failing-test.patch"))))
     (build-system gnu-build-system)
     (arguments `(#:configure-flags
-                 `("--with-tcsetpgrp"
+                 `("CFLAGS=-g -O -Wno-error=incompatible-pointer-types"
+                  "--with-tcsetpgrp"
                   "--enable-pcre"
                   "--enable-maildir-support"
                   ;; share/zsh/site-functions isn't populated
