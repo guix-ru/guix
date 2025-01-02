@@ -499,7 +499,7 @@ history mechanism, job control and a C-like syntax.")
               (patches (search-patches "zsh-egrep-failing-test.patch"))))
     (build-system gnu-build-system)
     (arguments `(#:configure-flags
-                 `("CFLAGS=-g -O -Wno-error=incompatible-pointer-types"
+                 `("CFLAGS=-g -O2 -Wno-error=incompatible-pointer-types"
                   "--with-tcsetpgrp"
                   "--enable-pcre"
                   "--enable-maildir-support"
