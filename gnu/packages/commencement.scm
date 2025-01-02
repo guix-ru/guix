@@ -2240,7 +2240,7 @@ exec " gcc "/bin/" program
   ;; 'Makefile.def' forcefully adds --enable-shared) and thus needs to refer
   ;; to libstdc++.so.  We cannot build libstdc++-5.3 because it relies on
   ;; C++14 features missing in some of our bootstrap compilers.
-  (let ((lib (make-libstdc++ gcc-4.9)))
+  (let ((lib (REMOVEME-make-libstdc++ gcc-4.9)))
     (package
       (inherit lib)
       (source (bootstrap-origin (package-source lib)))
@@ -2275,7 +2275,7 @@ exec " gcc "/bin/" program
 
 (define (make-libstdc++-boot0 gcc)
   ;; GCC >= 7 is needed by architectures which use C++-14 features.
-  (let ((lib (make-libstdc++ gcc)))
+  (let ((lib (REMOVEME-make-libstdc++ gcc)))
     (package
       (inherit lib)
       (source (bootstrap-origin (package-source lib)))
@@ -3151,7 +3151,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 (define libstdc++
   ;; Intermediate libstdc++ that will allow us to build the final GCC
   ;; (remember that GCC-BOOT0 cannot build libstdc++.)
-  (let ((lib (make-libstdc++ gcc-boot0)))
+  (let ((lib (REMOVEME-make-libstdc++ gcc-boot0)))
     (package
       (inherit lib)
       (source (bootstrap-origin (package-source lib)))
