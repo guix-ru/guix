@@ -132,7 +132,15 @@
                (file-name (git-file-name name version))
                (sha256
                 (base32
-                 "1yd3cnngr5z3nymnml8fynspxgdzap7y7glp601nbkdj67wyg0k8")))))))
+                 "1yd3cnngr5z3nymnml8fynspxgdzap7y7glp601nbkdj67wyg0k8"))))
+     (arguments
+      (substitute-keyword-arguments (package-arguments openldap)
+        ((#:configure-flags flags)
+         #~(append
+            (list #$(string-append "CFLAGS=-g -O2"
+                                   " -Wno-error=implicit-int"
+                                   " -Wno-error=int-conversion"))
+            #$flags)))))))
 
 (define-public nss-pam-ldapd
   (package
