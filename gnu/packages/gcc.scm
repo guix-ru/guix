@@ -1053,11 +1053,140 @@ using compilers other than GCC."
           (add-before 'configure 'chdir
             (lambda _
               (chdir "libstdc++-v3")))
-          (add-after 'unpack 'patch-tzdb.cc
+          #$@(if (target-hurd64?)
+                 #~((add-after 'unpack 'patch-hurd64
+                      (lambda _
+                        (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
+                          (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
+                           "#if __GNU__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                 '())
+          #$@(if (and (target-x86-64?) (target-linux?)
+                      (version>=? (package-version gcc) "14"))
+                 #~((add-after 'unpack 'patch-x86_64-linux
+                      (lambda _
+                        (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
+                          (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
+                           "#if __x86_64__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                 '())
+          #$@(if (and (target-x86-32?) (target-linux?)
+                      (version>=? (package-version gcc) "14"))
+                 #~((add-after 'unpack 'patch-x86_64-linux
+                      (lambda _
+                        (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
+                          (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
+                           "#if __i386__ || __x86_64__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                 '())
+          #$@(if (and (target-linux?)
+                      (version>=? (package-version gcc) "14"))
+                 #~((add-after 'unpack 'patch-tzdb.cc
+                      (lambda _
+                        (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
+                          (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
+                           "#if 1 // ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                 '()))
+
+      #:configure-flags '`("--disable-libstdcxx-pch"
+                           ,(string-append "--with-gxx-include-dir="
+                                           (assoc-ref %outputs "out")
+                                           "/include"))))
+    (outputs '("out" "debug"))
+    (inputs '())
+    (native-inputs
+     `(,@(if (and (target-ppc64le?)
+                  (let ((version (package-version gcc)))
+                    (and
+                     (version>=? version "11")
+                     (not (version>=? version "12")))))
+             `(("powerpc64le-patch" ,(search-patch "gcc-11-libstdc++-powerpc.patch")))
+             '())))
+    (propagated-inputs '())
+    (synopsis "GNU C++ standard library")))
+
+(define-public (REMOVEME-make-libstdc++ gcc)
+  "Return a libstdc++ package based on GCC.  The primary use case is when
+using compilers other than GCC."
+  (package
+    (inherit gcc)
+    (name "libstdc++")
+    (arguments
+     (list
+      #:out-of-source? #t
+      #:modules `((srfi srfi-1)
+                  (srfi srfi-26)
+                  ,@%default-gnu-modules)
+      #:phases
+      #~(modify-phases %standard-phases
+          #$@(if (version>=? (package-version gcc) "11")
+                 #~((add-after 'unpack 'hide-gcc-headers
+                      (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                        (let ((gcc (assoc-ref (or native-inputs inputs)
+                                              #$(if (%current-target-system)
+                                                    "cross-gcc"
+                                                    "gcc"))))
+                          ;; Fix a regression in GCC 11 where the GCC headers
+                          ;; shadows glibc headers when building libstdc++.  An
+                          ;; upstream fix was added in GCC 11.3.0, but it only
+                          ;; hides system include directories, not those on
+                          ;; CPLUS_INCLUDE_PATH.  See discussion at
+                          ;; <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100017>
+                          ;; and the similar adjustment in GCC-FINAL.
+                          (substitute* "libstdc++-v3/src/c++17/Makefile.in"
+                            (("AM_CXXFLAGS = ")
+                             (string-append #$(if (%current-target-system)
+                                                  "CROSS_CPLUS_INCLUDE_PATH = "
+                                                  "CPLUS_INCLUDE_PATH = ")
+                                            (string-join
+                                             (remove (cut string-prefix? gcc <>)
+                                                     (string-split
+                                                      (getenv
+                                                       #$(if (%current-target-system)
+                                                             "CROSS_CPLUS_INCLUDE_PATH"
+                                                             "CPLUS_INCLUDE_PATH"))
+                                                      #\:))
+                                             ":")
+                                            "\nAM_CXXFLAGS = ")))))))
+                 '())
+          #$@(let ((version (package-version gcc)))
+               (if (and (target-ppc64le?)
+                       (version>=? version "11")
+                       (not (version>=? version "12")))
+                   ;; TODO: Drop the 'else' branch below on next rebuild
+                   ;; cycle.
+                   (if (%current-target-system)
+                       #~((add-after 'unpack 'patch-powerpc ;correct
+                            (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                              (invoke "patch" "--force" "-p1" "-i"
+                                      (assoc-ref (or native-inputs inputs)
+                                                 "powerpc64le-patch")))))
+                       #~((add-after 'unpack 'patch-powerpc ;wrong
+                            (lambda* (#:key inputs #:allow-other-keys)
+                              (invoke "patch" "--force" "-p1" "-i"
+                                      (assoc-ref inputs "powerpc64le-patch"))))))
+                   '()))
+          ;; Force rs6000 (i.e., powerpc) libdir to be /lib and not /lib64.
+          (add-after 'unpack 'fix-rs6000-libdir
             (lambda _
-              (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
-                (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
-                 "#if 1 // ! defined _GLIBCXX_ZONEINFO_DIR")))))
+              (when (file-exists? "gcc/config/rs6000")
+                (substitute* (find-files "gcc/config/rs6000")
+                  (("/lib64") "/lib")))))
+          (add-before 'configure 'chdir
+            (lambda _
+              (chdir "libstdc++-v3")))
+          #$@(if (target-hurd64?)
+                 #~((add-after 'unpack 'patch-hurd64
+                      (lambda _
+                        (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
+                          (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
+                           "#if __GNU__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                 '())
+          #$@(if (and (target-x86?) (target-linux?)
+                      (version>=? (package-version gcc) "14"))
+                 #~((add-after 'unpack 'patch-x86_64-linux
+                      (lambda _
+                        (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
+                          (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
+                           "#if __x86_64__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                 '()))
 
       #:configure-flags '`("--disable-libstdcxx-pch"
                            ,(string-append "--with-gxx-include-dir="
