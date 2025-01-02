@@ -1066,7 +1066,7 @@ using compilers other than GCC."
                       (lambda _
                         (substitute* "libstdc++-v3/src/c++20/tzdb.cc"
                           (("#if ! defined _GLIBCXX_ZONEINFO_DIR")
-                           "#if __x86_64__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
+                           "#if __i386__ || __x86_64__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
                  '()))
 
       #:configure-flags '`("--disable-libstdcxx-pch"
