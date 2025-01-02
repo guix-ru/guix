@@ -62,7 +62,6 @@
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages documentation)
-  #:use-module (gnu packages gcc)
   #:use-module (gnu packages groff)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages libbsd)
@@ -500,7 +499,8 @@ history mechanism, job control and a C-like syntax.")
               (patches (search-patches "zsh-egrep-failing-test.patch"))))
     (build-system gnu-build-system)
     (arguments `(#:configure-flags
-                 `("--with-tcsetpgrp"
+                 `("CFLAGS=-g -O2 -Wno-error=incompatible-pointer-types"
+                  "--with-tcsetpgrp"
                   "--enable-pcre"
                   "--enable-maildir-support"
                   ;; share/zsh/site-functions isn't populated
@@ -543,9 +543,7 @@ history mechanism, job control and a C-like syntax.")
                      (lambda _ (invoke "make" "info")))
                    (add-after 'build 'install-info
                      (lambda _ (invoke "make" "install.info"))))))
-    (native-inputs (list autoconf
-                         gcc-13 ;Using gcc-14, A01grammar.ztst hangs
-                         texinfo))
+    (native-inputs (list autoconf texinfo))
     (inputs (list ncurses pcre perl))
     (synopsis "Powerful shell for interactive use and scripting")
     (description "The Z shell (zsh) is a Unix shell that can be used
