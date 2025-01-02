@@ -554,8 +554,16 @@ lossless JPEG manipulations such as rotation, scaling or cropping:
              ;; flag if there was no file decoding error.
              ;; The makefile is a "Non-ISO extended-ASCII text, with CRLF line
              ;; terminators" according to the file(1) utility.
-             (string-append "CFLAGS=-I. -Icommon/include -Iimage/sys -fPIC "
-                            "-D__ANSI__ -DDISABLE_PERF_MEASUREMENT -w -O "))
+             (string-append "CFLAGS=-I."
+                            " -Icommon/include"
+                            " -Iimage/sys"
+                            " -D__ANSI__"
+                            " -DDISABLE_PERF_MEASUREMENT"
+                            " -fPIC"
+                            " -w"
+                            " -O"
+                            " -Wno-error=implicit-function-declaration"
+                            " -Wno-error=incompatible-pointer-types"))
        #:tests? #f ; no check target
        #:phases
        (modify-phases %standard-phases
