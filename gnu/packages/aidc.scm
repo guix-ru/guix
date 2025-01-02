@@ -60,6 +60,7 @@
                 (uri (git-reference
                       (url "https://github.com/nu-book/zxing-cpp")
                       (commit commit)))
+                (patches (search-patches "zxing-cpp-1.2.0-gcc-14.patch"))
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
