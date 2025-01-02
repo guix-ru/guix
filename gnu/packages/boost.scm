@@ -344,6 +344,16 @@ across a broad spectrum of applications.")
              "--with-toolset=gcc")))
        ((#:phases phases)
         #~(modify-phases #$phases
+            (add-after 'unpack 'apply-gcc-14-patch
+              (lambda _
+                (substitute* "tools/build/src/engine/build.sh"
+                  (("=gcc")
+                   "=\"gcc -Wno-error=implicit-function-declaration\""))
+                (substitute* "tools/build/src/engine/build.jam"
+                  ((": -pedantic -fno-strict-aliasing" all)
+                   (string-append
+                    all
+                    " -Wno-error=implicit-function-declaration")))))
             (replace 'patch-shells
               (lambda _
                 (substitute* (append
