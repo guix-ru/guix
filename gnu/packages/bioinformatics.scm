@@ -27,6 +27,7 @@
 ;;; Copyright © 2022 Antero Mejr <antero@mailbox.org>
 ;;; Copyright © 2024 Alexis Simon <alexis.simon@runbox.com>
 ;;; Copyright © 2024 Spencer King <spencer.king@geneoscopy.com>
+;;; Copyright © 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
