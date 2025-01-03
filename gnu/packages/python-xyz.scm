@@ -14059,6 +14059,15 @@ of the structure, dynamics, and functions of complex networks.")
         (base32
          "0pbn32flkrpjiwfcknmj6398qa81ba783kbcvwan3kym73v0hnsj"))))
     (build-system python-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'relax-gcc-14-strictness
+            (lambda _
+              (setenv "CFLAGS"
+                      (string-append "-g -O2"
+                                     " -Wno-error=incompatible-pointer-types")))))))
     (native-inputs
      (list python-cython python-hypothesis python-pytest
            python-pytest-runner))
