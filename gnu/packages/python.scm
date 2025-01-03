@@ -1151,8 +1151,8 @@ data types.")
     (build-system gnu-build-system)
     (arguments
      (substitute-keyword-arguments (package-arguments python)
-       ((#:configure-flags flags '())
-        `(cons "--with-pydebug" ,flags))))
+       ((#:configure-flags flags #~'())
+        #~(cons "--with-pydebug" #$flags))))
     (synopsis
      "Python with the debug hooks enabled")
     (description
