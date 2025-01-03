@@ -973,16 +973,17 @@ Supported extensions to ISO 9660 are Rock Ridge, Joliet, AAIP, zisofs.")
     (inputs
      (list bzip2 libcap perl zlib))
     (arguments
-     `(#:tests? #f ;no tests
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'old-cdrecord
-           (lambda* (#:key outputs #:allow-other-keys)
-             (with-directory-excursion (string-append (assoc-ref outputs "out")
-                                                      "/bin")
-               (symlink "genisoimage" "mkisofs")
-               (symlink "wodim" "cdrecord"))
-             #t)))))
+     (list
+      #:tests? #f                       ;no tests
+      #:configure-flags
+      #~(list "-DCMAKE_C_FLAGS=-Wno-error=implicit-function-declaration")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'old-cdrecord
+            (lambda* (#:key outputs #:allow-other-keys)
+              (with-directory-excursion (string-append #$output "/bin")
+                (symlink "genisoimage" "mkisofs")
+                (symlink "wodim" "cdrecord")))))))
     (home-page "https://repo.parabola.nu/other/cdrkit-libre/")
     (synopsis "Command-line CD/DVD recorder")
     (description "Cdrkit is a suite of programs for recording CDs and DVDs,
