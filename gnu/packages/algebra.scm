@@ -16,6 +16,7 @@
 ;;; Copyright © 2021 Lars-Dominik Braun <ldb@leibniz-psychology.org>
 ;;; Copyright © 2022 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2023 Mehmet Tekman <mtekman89@gmail.com>
+;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -126,6 +127,10 @@ multiplication routines such as Toom–Cook and the FFT.")
                (base32
                 "04g5jg0i4vz46b4w2dvbmahwzi3k6b8g515mfw7im1inc78s14id"))))
     (build-system gnu-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "CFLAGS=-g -O2 -Wno-error=implicit-function-declaration")))
     (native-inputs (list autoconf automake libtool))
     (synopsis "Arithmetic of polynomials over binary finite fields")
     (description
