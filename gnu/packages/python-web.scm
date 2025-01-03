@@ -4820,13 +4820,13 @@ for the basic TCP/IP protocols.")
 (define-public python-geventhttpclient
   (package
     (name "python-geventhttpclient")
-    (version "2.0.9")
+    (version "2.3.3")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "geventhttpclient" version))
               (sha256
                (base32
-                "04qmcc7qpnif70ph61339dcld4g107fkhpa0gdmbs8z98v9kkg4a"))
+                "16vzhi1hygdf3vys0c9spg4hwlkjy3xnf9pypp50kp811mbw2x1y"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -4834,25 +4834,6 @@ for the basic TCP/IP protocols.")
                   (for-each delete-file (find-files "src/geventhttpclient"
                                                     ".*\\.pyc"))))))
     (build-system python-build-system)
-    (arguments
-     '(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'delete-network-tests
-           (lambda _
-             (delete-file "src/geventhttpclient/tests/test_client.py")))
-         (add-after 'unpack 'fix-compatibility-issue
-           ;; See: https://github.com/gwik/geventhttpclient/issues/137.
-           (lambda _
-             (substitute* "src/geventhttpclient/tests/test_ssl.py"
-               ((".*sock.last_seen_sni = None.*")
-                ""))))
-         (replace 'check
-           (lambda* (#:key tests? #:allow-other-keys)
-             (when tests?
-               (invoke "pytest" "src/geventhttpclient/tests" "-v"
-                       ;; Append the test modules to sys.path to avoid
-                       ;; namespace conflict which breaks SSL tests.
-                       "--import-mode=append")))))))
     (native-inputs (list nss-certs-for-test python-dpkt python-pytest))
     (propagated-inputs (list python-brotli python-certifi python-gevent
                              python-six python-urllib3))
