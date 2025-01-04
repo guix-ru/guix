@@ -39,7 +39,6 @@
 ;;; Copyright © 2022 Greg Hogan <code@greghogan.com>
 ;;; Copyright © 2024 Marco Baggio <guix@mawumag.com>
 ;;; Copyright © 2024 Spencer King <spencer.king@geneoscopy.com>
-;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -21665,17 +21664,10 @@ package provides a minimal R interface by relying on the Rcpp package.")
     (arguments
      (list
       #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'use-system-tbb
-            (lambda* (#:key inputs #:allow-other-keys)
-              (setenv "TBB_ROOT" (assoc-ref inputs "tbb"))))
-          (add-before 'install 'relax-gcc-14-strictness
-            (lambda _
-              (substitute* "src/Makevars.in"
-                (("(PKG|TBB)_CXXFLAGS =" all)
-                 (string-append all " -Wno-error=changes-meaning"))
-                (("CXXFLAGS=\"" all)
-                 (string-append all "-Wno-error=changes-meaning "))))))))
+      '(modify-phases %standard-phases
+         (add-after 'unpack 'use-system-tbb
+           (lambda* (#:key inputs #:allow-other-keys)
+             (setenv "TBB_ROOT" (assoc-ref inputs "tbb")))))))
     (inputs (list tbb-2020))
     (native-inputs (list r-rcpp r-runit))
     (home-page "https://rcppcore.github.io/RcppParallel/")
