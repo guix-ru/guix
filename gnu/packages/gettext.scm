@@ -158,6 +158,31 @@ translated messages from the catalogs.  Nearly all GNU packages use Gettext.")
                   (cpe-name . "gettext")))
     (license gpl3+)))                             ;some files are under GPLv2+
 
+(define-public gettext-minimal-0.21
+  (package/inherit gettext-minimal
+    (version "0.21")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/gettext/gettext-"
+                                  version ".tar.gz"))
+              (sha256
+               (base32
+                "04kbg1sx0ncfrsbr85ggjslqkzzb243fcw9nyh3rrv1a22ihszf7"))
+              (patches (search-patches "gettext-libunicode-update.patch"))))
+    (arguments
+     (substitute-keyword-arguments (package-arguments gettext-minimal)
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'touch-test
+              (lambda _
+                (with-output-to-file "gettext-tools/gnulib-tests/test-execute.sh"
+                  (lambda _ (display "")))))
+            (add-before 'check 'patch-test
+              (lambda _
+                ;; This test fails with ggc-14.
+                (substitute* "gettext-tools/tests/xgettext-javascript-6"
+                  (("^#!.*" all) (string-append all "exit 77;\n")))))))))))
+
 ;; Use that name to avoid clashes with Guile's 'gettext' procedure.
 ;;
 ;; We used to resort to #:renamer on the user side, but that prevented
