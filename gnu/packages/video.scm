@@ -2624,7 +2624,15 @@ streaming protocols.")
                 (("#! /bin/sh") (string-append "#!" (which "sh"))))
               (setenv "SHELL" (which "bash"))
               (setenv "CONFIG_SHELL" (which "bash"))
-              (apply invoke "./configure" configure-flags))))))
+              (apply invoke "./configure" configure-flags)
+              ;; Adding CFLAGS to #:configure-flags, or setting it in the
+              ;; enviroment does not work.  Adding CFLAGS to #:make-flags
+              ;; breaks the build.
+              (substitute* "config.mak"
+                (("CFLAGS *=" all)
+                 (string-append all
+                                " -Wno-error=incompatible-pointer-types"
+                                " -Wno-error=int-conversion"))))))))
     ;; FIXME: Add additional inputs once available.
     (native-inputs
      (list pkg-config yasm))
