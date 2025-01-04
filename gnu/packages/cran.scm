@@ -46928,6 +46928,14 @@ aggregation for comparing different implementations in order to provide a
          "16k87c3958g8p4qvp1vgnhfcsq1rqls272rsrwhdyimvkysvzpy0"))))
     (properties `((upstream-name . "Rfast")))
     (build-system r-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-before 'install 'relax-gcc-14-strictness
+           (lambda _
+             (substitute* "src/Makevars"
+               (("PKG_CXXFLAGS =" all)
+                (string-append all " -Wno-error=changes-meaning"))))))))
     (propagated-inputs
      (list r-rcpp r-rcpparmadillo r-rcppparallel r-rcppziggurat))
     (home-page "https://github.com/RfastOfficial/Rfast")
