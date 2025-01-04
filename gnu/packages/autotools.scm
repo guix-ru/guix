@@ -144,6 +144,18 @@ know anything about Autoconf or M4.")
                                               (lambda (file stat)
                                                 (executable-file? file)))))))))))))
 
+(define-public autoconf-2.72
+  (package (inherit autoconf-2.71)
+    (version "2.72")
+    (source
+     (origin
+      (method url-fetch)
+      (uri (string-append "mirror://gnu/autoconf/autoconf-"
+                          version ".tar.xz"))
+      (sha256
+       (base32
+        "0niz4852fgyavfh3gr4h4kzalk01nk70v6vfsja6r3ap349mr25s"))))))
+
 (define-public autoconf autoconf-2.69)
 
 (define-public autoconf-2.68
