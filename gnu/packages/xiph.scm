@@ -337,6 +337,10 @@ Kate stream.")
              (base32
               "1c7h4ivgfdyygz2hyh6nfibxlkz8kdk868a576qkkjgj5gn78xyv"))))
    (build-system gnu-build-system)
+   (arguments
+    (list
+     #:configure-flags
+     #~(list "CFLAGS=-g -O2 -Wno-error=implicit-function-declaration")))
    (inputs (list ao
                  curl
                  flac
