@@ -597,10 +597,7 @@ This is the declarative counterpart of 'text-file'."
   (options    computed-file-options))             ;list of arguments
 
 (define* (computed-file name gexp
-                        #:key
-                        guile
-                        (local-build? #t)
-                        (options '(#:env-vars (("LANG" . "C.UTF-8")))))
+                        #:key guile (local-build? #t) (options '()))
   "Return an object representing the store item NAME, a file or directory
 computed by GEXP.  When LOCAL-BUILD? is #t (the default), it ensures the
 corresponding derivation is built locally.  OPTIONS may be used to pass
@@ -1703,9 +1700,6 @@ TARGET, a GNU triplet."
                        (system base target)
                        (system base compile))
 
-          ;; Best effort.  The locale is not installed in all contexts.
-          (false-if-exception (setlocale LC_ALL "C.UTF-8"))
-
           (define modules
             (getenv "modules"))
 
@@ -1996,8 +1990,7 @@ particularly useful if SEXP is a long list or a deep tree."
                        #:key (guile (default-guile))
                        (module-path %load-path)
                        (system (%current-system))
-                       (target 'current)
-                       (locale "C.UTF-8"))
+                       (target 'current))
   "Return an executable script NAME that runs EXP using GUILE, with EXP's
 imported modules in its search path.  Look up EXP's modules in MODULE-PATH."
   (mlet* %store-monad ((target (if (eq? target 'current)
@@ -2040,8 +2033,7 @@ imported modules in its search path.  Look up EXP's modules in MODULE-PATH."
                       ;; These derivations are not worth offloading or
                       ;; substituting.
                       #:local-build? #t
-                      #:substitutable? #f
-                      #:env-vars `(("LANG" . ,locale)))))
+                      #:substitutable? #f)))
 
 (define* (gexp->file name exp #:key
                      (guile (default-guile))
@@ -2049,8 +2041,7 @@ imported modules in its search path.  Look up EXP's modules in MODULE-PATH."
                      (module-path %load-path)
                      (splice? #f)
                      (system (%current-system))
-                     (target 'current)
-                     (locale "C.UTF-8"))
+                     (target 'current))
   "Return a derivation that builds a file NAME containing EXP.  When SPLICE?
 is true, EXP is considered to be a list of expressions that will be spliced in
 the resulting file.
@@ -2090,8 +2081,7 @@ Lookup EXP's modules in MODULE-PATH."
                           #:local-build? #t
                           #:substitutable? #f
                           #:system system
-                          #:target target
-                          #:env-vars `(("LANG" . ,locale)))
+                          #:target target)
         (gexp->derivation name
                           (gexp
                            (call-with-output-file (ungexp output)
@@ -2108,8 +2098,7 @@ Lookup EXP's modules in MODULE-PATH."
                           #:local-build? #t
                           #:substitutable? #f
                           #:system system
-                          #:target target
-                          #:env-vars `(("LANG" . ,locale))))))
+                          #:target target))))
 
 (define* (text-file* name #:rest text)
   "Return as a monadic value a derivation that builds a text file containing
@@ -2119,7 +2108,6 @@ resulting store file holds references to all these."
   (define builder
     (gexp (call-with-output-file (ungexp output "out")
             (lambda (port)
-              (set-port-encoding! port "UTF-8")
               (display (string-append (ungexp-splicing text)) port)))))
 
   (gexp->derivation name builder
