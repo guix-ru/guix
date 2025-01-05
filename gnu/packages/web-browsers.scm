@@ -130,6 +130,8 @@
        ((guix build cmake-build-system)
         ((guix build glib-or-gtk-build-system) #:prefix glib-or-gtk:)
         (guix build utils))
+       #:configure-flags
+       '("-DCMAKE_C_FLAGS=-Wno-error=int-conversion")
        #:phases
        (modify-phases %standard-phases
          (add-after 'install 'glib-or-gtk-compile-schemas
