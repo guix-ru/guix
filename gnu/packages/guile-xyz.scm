@@ -3649,7 +3649,8 @@ list of components.  This module takes care of that for you.")
                 "019mbhgyga57k2074kg97mh3qsa8ny9l0kjgqids8cg3c6vbjdby"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags '("--with-gnu-filesystem-hierarchy")
+     `(#:configure-flags '("CFLAGS=-Wno-error=incompatible-pointer-types"
+                           "--with-gnu-filesystem-hierarchy")
        #:modules ((guix build glib-or-gtk-build-system)
                   (guix build utils)
                   (ice-9 popen)
