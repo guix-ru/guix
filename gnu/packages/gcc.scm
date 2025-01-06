@@ -1077,6 +1077,8 @@ using compilers other than GCC."
                            "#if __i386__ || __x86_64__ || ! defined _GLIBCXX_ZONEINFO_DIR")))))
                  '())
           #$@(if (and (target-linux?)
+                      (not (target-x86-64?))
+                      (not (target-x86-32?))
                       (version>=? (package-version gcc) "14"))
                  #~((add-after 'unpack 'patch-tzdb.cc
                       (lambda _
