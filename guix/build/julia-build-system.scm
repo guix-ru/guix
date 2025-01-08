@@ -3,6 +3,7 @@
 ;;; Copyright © 2021 Jean-Baptiste Volatier <jbv@pm.me>
 ;;; Copyright © 2021, 2022 Simon Tournier <zimon.toutoune@gmail.com>
 ;;; Copyright © 2022 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2025 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -109,6 +110,8 @@ Project.toml)."
     (let* ((out (assoc-ref outputs "out"))
            (package (or julia-package-name (project.toml->name "Project.toml")))
            (builddir (string-append out "/share/julia/"))
+           (test-file (string-append builddir "loadpath/"
+                                     package "/test/runtests.jl"))
            (job-count (if parallel-tests?
                           (parallel-job-count)
                           1))
@@ -116,6 +119,9 @@ Project.toml)."
            ;; than specify the exact count to use, so zero must be specified
            ;; to disable parallel processing...
            (additional-procs (max 0 (1- job-count))))
+      (format (current-error-port) "running tests from '~a'~%"
+              test-file)
+
       ;; With a patch, SOURCE_DATE_EPOCH is honored
       (setenv "SOURCE_DATE_EPOCH" "1")
       (setenv "JULIA_DEPOT_PATH" builddir)
@@ -125,6 +131,7 @@ Project.toml)."
                                  "")))
       (setenv "JULIA_CPU_THREADS" (number->string job-count))
       (setenv "HOME" "/tmp")
+
       (apply invoke "julia"
              `("--depwarn=yes"
                ,@(if (and parallel-tests? (< 0 additional-procs))
@@ -133,8 +140,7 @@ Project.toml)."
                      (list (string-append  "--procs="
                                            (number->string additional-procs)))
                      '())
-               ,(string-append builddir "loadpath/"
-                               package "/test/runtests.jl"))))))
+               ,test-file)))))
 
 (define* (link-depot #:key source inputs outputs
                      julia-package-name julia-package-uuid
@@ -170,9 +176,12 @@ println(Base.version_slug(Base.UUID(\"~a\"),
     ;; Where XXXX is a slug encoding the package UUID and SHA1 of the files
     ;; Here we create a link with the correct path to enable julia to find the
     ;; package
-    (mkdir-p (string-append out "/share/julia/packages/" package-name))
-    (symlink package-dir (string-append out "/share/julia/packages/"
-                                        package-name "/" slug))))
+    (let ((target (string-append out "/share/julia/packages/" package-name
+                                 "/" slug)))
+     (format (current-error-port) "linking '~a' to '~a'~%"
+             target package-dir)
+     (mkdir-p (dirname target))
+     (symlink package-dir target))))
 
 (define* (julia-create-package-toml location
                                     name uuid version
@@ -182,6 +191,8 @@ println(Base.version_slug(Base.UUID(\"~a\"),
                                     (file "Project.toml"))
   "Some packages are not using the new Project.toml dependency specifications.
 Write this FILE manually, so that Julia can find its dependencies."
+  (format (current-error-port) "creating '~a' for package ~a/~a/~a~%"
+          file name uuid version)
   (let ((f (open-file
             (string-append location "/" file)
             "w")))
