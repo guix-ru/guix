@@ -700,7 +700,7 @@ applications by providing high-level classes for commonly required tasks.")
 (define-public libde265
   (package
     (name "libde265")
-    (version "1.0.8")
+    (version "1.0.14")
     (source
      (origin
        (method git-fetch)
@@ -710,7 +710,7 @@ applications by providing high-level classes for commonly required tasks.")
          (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1dzflqbk248lz5ws0ni5acmf32b3rmnq5gsfaz7691qqjxkl1zml"))))
+        (base32 "1a4n1hnr9ybji87irg2kya95slf4jnybnkg4x2zihnqqihbnv539"))))
     (build-system gnu-build-system)
     (arguments
      `(#:configure-flags
@@ -720,7 +720,7 @@ applications by providing high-level classes for commonly required tasks.")
     (inputs
      ;; XXX: Build a complete version using libswscale or libvideogfx
      ;; and qtbase-5.
-     (list sdl))
+     (list sdl2))
     (synopsis "H.265 video codec implementation")
     (description "Libde265 is an implementation of the h.265 video codec.  It is
 written from scratch and has a plain C API to enable a simple integration into
