@@ -549,8 +549,7 @@ using Dates: @dateformat_str, Date, DateTime, DateFormat, Time"))
                            ("" "$JULIA_DEPOT_PATH"))))))))
 
            #:make-flags
-           #~(list (string-append "prefix="
-                                  (assoc-ref %outputs "out"))
+           #~(list (string-append "prefix=" #$output)
 
                    ;; Passing the MARCH or JULIA_CPU_TARGET flag is necessary to build
                    ;; binary substitutes for the supported architectures.  See also
@@ -571,8 +570,7 @@ using Dates: @dateformat_str, Date, DateTime, DateFormat, Time"))
                        (_ "JULIA_CPU_TARGET=generic"))
 
                    "CONFIG_SHELL=bash -x" ;needed to build bundled libraries
-                   (string-append "CC="
-                                  #$(cc-for-target))
+                   (string-append "CC=" #$(cc-for-target))
 
                    #$@(if (target-x86-64?)
                           `("USE_BLAS64=1"
@@ -582,8 +580,9 @@ using Dates: @dateformat_str, Date, DateTime, DateFormat, Time"))
                             "LIBBLASNAME=libopenblas"))
 
                    (string-append "UTF8PROC_INC="
-                                  (assoc-ref %build-inputs "utf8proc")
-                                  "/include")
+                                  (dirname
+                                   (search-input-file %build-inputs
+                                                      "/include/utf8proc.h")))
                    ;; Make.inc expects a static library for libuv.
                    (string-append "LIBUV="
                                   (search-input-file %build-inputs
