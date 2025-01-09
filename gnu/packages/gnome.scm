@@ -2088,7 +2088,7 @@ formats like PNG, SVG, PDF and EPS.")
        ("gsettings-desktop-schemas" ,gsettings-desktop-schemas)
        ("intltool" ,intltool)
        ("pkg-config" ,pkg-config)
-       ("uhttpmock" ,uhttpmock)))
+       ("uhttpmock" ,uhttpmock-with-libsoup2)))
     (inputs
      (list cyrus-sasl glib-networking vala))
     (propagated-inputs
