@@ -698,7 +698,7 @@ user.  As root, you can thus run this:
 
 @example
 cd /tmp
-wget https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD
+wget 'https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD'
 chmod +x guix-install.sh
 ./guix-install.sh
 @end example
