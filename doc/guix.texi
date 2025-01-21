@@ -642,7 +642,7 @@ to join!  @xref{Contributing}, for information about how you can help.
 
 @quotation Note
 We recommend the use of this
-@uref{https://git.savannah.gnu.org/cgit/guix.git/plain/etc/guix-install.sh,
+@uref{https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD,
 shell installer script} to install Guix on top of a running GNU/Linux system,
 thereafter called a @dfn{foreign distro}.@footnote{This section is concerned
 with the installation of the package manager, which can be done on top of a
@@ -691,14 +691,14 @@ GNU@tie{}tar and Xz.
 @c Note duplicated from the ``Installation'' node.
 @quotation Note
 We recommend the use of this
-@uref{https://git.savannah.gnu.org/cgit/guix.git/plain/etc/guix-install.sh,
+@uref{https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD,
 shell installer script}.  The script automates the download, installation, and
 initial configuration steps described below.  It should be run as the root
 user.  As root, you can thus run this:
 
 @example
 cd /tmp
-wget https://git.savannah.gnu.org/cgit/guix.git/plain/etc/guix-install.sh
+wget https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD
 chmod +x guix-install.sh
 ./guix-install.sh
 @end example
