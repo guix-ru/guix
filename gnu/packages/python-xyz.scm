@@ -8539,14 +8539,14 @@ with Python.")
 (define-public python-pygments
   (package
     (name "python-pygments")
-    (version "2.15.1")
+    (version "2.19.1")
     (source
      (origin
        (method url-fetch)
-       (uri (pypi-uri "Pygments" version))
+       (uri (pypi-uri "pygments" version))
        (sha256
         (base32
-         "0p3p28fif7m2w5mkd0z99zk9xwgrs3m61x85415qk0fl3ly4vkla"))))
+         "07qm8mx3y5r8ri6zpn0hp9zx5g02bydhi7pkv54hdp3nhlm6vhb1"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -8555,7 +8555,7 @@ with Python.")
       ;; basic tests.
       '(list "--ignore-glob=tests/*/*")))
     (native-inputs
-     (list python-pytest python-setuptools python-wheel))
+     (list python-hatchling python-pytest))
     (home-page "https://pygments.org/")
     (synopsis "Syntax highlighting")
     (description
