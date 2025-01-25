@@ -1654,7 +1654,7 @@ in terms of new algorithms.")
             pybind11
             python-coverage
             python-fb-re2
-            python-parameterized-next
+            python-parameterized
             python-pytest
             python-pytest-runner
             python-setuptools
