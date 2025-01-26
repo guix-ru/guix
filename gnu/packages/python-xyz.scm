@@ -32314,10 +32314,7 @@ standard error channel (stderr) in your program.")
            python-sniffio
            python-typing-extensions))
     (native-inputs
-     (list python-contextlib2
-           python-hypothesis
-           python-mock
-           python-psutil
+     (list python-psutil
            python-pytest
            python-pytest-mock
            python-setuptools
