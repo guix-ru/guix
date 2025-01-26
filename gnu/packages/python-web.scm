@@ -7193,13 +7193,40 @@ hard or impossible to fix in cssselect.")
        (sha256
         (base32 "1qq46ym3ymzfn4j6fnykfmr1f4qnb7x7p15dlw37hi38v87jpw9v"))
        (modules '((guix build utils)))
-        (snippet
-         '(begin (delete-file-recursively "vendor")
-                 (delete-file  "uvloop/loop.c")))))
+       (snippet
+        '(begin (delete-file-recursively "vendor")
+          (delete-file  "uvloop/loop.c")))))
     (build-system pyproject-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
+     (list
+      #:test-flags
+      ;; The tests are prone to get stuck. Use pytest-timeout’s --timeout flag
+      ;; to get a meaningful idea about where.
+      #~(list "--timeout=300"
+              "--timeout-method=thread"
+              "-k" (string-join
+                    (list
+                     ;; Timeout, because SIGINT cannot be sent to child.
+                     "not test_signals_sigint_pycode_continue"
+                     "test_signals_sigint_pycode_stop"
+                     "test_signals_sigint_uvcode"
+                     "test_signals_sigint_uvcode_two_loop_runs"
+                     ;; This test is racy and prone to get stuck on
+                     ;; various platforms, possibly a aiohttp issue:
+                     ;;  https://github.com/MagicStack/uvloop/issues/412
+                     "test_remote_shutdown_receives_trailing_data"
+                     ;; It looks like pytest is preventing
+                     ;; custom stdout/stderr redirection,
+                     ;; even with -s.
+                     "test_process_streams_redirect"
+                     ;; FileNotFoundError: [Errno 2] No such file or
+                     ;; directory
+                     "test_process_env_2"
+                     ;; socket.gaierror: [Errno -2] Name or service not known
+                     "test_getaddrinfo_21")
+                    " and not "))
+      #:phases
+       #~(modify-phases %standard-phases
          (add-after 'unpack 'preparations
            (lambda _
              ;; Use packaged libuv.
@@ -7207,35 +7234,13 @@ hard or impossible to fix in cssselect.")
                                       "self.use_system_libuv = True"))
              ;; Replace hardcoded shell command.
              (substitute* "uvloop/loop.pyx"
-               (("b'/bin/sh'") (string-append "b'" (which "sh") "'")))
-             #t))
-         (replace 'check
+               (("b'/bin/sh'") (string-append "b'" (which "sh") "'")))))
+         (add-before 'check 'pre-check
            (lambda* (#:key tests? #:allow-other-keys)
              (when tests?
-               ;; Remove Python module, which conflicts with the installed version,
-               ;; but lacks the built C module.
-               (delete-file-recursively "uvloop")
-               ;; The tests are prone to get stuck. Use pytest-timeout’s --timeout
-               ;; flag to get a meaningful idea about where.
-               (invoke "pytest" "-vv" "--timeout=300"
-                       "--timeout-method=thread"
-                       "-k" (string-append
-                              ;; Timeout, because SIGINT cannot be sent to child.
-                              "not test_signals_sigint_pycode_continue "
-                              "and not test_signals_sigint_pycode_stop "
-                              "and not test_signals_sigint_uvcode "
-                              "and not test_signals_sigint_uvcode_two_loop_runs "
-                              ;; This test is racy and prone to get stuck on
-                              ;; various platforms, possibly a aiohttp issue:
-                              ;;  https://github.com/MagicStack/uvloop/issues/412
-                              "and not test_remote_shutdown_receives_trailing_data "
-                              ;; It looks like pytest is preventing
-                              ;; custom stdout/stderr redirection,
-                              ;; even with -s.
-                              "and not test_process_streams_redirect "
-                              ;; FileNotFoundError: [Errno 2] No such file or
-                              ;; directory
-                              "and not test_process_env_2"))))))))
+               ;; Remove Python module, which conflicts with the installed
+               ;; version, but lacks the built C module.
+               (delete-file-recursively "uvloop")))))))
     (native-inputs
      (list python-aiohttp
            python-cython-3
