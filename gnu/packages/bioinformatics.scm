@@ -19271,6 +19271,8 @@ implementation differs in these ways:
            (add-after 'unpack 'patch-version-check
              (lambda _
                (substitute* "src/scanpy/_utils/__init__.py"
+                 (("Version\\(anndata_version\\) < Version\\(\"0.6.10\"\\):")
+                  "False:")
                  (("Version\\(anndata_version\\) >= Version\\(\"0.10.0\"\\):")
                   "True:"))))
            (add-after 'unpack 'pretend-version
