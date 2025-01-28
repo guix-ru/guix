@@ -761,10 +761,6 @@ OS."
   ;; Default arguments passed to the kernel.
   (list (string-append "modprobe.blacklist="
                        (string-join %default-modprobe-blacklist ","))
-        ;; Disable the EFI pstore storage backend to avoid causing
-        ;; unrecoverable failures on some EFI systems:
-        ;; <https://lists.gnu.org/archive/html/help-guix/2025-01/msg00173.html>.
-        "efi_pstore.pstore_disable=1"
         "quiet"))
 
 (define* (operating-system-directory-base-entries os)
