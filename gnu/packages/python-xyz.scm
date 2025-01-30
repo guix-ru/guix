@@ -31935,8 +31935,7 @@ Screenflick.")
     (propagated-inputs
      (list python-jinja2))
     (native-inputs
-     (list python-flake8
-           python-jinja2
+     (list python-jinja2
            python-pytest
            python-setuptools
            python-wheel))
