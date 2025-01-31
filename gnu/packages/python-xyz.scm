@@ -9158,7 +9158,7 @@ structure for Python.")
     ;; TODO: Add python-pytest-ruff to native-inputs once it has been
     ;; packaged.
     (native-inputs
-     (list python-hatchling python-mypy python-pytest))
+     (list python-hatchling python-pytest))
     (home-page "https://github.com/OneDeadKey/kalamine")
     (synopsis "Keyboard layout maker")
     (description
@@ -11190,7 +11190,6 @@ include_dirs = ~:*~a/include~%"
            pkg-config
            python-cython
            python-hypothesis
-           python-mypy
            python-pytest
            python-pytest-xdist
            python-setuptools

@@ -4636,7 +4636,6 @@ line tool called @command{udcli} that incorporates the library.")
            graphviz
            pkg-config
            python-pytest
-           python-mypy
            python-certifi
            python-twisted))
     (propagated-inputs
@@ -4839,7 +4838,6 @@ python bindings.  It belongs to the Cura project from Ultimaker.")
     (build-system qt-build-system)
     (native-inputs
      (list python-certifi
-           python-mypy
            python-pytest
            python-requests))
     (inputs
