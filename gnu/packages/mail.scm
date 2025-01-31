@@ -3843,7 +3843,6 @@ which sends emails to HyperKitty, the official Mailman3 web archiver.")
            python-django-rest-framework
            python-elasticsearch
            python-flufl-lock
-           python-isort
            python-lxml
            python-mailmanclient
            python-mistune
@@ -3894,7 +3893,6 @@ some configuration.")
            python-django-mailman3))
     (native-inputs
      (list python-beautifulsoup4
-           python-isort
            python-mock
            python-pdm-backend
            python-pytest
