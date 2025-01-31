@@ -5692,7 +5692,6 @@ PyTorch code to decouple the science from the engineering.")
      (list python-cloudpickle
            python-fire
            python-mir-eval
-           python-mypy
            python-pandas
            python-psutil
            python-pytest
