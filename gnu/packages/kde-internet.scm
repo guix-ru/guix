@@ -130,19 +130,6 @@ Other notable features include:
         (base32
          "0j930i2nvg71p05z881inbk59c54gx8dzhyjb8iaqkw8i5s5r983"))))
     (build-system qt-build-system)
-    (arguments
-     (list #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'install 'wrap
-                 (lambda* (#:key inputs outputs #:allow-other-keys)
-                   (let ((qtwebengineprocess
-                          (search-input-file inputs
-                                             "lib/qt6/libexec/QtWebEngineProcess")))
-                     ;; The program fails to find the QtWebEngineProcess program, so
-                     ;; we set QTWEBENGINEPROCESS_PATH to help it.
-                     (wrap-program (string-append #$output "/bin/falkon")
-                       `("QTWEBENGINEPROCESS_PATH" =
-                         (,qtwebengineprocess)))))))))
     (native-inputs
      (list extra-cmake-modules pkg-config qttools))
     (inputs
