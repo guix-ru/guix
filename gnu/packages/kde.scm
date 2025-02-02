@@ -205,18 +205,7 @@ This package contains GUI widgets for baloo.")
         (base32 "07flc3617px9w1c729p0lsixf1g0h297hkbip259ykkbwxizn71q"))))
     (build-system qt-build-system)
     (arguments
-     (list #:qtbase qtbase
-           #:phases
-           #~(modify-phases %standard-phases
-             (add-after 'install 'wrap-qt-process-path
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 (let* ((out (assoc-ref outputs "out"))
-                        (bin (string-append out "/bin/akregator"))
-                        (qt-process-path
-                         (search-input-file
-                          inputs "/lib/qt6/libexec/QtWebEngineProcess")))
-                   (wrap-program bin
-                     `("QTWEBENGINEPROCESS_PATH" = (,qt-process-path)))))))))
+     (list #:qtbase qtbase))
     (native-inputs
      (list extra-cmake-modules kdoctools))
     (inputs
