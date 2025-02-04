@@ -15,6 +15,7 @@
 ;;; Copyright © 2024 Ahmad Draidi <a.r.draidi@redscript.org>
 ;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2025 Julian Flake <flake@uni-koblenz.de>
+;;; Copyright © 2025 Ashish SHUKLA <ashish.is@lostca.se>
 ;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -511,6 +512,7 @@ significantly increases the risk of irreversible data loss!")
     (build-system go-build-system)
     (arguments
      (list
+      #:install-source? #f
       #:import-path "github.com/rfjakob/gocryptfs"
       #:build-flags
       #~(list
@@ -519,6 +521,15 @@ significantly increases the risk of irreversible data loss!")
                      " -X main.GitVersionFuse=" #$(package-version
                                                    go-github-com-hanwen-go-fuse-v2)
                      " -X main.BuildDate=" "[reproducible]"))
+      #:test-flags
+      #~(list "-skip" (string-join
+                       (list "TestPrepareAtSyscall"
+                             "TestPrepareAtSyscallPlaintextnames"
+                             "TestGetdents")
+                       "|"))
+      ;; XXX: Test suit requires a root access to mount, limit to some unit
+      ;; tests, figure out how to enable most of the them.
+      #:test-subdirs #~(list "internal/...")
       #:phases
       #~(modify-phases %standard-phases
           ;; after 'check phase, should maybe unmount leftover mounts as in
@@ -536,18 +547,14 @@ significantly increases the risk of irreversible data loss!")
                 "github.com/rfjakob/gocryptfs/contrib/findholes"
                 "github.com/rfjakob/gocryptfs/contrib/atomicrename")))))))
     (native-inputs (list
-                    go-github-com-hanwen-go-fuse-v2
                     go-github-com-aperturerobotics-jacobsa-crypto
-                    go-github-com-jacobsa-oglematchers
-                    go-github-com-jacobsa-oglemock
-                    go-github-com-jacobsa-ogletest
-                    go-github-com-jacobsa-reqtrace
+                    go-github-com-hanwen-go-fuse-v2
+                    go-github-com-moby-sys-mountinfo
                     go-github-com-pkg-xattr
                     go-github-com-rfjakob-eme
                     go-github-com-sabhiram-go-gitignore
                     go-github-com-spf13-pflag
                     go-golang-org-x-crypto
-                    go-golang-org-x-net
                     go-golang-org-x-sys
                     go-golang-org-x-term
                     openssl
@@ -1350,7 +1357,7 @@ APFS.")
 (define-public snapper
   (package
     (name "snapper")
-    (version "0.10.7")
+    (version "0.12.1")
     (source
      (origin
        (method git-fetch)
@@ -1359,7 +1366,7 @@ APFS.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0nwmyzjwid1lf29dsr6w72dr781c81xyrjpk5y3scn4r55b5df0h"))
+        (base32 "1i5623cnhzivf64zr0g1nlyn9sjgabhyawhpsffykdxvcrnyqn69"))
        (modules '((guix build utils)))
        (snippet
         '(begin
@@ -1376,17 +1383,31 @@ APFS.")
                         (add-after 'unpack 'relative-file-locations
                           (lambda* (#:key outputs #:allow-other-keys)
                             (let* ((out (assoc-ref outputs "out")))
-                              (substitute* (list "scripts/Makefile.am"
-                                                 "data/Makefile.am")
+                              (substitute* '("scripts/Makefile.am"
+                                             "client/systemd-helper/Makefile.am"
+                                             "client/installation-helper/Makefile.am"
+                                             "data/Makefile.am")
                                 (("/usr/share")
                                  (string-append out "/share"))
                                 (("/usr/lib")
                                  (string-append out "/lib"))
                                 (("/etc/")
-                                 (string-append out "/etc/"))))
-                            (substitute* "client/Makefile.am"
-                              (("/usr/lib")
-                               "@libdir@")))))))
+                                 (string-append out "/etc/")))
+                              (substitute* (cons "data/org.opensuse.Snapper.service"
+                                                 (find-files "scripts/" "\\.sh"))
+                                (("/usr/bin/snapper")
+                                 (string-append out "/bin/snapper"))
+                                (("/usr/sbin/snapperd")
+                                 (string-append out "/sbin/snapperd"))
+                                (("/sbin/btrfs")
+                                 (which "btrfs")))
+                              (substitute* "scripts/snapper-hourly"
+                                (("PATH=.*$")
+                                 (format #f "PATH=~a/sbin:~a/bin\n"
+                                         out out)))
+                              (substitute* (find-files "." "Makefile.am")
+                                (("/usr/lib")
+                                 "@libdir@"))))))))
     (home-page "https://snapper.io")
     (native-inputs
      (list glibc-locales autoconf automake libtool pkg-config))
@@ -1960,31 +1981,6 @@ Dropbox API v2.")
 local file system using FUSE.")
   (license license:gpl3+)))
 
-(define-public go-github-com-hanwen-fuse
-  (package
-    (name "go-github-com-hanwen-fuse")
-    (version "2.0.3")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/hanwen/go-fuse")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "1y44d08fxyis99s6jxdr6dbbw5kv3wb8lkhq3xmr886i4w41lz03"))))
-    (build-system go-build-system)
-    (arguments
-     `(#:import-path "github.com/hanwen/go-fuse"))
-    (propagated-inputs
-     (list go-golang-org-x-sys))
-    (home-page "https://github.com/hanwen/go-fuse")
-    (synopsis "FUSE bindings for Go")
-    (description
-     "This package provides Go native bindings for the FUSE kernel module.")
-    (license license:bsd-3)))
-
 (define-public rewritefs
   (let ((revision "1")
         (commit "3a56de8b5a2d44968b8bc3885c7d661d46367306"))
@@ -2146,7 +2142,7 @@ memory-efficient.")
                 (setenv "DESTDIR" #$output)
                 (invoke "make" "install")))))))
     (inputs
-     (list go-github-com-mattn-go-sqlite3 go-github-com-hanwen-fuse))
+     (list go-github-com-mattn-go-sqlite3 go-github-com-hanwen-go-fuse))
     (home-page "https://github.com/oniony/TMSU")
     (synopsis "Tag files and access them through a virtual file system")
     (description

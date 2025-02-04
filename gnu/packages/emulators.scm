@@ -15,7 +15,7 @@
 ;;; Copyright © 2020 Christopher Howard <christopher@librehacker.com>
 ;;; Copyright © 2021 Felipe Balbi <balbi@kernel.org>
 ;;; Copyright © 2021, 2024 Felix Gruber <felgru@posteo.net>
-;;; Copyright © 2021, 2025 Maxim Cournoyer <maxim.cournoyer@gmail.com>
+;;; Copyright © 2021, 2024, 2025 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2021 Guillaume Le Vaillant <glv@posteo.net>
 ;;; Copyright © 2023 c4droid <c4droid@foxmail.com>
 ;;; Copyright © 2023 Yovan Naumovski <yovan@gorski.stream>
@@ -95,9 +95,11 @@
   #:use-module (gnu packages ncurses)
   #:use-module (gnu packages networking)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages pretty-print)
   #:use-module (gnu packages pulseaudio)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages sdl)
   #:use-module (gnu packages sphinx)
@@ -289,64 +291,158 @@ console.")
          (file-name (git-file-name name version))
          (sha256
           (base32 "1p8qsxlabgmz3nic0a9ghh9d3lzl5f8i3kmdrrvx6w8kdlp33018"))
-         (modules '((guix build utils)))
+         (modules '((guix build utils)
+                    (ice-9 regex)))
          (snippet
           '(begin
              ;; Remove external stuff we don't need.
              (for-each (lambda (dir)
                          (delete-file-recursively
-                           (string-append "Externals/" dir)))
-                       '("LZO" "OpenAL" "Qt" "SFML" "curl" "ffmpeg"
-                         "gettext" "hidapi" "libpng" "libusb" "mbedtls"
-                         "miniupnpc" "MoltenVK" "zlib"))
-             ;; Clean up source.
+                          (string-append "Externals/" dir)))
+                       '("LZO" "OpenAL" "Qt" "SFML" "bzip2"
+                         ;; XXX: Attempting to use the vulkan-headers package
+                         ;; results in "error:
+                         ;; ‘VK_PRESENT_MODE_RANGE_SIZE_KHR’ was not declared
+                         ;; in this scope".
+                         ;;"Vulkan"
+                         "cubeb" "curl" "enet"
+                         "ffmpeg" "fmt" "gettext"
+                         ;; XXX: Attempting to use an unbundled glslang at the
+                         ;; exact commit used by Dolphin still results in
+                         ;; "error: ‘DefaultTBuiltInResource’ is not a member
+                         ;; of ‘glslang’".
+                         ;;"glslang"
+                         ;; XXX: Googletest cannot currently easily be
+                         ;; unbundled, as there are missing linking
+                         ;; directives.
+                         ;;"gtest"
+                         "hidapi" "libpng" "libusb" "mbedtls"
+                         "miniupnpc" "minizip" "MoltenVK" "pugixml"
+                         "soundtouch"
+                         "xxhash" "zlib" "zstd"))
+             ;; Clean up the source.
              (for-each delete-file
-                       (find-files "." ".*\\.(bin|dsy|exe|jar|rar)$"))))))
+                       (find-files
+                        "."
+                        (lambda (file _)
+                          (and (string-match "\\.(bin|dsy|exe|jar|rar)$" file)
+                               ;; Preserve the important wc24 .bin
+                               ;; configuration *data* files.
+                               (not (member (basename file)
+                                            '("misc.bin"
+                                              "nwc24dl.bin"
+                                              "nwc24fl.bin"
+                                              "nwc24fls.bin")))))))
+             ;; Do not attempt to include now-missing directories.
+             (substitute* "CMakeLists.txt"
+               ((".*add_subdirectory.*Externals/enet.*") "")
+               ((".*add_subdirectory.*Externals/soundtouch.*") "")
+               ((".*add_subdirectory.*Externals/xxhash.*") ""))))
+         (patches (search-patches "dolphin-emu-data.patch"))))
       (build-system cmake-build-system)
       (arguments
-       '(#:tests? #f
-         #:phases
-         (modify-phases %standard-phases
-           (add-before 'configure 'generate-fonts&hardcore-libvulkan-path
-             (lambda* (#:key inputs outputs #:allow-other-keys)
-               (let ((fontfile
-                      (search-input-file inputs
-                                         "/share/fonts/truetype/wqy-microhei.ttc"))
-                     (libvulkan
-                      (search-input-file inputs "/lib/libvulkan.so")))
-                 (chdir "docs")
-                 (invoke "bash" "-c" "g++ -O2 $(freetype-config \
+       (list
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'configure 'remove-unittests-target-post-build-command
+              (lambda _
+                ;; To skip a few problematic tests, CTest will be manually
+                ;; invoked in the post-check phase.
+                (with-directory-excursion "Source/UnitTests"
+                  (substitute* "CMakeLists.txt"
+                    (("add_custom_command\\(TARGET unittests POST_BUILD.*")
+                     "")))))
+            (add-before 'configure 'generate-fonts&hardcore-libvulkan-path
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((fontfile
+                       (search-input-file inputs
+                                          "/share/fonts/truetype/wqy-microhei.ttc"))
+                      (libvulkan
+                       (search-input-file inputs "/lib/libvulkan.so")))
+                  (chdir "docs")
+                  (invoke "bash" "-c" "g++ -O2 $(freetype-config \
 --cflags --libs) gc-font-tool.cpp -o gc-font-tool")
-                 (invoke "./gc-font-tool" "a" fontfile "font_western.bin")
-                 (invoke "./gc-font-tool" "s" fontfile "font_japanese.bin")
-                 (copy-file "font_japanese.bin" "../Data/Sys/GC/font_japanese.bin")
-                 (copy-file "font_western.bin" "../Data/Sys/GC/font_western.bin")
-                 (chdir "..")
-                 (substitute* "Source/Core/VideoBackends/Vulkan/VulkanLoader.cpp"
-                   (("\"vulkan\", 1") (string-append "\"vulkan\""))
-                   (("\"vulkan\"") (string-append "\"" libvulkan "\""))
-                   (("Common::DynamicLibrary::GetVersionedFilename") ""))))))
-
-         ;; The FindGTK2 cmake script only checks hardcoded directories for
-         ;; glib/gtk headers.
-
-         #:configure-flags
-         (list (string-append "-DX11_INCLUDE_DIR="
-                              (assoc-ref %build-inputs "libx11")
-                              "/include")
-               (string-append "-DX11_LIBRARIES="
-                              (assoc-ref %build-inputs "libx11")
-                              "/lib/libX11.so")
-               "-DX11_FOUND=1")))
+                  (invoke "./gc-font-tool" "a" fontfile "font_western.bin")
+                  (invoke "./gc-font-tool" "s" fontfile "font_japanese.bin")
+                  (copy-file "font_japanese.bin" "../Data/Sys/GC/font_japanese.bin")
+                  (copy-file "font_western.bin" "../Data/Sys/GC/font_western.bin")
+                  (chdir "..")
+                  (substitute* "Source/Core/VideoBackends/Vulkan/VulkanLoader.cpp"
+                    (("\"vulkan\", 1") (string-append "\"vulkan\""))
+                    (("\"vulkan\"") (string-append "\"" libvulkan "\""))
+                    (("Common::DynamicLibrary::GetVersionedFilename") "")))))
+            (add-after 'check 'post-check
+              (lambda* (#:key tests? #:allow-other-keys)
+                (when tests?
+                  (with-directory-excursion "Source/UnitTests"
+                    (invoke "ctest" "-V" "--output-on-failure"
+                            ;; These tests fail due to libusb failing to
+                            ;; init inside the build container.
+                            "-E" (string-join
+                                  '("MMIOTest"
+                                    "PageFaultTest"
+                                    "CoreTimingTest"
+                                    "FileSystemTest"
+                                    "PowerPCTest"
+                                    "VertexLoaderTest")
+                                  "|"))))))
+            (add-before 'install 'build-codeloader.bin
+              (lambda _
+                (with-directory-excursion "../source/docs"
+                  ;; The following command-line is adapted from the example in
+                  ;; codehandler.s.
+                  (invoke "powerpc-linux-gnu-gcc" "-mpowerpc" "-mbig"
+                          "codehandler.s" "-nostartfiles" "-nodefaultlibs"
+                          "-nostdlib" "-T" "codehandler.ld"
+                          "-o" "codehandler.bin")
+                  (copy-file "codehandler.bin" "../Data/Sys/codehandler.bin"))))
+            (add-before 'install 'build-dsp_rom.bin
+              (lambda _
+                ;; Ensure dsptool is on PATH.
+                (setenv "PATH" (string-append (getenv "PATH") ":"
+                                              (getcwd) "/Binaries"))
+                (with-directory-excursion "../source"
+                  (invoke "dsptool" "-o" "Data/Sys/GC/dsp_rom.bin"
+                          "docs/DSP/free_dsp_rom/dsp_rom.ds"))))
+            (add-before 'install 'build-dsp_coefs.bin
+              (lambda _
+                (with-directory-excursion "../source"
+                  (invoke "python3" "docs/DSP/free_dsp_rom/generate_coefs.py")
+                  (rename-file "dsp_coef.bin" "Data/Sys/GC/dsp_coef.bin")))))
+        ;; The FindGTK2 cmake script only checks hardcoded directories for
+        ;; glib/gtk headers.  Also add some include directories via the CXX
+        ;; flags to let GCC find some headers not actively searched by the
+        ;; build system.
+        #:configure-flags
+        #~(list (string-append "-DCMAKE_CXX_FLAGS="
+                               "-I" (search-input-directory
+                                     %build-inputs "include/soundtouch"))
+                "-DDSPTOOL=ON"
+                (string-append "-DX11_INCLUDE_DIR="
+                               #$(this-package-input "libx11")
+                               "/include")
+                (string-append "-DX11_LIBRARIES="
+                               (search-input-file %build-inputs
+                                                  "lib/libX11.so"))
+                "-DX11_FOUND=1")
+        #:test-target "unittests"))
       (native-inputs
-       (list gettext-minimal pkg-config))
+       (list (cross-gcc "powerpc-linux-gnu")
+             gettext-minimal
+             pkg-config
+             python-minimal
+             python-numpy))
       (inputs
        (list alsa-lib
              ao
              bluez
+             bzip2
+             cubeb
              curl
+             enet
              eudev
              ffmpeg-4
+             fmt-7
              font-wqy-microhei
              freetype
              glew
@@ -364,6 +460,7 @@ console.")
              mbedtls-lts
              mesa
              miniupnpc
+             minizip-ng
              openal
              pugixml
              pulseaudio
@@ -371,9 +468,11 @@ console.")
              sdl2
              sfml
              soil
-             soundtouch
+             soundtouch-1/integer-samples
              vulkan-loader
-             zlib))
+             xxhash
+             zlib
+             `(,zstd "lib")))
       (home-page "https://dolphin-emu.org/")
       (synopsis "Nintendo Wii and GameCube emulator")
       (description
@@ -381,8 +480,60 @@ console.")
 GameCube and the Wii.  It provides compatibility with all PC controllers,
 turbo speed, networked multiplayer, and graphical enhancements.")
       (supported-systems '("x86_64-linux" "aarch64-linux"))
-      ; dolphin/Data/Sys/GC/font_*.bin: Licensed under ASL2.0.
+      ;; dolphin/Data/Sys/GC/font_*.bin: Licensed under ASL2.0.
       (license (list license:gpl2+ license:asl2.0 license:fdl1.2+)))))
+
+(define-public libretro-dolphin-emu
+  ;; There are no tag or release; use the latest commit.
+  (let ((commit "89a4df725d4eb24537728f7d655cddb1add25c18")
+        (revision "0"))
+    (package
+      (inherit dolphin-emu)
+      (name "libretro-dolphin-emu")
+      (version (git-version "5.0" revision commit))
+      (source (origin
+                (inherit (package-source dolphin-emu))
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/libretro/dolphin")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "1fvm6hy0ihc0j3sgv88a7ak08c0kyikmmiif827j981fy7zvglvz"))
+                (patches (search-patches "libretro-dolphin-emu-data.patch"))))
+      (arguments
+       (substitute-keyword-arguments (package-arguments dolphin-emu)
+         ((#:configure-flags flags ''())
+          #~(cons "-DLIBRETRO=ON" #$flags))
+         ((#:phases phases '%standard-phases)
+          #~(modify-phases #$phases
+              (add-after 'unpack 'deregister-bundled-sources
+                (lambda _
+                  (substitute* "CMakeLists.txt"
+                    ((".*add_subdirectory.*Externals/curl.*") "")
+                    ((".*add_subdirectory.*Externals/libpng.*") ""))))
+              (replace 'install
+                (lambda _
+                  (install-file "dolphin_libretro.so"
+                                (string-append #$output "/lib/libretro"))
+                  ;; The system data files are also required for the proper
+                  ;; functioning of dolphin; without them, it crashes with
+                  ;; segmentation faults and cannot save files to the memory
+                  ;; card.
+                  (let ((sysdir (string-append
+                                 #$output
+                                 "/share/libretro/system/dolphin-emu")))
+                    (mkdir-p sysdir)
+                    (copy-recursively "../source/Data/Sys"
+                                      (string-append sysdir "/Sys")))))))))
+      (inputs
+       ;; Delete large and extraneous inputs.
+       (modify-inputs (package-inputs dolphin-emu)
+         (delete "ffmpeg"
+                 "gtk+"
+                 "qtbase")))
+      (synopsis "Libretro port of Dolphin, the Nintendo Wii/GameCube emulator"))))
 
 (define-public dosbox
   (package
@@ -1630,32 +1781,70 @@ libretro API, based on Mupen64Plus.  It incorporates the following projects:
 generate the various User Experience (UX) environments.")
     (license license:cc-by4.0)))
 
-(define-public retroarch-core-info
-  ;; Use the latest commit, to get recent additions such as bsnes-jg.
-  (let ((commit "c0e7b76d02504754de67a1318f93089f1e29f15f")
-        (revision "0"))
-    (package
-      (name "retroarch-core-info")
-      (version (git-version "1.19.0" revision commit))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/libretro/libretro-core-info")
-                      (commit commit)))
-                (file-name (git-file-name name version))
-                (sha256
-                 (base32
-                  "11xpy3zhy2smp4a70fc0r1b76mvmjyabkaaipifsxm3j25drki5z"))))
-      (build-system copy-build-system)
-      (arguments
-       (list #:install-plan #~'(("." "lib/libretro/"
-                                 #:include-regexp ("\\.info$")))))
-      (home-page "https://github.com/libretro/libretro-core-info")
-      (synopsis "Libretro core info files")
-      (description "This is a versioned snapshot of the files containing
+(define-public libretro-core-info
+  (package
+    (name "libretro-core-info")
+    (version "1.20.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/libretro/libretro-core-info")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1rfvp0lkv99jgpfyb9pp6vrh1i1974p3lckh93y1bibdizyxmwjg"))))
+    (build-system copy-build-system)
+    (arguments
+     (list #:install-plan #~'(("." "lib/libretro/"
+                               #:include-regexp ("\\.info$")))))
+    (home-page "https://github.com/libretro/libretro-core-info")
+    (synopsis "Libretro core info files")
+    (description "This is a versioned snapshot of the files containing
 metadata about each known libretro core.  The snapshot is taken from the
 @url{https://github.com/libretro/libretro-super, libretro-super} repository.")
-      (license license:expat))))
+    (license license:expat)))
+
+(define-public retroarch-core-info
+  (deprecated-package "retroarch-core-info" libretro-core-info))
+
+(define-public libretro-database
+  (package
+    (name "libretro-database")
+    (version "1.20.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/libretro/libretro-database")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "086a9grpd1irsdns2zx3hlna72bbrmsfra4r498wi4ia9zf8nb0p"))))
+    (build-system gnu-build-system)
+    (arguments (list #:tests? #f
+                     #:make-flags #~(list (string-append "PREFIX=" #$output))))
+    (home-page "https://github.com/libretro/libretro-database/")
+    (synopsis "Cheat codes and content data files for RetroArch")
+    (description "RetroArch incorporates a ROM scanning system to
+automatically produce playlists.  Each ROM that is scanned by the playlist
+generator is checked against a database of ROMs that are known to be good
+copies.  The various directories contain:
+@table @code
+@item cht
+Cheat codes for various games
+@item cursors
+Methods for querying the playlists
+@item dat
+Customized DAT files, maintained by the libretro team
+@item metadat
+Different metadata and third-party DATs available to the system
+@item rdb
+The compiled RetroArch database files
+@item scripts
+Various scripts that are used to maintain the database files.
+@end table")
+    (license license:cc-by-sa4.0)))
 
 (define-public retroarch-joypad-autoconfig
   (package
@@ -2388,173 +2577,183 @@ GLSL (@file{.slang}) shaders for use with RetroArch.")
                      license:unlicense)))))
 
 (define-public retroarch-minimal
-  (let ((commit "48b71d5cf8a070e785e2302d8fe241a7c2180fdd")
-        (revision "1"))
-    (package
-      (name "retroarch-minimal")
-      (version "1.19.1")
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/libretro/RetroArch")
-               (commit commit)))
-         (snippet
-          #~(begin
-              (use-modules (guix build utils)
-                           (ice-9 ftw)
-                           (srfi srfi-26))
-              ;; XXX: 'delete-all-but' is copied from the turbovnc package.
-              (define (delete-all-but directory . preserve)
-                (define (directory? x)
-                  (and=> (stat x #f)
-                         (compose (cut eq? 'directory <>) stat:type)))
-                (with-directory-excursion directory
-                  (let* ((pred
-                          (negate (cut member <> (append '("." "..") preserve))))
-                         (items (scandir "." pred)))
-                    (for-each (lambda (item)
-                                (if (directory? item)
-                                    (delete-file-recursively item)
-                                    (delete-file item)))
-                              items))))
-              ;; Remove as much bundled sources as possible, shaving off about
-              ;; 65 MiB.
-              (delete-all-but "deps"
-                              "feralgamemode" ;used in platform_unix.c
-                              "mbedtls"       ;further refined below
-                              "yxml")         ;used in rxml.c
-              ;; This is an old root certificate used in net_socket_ssl_mbed.c,
-              ;; not actually from mbedtls.
-              (delete-all-but "deps/mbedtls" "cacert.h")))
-         (patches (search-patches "retroarch-improved-search-paths.patch"
-                                  "retroarch-unbundle-spirv-cross.patch"))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "13hgg4pxkpwlcmmyp9npr9k9cb94waqiyjpy2jzs8m9rc7xl2ap9"))))
-      (build-system gnu-build-system)
-      (arguments
-       (list
-        #:tests? #f                     ; no tests
-        #:phases
-        #~(modify-phases %standard-phases
-            (replace 'configure
-              (lambda* (#:key inputs #:allow-other-keys)
-                ;; Hard-code some store file names.
-                (substitute* "gfx/common/vulkan_common.c"
-                  (("libvulkan.so")
-                   (search-input-file inputs "lib/libvulkan.so")))
-                (substitute* "gfx/common/wayland/generate_wayland_protos.sh"
-                  (("/usr/local/share/wayland-protocols")
-                   (search-input-directory inputs "share/wayland-protocols")))
+  (package
+    (name "retroarch-minimal")
+    (version "1.20.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/libretro/RetroArch")
+             (commit (string-append "v" version))))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils)
+                         (ice-9 ftw)
+                         (srfi srfi-26))
+            ;; XXX: 'delete-all-but' is copied from the turbovnc package.
+            (define (delete-all-but directory . preserve)
+              (define (directory? x)
+                (and=> (stat x #f)
+                       (compose (cut eq? 'directory <>) stat:type)))
+              (with-directory-excursion directory
+                (let* ((pred
+                        (negate (cut member <> (append '("." "..") preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (lambda (item)
+                              (if (directory? item)
+                                  (delete-file-recursively item)
+                                  (delete-file item)))
+                            items))))
+            ;; Remove as much bundled sources as possible, shaving off about
+            ;; 65 MiB.
+            (delete-all-but "deps"
+                            "feralgamemode" ;used in platform_unix.c
+                            "mbedtls"       ;further refined below
+                            "yxml")         ;used in rxml.c
+            ;; This is an old root certificate used in net_socket_ssl_mbed.c,
+            ;; not actually from mbedtls.
+            (delete-all-but "deps/mbedtls" "cacert.h")))
+       (patches (search-patches "retroarch-improved-search-paths.patch"
+                                "retroarch-unbundle-spirv-cross.patch"))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0yc16j3g2g0if64xqd7qr4dza8rw10x0zypwbl92y735825p87qi"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ; no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Hard-code some store file names.
+              (substitute* "gfx/common/vulkan_common.c"
+                (("libvulkan.so")
+                 (search-input-file inputs "lib/libvulkan.so")))
+              (substitute* "gfx/common/wayland/generate_wayland_protos.sh"
+                (("/usr/local/share/wayland-protocols")
+                 (search-input-directory inputs "share/wayland-protocols")))
 
-                ;; Without HLSL, we can still enable GLSLANG and Vulkan support.
-                (substitute* "qb/config.libs.sh"
-                  (("[$]HAVE_GLSLANG_HLSL") "notcare"))
+              ;; Without HLSL, we can still enable GLSLANG and Vulkan support.
+              (substitute* "qb/config.libs.sh"
+                (("[$]HAVE_GLSLANG_HLSL") "notcare"))
 
-                ;; The configure script does not yet accept the extra arguments
-                ;; (like ‘CONFIG_SHELL=’) passed by the default configure phase.
-                (invoke
-                 "./configure"
-                 #$@(if (string-prefix? "armhf" (or (%current-target-system)
-                                                    (%current-system)))
-                        '("--enable-neon" "--enable-floathard")
-                        '())
-                 (string-append "--prefix=" #$output)
-                 ;; D-Bus support is required for 'suspend screensaver' option
-                 ;; to work.
-                 "--enable-dbus"
-                 ;; Non-free software are available through the core updater,
-                 ;; disable it.  See <https://issues.guix.gnu.org/38360>.
-                 "--disable-update_cores"
-                 "--disable-update_core_info"
-                 "--disable-online_updater"
-                 ;; The assets are provided via the `retroarch-assets' package.
-                 "--disable-update_assets"
-                 "--disable-builtinmbedtls"
-                 "--disable-builtinbearssl"
-                 "--disable-builtinzlib"
-                 "--disable-builtinflac"
-                 "--disable-builtinglslang"
-                 "--disable-builtinspirv_cross"
-                 ;; These are disabled to avoid requiring the bundled
-                 ;; dependencies.
-                 "--disable-7zip"
-                 "--disable-cheevos"
-                 "--disable-crtswitchres"
-                 "--disable-discord"
-                 "--disable-dr_mp3"
-                 "--disable-ibxm"
-                 "--disable-stb_font"
-                 "--disable-stb_image"
-                 "--disable-stb_vorbis"
-                 "--disable-xdelta"))))))
-      (native-inputs
-       (list pkg-config
-             wayland-protocols
-             which))
-      (inputs
-       (list alsa-lib
-             dbus
-             eudev
-             ffmpeg
-             flac
-             fontconfig
-             freetype
-             glslang
-             libxinerama
-             libxkbcommon
-             libxml2
-             libxrandr
-             libxv
-             mbedtls-lts
-             mesa
-             openal
-             openssl
-             pulseaudio
-             python
-             qtbase-5
-             sdl2
-             spirv-cross
-             spirv-headers
-             spirv-tools
-             v4l-utils
-             vulkan-loader
-             wayland
-             zlib))
-      (native-search-paths
-       (list (search-path-specification
-              (variable "LIBRETRO_DIRECTORY")
-              (separator #f)            ;single entry
-              (files '("lib/libretro")))
-             (search-path-specification
-              (variable "LIBRETRO_ASSETS_DIRECTORY")
-              (separator #f)            ;single entry
-              (files '("share/libretro/assets")))
-             (search-path-specification
-              (variable "LIBRETRO_AUTOCONFIG_DIRECTORY")
-              (separator #f)            ;single entry
-              (files '("share/libretro/autoconfig")))
-             (search-path-specification
-              (variable "LIBRETRO_VIDEO_FILTER_DIRECTORY")
-              (separator #f)            ;single entry
-              (files '("share/libretro/filters/video")))
-             (search-path-specification
-              (variable "LIBRETRO_VIDEO_SHADER_DIRECTORY")
-              (separator #f)            ;single entry
-              (files '("share/libretro/shaders")))))
-      (home-page "https://www.libretro.com/")
-      (synopsis "Reference frontend for the libretro API")
-      (description
-       "Libretro is a simple but powerful development interface that allows for
+              ;; The configure script does not yet accept the extra arguments
+              ;; (like ‘CONFIG_SHELL=’) passed by the default configure phase.
+              (invoke
+               "./configure"
+               #$@(if (string-prefix? "armhf" (or (%current-target-system)
+                                                  (%current-system)))
+                      '("--enable-neon" "--enable-floathard")
+                      '())
+               (string-append "--prefix=" #$output)
+               ;; D-Bus support is required for 'suspend screensaver' option
+               ;; to work.
+               "--enable-dbus"
+               ;; Non-free software are available through the core updater,
+               ;; disable it.  See <https://issues.guix.gnu.org/38360>.
+               "--disable-update_cores"
+               "--disable-update_core_info"
+               "--disable-online_updater"
+               ;; The assets are provided via the `retroarch-assets' package.
+               "--disable-update_assets"
+               "--disable-builtinmbedtls"
+               "--disable-builtinbearssl"
+               "--disable-builtinzlib"
+               "--disable-builtinflac"
+               "--disable-builtinglslang"
+               "--disable-builtinspirv_cross"
+               ;; These are disabled to avoid requiring the bundled
+               ;; dependencies.
+               "--disable-7zip"
+               "--disable-cheevos"
+               "--disable-crtswitchres"
+               "--disable-discord"
+               "--disable-dr_mp3"
+               "--disable-ibxm"
+               "--disable-stb_font"
+               "--disable-stb_image"
+               "--disable-stb_vorbis"
+               "--disable-xdelta"))))))
+    (native-inputs
+     (list pkg-config
+           wayland-protocols
+           which))
+    (inputs
+     (list alsa-lib
+           dbus
+           eudev
+           ffmpeg
+           flac
+           fontconfig
+           freetype
+           glslang
+           libxinerama
+           libxkbcommon
+           libxml2
+           libxrandr
+           libxv
+           mbedtls-lts
+           mesa
+           openal
+           openssl
+           pulseaudio
+           python
+           qtbase-5
+           sdl2
+           spirv-cross
+           spirv-headers
+           spirv-tools
+           v4l-utils
+           vulkan-loader
+           wayland
+           zlib))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "LIBRETRO_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("lib/libretro")))
+           (search-path-specification
+            (variable "LIBRETRO_ASSETS_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("share/libretro/assets")))
+           (search-path-specification
+            (variable "LIBRETRO_AUTOCONFIG_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("share/libretro/autoconfig")))
+           (search-path-specification
+            (variable "LIBRETRO_CHEATS_DIRECTORY")
+            (separator #f)            ;single entry
+            (files '("share/libretro/database/cht")))
+           (search-path-specification
+            (variable "LIBRETRO_DATABASE_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("share/libretro/database/rdb")))
+           (search-path-specification
+            (variable "LIBRETRO_SYSTEM_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("share/libretro/system")))
+           (search-path-specification
+            (variable "LIBRETRO_VIDEO_FILTER_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("share/libretro/filters/video")))
+           (search-path-specification
+            (variable "LIBRETRO_VIDEO_SHADER_DIRECTORY")
+            (separator #f)              ;single entry
+            (files '("share/libretro/shaders")))))
+    (home-page "https://www.libretro.com/")
+    (synopsis "Reference frontend for the libretro API")
+    (description
+     "Libretro is a simple but powerful development interface that allows for
 the easy creation of emulators, games and multimedia applications that can plug
 straight into any libretro-compatible frontend.  RetroArch is the official
 reference frontend for the libretro API, currently used by most as a modular
 multi-system game/emulator system.")
-      (license (list license:gpl3+      ;for RetroArch itself
-                     license:asl2.0     ;SPIRV-Cross
-                     license:expat      ;yxml
-                     license:bsd-3))))) ;feragamemode
+    (license (list license:gpl3+        ;for RetroArch itself
+                   license:asl2.0       ;SPIRV-Cross
+                   license:expat        ;yxml
+                   license:bsd-3)))) ;feragamemode
 
 (define-public retroarch
   (package
@@ -2570,7 +2769,8 @@ multi-system game/emulator system.")
            ;; which is problematic.  The environment variables overrides the
            ;; configuration file values.
            retroarch-assets
-           retroarch-core-info
+           libretro-core-info
+           libretro-database
            retroarch-joypad-autoconfig))))
 
 (define-public wasm4

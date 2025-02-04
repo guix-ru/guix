@@ -446,19 +446,33 @@ blake3, a cryptographic hash function.")
          "1yxqfb5131wahjyw9pxz03bq476rcfx62s6k53xx4cqbzzgdaqkq"))))
     (build-system pyproject-build-system)
     (arguments
-     (list #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'unpack 'adjust-test
-                 (lambda _
-                   ;; Newer PyOpenSSL no longer separates extensions with
-                   ;; newline (this can be removed for >1.3.0).
-                   (substitute* "test/test_certauth.py"
-                     (("7334\\\\n, DNS")
-                      "7334, DNS")))))))
+     (list
+      #:test-flags
+      #~(list "-k" (string-join
+                    (list
+                     ;; Those tests uses PKCS12, which has been removed in
+                     ;; pyopenssl 23.3.0:
+                     "not test_custom_not_before_not_after"
+                     "test_ca_cert_in_mem"
+                     ;; Those tests try to download certificates:
+                     "test_file_wildcard"
+                     "test_file_wildcard_subdomains"
+                     "test_in_mem_parent_wildcard_cert"
+                     "test_in_mem_parent_wildcard_cert_at_tld"
+                     "test_in_mem_parent_wildcard_cert_2")
+                    " and not "))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'adjust-test
+            (lambda _
+              ;; Newer PyOpenSSL no longer separates extensions with
+              ;; newline (this can be removed for >1.3.0).
+              (substitute* "test/test_certauth.py"
+                (("7334\\\\n, DNS") "7334, DNS")))))))
     (propagated-inputs
      (list python-pyopenssl python-tldextract))
     (native-inputs
-     (list python-pytest-cov))
+     (list python-pytest-cov python-setuptools python-wheel))
     (home-page "https://github.com/ikreymer/certauth")
     (synopsis "Certificate authority creation tool")
     (description "This package provides a small library, built on top of
@@ -956,14 +970,14 @@ protocol (Javascript Object Signing and Encryption).")
 (define-public python-pycryptodome
   (package
     (name "python-pycryptodome")
-    (version "3.15.0")
+    (version "3.21.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "pycryptodome" version))
        (sha256
         (base32
-         "1f0qc0ns3ppybkr7wi66gsl5wfkcx1fdklmh3362nn84spddsdci"))
+         "15vjyjy686kgm4fnpwlah1wvxxy0wvr4q5vnp1iygnlv8q6pwy7p"))
        (modules '((guix build utils)))
        (snippet pycryptodome-unbundle-tomcrypt-snippet)))
     (build-system python-build-system)
@@ -1018,7 +1032,7 @@ PyCryptodome variants, the other being python-pycryptodomex.")
        (method url-fetch)
        (uri (pypi-uri "pycryptodomex" version))
        (sha256
-        (base32 "1vf0xbsqvcp4k3cl8cmxrlij9a88hajw6d3z0jhd3c5d5nxz2hbk"))
+        (base32 "0v4y03ha7rm9kdcv9fkrmc94425z3q3mq1nn5p1jbpc1ag80nb92"))
        (modules '((guix build utils)))
        (snippet pycryptodome-unbundle-tomcrypt-snippet)))
     (description
@@ -1782,3 +1796,23 @@ against (name, birthdate, etc.)
 in different situations.
 @end enumerate")
     (license license:expat)))
+
+(define-public python-pydes
+  (package
+    (name "python-pydes")
+    (version "2.0.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pyDes" version))
+       (sha256
+        (base32 "04lh71f47y04vspfrdrq6a0hn060ibxvdp5z1pcr0gmqs8hqxaz2"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools python-wheel))
+    (home-page "http://twhiteman.netfirms.com/des.html")
+    (synopsis
+     "Pure python implementation of the DES and TRIPLE DES encryption algorithms")
+    (description
+     "This package provides a pure Python implementation of the DES and
+TRIPLE DES encryption algorithms.")
+    (license license:public-domain)))

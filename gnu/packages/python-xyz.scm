@@ -153,14 +153,15 @@
 ;;; Copyright © 2024 Adriel Dumas--Jondeau <leirda@disroot.org>
 ;;; Copyright © 2024 Navid Afkhami <navid.afkhami@mdc-berlin.de>
 ;;; Copyright © 2024 TakeV <takev@disroot.org>
-;;; Copyright © 2024 David Elsing <david.elsing@posteo.net>
+;;; Copyright © 2024, 2025 David Elsing <david.elsing@posteo.net>
 ;;; Copyright © 2024 Rick Huijzer <ikbenrickhuyzer@gmail.com>
 ;;; Copyright © 2024 Peter Kannewitz <petre-vps@posteo.net>
 ;;; Copyright © 2024 Aaron Covrig <aaron.covrig.us@ieee.org>
-;;; Copyright © 2024 Evgeny Pisemsky <mail@pisemsky.site>
+;;; Copyright © 2024, 2025 Evgeny Pisemsky <mail@pisemsky.site>
 ;;; Copyright © 2024 Markku Korkeala <markku.korkeala@iki.fi>
 ;;; Copyright © 2025 Jordan Moore <lockbox@struct.foo>
 ;;; Copyright © 2025 Dariqq <dariqq@posteo.net>
+;;; Copyright © 2025 Nguyễn Gia Phong <mcsinyx@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -501,6 +502,32 @@ package.  It is not useful on its own, only as a dependency for awkward.")
 including arbitrary-length lists, records, mixed types, and missing data,
 using NumPy-like idioms.")
     (license license:bsd-3)))
+
+(define-public python-bresenham
+  (package
+    (name "python-bresenham")
+    (version "0.2.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/encukou/bresenham")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "07h04l50y35rhp13mqis61d1dkd7426q1gdfy5hd6rcgcfv15kxd"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools
+           python-wheel))
+    (home-page "https://github.com/encukou/bresenham")
+    (synopsis "Implementation of Bresenham's line drawing algorithm")
+    (description
+     "This package provides a Python implementation of
+@url{https://en.wikipedia.org/wiki/Bresenham's_line_algorithm, Bresenham's
+line drawing algorithm}.")
+    (license license:expat)))
 
 (define-public python-distance
   (package
@@ -3503,7 +3530,7 @@ Unicode-to-LaTeX conversion.")
 (define-public python-lsp-black
   (package
     (name "python-lsp-black")
-    (version "1.3.0")
+    (version "2.0.0")
     (source
      (origin
        (method git-fetch)
@@ -3512,8 +3539,16 @@ Unicode-to-LaTeX conversion.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1gwf3vwb01a3l8b75jbn8kyfmn0lva8vpgjnr75vazhm3lsf78fp"))))
+        (base32 "0ilh6nx15kzrp29nkrpx03vx6dw3n7wq65qwv7bg7kcnyiwacplx"))))
     (build-system pyproject-build-system)
+    (arguments
+     ;; The python version is too old for these tests to pass properly.
+     (list #:test-flags
+           `'("-k" ,(string-append
+                     "not test_pylsp_format_document_syntax_error"
+                     " and not test_pylsp_format_range_syntax_error"
+                     " and not test_load_config_defaults"
+                     " and not test_load_config_with_skip_options"))))
     (propagated-inputs
      (list python-black python-lsp-server python-tomli))
     (native-inputs
@@ -7236,6 +7271,31 @@ important tasks for becoming a daemon process:
     ;; Only setup.py is gpl3+, everything else is apache 2.0 licensed.
     (license (list license:asl2.0 license:gpl3+))))
 
+(define-public python-elevate
+  (package
+    (name "python-elevate")
+    (version "0.1.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "elevate" version))
+       (sha256
+        (base32 "02g23lxzzl64j1b4fsnrdxqiahl9lnrqyxpqwcfzn0g33px1kbak"))))
+    (build-system pyproject-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'clean-up
+           (lambda _
+             ;; Uses stuff we don't have.
+             (delete-file "elevate/windows.py"))))))
+    (native-inputs (list python-setuptools python-wheel))
+    (home-page "https://github.com/barneygale/elevate")
+    (synopsis "Python library for requesting root privileges")
+    (description "This package provides a Python library for requesting
+root privileges.")
+    (license license:expat)))
+
 (define-public python-annotated-types
   (package
     (name "python-annotated-types")
@@ -9958,16 +10018,25 @@ parse and apply unified diffs.  It has features such as:
 (define-public python-numexpr
   (package
     (name "python-numexpr")
-    (version "2.8.4")
+    (version "2.9.0") ; starting from 2.10.0, NumPy 2+ is required
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "numexpr" version))
        (sha256
-        (base32
-         "0iv1h1lvry5vmzqyvwxfbckyhzm1vbb1bmhmj4dnj64d84vjahym"))))
-    (build-system python-build-system)
-    (arguments `(#:tests? #f))          ; no tests included
+        (base32 "1w5ampdamlwj8ix1ipzxngmrlqpnmcmk95gbi6839kijqkv147gj"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'build-extensions
+            (lambda _
+              (invoke "python" "setup.py" "build_ext" "--inplace"))))))
+    (native-inputs
+     (list python-pytest
+           python-setuptools
+           python-wheel))
     (propagated-inputs
      (list python-numpy))
     (home-page "https://github.com/pydata/numexpr")
@@ -13222,7 +13291,7 @@ without using the configuration machinery.")
 (define-public python-optree
   (package
     (name "python-optree")
-    (version "0.11.0")
+    (version "0.14.0")
     (source
      (origin
        (method git-fetch)
@@ -13232,21 +13301,21 @@ without using the configuration machinery.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0sk5lm1xyxi7z0yjckip77qvbidyb7i1znmn9fz96q74hl9ffyan"))
-       (patches (search-patches "python-optree-fix-32-bit.patch"))))
+         "17zph1jgzk0zaanj7057qj8x5cml8j66ip0xmlbwmq4396hmdlbs"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
-      ;; This test fails due to a circular import
-      ''("-k" "not test_treespec_pickle_missing_registration")))
+      ;; These tests fails due to a circular import
+      '`("-k" ,(string-append "not test_treespec_pickle_missing_registration"
+                              " and not test_import_no_warnings"))))
     (propagated-inputs (list python-typing-extensions))
     (native-inputs
      (list python-pytest
            python-setuptools
            python-wheel
-           cmake
-           pybind11))
+           cmake-minimal
+           pybind11-2.13))
     (home-page "https://github.com/metaopt/optree")
     (synopsis "Optimized PyTree Utilities")
     (description "This package contains operations on PyTrees (a tree made of
@@ -15008,24 +15077,28 @@ syllables in a word.")
 (define-public python-sympy
   (package
     (name "python-sympy")
-    (version "1.11.1")
+    (version "1.13.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "sympy" version))
        (sha256
-        (base32 "0n46x1rfy8c2a9za3yp2va5icigxj805f9fmiq8c1drwwvf808z3"))))
-    (build-system python-build-system)
+        (base32 "1nf4zrjjbnv47n6sl6x9blfyarski61vdjaz4ygb62hfag3d4zxj"))))
+    (build-system pyproject-build-system)
     (arguments
-     `(#:phases
+     '(#:phases
        (modify-phases %standard-phases
          (replace 'check
-           (lambda* (#:key outputs #:allow-other-keys)
-             (invoke
-               (or (which "python3") (which "python"))
-               "-c" "import sympy; sympy.test(\"/core\")"))))))
-    (propagated-inputs
-     (list python-mpmath))
+           (lambda* (#:key tests? #:allow-other-keys)
+             (if tests?
+                 (invoke "python3" "-c"
+                         "import sympy; sympy.test(\"/core\")")))))))
+    (propagated-inputs (list python-mpmath))
+    (native-inputs
+     (list python-hypothesis
+           python-pytest
+           python-setuptools
+           python-wheel))
     (home-page "https://www.sympy.org/")
     (synopsis "Python library for symbolic mathematics")
     (description
@@ -21667,6 +21740,29 @@ Service (S3) protocol, including S3 itself.  It supports rsync-like backup,
 GnuPG encryption, and more.  It also supports management of Amazon's
 CloudFront content delivery network.")
     (license license:gpl2+)))
+
+(define-public python-securetar
+  (package
+    (name "python-securetar")
+    (version "2025.1.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/pvizeli/securetar")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1b9m29j4mjiv7925wrbiyj6vyx7m9qmdz40zqd4vgxhz4pq6x3xw"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools python-wheel python-pytest))
+    (propagated-inputs (list python-cryptography))
+    (home-page "https://github.com/pvizeli/securetar")
+    (synopsis "Python module to handle tarfile backups")
+    (description
+     "This library provides a streaming wrapper around python tarfile and allow
+secure handling files and support encryption.")
+    (license license:asl2.0)))
 
 (define-public python-pkgconfig
   (package
@@ -29054,6 +29150,22 @@ library: to minimize boilerplate code in traditional extension modules by
 inferring type information using compile-time introspection.")
     (license license:bsd-3)))
 
+;; Needed for python-optree
+(define-public pybind11-2.13
+  (package
+    (inherit pybind11)
+    (name "pybind11")
+    (version "2.13.6")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/pybind/pybind11")
+                    (commit (string-append "v" version))))
+              (sha256
+               (base32
+                "1dbnki0pnky39kr04afd9ks597bzjc530zbk33jjss53nfvdvlj8"))
+              (file-name (git-file-name name version))))))
+
 ;; Needed for scipy
 (define-public pybind11-2.10
   (package
@@ -29495,14 +29607,14 @@ validation testing and application logic.")
 (define-public python-numba
   (package
     (name "python-numba")
-    (version "0.59.1")
+    (version "0.61.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "numba" version))
        (sha256
         (base32
-         "02rp5x59kw3qw6x821d4k4r4x8r8qpl1a16j9rvx4a30p4r93xkn"))))
+         "09grslc9ij1ry94c5yz10rvf0w29vn7pwilijphrj20np24jx3c8"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -29551,9 +29663,8 @@ validation testing and application logic.")
                        "int(platform.machine()[len('armv'):-1]) >= 7")))))
                 (#t '()))))
          (replace 'check
-           (lambda* (#:key tests? inputs outputs #:allow-other-keys)
+           (lambda* (#:key tests? #:allow-other-keys)
              (when tests?
-               (add-installed-pythonpath inputs outputs)
                ;; Something is wrong with the PYTHONPATH when running the
                ;; tests from the build directory, as it complains about not being
                ;; able to import certain modules.
@@ -36024,19 +36135,17 @@ SMT solvers and is built on top of the Z3 solver.")
 (define-public python-pysmt
   (package
     (name "python-pysmt")
-    (version "0.9.5")
+    (version "0.9.6")
     (source
      (origin
        ;; Fetching from Git as pypi release doesn't include all test files.
        (method git-fetch)
-       (patches (search-patches "python-pysmt-fix-pow-return-type.patch"
-                 "python-pysmt-fix-smtlib-serialization-test.patch"))
        (uri (git-reference
              (url "https://github.com/pysmt/pysmt")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0hrxv23y5ip4ijfx5pvbwc2fq4zg9jz42wc9zqgqm0g0mjc9ckvh"))))
+        (base32 "0jiw8pa6hfh9ajr953q187qgpdnk3bvaa3wmrxs8ilw5jc41sq8y"))))
     (build-system pyproject-build-system)
     (arguments
      `(#:phases (modify-phases %standard-phases
@@ -38866,6 +38975,87 @@ profile.  It supports:
 Currently, Linux is the only platform supported by this library.")
     (license license:expat)))
 
+(define-public python-dbus-fast
+  (package
+    (name "python-dbus-fast")
+    (version "2.30.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "dbus_fast" version))
+       (sha256
+        (base32 "1cx71lbw716smpr4vsc9d421v45s36hcqj2z95nl3wm2yhan6ac7"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-cython python-poetry-core python-setuptools
+                         python-wheel))
+    (home-page "https://github.com/bluetooth-devices/dbus-fast")
+    (synopsis "Faster version of dbus-next")
+    (description "This package provides a faster version of dbus-next.")
+    (license license:expat)))
+
+(define-public python-bleak
+  (package
+    (name "python-bleak")
+    (version "0.22.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "bleak" version))
+       (sha256
+        (base32 "0p04kk84vjmfv2pl1lichaaq8rc9xdm9sgd5g9r5gr2pjv0w6j9i"))))
+    (build-system pyproject-build-system)
+    (arguments
+     `(#:tests? #f)) ; no tests
+    (propagated-inputs (list python-async-timeout
+                        python-dbus-fast
+                        python-typing-extensions))
+    (native-inputs (list python-poetry-core))
+    (home-page "https://github.com/hbldh/bleak")
+    (synopsis "Bluetooth Low Energy platform Agnostic Klient")
+    (description "This package provides a Bluetooth Low Energy platform-agnostic
+client library.")
+    (license license:expat)))
+
+(define-public python-ndeflib
+  (package
+    (name "python-ndeflib")
+    (version "0.3.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "ndeflib" version))
+       (sha256
+        (base32 "122a8prbcj070y3fl82kvxmbciv36hj1h1d448l6zcdrb22q4mhx"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools python-wheel))
+    (home-page "https://ndeflib.readthedocs.io/")
+    (synopsis "NFC Data Exchange Format decoder and encoder.")
+    (description "This package provides a NFC (Near-Field Communication)
+Data Exchange Format decoder and encoder.")
+    (license license:isc)))
+
+(define-public python-nfcpy
+  (package
+    (name "python-nfcpy")
+    (version "1.0.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "nfcpy" version))
+       (sha256
+        (base32 "0sxgp298i8y17i9drp8sclxx0i3vn0wgh5ajs2arw7cy2780igg5"))))
+    (build-system pyproject-build-system)
+    (arguments
+     `(#:tests? #f)) ; Tests use nfc.ndef even though that has been removed.
+    (propagated-inputs (list python-libusb1 python-ndeflib python-pydes
+                             python-pyserial))
+    (native-inputs (list python-setuptools python-wheel))
+    (home-page "https://github.com/nfcpy/nfcpy")
+    (synopsis "Python module for Near-Field Communication.")
+    (description "This package provides a Python module for Near-Field
+Communication.")
+    (license license:eupl1.1)))
+
 (define-public python-clrprint
   (package
     (name "python-clrprint")
@@ -39661,6 +39851,35 @@ write text fast, and for various text generation, statistics, and modeling tasks
               (sha256
                (base32
                 "0mikjfvq26kh8asnn9v55z41pap4c5ypymqnwwi4xkavc3mzyda2"))))))
+
+(define-public python-whenever
+  (package
+    (name "python-whenever")
+    (version "0.6.16")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "whenever" version))
+       (sha256
+        (base32 "1diqibiv07i0q4sqqd1qw4bbzmp84zlrfv8lmlc395b5czwpf5pj"))))
+    (build-system pyproject-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  ;; Use the pure python version
+                  (add-before 'build 'setenv
+                    (lambda _
+                      (setenv "WHENEVER_NO_BUILD_RUST_EXT" "1"))))))
+    (propagated-inputs (list python-tzdata))
+    (native-inputs (list python-setuptools python-setuptools-rust python-wheel))
+    (home-page "https://whenever.readthedocs.io/")
+    (synopsis "Modern datetime library for Python")
+    (description "Modern datetime library for Python.  Supports:
+@itemize
+@item DST-safe arithmetic
+@item Nanosecond precision
+@item Date arithmetic
+@end itemize")
+    (license license:expat)))
 
 (define-public python-xmp-toolkit
   (package

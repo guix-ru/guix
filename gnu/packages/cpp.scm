@@ -29,7 +29,7 @@
 ;;; Copyright © 2022 muradm <mail@muradm.net>
 ;;; Copyright © 2022 Attila Lendvai <attila@lendvai.name>
 ;;; Copyright © 2022 Arun Isaac <arunisaac@systemreboot.net>
-;;; Copyright © 2022, 2023, 2024 David Elsing <david.elsing@posteo.net>
+;;; Copyright © 2022-2025 David Elsing <david.elsing@posteo.net>
 ;;; Copyright © 2022-2024 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2022, 2023, 2024 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2022 Antero Mejr <antero@mailbox.org>
@@ -165,8 +165,8 @@ easy to use API.")
       (license license:expat))))
 
 (define-public asmjit
-  (let ((commit "062e69ca81defa35eb0ee15f7412f49a0dad3cdb")
-        (revision "1"))
+  (let ((commit "cfc9f813cc6ccda63cad872edb32b38e0662bedb")
+        (revision "2"))
     (package
       (name "asmjit")
       (version (git-version "0.0.0" revision commit))
@@ -179,7 +179,7 @@ easy to use API.")
            (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0lcwqzbv2628g3c7sflkwagyh49lp471px8bhg7lr77w9y94srqq"))))
+          (base32 "0lxkfg0b2bc2la0cvs5658a26mb00zlir4n0jkzzlg97l0jrbwpv"))))
       (build-system cmake-build-system)
       (arguments
        (list #:configure-flags #~(list "-DASMJIT_TEST=TRUE")))
@@ -704,7 +704,7 @@ utilities used across the hypr* ecosystem.")
 (define-public hyprlang
   (package
     (name "hyprlang")
-    (version "0.5.3")
+    (version "0.6.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -713,7 +713,7 @@ utilities used across the hypr* ecosystem.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0yvfrz3hdyxzhngzhr0bgc5279ra5fv01hbfi6pdj84pz0lpaw02"))))
+                "18f8vlg5ypw35gyi8gy0wqh5jvg1q67qywrb750bx8pk9gi1agx2"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -726,7 +726,7 @@ utilities used across the hypr* ecosystem.")
                  (string-append
                   "set(PKG_CONFIG_EXECUTABLE " #$(pkg-config-for-target) ")\n"
                   all))))))))
-    (native-inputs (list gcc-13 pkg-config))
+    (native-inputs (list gcc-14 pkg-config))
     (inputs (list hyprutils))
     (home-page "https://wiki.hyprland.org/Hypr-Ecosystem/hyprlang/")
     (synopsis "Official implementation library for hypr config language")
@@ -738,7 +738,7 @@ language used in Hyprland.")
 (define-public hyprutils
   (package
     (name "hyprutils")
-    (version "0.2.6")
+    (version "0.5.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -747,7 +747,7 @@ language used in Hyprland.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0scrfky9hkzhbyj5aji6qvi4b6ydf4g7sk0cknkpd7dg0zv8x5zq"))))
+                "1w6967kid21zczxsvwfls8ql65gnc6fr4sx856viw9l4f3855wad"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -1246,7 +1246,7 @@ tools:
   ;; header
   (package
     (name "cpp-httplib")
-    (version "0.16.0")
+    (version "0.18.5")
     (source
      (origin
        (method git-fetch)
@@ -1254,7 +1254,7 @@ tools:
              (url "https://github.com/yhirose/cpp-httplib")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "0n4ribq7c6lqj0hn50pdvy7wml62fqbgrgysb038fq1qc6xyw3np"))
+        (base32 "1jc31n4xdrknal4i1dvf8j6j9kafpczi0w5gbbi89xlir9dgm5kp"))
        (file-name (git-file-name name version))))
     (build-system cmake-build-system)
     (arguments
@@ -1290,7 +1290,7 @@ tools:
                 "TooManyRedirectTest" "UrlWithSpace"
                 "YahooRedirectTest" "YahooRedirectTest")))))))
     (native-inputs
-     (list googletest python))
+     (list curl googletest python))
     (inputs
      (list brotli openssl zlib))
     (home-page "https://github.com/yhirose/cpp-httplib")

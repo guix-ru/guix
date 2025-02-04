@@ -238,7 +238,7 @@ command line, without displaying a keyboard at all.")
 (define-public aquamarine
   (package
     (name "aquamarine")
-    (version "0.5.1")
+    (version "0.7.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -247,14 +247,14 @@ command line, without displaying a keyboard at all.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0m4yjpdkp8czfn897376d0pjba3l5iwfj1b9rv44p37r7j8za6qv"))))
+                "0vzbhz3mpln6ikg15cawr3ji3yiv86lxcy23gm4c0bdpr3hq7mcm"))))
     (build-system cmake-build-system)
     (arguments
      (list #:cmake cmake-3.30
            ;; TODO: Figure out what's expected in the test environment.
            #:tests? #f))
     (native-inputs
-     (list gcc-13 hyprwayland-scanner pkg-config))
+     (list gcc-14 hyprwayland-scanner pkg-config))
     (inputs
      (list eudev
            hwdata
@@ -3686,7 +3686,7 @@ This package is the fork of hsetroot by Hyriand.")
 (define-public hyprcursor
   (package
     (name "hyprcursor")
-    (version "0.1.10")
+    (version "0.1.11")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3695,10 +3695,10 @@ This package is the fork of hsetroot by Hyriand.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1rdn03ln7pqcwp8h4nmi7nc489q8y25dd3v4paq8ykvwzhvs3a1n"))))
+                "0k050802bpgdn1hnrfgadxs54hx0zak3y3jzbjnsb69i6ayydr1c"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f))      ;TODO: No themes currently packaged.
-    (native-inputs (list gcc-13 pkg-config))
+    (native-inputs (list gcc-14 pkg-config))
     (inputs (list cairo hyprlang (librsvg-for-system) libzip tomlplusplus))
     (home-page "https://standards.hyprland.org/hyprcursor/")
     (synopsis "Cursor theme format")
@@ -3709,7 +3709,7 @@ This package is the fork of hsetroot by Hyriand.")
 (define-public hyprpicker
   (package
     (name "hyprpicker")
-    (version "0.4.1")
+    (version "0.4.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3718,7 +3718,7 @@ This package is the fork of hsetroot by Hyriand.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "11r06c62dqj81r27qhf36f3smnjyk3vz8naa655m8khv4qqvmvc2"))))
+                "1jnncnsrb8h3driryj27mnamh5fqs0sys6xmfwsyg4qx3dgb6s89"))))
     (build-system cmake-build-system)
     (arguments
      (list #:tests? #f                  ;No tests.
@@ -3730,7 +3730,7 @@ This package is the fork of hsetroot by Hyriand.")
                      (("wl-copy" cmd)
                       (search-input-file
                        inputs (string-append "bin/" cmd)))))))))
-    (native-inputs (list gcc-13 hyprwayland-scanner pkg-config))
+    (native-inputs (list gcc-14 hyprwayland-scanner pkg-config))
     (inputs
      (list cairo
            hyprutils

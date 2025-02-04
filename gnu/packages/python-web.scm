@@ -49,7 +49,7 @@
 ;;; Copyright © 2021 Alice Brenon <alice.brenon@ens-lyon.fr>
 ;;; Copyright © 2022 John Kehayias <john.kehayias@protonmail.com>
 ;;; Copyright © 2022 Denis 'GNUtoo' Carikli <GNUtoo@cyberdimension.org>
-;;; Copyright © 2022, 2023 Felix Gruber <felgru@posteo.net>
+;;; Copyright © 2022, 2023, 2025 Felix Gruber <felgru@posteo.net>
 ;;; Copyright © 2022 Peter Polidoro <peter@polidoro.io>
 ;;; Copyright © 2022 Antero Mejr <antero@mailbox.org>
 ;;; Copyright © 2022 Luis Henrique Gomes Higino <luishenriquegh2701@gmail.com>
@@ -373,6 +373,58 @@ that is similar to threading, but provide the benefits of non-blocking I/O.
 The event dispatch is implicit, which means you can easily use @code{Eventlet}
 from the Python interpreter, or as a small part of a larger application.")
     (license license:expat)))
+
+(define-public python-hookdns
+  (package
+    (name "python-hookdns")
+    (version "2.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "hookdns" version))
+       (sha256
+        (base32 "087x12dy6slhyqwqblby2fpjdcy61yk3lqp3fplami0rmbn02fb7"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list "-k" (string-join
+                    ;; Tests requiring networking.
+                    (list
+                     "not test_patch_contextmanager_with_another_hostname"
+                     "test_patch_contextmanager_with_another_hostname_ipv6"
+                     "test_patch_contextmanager_with_ipv4"
+                     "test_patch_contextmanager_with_name"
+                     "test_patch_contextmanager_with_public_fqdn_and_"
+                     "test_patch_contextmanager_with_unknown_hostname"
+                     "test_patch_decorator_with_another_hostname"
+                     "test_patch_decorator_with_another_hostname_ipv6"
+                     "test_patch_decorator_with_ipv4"
+                     "test_patch_decorator_with_name"
+                     "test_patch_decorator_with_public_fqdn_and_a_name_for_"
+                     "test_patch_decorator_with_unknown_hostname"
+                     "test_real_getaddrinfo_with_name_ipv6"
+                     "test_real_getaddrinfo_with_public_fqdn_ipv4"
+                     "test_real_getaddrinfo_with_public_fqdn_ipv6"
+                     "test_real_gethostbyname_ex_with_public_fqdn"
+                     "test_real_gethostbyname_with_public_fqdn"
+                     "test_real_requests_ip"
+                     "test_real_requests_name"
+                     "test_real_requests_with_public_fqdn"
+                     "test_reentrant")
+                    " and not "))))
+    (native-inputs
+     (list python-pytest
+           python-requests
+           python-setuptools
+           python-wheel))
+    (home-page "https://github.com/cle-b/hookdns")
+    (synopsis "DNS resolution customization library")
+    (description
+     "HookDNS implements functionality that allows for modifying name
+resolution in a Python script without any changes to the hosts file or the use
+of a fake DNS resolver.")
+    (license license:asl2.0)))
 
 (define-public python-huggingface-hub
   (package
@@ -7696,44 +7748,48 @@ them to a designated prefix.")
 (define-public python-warcio
   ;; The PyPI release is missing some test support files (see:
   ;; https://github.com/webrecorder/warcio/issues/132).
-  (let ((revision "0")
-        (commit "aa702cb321621b233c6e5d2a4780151282a778be"))
-    (package
-      (name "python-warcio")
-      (version (git-version "1.7.4" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/webrecorder/warcio")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32
-           "11afr6zy3r6rda81010iq496dazg4xid0izg3smg6ighpmvsnzf2"))))
-      (build-system pyproject-build-system)
-      (arguments
-       (list
-        #:test-flags  ; These tests fail due to networking requirements.
-        '(list "-k" (format #f "not ~a"
-                            (string-join
-                             '("test_post_chunked"
-                               "test_remote"
-                               "test_capture_http_proxy"
-                               "test_capture_https_proxy"
-                               "test_capture_https_proxy_same_session")
-                             " and not ")))))
-      (native-inputs
-       ;; These inputs are required for the test suite.
-       (list python-httpbin python-pytest-cov python-requests
-             python-wsgiprox))
-      (home-page "https://github.com/webrecorder/warcio")
-      (synopsis "Streaming web archival archive (WARC) library")
-      (description "warcio is a Python library to read and write the WARC format
+  (package
+    (name "python-warcio")
+    (version "1.7.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/webrecorder/warcio")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0r3kijsm8wsbipi5pxsrqpg5nn4w8iaw5i8010b0ligmfxnxamlb"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags  ; These tests fail due to networking requirements.
+      '(list "-k" (format #f "not ~a"
+                          (string-join
+                           '("test_post_chunked"
+                             "test_remote"
+                             "test_capture_http_proxy"
+                             "test_capture_https_proxy"
+                             "test_capture_https_proxy_same_session")
+                           " and not "))
+             ; The following test requires the hookdns package.
+             "--ignore=test/test_capture_http_proxy.py")))
+    (native-inputs
+     ;; These inputs are required for the test suite.
+     (list python-httpbin
+           python-pytest-cov
+           python-requests
+           python-setuptools
+           python-wheel
+           python-wsgiprox))
+    (home-page "https://github.com/webrecorder/warcio")
+    (synopsis "Streaming web archival archive (WARC) library")
+    (description "warcio is a Python library to read and write the WARC format
 commonly used in Web archives. It is designed for fast, low-level access to
 web archival content, oriented around a stream of WARC records rather than
 files.")
-      (license license:asl2.0))))
+    (license license:asl2.0)))
 
 (define-public python-websockets
   (package

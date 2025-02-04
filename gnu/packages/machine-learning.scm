@@ -27,7 +27,7 @@
 ;;; Copyright © 2024 David Pflug <david@pflug.io>
 ;;; Copyright © 2024 Timothee Mathieu <timothee.mathieu@inria.fr>
 ;;; Copyright © 2024 Spencer King <spencer.king@geneoscopy.com>
-;;; Copyright © 2024 David Elsing <david.elsing@posteo.net>
+;;; Copyright © 2024, 2025 David Elsing <david.elsing@posteo.net>
 ;;; Copyright © 2024 Andy Tai <atai@atai.org>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -595,12 +595,15 @@ Performance is achieved by using the LLVM JIT compiler.")
                (commit tag)))
          (file-name (git-file-name name tag))
          (sha256
-          (base32 "1xf2579q0r8nv06kj8padi6w9cv30w58vdys65nq8yzm3dy452a1"))))
+          (base32 "1xf2579q0r8nv06kj8padi6w9cv30w58vdys65nq8yzm3dy452a1"))
+         (patches
+          (search-patches "llama-cpp-vulkan-optional.patch"))))
       (build-system cmake-build-system)
       (arguments
        (list
         #:configure-flags
         #~(list "-DBUILD_SHARED_LIBS=ON"
+                "-DGGML_VULKAN=ON"
                 "-DGGML_BLAS=ON"
                 "-DGGML_BLAS_VENDOR=OpenBLAS"
                 (string-append "-DBLAS_INCLUDE_DIRS="
@@ -625,10 +628,15 @@ Performance is achieved by using the LLVM JIT compiler.")
                              (guix build python-build-system))
         #:phases
         #~(modify-phases %standard-phases
+            (add-after 'unpack 'patch-paths
+              (lambda* (#:key inputs #:allow-other-keys)
+                (substitute* "ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp"
+                 (("\"/bin/sh\"")
+                  (string-append "\"" (search-input-file inputs "/bin/sh") "\"")))))
             (add-after 'unpack 'disable-unrunable-tests
-              ;; test-eval-callback downloads ML model from network, cannot
-              ;; run in Guix build environment
               (lambda _
+                ;; test-eval-callback downloads ML model from network, cannot
+                ;; run in Guix build environment
                 (substitute* '("examples/eval-callback/CMakeLists.txt")
                   (("COMMAND llama-eval-callback")
                    "COMMAND true llama-eval-callback"))))
@@ -658,8 +666,8 @@ Performance is achieved by using the LLVM JIT compiler.")
                                        (string-append (assoc-ref outputs "out")
                                                       "/bin")
                                        "^test-")))))))
-      (inputs (list python))
-      (native-inputs (list pkg-config))
+      (inputs (list python vulkan-headers vulkan-loader))
+      (native-inputs (list pkg-config shaderc bash))
       (propagated-inputs
        (list python-numpy python-pytorch python-sentencepiece openblas))
       (properties '((tunable? . #true))) ;use AVX512, FMA, etc. when available
@@ -1514,7 +1522,7 @@ in terms of new algorithms.")
 (define-public onnx
   (package
     (name "onnx")
-    (version "1.16.2")
+    (version "1.17.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1522,7 +1530,7 @@ in terms of new algorithms.")
                     (commit (string-append "v" version))))
               (sha256
                (base32
-                "0f5h204ksfz4ir3qq38ckxja1jfhf1vn5xzwrj83vkkbfjq6fv16"))
+                "1i6bh4z2xzz1maykr0xmrwfybm6i3g38vnx7hsls8hr58rdr30zn"))
               (file-name (git-file-name name version))
               (patches (search-patches
                         "onnx-shared-libraries.patch"
@@ -4538,7 +4546,7 @@ TensorFlow.js, PyTorch, and MediaPipe.")
 (define-public fbgemm
   (package
     (name "fbgemm")
-    (version "0.7.0")
+    (version "1.0.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -4547,14 +4555,12 @@ TensorFlow.js, PyTorch, and MediaPipe.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1dzw9w82ca0hss1lvshix6piwsd0k11lyq9pzm8yg8k7j56hmyig"))
-              (patches (search-patches "fbgemm-use-system-libraries.patch"))
-              (modules '((guix build utils)))
-              (snippet
-               '(delete-file-recursively "third_party"))))
+                "1a5g5f32377fad99xsfggqkwvl7vh5gc1wj77swa06x06lc1qwyw"))
+              (patches (search-patches "fbgemm-use-system-libraries.patch"))))
     (build-system cmake-build-system)
     (arguments
      (list
+      #:cmake cmake-3.30
       #:configure-flags
       ''("-DFBGEMM_LIBRARY_TYPE=shared")
       ;; Tests require AVX2 or AVX-512 instructions
@@ -4672,7 +4678,7 @@ PyTorch.")
         (base32
          "0hdpkhcjry22fjx2zg2r48v7f4ljrclzj0li2pgk76kvyblfbyvm"))))))
 
-(define %python-pytorch-version "2.4.0")
+(define %python-pytorch-version "2.5.1")
 
 (define %python-pytorch-src
   (origin
@@ -4683,7 +4689,7 @@ PyTorch.")
     (file-name (git-file-name "python-pytorch" %python-pytorch-version))
     (sha256
      (base32
-      "18hdhzr12brj0b7ppyiscax0dbra30207qx0cckw78midfkcn7cn"))
+      "052cvagpmm9y7jspjpcyysx8yc5fhxnjl8rcz6nndis06v8dcj8s"))
     (patches (search-patches "python-pytorch-system-libraries.patch"
                              "python-pytorch-runpath.patch"
                              "python-pytorch-without-kineto.patch"
@@ -4829,6 +4835,14 @@ PyTorch.")
                  (string-append #$output "/lib/python"
                                 #$(version-major+minor (package-version python))
                                 "/site-packages")))))
+          ;; This entry point is broken, because it refers to a module that is
+          ;; (intentionally) not installed
+          ;; (https://github.com/pytorch/pytorch/pull/134729), which causes
+          ;; the 'sanity-check phase to fail.
+          (add-after 'unpack 'remove-fr-trace-script
+            (lambda _
+              (substitute* "setup.py"
+                (("entry_points\\[\"console_scripts\"\\]\\.append\\(") "("))))
           (add-before 'build 'use-system-libraries
             (lambda _
               (substitute* '("caffe2/serialize/crc.cc"
@@ -4866,7 +4880,10 @@ PyTorch.")
                           (or (%current-target-system)
                               (%current-system))
                           (package-transitive-supported-systems qnnpack)))
-                  (setenv "USE_QNNPACK" "0"))))
+                  (setenv "USE_QNNPACK" "0"))
+              (substitute* '("requirements.txt" "setup.py")
+                (("sympy==1\\.13\\.1")
+                 "sympy>=1.13.1"))))
           ;; PyTorch is still built with AVX2 and AVX-512 support selected at
           ;; runtime, but these dependencies require it (nnpack only for
           ;; x86_64).
@@ -4967,10 +4984,11 @@ PyTorch.")
       ;; Even only the core tests take a very long time to run.
       #:tests? #f))
     (native-inputs
-     (list cmake
+     (list cmake-minimal
            doxygen
            ideep-pytorch
            ninja
+           nlohmann-json
            pocketfft-cpp
            python-expecttest
            python-pytest-flakefinder
@@ -4990,7 +5008,6 @@ PyTorch.")
             eigen
             flatbuffers-next
             fmt
-            foxi
             fp16
             fxdiv
             gemmlowp
@@ -5119,11 +5136,23 @@ Note: currently this package does not provide GPU support.")
     (name "python-pytorch")
     (version %python-pytorch-for-r-torch-version)
     (source %python-pytorch-for-r-torch-src)
+    (arguments
+     (substitute-keyword-arguments (package-arguments python-pytorch)
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            ;; See https://github.com/pytorch/pytorch/issues/61244
+            (add-after 'unpack 'fix-aten-vec
+              (lambda _
+                (substitute*
+                    '("aten/src/ATen/cpu/vec/vec512/vec512_bfloat16.h"
+                      "aten/src/ATen/cpu/vec/vec256/vec256_bfloat16.h")
+                  (("map\\(const __") "map(__"))))))))
     (native-inputs
      (modify-inputs (package-native-inputs python-pytorch)
        (replace "ideep-pytorch" ideep-pytorch-for-r-torch)))
     (inputs
      (modify-inputs (package-inputs python-pytorch)
+       (prepend foxi)
        (prepend qnnpack)
        (replace "qnnpack-pytorch" qnnpack-pytorch-for-r-torch)
        (replace "oneapi-dnnl" oneapi-dnnl-for-r-torch)
@@ -5139,7 +5168,7 @@ Note: currently this package does not provide GPU support.")
 (define-public python-pytorch-geometric
   (package
     (name "python-pytorch-geometric")
-    (version "2.4.0")
+    (version "2.6.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -5148,7 +5177,7 @@ Note: currently this package does not provide GPU support.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0hrs579asjsph16hyb4ablkbgfwd5j9y5s6ny7ahn3qrbkl2ji1g"))))
+                "0dbxz9d22vzm7fr9kgg66hj3sf8ag2ly8qky58cxvn1hyjl5h3v7"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -5162,6 +5191,8 @@ Note: currently this package does not provide GPU support.")
              ;; These all fail with a size mismatch error such as
              ;; RuntimeError: shape '[-1, 2, 1, 1]' is invalid for input of size 3
              "--ignore=test/explain/algorithm/test_captum_explainer.py"
+             ;; Requires the nonfree MKL on CPU.
+             "--ignore=test/nn/models/test_graph_unet.py"
              "-k" (string-append
                    ;; Permissions error
                    "not test_packaging"
@@ -5529,7 +5560,7 @@ implementations and an easy-to-use API to create custom metrics.  It offers:
 (define-public python-torchvision
   (package
     (name "python-torchvision")
-    (version "0.19.0")
+    (version "0.20.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -5539,7 +5570,7 @@ implementations and an easy-to-use API to create custom metrics.  It offers:
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "15zyq2k4x9yapx7qfghhslznz1mwybhf086pirsr98c4l891sp1r"))
+                "1hxcpg44bjnfzqwihzbnfgd0gpkhfgqrcg116mnvdn0fpbhf4yq5"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -5571,7 +5602,11 @@ implementations and an easy-to-use API to create custom metrics.  It offers:
            python-pillow-simd
            python-pytorch))
     (native-inputs
-     (list which python-pytest python-setuptools python-wheel))
+     (list pybind11
+           python-pytest
+           python-setuptools
+           python-wheel
+           which))
     (home-page "https://pytorch.org/vision/stable/index.html")
     (synopsis "Datasets, transforms and models specific to computer vision")
     (description
@@ -6260,11 +6295,47 @@ Brian 2 simulator.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1m2d7qlbfk86rmvmpvx2k3rc2k0l9hf9qpa54jl44670ls9n8i7w"))))
+        (base32 "1m2d7qlbfk86rmvmpvx2k3rc2k0l9hf9qpa54jl44670ls9n8i7w"))
+       (modules '((guix build utils)
+                  (ice-9 rdelim)))
+       ;; Copyright date used by code generation script
+       (snippet
+        '(for-each
+          (lambda (file)
+            (with-atomic-file-replacement
+             file
+             (lambda (in out)
+               (let loop ((line (read-line in 'concat)))
+                 (if (string-contains line "Copyright")
+                     (display line out)
+                     (loop (read-line in 'concat)))))))
+          '("include/oneapi/dnnl/dnnl_debug.h"
+            "src/common/dnnl_debug_autogenerated.cpp"
+            "tests/benchdnn/dnnl_debug_autogenerated.cpp"
+            "tests/benchdnn/dnnl_debug.hpp")))))
     (build-system cmake-build-system)
-    (arguments (if (target-riscv64?)
-                   (list #:configure-flags #~'("-DDNNL_CPU_RUNTIME=SEQ"))
-                   '()))
+    (arguments
+     (list
+      #:configure-flags
+      `(list
+        ,@(if (target-riscv64?)
+              (list #:configure-flags '("-DDNNL_CPU_RUNTIME=SEQ"))
+              '())
+        ;; Used in PyTorch
+        "-DDNNL_EXPERIMENTAL_UKERNEL=ON")
+      #:phases
+      '(modify-phases %standard-phases
+         (add-after 'configure 'codegen
+           (lambda _
+             (with-directory-excursion "../source"
+               (invoke "castxml" "--castxml-cc-gnu-c" "clang"
+                       "--castxml-output=1" "-DDNNL_EXPERIMENTAL_SPARSE"
+                       "-Iinclude" "-I../build/include"
+                       "include/oneapi/dnnl/dnnl_types.h" "-o" "types.xml")
+               (invoke "python3" "scripts/generate_dnnl_debug.py" "types.xml")
+               ;; Modifies include/oneapi/dnnl/dnnl.hpp
+               (invoke "python3" "scripts/generate_format_tags.py")))))))
+    (native-inputs (list castxml clang-17 python))
     (home-page "https://github.com/oneapi-src/oneDNN")
     (synopsis "Deep Neural Network Library")
     (description
@@ -6338,3 +6409,62 @@ performance library of basic building blocks for deep learning applications.")
      "This package provides a standard API for reinforcement learning and a
 diverse set of reference environments (formerly Gym).")
     (license license:expat)))
+
+(define-public dlib
+  (package
+   (name "dlib")
+   (version "19.24.6")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/davisking/dlib.git")
+           (commit (string-append "v" version))))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32 "11j86nxkj78v8xdx2s80mfplq4j0rs0y0iidqgma12b2pdk3p486"))
+     (modules '((guix build utils)))
+     (snippet
+      '(begin
+         (delete-file-recursively "dlib/external")))))
+   (build-system cmake-build-system)
+   (arguments
+    `(#:phases
+      (modify-phases %standard-phases
+                     (add-after 'unpack 'chdir
+                                (lambda _
+                                  (chdir "dlib")))
+                     (replace 'check
+                              (lambda _
+                                ;; Following the instructions on the website.
+                                (mkdir "../dlib/test/build")
+                                (with-directory-excursion "../dlib/test/build"
+                                                          (invoke "cmake" "..")
+                                                          (invoke "cmake" "--build" "." "--config" "Release")
+                                                          (invoke "./dtest" "--runall")))))))
+   (inputs (list libpng libjpeg-turbo openblas zlib libjxl))
+   (home-page "https://github.com/davisking/dlib")
+   (synopsis
+    "Toolkit for making machine learning and data analysis applications")
+   (description
+    "This package provides a toolkit for making machine learning and data
+analysis applications in C++.")
+   (license license:boost1.0)))
+
+;; This will build dlib in the process of building python-dlib--and that
+;; seems to be intended by upstream.  Well, at least it probably optimizes
+;; better that way.
+(define-public python-dlib
+  (package
+   (inherit dlib)
+   (name "python-dlib")
+   (build-system pyproject-build-system)
+   (arguments
+    `(#:phases
+      (modify-phases %standard-phases
+                     (add-after 'unpack 'subst
+                                (lambda _
+                                  (substitute* "tools/python/CMakeLists.txt"
+                                               (("add_subdirectory[(][.][.]/[.][.]/dlib/external/pybind11 pybind11_build[)]")
+                                                "find_package(pybind11 CONFIG)")))))))
+   (native-inputs (list python-setuptools python-wheel cmake-minimal perl pkg-config pybind11))))

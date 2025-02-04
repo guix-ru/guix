@@ -19,7 +19,7 @@
 # Copyright © 2018 Amirouche Boubekki <amirouche@hypermove.net>
 # Copyright © 2018, 2019, 2020, 2021, 2022, 2024 Oleg Pykhalov <go.wigust@gmail.com>
 # Copyright © 2018 Stefan Stefanović <stefanx2ovic@gmail.com>
-# Copyright © 2018, 2020, 2021, 2022, 2023, 2024 Maxim Cournoyer <maxim.cournoyer@gmail.com>
+# Copyright © 2018, 2020-2025 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 # Copyright © 2019, 2020, 2021, 2022, 2024 Guillaume Le Vaillant <glv@posteo.net>
 # Copyright © 2019, 2020 John Soo <jsoo1@asu.edu>
 # Copyright © 2019 Jonathan Brielmaier <jonathan.brielmaier@web.de>
@@ -64,7 +64,7 @@
 # Copyright © 2023, 2024 gemmaro <gemmaro.dev@gmail.com>
 # Copyright © 2023 Herman Rimm <herman@rimm.ee>
 # Copyright © 2023 Troy Figiel <troy@troyfigiel.com>
-# Copyright © 2024 David Elsing <david.elsing@posteo.net>
+# Copyright © 2024, 2025 David Elsing <david.elsing@posteo.net>
 # Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 # Copyright © 2024 Fabio Natali <me@fabionatali.com>
 # Copyright © 2024 Noé Lopez <noelopez@free.fr>
@@ -342,6 +342,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/golang-compression.scm		\
   %D%/packages/golang-crypto.scm	      	\
   %D%/packages/golang-maths.scm		\
+  %D%/packages/golang-vcs.scm	        	\
   %D%/packages/golang-web.scm	        	\
   %D%/packages/golang-xyz.scm	        	\
   %D%/packages/gperf.scm			\
@@ -1182,6 +1183,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/docbook2x-static-datadir-evaluation.patch	\
   %D%/packages/patches/doc++-include-directives.patch		\
   %D%/packages/patches/doc++-segfault-fix.patch			\
+  %D%/packages/patches/dolphin-emu-data.patch			\
   %D%/packages/patches/dovecot-opensslv3.patch			\
   %D%/packages/patches/dovecot-trees-support-dovecot-2.3.patch	\
   %D%/packages/patches/dstat-fix-crash-when-specifying-delay.patch	\
@@ -1503,8 +1505,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/go-fix-script-tests.patch			\
   %D%/packages/patches/go-gopkg-in-yaml-v3-32bit.patch		\
   %D%/packages/patches/go-github-com-golang-snappy-32bit-test.patch \
-  %D%/packages/patches/go-github-com-urfave-cli-fix-tests.patch \
-  %D%/packages/patches/go-github-com-urfave-cli-v2-fix-tests.patch \
   %D%/packages/patches/go-github-com-warpfork-go-wish-fix-tests.patch \
   %D%/packages/patches/go-github-com-wraparound-wrap-free-fonts.patch \
   %D%/packages/patches/go-skip-gc-test.patch			\
@@ -1656,6 +1656,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/libgeotiff-fix-tests-on-i386.patch	\
   %D%/packages/patches/libguestfs-syms.patch            	\
   %D%/packages/patches/libobjc2-unbundle-robin-map.patch	\
+  %D%/packages/patches/libretro-dolphin-emu-data.patch		\
   %D%/packages/patches/librewolf-use-system-wide-dir.patch	\
   %D%/packages/patches/libvirt-add-install-prefix.patch	\
   %D%/packages/patches/libziparchive-add-includes.patch		\
@@ -1742,7 +1743,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/libmpeg2-global-symbol-test.patch	\
   %D%/packages/patches/libmygpo-qt-fix-qt-5.11.patch		\
   %D%/packages/patches/libmygpo-qt-missing-qt5-modules.patch	\
-  %D%/packages/patches/libpciaccess-hurd64.patch		\
   %D%/packages/patches/libphonenumber-reproducible-build.patch	\
   %D%/packages/patches/libqalculate-3.8.0-libcurl-ssl-fix.patch	\
   %D%/packages/patches/libquicktime-ffmpeg.patch 		\
@@ -1810,6 +1810,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/lxc-no-static-bin.patch	\
   %D%/packages/patches/mactelnet-remove-init.patch		\
   %D%/packages/patches/mailutils-variable-lookup.patch		\
+  %D%/packages/patches/mandoc-support-zstd-compression.patch	\
   %D%/packages/patches/make-impure-dirs.patch			\
   %D%/packages/patches/mariadb-rocksdb-atomic-linking.patch	\
   %D%/packages/patches/mathjax-disable-webpack.patch			\
@@ -1823,6 +1824,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/mcrypt-CVE-2012-4527.patch			\
   %D%/packages/patches/libmemcached-build-with-gcc7.patch	\
   %D%/packages/patches/libmhash-hmac-fix-uaf.patch		\
+  %D%/packages/patches/llama-cpp-vulkan-optional.patch	\
   %D%/packages/patches/lvm2-no-systemd.patch    		\
   %D%/packages/patches/maturin-no-cross-compile.patch		\
   %D%/packages/patches/mecab-variable-param.patch		\
@@ -2094,7 +2096,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-fixtures-remove-monkeypatch-test.patch	\
   %D%/packages/patches/python-hiredis-use-system-hiredis.patch	\
   %D%/packages/patches/python-online-judge-api-client-tests.patch \
-  %D%/packages/patches/python-optree-fix-32-bit.patch		\
   %D%/packages/patches/python-pdoc3-tests.patch			\
   %D%/packages/patches/python-peachpy-determinism.patch	\
   %D%/packages/patches/python-pep8-stdlib-tokenize-compat.patch \
@@ -2108,8 +2109,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-paste-remove-timing-test.patch	\
   %D%/packages/patches/python-pyan3-fix-absolute-path-bug.patch \
   %D%/packages/patches/python-pyan3-fix-positional-arguments.patch \
-  %D%/packages/patches/python-pysmt-fix-pow-return-type.patch	\
-  %D%/packages/patches/python-pysmt-fix-smtlib-serialization-test.patch	\
   %D%/packages/patches/python-pytorch-fix-codegen.patch		\
   %D%/packages/patches/python-pytorch-runpath.patch		\
   %D%/packages/patches/python-pytorch-system-libraries.patch	\
@@ -2162,7 +2161,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/r-httpuv-1.6.6-unvendor-libuv.patch	\
   %D%/packages/patches/r-sapa-lapack.patch			\
   %D%/packages/patches/r-sgloptim.patch				\
-  %D%/packages/patches/ri-li-modernize_cpp.patch		\
   %D%/packages/patches/ripperx-missing-file.patch		\
   %D%/packages/patches/rpcbind-CVE-2017-8779.patch		\
   %D%/packages/patches/rtags-separate-rct.patch			\
@@ -2289,6 +2287,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/texi2html-i18n.patch			\
   %D%/packages/patches/texmacs-wayland-hidpi.patch	\
   %D%/packages/patches/thefuck-test-environ.patch		\
+  %D%/packages/patches/thefuck-remove-broken-tests.patch	\
   %D%/packages/patches/tidy-CVE-2015-5522+5523.patch		\
   %D%/packages/patches/timewarrior-time-sensitive-tests.patch	\
   %D%/packages/patches/tinyxml-use-stl.patch			\
@@ -2398,9 +2397,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/x265-arm-flags.patch			\
   %D%/packages/patches/xdg-desktop-portal-disable-portal-tests.patch\
   %D%/packages/patches/xdg-desktop-portal-wlr-harcoded-length.patch\
-  %D%/packages/patches/xf86-video-ark-remove-mibstore.patch	\
-  %D%/packages/patches/xf86-video-nouveau-fixup-ABI.patch	\
-  %D%/packages/patches/xf86-video-savage-xorg-compat.patch 	\
   %D%/packages/patches/xf86-video-siliconmotion-fix-ftbfs.patch \
   %D%/packages/patches/xfig-Enable-error-message-for-missing-libraries.patch		\
   %D%/packages/patches/xfig-Fix-double-free-when-requesting-MediaBox.patch		\

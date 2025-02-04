@@ -8,7 +8,7 @@
 ;;; Copyright © 2016, 2020, 2022 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2016, 2018 Raoul Bonnal <ilpuccio.febo@gmail.com>
 ;;; Copyright © 2017, 2018 Tobias Geerinckx-Rice <me@tobias.gr>
-;;; Copyright © 2017, 2021, 2022, 2024 Arun Isaac <arunisaac@systemreboot.net>
+;;; Copyright © 2017, 2021, 2022, 2024, 2025 Arun Isaac <arunisaac@systemreboot.net>
 ;;; Copyright © 2018 Joshua Sierles, Nextjournal <joshua@nextjournal.com>
 ;;; Copyright © 2018 Gábor Boskovits <boskovits@gmail.com>
 ;;; Copyright © 2018-2024 Mădălin Ionel Patrașcu <madalinionel.patrascu@mdc-berlin.de>
@@ -103,6 +103,7 @@
   #:use-module (gnu packages golang-compression)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages gnupg)
   #:use-module (gnu packages graph)
   #:use-module (gnu packages graphics)
   #:use-module (gnu packages graphviz)
@@ -134,6 +135,7 @@
   #:use-module (gnu packages node)
   #:use-module (gnu packages ocaml)
   #:use-module (gnu packages pcre)
+  #:use-module (gnu packages package-management)
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages pdf)
   #:use-module (gnu packages perl)
@@ -6585,6 +6587,64 @@ implementation} is intended to be feature complete and to provide comprehensive
 validation of CWL files as well as provide other tools related to working with
 CWL descriptions.")
     (license license:asl2.0)))
+
+(define-public ravanan
+  (package
+    (name "ravanan")
+    (version "0.1.0")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://github.com/arunisaac/ravanan/releases/download/v"
+                    version "/ravanan-" version ".tar.lz"))
+              (sha256
+               (base32
+                "163r3iyqfdwd3bizm36axfsvnppqwqd6zxl2vwf7sq0lcgl2zx5p"))))
+    (arguments
+     (list #:make-flags
+           #~(list (string-append "prefix=" #$output)
+                   (string-append "NODE=" (search-input-file %build-inputs "bin/node")))
+           #:modules `(((guix build guile-build-system)
+                        #:select (target-guile-effective-version))
+                       ,@%default-gnu-imported-modules)
+           #:phases
+           (with-imported-modules `((guix build guile-build-system)
+                                    ,@%default-gnu-imported-modules)
+             #~(modify-phases %standard-phases
+                 (delete 'configure)
+                 (add-after 'install 'wrap
+                   (lambda* (#:key inputs outputs #:allow-other-keys)
+                     (let ((out (assoc-ref outputs "out"))
+                           (effective-version (target-guile-effective-version)))
+                       (wrap-program (string-append out "/bin/ravanan")
+                         `("GUILE_LOAD_PATH" prefix
+                           (,(string-append out "/share/guile/site/" effective-version)
+                            ,(getenv "GUILE_LOAD_PATH")))
+                         `("GUILE_LOAD_COMPILED_PATH" prefix
+                           (,(string-append out "/lib/guile/"
+                                            effective-version "/site-ccache")
+                            ,(getenv "GUILE_LOAD_COMPILED_PATH")))))))))))
+    (inputs
+     (list bash-minimal
+           node
+           guile-3.0
+           guile-filesystem
+           guile-gcrypt
+           guile-json-4
+           guile-libyaml
+           guix))
+    (native-inputs
+     (list lzip))
+    (build-system gnu-build-system)
+    (home-page "https://github.com/arunisaac/ravanan")
+    (synopsis "High-reproducibility CWL runner powered by Guix")
+    (description "ravanan is a @acronym{CWL, Common Workflow Language}
+implementation that is powered by GNU Guix and provides strong reproducibility
+guarantees.  ravanan provides strong caching of intermediate results so the
+same step of a workflow is never run twice.  ravanan captures logs from every
+step of the workflow for easy tracing back in case of job failures.  ravanan
+currently runs on single machines and on slurm via its API.")
+    (license license:gpl3+)))
 
 (define-public python-dendropy
   (package
@@ -19098,6 +19158,9 @@ implementation differs in these ways:
                             " and not scanpy.get._aggregated.aggregate"
                             " and not scanpy.plotting._tools.scatterplots.spatial"
 
+                            ;; One difference in a long array.
+                            " and not test_cell_demultiplexing"
+
                             ;; These try to connect to the network
                             " and not test_scrublet_plots"
                             " and not test_plot_rank_genes_groups_gene_symbols"
@@ -24109,7 +24172,7 @@ single-cell data named @url{https://github.com/PMBio/cardelino, cardelino}.")
 (define-public ccwl
   (package
     (name "ccwl")
-    (version "0.3.0")
+    (version "0.4.0")
     (source
      (origin
        (method url-fetch)
@@ -24117,7 +24180,7 @@ single-cell data named @url{https://github.com/PMBio/cardelino, cardelino}.")
                            version ".tar.lz"))
        (sha256
         (base32
-         "0za710mcn9di1njli3dk3660n3836ip8b4msb8f958498va95y7j"))))
+         "1vnkj34400kj77xavdr0cry0vm2fmk40vf7cwca61q3jl3h7hl2c"))))
     (build-system gnu-build-system)
     (arguments
      `(#:make-flags '("GUILE_AUTO_COMPILE=0") ; to prevent guild warnings
@@ -24460,9 +24523,9 @@ for nanopore cDNA, native RNA, and PacBio sequencing reads.")
 functions.")
     (license license:bsd-3)))
 
-(define-public go-github-com-biogo-store-interval
+(define-public go-github-com-biogo-store
   (package
-    (name "go-github-com-biogo-store-interval")
+    (name "go-github-com-biogo-store")
     (version "0.0.0-20201120204734-aad293a2328f")
     (source (origin
               (method git-fetch)
@@ -24475,8 +24538,9 @@ functions.")
                 "0skizrp1j6vgbl0g1kmh73picagqlvwckaqs0gkl6rai5lckxj8a"))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/biogo/store/interval"
-       #:unpack-path "github.com/biogo/store"))
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/biogo/store"))
     (propagated-inputs
      (list go-gopkg-in-check-v1
            go-github-com-kr-pretty))
@@ -24487,45 +24551,9 @@ functions.")
 useful for bioinformatic analysis.")
     (license license:bsd-3)))
 
-(define-public go-github-com-biogo-store-kdtree
+(define-public go-github-com-biogo-hts
   (package
-    (inherit go-github-com-biogo-store-interval)
-    (name "go-github-com-biogo-store-kdtree")
-    (arguments
-     '(#:import-path "github.com/biogo/store/kdtree"
-       #:unpack-path "github.com/biogo/store"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1
-           go-github-com-kr-pretty))
-    (synopsis "kdtree store type for biogo")))
-
-(define-public go-github-com-biogo-store-llrb
-  (package
-    (inherit go-github-com-biogo-store-interval)
-    (name "go-github-com-biogo-store-llrb")
-    (arguments
-     '(#:import-path "github.com/biogo/store/llrb"
-       #:unpack-path "github.com/biogo/store"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1
-           go-github-com-kr-pretty))
-    (synopsis "LLRB store for biogo")))
-
-(define-public go-github-com-biogo-store-step
-  (package
-    (inherit go-github-com-biogo-store-interval)
-    (name "go-github-com-biogo-store-step")
-    (arguments
-     '(#:import-path "github.com/biogo/store/step"
-       #:unpack-path "github.com/biogo/store"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1
-           go-github-com-kr-pretty))
-    (synopsis "Step store for biogo")))
-
-(define-public go-github-com-biogo-hts-bam
-  (package
-    (name "go-github-com-biogo-hts-bam")
+    (name "go-github-com-biogo-hts")
     (version "1.4.4")
     (source (origin
               (method git-fetch)
@@ -24538,91 +24566,22 @@ useful for bioinformatic analysis.")
                 "1vkcqxyajghx5p5j7g2i376nbsxh8q2smk0smlv8mi34yr7hlw5b"))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/biogo/hts/bam"
-       #:unpack-path "github.com/biogo/hts"))
-    (propagated-inputs
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/biogo/hts"
+      ;; Tests try to get samples from <https://github.com/samtools/htslib>.
+      #:test-flags #~(list "-skip" "TestHasEOF|TestRead")))
+    (native-inputs
      (list go-gopkg-in-check-v1))
-    (home-page "https://github.com/biogo/hts")
-    (synopsis "HTS BAM module for biogo")
-    (description "This package provides tools for handling BAM files.")
-    (license license:bsd-3)))
-
-(define-public go-github-com-biogo-hts-sam
-  (package
-    (inherit go-github-com-biogo-hts-bam)
-    (name "go-github-com-biogo-hts-sam")
-    (arguments
-     '(#:import-path "github.com/biogo/hts/sam"
-       #:unpack-path "github.com/biogo/hts"))
     (propagated-inputs
-     (list go-gopkg-in-check-v1))
-    (synopsis "HTS SAM module for biogo")
-    (description "This package provides tools for handling SAM files.")))
-
-(define-public go-github-com-biogo-hts-tabix
-  (package
-    (inherit go-github-com-biogo-hts-bam)
-    (name "go-github-com-biogo-hts-tabix")
-    (arguments
-     '(#:import-path "github.com/biogo/hts/tabix"
-       #:unpack-path "github.com/biogo/hts"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1))
-    (synopsis "HTS Tabix module for biogo")
-    (description "This package provides tools for handling Tabix files.")))
-
-(define-public go-github-com-biogo-hts-bgzf
-  (package
-    (inherit go-github-com-biogo-hts-bam)
-    (name "go-github-com-biogo-hts-bgzf")
-    (arguments
-     '(#:import-path "github.com/biogo/hts/bgzf"
-       #:unpack-path "github.com/biogo/hts"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1))
-    (synopsis "HTS bgzf module for biogo")
-    (description "This package provides tools for handling bgzf files.")))
-
-(define-public go-github-com-biogo-hts-cram
-  (package
-    (inherit go-github-com-biogo-hts-bam)
-    (name "go-github-com-biogo-hts-cram")
-    (arguments
-     '(#:import-path "github.com/biogo/hts/cram"
-       #:unpack-path "github.com/biogo/hts"
-       #:tests? #false)) ;require network access
-    (propagated-inputs
-     (list go-gopkg-in-check-v1
-           go-github-com-ulikunitz-xz
+     (list go-github-com-ulikunitz-xz
            go-github-com-kortschak-utter))
-    (synopsis "HTS CRAM module for biogo")
-    (description "This package provides tools for handling CRAM files.")))
-
-(define-public go-github-com-biogo-hts-csi
-  (package
-    (inherit go-github-com-biogo-hts-bam)
-    (name "go-github-com-biogo-hts-csi")
-    (arguments
-     '(#:import-path "github.com/biogo/hts/csi"
-       #:unpack-path "github.com/biogo/hts"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1))
-    (synopsis "Coordinate sorted indexing for biogo")
-    (description "This package implements CSIv1 and CSIv2 coordinate sorted
-indexing.")))
-
-(define-public go-github-com-biogo-hts-fai
-  (package
-    (inherit go-github-com-biogo-hts-bam)
-    (name "go-github-com-biogo-hts-fai")
-    (arguments
-     '(#:import-path "github.com/biogo/hts/fai"
-       #:unpack-path "github.com/biogo/hts"))
-    (propagated-inputs
-     (list go-gopkg-in-check-v1))
-    (synopsis "Fasta sequence file index handling for biogo")
-    (description "This package implements FAI fasta sequence file index
-handling.")))
+    (home-page "https://github.com/biogo/hts")
+    (synopsis "HTS module for biogo")
+    (description
+     "This package provides tools for handling BAM, SAM, Tabix, bgzf, CRAM,
+CSIv1, CSIv2 and FAI files.")
+    (license license:bsd-3)))
 
 (define-public go-github-com-biogo-biogo
   (package
@@ -24642,11 +24601,8 @@ handling.")))
      '(#:import-path "github.com/biogo/biogo"))
     (propagated-inputs
      (list go-gopkg-in-check-v1
-           go-github-com-biogo-store-interval
-           go-github-com-biogo-store-kdtree
-           go-github-com-biogo-store-llrb
-           go-github-com-biogo-store-step
-           go-github-com-biogo-hts-bam
+           go-github-com-biogo-store
+           go-github-com-biogo-hts
            go-github-com-biogo-graph))
     (home-page "https://github.com/biogo/biogo")
     (synopsis "Bioinformatics library for Go")

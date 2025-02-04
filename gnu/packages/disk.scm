@@ -71,7 +71,6 @@
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gnupg)
-  #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages graphics)
@@ -594,6 +593,30 @@ which respectively make and check MS-DOS FAT file systems.")
     (description "This package provides a statically-linked @command{fsck.fat}
 and a @command{fsck.vfat} compatibility symlink for use in an initrd.")
     (license (package-license dosfstools))))
+
+(define-public fatresize
+  (package
+    (name "fatresize")
+    (version "1.1.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/ya-mouse/fatresize")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1vhz84kxfyl0q7mkqn68nvzzly0a4xgzv76m6db0bk7xyczv1qr2"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (list pkg-config))
+    (inputs
+     (list parted))
+    (home-page "https://github.com/ya-mouse/fatresize")
+    (synopsis "Resize FAT partitions")
+    (description
+     "This package provides a tool to resize FAT partitions using libparted.")
+    (license license:gpl3+)))
 
 (define-public hdparm
   (package
@@ -1213,7 +1236,11 @@ to create devices with respective mappings for the ATARAID sets discovered.")
                             (false-if-exception
                              (search-input-file inputs
                                                 (string-append "sbin/" program)))
-                            program)))))))))
+                            (begin
+                              (format (current-warning-port)
+                                      "warning: program ~s left unpatched~%"
+                                      program)
+                              program))))))))))
     (native-inputs
      (list gobject-introspection
            pkg-config
@@ -1320,7 +1347,7 @@ on your file system and offers to remove it.  @command{rmlint} can find:
 (define-public lf
   (package
     (name "lf")
-    (version "31")
+    (version "33")
     (source
      (origin
        (method git-fetch)
@@ -1329,7 +1356,7 @@ on your file system and offers to remove it.  @command{rmlint} can find:
              (commit (string-append "r" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "03icsf4c3j7295s1d8s6srz5gf09a3lghgw3zfcd86p03zhkzsaf"))))
+        (base32 "1jmqf27ysi35n3hqahlzs5hym7i4w1mplklrvv0lc0baddzx7av8"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -1337,10 +1364,13 @@ on your file system and offers to remove it.  @command{rmlint} can find:
       #:import-path "github.com/gokcehan/lf"))
     (native-inputs
      (list go-github-com-djherbis-times
+           go-github-com-fsnotify-fsnotify
            go-github-com-gdamore-tcell-v2
            go-github-com-mattn-go-runewidth
+           go-github-com-xuanwo-go-locale
+           go-golang-org-x-sys
            go-golang-org-x-term
-           go-gopkg-in-djherbis-times-v1))
+           go-golang-org-x-text))
     (home-page "https://github.com/gokcehan/lf")
     (synopsis "Console file browser similar to Ranger")
     (description

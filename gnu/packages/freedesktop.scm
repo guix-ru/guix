@@ -1419,7 +1419,7 @@ Python.")
 (define-public hyprland-protocols
   (package
     (name "hyprland-protocols")
-    (version "0.4.0")
+    (version "0.6.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1428,7 +1428,7 @@ Python.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0x86w7z3415qvixfhk9a8v5fnbnxdydzx366qz0mpmfg5h86qyha"))))
+                "01nlkznq9gkkz3q2y1m1q5v4rz0qdrxsngxbnpxarnmbg4is18lm"))))
     (build-system meson-build-system)
     (home-page "https://github.com/hyprwm/hyprland-protocols")
     (synopsis "Wayland protocol extensions for Hyprland")
@@ -1439,7 +1439,7 @@ Python.")
 (define-public hyprwayland-scanner
   (package
     (name "hyprwayland-scanner")
-    (version "0.4.2")
+    (version "0.4.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1448,11 +1448,11 @@ Python.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0r7ay4zjkfyr0xd73wz99qhnqjq7nma98gm51wm9lmai4igw90qw"))))
+                "1bnckwj7hh4k4knlyprybi1fmy9vda2h492hw6yska2shfzp6jvy"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f))      ;No tests.
     (inputs (list pugixml))
-    (native-inputs (list gcc-13 pkg-config))
+    (native-inputs (list gcc-14 pkg-config))
     (home-page "https://github.com/hyprwm/hyprwayland-scanner")
     (synopsis "Hyprland implementation of @code{wayland-scanner}")
     (description
@@ -1860,8 +1860,9 @@ Analysis and Reporting Technology) functionality.")
     (source (origin
               (method url-fetch)
               (uri (string-append
-                    "https://github.com/storaged-project/udisks/releases/download/udisks-"
-                    version "/udisks-" version ".tar.bz2"))
+                    "https://github.com/storaged-project/" name
+                    "/releases/download/" name "-" version "/"
+                    name "-" version ".tar.bz2"))
               (sha256
                (base32
                 "1klf5pcr9yg8g88mwwh3q2j0idfwd8hfr2q6nknhsm02yv638mxp"))))
@@ -1904,14 +1905,15 @@ Analysis and Reporting Technology) functionality.")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-commands
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "src/udisksstate.c"
-               (("\"umount -l")
-                (string-append "\"" (search-input-file inputs "bin/umount")
-                               " -l")))
-             (substitute* "src/udiskslinuxdrive.c"
-               (("\"eject %s")
-                (string-append "\"" (search-input-file inputs "bin/eject"))))))
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "src/udiskslinuxdrive.c"
+                (("\"eject %s\"")
+                 (format #f "\"~a %s\""
+                         (search-input-file inputs "bin/eject"))))
+              (substitute* "src/udisksstate.c"
+                (("\"umount -l %s\"")
+                 (format #f "\"~a -l %s\""
+                         (search-input-file inputs "bin/umount"))))))
           (add-before 'configure 'fix-girdir
             (lambda _
               ;; Install introspection data to its own output.
@@ -3339,7 +3341,7 @@ interfaces.")
                      (("\\<(hyprland-share-picker)\\>" _ cmd)
                       (string-append #$output "/bin/" cmd))))))))
     (native-inputs
-     (list gcc-13 hyprwayland-scanner pkg-config))
+     (list gcc-14 hyprwayland-scanner pkg-config))
     (inputs
      (list bash-minimal
            grim

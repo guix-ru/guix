@@ -24104,7 +24104,7 @@ SLiM@.  Thus, the configuration of these display managers aggregates an
 @table @asis
 @item @code{modules} (default: @code{%default-xorg-modules})
 This is a list of @dfn{module packages} loaded by the Xorg
-server---e.g., @code{xf86-video-vesa}, @code{xf86-input-keyboard}, and so on.
+server---e.g., @code{xf86-video-vesa}, @code{xf86-input-libinput}, and so on.
 
 @item @code{fonts} (default: @code{%default-xorg-fonts})
 This is a list of font directories to add to the server's @dfn{font path}.
@@ -41514,7 +41514,25 @@ A @code{<dicod-database>} object serving the GNU Collaborative International
 Dictionary of English using the @code{gcide} package.
 @end defvar
 
-The following is an example @code{dicod-service-type} configuration.
+@deffn {Procedure} dicod-freedict-database dictionary-name
+Returns a record of type @code{dicod-database} for purpose of
+configuring a database for the FreeDict multilingual dictionary named by
+@var{dictionary-name}, a string such as @code{"kur-eng"} for the
+Kurdish-to-English dictionary, into a service of type
+@code{dicod-service-type}.
+@end deffn
+
+@defvar %dicod-databases:freedict
+A relatively large list of records of type @code{dicod-database}, made
+available for users who wish to configure all the FreeDict multilingual
+dictionaries provided by the @code{freedict-dictionaries} package into a
+service of type @code{dicod-service-type}.
+@end defvar
+
+The following is an example @code{dicod-service-type} configuration,
+extending a @command{dicod} daemon serving databases for the wordnet and
+gcide dictionaries, as well as a selection of FreeDict multilingual
+dictionaries.
 
 @lisp
 (service dicod-service-type
@@ -41525,12 +41543,15 @@ The following is an example @code{dicod-service-type} configuration.
                       (module "wordnet")
                       (options
                        (list #~(string-append "wnhome=" #$wordnet))))))
-          (databases (list
+          (databases (cons*
                       (dicod-database
                        (name "wordnet")
                        (complex? #t)
                        (handler "wordnet"))
-                      %dicod-database:gcide))))
+                      %dicod-database:gcide
+                      (map
+                       dicod-freedict-database
+                       '("fra-eng" "eng-fra" "eng-spa" "spa-eng"))))))
 @end lisp
 
 @cindex Docker
@@ -45702,6 +45723,40 @@ system:
                                             (shepherd my-shepherd))))))
 @end lisp
 
+@anchor{shepherd-transient-timer-services}
+@cindex @code{transient} service, Shepherd
+@defvar shepherd-transient-service-type
+This service type represents the Shepherd's @code{transient} service,
+which lets you spawn commands in the background and interact with them
+as regular Shepherd service; it is similar to @command{systemd-run}.
+
+For example, the command below spawns @command{rsync} in the background,
+in an environment where the @env{SSH_AUTH_SOCK} environment variable has
+the given value:
+
+@example
+herd spawn transient -E SSH_AUTH_SOCK=$SSH_AUTH_SOCK -- \
+  rsync -e ssh -vur . backup.example.org:
+@end example
+
+@xref{Transient Service Maker,,, shepherd, The GNU Shepherd Manual}, for
+more info on the @code{transient} service.
+@end defvar
+
+@cindex @code{timer} service, Shepherd
+@defvar shepherd-timer-service-type
+This is the service type representing the Shepherd's @code{timer}
+service, which lets you schedule the execution of commands, similar to
+the venerable @command{at} command.  Here is an example:
+
+@example
+herd schedule timer at 07:00 -- mpg123 Music/alarm.mp3
+@end example
+
+@xref{Timer Service,,, shepherd, The GNU Shepherd Manual}, for more info
+on the @code{timer} service.
+@end defvar
+
 @defvar %shepherd-root-service
 This service represents PID@tie{}1.
 @end defvar
@@ -47331,6 +47386,17 @@ for its system-wide counterpart.  @xref{log-rotation-configuration}, for
 its reference.
 
 This service is part of @code{%base-home-services}.
+@end defvar
+
+@defvar home-shepherd-transient-service-type
+@defvarx home-shepherd-timer-service-type
+These are the @code{timer} and @code{transient} Shepherd services.  The
+former lets you schedule command execution for later, while the latter
+can run commands in the background as a regular service.
+
+@xref{shepherd-transient-timer-services, the system @code{timer} and
+@code{transient} services}, which are their Guix System counterparts,
+for more info.
 @end defvar
 
 @node Secure Shell

@@ -51,6 +51,8 @@
 ;;; Copyright © 2024 Artyom Bologov <mail@aartaka.me>
 ;;; Copyright © 2024 Felix Lechner <felix.lechner@lease-up.com>
 ;;; Copyright © 2024 Alec Barreto <mrh57@posteo.net>
+;;; Copyright © 2024 Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -149,14 +151,14 @@
 (define-public artanis
   (package
     (name "artanis")
-    (version "1.1.0")
+    (version "1.2.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/artanis/artanis-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "1b7mab8izvli4152hzv4n2z67kw0kwm7pvh0m960whr77rdxwid4"))
+                "013rs623075bbf824hf6jxng0kwbmg587l45fis9mmpq5168kspq"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -1047,7 +1049,7 @@ that augment Guile's support for handling files and their names.")
 (define-public guile-swayer
   (package
     (name "guile-swayer")
-    (version "0.3.0")
+    (version "0.4.1")
     (home-page "https://github.com/ebeem/guile-swayer")
     (source
      (origin
@@ -1056,11 +1058,10 @@ that augment Guile's support for handling files and their names.")
              (url "https://github.com/ebeem/guile-swayer")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
-       (snippet '(delete-file "manifest.scm"))
        (sha256
-        (base32 "16npa337rp0s9rg4fc749b1nq6kfxj77pdd1qfh9xdrb1n0w7awi"))))
-    (native-inputs (list guile-3.0))
-    (build-system guile-build-system)
+        (base32 "14w126444jsbpqyhic1ibg1zwzmai9hlnzdk4gg1cj7fclq6vxpb"))))
+    (native-inputs (list autoconf automake guile-3.0 pkg-config))
+    (build-system gnu-build-system)
     (synopsis "Extensible Guile bindings for SwayWM")
     (description
      "This package provides extensible Guile bindings for the Sway window
@@ -1984,6 +1985,7 @@ bindings to the @code{yaml-cpp} C++ library.")
                   ,@%default-gnu-modules)
        #:imported-modules ((guix build guile-build-system)
                            ,@%default-gnu-imported-modules)
+       #:make-flags '("LDFLAGS=\"-Wl,-allow-multiple-definition\"")
        #:configure-flags
        (list (string-append
               "--with-guile-site-dir=" %output "/share/guile/site/"
@@ -2005,9 +2007,9 @@ bindings to the @code{yaml-cpp} C++ library.")
                     (ext (string-append out "/lib/libguile-dbi")))
                (substitute* dbi.scm (("libguile-dbi") ext))))))))
     (native-inputs
-     (list autoconf automake libtool perl texinfo))
+     (list autoconf automake libtool perl texinfo libltdl))
     (propagated-inputs
-     (list guile-2.2))
+     (list guile-3.0))
     (synopsis "Guile database abstraction layer")
     (home-page "https://github.com/opencog/guile-dbi")
     (description
@@ -6263,8 +6265,8 @@ is an attempt to combine both into something useful.")
       (license license:asl2.0))))
 
 (define-public guile-knots
-  (let ((commit "d572f591a3c136bfc7b23160e16381c92588f8d9")
-        (revision "4"))
+  (let ((commit "eebb42e7a778eb21342fcd861e313bf21f0afc94")
+        (revision "6"))
     (package
     (name "guile-knots")
     (version (git-version "0" revision commit))
@@ -6275,7 +6277,7 @@ is an attempt to combine both into something useful.")
                     (commit commit)))
               (sha256
                (base32
-                "0g85frfniblxb2cl81fg558ic3cxvla7fvml08scjgbbxn8151gv"))
+                "197hknxvrl9wp99ib6jvbnx9mvx24dnj0l5a9gfd8waadb9iafbi"))
               (file-name (string-append name "-" version "-checkout"))))
     (build-system gnu-build-system)
     (native-inputs

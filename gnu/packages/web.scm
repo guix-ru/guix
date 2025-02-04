@@ -370,12 +370,6 @@ and its related documentation.")
                #$version))
       #:phases
       #~(modify-phases %standard-phases
-          ;; XXX: Replace when go-build-system supports nested path.
-          (replace 'check
-            (lambda* (#:key import-path tests? #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion (string-append "src/" import-path)
-                  (invoke "go" "test" "-v" "./...")))))
           (add-after 'install 'install-manpage
             (lambda* (#:key import-path #:allow-other-keys)
               (let ((man1 (string-append #$output "/share/man/man1/"))
@@ -402,8 +396,7 @@ and its related documentation.")
            go-golang-org-x-net
            go-golang-org-x-oauth2
            go-golang-org-x-term
-           go-golang-org-x-text
-           go-mvdan-cc-xurls-v2))
+           go-golang-org-x-text))
     (home-page "https://miniflux.app/")
     (synopsis "Minimalist and opinionated feed reader")
     (description
@@ -1961,7 +1954,7 @@ UTS#46.")
 (define-public esbuild
   (package
     (name "esbuild")
-    (version "0.14.0")
+    (version "0.24.0")
     (source
      (origin
        (method git-fetch)
@@ -1970,43 +1963,28 @@ UTS#46.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09r1xy0kk6c9cpz6q0mxr4why373pwxbm439z2ihq3k1d5kk7x4w"))
+        (base32 "1j99m7rdql6iq3llrr8bm85hq34ssc8bmb6vhwr1ibgspjl0jd3k"))
        (modules '((guix build utils)))
        (snippet
-        '(begin
-           ;; Remove prebuilt binaries
-           (delete-file-recursively "npm")
-           #t))))
+        #~(begin
+            ;; Remove prebuilt binaries
+            (delete-file-recursively "npm")))))
     (build-system go-build-system)
     (arguments
-     `(#:import-path "github.com/evanw/esbuild/cmd/esbuild"
-       #:unpack-path "github.com/evanw/esbuild"
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'check
-           (lambda* (#:key tests? unpack-path #:allow-other-keys)
-             (when tests?
-               ;; The "Go Race Detector" is only supported on 64-bit
-               ;; platforms, this variable disables it.
-               ;; TODO: Causes too many rebuilds, rewrite to limit to x86_64,
-               ;; aarch64 and ppc64le.
-               ,(if (target-riscv64?)
-                  `(setenv "ESBUILD_RACE" "")
-                  `(unless ,(target-64bit?)
-                     (setenv "ESBUILD_RACE" "")))
-               (with-directory-excursion (string-append "src/" unpack-path)
-                 (invoke "make" "test-go")))
-             #t)))))
+     (list
+      #:import-path "github.com/evanw/esbuild/cmd/esbuild"
+      #:unpack-path "github.com/evanw/esbuild"
+      #:test-flags #~(list #$(if (target-64bit?) "-race" "-short"))
+      ;; Test subdirectories are compiled from #:import-path.
+      #:test-subdirs #~(list "../../internal/..." "../../pkg/..." )))
     (inputs
-     `(("golang.org/x/sys" ,go-golang-org-x-sys)))
-    (native-inputs
-     `(("github.com/kylelemons/godebug" ,go-github-com-kylelemons-godebug)))
+     (list go-golang-org-x-sys-for-esbuild))
     (home-page "https://esbuild.github.io/")
     (synopsis "Bundler and minifier tool for JavaScript and TypeScript")
     (description
-     "The esbuild tool provides a unified bundler, transpiler and
-minifier.  It packages up JavaScript and TypeScript code, along with JSON
-and other data, for distribution on the web.")
+     "The esbuild tool provides a unified bundler, transpiler and minifier.
+It packages up JavaScript and TypeScript code, along with JSON and other data,
+for distribution on the web.")
     (license license:expat)))
 
 (define-public tinyproxy
@@ -5295,8 +5273,8 @@ Cloud.")
     (license license:expat)))
 
 (define-public guix-data-service
-  (let ((commit "c886685e9284da4bbed9377f70dd70da9e7ca29f")
-        (revision "58"))
+  (let ((commit "8f3968af1e9cc09f7156f406d4b2e0c72976f683")
+        (revision "60"))
     (package
       (name "guix-data-service")
       (version (string-append "0.0.1-" revision "." (string-take commit 7)))
@@ -5308,7 +5286,7 @@ Cloud.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "0rg8ydzg4s984bvz73343vqb3fkykk7x48121c1rzdiakh3ndp1i"))))
+                  "1wz1xgzgzk6cv2vaxn4rq1d7rdyvamnklzl5qjj9svlim07v862c"))))
       (build-system gnu-build-system)
       (arguments
        (list
@@ -5550,13 +5528,17 @@ you'd expect.")
                 "0s7c8r6y5jv6wda2v3k47hawfdr9j3rwk717l6byvh5qsbbml0vd"))))
     (build-system go-build-system)
     (arguments
-     (list #:import-path "github.com/mikefarah/yq/v4"
-           #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'install 'remove-binary
-                 (lambda _
-                   (delete-file-recursively
-                    (string-append #$output "/bin")))))))
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/mikefarah/yq/v4"
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Tests need this.
+          (add-after 'unpack 'fix-access-to-doc
+            (lambda* (#:key import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (for-each make-file-writable
+                          (find-files "./pkg/yqlib/doc" "\\.md"))))))))
     (propagated-inputs
      (list go-github-com-a8m-envsubst
            go-github-com-alecthomas-participle-v2
@@ -5591,14 +5573,12 @@ JSON, XML, properties, CSV and TSV.")
     (inherit go-github-com-mikefarah-yq-v4)
     (name "yq")
     (arguments
-     (list #:install-source? #f
-           #:import-path "github.com/mikefarah/yq/v4"
-           #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'install 'rename-binary
-                 (lambda _
-                   (rename-file (string-append #$output "/bin/v4")
-                                (string-append #$output "/bin/yq")))))))
+     (substitute-keyword-arguments
+         (package-arguments go-github-com-mikefarah-yq-v4)
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:import-path _) "github.com/mikefarah/yq")))
     (propagated-inputs '())
     (inputs (package-propagated-inputs go-github-com-mikefarah-yq-v4))))
 
@@ -6451,44 +6431,46 @@ handling many of the web standards in use today.")
     (license license:gpl2+)))
 
 (define-public surfraw
-  (package
-    (name "surfraw")
-    (version "2.3.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://gitlab.com/surfraw/Surfraw/uploads/"
-                           "2de827b2786ef2fe43b6f07913ca7b7f/"
-                           "surfraw-" version ".tar.gz"))
-       (sha256
-        (base32 "099nbif0x5cbcf18snc58nx1a3q7z0v9br9p2jiq9pcc7ic2015d"))))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'patch-perl
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let ((perl (assoc-ref inputs "perl")))
-               (substitute* "surfraw.IN"
-                 (("perl -e")
-                  (string-append perl "/bin/perl -e")))
-               #t)))
-         (add-after 'install 'compress-elvi.1sr
-           (lambda* (#:key outputs #:allow-other-keys)
-             ;; The manpages of the elvis are symlinks to elvi.1sr.gz
-             ;; but elvi.1sr does not get compressed by our manpage phase.
-             (let* ((out (assoc-ref %outputs "out"))
-                    (man (string-append out "/share/man/man1")))
-               (with-directory-excursion man
-                 (invoke "gzip" "elvi.1sr"))))))))
-    (inputs
-     (list perl perl-www-opensearch perl-html-parser perl-libwww))
-    (synopsis "Unix command line interface to the www")
-    (description "Surfraw (Shell Users' Revolutionary Front Rage Against the Web)
+  (let ((commit "ebb8131c7c623ef90d3345cd9d64203693861013")
+        (revision "0"))
+    (package
+      (name "surfraw")
+      (version (git-version "2.3.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://gitlab.com/surfraw/Surfraw/")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1y3qybbyv8fnfpaw76xkh1b53pd7dvx1zr9pj71df649g4kbbibs"))))
+      (build-system gnu-build-system)
+      (arguments
+       `(#:phases (modify-phases %standard-phases
+                    (add-before 'configure 'patch-perl
+                      (lambda* (#:key inputs #:allow-other-keys)
+                        (let ((perl (assoc-ref inputs "perl")))
+                          (substitute* "surfraw.IN"
+                            (("perl -e")
+                             (string-append perl "/bin/perl -e"))) #t)))
+                    (add-after 'install 'compress-elvi.1sr
+                      (lambda* (#:key outputs #:allow-other-keys)
+                        ;; The manpages of the elvis are symlinks to elvi.1sr.gz
+                        ;; but elvi.1sr does not get compressed by our manpage phase.
+                        (let* ((out (assoc-ref %outputs "out"))
+                               (man (string-append out "/share/man/man1")))
+                          (with-directory-excursion man
+                            (invoke "gzip" "elvi.1sr"))))))))
+      (native-inputs (list autoconf automake))
+      (inputs (list perl perl-www-opensearch perl-html-parser perl-libwww))
+      (synopsis "Unix command line interface to the www")
+      (description
+       "Surfraw (Shell Users' Revolutionary Front Rage Against the Web)
 provides a unix command line interface to a variety of popular www search engines
 and similar services.")
-    (home-page "https://surfraw.alioth.debian.org/")
-    (license license:public-domain)))
+      (home-page "http://surfraw.org/")
+      (license license:public-domain))))
 
 (define-public darkhttpd
   (package
@@ -9032,7 +9014,7 @@ Anonip can also be uses as a Python module in your own Python application.")
          "0kckcwvqklavd855np9aq5js6mg84isrlwchr504yigwma0sm7hm"))))
     (build-system go-build-system)
     (propagated-inputs
-     (list go-github-com-robfig-cron go-golang-org-x-time))
+     (list go-github-com-robfig-cron-v3 go-golang-org-x-time))
     (arguments
      `(#:import-path "github.com/tsileo/poussetaches"))
     (home-page "https://github.com/tsileo/poussetaches")

@@ -57,6 +57,7 @@
   #:use-module (guix build-system go)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system python)
+  #:use-module (guix build-system pyproject)
   #:use-module (guix build-system qt)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages algebra)
@@ -81,8 +82,8 @@
   #:use-module (gnu packages gl)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
-  #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
+  #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages graphics)
   #:use-module (gnu packages image)
@@ -98,6 +99,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages profiling)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-check)
   #:use-module (gnu packages python-compression)
   #:use-module (gnu packages python-crypto)
@@ -116,6 +118,55 @@
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages))
+
+(define-public swayimg
+  (package
+    (name "swayimg")
+    (version "3.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/artemsen/swayimg")
+             (commit (string-append "v" version))))
+       (sha256
+        (base32 "15nqb1igikkvrzx3dhyj9msynfpvrnqvql6plqm8fhg10fbimfhd"))))
+    (build-system meson-build-system)
+    (arguments
+     `(#:configure-flags '(,(string-append "-Dversion=" version))))
+    (native-inputs (list pkg-config))
+    (inputs (list bash-completion
+                  fontconfig
+                  freetype
+                  giflib
+                  ijg-libjpeg
+                  imath
+                  json-c
+                  libavif
+                  libexif
+                  libheif
+                  libjxl
+                  libpng
+                  librsvg
+                  libtiff
+                  libwebp
+                  libxkbcommon
+                  openexr
+                  wayland
+                  wayland-protocols))
+    (home-page "https://github.com/artemsen/swayimg")
+    (synopsis "Customizable and lightweight image viewer for Wayland")
+    (description
+     "Swayimg is a fully customizable and lightweight image viewer for Wayland
+based display servers.  It supports the most popular image formats (JPEG, JPEG
+XL, PNG, GIF, SVG, WebP, HEIF/AVIF, AV1F/AVIFS, TIFF, EXR, BMP, PNM, TGA, QOI,
+DICOM, Farbfeld).  It has fully customizable keyboard bindings, colors, and
+many other parameters.  It also supports loading images from files and pipes,
+and provides gallery and viewer modes with slideshow and animation support.
+It also includes a Sway integration mode: the application creates an overlay
+above the currently active window, which gives the illusion that you are
+opening the image directly in a terminal window.")
+    (license license:expat)))
 
 (define-public ytfzf
   (package
@@ -527,7 +578,7 @@ It supports JPEG, PNG and GIF formats.")
 (define-public pixterm
   (package
     (name "pixterm")
-    (version "1.3.1")
+    (version "1.3.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -536,14 +587,14 @@ It supports JPEG, PNG and GIF formats.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0fm6c0mjz6zillqjirnjjf7mkrax1gyfcv6777i07ms3bnv0pcii"))))
+                "08x0pwnl3cyq5f29fxj379p9klzxl85p8jq2595xdz3mhb3pkgsg"))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/eliukblau/pixterm/cmd/pixterm"
+     '(#:install-source? #f
+       #:import-path "github.com/eliukblau/pixterm/cmd/pixterm"
        #:unpack-path "github.com/eliukblau/pixterm"))
     (inputs (list go-github-com-disintegration-imaging
                   go-github-com-lucasb-eyer-go-colorful
-                  go-golang-org-x-crypto
                   go-golang-org-x-image
                   go-golang-org-x-term))
     (home-page "https://github.com/eliukblau/pixterm")
@@ -624,7 +675,7 @@ imaging.  It supports several HDR and LDR image formats, and it can:
 (define-public mcomix
   (package
     (name "mcomix")
-    (version "2.0.2")
+    (version "3.1.0")
     (source
      (origin
        (method url-fetch)
@@ -632,17 +683,19 @@ imaging.  It supports several HDR and LDR image formats, and it can:
                            "mcomix-" version ".tar.gz"))
        (sha256
         (base32
-         "0n0akk3njsm0paqxfbxqycwhwy6smjg0rhlcz5r7r82n7rqx0f7g"))))
-    (build-system python-build-system)
+         "09y4nhlcqvvhz0wscx4zpqxmyhiwh8wrjnhk52awxhzvgyx6wa7r"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-wheel))
     (inputs
      (list p7zip python python-pillow python-pygobject python-pycairo gtk+))
     (arguments
      (list
-      #:imported-modules `(,@%python-build-system-modules
+      #:imported-modules `(,@%pyproject-build-system-modules
                            (guix build glib-or-gtk-build-system))
-      #:modules '((guix build python-build-system)
+      #:modules '((guix build pyproject-build-system)
                   ((guix build glib-or-gtk-build-system) #:prefix glib-or-gtk:)
                   (guix build utils))
+      #:tests? #f                       ;no tests
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-source

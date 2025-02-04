@@ -78,6 +78,7 @@
 ;;; Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2024 Josep Bigorra <jjbigorra@gmail.com>
 ;;; Copyright © 2024 Jakob Kirsch <jakob.kirsch@web.de>
+;;; Copyright © 2025 Tomáš Čech <sleep_walker@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -341,7 +342,7 @@ or musca).
                 "1622iz8bl8mi7gj2sc2jq6z7622l7l2izj1l9ajwj2mxpwpkdhbs"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f)) ;No tests.
-    (native-inputs (list gcc-13 pkg-config))
+    (native-inputs (list gcc-14 pkg-config))
     (inputs
      (list hyprlang
            hyprutils
@@ -359,7 +360,7 @@ commands (lock/unlock/before-sleep) and inhibit.")
 (define-public hyprland
   (package
     (name "hyprland")
-    (version "0.46.2")
+    (version "0.47.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://github.com/hyprwm/Hyprland"
@@ -376,11 +377,12 @@ commands (lock/unlock/before-sleep) and inhibit.")
                               "subprojects"))))
               (sha256
                (base32
-                "1hdhk7skf94nm4kk3zs2vqyi0qlc32hb7gfhlyzawj5wq05bawnh"))))
+                "1k59aqny2bhfx5jw8yp0h8gqwxyrbvx9cp9pnsxhd4cgxk9fp2h5"))))
     (build-system cmake-build-system)
     (arguments
      (list #:cmake cmake-3.30
            #:tests? #f                  ;No tests.
+           #:configure-flags #~'("-DNO_HYPRPM=True")
            #:phases
            #~(modify-phases %standard-phases
                (add-after 'unpack 'fix-path
@@ -398,8 +400,9 @@ commands (lock/unlock/before-sleep) and inhibit.")
                       (search-input-file
                        inputs (string-append "bin/" cmd))))
                    (substitute* '("src/Compositor.cpp"
+                                  "src/xwayland/XWayland.cpp"
                                   "src/managers/VersionKeeperManager.cpp")
-                     (("!executableExistsInPath.*\".") "false")
+                     (("!NFsUtils::executableExistsInPath.*\".") "false")
                      (("hyprland-update-screen" cmd)
                       (search-input-file inputs (in-vicinity "bin" cmd)))))))))
     (native-inputs
@@ -569,6 +572,43 @@ many programming languages.")
 
 (define-public i3-gaps
   (deprecated-package "i3-gaps" i3-wm))
+
+(define-public i3ipc-glib
+  (package
+    (name "i3ipc-glib")
+    (version "1.0.1")
+    (source (origin
+              (method git-fetch)
+              (uri
+               (git-reference
+                (url "https://github.com/altdesktop/i3ipc-glib")
+                (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "01fzvrbnzcwx0vxw29igfpza9zwzp2s7msmzb92v01z0rz0y5m0p"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (list
+      autoconf
+      automake
+      `(,glib "bin")                    ;for glib-mkenums
+      gobject-introspection
+      gtk-doc
+      libtool
+      pkg-config
+      which))
+    (propagated-inputs
+     ;; In Requires.private of i3ipc-glib-1.0.pc.
+     (list
+      glib
+      json-glib
+      libxcb))
+    (home-page "https://github.com/altdesktop/i3ipc-glib")
+    (synopsis "C interface library to i3 window manager")
+    (description
+     "@code{i3ipc-GLib} is a C library for controlling the i3 window manager.")
+    (license license:gpl3+)))
 
 (define-public i3lock
   (package
@@ -762,19 +802,20 @@ subscribe to events.")
 (define-public qtile
   (package
     (name "qtile")
-    (version "0.23.0")
+    (version "0.30.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "qtile" version))
        (sha256
-        (base32 "1v8rxm2xg2igxv6gwa78wrkxzgfxmxfgflbjdp4fm7cxjdx3zrpa"))))
+        (base32 "0zd2bh4mvgwjxkkwn3angkaqzm7ldcmzg3gdc098jzzlf90fmywm"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       ;; A lot of tests fail despite Xvfb and writable temp/cache space.
       #:tests? #f
-      #:test-flags '("--ignore=test/widgets/test_widget_init_configure.py")
+      #:test-flags
+      #~(list "--ignore=test/widgets/test_widget_init_configure.py")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-paths
@@ -813,10 +854,12 @@ subscribe to events.")
      (list python-cairocffi
            python-cffi
            python-dateutil
-           python-dbus-next
+           python-dbus-fast
            python-iwlib
            python-keyring
+           python-libcst
            python-mpd2
+           python-pygobject
            python-pyxdg
            python-xcffib))
     (native-inputs
@@ -826,7 +869,9 @@ subscribe to events.")
             python-pytest
             python-pytest-cov
             python-psutil
+            python-setuptools
             python-setuptools-scm
+            python-wheel
             xorg-server-for-tests))
     (home-page "http://qtile.org")
     (synopsis "Hackable tiling window manager written and configured in Python")
@@ -4173,6 +4218,37 @@ configuration."))))
 for short) for X11 and Wayland, that goes to great lengths to be both CPU and
 battery efficient---polling is only done when absolutely necessary.")
     (license license:expat)))
+
+(define-public wideriver
+  (package
+    (name "wideriver")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/alex-courtis/wideriver")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "16i0mzgxn32nrh5ajn0kb4xdwmsjg03amhasxhwyvspar5y4flhg"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:test-target "test"
+      #:make-flags
+      #~(list (string-append "PREFIX=" #$output)
+              (string-append "CC=" #$(cc-for-target)))
+      #:phases #~(modify-phases %standard-phases
+                   (delete 'configure)))) ; no configure script
+    (native-inputs (list pkg-config cmocka))
+    (inputs (list wayland wayland-protocols wlroots))
+    (home-page "https://github.com/alex-courtis/wideriver")
+    (synopsis "A set of riverWM layouts")
+    (description
+     "Tiling window manager for the river wayland compositor, inspired by dwm
+and xmonad.")
+    (license license:gpl3)))
 
 (define-public wf-config
   (package

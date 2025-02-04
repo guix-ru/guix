@@ -149,7 +149,7 @@
   ;; <https://bitcoincore.org/en/lifecycle/#schedule>.
   (package
     (name "bitcoin-core")
-    (version "28.0")
+    (version "28.1")
     (source (origin
               (method url-fetch)
               (uri
@@ -157,7 +157,7 @@
                               version "/bitcoin-" version ".tar.gz"))
               (sha256
                (base32
-                "0zzk5w88xzw07xcr18nwq2bbr4wqcvkacy97gyq2wq04wb8y42kh"))))
+                "1fl312ns86syc6871il9l3lzf96nm6jhnj92qyvxkyf78782vbn5"))))
     (build-system gnu-build-system)
     (native-inputs
      (list autoconf
@@ -410,8 +410,8 @@ in ability, and easy to use.")
 
 (define-public emacs-ledger-mode
   ;; The last release was on Nov 8, 2019 and doesn't build with Emacs 28.
-  (let ((commit "11e850395448ee7012dba16bd6df103f5552ebfb")
-        (revision "0"))
+  (let ((commit "356d8049ede02c06db4f487d1d6076f74d6098c5")
+        (revision "1"))
     (package
       (name "emacs-ledger-mode")
       (version (git-version "4.0.0" revision commit))
@@ -423,18 +423,19 @@ in ability, and easy to use.")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0hzky36vrlb7kvpyz4gy3zn01zdlmlx0s58w6ggk5djbcvjc2rfx"))))
+          (base32 "1wssagczhils0nx12b2nq2jk2gp9j26jn8nrqdrj255nzl40aia1"))))
       (build-system emacs-build-system)
       (arguments
        (list
-        ;; ledger-test.el is needed at runtime (but probably not for a good reason).
-        #:exclude #~'()
         #:tests? #t
         #:phases
         #~(modify-phases %standard-phases
+            (add-after 'unpack 'do-not-require-tests-at-runtime
+              (lambda _
+                (substitute* "ledger-mode.el"
+                  (("\\(require 'ledger-test\\)") ""))))
             (add-after 'unpack 'patch-path
               (lambda* (#:key inputs #:allow-other-keys)
-                (make-file-writable "ledger-exec.el")
                 (emacs-substitute-variables "ledger-exec.el"
                   ("ledger-binary-path" (search-input-file inputs "/bin/ledger")))))
             (add-after 'build 'build-doc
@@ -447,7 +448,9 @@ in ability, and easy to use.")
               (lambda* (#:key tests? #:allow-other-keys)
                 (when tests?
                   (with-directory-excursion "../source/test"
-                    (invoke "make" "test-batch"))))))))
+                    ;; Test does not respect `ledger-binary-path' and thus fails
+                    (delete-file-recursively "report-test.el")
+                    (invoke "make" "test"))))))))
       (inputs
        (list ledger))
       (native-inputs
@@ -1051,21 +1054,28 @@ of Bitcoin BIP-0039.")
 (define-public python-ledgerblue
   (package
     (name "python-ledgerblue")
-    (version "0.1.44")
+    (version "0.1.54")
     (source
       (origin
         (method url-fetch)
         (uri (pypi-uri "ledgerblue" version))
         (sha256
           (base32
-            "0nbfa5i9ww7jsfc8cgy0r229pq2a1vj4xvn8mz0nxl7mx1wykqm4"))))
-    (build-system python-build-system)
+            "0ghpvxgih1zarp788qi1xh5xmprv6yhaxglfbix4974i7r4pszqy"))))
+    (build-system pyproject-build-system)
     (arguments
      `(#:tests? #f)) ; no tests
+    (native-inputs
+     (list python-setuptools python-wheel))
     (propagated-inputs
-     (list python-ecpy
+     (list python-bleak
+           python-pyelftools
+           python-pycryptodome
+           python-ecpy
            python-future
+           python-gnupg
            python-hidapi
+           python-nfcpy
            python-pillow
            python-protobuf
            python-pycryptodomex
