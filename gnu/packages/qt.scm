@@ -3505,14 +3505,14 @@ and binaries removed, and adds modular support for using system libraries.")
 (define-public qtwebengine
   (package
     (name "qtwebengine")
-    (version "6.7.2")
+    (version "6.8.2")
     (source
      (origin
        (method url-fetch)
        (uri (qt-url name version))
        (sha256
         (base32
-         "1lgz0mj9lw4ii1c8nkbr0ll02xzx8i6n7wvvn21f72sdb5smhxf7"))
+         "00j8wlz6fbg4ivkc6w7dbc67835hv7w74sfrshdb75y12rzri5gz"))
        (modules '((ice-9 ftw)
                   (ice-9 match)
                   (srfi srfi-1)
