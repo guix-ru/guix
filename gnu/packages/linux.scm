@@ -4538,7 +4538,7 @@ to the in-kernel OOM killer.")
     (version "3.2.14")
     (source (origin
               (method git-fetch)
-              (uri (git-reference (url "https://github.com/gentoo/eudev")
+              (uri (git-reference (url "https://github.com/eudev-project/eudev")
                                   (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
@@ -4623,7 +4623,7 @@ to the in-kernel OOM killer.")
      (list `(,util-linux "lib") ;for blkid
            kmod))
     (outputs '("out" "static"))
-    (home-page "https://wiki.gentoo.org/wiki/Project:Eudev")
+    (home-page "https://github.com/eudev-project/eudev")
     (synopsis "Userspace device management")
     (description "Udev is a daemon which dynamically creates and removes
 device nodes from /dev/, handles hotplug events and loads drivers at boot
