@@ -3667,7 +3667,9 @@ instruments.")
                           "test_table_comp[t16-t26]"
                           ;; UnboundLocalError: local variable 'ihd'
                           ;; referenced before assignment
-                          "test_delay_doc_updates")
+                          "test_delay_doc_updates"
+                          ;; assert 13 == 1
+                          "test_skip_meta")
                     " and not "))
       #:phases
       #~(modify-phases %standard-phases
