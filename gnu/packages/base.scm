@@ -709,7 +709,9 @@ change.  GNU make offers many powerful extensions over the standard utility.")
                           version ".tar.bz2"))
       (sha256
        (base32 "0fnwaasfglbphqzvz5n25js9gl695p7pjbmb1z81g8gsc6k90qzn"))
-      (patches (search-patches "binutils-loongson-workaround.patch"))))
+      (patches (search-patches
+                "binutils-2.41-fix-cross.patch"
+                "binutils-loongson-workaround.patch"))))
    (build-system gnu-build-system)
    (arguments
     (list #:out-of-source? #t ;recommended in the README
