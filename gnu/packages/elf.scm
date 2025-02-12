@@ -164,15 +164,6 @@ libraries.")
                                          "tests/run-varlocs.sh")
                             (("^#!.*" all)
                              (string-append all "exit 77;\n"))))))
-                   #~())
-            #$@(if (%current-target-system)
-                   #~((add-after 'unpack 'patch
-                        (lambda* (#:key native-inputs #:allow-other-keys)
-                          (invoke
-                           "patch" "-p1" "--force" "-i"
-                           #$(local-file
-                              (search-patch
-                               "elfutils-libdwfl-string-overflow.patch"))))))
                    #~()))))
 
     (native-inputs (list m4))
