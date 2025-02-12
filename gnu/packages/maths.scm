@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013, 2014, 2015, 2016, 2019, 2020, 2023, 2024 Andreas Enge <andreas@enge.fr>
+;;; Copyright © 2013, 2014, 2015, 2016, 2019, 2020, 2023, 2024, 2025 Andreas Enge <andreas@enge.fr>
 ;;; Copyright © 2013 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2014, 2016, 2017 John Darrington <jmd@gnu.org>
 ;;; Copyright © 2014-2022 Eric Bavier <bavier@posteo.net>
@@ -5417,8 +5417,8 @@ to BMP, JPEG or PNG image formats.")
     (build-system gnu-build-system)
     (inputs
      (list bash-minimal
+           ecl
            gnuplot                       ;for plots
-           sbcl
            sed
            tk))                          ;Tcl/Tk is used by 'xmaxima'
     (native-inputs
@@ -5426,11 +5426,7 @@ to BMP, JPEG or PNG image formats.")
     (arguments
      (list
       #:configure-flags
-      #~(list "--enable-sbcl"
-              (string-append "--with-sbcl=" #$sbcl "/bin/sbcl")
-              (string-append "--with-posix-shell=" #$bash-minimal "/bin/sh")
-              (string-append "--with-wish=" #$tk "/bin/wish"
-                             #$(version-major+minor (package-version tk))))
+      #~(list "--enable-ecl")
       ;; By default Maxima attempts to write temporary files to
       ;; '/tmp/nix-build-maxima-*', which won't exist at run time.
       ;; Work around that.
@@ -5457,21 +5453,28 @@ to BMP, JPEG or PNG image formats.")
             (lambda _
               (chmod "src/maxima" #o555)))
           (replace 'check
+            ;; This is derived from the testing code in the "debian/rules" file
+            ;; of Debian's Maxima package.
+            ;; If Maxima can successfully run this, the binary to be installed
+            ;; should be fine.
             (lambda _
-              ;; This is derived from the testing code in the "debian/rules" file
-              ;; of Debian's Maxima package.
-              ;; If Maxima can successfully run this, the binary to be installed
-              ;; should be fine.
               (invoke "sh" "-c"
                       (string-append
-                       "./maxima-local "
-                       "--lisp=sbcl "
-                       "--batch-string=\"run_testsuite();\" "
-                       "| grep -q \"No unexpected errors found\""))))
+                        "./maxima-local "
+                        "--lisp=ecl "
+                        "--batch-string=\"run_testsuite();\" "
+                        "| grep -q \"No unexpected errors found\""))))
+          (add-after 'install 'install-lib
+           (lambda _
+             (let ((lib (string-append
+                          #$output "/lib/maxima/"
+                          #$(package-version this-package)
+                          "/binary-ecl")))
+                  (install-file "src/binary-ecl/maxima.fas" lib))))
           ;; Make sure the doc and emacs files are found in the
           ;; standard location.  Also configure maxima to find gnuplot
           ;; without having it on the PATH.
-          (add-after 'install 'post-install
+          (add-after 'install-lib 'post-install
             (lambda* (#:key outputs inputs #:allow-other-keys)
               (let* ((gnuplot (assoc-ref inputs "gnuplot"))
                      (out (assoc-ref outputs "out"))
