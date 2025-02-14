@@ -1843,8 +1843,37 @@ command execution.")
      `(#:tests? #f      ; use of undeclared crate or module `gix_testtools`
        #:cargo-inputs (("rust-bstr" ,rust-bstr-1))))))
 
+(define-public rust-gix-commitgraph-0.25
+  (package
+    (name "rust-gix-commitgraph")
+    (version "0.25.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-commitgraph" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "11cdlkbkv80imbdkiy8k09gb1c48k6qadpmxvavb53w6ly8nbnm8"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-gix-chunk" ,rust-gix-chunk-0.4)
+                       ("rust-gix-features" ,rust-gix-features-0.39)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-memmap2" ,rust-memmap2-0.9)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-thiserror" ,rust-thiserror-2))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Read only access to the Git commitgraph file format")
+    (description
+     "Part of the Gitoxide project, a pure Rust implementation of Git.  This
+package provides read only access to Git's commitgraph file format.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-commitgraph-0.24
   (package
+    (inherit rust-gix-commitgraph-0.25)
     (name "rust-gix-commitgraph")
     (version "0.24.3")
     (source
@@ -1854,7 +1883,6 @@ command execution.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0y7wc0y0xb0kh3c22pj3ns04zdqglqb22gj71kn3cn2ngzv0cfqk"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -1864,13 +1892,7 @@ command execution.")
         ("rust-gix-hash" ,rust-gix-hash-0.14)
         ("rust-memmap2" ,rust-memmap2-0.9)
         ("rust-serde" ,rust-serde-1)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis "Read only access to the Git commitgraph file format")
-    (description
-     "Part of the Gitoxide project, a pure Rust implementation of Git.  This
-package provides read only access to Git's commitgraph file format.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-commitgraph-0.23
   (package
