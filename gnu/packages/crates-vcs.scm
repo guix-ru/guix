@@ -3021,8 +3021,49 @@ This package is part of Gitoxide, a pure Rust implementation of Git.")
         ("rust-serial-test" ,rust-serial-test-2)
         ("rust-tempfile" ,rust-tempfile-3))))))
 
+(define-public rust-gix-features-0.39
+  (package
+    (name "rust-gix-features")
+    (version "0.39.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-features" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "07yqby9y0icx2l7kwbvxfg6z8b7gfznknwd4vd0a68p0y9rxd1bx"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bytes" ,rust-bytes-1)
+                       ("rust-bytesize" ,rust-bytesize-1)
+                       ("rust-crc32fast" ,rust-crc32fast-1)
+                       ("rust-crossbeam-channel" ,rust-crossbeam-channel-0.5)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-flate2" ,rust-flate2-1)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-trace" ,rust-gix-trace-0.1)
+                       ("rust-gix-utils" ,rust-gix-utils-0.1)
+                       ("rust-jwalk" ,rust-jwalk-0.8)
+                       ("rust-libc" ,rust-libc-0.2)
+                       ("rust-once-cell" ,rust-once-cell-1)
+                       ("rust-parking-lot" ,rust-parking-lot-0.12)
+                       ("rust-prodash" ,rust-prodash-29)
+                       ("rust-sha1" ,rust-sha1-0.10)
+                       ("rust-sha1-smol" ,rust-sha1-smol-1)
+                       ("rust-thiserror" ,rust-thiserror-2)
+                       ("rust-walkdir" ,rust-walkdir-2))
+       #:cargo-development-inputs (("rust-bstr" ,rust-bstr-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis
+     "Crate to integrate various capabilities using compile-time feature flags")
+    (description
+     "This package provides a crate to integrate various capabilities using
+compile-time feature flags.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-features-0.38
   (package
+    (inherit rust-gix-features-0.39)
     (name "rust-gix-features")
     (version "0.38.2")
     (source
@@ -3032,7 +3073,6 @@ This package is part of Gitoxide, a pure Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0sfw6zs3qgmlqjkj4cvyfz6q6dgdlw1d16c7yckwgyg5kyn4aw5c"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs (("rust-bytes" ,rust-bytes-1)
                        ("rust-bytesize" ,rust-bytesize-1)
@@ -3052,14 +3092,7 @@ This package is part of Gitoxide, a pure Rust implementation of Git.")
                        ("rust-sha1-smol" ,rust-sha1-smol-1)
                        ("rust-thiserror" ,rust-thiserror-1)
                        ("rust-walkdir" ,rust-walkdir-2))
-       #:cargo-development-inputs (("rust-bstr" ,rust-bstr-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-     "Crate to integrate various capabilities using compile-time feature flags")
-    (description
-     "This package provides a crate to integrate various capabilities using
-compile-time feature flags.")
-    (license (list license:expat license:asl2.0))))
+       #:cargo-development-inputs (("rust-bstr" ,rust-bstr-1))))))
 
 (define-public rust-gix-features-0.37
   (package
