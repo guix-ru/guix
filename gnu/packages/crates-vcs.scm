@@ -4426,6 +4426,44 @@ Gitoxide, a pure Rust implementation of Git.")
                        ("rust-serde" ,rust-serde-1)
                        ("rust-thiserror" ,rust-thiserror-1))))))
 
+(define-public rust-gix-merge-0.0.0
+  (package
+    (name "rust-gix-merge")
+    (version "0.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-merge" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0j00zbka50r268kqmbf7cqiisb48103a7pvkznajv8d5s230rw7y"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:tests? #f      ; undeclared crate `gix_testtools`
+       #:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-gix-command" ,rust-gix-command-0.3)
+                       ("rust-gix-filter" ,rust-gix-filter-0.14)
+                       ("rust-gix-fs" ,rust-gix-fs-0.12)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-quote" ,rust-gix-quote-0.4)
+                       ("rust-gix-tempfile" ,rust-gix-tempfile-15)
+                       ("rust-gix-trace" ,rust-gix-trace-0.1)
+                       ("rust-gix-worktree" ,rust-gix-worktree-0.37)
+                       ("rust-imara-diff" ,rust-imara-diff-0.1)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-thiserror" ,rust-thiserror-1))
+       #:cargo-development-inputs
+       (("rust-pretty-assertions" ,rust-pretty-assertions-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Implementation of git's merge algorithms")
+    (description
+     "Gitoxide is a pure Rust implementation of Git.  This package consists of
+Git's merge algorithms.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-negotiate-0.16
   (package
     (name "rust-gix-negotiate")
