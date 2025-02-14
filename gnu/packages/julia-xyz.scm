@@ -2314,6 +2314,7 @@ metaprogramming on Julia Expr, the meta programming standard library for
         (sha256
          (base32 "0sxrhc5dz1v53zs8sym4csfy28ki00b7x7aihm2zmkrx48if63gb"))))
     (build-system julia-build-system)
+    (arguments (list #:tests? #f))
     (home-page "https://github.com/invenia/ExprTools.jl")
     (synopsis "Light-weight expression manipulation tools")
     (description "@code{ExprTools} provides tooling for working with Julia
