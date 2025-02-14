@@ -8199,8 +8199,39 @@ a pure Rust implementation of Git.")
                        ("rust-io-close" ,rust-io-close-0.3)
                        ("rust-thiserror" ,rust-thiserror-1))))))
 
+(define-public rust-gix-worktree-stream-0.16
+  (package
+    (name "rust-gix-worktree-stream")
+    (version "0.16.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-worktree-stream" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0riackffdhz9var52wbdxjrab4cgmmzhknspar6pxfc1ks0m3lw1"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-gix-attributes" ,rust-gix-attributes-0.23)
+                       ("rust-gix-features" ,rust-gix-features-0.39)
+                       ("rust-gix-filter" ,rust-gix-filter-0.14)
+                       ("rust-gix-fs" ,rust-gix-fs-0.12)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-traverse" ,rust-gix-traverse-0.42)
+                       ("rust-parking-lot" ,rust-parking-lot-0.12)
+                       ("rust-thiserror" ,rust-thiserror-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Gitoxide library to generate a byte-stream from a git-tree")
+    (description
+     "This crate provides the ability to generate a byte-stream from a git-tree.
+It's part of Gitoxide, a pure Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-worktree-stream-0.15
   (package
+    (inherit rust-gix-worktree-stream-0.16)
     (name "rust-gix-worktree-stream")
     (version "0.15.0")
     (source
@@ -8210,7 +8241,6 @@ a pure Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "1jnvzmsp3h2yzv575a9d2dvkkfvzqgyxd0mnahmf5v53q63ips38"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-gix-attributes" ,rust-gix-attributes-0.22)
@@ -8222,14 +8252,7 @@ a pure Rust implementation of Git.")
         ("rust-gix-path" ,rust-gix-path-0.10)
         ("rust-gix-traverse" ,rust-gix-traverse-0.41)
         ("rust-parking-lot" ,rust-parking-lot-0.12)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-      "Gitoxide library to generate a byte-stream from a git-tree")
-    (description
-      "This crate provides the ability to generate a byte-stream from a git-tree.
-It's part of Gitoxide, a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-worktree-stream-0.13
   (package
