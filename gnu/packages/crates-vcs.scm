@@ -2258,8 +2258,41 @@ Gitoxide project.  Gitoxide is a pure Rust implementation of Git.")
 Gitoxide a Rust implementation of Git.")
     (license (list license:expat license:asl2.0))))
 
+(define-public rust-gix-credentials-0.25
+  (package
+    (name "rust-gix-credentials")
+    (version "0.25.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-credentials" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0wdfnq6y3za7h1xqj32af84zdzwg0r2irxrf0gkydiszd2w7ps1b"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-gix-command" ,rust-gix-command-0.3)
+                       ("rust-gix-config-value" ,rust-gix-config-value-0.14)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-prompt" ,rust-gix-prompt-0.8)
+                       ("rust-gix-sec" ,rust-gix-sec-0.10)
+                       ("rust-gix-trace" ,rust-gix-trace-0.1)
+                       ("rust-gix-url" ,rust-gix-url-0.28)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-thiserror" ,rust-thiserror-2))
+       #:cargo-development-inputs (("rust-once-cell" ,rust-once-cell-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Git credentials handlers for Gitoxide")
+    (description
+     "Gitoxide is a Rust implementation of Git.  This package provides helpers
+to interact with Git credentials helpers.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-credentials-0.24
   (package
+    (inherit rust-gix-credentials-0.25)
     (name "rust-gix-credentials")
     (version "0.24.5")
     (source
@@ -2269,7 +2302,6 @@ Gitoxide a Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0y6f5g8ny3rh80vw12qxzzvisw6588yll71hmvqq51wn0p9r3qwc"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
                        ("rust-document-features" ,rust-document-features-0.2)
@@ -2281,14 +2313,7 @@ Gitoxide a Rust implementation of Git.")
                        ("rust-gix-trace" ,rust-gix-trace-0.1)
                        ("rust-gix-url" ,rust-gix-url-0.27)
                        ("rust-serde" ,rust-serde-1)
-                       ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-     "Git credentials handlers for Gitoxide")
-    (description
-     "Gitoxide is a Rust implementation of Git.  This package provides helpers
-to interact with Git credentials helpers.")
-    (license (list license:expat license:asl2.0))))
+                       ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-credentials-0.23
   (package
