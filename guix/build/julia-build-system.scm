@@ -1,7 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2019, 2020 Nicolò Balzarotti <nicolo@nixo.xyz>
 ;;; Copyright © 2021 Jean-Baptiste Volatier <jbv@pm.me>
-;;; Copyright © 2021, 2022 Simon Tournier <zimon.toutoune@gmail.com>
+;;; Copyright © 2021, 2022, 2025 Simon Tournier <zimon.toutoune@gmail.com>
 ;;; Copyright © 2022 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2025 Ludovic Courtès <ludo@gnu.org>
 ;;;
@@ -87,12 +87,18 @@ Project.toml)."
     (mkdir-p builddir)
     ;; With a patch, SOURCE_DATE_EPOCH is honored
     (setenv "SOURCE_DATE_EPOCH" "1")
-    (setenv "JULIA_DEPOT_PATH" builddir)
+
+    (setenv "JULIA_DEPOT_PATH"
+            (if (getenv "JULIA_DEPOT_PATH")
+                (string-append builddir ":" (getenv "JULIA_DEPOT_PATH"))
+                builddir))
+
     ;; Add new package dir to the load path.
-    (setenv "JULIA_LOAD_PATH"
-            (string-append builddir "loadpath/" ":"
-                           (or (getenv "JULIA_LOAD_PATH")
-                               "")))
+    (let ((loadpath (string-append builddir "loadpath/")))
+      (setenv "JULIA_LOAD_PATH"
+              (if (getenv "JULIA_LOAD_PATH")
+                  (string-append (getenv "JULIA_LOAD_PATH") ":" loadpath)
+                  loadpath)))
     ;; Actual precompilation:
     (invoke-julia
      ;; When using Julia as a user, Julia writes precompile cache to the first
@@ -101,8 +107,7 @@ Project.toml)."
      ;; element of DEPOT_PATH.  Once the cache file exists, this hack is not
      ;; needed anymore (like in the check phase).  If the user install new
      ;; packages, those will be installed and precompiled in the home dir.
-     (string-append "pushfirst!(DEPOT_PATH, pop!(DEPOT_PATH)); using "
-                    package))))
+     (string-append "using " package))))
 
 (define* (check #:key tests? source inputs outputs julia-package-name
                 parallel-tests? #:allow-other-keys)
@@ -124,11 +129,18 @@ Project.toml)."
 
       ;; With a patch, SOURCE_DATE_EPOCH is honored
       (setenv "SOURCE_DATE_EPOCH" "1")
-      (setenv "JULIA_DEPOT_PATH" builddir)
-      (setenv "JULIA_LOAD_PATH"
-              (string-append builddir "loadpath/" ":"
-                             (or (getenv "JULIA_LOAD_PATH")
-                                 "")))
+
+      (setenv "JULIA_DEPOT_PATH"
+              (if (getenv "JULIA_DEPOT_PATH")
+                  (string-append (getenv "JULIA_DEPOT_PATH") ":" builddir)
+                  builddir))
+
+      (let ((loadpath (string-append builddir "loadpath/")))
+        (setenv "JULIA_LOAD_PATH"
+                (if (getenv "JULIA_LOAD_PATH")
+                    (string-append (getenv "JULIA_LOAD_PATH") ":" loadpath)
+                    loadpath)))
+
       (setenv "JULIA_CPU_THREADS" (number->string job-count))
       (setenv "HOME" "/tmp")
 
