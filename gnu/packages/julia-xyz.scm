@@ -4564,7 +4564,7 @@ with @code{missing} values in Julia.")
 (define-public julia-mlstyle
   (package
     (name "julia-mlstyle")
-    (version "0.4.10")
+    (version "0.4.17")
     (source
       (origin
         (method git-fetch)
@@ -4573,8 +4573,9 @@ with @code{missing} values in Julia.")
                (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "0h1cd7cr4c4cnpqyj3180113gdbvcc047lqphp8a8gq5smp3c059"))))
+         (base32 "12xb5gazw3s5sxx5xbk84qr2bg6h20z6xqrlxipn8jl9l6vj2j2g"))))
     (build-system julia-build-system)
+    (arguments (list #:parallel-tests? #f))
     (native-inputs
      (list julia-datastructures))
     (home-page "https://thautwarm.github.io/MLStyle.jl/latest/")
