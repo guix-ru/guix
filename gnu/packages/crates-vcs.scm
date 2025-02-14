@@ -4878,8 +4878,44 @@ support.")
        #:cargo-development-inputs
        (("rust-pretty-assertions" ,rust-pretty-assertions-1))))))
 
+(define-public rust-gix-odb-0.64
+  (package
+    (name "rust-gix-odb")
+    (version "0.64.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-odb" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0q8gwv4mdm8jqmfr73q0z009fvvh151wjkqvc20gkcpiyynnmf0b"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-arc-swap" ,rust-arc-swap-1)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-gix-date" ,rust-gix-date-0.9)
+                       ("rust-gix-features" ,rust-gix-features-0.39)
+                       ("rust-gix-fs" ,rust-gix-fs-0.12)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-hashtable" ,rust-gix-hashtable-0.6)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-pack" ,rust-gix-pack-0.54)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-quote" ,rust-gix-quote-0.4)
+                       ("rust-parking-lot" ,rust-parking-lot-0.12)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-tempfile" ,rust-tempfile-3)
+                       ("rust-thiserror" ,rust-thiserror-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Implements various Git object databases")
+    (description
+     "Implements various Git object databases for Gitoxide.  Gitoxide is a pure
+Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-odb-0.63
   (package
+    (inherit rust-gix-odb-0.64)
     (name "rust-gix-odb")
     (version "0.63.0")
     (source
@@ -4889,7 +4925,6 @@ support.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0iy7grqs5h73nz781zfmiyisr9pm4yjxsamby1ady5qwf1l805d3"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-arc-swap" ,rust-arc-swap-1)
@@ -4905,13 +4940,7 @@ support.")
         ("rust-parking-lot" ,rust-parking-lot-0.12)
         ("rust-serde" ,rust-serde-1)
         ("rust-tempfile" ,rust-tempfile-3)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis "Implements various Git object databases")
-    (description
-      "Implements various Git object databases for Gitoxide.
-Gitoxide is a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-odb-0.61
   (package
