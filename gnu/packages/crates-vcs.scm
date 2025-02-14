@@ -8008,8 +8008,42 @@ types and utilities.  Part of Gitoxide a pure Rust implementation of Git.")
                        ("rust-gix-path" ,rust-gix-path-0.10)
                        ("rust-serde" ,rust-serde-1))))))
 
+(define-public rust-gix-worktree-state-0.14
+  (package
+    (name "rust-gix-worktree-state")
+    (version "0.14.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-worktree-state" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1nmql110n8f3m9l0p3wcw4mg8j87wyc0mhp9m9y77ggk087b0wjy"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-gix-features" ,rust-gix-features-0.39)
+                       ("rust-gix-filter" ,rust-gix-filter-0.14)
+                       ("rust-gix-fs" ,rust-gix-fs-0.12)
+                       ("rust-gix-glob" ,rust-gix-glob-0.17)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-index" ,rust-gix-index-0.36)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-worktree" ,rust-gix-worktree-0.37)
+                       ("rust-io-close" ,rust-io-close-0.3)
+                       ("rust-thiserror" ,rust-thiserror-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis
+     "Gitoxide project library to set a Git worktree to a particular state")
+    (description
+     "This crate sets the Git worktree to a particular state.  Part of Gitoxide
+a pure Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-worktree-state-0.13
   (package
+    (inherit rust-gix-worktree-state-0.14)
     (name "rust-gix-worktree-state")
     (version "0.13.0")
     (source
@@ -8019,7 +8053,6 @@ types and utilities.  Part of Gitoxide a pure Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0hyyhvigwnb8cybxxyiqp5rxlw8nw39qs1nmmh5jqw7s2frw81bv"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -8033,14 +8066,7 @@ types and utilities.  Part of Gitoxide a pure Rust implementation of Git.")
         ("rust-gix-path" ,rust-gix-path-0.10)
         ("rust-gix-worktree" ,rust-gix-worktree-0.36)
         ("rust-io-close" ,rust-io-close-0.3)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-     "Gitoxide project library to set a Git worktree to a particular state")
-    (description
-     "This crate sets the Git worktree to a particular state.  Part of Gitoxide
-a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-worktree-state-0.11
   (package
