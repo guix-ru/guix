@@ -3734,8 +3734,33 @@ package is part of Gitoxide, a pure Rust implementation of Git.")
         ("rust-serde" ,rust-serde-1)
         ("rust-thiserror" ,rust-thiserror-1))))))
 
+(define-public rust-gix-hashtable-0.6
+  (package
+    (name "rust-gix-hashtable")
+    (version "0.6.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-hashtable" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1zhqgncv6jh3x7a7a2w3qbayghmiwv230mdw6gvqw1ricqjmpxhf"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-hashbrown" ,rust-hashbrown-0.14)
+                       ("rust-parking-lot" ,rust-parking-lot-0.12))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis
+     "Hashtable based data structures optimized to utilize ObjectId keys")
+    (description
+     "This package provides hashtable based data structures optimized to utilize
+@code{ObjectId} keys.  Part of Gitoxide a Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-hashtable-0.5
   (package
+    (inherit rust-gix-hashtable-0.6)
     (name "rust-gix-hashtable")
     (version "0.5.2")
     (source
@@ -3745,18 +3770,10 @@ package is part of Gitoxide, a pure Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0hp2m2rvbv0vav5lkq7d7bvx74qrb6w3hnj1rq3aq69wdzhq1pvx"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs (("rust-gix-hash" ,rust-gix-hash-0.14)
                        ("rust-hashbrown" ,rust-hashbrown-0.14)
-                       ("rust-parking-lot" ,rust-parking-lot-0.12))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-     "Hashtable based data structures optimized to utilize ObjectId keys")
-    (description
-     "Hashtable based data structures optimized to utilize @code{ObjectId}
-keys.  Part of Gitoxide a Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+                       ("rust-parking-lot" ,rust-parking-lot-0.12))))))
 
 (define-public rust-gix-hashtable-0.4
   (package
