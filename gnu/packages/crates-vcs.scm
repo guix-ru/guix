@@ -6889,8 +6889,36 @@ Gitoxide is a pure Rust implementation of Git.")
                        ("rust-gix-pathspec" ,rust-gix-pathspec-0.3)
                        ("rust-thiserror" ,rust-thiserror-1))))))
 
+(define-public rust-gix-submodule-0.15
+  (package
+    (name "rust-gix-submodule")
+    (version "0.15.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-submodule" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0yj9y2b7425a3bc2wp2sy7z50zialdv230pwh32kdkbk31i9kl1y"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-gix-config" ,rust-gix-config-0.41)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-pathspec" ,rust-gix-pathspec-0.8)
+                       ("rust-gix-refspec" ,rust-gix-refspec-0.26)
+                       ("rust-gix-url" ,rust-gix-url-0.28)
+                       ("rust-thiserror" ,rust-thiserror-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Functions for dealing with Git submodules")
+    (description
+     "Functions for dealing with Git submodules.  Part of Gitoxide a pure Rust
+implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-submodule-0.14
   (package
+    (inherit rust-gix-submodule-0.15)
     (name "rust-gix-submodule")
     (version "0.14.0")
     (source
@@ -6900,7 +6928,6 @@ Gitoxide is a pure Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0jw7rb181z5ns0njxh9pi4fa4d8n7lgfn5cg46rp5wy2ikvhm7aj"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -6909,14 +6936,7 @@ Gitoxide is a pure Rust implementation of Git.")
         ("rust-gix-pathspec" ,rust-gix-pathspec-0.7)
         ("rust-gix-refspec" ,rust-gix-refspec-0.25)
         ("rust-gix-url" ,rust-gix-url-0.27)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/GitoxideLabs/gitoxide")
-    (synopsis
-      "Functions for dealing with Git submodules")
-    (description
-     "Functions for dealing with Git submodules.  Part of Gitoxide a pure Rust
-implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-submodule-0.12
   (package
