@@ -52279,8 +52279,44 @@ and would-block I/O operations.")
 find a device path by its ID.")
     (license license:expat)))
 
+(define-public rust-pasetors-0.7
+  (package
+    (name "rust-pasetors")
+    (version "0.7.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "pasetors" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0adpf4fd6bgkznrb4fzmbiahvh0c6s6i2pring2wkrx64px48jf5"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-ct-codecs" ,rust-ct-codecs-1)
+                       ("rust-ed25519-compact" ,rust-ed25519-compact-2)
+                       ("rust-getrandom" ,rust-getrandom-0.3)
+                       ("rust-orion" ,rust-orion-0.17)
+                       ("rust-p384" ,rust-p384-0.13)
+                       ("rust-rand-core" ,rust-rand-core-0.6)
+                       ("rust-regex" ,rust-regex-1)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-serde-json" ,rust-serde-json-1)
+                       ("rust-sha2" ,rust-sha2-0.10)
+                       ("rust-subtle" ,rust-subtle-2)
+                       ("rust-time" ,rust-time-0.3)
+                       ("rust-zeroize" ,rust-zeroize-1))
+       #:cargo-development-inputs (("rust-hex" ,rust-hex-0.4)
+                                   ("rust-serde" ,rust-serde-1)
+                                   ("rust-serde-json" ,rust-serde-json-1))))
+    (home-page "https://github.com/brycx/pasetors")
+    (synopsis "PASETO: Platform-Agnostic Security Tokens (in Rust)")
+    (description
+     "This package provides Platform-Agnostic Security Tokens (in Rust).")
+    (license license:expat)))
+
 (define-public rust-pasetors-0.6
   (package
+    (inherit rust-pasetors-0.7)
     (name "rust-pasetors")
     (version "0.6.8")
     (source (origin
@@ -52290,7 +52326,6 @@ find a device path by its ID.")
               (sha256
                (base32
                 "1fkdp4lya95nrkrds3i14288g4a85gxrlg8lnz8hs8zjcryd8dkb"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-ct-codecs" ,rust-ct-codecs-1)
@@ -52309,11 +52344,7 @@ find a device path by its ID.")
        #:cargo-development-inputs
        (("rust-hex" ,rust-hex-0.4)
         ("rust-serde" ,rust-serde-1)
-        ("rust-serde-json" ,rust-serde-json-1))))
-    (home-page "https://github.com/brycx/pasetors")
-    (synopsis "PASETO: Platform-Agnostic Security Tokens (in Rust)")
-    (description "PASETO: Platform-Agnostic Security Tokens (in Rust)")
-    (license license:expat)))
+        ("rust-serde-json" ,rust-serde-json-1))))))
 
 (define-public rust-password-hash-0.5
   (package
