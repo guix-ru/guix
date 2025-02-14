@@ -2806,8 +2806,42 @@ directory walking.")
        #:cargo-development-inputs
        (("rust-pretty-assertions" ,rust-pretty-assertions-1))))))
 
+(define-public rust-gix-discover-0.36
+  (package
+    (name "rust-gix-discover")
+    (version "0.36.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-discover" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1xkijvasm2c9a1pwjjc05xq8ydy5fc4f255hvw4syl4g8lgy68n5"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-dunce" ,rust-dunce-1)
+                       ("rust-gix-fs" ,rust-gix-fs-0.12)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-ref" ,rust-gix-ref-0.48)
+                       ("rust-gix-sec" ,rust-gix-sec-0.10)
+                       ("rust-thiserror" ,rust-thiserror-1))
+       #:cargo-development-inputs (("rust-defer" ,rust-defer-0.2)
+                                   ("rust-is-ci" ,rust-is-ci-1)
+                                   ("rust-serial-test" ,rust-serial-test-3)
+                                   ("rust-tempfile" ,rust-tempfile-3))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis
+     "Discover Git repositories and check if a directory is a Git repository")
+    (description
+     "Discover Git repositories and check if a directory is a repository.
+This package is part of Gitoxide, a pure Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-discover-0.35
   (package
+    (inherit rust-gix-discover-0.36)
     (name "rust-gix-discover")
     (version "0.35.0")
     (source
@@ -2817,7 +2851,6 @@ directory walking.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "1ljnv5c2q1xpwpw45qhli0hydl7ba52dfpw1dv16ndv7jmmkcxq5"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -2832,14 +2865,7 @@ directory walking.")
        (("rust-defer" ,rust-defer-0.2)
         ("rust-is-ci" ,rust-is-ci-1)
         ("rust-serial-test" ,rust-serial-test-3)
-        ("rust-tempfile" ,rust-tempfile-3))))
-    (home-page "https://github.com/GitoxideLabs/gitoxide")
-    (synopsis
-     "Discover Git repositories and check if a directory is a Git repository")
-    (description
-     "Discover Git repositories and check if a directory is a repository.
-This package is part of Gitoxide, a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-tempfile" ,rust-tempfile-3))))))
 
 (define-public rust-gix-discover-0.33
   (package
