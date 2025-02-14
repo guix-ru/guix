@@ -6662,8 +6662,46 @@ Gitoxide, a pure Rust implementation of Git.")
      "This package is part of Gitoxide, it implements a shared trust model.")
     (license (list license:expat license:asl2.0))))
 
+(define-public rust-gix-status-0.14
+  (package
+    (name "rust-gix-status")
+    (version "0.14.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-status" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0hq574lvvsswn15nhinwgprqgk2vs6radg6qhr61n5jhwy34hhap"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-filetime" ,rust-filetime-0.2)
+                       ("rust-gix-diff" ,rust-gix-diff-0.47)
+                       ("rust-gix-dir" ,rust-gix-dir-0.9)
+                       ("rust-gix-features" ,rust-gix-features-0.39)
+                       ("rust-gix-filter" ,rust-gix-filter-0.14)
+                       ("rust-gix-fs" ,rust-gix-fs-0.12)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-index" ,rust-gix-index-0.36)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-pathspec" ,rust-gix-pathspec-0.8)
+                       ("rust-gix-worktree" ,rust-gix-worktree-0.37)
+                       ("rust-portable-atomic" ,rust-portable-atomic-1)
+                       ("rust-thiserror" ,rust-thiserror-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis
+     "Gitoxide project crate that provides @code{git status} functionality")
+    (description
+     "This Gitoxide project crate provides @code{git status} functionality.
+Gitoxide is a pure Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-status-0.13
   (package
+    (inherit rust-gix-status-0.14)
     (name "rust-gix-status")
     (version "0.13.0")
     (source
@@ -6673,7 +6711,6 @@ Gitoxide, a pure Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "1spznjc0s41cnyzfhvm37yr0fpx0fjiima6cwjk1c34zcfx3a3gp"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -6691,14 +6728,7 @@ Gitoxide, a pure Rust implementation of Git.")
         ("rust-gix-pathspec" ,rust-gix-pathspec-0.7)
         ("rust-gix-worktree" ,rust-gix-worktree-0.36)
         ("rust-portable-atomic" ,rust-portable-atomic-1)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/GitoxideLabs/gitoxide")
-    (synopsis
-     "Gitoxide project crate that provides @code{git status} functionality")
-    (description
-     "This Gitoxide project crate provides @code{git status} functionality.
-Gitoxide is a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-status-0.11
   (package
