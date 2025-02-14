@@ -186,6 +186,17 @@ println(Base.version_slug(Base.UUID(\"~a\"),
                                    julia-package-dependencies
                                    #:file "Project.toml"))
 
+    (unless (null? julia-package-dependencies)
+      (let ((package-dir (string-append out "/share/julia/environments/v1.9/"))) ;XXXX: Fix v1.9
+        (format (current-error-port) "creating directory ~a for dependencies ~s~%"
+                package-dir inputs)
+        (mkdir-p package-dir)
+        (julia-create-package-toml package-dir
+                                   package-name uuid
+                                   version
+                                   julia-package-dependencies
+                                   #:file "Project.toml")))
+
     ;; When installing a package, julia looks first at in the JULIA_DEPOT_PATH
     ;; for a path like packages/PACKAGE/XXXX
     ;; Where XXXX is a slug encoding the package UUID and SHA1 of the files
