@@ -91933,8 +91933,33 @@ result.")
     (description "Detect when another Future wants a result.")
     (license license:expat)))
 
+(define-public rust-wasi-0.13
+  (package
+    (name "rust-wasi")
+    (version "0.13.3+wasi-0.2.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "wasi" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1lnapbvdcvi3kc749wzqvwrpd483win2kicn1faa4dja38p6v096"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:skip-build? #t
+       #:cargo-inputs
+       (("rust-compiler-builtins" ,rust-compiler-builtins-0.1)
+        ("rust-rustc-std-workspace-alloc" ,rust-rustc-std-workspace-alloc-1)
+        ("rust-rustc-std-workspace-core" ,rust-rustc-std-workspace-core-1)
+        ("rust-wit-bindgen-rt" ,rust-wit-bindgen-rt-0.33))))
+    (home-page "https://github.com/bytecodealliance/wasi-rs")
+    (synopsis "WASI API bindings for Rust")
+    (description "This package provides WASI API bindings for Rust.")
+    (license (list license:asl2.0 license:expat))))
+
 (define-public rust-wasi-0.11
   (package
+    (inherit rust-wasi-0.13)
     (name "rust-wasi")
     (version "0.11.0+wasi-snapshot-preview1")
     (source
@@ -91944,7 +91969,6 @@ result.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "08z4hxwkpdpalxjps1ai9y7ihin26y9f476i53dv98v45gkqg3cw"))))
-    (build-system cargo-build-system)
     (arguments
      (list #:skip-build? #t
            #:cargo-inputs
@@ -91956,9 +91980,7 @@ result.")
     (home-page "https://github.com/bytecodealliance/wasi")
     (synopsis "Experimental WASI API bindings for Rust")
     (description
-     "This package provides experimental WASI API bindings for Rust.")
-    (license (list license:asl2.0
-                   license:expat))))
+     "This package provides experimental WASI API bindings for Rust.")))
 
 (define-public rust-wasi-0.10
   (package
