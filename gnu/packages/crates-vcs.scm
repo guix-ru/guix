@@ -3655,8 +3655,33 @@ pattern matching.")
                        ("rust-gix-path" ,rust-gix-path-0.10)
                        ("rust-serde" ,rust-serde-1))))))
 
+(define-public rust-gix-hash-0.15
+  (package
+    (name "rust-gix-hash")
+    (version "0.15.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-hash" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1kp4yjlkp8g4qg0r2zs0jmz19r076f2y91cjsikhxvclf70wqphb"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-faster-hex" ,rust-faster-hex-0.9)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-thiserror" ,rust-thiserror-2))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Borrowed and owned git hash digests used to identify git objects")
+    (description
+     "Borrowed and owned git hash digests used to identify git objects.  This
+package is part of Gitoxide, a pure Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-hash-0.14
   (package
+    (inherit rust-gix-hash-0.15)
     (name "rust-gix-hash")
     (version "0.14.2")
     (source
@@ -3666,19 +3691,11 @@ pattern matching.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0pjdlxbqxd9lbkccryfw2ghifiq3gz9h8ylliw0va8b16vvpsggr"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs (("rust-document-features" ,rust-document-features-0.2)
                        ("rust-faster-hex" ,rust-faster-hex-0.9)
                        ("rust-serde" ,rust-serde-1)
-                       ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-     "Borrowed and owned git hash digests used to identify git objects")
-    (description
-     "Borrowed and owned git hash digests used to identify git objects.  This
-package is part of Gitoxide, a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+                       ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-hash-0.13
   (package
