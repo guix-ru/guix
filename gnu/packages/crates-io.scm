@@ -11458,23 +11458,25 @@ parsing with Serde.")
     (description "Miscellaneous support code used by Cargo.")
     (license (list license:expat license:asl2.0))))
 
-(define-public rust-cargo-util-schemas-0.6
+(define-public rust-cargo-util-schemas-0.7
   (package
     (name "rust-cargo-util-schemas")
-    (version "0.6.0")
+    (version "0.7.1")
     (source
      (origin
        (method url-fetch)
        (uri (crate-uri "cargo-util-schemas" version))
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
-        (base32 "163x9cfg5g9ilz1ra3zr5nzk34qg8h4bxgsbrpgff6saaja2f19w"))))
+        (base32 "1hkzir5imbx53l9rkbhhg15fdc965jq375c0nw0sls40nldiz8r6"))))
     (build-system cargo-build-system)
     (arguments
-     `(#:cargo-inputs (("rust-semver" ,rust-semver-1)
+     `(#:cargo-inputs (("rust-schemars" ,rust-schemars-0.8)
+                       ("rust-semver" ,rust-semver-1)
                        ("rust-serde" ,rust-serde-1)
                        ("rust-serde-untagged" ,rust-serde-untagged-0.1)
                        ("rust-serde-value" ,rust-serde-value-0.7)
+                       ("rust-serde-json" ,rust-serde-json-1)
                        ("rust-thiserror" ,rust-thiserror-1)
                        ("rust-toml" ,rust-toml-0.8)
                        ("rust-unicode-xid" ,rust-unicode-xid-0.2)
