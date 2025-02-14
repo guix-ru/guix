@@ -36101,8 +36101,35 @@ in ISO/IEC 7816-4.")
 language codes.")
     (license license:asl2.0)))
 
+(define-public rust-itertools-0.14
+  (package
+    (name "rust-itertools")
+    (version "0.14.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "itertools" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "118j6l1vs2mx65dqhwyssbrxpawa90886m3mzafdvyip41w2q69b"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-either" ,rust-either-1))
+       #:cargo-development-inputs (("rust-criterion" ,rust-criterion-0.4)
+                                   ("rust-paste" ,rust-paste-1)
+                                   ("rust-permutohedron" ,rust-permutohedron-0.2)
+                                   ("rust-quickcheck" ,rust-quickcheck-0.9)
+                                   ("rust-rand" ,rust-rand-0.7))))
+    (home-page "https://github.com/rust-itertools/itertools")
+    (synopsis "Extra iterator adaptors, methods, free functions, and macros")
+    (description
+     "This package provides extra iterator adaptors, iterator methods, free
+functions, and macros.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-itertools-0.13
   (package
+    (inherit rust-itertools-0.14)
     (name "rust-itertools")
     (version "0.13.0")
     (source
@@ -36112,7 +36139,6 @@ language codes.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "11hiy3qzl643zcigknclh446qb9zlg4dpdzfkjaa9q9fqpgyfgj1"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs (("rust-either" ,rust-either-1))
        #:cargo-development-inputs
@@ -36120,13 +36146,7 @@ language codes.")
         ("rust-paste" ,rust-paste-1)
         ("rust-permutohedron" ,rust-permutohedron-0.2)
         ("rust-quickcheck" ,rust-quickcheck-0.9)
-        ("rust-rand" ,rust-rand-0.7))))
-    (home-page "https://github.com/rust-itertools/itertools")
-    (synopsis "Extra iterator adaptors, methods, free functions, and macros")
-    (description
-     "This package provides extra iterator adaptors, iterator methods, free
-functions, and macros.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-rand" ,rust-rand-0.7))))))
 
 (define-public rust-itertools-0.12
   (package
