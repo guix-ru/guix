@@ -169,7 +169,10 @@ Project.toml)."
                            (format #f "using Pkg;
 println(Base.version_slug(Base.UUID(\"~a\"),
                           Base.SHA1(Pkg.GitTools.tree_hash(\".\"))))" uuid)))
-         (slug (string-trim-right (get-string-all pipe))))
+         (slug (string-take-right
+                (string-trim-right (get-string-all pipe))
+                5)))
+
     (let ((status (close-pipe pipe)))
       (unless (zero? status)
         (error "failed to compute package slug" status)))
