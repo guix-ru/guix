@@ -5078,8 +5078,47 @@ Rust implementation of Git.")
                        ("rust-tempfile" ,rust-tempfile-3)
                        ("rust-thiserror" ,rust-thiserror-1))))))
 
+(define-public rust-gix-pack-0.54
+  (package
+    (name "rust-gix-pack")
+    (version "0.54.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-pack" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0sq240glmpvp0x1bpsngrlk82iz2d3dkk0a0f8v29fjmm1cnwgin"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:tests? #f      ; undeclared crate `gix_testtools`
+       #:cargo-inputs (("rust-clru" ,rust-clru-0.6)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-gix-chunk" ,rust-gix-chunk-0.4)
+                       ("rust-gix-diff" ,rust-gix-diff-0.47)
+                       ("rust-gix-features" ,rust-gix-features-0.39)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-hashtable" ,rust-gix-hashtable-0.6)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-tempfile" ,rust-gix-tempfile-15)
+                       ("rust-gix-traverse" ,rust-gix-traverse-0.42)
+                       ("rust-memmap2" ,rust-memmap2-0.9)
+                       ("rust-parking-lot" ,rust-parking-lot-0.12)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-smallvec" ,rust-smallvec-1)
+                       ("rust-thiserror" ,rust-thiserror-1)
+                       ("rust-uluru" ,rust-uluru-3))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Implements Git packs and related data structures")
+    (description
+     "Git packs and related data structures.  Gitoxide is a pure Rust
+implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-pack-0.53
   (package
+    (inherit rust-gix-pack-0.54)
     (name "rust-gix-pack")
     (version "0.53.0")
     (source
@@ -5089,7 +5128,6 @@ Rust implementation of Git.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "0m6rdxkq21ni71vk8k7qbsjxr7mgkjpdijh3wkhf28gf5qsal8rj"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:tests? #f ;use of undeclared crate gix_testtools
        #:cargo-inputs
@@ -5109,13 +5147,7 @@ Rust implementation of Git.")
         ("rust-serde" ,rust-serde-1)
         ("rust-smallvec" ,rust-smallvec-1)
         ("rust-thiserror" ,rust-thiserror-1)
-        ("rust-uluru" ,rust-uluru-3))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis "Implements Git packs and related data structures")
-    (description
-     "Git packs and related data structures.  Gitoxide is a pure
-Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-uluru" ,rust-uluru-3))))))
 
 (define-public rust-gix-pack-0.51
   (package
