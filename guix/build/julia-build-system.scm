@@ -170,12 +170,12 @@ Project.toml)."
 println(Base.version_slug(Base.UUID(\"~a\"),
                           Base.SHA1(Pkg.GitTools.tree_hash(\".\"))))" uuid)))
          (slug (string-trim-right (get-string-all pipe))))
-    ;; Few packages do not have the regular Project.toml file, then when they
-    ;; are propagated, dependencies do not find them and an error is raised.
     (let ((status (close-pipe pipe)))
       (unless (zero? status)
         (error "failed to compute package slug" status)))
 
+    ;; Few packages do not have the regular Project.toml file, then when they
+    ;; are propagated, dependencies do not find them and an error is raised.
     (unless (file-exists? "Project.toml")
         (julia-create-package-toml (getcwd)
                                    julia-package-name julia-package-uuid
@@ -214,7 +214,7 @@ name = \"" name "\"
 uuid = \"" uuid "\"
 version = \"" version "\"
 ") f)
-    (when (not (null? deps))
+    (unless (null? deps)
       (display "[deps]\n" f)
       (for-each (match-lambda
                   ((name . uuid)
