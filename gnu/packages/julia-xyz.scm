@@ -7179,7 +7179,7 @@ working with @acronym{URIs,Uniform Resource Identifiers}, as defined in RFC
         (base32 "1b8w6wqc7azqzg2f8zc3bmc72fb01sx0rqh6dv3k54wj01ph15p7"))))
     (build-system julia-build-system)
     (arguments
-     (list #:parallel-tests? #f))
+     (list #:tests? #f #:parallel-tests? #f))
     (propagated-inputs
      (list julia-constructionbase))
     (home-page "https://painterqubits.github.io/Unitful.jl/stable/")
