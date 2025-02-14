@@ -29503,8 +29503,40 @@ platforms.")
     (license (list license:asl2.0
                    license:expat))))
 
+(define-public rust-getrandom-0.3
+  (package
+    (name "rust-getrandom")
+    (version "0.3.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "getrandom" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1y154yzby383p63ndw6zpfm0fz3vf6c0zdwc7df6vkl150wrr923"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs
+       (("rust-cfg-if" ,rust-cfg-if-1)
+        ("rust-compiler-builtins" ,rust-compiler-builtins-0.1)
+        ("rust-js-sys" ,rust-js-sys-0.3)
+        ("rust-libc" ,rust-libc-0.2)
+        ("rust-rustc-std-workspace-core" ,rust-rustc-std-workspace-core-1)
+        ("rust-wasi" ,rust-wasi-0.13)
+        ("rust-wasm-bindgen" ,rust-wasm-bindgen-0.2)
+        ("rust-windows-targets" ,rust-windows-targets-0.52))
+       #:cargo-development-inputs
+       (("rust-wasm-bindgen-test" ,rust-wasm-bindgen-test-0.3))))
+    (home-page "https://github.com/rust-random/getrandom")
+    (synopsis "Retrieve random data from system source")
+    (description
+     "This package provides a small cross-platform library for retrieving
+random data from system source.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-getrandom-0.2
   (package
+    (inherit rust-getrandom-0.3)
     (name "rust-getrandom")
     (version "0.2.15")
     (source
@@ -29514,7 +29546,6 @@ platforms.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "1mzlnrb3dgyd1fb84gvw10pyr8wdqdl4ry4sr64i1s8an66pqmn4"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-cfg-if" ,rust-cfg-if-1)
@@ -29525,13 +29556,7 @@ platforms.")
         ("rust-wasi" ,rust-wasi-0.11)
         ("rust-wasm-bindgen" ,rust-wasm-bindgen-0.2))
        #:cargo-development-inputs
-       (("rust-wasm-bindgen-test" ,rust-wasm-bindgen-test-0.3))))
-    (home-page "https://github.com/rust-random/getrandom")
-    (synopsis "Retrieve random data from system source")
-    (description
-     "This package provides a small cross-platform library for
-retrieving random data from system source.")
-    (license (list license:expat license:asl2.0))))
+       (("rust-wasm-bindgen-test" ,rust-wasm-bindgen-test-0.3))))))
 
 (define-public rust-getrandom-0.1
   (package
