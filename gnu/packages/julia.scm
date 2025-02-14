@@ -541,12 +541,15 @@ using Dates: @dateformat_str, Date, DateTime, DateFormat, Time"))
                    (let* ((out (assoc-ref outputs "out"))
                           (bin (string-append out "/bin"))
                           (program "julia"))
+                     ;; Always append ":" to the end of the load path.  The
+                     ;; empty load path entry expands to the default load
+                     ;; path, which includes Julia's own modules.
                      (with-directory-excursion bin
                        (wrap-program program
-                         `("JULIA_LOAD_PATH" ":" prefix
-                           ("" "$JULIA_LOAD_PATH"))
-                         `("JULIA_DEPOT_PATH" ":" prefix
-                           ("" "$JULIA_DEPOT_PATH"))))))))
+                         `("JULIA_LOAD_PATH" ":" =
+                           ("$JULIA_LOAD_PATH" ""))
+                         `("JULIA_DEPOT_PATH" ":" =
+                           ("$JULIA_DEPOT_PATH" ""))))))))
 
            #:make-flags
            #~(list (string-append "prefix=" #$output)
