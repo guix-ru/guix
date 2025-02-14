@@ -1437,8 +1437,39 @@ package provides a way to identify Git actors.")
        #:cargo-development-inputs
        (("rust-pretty-assertions" ,rust-pretty-assertions-1))))))
 
+(define-public rust-gix-archive-0.16
+  (package
+    (name "rust-gix-archive")
+    (version "0.16.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-archive" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "09iihl24zz3ibxp3z5jzg5gipjv6mmhnbn1b0jbzbj33mj412xy4"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-document-features" ,rust-document-features-0.2)
+                       ("rust-flate2" ,rust-flate2-1)
+                       ("rust-gix-date" ,rust-gix-date-0.9)
+                       ("rust-gix-object" ,rust-gix-object-0.45)
+                       ("rust-gix-path" ,rust-gix-path-0.10)
+                       ("rust-gix-worktree-stream" ,rust-gix-worktree-stream-0.16)
+                       ("rust-jiff" ,rust-jiff-0.1)
+                       ("rust-tar" ,rust-tar-0.4)
+                       ("rust-thiserror" ,rust-thiserror-1)
+                       ("rust-zip" ,rust-zip-2))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Archive generation from of a worktree stream")
+    (description
+     "This package provides archive generation from of a worktree stream.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-archive-0.15
   (package
+    (inherit rust-gix-archive-0.16)
     (name "rust-gix-archive")
     (version "0.15.0")
     (source
@@ -1448,7 +1479,6 @@ package provides a way to identify Git actors.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "02m6n14jpvz61rwf1rg5lbjgz47n7zbcvqiramsqnff1an5c0iwi"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -1461,12 +1491,7 @@ package provides a way to identify Git actors.")
         ("rust-jiff" ,rust-jiff-0.1)
         ("rust-tar" ,rust-tar-0.4)
         ("rust-thiserror" ,rust-thiserror-1)
-        ("rust-zip" ,rust-zip-2))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis "Archive generation from of a worktree stream")
-    (description
-     "This package provides archive generation from of a worktree stream.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-zip" ,rust-zip-2))))))
 
 (define-public rust-gix-archive-0.13
   (package
