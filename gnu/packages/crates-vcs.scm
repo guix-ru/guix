@@ -6130,8 +6130,35 @@ Part of Gitoxide, a project to create a pure Rust Git implementation.")
                        ("rust-thiserror" ,rust-thiserror-1)
                        ("rust-winnow" ,rust-winnow-0.5))))))
 
+(define-public rust-gix-refspec-0.26
+  (package
+    (name "rust-gix-refspec")
+    (version "0.26.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "gix-refspec" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0hn4mbnvcammpwrqcawpysbqv1h2np5yzs1vfyzrl3fq165068h0"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-bstr" ,rust-bstr-1)
+                       ("rust-gix-hash" ,rust-gix-hash-0.15)
+                       ("rust-gix-revision" ,rust-gix-revision-0.30)
+                       ("rust-gix-validate" ,rust-gix-validate-0.9)
+                       ("rust-smallvec" ,rust-smallvec-1)
+                       ("rust-thiserror" ,rust-thiserror-1))))
+    (home-page "https://github.com/GitoxideLabs/gitoxide")
+    (synopsis "Parsing and representing refspecs for Gitoxide")
+    (description
+     "This package parses and represents Git refspecs.  It's part of Gitoxide
+a pure Rust implementation of Git.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-gix-refspec-0.25
   (package
+    (inherit rust-gix-refspec-0.26)
     (name "rust-gix-refspec")
     (version "0.25.0")
     (source
@@ -6141,7 +6168,6 @@ Part of Gitoxide, a project to create a pure Rust Git implementation.")
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
         (base32 "19lwhs10cg9rg040k20w8i27ay475isggngxbxhngfj14gw0bc7b"))))
-    (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs
        (("rust-bstr" ,rust-bstr-1)
@@ -6149,14 +6175,7 @@ Part of Gitoxide, a project to create a pure Rust Git implementation.")
         ("rust-gix-revision" ,rust-gix-revision-0.29)
         ("rust-gix-validate" ,rust-gix-validate-0.9)
         ("rust-smallvec" ,rust-smallvec-1)
-        ("rust-thiserror" ,rust-thiserror-1))))
-    (home-page "https://github.com/Byron/gitoxide")
-    (synopsis
-     "Parsing and representing refspecs for Gitoxide")
-    (description
-     "This package parses and represents Git refspecs.  It's part of Gitoxide
-a pure Rust implementation of Git.")
-    (license (list license:expat license:asl2.0))))
+        ("rust-thiserror" ,rust-thiserror-1))))))
 
 (define-public rust-gix-refspec-0.23
   (package
