@@ -6270,7 +6270,7 @@ beginners.")
 (define-public julia-sortingalgorithms
   (package
     (name "julia-sortingalgorithms")
-    (version "1.0.1")
+    (version "1.2.1")
     (source
       (origin
         (method git-fetch)
@@ -6279,7 +6279,7 @@ beginners.")
                (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "173x77a80xnh99viqa3r7rgdaksvxaw8xyfqw09gwvp4p2zrxivb"))))
+         (base32 "0xf35x67pxm1b7x13il0mi2zn2wdj7dc231chgakfvdiisk9l0k8"))))
     (build-system julia-build-system)
     (arguments
      (list #:tests? #f))    ; cycle with StatsBase.jl
