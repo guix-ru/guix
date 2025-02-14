@@ -227,9 +227,9 @@ version = \"" version "\"
   (modify-phases gnu:%standard-phases
     (delete 'check) ; tests must be run after installation
     (replace 'install install)
-    (add-after 'install 'precompile precompile)
     (add-after 'unpack 'link-depot link-depot)
-    (add-after 'install 'check check)
+    (add-after 'install 'precompile precompile)
+    (add-after 'precompile 'check check)
     ;; TODO: In the future we could add a "system-image-generation" phase
     ;; where we use PackageCompiler.jl to speed up package loading times
     (delete 'configure)
