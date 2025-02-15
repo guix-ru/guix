@@ -8800,6 +8800,8 @@ analyses.")
                          "inst/lib/selectize/js/selectize.min.js"
                          "inst/www/js/crosstalk.min.js")))))
     (build-system r-build-system)
+    (properties
+     '((updater-extra-native-inputs . ("r-sass" "r-shiny"))))
     (arguments
      (list
       #:modules '((guix build r-build-system)
@@ -8828,7 +8830,7 @@ analyses.")
     (propagated-inputs
      (list r-htmltools r-jsonlite r-lazyeval r-r6))
     (native-inputs
-     (list esbuild js-selectize r-testthat))
+     (list esbuild js-selectize r-sass r-shiny r-testthat))
     (home-page "https://rstudio.github.io/crosstalk/")
     (synopsis "Inter-widget interactivity for HTML widgets")
     (description
