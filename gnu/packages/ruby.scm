@@ -203,6 +203,23 @@ a focus on simplicity and productivity.")
         (base32
          "1jvyl8szfhinhqjiv40pfqck95lhikjx3iwxsylw9hiq481384b7"))))))
 
+(define-public ruby-3.1
+  (package
+    (inherit ruby-3.2)
+    (version "3.1.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://cache.ruby-lang.org/pub/ruby/"
+                           (version-major+minor version)
+                           "/ruby-" version ".tar.xz"))
+       (sha256
+        (base32
+         "0kzr792rk9n9yrqlyrkc1a0cmbk5y194f7v7p4vwjdk0ww860v8v"))))
+    (inputs
+     (modify-inputs (package-inputs ruby-3.2)
+       (delete "libyaml")))))
+
 (define-public ruby-2.6
   (package
     (name "ruby")
@@ -331,20 +348,6 @@ a focus on simplicity and productivity.")
     (inputs
      (modify-inputs (package-inputs ruby-2.7)
        (replace "openssl" openssl)))))
-
-(define-public ruby-3.1
-  (package
-    (inherit ruby-3.0)
-    (version "3.1.4")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "http://cache.ruby-lang.org/pub/ruby/"
-                           (version-major+minor version)
-                           "/ruby-" version ".tar.xz"))
-       (sha256
-        (base32
-         "0kzr792rk9n9yrqlyrkc1a0cmbk5y194f7v7p4vwjdk0ww860v8v"))))))
 
 (define-public ruby ruby-3.1)
 
