@@ -24886,6 +24886,8 @@ data in the column sparse format.")
     (build-system r-build-system)
     (arguments
      (list
+      ;; 4 tests fail because they need Internet access.
+      #:tests? #false
       #:phases
       '(modify-phases %standard-phases
          (add-after 'unpack 'set-HOME
