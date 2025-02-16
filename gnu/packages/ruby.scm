@@ -189,6 +189,20 @@ a focus on simplicity and productivity.")
         (base32
          "0wmdnqcmfa5mf961hzklvjic7vdpgrbl2ckhaafb1m0fbrhbrg2x"))))))
 
+(define-public ruby-3.2
+  (package
+    (inherit ruby-3.3)
+    (version "3.2.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://cache.ruby-lang.org/pub/ruby/"
+                           (version-major+minor version)
+                           "/ruby-" version ".tar.xz"))
+       (sha256
+        (base32
+         "0ss7pb7f62sakq5ywpw3dl0v586cl61cd91qlm1i094c9fak3cng"))))))
+
 (define-public ruby-2.6
   (package
     (name "ruby")
@@ -331,23 +345,6 @@ a focus on simplicity and productivity.")
        (sha256
         (base32
          "0kzr792rk9n9yrqlyrkc1a0cmbk5y194f7v7p4vwjdk0ww860v8v"))))))
-
-(define-public ruby-3.2
-  (package
-    (inherit ruby-3.1)
-    (version "3.2.3")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "http://cache.ruby-lang.org/pub/ruby/"
-                           (version-major+minor version)
-                           "/ruby-" version ".tar.xz"))
-       (sha256
-        (base32
-         "0ss7pb7f62sakq5ywpw3dl0v586cl61cd91qlm1i094c9fak3cng"))))
-    (inputs
-     (modify-inputs (package-inputs ruby-3.1)
-       (prepend libyaml)))))
 
 (define-public ruby ruby-3.1)
 
