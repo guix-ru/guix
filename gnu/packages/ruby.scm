@@ -192,7 +192,7 @@ a focus on simplicity and productivity.")
 (define-public ruby-3.2
   (package
     (inherit ruby-3.3)
-    (version "3.2.3")
+    (version "3.2.6")
     (source
      (origin
        (method url-fetch)
@@ -201,7 +201,7 @@ a focus on simplicity and productivity.")
                            "/ruby-" version ".tar.xz"))
        (sha256
         (base32
-         "0ss7pb7f62sakq5ywpw3dl0v586cl61cd91qlm1i094c9fak3cng"))))))
+         "1jvyl8szfhinhqjiv40pfqck95lhikjx3iwxsylw9hiq481384b7"))))))
 
 (define-public ruby-2.6
   (package
