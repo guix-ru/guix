@@ -40184,7 +40184,8 @@ vignette for more information and examples.")
         (base32
          "1b3i5vgljpjcr8v2xrz20cd900q36rmijizfgcx7id3raj5dwp1l"))))
     (properties
-     `((upstream-name . "distributional")))
+     '((upstream-name . "distributional")
+       (updater-extra-native-inputs . ("r-evd" "r-mvtnorm"))))
     (build-system r-build-system)
     (propagated-inputs
      (list r-generics
@@ -40193,7 +40194,7 @@ vignette for more information and examples.")
            r-pillar
            r-rlang
            r-vctrs))
-    (native-inputs (list r-testthat))
+    (native-inputs (list r-evd r-mvtnorm r-testthat))
     (home-page "https://pkg.mitchelloharawild.com/distributional/")
     (synopsis "Vectorized probability distributions")
     (description
