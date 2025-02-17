@@ -32070,6 +32070,8 @@ extends the lme4 package.")
         (base32
          "1rlvfk0279saf930z48g230p9z30dd7qil9aiprjn35px1advqdn"))))
     (build-system r-build-system)
+    (properties
+     '((updater-extra-native-inputs . ("r-ranger"))))
     (propagated-inputs
      (list r-backports
            r-base64url
@@ -32084,7 +32086,7 @@ extends the lme4 package.")
            r-stringi
            r-withr))
     (native-inputs
-     (list r-knitr r-testthat))
+     (list r-knitr r-ranger r-testthat))
     (home-page "https://github.com/mllg/batchtools")
     (synopsis "Tools for computation on batch systems")
     (description
