@@ -7501,13 +7501,14 @@ and fairly speedy.")
            python-trustme
            python-wsproto))
     (propagated-inputs
-     (list python-click
+     (list python-a2wsgi
+           python-click
            python-dotenv
            python-h11
            python-httptools
            python-pyyaml
            python-uvloop
-           python-watchgod
+           python-watchfiles
            python-websockets))
     (home-page "https://github.com/encode/uvicorn")
     (synopsis "Fast ASGI server implementation")
