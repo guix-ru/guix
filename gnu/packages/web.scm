@@ -2157,7 +2157,7 @@ directions.")
   (package
     (inherit esbuild)
     (name "esbuild-node")
-    (version (package-version esbuild))
+    (version "0.14.0")
     (source
      (origin
        (method git-fetch)
@@ -2201,8 +2201,7 @@ directions.")
                 (with-directory-excursion (string-append "src/" unpack-path)
                   (invoke "make" "test-go"))))))))
     (native-inputs
-     (modify-inputs (package-native-inputs esbuild)
-       (append node-lts)))))
+     (list go-github-com-kylelemons-godebug node-lts))))
 
 (define-public wwwoffle
   (package
