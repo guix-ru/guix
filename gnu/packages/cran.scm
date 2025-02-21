@@ -45112,6 +45112,8 @@ annealing.")
               (sha256
                (base32
                 "1fa2hd6mrzkcygwhmxd5yzs0yfvzkw7k3v73c7rdbn3bangmafmi"))))
+    (properties
+     '((updater-extra-native-inputs . ("r-rpart"))))
     (build-system r-build-system)
     (propagated-inputs
      (list r-bbotk
@@ -45123,7 +45125,7 @@ annealing.")
            r-paradox
            r-r6))
     (native-inputs
-     (list r-knitr r-mlr3pipelines r-rush r-testthat))
+     (list r-knitr r-mlr3pipelines r-rpart r-rush r-testthat))
     (home-page "https://mlr3tuning.mlr-org.com/")
     (synopsis "Tuning for @code{mlr3}")
     (description "@code{mlr3tuning} implements methods for hyperparameter
