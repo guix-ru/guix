@@ -32120,8 +32120,13 @@ provides tools to compute this metric.")
     (arguments
      (list
       #:phases
-      ;; Needed by tests.
       '(modify-phases %standard-phases
+         (add-after 'unpack 'disable-bad-tests
+           (lambda _
+             ;; Two tests run code outside of testthat.
+             (delete-file "tests/testthat/test-fixed_regex_linter.R")
+             (delete-file "tests/testthat/test-pipe_continuation_linter.R")))
+         ;; Needed by tests.
          (add-after 'unpack 'set-HOME
            (lambda _ (setenv "HOME" "/tmp"))))))
     (propagated-inputs
