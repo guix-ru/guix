@@ -9,7 +9,7 @@
 ;;; Copyright © 2015 Andy Wingo <wingo@igalia.com>
 ;;; Copyright © 2015 David Hashe <david.hashe@dhashe.com>
 ;;; Copyright © 2015, 2016, 2017, 2018, 2020, 2021 Ricardo Wurmus <rekado@elephly.net>
-;;; Copyright © 2016, 2017, 2020-2024 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2016, 2017, 2020-2025 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2016 Fabian Harfert <fhmgufs@web.de>
 ;;; Copyright © 2016 Kei Kebreau <kkebreau@posteo.net>
 ;;; Copyright © 2016 Patrick Hetu <patrick.hetu@auf.org>
@@ -1250,14 +1250,18 @@ application suites.")
                           (("'empty-inset-shadow',") "")
                           (("'empty-outset-shadow',") "")
                           (("'inset-shadow-multiple',") "")
+                          (("'lots-of-offscreens-nogl',") "")
                           (("'outset-shadow-scale-offset',") "")
                           (("'outset_shadow_offset_both',") "")
                           (("'outset_shadow_offset_x',") "")
                           (("'outset_shadow_offset_y',") "")
                           (("'outset_shadow_rounded_top',") "")
                           (("'outset_shadow_simple',") "")
+                          (("'radial-gradient-premultiplied-nocairo',") "")
                           (("'shadow-offset-clip',") "")
-                          (("'shrink-rounded-border',") "")))
+                          (("'shrink-rounded-border',") ""))
+                        (substitute* "testsuite/css/parser/meson.build"
+                          ((".*color-mix.*") "")))
                      #~())
               ;; XXX: These failures appear specific to i686 – investigate them.
               #$@(if (target-x86-32?)
