@@ -1948,7 +1948,6 @@ model packaging, deployment and workflow management.")
       (list cmake-minimal
             googletest
             pybind11
-            python-coverage
             python-fb-re2
             python-parameterized
             python-pytest
@@ -5653,7 +5652,6 @@ feedback.")
       (native-inputs
        (list python-aiohttp
              python-cloudpickle
-             python-coverage
              python-flaky
              python-pympler
              python-pytest
@@ -5692,7 +5690,6 @@ PyTorch code to decouple the science from the engineering.")
            python-lightning-utilities))
     (native-inputs
      (list python-cloudpickle
-           python-coverage
            python-fire
            python-mir-eval
            python-mypy
