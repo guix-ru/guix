@@ -79637,8 +79637,44 @@ easier in Rust.")
      `(#:cargo-inputs
        (("rust-strum-macros" ,rust-strum-macros-0.18))))))
 
+(define-public rust-strum-macros-0.27
+  (package
+    (name "rust-strum-macros")
+    (version "0.27.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "strum_macros" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1s7x07nkrgjfvxrvcdjw6qanad4c55yjnd32bph9q3xgpid8qyn7"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-test-flags
+         '("--release" "--"
+           "--skip=enum_count"
+           "--skip=enum_discriminants"
+           "--skip=enum_iter"
+           "--skip=enum_messages"
+           "--skip=enum_properties"
+           "--skip=from_string"
+           "--skip=static_variants_array"
+           "--skip=variant_names")
+       #:cargo-inputs
+         (("rust-heck" ,rust-heck-0.5)
+          ("rust-proc-macro2" ,rust-proc-macro2-1)
+          ("rust-quote" ,rust-quote-1)
+          ("rust-rustversion" ,rust-rustversion-1)
+          ("rust-syn" ,rust-syn-2))))
+    (home-page "https://github.com/Peternator7/strum")
+    (synopsis "Macros for working with enums and strings")
+    (description
+     "This package provides helpful macros for working with enums and strings.")
+    (license license:expat)))
+
 (define-public rust-strum-macros-0.26
   (package
+    (inherit rust-strum-macros-0.27)
     (name "rust-strum-macros")
     (version "0.26.4")
     (source
@@ -79658,16 +79694,11 @@ easier in Rust.")
                        ("rust-quote" ,rust-quote-1)
                        ("rust-rustversion" ,rust-rustversion-1)
                        ("rust-syn" ,rust-syn-2))
-       #:cargo-development-inputs (("rust-strum" ,rust-strum-0.26))))
-    (home-page "https://github.com/Peternator7/strum")
-    (synopsis "Set of macros for working with enums and strings")
-    (description
-     "This crate provides helpful macros for working with enums and strings.")
-    (license license:expat)))
+       #:cargo-development-inputs (("rust-strum" ,rust-strum-0.26))))))
 
 (define-public rust-strum-macros-0.25
   (package
-    (inherit rust-strum-macros-0.26)
+    (inherit rust-strum-macros-0.27)
     (name "rust-strum-macros")
     (version "0.25.3")
     (source
@@ -79687,7 +79718,7 @@ easier in Rust.")
 
 (define-public rust-strum-macros-0.24
   (package
-    (inherit rust-strum-macros-0.25)
+    (inherit rust-strum-macros-0.27)
     (name "rust-strum-macros")
     (version "0.24.3")
     (source
@@ -79709,7 +79740,7 @@ easier in Rust.")
 
 (define-public rust-strum-macros-0.21
   (package
-    (inherit rust-strum-macros-0.24)
+    (inherit rust-strum-macros-0.27)
     (name "rust-strum-macros")
     (version "0.21.1")
     (source
@@ -79729,7 +79760,7 @@ easier in Rust.")
 
 (define-public rust-strum-macros-0.20
   (package
-    (inherit rust-strum-macros-0.21)
+    (inherit rust-strum-macros-0.27)
     (name "rust-strum-macros")
     (version "0.20.1")
     (source
