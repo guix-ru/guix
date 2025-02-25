@@ -79504,6 +79504,35 @@ struct.")
      "Parse command line argument by defining a struct, derive crate.")
     (license (list license:asl2.0 license:expat))))
 
+(define-public rust-strum-0.27
+  (package
+    (name "rust-strum")
+    (version "0.27.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "strum" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0cic9r2sc2h17nnpjm2yfp7rsd35gkbcbqvrhl553jaiih4fykgn"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-test-flags
+         '("--release" "--"
+           "--skip=EnumMessage"
+           "--skip=EnumProperty"
+           "--skip=IntoEnumIterator"
+           "--skip=additional_attributes")
+       #:cargo-inputs
+         (("rust-phf" ,rust-phf-0.11)
+          ("rust-strum-macros" ,rust-strum-macros-0.27))))
+    (home-page "https://github.com/Peternator7/strum")
+    (synopsis "Macros for working with enums and strings")
+    (description
+     "Strum is a set of macros and traits for working with enums and strings
+in Rust.")
+    (license license:expat)))
+
 (define-public rust-strum-0.26
   (package
     (name "rust-strum")
