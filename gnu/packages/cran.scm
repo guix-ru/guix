@@ -24232,6 +24232,27 @@ to colexicographical order.")
 simple multicore parallelism.")
     (license license:expat)))
 
+(define-public r-multigraph
+  (package
+    (name "r-multigraph")
+    (version "0.99-3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "multigraph" version))
+       (sha256
+        (base32 "0q634jsr1m9nzn4g3bcy5dxl26bdzdg6imcym2jifaa29b7m1790"))))
+    (properties `((upstream-name . "multigraph")))
+    (build-system r-build-system)
+    (propagated-inputs (list r-multiplex))
+    (home-page "https://github.com/mplex/multigraph/")
+    (synopsis "Plot and manipulate multigraphs")
+    (description
+     "This package provides functions to plot and manipulate multigraphs,
+signed and valued graphs, bipartite graphs, multilevel graphs, and Cayley
+graphs with various layout options.")
+    (license license:gpl3)))
+
 (define-public r-multiplex
   (package
     (name "r-multiplex")
