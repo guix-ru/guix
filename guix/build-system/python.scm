@@ -34,6 +34,7 @@
   #:use-module (srfi srfi-1)
   #:export (%python-build-system-modules
             package-with-python2
+            package-with-pypy
             strip-python2-variant
             default-python
             default-python2
@@ -71,6 +72,11 @@ extension, such as '.tar.gz'."
   "Return the default Python 2 package."
   (let ((python (resolve-interface '(gnu packages python))))
     (module-ref python 'python-2)))
+
+(define (default-pypy)
+  "Return the default pypy package."
+  (let ((python (resolve-interface '(gnu packages python))))
+    (module-ref python 'pypy)))
 
 (define sanity-check.py
   ;; The script used to validate the installation of a Python package.
@@ -125,6 +131,14 @@ pre-defined variants."
         (package-variant p)))
 
   (package-mapping transform cut?))
+
+(define package-with-pypy
+  ;; Note: delay call to 'default-pypy' until after the 'arguments' field
+  ;; of packages is accessed to avoid a circular dependency when evaluating
+  ;; the top-level of (gnu packages python).
+  (package-with-explicit-python (delay (default-pypy))
+                                "python-" "pypy-"
+                                #:variant-property 'pypy-variant))
 
 (define package-with-python2
   ;; Note: delay call to 'default-python2' until after the 'arguments' field

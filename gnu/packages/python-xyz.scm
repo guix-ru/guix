@@ -40263,6 +40263,10 @@ write text fast, and for various text generation, statistics, and modeling tasks
 @end itemize")
     (license license:expat)))
 
+(define-public pypy-whenever
+  (package
+    (inherit (package-with-pypy python-whenever))))
+
 (define-public python-xmp-toolkit
   (package
     (name "python-xmp-toolkit")
