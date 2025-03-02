@@ -2713,20 +2713,12 @@ organizing remote Go repository clones.")
     (arguments
      (list
       #:tests? #f                       ; no test suite
+      #:lisp-directory "lisp"
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'install 'make-info
             (lambda _
-              (invoke "make" "info")))
-          (add-after 'make-info 'enter-lisp-directory
-            (lambda _
-              (chdir "lisp")))
-          (add-after 'expand-load-path 'add-el-dir-to-emacs-load-path
-            (lambda _
-              (setenv "EMACSLOADPATH"
-                      (string-append (getcwd)
-                                     "/lisp:"
-                                     (getenv "EMACSLOADPATH")))))
+              (invoke "make" "--directory=.." "info")))
           (add-after 'install 'install-info
             (lambda _
               (let ((info (string-append #$output "/share/info")))
