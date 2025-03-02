@@ -33772,17 +33772,15 @@ commands (a prefix and a suffix) we prefer to call it just a \"transient\".")
      (build-system emacs-build-system)
      (arguments
       `(#:tests? #f                     ;no tests
+        #:lisp-directory "lisp"
         #:phases
         (modify-phases %standard-phases
           (add-after 'unpack 'build-info-manual
             (lambda _
-              (invoke "make" "info")
+              (invoke "make" "--directory=.." "info")
               ;; Move the info file to lisp so that it gets installed by the
               ;; emacs-build-system.
-              (rename-file "docs/forge.info" "lisp/forge.info")))
-          (add-after 'build-info-manual 'chdir-lisp
-            (lambda _
-              (chdir "lisp"))))))
+              (rename-file "../docs/forge.info" "forge.info"))))))
      (native-inputs
       (list texinfo))
      (propagated-inputs
