@@ -32618,7 +32618,6 @@ according to their use.")
                 "0dvvyqc0nw9has54vps10f5iv831cb29vqvbvx0m2djv9pacqp17"))))
     (arguments
      (list
-      #:test-command #~(list "ert-runner")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'configure
