@@ -30104,7 +30104,6 @@ Requests from magit.")
     (build-system emacs-build-system)
     (arguments
      (list
-      #:test-command #~(list "ert-runner")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'configure
