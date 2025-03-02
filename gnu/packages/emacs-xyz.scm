@@ -37614,11 +37614,10 @@ for the Telegram messaging platform.")
     (name "emacs-telega-contrib")
     (arguments
      (list
+      #:lisp-directory "contrib"
       #:exclude #~(list "telega-live-location.el")
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'enter-subdirectory
-            (lambda _ (chdir "contrib")))
           (add-before 'install-license-files 'leave-subdirectory
             (lambda _ (chdir ".."))))))
     (inputs '())
