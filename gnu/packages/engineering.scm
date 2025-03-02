@@ -3257,13 +3257,7 @@ full programmatic control over your models.")
     (inputs '())
     (build-system emacs-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'chdir-elisp
-           ;; Elisp directory is not in root of the source.
-           (lambda _
-             (chdir "contrib")
-             #t)))))
+     (list #:lisp-directory "contrib"))
     (synopsis "Emacs major mode for editing editing OpenSCAD code")
     (description "@code{scad-mode} provides an Emacs major mode for editing
 OpenSCAD code.  It supports syntax highlighting, indenting and refilling of
