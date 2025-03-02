@@ -12588,7 +12588,6 @@ and set HTML attributes.")
       (arguments
        (list
         #:emacs emacs-no-x              ;for libxml
-        #:test-command #~(list "ert-runner")
         #:phases
         #~(modify-phases %standard-phases
             (add-before 'check 'disable-failing-tests
