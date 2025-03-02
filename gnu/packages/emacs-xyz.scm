@@ -22122,8 +22122,7 @@ running a customisable handler command (@code{ignore} by default).")
        (patches (search-patches "emacs-json-reformat-fix-tests.patch"))))
     (build-system emacs-build-system)
     (arguments
-     `(#:test-command '("ert-runner")
-       #:phases
+     `(#:phases
        (modify-phases %standard-phases
          (add-before 'check 'make-tests-writable
            (lambda _
