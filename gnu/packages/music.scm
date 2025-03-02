@@ -1760,10 +1760,7 @@ Guile.")
     (build-system emacs-build-system)
     (arguments
      (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'expand-load-path 'change-working-directory
-            (lambda _ (chdir "elisp"))))))
+      #:lisp-directory "elisp"))
     (home-page (package-home-page lilypond))
     (synopsis "Major mode for editing GNU LilyPond music scores")
     (description
