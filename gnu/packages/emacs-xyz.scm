@@ -11981,7 +11981,6 @@ the locations of docstrings, arguments, and functions.")
     (arguments
      (list
       #:emacs emacs-no-x
-      #:test-command #~(list "ert-runner")
       #:phases #~(modify-phases %standard-phases
                    (add-after 'unpack 'fix-native-compilation
                      (lambda _
