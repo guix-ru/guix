@@ -35297,8 +35297,7 @@ and takes advantage of the org-ql cache.")))
       (native-inputs
        (list emacs-undercover emacs-ert-runner))
       (arguments
-       `(#:test-command '("ert-runner")
-         #:phases
+       `(#:phases
          ;; this test requires network access, so remove it
          (modify-phases %standard-phases
            (add-before 'check 'make-tests-writable
