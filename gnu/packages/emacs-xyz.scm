@@ -28806,7 +28806,6 @@ through the symbol: @command{this-fn}.")
     (build-system emacs-build-system)
     (arguments
      `(#:tests? #f                      ; FIXME: Tests freeze when run.
-       #:test-command '("ert-runner")
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'set-shell
