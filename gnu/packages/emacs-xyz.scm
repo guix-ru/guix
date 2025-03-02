@@ -29475,8 +29475,6 @@ tracking.")
      (list emacs-helm emacs-company))
     (native-inputs
      (list emacs-ert-runner))
-    (arguments
-     (list #:test-command #~(list "ert-runner")))
     (home-page "https://github.com/Sodel-the-Vociferous/helm-company")
     (synopsis "Helm interface for Company mode")
     (description
