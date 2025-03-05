@@ -971,7 +971,7 @@ variables, both with unordered (nominal variables) and ordered categories
        (sha256
         (base32 "05bxzzjcc021p3hi092h06r2q7qnvql0xz1alggi83i0pp1mxp6d"))))
     (build-system julia-build-system)
-    (native-inputs (list julia-aqua))
+    (native-inputs (list julia-aqua-0.5))
     (propagated-inputs (list julia-cfitsio-jll))
     (home-page "https://github.com/JuliaAstro/CFITSIO.jl")
     (synopsis "C-style interface to the libcfitsio library")
