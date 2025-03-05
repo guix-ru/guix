@@ -2488,10 +2488,9 @@ working with filesystem paths in Julia.")
        (sha256
         (base32 "1c4i8awmw9qq8dqfhxwjh76mc1nlmzrl5j754fpnbajv8p49gdv5"))))
     (build-system julia-build-system)
-    (propagated-inputs
-     (list julia-aqua))
     (inputs                             ;required by tests
-     (list julia-staticarrays))
+     (list julia-aqua-0.5
+           julia-staticarrays))
     (home-page "https://github.com/JuliaArrays/FillArrays.jl")
     (synopsis "Lazy matrix representation")
     (description "This package lazily represents matrices filled with
