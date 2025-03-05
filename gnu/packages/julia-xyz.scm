@@ -1300,6 +1300,32 @@ clash with SciML if both ecosystems export the solve command.")
 common subexpression elimination.")
     (license license:expat)))
 
+(define-public julia-commonworldinvalidations
+  (let ((commit "e462b98bd214e3c6b70c2e4e64831466c21b8c04"))
+    (package
+      (name "julia-commonworldinvalidations")
+      (version (git-version "0.0.0" "1" commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/SciML/CommonWorldInvalidations.jl")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0wi41ci6mrlkpk2cvvfxbmgja7cggmmlrk509b4kmmhxds6dxjqx"))))
+      (build-system julia-build-system)
+      (propagated-inputs
+       (list julia-macrotools))
+      (home-page "https://github.com/SciML/CommonWordInvalidations.jl")
+      (synopsis "Fixing the world one invalidator at a time")
+      (description "This package fixes the common unfixable invalidators by
+simply forcing the invalidations.  It's made to be an unchanged dependency
+that is then reused by downstream libraries with
+@code{PrecompileTools.@@recompile_invalidations} so the common invalidators are
+all handled during the precompilation stage a single time.")
+      (license license:expat))))
+
 (define-public julia-compat
   (package
     (name "julia-compat")
