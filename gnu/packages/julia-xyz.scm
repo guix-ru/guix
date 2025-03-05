@@ -148,6 +148,22 @@ ANSI escape codes to another format.")
 provides functions to run a few automatable checks for Julia packages.")
     (license license:expat)))
 
+;;; Required by julia-cfitsio
+(define julia-aqua-0.5
+  (package
+    (inherit julia-aqua)
+    (name "julia-aqua")
+    (version "0.5.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/JuliaTesting/Aqua.jl")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "12hng8czkgynsn1pshavma2wijypl6k05hhgivc3rqiyclfpi89z"))))))
+
 (define-public julia-argcheck
   (package
     (name "julia-argcheck")
