@@ -42,7 +42,9 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages sqlite)
-  #:use-module (gnu packages time))
+  #:use-module (gnu packages time)
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26))
 
 (define-public nspr
   (package
@@ -95,30 +97,37 @@ platform-neutral API for system level and libc-like functions.  It is used
 in the Mozilla clients.")
     (license license:mpl2.0)))
 
-;; nss should track ESRs, but currently doesn't.  3.102.1 is the current ESR.
+(define (nss-uri version)
+  (let* ((versions (string-split version #\.))
+         (version-with-underscores (string-join versions "_"))
+         (version-with-final-underscore
+          (string-append (car versions) "."
+                         (cadr versions) "_"
+                         (caddr versions))))
+    (string-append
+     "https://ftp.mozilla.org/pub/mozilla.org/security/nss/"
+     "releases/NSS_" version-with-underscores "_RTM/src/"
+     "nss-" version-with-final-underscore ".tar.gz")))
 
+(define %nss-release-date "2025-02-05")
 (define-public nss
   (package
     (name "nss")
     ;; IMPORTANT: Also update and test the nss-certs package, which duplicates
     ;; version and source to avoid a top-level variable reference & module
     ;; cycle.
-    (version "3.99")
+    (version "3.101.3")                 ;also update above %NSS-RELEASE-DATE!
     (source (origin
               (method url-fetch)
-              (uri (let ((version-with-underscores
-                          (string-join (string-split version #\.) "_")))
-                     (string-append
-                      "https://ftp.mozilla.org/pub/mozilla.org/security/nss/"
-                      "releases/NSS_" version-with-underscores "_RTM/src/"
-                      "nss-" version ".tar.gz")))
+              (uri (nss-uri version))
               (sha256
                (base32
-                "1g89ig40gfi1sp02gybvl2z818lawcnrqjzsws36cdva834c5maw"))
+                "1gkpbyh90aw9yhjnyj1bsp79s2bxab886d9ihkaw1i2kzqfvf3dg"))
               ;; Create nss.pc and nss-config.
               (patches (search-patches "nss-3.56-pkgconfig.patch"
                                        "nss-getcwd-nonnull.patch"
-                                       "nss-increase-test-timeout.patch"))
+                                       "nss-increase-test-timeout.patch"
+                                       "nss-disable-broken-tests.patch"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -177,13 +186,12 @@ in the Mozilla clients.")
               (setenv "CCC" #$(cxx-for-target))
               (setenv "NATIVE_CC" "gcc")
               ;; No VSX on powerpc-linux.
-              #$@(if (target-ppc32?)
-                     #~((setenv "NSS_DISABLE_CRYPTO_VSX" "1"))
-                     #~())
+              (when #$(target-ppc32?)
+                (setenv "NSS_DISABLE_CRYPTO_VSX" "1"))
+
               ;; Tells NSS to build for the 64-bit ABI if we are 64-bit system.
-              #$@(if (target-64bit?)
-                     #~((setenv "USE_64" "1"))
-                     #~())))
+              (when #$(target-64bit?)
+                (setenv "USE_64" "1"))))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (if tests?
@@ -202,21 +210,20 @@ in the Mozilla clients.")
                     (substitute* "nss/tests/dbtests/dbtests.sh"
                       ((" -lt 5") " -lt 50"))
 
-                    #$@(if (target-64bit?)
-                           '()
-                           ;; The script fails to determine the source
-                           ;; directory when running under 'datefudge' (see
-                           ;; <https://issues.guix.gnu.org/72239>).  Help it.
-                           #~((substitute* "nss/tests/gtests/gtests.sh"
-                                (("SOURCE_DIR=.*")
-                                 (string-append "SOURCE_DIR=" (getcwd) "/nss\n")))))
+                    (unless #$(target-64bit?)
+                      ;; The script fails to determine the source
+                      ;; directory when running under 'datefudge' (see
+                      ;; <https://issues.guix.gnu.org/72239>).  Help it.
+                      (substitute* "nss/tests/gtests/gtests.sh"
+                        (("SOURCE_DIR=.*")
+                         (string-append "SOURCE_DIR=" (getcwd) "/nss\n"))))
 
                     ;; The "PayPalEE.cert" certificate expires every six months,
                     ;; leading to test failures:
                     ;; <https://bugzilla.mozilla.org/show_bug.cgi?id=609734>.  To
                     ;; work around that, set the time to roughly the release date.
                     (invoke #$(if (target-64bit?) "faketime" "datefudge")
-                            "2024-01-23" "./nss/tests/all.sh"))
+                            #$%nss-release-date "./nss/tests/all.sh"))
                   (format #t "test suite not run~%"))))
           (replace 'install
             (lambda* (#:key outputs #:allow-other-keys)
@@ -250,13 +257,15 @@ in the Mozilla clients.")
     (properties '((timeout . 216000)))  ;60 hours
 
     (home-page "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS")
-    (synopsis "Network Security Services")
+    (synopsis "Network Security Services (ESR)")
     (description
      "Network Security Services (@dfn{NSS}) is a set of libraries designed to
 support cross-platform development of security-enabled client and server
 applications.  Applications built with NSS can support SSL v2 and v3, TLS,
 PKCS #5, PKCS #7, PKCS #11, PKCS #12, S/MIME, X.509 v3 certificates, and other
-security standards.")
+security standards.
+
+This package tracks the Extended Support Release (ESR) channel.")
     (license license:mpl2.0)))
 
 ;; nss-rapid tracks the rapid release channel.  Unless your package requires a
@@ -281,7 +290,10 @@ security standards.")
                      "nss-" version ".tar.gz")))
              (sha256
               (base32
-               "09xfndqj07wy28l7jnk01gqa4bh55nz6cldlp5qpg8120k211mlw"))))
+               "09xfndqj07wy28l7jnk01gqa4bh55nz6cldlp5qpg8120k211mlw"))
+             (patches
+              (remove (cut string-contains <> "nss-disable-broken-tests.patch")
+                      (origin-patches (package-source nss))))))
    (arguments
     (substitute-keyword-arguments (package-arguments nss)
       ((#:phases phases)

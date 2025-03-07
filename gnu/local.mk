@@ -1937,6 +1937,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/nsis-env-passthru.patch			\
   %D%/packages/patches/nss-getcwd-nonnull.patch			\
   %D%/packages/patches/nss-increase-test-timeout.patch		\
+  %D%/packages/patches/nss-disable-broken-tests.patch		\
   %D%/packages/patches/nss-3.56-pkgconfig.patch			\
   %D%/packages/patches/ntp-fix-dereferencing-the-wrong-variable.patch   \
   %D%/packages/patches/nvi-assume-preserve-path.patch		\
