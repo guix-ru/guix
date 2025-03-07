@@ -95,27 +95,28 @@ platform-neutral API for system level and libc-like functions.  It is used
 in the Mozilla clients.")
     (license license:mpl2.0)))
 
-
-;; nss should track ESRs, but currently doesn't.  3.102.1 is the current ESR.
-
 (define-public nss
   (package
     (name "nss")
     ;; IMPORTANT: Also update and test the nss-certs package, which duplicates
     ;; version and source to avoid a top-level variable reference & module
     ;; cycle.
-    (version "3.99")
+    (version "3.101.3")
     (source (origin
               (method url-fetch)
-              (uri (let ((version-with-underscores
-                          (string-join (string-split version #\.) "_")))
+              (uri (let* ((versions (string-split version #\.))
+                          (version-with-underscores (string-join versions "_"))
+                          (version-with-final-underscore
+                          (string-append (car versions) "."
+                                         (cadr versions) "_"
+                                         (caddr versions))))
                      (string-append
                       "https://ftp.mozilla.org/pub/mozilla.org/security/nss/"
                       "releases/NSS_" version-with-underscores "_RTM/src/"
-                      "nss-" version ".tar.gz")))
+                      "nss-" version-with-final-underscore ".tar.gz")))
               (sha256
                (base32
-                "1g89ig40gfi1sp02gybvl2z818lawcnrqjzsws36cdva834c5maw"))
+                "1gkpbyh90aw9yhjnyj1bsp79s2bxab886d9ihkaw1i2kzqfvf3dg"))
               ;; Create nss.pc and nss-config.
               (patches (search-patches "nss-3.56-pkgconfig.patch"
                                        "nss-getcwd-nonnull.patch"
@@ -178,7 +179,7 @@ in the Mozilla clients.")
           ;; around that, set the time to roughly the release date.
           (add-after 'unpack 'set-release-date
             (lambda _
-              (setenv "GUIX_NSS_RELEASE_DATE" "2024-01-23")))
+              (setenv "GUIX_NSS_RELEASE_DATE" "2025-02-05")))
           (replace 'configure
             (lambda _
               (setenv "CC" #$(cc-for-target))
@@ -258,13 +259,15 @@ in the Mozilla clients.")
     (properties '((timeout . 216000)))  ;60 hours
 
     (home-page "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS")
-    (synopsis "Network Security Services")
+    (synopsis "Network Security Services (ESR")
     (description
      "Network Security Services (@dfn{NSS}) is a set of libraries designed to
 support cross-platform development of security-enabled client and server
 applications.  Applications built with NSS can support SSL v2 and v3, TLS,
 PKCS #5, PKCS #7, PKCS #11, PKCS #12, S/MIME, X.509 v3 certificates, and other
-security standards.")
+security standards.
+
+This package tracks the Extended Support Release (ESR) channel.")
     (license license:mpl2.0)))
 
 ;; nss-rapid tracks the rapid release channel.  Unless your package requires a
