@@ -5172,7 +5172,6 @@ with integrated support for finding required rows quickly.")
     (build-system cmake-build-system)
     (arguments
      (list
-      #:cmake cmake ;needs 3.25+
       #:tests? #f
       #:phases
       #~(modify-phases %standard-phases

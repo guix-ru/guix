@@ -13362,7 +13362,6 @@ virtual reality devices.")
     (build-system cmake-build-system)
     (arguments
      (list
-      #:cmake cmake-next
       #:configure-flags
       #~(list "-DUSE_TESTS=ON" "-DOPENGL_BACKEND=OpenGL")))
     (native-inputs (list python-3.10 glibc-locales googletest))
