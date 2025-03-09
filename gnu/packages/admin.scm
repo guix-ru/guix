@@ -137,6 +137,7 @@
   #:use-module (gnu packages debian)
   #:use-module (gnu packages dns)
   #:use-module (gnu packages elf)
+  #:use-module (gnu packages emacs-xyz) ; for emacs-ert-runner
   #:use-module (gnu packages file)
   #:use-module (gnu packages flex)
   #:use-module (gnu packages fonts)
@@ -3388,6 +3389,8 @@ manage virtual machines and/or containers.")
           (base32
            "0lap404ch74w99n3xip176jr42b38xhyzkfnkyqg0g3wk2cd3aq8"))))
       (build-system emacs-build-system)
+      (arguments (list #:test-command #~(list "ert-runner" ".")))
+      (native-inputs (list emacs-ert-runner))
       ;; Unmaintained by upstream.
       (home-page "https://github.com/lunaryorn/ansible-doc.el")
       (synopsis "Ansible documentation for Emacs")
