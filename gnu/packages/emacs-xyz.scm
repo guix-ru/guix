@@ -4186,7 +4186,8 @@ light user interface.")
            mp3info
            python-mutagen
            perl-image-exiftool
-           opus-tools))))
+           opus-tools))
+    (native-inputs (list emacs-ert-runner))))
 
 (define-public emacs-emms-mode-line-cycle
   (package
