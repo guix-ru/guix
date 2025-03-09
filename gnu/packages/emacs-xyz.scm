@@ -30661,6 +30661,7 @@ was called.")
        (sha256
         (base32 "0vhph7vcicsiq28b10h3b4dvnhckcy4gccpdgsad5j7pwa5k26m1"))))
     (build-system emacs-build-system)
+    (arguments (list #:test-command #~'(list "make" "test")))
     (home-page "https://elpa.gnu.org/packages/dired-du.html")
     (synopsis "Dired with recursive directory sizes")
     (description
