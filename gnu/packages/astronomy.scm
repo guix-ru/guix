@@ -1268,7 +1268,10 @@ standard astronomy libraries:
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
                 (chdir "../source")
-                (setenv "CC" #$(cc-for-target))))))))
+                (setenv "CC" #$(cc-for-target)))))
+          (add-after 'check 'post-check
+            (lambda _
+              (chdir "../build"))))))
     (native-inputs
      (list python-wrapper))
     (home-page "https://github.com/kbarbary/sep")
