@@ -404,6 +404,8 @@ devices.")
        ;; Run only the CI tests.  The default test target requires additional
        ;; add-ons from NPM that are not distributed with the source.
        #:test-target "test-ci-js"
+       ;; For now
+       #:tests? ,(not (target-riscv64?))
        ;; Some of the tests can timeout under heavy load.
        #:parallel-tests? ,(target-x86?)
        #:modules

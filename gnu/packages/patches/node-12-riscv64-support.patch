@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index b8986e9a3c1..4768b4d1fff 100644
+index b8986e9a3c1..abdacdbcc9a 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -843,6 +843,9 @@ else
@@ -20,6 +20,24 @@ index b8986e9a3c1..4768b4d1fff 100644
  ifeq ($(DESTCPU),x64)
  ARCH=x64
  else
+@@ -883,6 +887,9 @@ else
+ ifeq ($(DESTCPU),s390x)
+ ARCH=s390x
+ else
++ifeq ($(DESTCPU),riscv64)
++ARCH=riscv64
++else
+ ARCH=x86
+ endif
+ endif
+@@ -891,6 +898,7 @@ endif
+ endif
+ endif
+ endif
++endif
+ 
+ # node and v8 use different arch names (e.g. node 'x86' vs v8 'ia32').
+ # pass the proper v8 arch name to $V8_ARCH based on user-specified $DESTCPU.
 diff --git a/configure.py b/configure.py
 index e6485a7b383..a557a22de28 100755
 --- a/configure.py
@@ -341,7 +359,7 @@ index c50cdd7a98e..d35c2a1fbb1 100644
  #error Unsupported host architecture.
  #endif
 diff --git a/deps/v8/src/builtins/builtins-sharedarraybuffer-gen.cc b/deps/v8/src/builtins/builtins-sharedarraybuffer-gen.cc
-index 8ae89187ecb..de9948e38fe 100644
+index 8ae89187ecb..aa74f6d4aac 100644
 --- a/deps/v8/src/builtins/builtins-sharedarraybuffer-gen.cc
 +++ b/deps/v8/src/builtins/builtins-sharedarraybuffer-gen.cc
 @@ -322,7 +322,7 @@ TF_BUILTIN(AtomicsExchange, SharedArrayBufferBuiltinsAssembler) {
@@ -353,6 +371,15 @@ index 8ae89187ecb..de9948e38fe 100644
    Return(CallRuntime(Runtime::kAtomicsExchange, context, array, index_integer,
                       value));
  #else
+@@ -405,7 +405,7 @@ TF_BUILTIN(AtomicsExchange, SharedArrayBufferBuiltinsAssembler) {
+   // This shouldn't happen, we've already validated the type.
+   BIND(&other);
+   Unreachable();
+-#endif  // V8_TARGET_ARCH_MIPS || V8_TARGET_ARCH_MIPS64
++#endif  // V8_TARGET_ARCH_MIPS || V8_TARGET_ARCH_MIPS64 || V8_TARGET_ARCH_RISCV64
+ }
+ 
+ TF_BUILTIN(AtomicsCompareExchange, SharedArrayBufferBuiltinsAssembler) {
 @@ -425,7 +425,8 @@ TF_BUILTIN(AtomicsCompareExchange, SharedArrayBufferBuiltinsAssembler) {
    ValidateAtomicIndex(array, index_word32, context);
  
@@ -363,7 +390,15 @@ index 8ae89187ecb..de9948e38fe 100644
    Return(CallRuntime(Runtime::kAtomicsCompareExchange, context, array,
                       index_integer, old_value, new_value));
  #else
-@@ -555,7 +556,8 @@ void SharedArrayBufferBuiltinsAssembler::AtomicBinopBuiltinCommon(
+@@ -523,6 +524,7 @@ TF_BUILTIN(AtomicsCompareExchange, SharedArrayBufferBuiltinsAssembler) {
+   Unreachable();
+ #endif  // V8_TARGET_ARCH_MIPS || V8_TARGET_ARCH_MIPS64 || V8_TARGET_ARCH_PPC64
+         // || V8_TARGET_ARCH_PPC || V8_TARGET_ARCH_S390 || V8_TARGET_ARCH_S390X
++        // || V8_TARGET_ARCH_RISCV64
+ }
+ 
+ #define BINOP_BUILTIN(op)                                       \
+@@ -555,7 +557,8 @@ void SharedArrayBufferBuiltinsAssembler::AtomicBinopBuiltinCommon(
    ValidateAtomicIndex(array, index_word32, context);
  
  #if V8_TARGET_ARCH_MIPS || V8_TARGET_ARCH_MIPS64 || V8_TARGET_ARCH_PPC64 || \
@@ -373,6 +408,14 @@ index 8ae89187ecb..de9948e38fe 100644
    Return(CallRuntime(runtime_function, context, array, index_integer, value));
  #else
    TNode<UintPtrT> index_word = ChangeUint32ToWord(index_word32);
+@@ -642,6 +645,7 @@ void SharedArrayBufferBuiltinsAssembler::AtomicBinopBuiltinCommon(
+   Unreachable();
+ #endif  // V8_TARGET_ARCH_MIPS || V8_TARGET_ARCH_MIPS64 || V8_TARGET_ARCH_PPC64
+         // || V8_TARGET_ARCH_PPC || V8_TARGET_ARCH_S390 || V8_TARGET_ARCH_S390X
++        // || V8_TARGET_ARCH_RISCV64
+ }
+ 
+ }  // namespace internal
 diff --git a/deps/v8/src/builtins/riscv64/builtins-riscv64.cc b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
 new file mode 100644
 index 00000000000..685f575598f
@@ -4453,10 +4496,10 @@ index 00000000000..b99262cb367
 +#endif  // V8_CODEGEN_RISCV64_ASSEMBLER_RISCV64_INL_H_
 diff --git a/deps/v8/src/codegen/riscv64/assembler-riscv64.cc b/deps/v8/src/codegen/riscv64/assembler-riscv64.cc
 new file mode 100644
-index 00000000000..e070e72f45e
+index 00000000000..c66081657b0
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/assembler-riscv64.cc
-@@ -0,0 +1,3020 @@
+@@ -0,0 +1,3024 @@
 +// Copyright (c) 1994-2006 Sun Microsystems Inc.
 +// All Rights Reserved.
 +//
@@ -4491,14 +4534,16 @@ index 00000000000..e070e72f45e
 +// modified significantly by Google Inc.
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +
-+#if V8_TARGET_ARCH_RISCV64
-+
 +#include "src/codegen/riscv64/assembler-riscv64.h"
++
++#if V8_TARGET_ARCH_RISCV64
 +
 +#include "src/base/cpu.h"
 +#include "src/codegen/riscv64/assembler-riscv64-inl.h"
++#include "src/codegen/register-configuration.h"
 +#include "src/codegen/safepoint-table.h"
 +#include "src/codegen/string-constants.h"
++#include "src/execution/frame-constants.h"
 +#include "src/deoptimizer/deoptimizer.h"
 +#include "src/diagnostics/disasm.h"
 +#include "src/diagnostics/disassembler.h"
@@ -4584,6 +4629,8 @@ index 00000000000..e070e72f45e
 +// Implementation of RelocInfo.
 +
 +const int RelocInfo::kApplyMask =
++    RelocInfo::ModeMask(RelocInfo::CODE_TARGET) |
++    RelocInfo::ModeMask(RelocInfo::RUNTIME_ENTRY) |
 +    RelocInfo::ModeMask(RelocInfo::INTERNAL_REFERENCE) |
 +    RelocInfo::ModeMask(RelocInfo::INTERNAL_REFERENCE_ENCODED);
 +
@@ -7479,10 +7526,10 @@ index 00000000000..e070e72f45e
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/codegen/riscv64/assembler-riscv64.h b/deps/v8/src/codegen/riscv64/assembler-riscv64.h
 new file mode 100644
-index 00000000000..1dcf4e0aae1
+index 00000000000..98d84918bc4
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/assembler-riscv64.h
-@@ -0,0 +1,1243 @@
+@@ -0,0 +1,1267 @@
 +// Copyright (c) 1994-2006 Sun Microsystems Inc.
 +// All Rights Reserved.
 +//
@@ -7543,6 +7590,30 @@ index 00000000000..1dcf4e0aae1
 +  }
 +
 +class SafepointTableBuilder;
++
++// -----------------------------------------------------------------------------
++// Immediates.
++class Immediate {
++ public:
++  template <typename T>
++  inline explicit Immediate(
++      Handle<T> handle, RelocInfo::Mode mode = RelocInfo::FULL_EMBEDDED_OBJECT);
++
++  // This is allowed to be an implicit constructor because Immediate is
++  // a wrapper class that doesn't normally perform any type conversion.
++  template <typename T>
++  inline Immediate(T value);  // NOLINT(runtime/explicit)
++
++  template <typename T>
++  inline Immediate(T value, RelocInfo::Mode rmode);
++
++  int64_t value() const { return value_; }
++  RelocInfo::Mode rmode() const { return rmode_; }
++
++ private:
++  int64_t value_;
++  RelocInfo::Mode rmode_;
++};
 +
 +// -----------------------------------------------------------------------------
 +// Machine instruction Operands.
@@ -10149,10 +10220,10 @@ index 00000000000..aad09378f99
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/codegen/riscv64/interface-descriptors-riscv64.cc b/deps/v8/src/codegen/riscv64/interface-descriptors-riscv64.cc
 new file mode 100644
-index 00000000000..26730aceca7
+index 00000000000..b2717d9fa87
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/interface-descriptors-riscv64.cc
-@@ -0,0 +1,301 @@
+@@ -0,0 +1,323 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -10216,6 +10287,11 @@ index 00000000000..26730aceca7
 +           arraysize(default_stub_registers));
 +  data->InitializePlatformSpecific(kParameterCount, default_stub_registers);
 +}
++
++const Register FastNewFunctionContextDescriptor::ScopeInfoRegister() {
++  return a1;
++}
++const Register FastNewFunctionContextDescriptor::SlotsRegister() { return a0; }
 +
 +void DynamicCheckMapsDescriptor::InitializePlatformSpecific(
 +    CallInterfaceDescriptorData* data) {
@@ -10374,6 +10450,12 @@ index 00000000000..26730aceca7
 +  data->InitializePlatformSpecific(arraysize(registers), registers);
 +}
 +
++void AllocateHeapNumberDescriptor::InitializePlatformSpecific(
++    CallInterfaceDescriptorData* data) {
++  // register state
++  data->InitializePlatformSpecific(0, nullptr);
++}
++
 +void CompareDescriptor::InitializePlatformSpecific(
 +    CallInterfaceDescriptorData* data) {
 +  Register registers[] = {a1, a0};
@@ -10383,6 +10465,17 @@ index 00000000000..26730aceca7
 +void BinaryOpDescriptor::InitializePlatformSpecific(
 +    CallInterfaceDescriptorData* data) {
 +  Register registers[] = {a1, a0};
++  data->InitializePlatformSpecific(arraysize(registers), registers);
++}
++
++void ArgumentsAdaptorDescriptor::InitializePlatformSpecific(
++    CallInterfaceDescriptorData* data) {
++  Register registers[] = {
++      a1,  // JSFunction
++      a3,  // the new target
++      a0,  // actual number of arguments
++      a2,  // expected number of arguments
++  };
 +  data->InitializePlatformSpecific(arraysize(registers), registers);
 +}
 +
@@ -35898,3 +35991,21 @@ index e4778326a90..1fd0f464ef2 100644
    VARIABLES[var] = var
  
  # Allow using variants as keywords.
+diff --git a/tools/v8_gypfiles/toolchain.gypi b/tools/v8_gypfiles/toolchain.gypi
+index 0876b16b46a..df96d605d41 100644
+--- a/tools/v8_gypfiles/toolchain.gypi
++++ b/tools/v8_gypfiles/toolchain.gypi
+@@ -271,6 +271,13 @@
+           'V8_TARGET_ARCH_ARM64',
+         ],
+       }],
++      ['v8_target_arch=="riscv64"', {
++        'defines': [
++          'V8_TARGET_ARCH_RISCV64',
++          '__riscv_xlen=64',
++          'CAN_USE_FPU_INSTRUCTIONS'
++        ],
++      }],
+       ['v8_target_arch=="s390x"', {
+         'defines': [
+           'V8_TARGET_ARCH_S390',
