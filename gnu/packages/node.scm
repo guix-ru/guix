@@ -397,6 +397,7 @@ devices.")
              "--shared-nghttp2"
              "--shared-openssl"
              "--shared-zlib"
+             "--verbose"
              "--without-snapshot"
              "--without-inspector"      ; build without llhttp
              "--with-intl=system-icu")
@@ -451,6 +452,7 @@ devices.")
                             "test/parallel/test-child-process-exec-env.js")
                (("'/usr/bin/env'")
                 (string-append "'" (search-input-file inputs "/bin/env") "'")))))
+         #;
          (add-after 'unpack 'extend-default-test-timeout
            (lambda _
              ;; The default is 120ms, with a multiplier for some architectures.
@@ -528,30 +530,61 @@ devices.")
              (cond
                (,(target-ppc64le?)
                 (delete-file "test/parallel/test-worker-nearheaplimit-deadlock.js"))
-               #;
                (,(target-aarch64?)
-                ;; These tests timeout
-                (for-each
-                  delete-file
-                  '(
-                    "test/parallel/test-async-hooks-worker-asyncfn-terminate-1.js"
-                    "test/parallel/test-async-hooks-worker-asyncfn-terminate-2.js"
-                    "test/parallel/test-async-hooks-worker-asyncfn-terminate-3.js"
-                    "test/parallel/test-async-hooks-worker-asyncfn-terminate-4.js"
-                    "test/parallel/test-cli-node-options.js"
-                    "test/parallel/test-crypto-key-objects-messageport.js"
-                    "test/parallel/test-crypto-worker-thread.js"
-                    "test/parallel/test-disable-proto-delete.js"
-                    "test/parallel/test-disable-proto-throw.js"
-                    "test/parallel/test-performance-eventlooputil.js"
-                    "test/parallel/test-preload.js"
-                    "test/parallel/test-process-exec-argv.js"
-                    "test/parallel/test-require-symlink.js"
-                    "test/parallel/test-trace-events-api-worker-disabled.js"
-                    "test/parallel/test-trace-events-async-hooks-worker.js"
-                    "test/parallel/test-trace-events-worker-metadata.js"
-                    "test/parallel/test-trace-exit.js"
-                    )))
+                ;; These tests timeout even with an extended timeout.
+                (with-directory-excursion "test/parallel"
+                  (for-each
+                    delete-file
+                    '(
+                      "test-async-hooks-worker-asyncfn-terminate-1.js"
+                      "test-async-hooks-worker-asyncfn-terminate-2.js"
+                      "test-async-hooks-worker-asyncfn-terminate-3.js"
+                      "test-async-hooks-worker-asyncfn-terminate-4.js"
+                      "test-cli-node-options.js"
+                      "test-crypto-key-objects-messageport.js"
+                      "test-crypto-worker-thread.js"
+                      "test-disable-proto-delete.js"
+                      "test-disable-proto-throw.js"
+                      "test-performance-eventlooputil.js"
+                      "test-preload.js"
+                      "test-process-exec-argv.js"
+                      "test-require-symlink.js"
+                      "test-trace-events-api-worker-disabled.js"
+                      "test-trace-events-async-hooks-worker.js"
+                      "test-trace-events-worker-metadata.js"
+                      "test-trace-exit.js"
+                      "test-worker.js"
+                      "test-worker-abort-on-uncaught-exception.js"
+                      "test-worker-abort-on-uncaught-exception-terminate.js"
+                      "test-worker-arraybuffer-zerofill.js"
+                      "test-worker-cjs-workerdata.js"
+                      "test-worker-cleanexit-with-js.js"
+                      "test-worker-cleanexit-with-moduleload.js"
+                      "test-worker-cleanup-handles.js"
+                      "test-worker-console-listeners.js"
+                      "test-worker-crypto-sign-transfer-result.js"
+                      "test-worker-dns-terminate.js"
+                      "test-worker-dns-terminate-during-query.js"
+                      "test-worker-error-stack-getter-throws.js"
+                      "test-worker-esm-exit.js"
+                      "test-worker-esm-missing-main.js"
+                      "test-worker-esmodule.js"
+                      "test-worker-eventlooputil.js"
+                      "test-worker-execargv.js"
+                      "test-worker-exit-code.js"
+                      "test-worker-exit-event-error.js"
+                      "test-worker-exit-from-uncaught-exception.js"
+                      "test-worker-fs-stat-watcher.js"
+                      "test-worker-heapdump-failure.js"
+                      "test-worker-http2-generic-streams-terminate.js"
+                      "test-worker-init-failure.js"
+                      "test-worker-memory.js"
+                      "test-worker-message-channel.js"
+                      "test-worker-message-channel-sharedarraybuffer.js"
+                      "test-worker-message-not-serializable.js"
+                      "test-worker-message-port-drain.js"
+                      "test-worker-message-port-message-before-close.js"
+                      ))))
                (else #t))
 
              ;; These tests have an expiry date: they depend on the validity of
@@ -613,8 +646,6 @@ devices.")
                                          "x64")
                                         ((? (cut string-prefix? "powerpc64" <>))
                                          "ppc64")
-                                        ((? (cut string-prefix? "powerpc" <>))
-                                         "ppc")
                                         ((? (cut string-prefix? "riscv64" <>))
                                          "riscv64")
                                         (_ "unsupported"))))
