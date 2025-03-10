@@ -508,9 +508,12 @@ devices.")
                  "test/parallel/test-http-timeout-client-warning.js"
                  "test/parallel/test-http2-client-http1-server.js"
                  "test/parallel/test-http2-client-request-listeners-warning.js"
+                 "test/parallel/test-http2-methods.js"
+                 "test/parallel/test-http2-multiplex.js"
                  "test/parallel/test-http2-server-set-header.js"
                  "test/parallel/test-https-simple.js"
                  "test/parallel/test-https-strict.js"
+                 "test/parallel/test-intl.js"
                  "test/parallel/test-release-npm.js"))
 
              ;; Some architecture dependant test failures:
