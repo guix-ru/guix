@@ -334,6 +334,71 @@ index 5d68f7e11b0..c90d4292885 100644
       (defined(__clang__) && __cplusplus > 201300L))
  #define V8_NOEXCEPT noexcept
  #else
+diff --git a/deps/v8/src/base/cpu.cc b/deps/v8/src/base/cpu.cc
+index 0b1514b5759..f26ffc91055 100644
+--- a/deps/v8/src/base/cpu.cc
++++ b/deps/v8/src/base/cpu.cc
+@@ -78,7 +78,7 @@ static V8_INLINE void __cpuid(int cpu_info[4], int info_type) {
+ 
+ #endif  // !V8_LIBC_MSVCRT
+ 
+-#elif V8_HOST_ARCH_ARM || V8_HOST_ARCH_MIPS || V8_HOST_ARCH_MIPS64
++#elif V8_HOST_ARCH_ARM || V8_HOST_ARCH_MIPS || V8_HOST_ARCH_MIPS64 || V8_HOST_ARCH_RISCV64
+ 
+ #if V8_OS_LINUX
+ 
+@@ -298,7 +298,7 @@ static bool HasListItem(const char* list, const char* item) {
+ 
+ #endif  // V8_OS_LINUX
+ 
+-#endif  //  V8_HOST_ARCH_ARM || V8_HOST_ARCH_MIPS || V8_HOST_ARCH_MIPS64
++#endif  //  V8_HOST_ARCH_ARM || V8_HOST_ARCH_MIPS || V8_HOST_ARCH_MIPS64 || V8_HOST_ARCH_RISCV64
+ 
+ CPU::CPU()
+     : stepping_(0),
+@@ -687,7 +687,19 @@ CPU::CPU()
+   }
+ #endif  // V8_OS_AIX
+ #endif  // !USE_SIMULATOR
+-#endif  // V8_HOST_ARCH_PPC
++
++#elif V8_HOST_ARCH_RISCV64
++CPUInfo cpu_info;
++char* features = cpu_info.ExtractField("isa");
++
++if (HasListItem(features, "rv64imafdc")) {
++  has_fpu_ = true;
++}
++if (HasListItem(features, "rv64imafdcv")) {
++  has_fpu_ = true;
++  has_rvv_ = true;
++}
++#endif  // V8_HOST_ARCH_RISCV64
+ }
+ 
+ }  // namespace base
+diff --git a/deps/v8/src/base/cpu.h b/deps/v8/src/base/cpu.h
+index 98688a3cd38..3e23bbd2787 100644
+--- a/deps/v8/src/base/cpu.h
++++ b/deps/v8/src/base/cpu.h
+@@ -116,6 +116,9 @@ class V8_BASE_EXPORT CPU final {
+   bool is_fp64_mode() const { return is_fp64_mode_; }
+   bool has_msa() const { return has_msa_; }
+ 
++  // riscv features
++  bool has_rvv() const { return has_rvv_; }
++
+  private:
+   char vendor_[13];
+   int stepping_;
+@@ -157,6 +160,7 @@ class V8_BASE_EXPORT CPU final {
+   bool is_fp64_mode_;
+   bool has_non_stop_time_stamp_counter_;
+   bool has_msa_;
++  bool has_rvv_;
+ };
+ 
+ }  // namespace base
 diff --git a/deps/v8/src/base/platform/platform-posix.cc b/deps/v8/src/base/platform/platform-posix.cc
 index c50cdd7a98e..d35c2a1fbb1 100644
 --- a/deps/v8/src/base/platform/platform-posix.cc
