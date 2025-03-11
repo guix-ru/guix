@@ -483,10 +483,10 @@ index 8ae89187ecb..aa74f6d4aac 100644
  }  // namespace internal
 diff --git a/deps/v8/src/builtins/riscv64/builtins-riscv64.cc b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
 new file mode 100644
-index 00000000000..685f575598f
+index 00000000000..ebdf1d46ba1
 --- /dev/null
 +++ b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
-@@ -0,0 +1,3316 @@
+@@ -0,0 +1,3320 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -1266,6 +1266,7 @@ index 00000000000..685f575598f
 +  __ Lw(params_size,
 +        FieldMemOperand(params_size, BytecodeArray::kParameterSizeOffset));
 +
++  /*
 +  Register actual_params_size = scratch2;
 +  Label L1;
 +  // Compute the size of the actual parameters + receiver (in bytes).
@@ -1279,6 +1280,7 @@ index 00000000000..685f575598f
 +  __ Branch(&L1, le, actual_params_size, Operand(params_size));
 +  __ Move(params_size, actual_params_size);
 +  __ bind(&L1);
++  */
 +
 +  // Leave the frame (also dropping the register file).
 +  __ LeaveFrame(StackFrame::INTERPRETED);
@@ -1293,7 +1295,7 @@ index 00000000000..685f575598f
 +                                          OptimizationMarker expected_marker,
 +                                          Runtime::FunctionId function_id) {
 +  Label no_match;
-+  __ Branch(&no_match, ne, actual_marker, Operand(expected_marker));
++  __ Branch(&no_match, ne, actual_marker, Operand(Smi::FromEnum(expected_marker)));
 +  GenerateTailCallToReturnedCode(masm, function_id);
 +  __ bind(&no_match);
 +}
@@ -1339,7 +1341,7 @@ index 00000000000..685f575598f
 +  // optimized code marker isn't updated. Evict the code, update the marker
 +  // and re-enter the closure's code.
 +  __ bind(&heal_optimized_code_slot);
-+  GenerateTailCallToReturnedCode(masm, Runtime::kHealOptimizedCodeSlot);
++  GenerateTailCallToReturnedCode(masm, Runtime::kEvictOptimizedCodeSlot);
 +}
 +
 +static void MaybeOptimizeCode(MacroAssembler* masm, Register feedback_vector,
@@ -1503,13 +1505,13 @@ index 00000000000..685f575598f
 +  // is optimized code or an optimization marker, call that instead.
 +  Register optimization_state = a4;
 +  __ Lw(optimization_state,
-+        FieldMemOperand(feedback_vector, FeedbackVector::kFlagsOffset));
++        FieldMemOperand(feedback_vector, FeedbackVector::kInvocationCountOffset));
 +
 +  // Check if the optimized code slot is not empty or has a optimization marker.
 +  Label has_optimized_code_or_marker;
 +
 +  __ And(t0, optimization_state,
-+         FeedbackVector::kHasOptimizedCodeOrCompileOptimizedMarkerMask);
++         FeedbackVector::kOptimizedCodeWeakOrSmiOffset);
 +  __ Branch(&has_optimized_code_or_marker, ne, t0, Operand(zero_reg));
 +
 +  Label not_optimized;
@@ -1634,6 +1636,7 @@ index 00000000000..685f575598f
 +  LeaveInterpreterFrame(masm, t0, t1);
 +  __ Jump(ra);
 +
++  /*
 +  __ bind(&stack_check_interrupt);
 +  // Modify the bytecode offset in the stack to be kFunctionEntryBytecodeOffset
 +  // for the call to the StackGuard.
@@ -1677,6 +1680,7 @@ index 00000000000..685f575598f
 +                        FeedbackVector::kMaybeOptimizedCodeOffset));
 +
 +  TailCallOptimizedCodeSlot(masm, optimized_code_entry, t4, a5);
++  */
 +
 +  __ bind(&compile_lazy);
 +  GenerateTailCallToReturnedCode(masm, Runtime::kCompileLazy);
@@ -24789,6 +24793,53 @@ index 00000000000..b2923001509
 +}  // namespace v8
 +
 +#endif  // V8_TARGET_ARCH_RISCV64
+diff --git a/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc b/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc
+new file mode 100644
+index 00000000000..1cbe85ba5df
+--- /dev/null
++++ b/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc
+@@ -0,0 +1,41 @@
++// Copyright 2021 the V8 project authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "src/deoptimizer/deoptimizer.h"
++
++namespace v8 {
++namespace internal {
++
++const bool Deoptimizer::kSupportsFixedDeoptExitSizes = true;
++const int Deoptimizer::kNonLazyDeoptExitSize = 5 * kInstrSize;
++const int Deoptimizer::kLazyDeoptExitSize = 5 * kInstrSize;
++const int Deoptimizer::kEagerWithResumeBeforeArgsSize = 6 * kInstrSize;
++const int Deoptimizer::kEagerWithResumeDeoptExitSize =
++    kEagerWithResumeBeforeArgsSize + 4 * kInstrSize;
++const int Deoptimizer::kEagerWithResumeImmedArgs1PcOffset = kInstrSize;
++const int Deoptimizer::kEagerWithResumeImmedArgs2PcOffset =
++    kInstrSize + kSystemPointerSize;
++
++Float32 RegisterValues::GetFloatRegister(unsigned n) const {
++  return Float32::FromBits(
++      static_cast<uint32_t>(double_registers_[n].get_bits()));
++}
++
++void FrameDescription::SetCallerPc(unsigned offset, intptr_t value) {
++  SetFrameSlot(offset, value);
++}
++
++void FrameDescription::SetCallerFp(unsigned offset, intptr_t value) {
++  SetFrameSlot(offset, value);
++}
++
++void FrameDescription::SetCallerConstantPool(unsigned offset, intptr_t value) {
++  // No embedded constant pool support.
++  UNREACHABLE();
++}
++
++void FrameDescription::SetPc(intptr_t pc) { pc_ = pc; }
++
++}  // namespace internal
++}  // namespace v8
 diff --git a/deps/v8/src/diagnostics/perf-jit.h b/deps/v8/src/diagnostics/perf-jit.h
 index 36ab8441100..e3a28ce65b9 100644
 --- a/deps/v8/src/diagnostics/perf-jit.h
@@ -36074,3 +36125,31 @@ index 0876b16b46a..df96d605d41 100644
        ['v8_target_arch=="s390x"', {
          'defines': [
            'V8_TARGET_ARCH_S390',
+diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
+index 26b8e56e834..2e36827d412 100644
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -364,6 +364,11 @@
+             '<(V8_ROOT)/src/builtins/ppc/builtins-ppc.cc',
+           ],
+         }],
++        ['v8_target_arch=="riscv64"', {
++          'sources': [
++            '<(V8_ROOT)/src/builtins/riscv64/builtins-riscv64.cc',
++          ],
++        }],
+         ['v8_target_arch=="s390x"', {
+           'sources': [
+             '<(V8_ROOT)/src/builtins/s390/builtins-s390.cc',
+@@ -749,6 +754,11 @@
+             '<!@pymod_do_main(GN-scraper "<(V8_ROOT)/BUILD.gn"  "\\"v8_base_without_compiler.*?v8_current_cpu == \\"ppc.*?sources \+= ")',
+           ],
+         }],
++        ['v8_target_arch=="riscv64"', {
++          'sources': [  ### gcmole(arch:riscv64) ###
++            '<!@pymod_do_main(GN-scraper "<(V8_ROOT)/BUILD.gn"  "\\"v8_base_without_compiler.*?v8_current_cpu == \\"riscv64.*?sources \+= ")',
++          ],
++        }],
+         ['v8_target_arch=="s390x"', {
+           'sources': [  ### gcmole(arch:s390) ###
+             '<!@pymod_do_main(GN-scraper "<(V8_ROOT)/BUILD.gn"  "\\"v8_base_without_compiler.*?v8_current_cpu == \\"s390.*?sources \+= ")',
