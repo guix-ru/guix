@@ -483,10 +483,10 @@ index 8ae89187ecb..aa74f6d4aac 100644
  }  // namespace internal
 diff --git a/deps/v8/src/builtins/riscv64/builtins-riscv64.cc b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
 new file mode 100644
-index 00000000000..7633ef8e7c5
+index 00000000000..e389b211000
 --- /dev/null
 +++ b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
-@@ -0,0 +1,3329 @@
+@@ -0,0 +1,3332 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -1935,14 +1935,14 @@ index 00000000000..7633ef8e7c5
 +
 +  Generate_InterpreterEnterBytecode(masm);
 +
-+  __ bind(&function_entry_bytecode);
++  // __ bind(&function_entry_bytecode);
 +  // If the code deoptimizes during the implicit function entry stack interrupt
 +  // check, it will have a bailout ID of kFunctionEntryBytecodeOffset, which is
 +  // not a valid bytecode offset. Detect this case and advance to the first
 +  // actual bytecode.
 +  __ li(kInterpreterBytecodeOffsetRegister,
 +        Operand(BytecodeArray::kHeaderSize - kHeapObjectTag));
-+  __ Branch(&enter_bytecode);
++  // __ Branch(&enter_bytecode);
 +
 +  // We should never take the if_return path.
 +  __ bind(&if_return);
@@ -2659,7 +2659,7 @@ index 00000000000..7633ef8e7c5
 +  __ bind(&non_smi);
 +  //__ LoadMap(t1, a1);
 +  //__ GetInstanceTypeRange(t1, t2, FIRST_JS_FUNCTION_TYPE, t4);
-+  __ GetObjectType(a1, t1, t2)
++  __ GetObjectType(a1, t1, t2);
 +  __ Jump(masm->isolate()->builtins()->CallFunction(mode),
 +          RelocInfo::CODE_TARGET, eq, t2, Operand(JS_FUNCTION_TYPE));
 +          //RelocInfo::CODE_TARGET, Uless_equal, t4,
@@ -3186,10 +3186,10 @@ index 00000000000..7633ef8e7c5
 +  __ Ret();
 +}
 +
-+void Builtins::Generate_GenericJSToWasmWrapper(MacroAssembler* masm) {
-+  // TODO(v8:10701): Implement for this platform.
-+  __ Trap();
-+}
++//void Builtins::Generate_GenericJSToWasmWrapper(MacroAssembler* masm) {
++//  // TODO(v8:10701): Implement for this platform.
++//  __ Trap();
++//}
 +
 +namespace {
 +
@@ -3544,6 +3544,7 @@ index 00000000000..7633ef8e7c5
 +  __ Jump(t6);
 +}
 +
++/*
 +namespace {
 +
 +// This code tries to be close to ia32 code so that any changes can be
@@ -3587,7 +3588,8 @@ index 00000000000..7633ef8e7c5
 +  const int kSavedRegistersAreaSize =
 +      (kNumberOfRegisters * kPointerSize) + kDoubleRegsSize;
 +
-+  __ li(a2, Operand(Deoptimizer::kFixedExitSizeMarker));
++  //__ li(a2, Operand(Deoptimizer::kFixedExitSizeMarker));
++  __ li(a2, Operand(0xFFFFFFFFu));
 +  // Get the address of the location in the code object (a3) (return
 +  // address for lazy deoptimization) and compute the fp-to-sp delta in
 +  // register a4.
@@ -3809,6 +3811,7 @@ index 00000000000..7633ef8e7c5
 +      Deoptimizer::GetDeoptimizationEntry(DeoptimizeKind::kBailout));
 +  __ Jump(deopt_bailout, RelocInfo::CODE_TARGET);
 +}
++*/
 +
 +#undef __
 +
