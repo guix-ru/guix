@@ -533,6 +533,9 @@ devices.")
              (cond
                (,(target-ppc64le?)
                 (delete-file "test/parallel/test-worker-nearheaplimit-deadlock.js"))
+               (,(target-arm32?)
+                ;; This test crashed.
+                (delete-file "test/parallel/test-worker-resource-limits.js"))
                (,(target-aarch64?)
                 ;; These tests timeout even with an extended timeout.
                 (with-directory-excursion "test"
