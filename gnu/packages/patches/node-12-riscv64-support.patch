@@ -60,7 +60,7 @@ index e6485a7b383..a557a22de28 100755
  
    rtn = 'ia32' # default
 diff --git a/deps/v8/BUILD.gn b/deps/v8/BUILD.gn
-index 5c226f4b836..bf8916f5510 100644
+index 5c226f4b836..cd6eddb155f 100644
 --- a/deps/v8/BUILD.gn
 +++ b/deps/v8/BUILD.gn
 @@ -627,6 +627,15 @@ config("toolchain") {
@@ -100,7 +100,7 @@ index 5c226f4b836..bf8916f5510 100644
    }
  
    if (!v8_enable_i18n_support) {
-@@ -3244,6 +3258,34 @@ v8_source_set("v8_base_without_compiler") {
+@@ -3244,6 +3258,33 @@ v8_source_set("v8_base_without_compiler") {
        "src/regexp/s390/regexp-macro-assembler-s390.h",
        "src/wasm/baseline/s390/liftoff-assembler-s390.h",
      ]
@@ -123,7 +123,6 @@ index 5c226f4b836..bf8916f5510 100644
 +      "src/debug/riscv64/debug-riscv64.cc",
 +      "src/deoptimizer/riscv64/deoptimizer-riscv64.cc",
 +      "src/diagnostics/riscv64/disasm-riscv64.cc",
-+      "src/diagnostics/riscv64/unwinder-riscv64.cc",
 +      "src/execution/riscv64/frame-constants-riscv64.cc",
 +      "src/execution/riscv64/frame-constants-riscv64.h",
 +      "src/execution/riscv64/simulator-riscv64.cc",
@@ -135,7 +134,7 @@ index 5c226f4b836..bf8916f5510 100644
    }
  
    configs = [ ":internal_config" ]
-@@ -3321,7 +3363,8 @@ v8_source_set("v8_base_without_compiler") {
+@@ -3321,7 +3362,8 @@ v8_source_set("v8_base_without_compiler") {
    if (v8_current_cpu == "mips" || v8_current_cpu == "mipsel" ||
        v8_current_cpu == "mips64" || v8_current_cpu == "mips64el" ||
        v8_current_cpu == "ppc" || v8_current_cpu == "ppc64" ||
@@ -145,7 +144,7 @@ index 5c226f4b836..bf8916f5510 100644
      libs = [ "atomic" ]
    }
  }
-@@ -3639,6 +3682,10 @@ v8_component("v8_libbase") {
+@@ -3639,6 +3681,10 @@ v8_component("v8_libbase") {
      ]
    }
  
@@ -4577,10 +4576,10 @@ index 00000000000..b99262cb367
 +#endif  // V8_CODEGEN_RISCV64_ASSEMBLER_RISCV64_INL_H_
 diff --git a/deps/v8/src/codegen/riscv64/assembler-riscv64.cc b/deps/v8/src/codegen/riscv64/assembler-riscv64.cc
 new file mode 100644
-index 00000000000..c66081657b0
+index 00000000000..a54f4ebe392
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/assembler-riscv64.cc
-@@ -0,0 +1,3024 @@
+@@ -0,0 +1,3026 @@
 +// Copyright (c) 1994-2006 Sun Microsystems Inc.
 +// All Rights Reserved.
 +//
@@ -4771,8 +4770,10 @@ index 00000000000..c66081657b0
 +    Handle<HeapObject> object;
 +    switch (request.kind()) {
 +      case HeapObjectRequest::kHeapNumber:
-+        object = isolate->factory()->NewHeapNumber<AllocationType::kOld>(
-+            request.heap_number());
++        object = isolate->factory()->NewHeapNumber(request.heap_number(),
++                                                   AllocationType::kOld);
++        //object = isolate->factory()->NewHeapNumber<AllocationType::kOld>(
++        //    request.heap_number());
 +        break;
 +      case HeapObjectRequest::kStringConstant:
 +        const StringConstantBase* str = request.string();
@@ -4821,7 +4822,7 @@ index 00000000000..c66081657b0
 +  // TODO(jgruber): Consider moving responsibility for proper alignment to
 +  // metadata table builders (safepoint, handler, constant pool, code
 +  // comments).
-+  DataAlign(Code::kMetadataAlignment);
++  //DataAlign(Code::kMetadataAlignment);
 +
 +  ForceConstantPoolEmissionWithoutJump();
 +
@@ -10301,10 +10302,10 @@ index 00000000000..aad09378f99
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/codegen/riscv64/interface-descriptors-riscv64.cc b/deps/v8/src/codegen/riscv64/interface-descriptors-riscv64.cc
 new file mode 100644
-index 00000000000..b2717d9fa87
+index 00000000000..75c855eaeb0
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/interface-descriptors-riscv64.cc
-@@ -0,0 +1,323 @@
+@@ -0,0 +1,329 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -10328,6 +10329,7 @@ index 00000000000..b2717d9fa87
 +                                   default_stub_registers);
 +}
 +
++/*
 +void WasmI32AtomicWait32Descriptor::InitializePlatformSpecific(
 +    CallInterfaceDescriptorData* data) {
 +  const Register default_stub_registers[] = {a0, a1, a2, a3};
@@ -10344,6 +10346,7 @@ index 00000000000..b2717d9fa87
 +  data->InitializePlatformSpecific(kParameterCount - kStackArgumentsCount,
 +                                   default_stub_registers);
 +}
++*/
 +
 +void RecordWriteDescriptor::InitializePlatformSpecific(
 +    CallInterfaceDescriptorData* data) {
@@ -10374,6 +10377,7 @@ index 00000000000..b2717d9fa87
 +}
 +const Register FastNewFunctionContextDescriptor::SlotsRegister() { return a0; }
 +
++/*
 +void DynamicCheckMapsDescriptor::InitializePlatformSpecific(
 +    CallInterfaceDescriptorData* data) {
 +  Register default_stub_registers[] = {kReturnRegister0, a1, a2, a3, cp};
@@ -10385,6 +10389,7 @@ index 00000000000..b2717d9fa87
 +           arraysize(default_stub_registers));
 +  data->InitializePlatformSpecific(kParameterCount, default_stub_registers);
 +}
++*/
 +
 +const Register LoadDescriptor::ReceiverRegister() { return a1; }
 +const Register LoadDescriptor::NameRegister() { return a2; }
@@ -10392,10 +10397,12 @@ index 00000000000..b2717d9fa87
 +
 +const Register LoadWithVectorDescriptor::VectorRegister() { return a3; }
 +
++/*
 +const Register
 +LoadWithReceiverAndVectorDescriptor::LookupStartObjectRegister() {
 +  return a4;
 +}
++*/
 +
 +const Register StoreDescriptor::ReceiverRegister() { return a1; }
 +const Register StoreDescriptor::NameRegister() { return a2; }
@@ -10630,10 +10637,10 @@ index 00000000000..b2717d9fa87
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/codegen/riscv64/macro-assembler-riscv64.cc b/deps/v8/src/codegen/riscv64/macro-assembler-riscv64.cc
 new file mode 100644
-index 00000000000..ade49800c6b
+index 00000000000..e9d03526c06
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/macro-assembler-riscv64.cc
-@@ -0,0 +1,4589 @@
+@@ -0,0 +1,4591 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -10652,6 +10659,7 @@ index 00000000000..ade49800c6b
 +#include "src/codegen/register-configuration.h"
 +#include "src/debug/debug.h"
 +#include "src/execution/frames-inl.h"
++#include "src/heap/heap-inl.h"  // For MemoryChunk.
 +#include "src/init/bootstrapper.h"
 +#include "src/logging/counters.h"
 +#include "src/objects/heap-number.h"
@@ -14062,7 +14070,7 @@ index 00000000000..ade49800c6b
 +  // If the expected parameter count is equal to the adaptor sentinel, no need
 +  // to push undefined value as arguments.
 +  Branch(&regular_invoke, eq, expected_parameter_count,
-+         Operand(kDontAdaptArgumentsSentinel));
++         Operand(static_cast<uint16_t>(-1)));
 +
 +  // If overapplication or if the actual argument count is equal to the
 +  // formal parameter count, no need to push extra undefined values.
@@ -14346,8 +14354,8 @@ index 00000000000..ade49800c6b
 +  // smarter.
 +  PrepareCEntryArgs(f->nargs);
 +  PrepareCEntryFunction(ExternalReference::Create(f));
-+  DCHECK(!AreAliased(centry, a0, a1));
-+  Daddu(centry, centry, Operand(Code::kHeaderSize - kHeapObjectTag));
++  //DCHECK(!AreAliased(centry, a0, a1));
++  //Daddu(centry, centry, Operand(Code::kHeaderSize - kHeapObjectTag));
 +  Call(centry);
 +}
 +
@@ -14439,8 +14447,8 @@ index 00000000000..ade49800c6b
 +// -----------------------------------------------------------------------------
 +// Debugging.
 +
-+void TurboAssembler::Trap() { stop(); }
-+void TurboAssembler::DebugBreak() { stop(); }
++//void TurboAssembler::Trap() { stop(); }
++//void TurboAssembler::DebugBreak() { stop(); }
 +
 +void TurboAssembler::Assert(Condition cc, AbortReason reason, Register rs,
 +                            Operand rt) {
@@ -14514,7 +14522,7 @@ index 00000000000..ade49800c6b
 +void MacroAssembler::LoadNativeContextSlot(int index, Register dst) {
 +  LoadMap(dst, cp);
 +  Ld(dst,
-+     FieldMemOperand(dst, Map::kConstructorOrBackPointerOrNativeContextOffset));
++     FieldMemOperand(dst, Map::kConstructorOrBackPointerOffset));
 +  Ld(dst, MemOperand(dst, Context::SlotOffset(index)));
 +}
 +
@@ -14776,27 +14784,25 @@ index 00000000000..ade49800c6b
 +
 +    LoadMap(kScratchReg, object);
 +    Lbu(kScratchReg, FieldMemOperand(kScratchReg, Map::kBitFieldOffset));
-+    And(kScratchReg, kScratchReg, Operand(Map::Bits1::IsConstructorBit::kMask));
++    And(kScratchReg, kScratchReg, Operand(Map::IsConstructorBit::kMask));
 +    Check(ne, AbortReason::kOperandIsNotAConstructor, kScratchReg,
 +          Operand(zero_reg));
 +  }
 +}
 +
 +void MacroAssembler::AssertFunction(Register object) {
-+  if (emit_debug_code()) {
-+    BlockTrampolinePoolScope block_trampoline_pool(this);
-+    STATIC_ASSERT(kSmiTag == 0);
-+    DCHECK(object != kScratchReg);
-+    SmiTst(object, kScratchReg);
-+    Check(ne, AbortReason::kOperandIsASmiAndNotAFunction, kScratchReg,
-+          Operand(zero_reg));
-+    push(object);
-+    LoadMap(object, object);
-+    GetInstanceTypeRange(object, object, FIRST_JS_FUNCTION_TYPE, t5);
-+    Check(Uless_equal, AbortReason::kOperandIsNotAFunction, t5,
-+          Operand(LAST_JS_FUNCTION_TYPE - FIRST_JS_FUNCTION_TYPE));
-+    pop(object);
-+  }
++  //if (emit_debug_code()) {
++  //  BlockTrampolinePoolScope block_trampoline_pool(this);
++  //  STATIC_ASSERT(kSmiTag == 0);
++  //  DCHECK(object != kScratchReg);
++  //  SmiTst(object, kScratchReg);
++  //  Check(ne, AbortReason::kOperandIsASmiAndNotAFunction, kScratchReg,
++  //        Operand(zero_reg));
++  //  push(object);
++  //  CompareObjectType(object, object, object, JS_FUNCTION_TYPE);
++  //  pop(object);
++  //  Check(eq, AbortReason::kOperandIsNotAFunction);
++  //}
 +}
 +
 +void MacroAssembler::AssertBoundFunction(Register object) {
@@ -15059,10 +15065,10 @@ index 00000000000..ade49800c6b
 +
 +    // See x64 code for reasoning about how to address the isolate data fields.
 +    if (root_array_available()) {
-+      Sd(pc_scratch, MemOperand(kRootRegister,
-+                                IsolateData::fast_c_call_caller_pc_offset()));
-+      Sd(fp, MemOperand(kRootRegister,
-+                        IsolateData::fast_c_call_caller_fp_offset()));
++      //Sd(pc_scratch, MemOperand(kRootRegister,
++      //                          IsolateData::fast_c_call_caller_pc_offset()));
++      //Sd(fp, MemOperand(kRootRegister,
++      //                  IsolateData::fast_c_call_caller_fp_offset()));
 +    } else {
 +      DCHECK_NOT_NULL(isolate());
 +      li(scratch, ExternalReference::fast_c_call_caller_pc_address(isolate()));
@@ -15096,7 +15102,7 @@ index 00000000000..ade49800c6b
 +void TurboAssembler::CheckPageFlag(Register object, Register scratch, int mask,
 +                                   Condition cc, Label* condition_met) {
 +  And(scratch, object, Operand(~kPageAlignmentMask));
-+  Ld(scratch, MemOperand(scratch, BasicMemoryChunk::kFlagsOffset));
++  Ld(scratch, MemOperand(scratch, MemoryChunk::kFlagsOffset));
 +  And(scratch, scratch, Operand(mask));
 +  Branch(condition_met, cc, scratch, Operand(zero_reg));
 +}
@@ -15144,12 +15150,15 @@ index 00000000000..ade49800c6b
 +//void TurboAssembler::CallForDeoptimization(Builtins::Name target, int,
 +//                                           Label* exit, DeoptimizeKind kind,
 +//                                           Label* ret, Label*) {
-+  UseScratchRegisterScope temps(this);
-+  BlockTrampolinePoolScope block_trampoline_pool(this);
-+  Register scratch = temps.Acquire();
-+  Ld(scratch,
-+     MemOperand(kRootRegister, IsolateData::builtin_entry_slot_offset(target)));
-+  Call(scratch);
++  DCHECK_LE(deopt_id, 0xFFFF);
++  li(kRootRegister, deopt_id);
++  Call(target, RelocInfo::RUNTIME_ENTRY);
++  //UseScratchRegisterScope temps(this);
++  //BlockTrampolinePoolScope block_trampoline_pool(this);
++  //Register scratch = temps.Acquire();
++  //Ld(scratch,
++  //   MemOperand(kRootRegister, IsolateData::builtin_entry_slot_offset(target)));
++  //Call(scratch);
 +  //DCHECK_EQ(SizeOfCodeGeneratedSince(exit),
 +  //          (kind == DeoptimizeKind::kLazy)
 +  //              ? Deoptimizer::kLazyDeoptExitSize
@@ -15225,10 +15234,10 @@ index 00000000000..ade49800c6b
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/codegen/riscv64/macro-assembler-riscv64.h b/deps/v8/src/codegen/riscv64/macro-assembler-riscv64.h
 new file mode 100644
-index 00000000000..9f7d65ce6bd
+index 00000000000..eebccd931d9
 --- /dev/null
 +++ b/deps/v8/src/codegen/riscv64/macro-assembler-riscv64.h
-@@ -0,0 +1,1217 @@
+@@ -0,0 +1,1219 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -15385,6 +15394,8 @@ index 00000000000..9f7d65ce6bd
 +#undef DECLARE_BRANCH_PROTOTYPES
 +#undef COND_TYPED_ARGS
 +#undef COND_ARGS
++
++  inline void NegateBool(Register rd, Register rs) { Xor(rd, rs, 1); }
 +
 +  // Compare float, if any operand is NaN, result is false except for NE
 +  void CompareF32(Register rd, FPUCondition cc, FPURegister cmp1,
@@ -16849,10 +16860,10 @@ index d565a469639..837d192afb3 100644
  #if !V8_TARGET_ARCH_ARM64
 diff --git a/deps/v8/src/compiler/backend/riscv64/code-generator-riscv64.cc b/deps/v8/src/compiler/backend/riscv64/code-generator-riscv64.cc
 new file mode 100644
-index 00000000000..f626c36544c
+index 00000000000..522647a925f
 --- /dev/null
 +++ b/deps/v8/src/compiler/backend/riscv64/code-generator-riscv64.cc
-@@ -0,0 +1,2774 @@
+@@ -0,0 +1,2779 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -16867,7 +16878,9 @@ index 00000000000..f626c36544c
 +#include "src/compiler/backend/gap-resolver.h"
 +#include "src/compiler/node-matchers.h"
 +#include "src/compiler/osr.h"
++#include "src/heap/heap-inl.h"  // crbug.com/v8/8499
 +#include "src/wasm/wasm-code-manager.h"
++#include "src/wasm/wasm-objects.h"
 +
 +namespace v8 {
 +namespace internal {
@@ -17034,7 +17047,7 @@ index 00000000000..f626c36544c
 +      // Just encode the stub index. This will be patched when the code
 +      // is added to the native module and copied into wasm code space.
 +      __ CallRecordWriteStub(object_, scratch1_, remembered_set_action,
-+                             save_fp_mode, wasm::WasmCode::kRecordWrite);
++                             save_fp_mode, wasm::WasmCode::kWasmRecordWrite);
 +    } else {
 +      __ CallRecordWriteStub(object_, scratch1_, remembered_set_action,
 +                             save_fp_mode);
@@ -17147,10 +17160,10 @@ index 00000000000..f626c36544c
 +                                   InstructionCode opcode, Instruction* instr,
 +                                   RiscvOperandConverter const& i) {
 +  const MemoryAccessMode access_mode =
-+      static_cast<MemoryAccessMode>(MiscField::decode(opcode));
++      static_cast<MemoryAccessMode>(MiscField::decode(instr->opcode()));
 +  if (access_mode == kMemoryAccessPoisoned) {
 +    Register value = i.OutputRegister();
-+    codegen->tasm()->And(value, value, kSpeculationPoisonRegister);
++    codegen->tasm()->AndP(value, kSpeculationPoisonRegister);
 +  }
 +}
 +
@@ -17574,9 +17587,9 @@ index 00000000000..f626c36544c
 +        __ CallCFunction(func, num_parameters);
 +      }
 +      __ bind(&after_call);
-+      if (isWasmCapiFunction) {
-+        RecordSafepoint(instr->reference_map());
-+      }
++      //if (isWasmCapiFunction) {
++      //  RecordSafepoint(instr->reference_map());
++      //}
 +
 +      frame_access_state()->SetFrameAccessToDefault();
 +      // Ideally, we should decrement SP delta to match the change of stack
@@ -17619,7 +17632,7 @@ index 00000000000..f626c36544c
 +      __ stop();
 +      break;
 +    case kArchDebugBreak:
-+      __ DebugBreak();
++      __ stop();
 +      break;
 +    case kArchComment:
 +      __ RecordComment(reinterpret_cast<const char*>(i.InputInt64(0)));
@@ -17630,7 +17643,7 @@ index 00000000000..f626c36544c
 +      break;
 +    case kArchDeoptimize: {
 +      DeoptimizationExit* exit =
-+          BuildTranslation(instr, -1, 0, 0, OutputFrameStateCombine::Ignore());
++          BuildTranslation(instr, -1, 0, OutputFrameStateCombine::Ignore());
 +      __ Branch(exit->label());
 +      break;
 +    }
@@ -17640,9 +17653,9 @@ index 00000000000..f626c36544c
 +    case kArchStackPointerGreaterThan:
 +      // Pseudo-instruction used for cmp/branch. No opcode emitted here.
 +      break;
-+    case kArchStackCheckOffset:
-+      __ Move(i.OutputRegister(), Smi::FromInt(GetStackCheckOffset()));
-+      break;
++    //case kArchStackCheckOffset:
++    //  __ Move(i.OutputRegister(), Smi::FromInt(GetStackCheckOffset()));
++    //  break;
 +    case kArchFramePointer:
 +      __ Move(i.OutputRegister(), fp);
 +      break;
@@ -17665,9 +17678,9 @@ index 00000000000..f626c36544c
 +      Register value = i.InputRegister(2);
 +      Register scratch0 = i.TempRegister(0);
 +      Register scratch1 = i.TempRegister(1);
-+      auto ool = zone()->New<OutOfLineRecordWrite>(this, object, index, value,
-+                                                   scratch0, scratch1, mode,
-+                                                   DetermineStubCallMode());
++      auto ool = new (zone())
++          OutOfLineRecordWrite(this, object, index, value, scratch0, scratch1,
++                               mode, DetermineStubCallMode());
 +      __ Add64(kScratchReg, object, index);
 +      __ Sd(value, MemOperand(kScratchReg));
 +      __ CheckPageFlag(object, scratch0,
@@ -18758,12 +18771,12 @@ index 00000000000..f626c36544c
 +    __ Branch(tlabel, cc, i.InputRegister(0), i.InputOperand(1));
 +  } else if (instr->arch_opcode() == kArchStackPointerGreaterThan) {
 +    cc = FlagsConditionToConditionCmp(condition);
-+    Register lhs_register = sp;
-+    uint32_t offset;
-+    if (gen->ShouldApplyOffsetToStackCheck(instr, &offset)) {
-+      lhs_register = i.TempRegister(0);
-+      __ Sub64(lhs_register, sp, offset);
-+    }
++    //Register lhs_register = sp;
++    //uint32_t offset;
++    //if (gen->ShouldApplyOffsetToStackCheck(instr, &offset)) {
++    //  lhs_register = i.TempRegister(0);
++    //  __ Sub64(lhs_register, sp, offset);
++    //}
 +    __ Branch(tlabel, cc, lhs_register, Operand(i.InputRegister(0)));
 +  } else if (instr->arch_opcode() == kRiscvCmpS ||
 +             instr->arch_opcode() == kRiscvCmpD) {
@@ -18926,7 +18939,7 @@ index 00000000000..f626c36544c
 +        __ PrepareCallCFunction(0, 0, cp);
 +        __ CallCFunction(
 +            ExternalReference::wasm_call_trap_callback_for_testing(), 0);
-+        __ LeaveFrame(StackFrame::WASM);
++        __ LeaveFrame(StackFrame::WASM_COMPILED);
 +        auto call_descriptor = gen_->linkage()->GetIncomingDescriptor();
 +        int pop_count =
 +            static_cast<int>(call_descriptor->StackParameterCount());
@@ -18940,8 +18953,8 @@ index 00000000000..f626c36544c
 +        // is added to the native module and copied into wasm code space.
 +        __ Call(static_cast<Address>(trap_id), RelocInfo::WASM_STUB_CALL);
 +        ReferenceMap* reference_map =
-+            gen_->zone()->New<ReferenceMap>(gen_->zone());
-+        gen_->RecordSafepoint(reference_map);
++            new (gen_->zone()) ReferenceMap(gen_->zone());
++        gen_->RecordSafepoint(reference_map, Safepoint::kNoLazyDeopt);
 +        if (FLAG_debug_code) {
 +          __ stop();
 +        }
@@ -18950,7 +18963,7 @@ index 00000000000..f626c36544c
 +    Instruction* instr_;
 +    CodeGenerator* gen_;
 +  };
-+  auto ool = zone()->New<OutOfLineTrap>(this, instr);
++  auto ool = new (zone()) OutOfLineTrap(this, instr);
 +  Label* tlabel = ool->entry();
 +  AssembleBranchToLabels(this, tasm(), instr, condition, tlabel, nullptr, true);
 +}
@@ -19235,8 +19248,8 @@ index 00000000000..f626c36544c
 +
 +      __ Call(wasm::WasmCode::kWasmStackOverflow, RelocInfo::WASM_STUB_CALL);
 +      // We come from WebAssembly, there are no references for the GC.
-+      ReferenceMap* reference_map = zone()->New<ReferenceMap>(zone());
-+      RecordSafepoint(reference_map);
++      ReferenceMap* reference_map = new (zone()) ReferenceMap(zone());
++      RecordSafepoint(reference_map, Safepoint::kNoLazyDeopt);
 +      if (FLAG_debug_code) {
 +        __ stop();
 +      }
@@ -19300,6 +19313,7 @@ index 00000000000..f626c36544c
 +
 +  // {aditional_pop_count} is only greater than zero if {parameter_count = 0}.
 +  // Check RawMachineAssembler::PopAndReturn.
++  /*
 +  if (parameter_count != 0) {
 +    if (additional_pop_count->IsImmediate()) {
 +      DCHECK_EQ(g.ToConstant(additional_pop_count).ToInt32(), 0);
@@ -19309,6 +19323,7 @@ index 00000000000..f626c36544c
 +                Operand(static_cast<int64_t>(0)));
 +    }
 +  }
++  */
 +
 +  // Functions with JS linkage have at least one parameter (the receiver).
 +  // If {parameter_count} == 0, it means it is a builtin with
@@ -19332,10 +19347,10 @@ index 00000000000..f626c36544c
 +        __ bind(&return_label_);
 +      }
 +    }
-+    if (drop_jsargs) {
-+      // Get the actual argument count
-+      __ Ld(t0, MemOperand(fp, StandardFrameConstants::kArgCOffset));
-+    }
++    //if (drop_jsargs) {
++    //  // Get the actual argument count
++    //  __ Ld(t0, MemOperand(fp, StandardFrameConstants::kArgCOffset));
++    //}
 +    AssembleDeconstructFrame();
 +  }
 +  if (drop_jsargs) {
@@ -19367,8 +19382,9 @@ index 00000000000..f626c36544c
 +
 +void CodeGenerator::FinishCode() {}
 +
-+void CodeGenerator::PrepareForDeoptimizationExits(
-+    ZoneDeque<DeoptimizationExit*>* exits) {}
++void CodeGenerator::PrepareForDeoptimizationExits(int deopt_count) {}
++//void CodeGenerator::PrepareForDeoptimizationExits(
++//    ZoneDeque<DeoptimizationExit*>* exits) {}
 +
 +void CodeGenerator::AssembleMove(InstructionOperand* source,
 +                                 InstructionOperand* destination) {
@@ -21667,10 +21683,10 @@ index 00000000000..fdc13469026
 +}  // namespace v8
 diff --git a/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc b/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc
 new file mode 100644
-index 00000000000..4d86fd02a32
+index 00000000000..90376ff1b16
 --- /dev/null
 +++ b/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc
-@@ -0,0 +1,3034 @@
+@@ -0,0 +1,3011 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -22054,10 +22070,11 @@ index 00000000000..4d86fd02a32
 +  }
 +}
 +
-+void InstructionSelector::VisitStoreLane(Node* node) { UNIMPLEMENTED(); }
++//void InstructionSelector::VisitStoreLane(Node* node) { UNIMPLEMENTED(); }
 +
-+void InstructionSelector::VisitLoadLane(Node* node) { UNIMPLEMENTED(); }
++//void InstructionSelector::VisitLoadLane(Node* node) { UNIMPLEMENTED(); }
 +
++/*
 +void InstructionSelector::VisitLoadTransform(Node* node) {
 +  LoadTransformParameters params = LoadTransformParametersOf(node->op());
 +
@@ -22099,6 +22116,7 @@ index 00000000000..4d86fd02a32
 +
 +  EmitLoad(this, node, opcode);
 +}
++*/
 +
 +void InstructionSelector::VisitLoad(Node* node) {
 +  LoadRepresentation load_rep = LoadRepresentationOf(node->op());
@@ -22238,8 +22256,8 @@ index 00000000000..4d86fd02a32
 +  RiscvOperandGenerator g(this);
 +  Int64BinopMatcher m(node);
 +  if (m.left().IsWord64Shr() && CanCover(node, m.left().node()) &&
-+      m.right().HasResolvedValue()) {
-+    uint64_t mask = m.right().ResolvedValue();
++      m.right().HasValue()) {
++    uint64_t mask = m.right().Value();
 +    uint32_t mask_width = base::bits::CountPopulation(mask);
 +    uint32_t mask_msb = base::bits::CountLeadingZeros64(mask);
 +    if ((mask_width != 0) && (mask_msb + mask_width == 64)) {
@@ -22249,10 +22267,10 @@ index 00000000000..4d86fd02a32
 +      // Select Dext for And(Shr(x, imm), mask) where the mask is in the least
 +      // significant bits.
 +      Int64BinopMatcher mleft(m.left().node());
-+      if (mleft.right().HasResolvedValue()) {
++      if (mleft.right().HasValue()) {
 +        // Any shift value can match; int64 shifts use `value % 64`.
 +        uint32_t lsb =
-+            static_cast<uint32_t>(mleft.right().ResolvedValue() & 0x3F);
++            static_cast<uint32_t>(mleft.right().Value() & 0x3F);
 +
 +        // Dext cannot extract bits past the register size, however since
 +        // shifting the original value would have introduced some zeros we can
@@ -22284,7 +22302,7 @@ index 00000000000..4d86fd02a32
 +  if (m.left().IsWord32Or() && CanCover(node, m.left().node()) &&
 +      m.right().Is(-1)) {
 +    Int32BinopMatcher mleft(m.left().node());
-+    if (!mleft.right().HasResolvedValue()) {
++    if (!mleft.right().HasValue()) {
 +      RiscvOperandGenerator g(this);
 +      Emit(kRiscvNor32, g.DefineAsRegister(node),
 +           g.UseRegister(mleft.left().node()),
@@ -22307,7 +22325,7 @@ index 00000000000..4d86fd02a32
 +  if (m.left().IsWord64Or() && CanCover(node, m.left().node()) &&
 +      m.right().Is(-1)) {
 +    Int64BinopMatcher mleft(m.left().node());
-+    if (!mleft.right().HasResolvedValue()) {
++    if (!mleft.right().HasValue()) {
 +      RiscvOperandGenerator g(this);
 +      Emit(kRiscvNor, g.DefineAsRegister(node),
 +           g.UseRegister(mleft.left().node()),
@@ -22333,12 +22351,12 @@ index 00000000000..4d86fd02a32
 +    Int32BinopMatcher mleft(m.left().node());
 +    // Match Word32Shl(Word32And(x, mask), imm) to Shl where the mask is
 +    // contiguous, and the shift immediate non-zero.
-+    if (mleft.right().HasResolvedValue()) {
-+      uint32_t mask = mleft.right().ResolvedValue();
++    if (mleft.right().HasValue()) {
++      uint32_t mask = mleft.right().Value();
 +      uint32_t mask_width = base::bits::CountPopulation(mask);
 +      uint32_t mask_msb = base::bits::CountLeadingZeros32(mask);
 +      if ((mask_width != 0) && (mask_msb + mask_width == 32)) {
-+        uint32_t shift = m.right().ResolvedValue();
++        uint32_t shift = m.right().Value();
 +        DCHECK_EQ(0u, base::bits::CountTrailingZeros32(mask));
 +        DCHECK_NE(0u, shift);
 +        if ((shift + mask_width) >= 32) {
@@ -22363,10 +22381,10 @@ index 00000000000..4d86fd02a32
 +  Int32BinopMatcher m(node);
 +  if (m.left().IsWord32Shl() && CanCover(node, m.left().node())) {
 +    Int32BinopMatcher mleft(m.left().node());
-+    if (m.right().HasResolvedValue() && mleft.right().HasResolvedValue()) {
++    if (m.right().HasValue() && mleft.right().HasValue()) {
 +      RiscvOperandGenerator g(this);
-+      uint32_t sar = m.right().ResolvedValue();
-+      uint32_t shl = mleft.right().ResolvedValue();
++      uint32_t sar = m.right().Value();
++      uint32_t shl = mleft.right().Value();
 +      if ((sar == shl) && (sar == 16)) {
 +        Emit(kRiscvSignExtendShort, g.DefineAsRegister(node),
 +             g.UseRegister(mleft.left().node()));
@@ -22402,12 +22420,12 @@ index 00000000000..4d86fd02a32
 +    // Match Word64Shl(Word64And(x, mask), imm) to Dshl where the mask is
 +    // contiguous, and the shift immediate non-zero.
 +    Int64BinopMatcher mleft(m.left().node());
-+    if (mleft.right().HasResolvedValue()) {
-+      uint64_t mask = mleft.right().ResolvedValue();
++    if (mleft.right().HasValue()) {
++      uint64_t mask = mleft.right().Value();
 +      uint32_t mask_width = base::bits::CountPopulation(mask);
 +      uint32_t mask_msb = base::bits::CountLeadingZeros64(mask);
 +      if ((mask_width != 0) && (mask_msb + mask_width == 64)) {
-+        uint64_t shift = m.right().ResolvedValue();
++        uint64_t shift = m.right().Value();
 +        DCHECK_EQ(0u, base::bits::CountTrailingZeros64(mask));
 +        DCHECK_NE(0u, shift);
 +
@@ -22434,9 +22452,9 @@ index 00000000000..4d86fd02a32
 +  VisitRRO(this, kRiscvSar64, node);
 +}
 +
-+void InstructionSelector::VisitWord32Rol(Node* node) { UNREACHABLE(); }
++//void InstructionSelector::VisitWord32Rol(Node* node) { UNREACHABLE(); }
 +
-+void InstructionSelector::VisitWord64Rol(Node* node) { UNREACHABLE(); }
++//void InstructionSelector::VisitWord64Rol(Node* node) { UNREACHABLE(); }
 +
 +void InstructionSelector::VisitWord32Ror(Node* node) {
 +  VisitRRO(this, kRiscvRor32, node);
@@ -22462,9 +22480,11 @@ index 00000000000..4d86fd02a32
 +       g.UseRegister(node->InputAt(0)));
 +}
 +
++/*
 +void InstructionSelector::VisitSimd128ReverseBytes(Node* node) {
 +  UNREACHABLE();
 +}
++*/
 +
 +void InstructionSelector::VisitWord32Ctz(Node* node) {
 +  RiscvOperandGenerator g(this);
@@ -22515,19 +22535,19 @@ index 00000000000..4d86fd02a32
 +void InstructionSelector::VisitInt32Mul(Node* node) {
 +  RiscvOperandGenerator g(this);
 +  Int32BinopMatcher m(node);
-+  if (m.right().HasResolvedValue() && m.right().ResolvedValue() > 0) {
-+    uint32_t value = static_cast<uint32_t>(m.right().ResolvedValue());
++  if (m.right().HasValue() && m.right().Value() > 0) {
++    uint32_t value = static_cast<uint32_t>(m.right().Value());
 +    if (base::bits::IsPowerOfTwo(value)) {
 +      Emit(kRiscvShl32 | AddressingModeField::encode(kMode_None),
 +           g.DefineAsRegister(node), g.UseRegister(m.left().node()),
-+           g.TempImmediate(base::bits::WhichPowerOfTwo(value)));
++           g.TempImmediate(base::bits::IsPowerOfTwo(value)));
 +      return;
 +    }
 +    if (base::bits::IsPowerOfTwo(value + 1)) {
 +      InstructionOperand temp = g.TempRegister();
 +      Emit(kRiscvShl32 | AddressingModeField::encode(kMode_None), temp,
 +           g.UseRegister(m.left().node()),
-+           g.TempImmediate(base::bits::WhichPowerOfTwo(value + 1)));
++           g.TempImmediate(base::bits::IsPowerOfTwo(value + 1)));
 +      Emit(kRiscvSub32 | AddressingModeField::encode(kMode_None),
 +           g.DefineAsRegister(node), temp, g.UseRegister(m.left().node()));
 +      return;
@@ -22563,19 +22583,19 @@ index 00000000000..4d86fd02a32
 +  RiscvOperandGenerator g(this);
 +  Int64BinopMatcher m(node);
 +  // TODO(dusmil): Add optimization for shifts larger than 32.
-+  if (m.right().HasResolvedValue() && m.right().ResolvedValue() > 0) {
-+    uint32_t value = static_cast<uint32_t>(m.right().ResolvedValue());
++  if (m.right().HasValue() && m.right().Value() > 0) {
++    uint32_t value = static_cast<uint32_t>(m.right().Value());
 +    if (base::bits::IsPowerOfTwo(value)) {
 +      Emit(kRiscvShl64 | AddressingModeField::encode(kMode_None),
 +           g.DefineAsRegister(node), g.UseRegister(m.left().node()),
-+           g.TempImmediate(base::bits::WhichPowerOfTwo(value)));
++           g.TempImmediate(base::bits::IsPowerOfTwo(value)));
 +      return;
 +    }
 +    if (base::bits::IsPowerOfTwo(value + 1)) {
 +      InstructionOperand temp = g.TempRegister();
 +      Emit(kRiscvShl64 | AddressingModeField::encode(kMode_None), temp,
 +           g.UseRegister(m.left().node()),
-+           g.TempImmediate(base::bits::WhichPowerOfTwo(value + 1)));
++           g.TempImmediate(base::bits::IsPowerOfTwo(value + 1)));
 +      Emit(kRiscvSub64 | AddressingModeField::encode(kMode_None),
 +           g.DefineAsRegister(node), temp, g.UseRegister(m.left().node()));
 +      return;
@@ -22696,23 +22716,25 @@ index 00000000000..4d86fd02a32
 +}
 +
 +void InstructionSelector::VisitTruncateFloat32ToInt32(Node* node) {
-+  RiscvOperandGenerator g(this);
-+  InstructionCode opcode = kRiscvTruncWS;
-+  TruncateKind kind = OpParameter<TruncateKind>(node->op());
-+  if (kind == TruncateKind::kSetOverflowToMin) {
-+    opcode |= MiscField::encode(true);
-+  }
-+  Emit(opcode, g.DefineAsRegister(node), g.UseRegister(node->InputAt(0)));
++  VisitRR(this, kRiscvTruncWS, node);
++  //RiscvOperandGenerator g(this);
++  //InstructionCode opcode = kRiscvTruncWS;
++  //TruncateKind kind = OpParameter<TruncateKind>(node->op());
++  //if (kind == TruncateKind::kSetOverflowToMin) {
++  //  opcode |= MiscField::encode(true);
++  //}
++  //Emit(opcode, g.DefineAsRegister(node), g.UseRegister(node->InputAt(0)));
 +}
 +
 +void InstructionSelector::VisitTruncateFloat32ToUint32(Node* node) {
-+  RiscvOperandGenerator g(this);
-+  InstructionCode opcode = kRiscvTruncUwS;
-+  TruncateKind kind = OpParameter<TruncateKind>(node->op());
-+  if (kind == TruncateKind::kSetOverflowToMin) {
-+    opcode |= MiscField::encode(true);
-+  }
-+  Emit(opcode, g.DefineAsRegister(node), g.UseRegister(node->InputAt(0)));
++  VisitRR(this, kRiscvTruncUwS, node);
++  //RiscvOperandGenerator g(this);
++  //InstructionCode opcode = kRiscvTruncUwS;
++  //TruncateKind kind = OpParameter<TruncateKind>(node->op());
++  //if (kind == TruncateKind::kSetOverflowToMin) {
++  //  opcode |= MiscField::encode(true);
++  //}
++  //Emit(opcode, g.DefineAsRegister(node), g.UseRegister(node->InputAt(0)));
 +}
 +
 +void InstructionSelector::VisitChangeFloat64ToInt32(Node* node) {
@@ -22795,28 +22817,30 @@ index 00000000000..4d86fd02a32
 +}
 +
 +void InstructionSelector::VisitTruncateFloat64ToInt64(Node* node) {
-+  RiscvOperandGenerator g(this);
-+  InstructionCode opcode = kRiscvTruncLD;
-+  TruncateKind kind = OpParameter<TruncateKind>(node->op());
-+  if (kind == TruncateKind::kSetOverflowToMin) {
-+    opcode |= MiscField::encode(true);
-+  }
-+  Emit(opcode, g.DefineAsRegister(node), g.UseRegister(node->InputAt(0)));
++  VisitRR(this, kRiscvTruncLD, node);
++  //RiscvOperandGenerator g(this);
++  //InstructionCode opcode = kRiscvTruncLD;
++  //TruncateKind kind = OpParameter<TruncateKind>(node->op());
++  //if (kind == TruncateKind::kSetOverflowToMin) {
++  //  opcode |= MiscField::encode(true);
++  //}
++  //Emit(opcode, g.DefineAsRegister(node), g.UseRegister(node->InputAt(0)));
 +}
 +
 +void InstructionSelector::VisitTryTruncateFloat32ToInt64(Node* node) {
-+  RiscvOperandGenerator g(this);
-+  InstructionOperand inputs[] = {g.UseRegister(node->InputAt(0))};
-+  InstructionOperand outputs[2];
-+  size_t output_count = 0;
-+  outputs[output_count++] = g.DefineAsRegister(node);
++  VisitRR(this, kRiscvTruncLS, node);
++  //RiscvOperandGenerator g(this);
++  //InstructionOperand inputs[] = {g.UseRegister(node->InputAt(0))};
++  //InstructionOperand outputs[2];
++  //size_t output_count = 0;
++  //outputs[output_count++] = g.DefineAsRegister(node);
 +
-+  Node* success_output = NodeProperties::FindProjection(node, 1);
-+  if (success_output) {
-+    outputs[output_count++] = g.DefineAsRegister(success_output);
-+  }
++  //Node* success_output = NodeProperties::FindProjection(node, 1);
++  //if (success_output) {
++  //  outputs[output_count++] = g.DefineAsRegister(success_output);
++  //}
 +
-+  this->Emit(kRiscvTruncLS, output_count, outputs, 1, inputs);
++  //this->Emit(kRiscvTruncLS, output_count, outputs, 1, inputs);
 +}
 +
 +void InstructionSelector::VisitTryTruncateFloat64ToInt64(Node* node) {
@@ -22865,9 +22889,9 @@ index 00000000000..4d86fd02a32
 +  Emit(kRiscvTruncUlD, output_count, outputs, 1, inputs);
 +}
 +
-+void InstructionSelector::VisitBitcastWord32ToWord64(Node* node) {
-+  UNIMPLEMENTED();
-+}
++//void InstructionSelector::VisitBitcastWord32ToWord64(Node* node) {
++//  UNIMPLEMENTED();
++//}
 +
 +void InstructionSelector::VisitChangeInt32ToInt64(Node* node) {
 +  Node* value = node->InputAt(0);
@@ -22897,6 +22921,7 @@ index 00000000000..4d86fd02a32
 +  }
 +}
 +
++/*
 +bool InstructionSelector::ZeroExtendsWord32ToWord64NoPhis(Node* node) {
 +  DCHECK_NE(node->opcode(), IrOpcode::kPhi);
 +  if (node->opcode() == IrOpcode::kLoad) {
@@ -22916,14 +22941,15 @@ index 00000000000..4d86fd02a32
 +  // All other 32-bit operations sign-extend to the upper 32 bits
 +  return false;
 +}
++*/
 +
 +void InstructionSelector::VisitChangeUint32ToUint64(Node* node) {
 +  RiscvOperandGenerator g(this);
 +  Node* value = node->InputAt(0);
-+  if (ZeroExtendsWord32ToWord64(value)) {
-+    Emit(kArchNop, g.DefineSameAsFirst(node), g.Use(value));
-+    return;
-+  }
++  //if (ZeroExtendsWord32ToWord64(value)) {
++  //  Emit(kArchNop, g.DefineSameAsFirst(node), g.Use(value));
++  //  return;
++  //}
 +  Emit(kRiscvZeroExtendWord, g.DefineAsRegister(node),
 +       g.UseRegister(node->InputAt(0)));
 +}
@@ -23656,12 +23682,16 @@ index 00000000000..4d86fd02a32
 +
 +void InstructionSelector::VisitStackPointerGreaterThan(
 +    Node* node, FlagsContinuation* cont) {
-+  StackCheckKind kind = StackCheckKindOf(node->op());
-+  InstructionCode opcode =
-+      kArchStackPointerGreaterThan | MiscField::encode(static_cast<int>(kind));
++  //StackCheckKind kind = StackCheckKindOf(node->op());
++  //InstructionCode opcode =
++  //    kArchStackPointerGreaterThan | MiscField::encode(static_cast<int>(kind));
++  Node* const value = node->InputAt(0);
++  InstructionCode opcode = kArchStackPointerGreaterThan;
 +
 +  RiscvOperandGenerator g(this);
++  EmitWithContinuation(opcode, g.UseRegister(value), cont);
 +
++  /*
 +  // No outputs.
 +  InstructionOperand* const outputs = nullptr;
 +  const int output_count = 0;
@@ -23681,6 +23711,7 @@ index 00000000000..4d86fd02a32
 +
 +  EmitWithContinuation(opcode, output_count, outputs, input_count, inputs,
 +                       temp_count, temps, cont);
++  */
 +}
 +
 +// Shared routine for word comparisons against zero.
@@ -24253,33 +24284,14 @@ index 00000000000..4d86fd02a32
 +#define SIMD_UNOP_LIST(V)                                   \
 +  V(F64x2Abs, kRiscvF64x2Abs)                               \
 +  V(F64x2Neg, kRiscvF64x2Neg)                               \
-+  V(F64x2Sqrt, kRiscvF64x2Sqrt)                             \
-+  V(F64x2ConvertLowI32x4S, kRiscvF64x2ConvertLowI32x4S)     \
-+  V(F64x2ConvertLowI32x4U, kRiscvF64x2ConvertLowI32x4U)     \
-+  V(F64x2PromoteLowF32x4, kRiscvF64x2PromoteLowF32x4)       \
-+  V(F64x2Ceil, kRiscvF64x2Ceil)                             \
-+  V(F64x2Floor, kRiscvF64x2Floor)                           \
-+  V(F64x2Trunc, kRiscvF64x2Trunc)                           \
-+  V(F64x2NearestInt, kRiscvF64x2NearestInt)                 \
 +  V(I64x2Neg, kRiscvI64x2Neg)                               \
-+  V(I64x2BitMask, kRiscvI64x2BitMask)                       \
 +  V(I64x2Eq, kRiscvI64x2Eq)                                 \
 +  V(F32x4SConvertI32x4, kRiscvF32x4SConvertI32x4)           \
 +  V(F32x4UConvertI32x4, kRiscvF32x4UConvertI32x4)           \
 +  V(F32x4Abs, kRiscvF32x4Abs)                               \
 +  V(F32x4Neg, kRiscvF32x4Neg)                               \
-+  V(F32x4Sqrt, kRiscvF32x4Sqrt)                             \
 +  V(F32x4RecipApprox, kRiscvF32x4RecipApprox)               \
 +  V(F32x4RecipSqrtApprox, kRiscvF32x4RecipSqrtApprox)       \
-+  V(F32x4DemoteF64x2Zero, kRiscvF32x4DemoteF64x2Zero)       \
-+  V(F32x4Ceil, kRiscvF32x4Ceil)                             \
-+  V(F32x4Floor, kRiscvF32x4Floor)                           \
-+  V(F32x4Trunc, kRiscvF32x4Trunc)                           \
-+  V(F32x4NearestInt, kRiscvF32x4NearestInt)                 \
-+  V(I64x2SConvertI32x4Low, kRiscvI64x2SConvertI32x4Low)     \
-+  V(I64x2SConvertI32x4High, kRiscvI64x2SConvertI32x4High)   \
-+  V(I64x2UConvertI32x4Low, kRiscvI64x2UConvertI32x4Low)     \
-+  V(I64x2UConvertI32x4High, kRiscvI64x2UConvertI32x4High)   \
 +  V(I32x4SConvertF32x4, kRiscvI32x4SConvertF32x4)           \
 +  V(I32x4UConvertF32x4, kRiscvI32x4UConvertF32x4)           \
 +  V(I32x4Neg, kRiscvI32x4Neg)                               \
@@ -24287,26 +24299,14 @@ index 00000000000..4d86fd02a32
 +  V(I32x4SConvertI16x8High, kRiscvI32x4SConvertI16x8High)   \
 +  V(I32x4UConvertI16x8Low, kRiscvI32x4UConvertI16x8Low)     \
 +  V(I32x4UConvertI16x8High, kRiscvI32x4UConvertI16x8High)   \
-+  V(I32x4Abs, kRiscvI32x4Abs)                               \
-+  V(I32x4BitMask, kRiscvI32x4BitMask)                       \
-+  V(I32x4TruncSatF64x2SZero, kRiscvI32x4TruncSatF64x2SZero) \
-+  V(I32x4TruncSatF64x2UZero, kRiscvI32x4TruncSatF64x2UZero) \
 +  V(I16x8Neg, kRiscvI16x8Neg)                               \
 +  V(I16x8SConvertI8x16Low, kRiscvI16x8SConvertI8x16Low)     \
 +  V(I16x8SConvertI8x16High, kRiscvI16x8SConvertI8x16High)   \
 +  V(I16x8UConvertI8x16Low, kRiscvI16x8UConvertI8x16Low)     \
 +  V(I16x8UConvertI8x16High, kRiscvI16x8UConvertI8x16High)   \
 +  V(I16x8Abs, kRiscvI16x8Abs)                               \
-+  V(I16x8BitMask, kRiscvI16x8BitMask)                       \
 +  V(I8x16Neg, kRiscvI8x16Neg)                               \
-+  V(I8x16Abs, kRiscvI8x16Abs)                               \
-+  V(I8x16BitMask, kRiscvI8x16BitMask)                       \
-+  V(I8x16Popcnt, kRiscvI8x16Popcnt)                         \
-+  V(S128Not, kRiscvS128Not)                                 \
-+  V(V128AnyTrue, kRiscvV128AnyTrue)                         \
-+  V(V32x4AllTrue, kRiscvV32x4AllTrue)                       \
-+  V(V16x8AllTrue, kRiscvV16x8AllTrue)                       \
-+  V(V8x16AllTrue, kRiscvV8x16AllTrue)
++  V(S128Not, kRiscvS128Not)
 +
 +#define SIMD_SHIFT_OP_LIST(V) \
 +  V(I64x2Shl)                 \
@@ -24361,14 +24361,9 @@ index 00000000000..4d86fd02a32
 +  V(I32x4GeS, kRiscvI32x4GeS)                           \
 +  V(I32x4GtU, kRiscvI32x4GtU)                           \
 +  V(I32x4GeU, kRiscvI32x4GeU)                           \
-+  V(I32x4DotI16x8S, kRiscvI32x4DotI16x8S)               \
 +  V(I16x8Add, kRiscvI16x8Add)                           \
-+  V(I16x8AddSatS, kRiscvI16x8AddSatS)                   \
-+  V(I16x8AddSatU, kRiscvI16x8AddSatU)                   \
 +  V(I16x8AddHoriz, kRiscvI16x8AddHoriz)                 \
 +  V(I16x8Sub, kRiscvI16x8Sub)                           \
-+  V(I16x8SubSatS, kRiscvI16x8SubSatS)                   \
-+  V(I16x8SubSatU, kRiscvI16x8SubSatU)                   \
 +  V(I16x8Mul, kRiscvI16x8Mul)                           \
 +  V(I16x8MaxS, kRiscvI16x8MaxS)                         \
 +  V(I16x8MinS, kRiscvI16x8MinS)                         \
@@ -24380,16 +24375,10 @@ index 00000000000..4d86fd02a32
 +  V(I16x8GeS, kRiscvI16x8GeS)                           \
 +  V(I16x8GtU, kRiscvI16x8GtU)                           \
 +  V(I16x8GeU, kRiscvI16x8GeU)                           \
-+  V(I16x8RoundingAverageU, kRiscvI16x8RoundingAverageU) \
-+  V(I16x8Q15MulRSatS, kRiscvI16x8Q15MulRSatS)           \
 +  V(I16x8SConvertI32x4, kRiscvI16x8SConvertI32x4)       \
 +  V(I16x8UConvertI32x4, kRiscvI16x8UConvertI32x4)       \
 +  V(I8x16Add, kRiscvI8x16Add)                           \
-+  V(I8x16AddSatS, kRiscvI8x16AddSatS)                   \
-+  V(I8x16AddSatU, kRiscvI8x16AddSatU)                   \
 +  V(I8x16Sub, kRiscvI8x16Sub)                           \
-+  V(I8x16SubSatS, kRiscvI8x16SubSatS)                   \
-+  V(I8x16SubSatU, kRiscvI8x16SubSatU)                   \
 +  V(I8x16Mul, kRiscvI8x16Mul)                           \
 +  V(I8x16MaxS, kRiscvI8x16MaxS)                         \
 +  V(I8x16MinS, kRiscvI8x16MinS)                         \
@@ -24401,15 +24390,14 @@ index 00000000000..4d86fd02a32
 +  V(I8x16GeS, kRiscvI8x16GeS)                           \
 +  V(I8x16GtU, kRiscvI8x16GtU)                           \
 +  V(I8x16GeU, kRiscvI8x16GeU)                           \
-+  V(I8x16RoundingAverageU, kRiscvI8x16RoundingAverageU) \
 +  V(I8x16SConvertI16x8, kRiscvI8x16SConvertI16x8)       \
 +  V(I8x16UConvertI16x8, kRiscvI8x16UConvertI16x8)       \
 +  V(S128And, kRiscvS128And)                             \
 +  V(S128Or, kRiscvS128Or)                               \
-+  V(S128Xor, kRiscvS128Xor)                             \
-+  V(S128AndNot, kRiscvS128AndNot)
++  V(S128Xor, kRiscvS128Xor)
 +
-+void InstructionSelector::VisitS128Const(Node* node) {
++/*
++ void InstructionSelector::VisitS128Const(Node* node) {
 +  RiscvOperandGenerator g(this);
 +  static const int kUint32Immediates = kSimd128Size / sizeof(uint32_t);
 +  uint32_t val[kUint32Immediates];
@@ -24428,6 +24416,7 @@ index 00000000000..4d86fd02a32
 +         g.UseImmediate(val[2]), g.UseImmediate(val[3]));
 +  }
 +}
++*/
 +
 +void InstructionSelector::VisitS128Zero(Node* node) {
 +  RiscvOperandGenerator g(this);
@@ -24449,10 +24438,10 @@ index 00000000000..4d86fd02a32
 +SIMD_VISIT_EXTRACT_LANE(F64x2, )
 +SIMD_VISIT_EXTRACT_LANE(F32x4, )
 +SIMD_VISIT_EXTRACT_LANE(I32x4, )
-+SIMD_VISIT_EXTRACT_LANE(I16x8, U)
-+SIMD_VISIT_EXTRACT_LANE(I16x8, S)
-+SIMD_VISIT_EXTRACT_LANE(I8x16, U)
-+SIMD_VISIT_EXTRACT_LANE(I8x16, S)
++//SIMD_VISIT_EXTRACT_LANE(I16x8, U)
++//SIMD_VISIT_EXTRACT_LANE(I16x8, S)
++//SIMD_VISIT_EXTRACT_LANE(I8x16, U)
++//SIMD_VISIT_EXTRACT_LANE(I8x16, S)
 +#undef SIMD_VISIT_EXTRACT_LANE
 +
 +#define SIMD_VISIT_REPLACE_LANE(Type)                              \
@@ -24565,6 +24554,7 @@ index 00000000000..4d86fd02a32
 +
 +}  // namespace
 +
++/*
 +void InstructionSelector::VisitI8x16Shuffle(Node* node) {
 +  uint8_t shuffle[kSimd128Size];
 +  bool is_swizzle;
@@ -24608,6 +24598,7 @@ index 00000000000..4d86fd02a32
 +       g.UseUniqueRegister(node->InputAt(0)),
 +       g.UseUniqueRegister(node->InputAt(1)), arraysize(temps), temps);
 +}
++*/
 +
 +void InstructionSelector::VisitSignExtendWord8ToInt32(Node* node) {
 +  RiscvOperandGenerator g(this);
@@ -24639,6 +24630,7 @@ index 00000000000..4d86fd02a32
 +       g.TempImmediate(0));
 +}
 +
++/*
 +void InstructionSelector::VisitF32x4Pmin(Node* node) {
 +  VisitUniqueRRR(this, kRiscvF32x4Pmin, node);
 +}
@@ -24670,6 +24662,7 @@ index 00000000000..4d86fd02a32
 +VISIT_EXT_MUL(I16x8, I8x16S)
 +VISIT_EXT_MUL(I16x8, I8x16U)
 +#undef VISIT_EXT_MUL
++*/
 +
 +// static
 +MachineOperatorBuilder::Flags
@@ -24807,10 +24800,10 @@ index 00000000000..b2923001509
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc b/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc
 new file mode 100644
-index 00000000000..1cbe85ba5df
+index 00000000000..16cf733e808
 --- /dev/null
 +++ b/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,43 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -24820,7 +24813,8 @@ index 00000000000..1cbe85ba5df
 +namespace v8 {
 +namespace internal {
 +
-+const bool Deoptimizer::kSupportsFixedDeoptExitSizes = true;
++const bool Deoptimizer::kSupportsFixedDeoptExitSize = true;
++/*
 +const int Deoptimizer::kNonLazyDeoptExitSize = 5 * kInstrSize;
 +const int Deoptimizer::kLazyDeoptExitSize = 5 * kInstrSize;
 +const int Deoptimizer::kEagerWithResumeBeforeArgsSize = 6 * kInstrSize;
@@ -24829,6 +24823,7 @@ index 00000000000..1cbe85ba5df
 +const int Deoptimizer::kEagerWithResumeImmedArgs1PcOffset = kInstrSize;
 +const int Deoptimizer::kEagerWithResumeImmedArgs2PcOffset =
 +    kInstrSize + kSystemPointerSize;
++*/
 +
 +Float32 RegisterValues::GetFloatRegister(unsigned n) const {
 +  return Float32::FromBits(
@@ -24848,7 +24843,7 @@ index 00000000000..1cbe85ba5df
 +  UNREACHABLE();
 +}
 +
-+void FrameDescription::SetPc(intptr_t pc) { pc_ = pc; }
++// void FrameDescription::SetPc(intptr_t pc) { pc_ = pc; }
 +
 +}  // namespace internal
 +}  // namespace v8
@@ -24875,10 +24870,10 @@ index 36ab8441100..e3a28ce65b9 100644
      return 0;
 diff --git a/deps/v8/src/diagnostics/riscv64/disasm-riscv64.cc b/deps/v8/src/diagnostics/riscv64/disasm-riscv64.cc
 new file mode 100644
-index 00000000000..a39261555d1
+index 00000000000..480fa78c3eb
 --- /dev/null
 +++ b/deps/v8/src/diagnostics/riscv64/disasm-riscv64.cc
-@@ -0,0 +1,1862 @@
+@@ -0,0 +1,1864 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -25731,7 +25726,8 @@ index 00000000000..a39261555d1
 +  // Special handling for A extension instructions because it uses func5
 +  // For all A extension instruction, V8 simulator is pure sequential. No
 +  // Memory address lock or other synchronizaiton behaviors.
-+  switch (instr->InstructionBits() & kRATypeMask) {
++  uint32_t opcode = (instr->InstructionBits() & kRATypeMask);
++  switch (opcode) {
 +    case RO_LR_W:
 +      Format(instr, "lr.w'a    'rd, ('rs1)");
 +      break;
@@ -25811,7 +25807,8 @@ index 00000000000..a39261555d1
 +  // OP_FP instructions (F/D) uses func7 first. Some further uses fun3 and rs2()
 +
 +  // kRATypeMask is only for func7
-+  switch (instr->InstructionBits() & kRFPTypeMask) {
++  uint32_t opcode = (instr->InstructionBits() & kRFPTypeMask);
++  switch (opcode) {
 +    // TODO(riscv): Add macro for RISCV F extension
 +    case RO_FADD_S:
 +      Format(instr, "fadd.s    'fd, 'fs1, 'fs2");
@@ -26741,24 +26738,6 @@ index 00000000000..a39261555d1
 +}  // namespace disasm
 +
 +#endif  // V8_TARGET_ARCH_RISCV64
-diff --git a/deps/v8/src/diagnostics/riscv64/unwinder-riscv64.cc b/deps/v8/src/diagnostics/riscv64/unwinder-riscv64.cc
-new file mode 100644
-index 00000000000..ccfb9268ea2
---- /dev/null
-+++ b/deps/v8/src/diagnostics/riscv64/unwinder-riscv64.cc
-@@ -0,0 +1,12 @@
-+// Copyright 2021 the V8 project authors. All rights reserved.
-+// Use of this source code is governed by a BSD-style license that can be
-+// found in the LICENSE file.
-+
-+#include "src/diagnostics/unwinder.h"
-+
-+namespace v8 {
-+
-+void GetCalleeSavedRegistersFromEntryFrame(void* fp,
-+                                           RegisterState* register_state) {}
-+
-+}  // namespace v8
 diff --git a/deps/v8/src/execution/frame-constants.h b/deps/v8/src/execution/frame-constants.h
 index a6e5c9522cc..f3cdbc92c50 100644
 --- a/deps/v8/src/execution/frame-constants.h
@@ -26774,7 +26753,7 @@ index a6e5c9522cc..f3cdbc92c50 100644
  #endif
 diff --git a/deps/v8/src/execution/riscv64/frame-constants-riscv64.cc b/deps/v8/src/execution/riscv64/frame-constants-riscv64.cc
 new file mode 100644
-index 00000000000..13e91639c98
+index 00000000000..43be3bde508
 --- /dev/null
 +++ b/deps/v8/src/execution/riscv64/frame-constants-riscv64.cc
 @@ -0,0 +1,32 @@
@@ -26797,7 +26776,7 @@ index 00000000000..13e91639c98
 +Register JavaScriptFrame::context_register() { return cp; }
 +Register JavaScriptFrame::constant_pool_pointer_register() { UNREACHABLE(); }
 +
-+int UnoptimizedFrameConstants::RegisterStackSlotCount(int register_count) {
++int InterpreterFrameConstants::RegisterStackSlotCount(int register_count) {
 +  return register_count;
 +}
 +
