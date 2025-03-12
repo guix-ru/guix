@@ -19604,6 +19604,7 @@ stuff (words, region, lines) around in Emacs.")
                 (sha256
                  (base32 "08xpdpac82v5vwqqqgbh5imakl4pys6bpfacfk05pk88lw925ql8"))))
       (build-system emacs-build-system)
+      (arguments (list #:tests? #f))    ; no tests
       (home-page "https://github.com/AmaiKinono/clue/")
       (synopsis "Connecting clues while reading code")
       (description
