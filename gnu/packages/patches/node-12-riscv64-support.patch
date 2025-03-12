@@ -483,10 +483,10 @@ index 8ae89187ecb..aa74f6d4aac 100644
  }  // namespace internal
 diff --git a/deps/v8/src/builtins/riscv64/builtins-riscv64.cc b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
 new file mode 100644
-index 00000000000..ebdf1d46ba1
+index 00000000000..7633ef8e7c5
 --- /dev/null
 +++ b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
-@@ -0,0 +1,3320 @@
+@@ -0,0 +1,3329 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -1910,10 +1910,12 @@ index 00000000000..ebdf1d46ba1
 +        MemOperand(fp, InterpreterFrameConstants::kBytecodeOffsetFromFp));
 +  __ SmiUntag(kInterpreterBytecodeOffsetRegister);
 +
++  /*
 +  Label enter_bytecode, function_entry_bytecode;
 +  __ Branch(&function_entry_bytecode, eq, kInterpreterBytecodeOffsetRegister,
 +            Operand(BytecodeArray::kHeaderSize - kHeapObjectTag +
 +                    kFunctionEntryBytecodeOffset));
++  */
 +
 +  // Load the current bytecode.
 +  __ Add64(a1, kInterpreterBytecodeArrayRegister,
@@ -1926,7 +1928,7 @@ index 00000000000..ebdf1d46ba1
 +                                kInterpreterBytecodeOffsetRegister, a1, a2, a3,
 +                                a4, &if_return);
 +
-+  __ bind(&enter_bytecode);
++  // __ bind(&enter_bytecode);
 +  // Convert new bytecode offset to a Smi and save in the stackframe.
 +  __ SmiTag(a2, kInterpreterBytecodeOffsetRegister);
 +  __ Sd(a2, MemOperand(fp, InterpreterFrameConstants::kBytecodeOffsetFromFp));
@@ -2392,7 +2394,7 @@ index 00000000000..ebdf1d46ba1
 +    __ JumpIfSmi(a3, &new_target_not_constructor);
 +    __ Ld(t1, FieldMemOperand(a3, HeapObject::kMapOffset));
 +    __ Lbu(t1, FieldMemOperand(t1, Map::kBitFieldOffset));
-+    __ And(t1, t1, Operand(Map::Bits1::IsConstructorBit::kMask));
++    __ And(t1, t1, Operand(Map::IsConstructorBit::kMask));
 +    __ Branch(&new_target_constructor, ne, t1, Operand(zero_reg));
 +    __ bind(&new_target_not_constructor);
 +    {
@@ -2407,7 +2409,7 @@ index 00000000000..ebdf1d46ba1
 +  // TODO(victorgomes): Remove this copy when all the arguments adaptor frame
 +  // code is erased.
 +  __ Move(a6, fp);
-+  __ Ld(a7, MemOperand(fp, StandardFrameConstants::kArgCOffset));
++  __ Ld(a7, MemOperand(fp, ConstructFrameConstants::kContextOffset));
 +
 +  Label stack_done, stack_overflow;
 +  __ Sub32(a7, a7, a2);
@@ -2655,17 +2657,19 @@ index 00000000000..ebdf1d46ba1
 +  Label non_callable, non_smi;
 +  __ JumpIfSmi(a1, &non_callable);
 +  __ bind(&non_smi);
-+  __ LoadMap(t1, a1);
-+  __ GetInstanceTypeRange(t1, t2, FIRST_JS_FUNCTION_TYPE, t4);
++  //__ LoadMap(t1, a1);
++  //__ GetInstanceTypeRange(t1, t2, FIRST_JS_FUNCTION_TYPE, t4);
++  __ GetObjectType(a1, t1, t2)
 +  __ Jump(masm->isolate()->builtins()->CallFunction(mode),
-+          RelocInfo::CODE_TARGET, Uless_equal, t4,
-+          Operand(LAST_JS_FUNCTION_TYPE - FIRST_JS_FUNCTION_TYPE));
++          RelocInfo::CODE_TARGET, eq, t2, Operand(JS_FUNCTION_TYPE));
++          //RelocInfo::CODE_TARGET, Uless_equal, t4,
++          //Operand(LAST_JS_FUNCTION_TYPE - FIRST_JS_FUNCTION_TYPE));
 +  __ Jump(BUILTIN_CODE(masm->isolate(), CallBoundFunction),
 +          RelocInfo::CODE_TARGET, eq, t2, Operand(JS_BOUND_FUNCTION_TYPE));
 +
 +  // Check if target has a [[Call]] internal method.
 +  __ Lbu(t1, FieldMemOperand(t1, Map::kBitFieldOffset));
-+  __ And(t1, t1, Operand(Map::Bits1::IsCallableBit::kMask));
++  __ And(t1, t1, Operand(Map::IsCallableBit::kMask));
 +  __ Branch(&non_callable, eq, t1, Operand(zero_reg));
 +
 +  __ Jump(BUILTIN_CODE(masm->isolate(), CallProxy), RelocInfo::CODE_TARGET, eq,
@@ -2810,14 +2814,17 @@ index 00000000000..ebdf1d46ba1
 +  // Check if target has a [[Construct]] internal method.
 +  __ Ld(t1, FieldMemOperand(a1, HeapObject::kMapOffset));
 +  __ Lbu(t4, FieldMemOperand(t1, Map::kBitFieldOffset));
-+  __ And(t4, t4, Operand(Map::Bits1::IsConstructorBit::kMask));
++  __ And(t4, t4, Operand(Map::IsConstructorBit::kMask));
 +  __ Branch(&non_constructor, eq, t4, Operand(zero_reg));
 +
 +  // Dispatch based on instance type.
-+  __ GetInstanceTypeRange(t1, t2, FIRST_JS_FUNCTION_TYPE, t0);
++  __ Lhu(t2, FieldMemOperand(t1, Map::kInstanceTypeOffset));
++  // __ GetInstanceTypeRange(t1, t2, FIRST_JS_FUNCTION_TYPE, t0);
 +  __ Jump(BUILTIN_CODE(masm->isolate(), ConstructFunction),
-+          RelocInfo::CODE_TARGET, Uless_equal, t0,
-+          Operand(LAST_JS_FUNCTION_TYPE - FIRST_JS_FUNCTION_TYPE));
++          //RelocInfo::CODE_TARGET, eq);
++          RelocInfo::CODE_TARGET, eq, t2, Operand(JS_FUNCTION_TYPE));
++          //RelocInfo::CODE_TARGET, Uless_equal, t0,
++          //Operand(LAST_JS_FUNCTION_TYPE - FIRST_JS_FUNCTION_TYPE));
 +
 +  // Only dispatch to bound functions after checking whether they are
 +  // constructors.
@@ -2899,6 +2906,7 @@ index 00000000000..ebdf1d46ba1
 +  __ Jump(s1);
 +}
 +
++/*
 +void Builtins::Generate_WasmDebugBreak(MacroAssembler* masm) {
 +  HardAbortScope hard_abort(masm);  // Avoid calls to Abort.
 +  {
@@ -2920,6 +2928,7 @@ index 00000000000..ebdf1d46ba1
 +  }
 +  __ Ret();
 +}
++*/
 +
 +void Builtins::Generate_CEntry(MacroAssembler* masm, int result_size,
 +                               SaveFPRegsMode save_doubles, ArgvMode argv_mode,
