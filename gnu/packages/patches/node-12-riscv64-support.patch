@@ -16860,10 +16860,10 @@ index d565a469639..837d192afb3 100644
  #if !V8_TARGET_ARCH_ARM64
 diff --git a/deps/v8/src/compiler/backend/riscv64/code-generator-riscv64.cc b/deps/v8/src/compiler/backend/riscv64/code-generator-riscv64.cc
 new file mode 100644
-index 00000000000..522647a925f
+index 00000000000..228462bfdb1
 --- /dev/null
 +++ b/deps/v8/src/compiler/backend/riscv64/code-generator-riscv64.cc
-@@ -0,0 +1,2779 @@
+@@ -0,0 +1,2780 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -17158,12 +17158,12 @@ index 00000000000..522647a925f
 +
 +void EmitWordLoadPoisoningIfNeeded(CodeGenerator* codegen,
 +                                   InstructionCode opcode, Instruction* instr,
-+                                   RiscvOperandConverter const& i) {
++                                   RiscvOperandConverter& i) {
 +  const MemoryAccessMode access_mode =
 +      static_cast<MemoryAccessMode>(MiscField::decode(instr->opcode()));
 +  if (access_mode == kMemoryAccessPoisoned) {
 +    Register value = i.OutputRegister();
-+    codegen->tasm()->AndP(value, kSpeculationPoisonRegister);
++    codegen->tasm()->And(value, value, kSpeculationPoisonRegister);
 +  }
 +}
 +
@@ -18777,7 +18777,8 @@ index 00000000000..522647a925f
 +    //  lhs_register = i.TempRegister(0);
 +    //  __ Sub64(lhs_register, sp, offset);
 +    //}
-+    __ Branch(tlabel, cc, lhs_register, Operand(i.InputRegister(0)));
++    //__ Branch(tlabel, cc, lhs_register, Operand(i.InputRegister(0)));
++    __ Branch(tlabel, cc, sp, Operand(i.InputRegister(0)));
 +  } else if (instr->arch_opcode() == kRiscvCmpS ||
 +             instr->arch_opcode() == kRiscvCmpD) {
 +    bool predicate;
@@ -21683,10 +21684,10 @@ index 00000000000..fdc13469026
 +}  // namespace v8
 diff --git a/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc b/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc
 new file mode 100644
-index 00000000000..90376ff1b16
+index 00000000000..f84ff026b08
 --- /dev/null
 +++ b/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc
-@@ -0,0 +1,3011 @@
+@@ -0,0 +1,3010 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -24304,7 +24305,6 @@ index 00000000000..90376ff1b16
 +  V(I16x8SConvertI8x16High, kRiscvI16x8SConvertI8x16High)   \
 +  V(I16x8UConvertI8x16Low, kRiscvI16x8UConvertI8x16Low)     \
 +  V(I16x8UConvertI8x16High, kRiscvI16x8UConvertI8x16High)   \
-+  V(I16x8Abs, kRiscvI16x8Abs)                               \
 +  V(I8x16Neg, kRiscvI8x16Neg)                               \
 +  V(S128Not, kRiscvS128Not)
 +
@@ -31673,10 +31673,10 @@ index e0bc4b8e323..a46a9ba196d 100644
  #endif
 diff --git a/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.cc b/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.cc
 new file mode 100644
-index 00000000000..7882d3b978b
+index 00000000000..75bdb09e280
 --- /dev/null
 +++ b/deps/v8/src/regexp/riscv64/regexp-macro-assembler-riscv64.cc
-@@ -0,0 +1,1289 @@
+@@ -0,0 +1,1293 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -31835,6 +31835,7 @@ index 00000000000..7882d3b978b
 +
 +void RegExpMacroAssemblerRISCV::Backtrack() {
 +  CheckPreemption();
++  /*
 +  if (has_backtrack_limit()) {
 +    Label next;
 +    __ Ld(a0, MemOperand(frame_pointer(), kBacktrackCount));
@@ -31852,6 +31853,7 @@ index 00000000000..7882d3b978b
 +
 +    __ bind(&next);
 +  }
++  */
 +  // Pop Code offset from backtrack stack, add Code and jump to location.
 +  Pop(a0);
 +  __ Add64(a0, a0, code_pointer());
@@ -32015,10 +32017,11 @@ index 00000000000..7882d3b978b
 +    {
 +      AllowExternalCallThatCantCauseGC scope(masm_);
 +      ExternalReference function =
-+          unicode ? ExternalReference::re_case_insensitive_compare_unicode(
-+                        isolate())
-+                  : ExternalReference::re_case_insensitive_compare_non_unicode(
-+                        isolate());
++          ExternalReference::re_case_insensitive_compare_uc16(masm_->isolate());
++          //unicode ? ExternalReference::re_case_insensitive_compare_unicode(
++          //              isolate())
++          //        : ExternalReference::re_case_insensitive_compare_non_unicode(
++          //              isolate());
 +      __ CallCFunction(function, argument_count);
 +    }
 +
@@ -32590,21 +32593,22 @@ index 00000000000..7882d3b978b
 +      __ jmp(&return_a0);
 +    }
 +
-+    if (fallback_label_.is_linked()) {
-+      __ bind(&fallback_label_);
-+      __ li(a0, Operand(FALLBACK_TO_EXPERIMENTAL));
-+      __ jmp(&return_a0);
-+    }
++    //if (fallback_label_.is_linked()) {
++    //  __ bind(&fallback_label_);
++    //  __ li(a0, Operand(FALLBACK_TO_EXPERIMENTAL));
++    //  __ jmp(&return_a0);
++    //}
 +  }
 +
 +  CodeDesc code_desc;
 +  masm_->GetCode(isolate(), &code_desc);
 +  Handle<Code> code =
-+      Factory::CodeBuilder(isolate(), code_desc, CodeKind::REGEXP)
++      Factory::CodeBuilder(isolate(), code_desc, Code::REGEXP)
 +          .set_self_reference(masm_->CodeObject())
 +          .Build();
 +  LOG(masm_->isolate(),
-+      RegExpCodeCreateEvent(Handle<AbstractCode>::cast(code), source));
++      //RegExpCodeCreateEvent(Handle<AbstractCode>::cast(code), source));
++      RegExpCodeCreateEvent(AbstractCode::cast(*code), *source));
 +  return Handle<HeapObject>::cast(code);
 +}
 +
