@@ -20619,6 +20619,7 @@ on Dired and image-mode.")
        (sha256
         (base32 "125a49ibbaicp6kxv0ja9mz9paryqgz30xhl0pk3kvnm8z40hlr6"))))
     (build-system emacs-build-system)
+    (arguments (list #:tests? #f))      ; no tests
     (home-page "https://github.com/purcell/diredfl/")
     (synopsis "Extra Emacs font lock rules for a more colourful Dired")
     (description "This library enables additional font locking in Dired mode.
