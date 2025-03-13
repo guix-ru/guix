@@ -32629,6 +32629,10 @@ or a window into some windows according to a layout recipe.")
                   "12midsrx07pdrsr1qbl2rpi7xyhxqx08bkz7n7gf8vsmqkpfp56s"))
                 (file-name (git-file-name name version))))
       (build-system emacs-build-system)
+      (arguments (list #:test-command
+                       #~(list "emacs" "--batch" "-L" "."
+                               "-l" "test-e2wm-pst-class.el"
+                               "-f" "ert-run-tests-batch-and-exit")))
       (propagated-inputs
        (list emacs-window-layout))
       (synopsis "Equilibrium Emacs Window Manager")
