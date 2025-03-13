@@ -16459,6 +16459,7 @@ much easier.")
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-elfeed))
+    (native-inputs (list emacs-ert-runner))
     (home-page "https://github.com/fasheng/elfeed-protocol")
     (synopsis "Fever/NewsBlur/ownCloud/tt-RSS protocols for Elfeed")
     (description
