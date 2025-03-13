@@ -25596,6 +25596,7 @@ match your personal coding style.")
     (build-system emacs-build-system)
     (arguments
      `(#:lisp-directory "lisp"
+       #:tests? #f                      ; no tests
        #:phases
        (modify-phases %standard-phases
          (add-before 'install 'make-info
