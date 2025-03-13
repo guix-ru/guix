@@ -39629,6 +39629,7 @@ state to and restoring it from a file, with auto-saving and backups.")
        (sha256
         (base32 "1afy2f1ymzr518npbhy5296kaqshax5hs2ij7wgl28h0hsa2mnk1"))))
     (build-system emacs-build-system)
+    (arguments (list #:tests? #f))      ; no tests
     (propagated-inputs
      (list emacs-company))
     (home-page "https://codeberg.org/egirl/company-emoji")
