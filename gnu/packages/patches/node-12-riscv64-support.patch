@@ -482,10 +482,10 @@ index 8ae89187ecb..aa74f6d4aac 100644
  }  // namespace internal
 diff --git a/deps/v8/src/builtins/riscv64/builtins-riscv64.cc b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
 new file mode 100644
-index 00000000000..e389b211000
+index 00000000000..5b777640fd0
 --- /dev/null
 +++ b/deps/v8/src/builtins/riscv64/builtins-riscv64.cc
-@@ -0,0 +1,3332 @@
+@@ -0,0 +1,3386 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -2840,6 +2840,60 @@ index 00000000000..e389b211000
 +  {
 +    // Overwrite the original receiver with the (original) target.
 +    __ StoreReceiver(a1, a0, kScratchReg);
++    // Let the "call_as_constructor_delegate" take care of the rest.
++    __ LoadNativeContextSlot(Context::CALL_AS_CONSTRUCTOR_DELEGATE_INDEX, a1);
++    __ Jump(masm->isolate()->builtins()->CallFunction(),
++            RelocInfo::CODE_TARGET);
++  }
++
++  // Called Construct on an Object that doesn't have a [[Construct]] internal
++  // method.
++  __ bind(&non_constructor);
++  __ Jump(BUILTIN_CODE(masm->isolate(), ConstructedNonConstructable),
++          RelocInfo::CODE_TARGET);
++}
++
++// YOLO copy from mips
++// static
++void Builtins::Generate_Construct(MacroAssembler* masm) {
++  // ----------- S t a t e -------------
++  //  -- a0 : the number of arguments (not including the receiver)
++  //  -- a1 : the constructor to call (can be any Object)
++  //  -- a3 : the new target (either the same as the constructor or
++  //          the JSFunction on which new was invoked initially)
++  // -----------------------------------
++
++  // Check if target is a Smi.
++  Label non_constructor, non_proxy;
++  __ JumpIfSmi(a1, &non_constructor);
++
++  // Check if target has a [[Construct]] internal method.
++  __ lw(t1, FieldMemOperand(a1, HeapObject::kMapOffset));
++  __ lbu(t3, FieldMemOperand(t1, Map::kBitFieldOffset));
++  __ And(t3, t3, Operand(Map::IsConstructorBit::kMask));
++  __ Branch(&non_constructor, eq, t3, Operand(zero_reg));
++
++  // Dispatch based on instance type.
++  __ lhu(t2, FieldMemOperand(t1, Map::kInstanceTypeOffset));
++  __ Jump(BUILTIN_CODE(masm->isolate(), ConstructFunction),
++          RelocInfo::CODE_TARGET, eq, t2, Operand(JS_FUNCTION_TYPE));
++
++  // Only dispatch to bound functions after checking whether they are
++  // constructors.
++  __ Jump(BUILTIN_CODE(masm->isolate(), ConstructBoundFunction),
++          RelocInfo::CODE_TARGET, eq, t2, Operand(JS_BOUND_FUNCTION_TYPE));
++
++  // Only dispatch to proxies after checking whether they are constructors.
++  __ Branch(&non_proxy, ne, t2, Operand(JS_PROXY_TYPE));
++  __ Jump(BUILTIN_CODE(masm->isolate(), ConstructProxy),
++          RelocInfo::CODE_TARGET);
++
++  // Called Construct on an exotic Object with a [[Construct]] internal method.
++  __ bind(&non_proxy);
++  {
++    // Overwrite the original receiver with the (original) target.
++    __ Lsa(kScratchReg, sp, a0, kPointerSizeLog2);
++    __ sw(a1, MemOperand(kScratchReg));
 +    // Let the "call_as_constructor_delegate" take care of the rest.
 +    __ LoadNativeContextSlot(Context::CALL_AS_CONSTRUCTOR_DELEGATE_INDEX, a1);
 +    __ Jump(masm->isolate()->builtins()->CallFunction(),
@@ -21684,10 +21738,10 @@ index 00000000000..fdc13469026
 +}  // namespace v8
 diff --git a/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc b/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc
 new file mode 100644
-index 00000000000..9128ca0e8e2
+index 00000000000..0bcaf2b4c36
 --- /dev/null
 +++ b/deps/v8/src/compiler/backend/riscv64/instruction-selector-riscv64.cc
-@@ -0,0 +1,2990 @@
+@@ -0,0 +1,3005 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -23247,6 +23301,8 @@ index 00000000000..9128ca0e8e2
 +
 +bool InstructionSelector::IsTailCallAddressImmediate() { return false; }
 +
++int InstructionSelector::GetTempsCountForTailCallFromJSFunction() { return 3; }
++
 +void InstructionSelector::VisitUnalignedLoad(Node* node) {
 +  LoadRepresentation load_rep = LoadRepresentationOf(node->op());
 +  RiscvOperandGenerator g(this);
@@ -24302,7 +24358,13 @@ index 00000000000..9128ca0e8e2
 +  V(I16x8UConvertI8x16Low, kRiscvI16x8UConvertI8x16Low)     \
 +  V(I16x8UConvertI8x16High, kRiscvI16x8UConvertI8x16High)   \
 +  V(I8x16Neg, kRiscvI8x16Neg)                               \
-+  V(S128Not, kRiscvS128Not)
++  V(S128Not, kRiscvS128Not)                                 \
++  V(S1x4AnyTrue, kRiscv64S1x4AnyTrue)                       \
++  V(S1x4AllTrue, kRiscv64S1x4AllTrue)                       \
++  V(S1x8AnyTrue, kRiscv64S1x8AnyTrue)                       \
++  V(S1x8AllTrue, kRiscv64S1x8AllTrue)                       \
++  V(S1x16AnyTrue, kRiscv64S1x16AnyTrue)                     \
++  V(S1x16AllTrue, kRiscv64S1x16AllTrue)
 +
 +#define SIMD_SHIFT_OP_LIST(V) \
 +  V(I32x4Shl)                 \
@@ -24342,8 +24404,12 @@ index 00000000000..9128ca0e8e2
 +  V(I32x4GtU, kRiscvI32x4GtU)                           \
 +  V(I32x4GeU, kRiscvI32x4GeU)                           \
 +  V(I16x8Add, kRiscvI16x8Add)                           \
++  V(I16x8AddSaturateS, kRiscv64I16x8AddSaturateS)       \
++  V(I16x8AddSaturateU, kRiscv64I16x8AddSaturateU)       \
 +  V(I16x8AddHoriz, kRiscvI16x8AddHoriz)                 \
 +  V(I16x8Sub, kRiscvI16x8Sub)                           \
++  V(I16x8SubSaturateS, kRiscv64I16x8SubSaturateS)       \
++  V(I16x8SubSaturateU, kRiscv64I16x8SubSaturateU)       \
 +  V(I16x8Mul, kRiscvI16x8Mul)                           \
 +  V(I16x8MaxS, kRiscvI16x8MaxS)                         \
 +  V(I16x8MinS, kRiscvI16x8MinS)                         \
@@ -24358,7 +24424,11 @@ index 00000000000..9128ca0e8e2
 +  V(I16x8SConvertI32x4, kRiscvI16x8SConvertI32x4)       \
 +  V(I16x8UConvertI32x4, kRiscvI16x8UConvertI32x4)       \
 +  V(I8x16Add, kRiscvI8x16Add)                           \
++  V(I8x16AddSaturateS, kRiscv64I8x16AddSaturateS)       \
++  V(I8x16AddSaturateU, kRiscv64I8x16AddSaturateU)       \
 +  V(I8x16Sub, kRiscvI8x16Sub)                           \
++  V(I8x16SubSaturateS, kRiscv64I8x16SubSaturateS)       \
++  V(I8x16SubSaturateU, kRiscv64I8x16SubSaturateU)       \
 +  V(I8x16Mul, kRiscvI8x16Mul)                           \
 +  V(I8x16MaxS, kRiscvI8x16MaxS)                         \
 +  V(I8x16MinS, kRiscvI8x16MinS)                         \
@@ -24418,6 +24488,7 @@ index 00000000000..9128ca0e8e2
 +//SIMD_VISIT_EXTRACT_LANE(F64x2, )
 +SIMD_VISIT_EXTRACT_LANE(F32x4, )
 +SIMD_VISIT_EXTRACT_LANE(I32x4, )
++SIMD_VISIT_EXTRACT_LANE(I16x8, )
 +//SIMD_VISIT_EXTRACT_LANE(I16x8, U)
 +//SIMD_VISIT_EXTRACT_LANE(I16x8, S)
 +//SIMD_VISIT_EXTRACT_LANE(I8x16, U)
@@ -24534,8 +24605,7 @@ index 00000000000..9128ca0e8e2
 +
 +}  // namespace
 +
-+/*
-+void InstructionSelector::VisitI8x16Shuffle(Node* node) {
++void InstructionSelector::VisitS8x16Shuffle(Node* node) {
 +  uint8_t shuffle[kSimd128Size];
 +  bool is_swizzle;
 +  CanonicalizeShuffle(node, shuffle, &is_swizzle);
@@ -24569,7 +24639,7 @@ index 00000000000..9128ca0e8e2
 +       g.UseImmediate(wasm::SimdShuffle::Pack4Lanes(shuffle + 12)));
 +}
 +
-+void InstructionSelector::VisitI8x16Swizzle(Node* node) {
++void InstructionSelector::VisitS8x16Swizzle(Node* node) {
 +  RiscvOperandGenerator g(this);
 +  InstructionOperand temps[] = {g.TempSimd128Register()};
 +  // We don't want input 0 or input 1 to be the same as output, since we will
@@ -24578,7 +24648,6 @@ index 00000000000..9128ca0e8e2
 +       g.UseUniqueRegister(node->InputAt(0)),
 +       g.UseUniqueRegister(node->InputAt(1)), arraysize(temps), temps);
 +}
-+*/
 +
 +void InstructionSelector::VisitSignExtendWord8ToInt32(Node* node) {
 +  RiscvOperandGenerator g(this);
@@ -24780,10 +24849,10 @@ index 00000000000..b2923001509
 +#endif  // V8_TARGET_ARCH_RISCV64
 diff --git a/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc b/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc
 new file mode 100644
-index 00000000000..58b52b3c2a7
+index 00000000000..c2957e5c366
 --- /dev/null
 +++ b/deps/v8/src/deoptimizer/riscv64/deoptimizer-riscv64.cc
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,52 @@
 +// Copyright 2021 the V8 project authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -24805,6 +24874,14 @@ index 00000000000..58b52b3c2a7
 +const int Deoptimizer::kEagerWithResumeImmedArgs2PcOffset =
 +    kInstrSize + kSystemPointerSize;
 +*/
++
++// YOLO try to skip this
++
++void Deoptimizer::GenerateDeoptimizationEntries(MacroAssembler* masm,
++                                                Isolate* isolate,
++                                                DeoptimizeKind deopt_kind) {
++  UNREACHABLE();
++}
 +
 +Float32 RegisterValues::GetFloatRegister(unsigned n) const {
 +  return Float32::FromBits(
