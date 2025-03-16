@@ -36821,6 +36821,7 @@ it forcibly
     (arguments
      (list
       #:emacs emacs-no-x                ;need libxml support
+      #:tests? #f                       ;no tests
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'install 'build-doc
