@@ -28427,7 +28427,15 @@ their meaning for the current Emacs major-mode.")
         #:include #~(cons* "org-ref.org" "org-ref.bib" %default-include)
         #:exclude #~(list
                      ;; author doesn't recommend using it
-                     "org-ref-pdf.el")))
+                     "org-ref-pdf.el")
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'check 'skip-failing-test
+              (lambda _
+                (substitute* "test/all-org-test.el"
+                  (("\\(ert-deftest preprocess .*" all)
+                   (string-append all
+                                  " (skip-unless (libxml-available-p))"))))))))
       (propagated-inputs
        (list emacs-avy
              emacs-citeproc-el
@@ -28440,6 +28448,7 @@ their meaning for the current Emacs major-mode.")
              emacs-parsebib
              emacs-request
              emacs-s))
+      (native-inputs (list emacs-ert-runner))
       (home-page "https://github.com/jkitchin/org-ref")
       (synopsis "Citations, cross-references and bibliographies in Org mode")
       (description
