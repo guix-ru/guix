@@ -17098,6 +17098,8 @@ behavior very similar to that of Python mode.")
                (base32
                 "16fb4r3vq8xkzl911v7gaky95w1agfxjlpaxpjmidwx48rbcar59"))))
     (build-system emacs-build-system)
+    (arguments (list #:test-command #~(list "ert-runner" "tests")))
+    (native-inputs (list emacs-ert-runner))
     (propagated-inputs
      (list emacs-yaml-mode))
     (home-page "https://gitlab.com/joewreschnig/gitlab-ci-mode/")
