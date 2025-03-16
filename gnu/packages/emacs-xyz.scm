@@ -22442,6 +22442,7 @@ with Eglot.")
       (arguments
        (list
         #:emacs emacs                   ;requires gnutls
+        #:test-command #~(list "ert-runner" "tests")
         #:phases
         #~(modify-phases %standard-phases
             (add-after 'build 'make-info
@@ -22449,7 +22450,7 @@ with Eglot.")
                 (invoke "makeinfo" "jabber.texi")
                 (install-file "jabber.info"
                               (string-append #$output "/share/info")))))))
-      (native-inputs (list texinfo))
+      (native-inputs (list emacs-ert-runner texinfo))
       (propagated-inputs (list emacs-fsm emacs-hexrgb emacs-srv gnutls))
       (home-page "https://codeberg.org/emacs-jabber/emacs-jabber")
       (synopsis "XMPP (Jabber) client for Emacs")
