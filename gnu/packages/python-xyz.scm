@@ -15336,7 +15336,7 @@ Python style, together with a fast and comfortable execution environment.")
   (package
     (inherit snakemake-6)
     (name "snakemake")
-    (version "7.7.0")
+    (version "7.32.4")
     (source
      (origin
        (method git-fetch)
@@ -15345,10 +15345,20 @@ Python style, together with a fast and comfortable execution environment.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1qrqbmx4cbis0wxr6dl2rdjv9v627sbirsz6v5c31vlbqwkvs04q"))))
+        (base32 "1d5hizai89k1glfqfkvf1ghj0l7wm8il6gl5pfwk2gkza87yka6d"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      #:test-flags
+      ;; This test attempts to change S3 buckets on AWS and fails
+      ;; because there are no AWS credentials.
+      '(list "--ignore=tests/test_tibanna.py"
+             ;; It's a similar story with this test, which requires access to
+             ;; the Google Storage service.
+             "--ignore=tests/test_google_lifesciences.py"
+             "--ignore-glob=tests/test_conda_python_3_7_script/*"
+             ;; We don't have a slurm installation in the build environment
+             "--ignore=tests/test_slurm.py")
       #:phases
       #~(modify-phases %standard-phases
           ;; For cluster execution Snakemake will call Python.  Since there is
@@ -15377,12 +15387,6 @@ Python style, together with a fast and comfortable execution environment.")
                  (string-append
                   "tibanna_args.command = command.replace('"
                   #$output "/bin/snakemake', 'python3 -m snakemake')")))))
-          ;; No longer needed with 7.15.2+
-          (add-after 'unpack 'tabulate-compatibility
-            (lambda _
-              (substitute* "snakemake/dag.py"
-                (("\"job\": rule,")
-                 "\"job\": rule.name,"))))
           (add-after 'unpack 'patch-version
             (lambda _
               (substitute* "setup.py"
@@ -15391,17 +15395,8 @@ Python style, together with a fast and comfortable execution environment.")
               (substitute* '("snakemake/_version.py"
                              "versioneer.py")
                 (("0\\+unknown") #$version))))
-          (replace 'check
-            (lambda* (#:key tests? #:allow-other-keys)
-              (when tests?
-                (setenv "HOME" "/tmp")
-                ;; This test attempts to change S3 buckets on AWS and fails
-                ;; because there are no AWS credentials.
-                (delete-file "tests/test_tibanna.py")
-                ;; It's a similar story with this test, which requires access
-                ;; to the Google Storage service.
-                (delete-file "tests/test_google_lifesciences.py")
-                (invoke "pytest")))))))
+          (add-before 'check 'pre-check
+            (lambda _ (setenv "HOME" "/tmp"))))))
     (propagated-inputs
      (list python-appdirs
            python-configargparse
@@ -15410,6 +15405,7 @@ Python style, together with a fast and comfortable execution environment.")
            python-docutils
            python-filelock
            python-gitpython
+           python-humanfriendly
            python-jinja2
            python-jsonschema
            python-nbformat
@@ -15418,12 +15414,13 @@ Python style, together with a fast and comfortable execution environment.")
            python-pulp
            python-pyyaml
            python-py-tes
-           python-ratelimiter
            python-requests
            python-retry
+           python-reretry
            python-smart-open
            python-stopit
            python-tabulate
+           python-throttler
            python-toposort
            python-wrapt
            python-yte))
