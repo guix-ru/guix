@@ -1534,6 +1534,7 @@ ing, and tagging large collections of email messages.")
     (arguments
      (list
       #:lisp-directory "emacs"
+      #:tests? #f ; Tests are run in the parent package.
       #:exclude #~(cons* "make-deps.el" "rstdoc.el" %default-exclude)
       #:include #~(cons* "notmuch-logo.svg" %default-include)
       #:phases
