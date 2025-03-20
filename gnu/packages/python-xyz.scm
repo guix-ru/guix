@@ -9631,6 +9631,12 @@ include_dirs = ~:*~a/include~%"
                                      `(" and not test_identityless_reduction_huge_array"
                                        " and not (TestKind and test_all)")
                                    '())
+                              ;; This test fails with a Fortran failure (16
+                              ;; expected but got -1), due to the fact that it
+                              ;; requires a 64-bit system.
+                              #$@(if (or (target-x86-32?) (target-arm32?))
+                                     `(" and not test_int")
+                                     '())
                               ;; This test fails when building from aarch64-linux.
                               #$@(if (target-arm32?)
                                    `(" and not test_features")
