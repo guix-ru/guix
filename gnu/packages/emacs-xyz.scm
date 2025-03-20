@@ -40984,6 +40984,7 @@ comfortable presentation.")
     (build-system emacs-build-system)
     (arguments
      (list
+      #:tests? #f  ; No tests.
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'convert-encoding
