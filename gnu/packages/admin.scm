@@ -137,7 +137,7 @@
   #:use-module (gnu packages debian)
   #:use-module (gnu packages dns)
   #:use-module (gnu packages elf)
-  #:use-module (gnu packages emacs-xyz) ; for emacs-ert-runner
+  #:use-module (gnu packages emacs-build) ; for emacs-ert-runner
   #:use-module (gnu packages file)
   #:use-module (gnu packages flex)
   #:use-module (gnu packages fonts)
