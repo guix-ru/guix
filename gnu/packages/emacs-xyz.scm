@@ -42884,6 +42884,8 @@ tools from major vendors.")
                  (base32
                   "13sfwv889i99l5zv10ibzm221wvwbp3m45nf4nsr0dhvln90zrjj"))))
       (build-system emacs-build-system)
+      (arguments
+       (list #:tests? #f)) ; No tests.
       (propagated-inputs (list emacs-flim-lb))
       (inputs (list emacs-bbdb-vcard))
       (home-page "https://www.emacswiki.org/emacs/WanderLust")
