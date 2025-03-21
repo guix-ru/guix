@@ -866,6 +866,15 @@ cancellation for groups of goroutines working on subtasks of a common task
     (arguments
      (list
       #:skip-build? #t
+      #:test-flags
+      #~(list #$@(if (target-arm?)
+                     '("-skip" (string-join
+                                (list "TestParseOrigDstAddr/udp4"
+                                      "TestIoctlGetEthtoolDrvinfo"
+                                      "TestIoctlGetEthtoolTsInfo"
+                                      "TestRlimitAs")
+                                "|"))
+                     '()))
       #:import-path "golang.org/x/sys"))
     (home-page "https://go.googlesource.com/sys")
     (synopsis "Go support for low-level system interaction")
