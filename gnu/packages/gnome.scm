@@ -1940,7 +1940,7 @@ either on a local, or remote machine via a number of methods.")
            flex
            gettext-minimal
            `(,glib "bin")
-           googletest
+           googletest-1.12
            `(,gtk+ "bin")
            itstool
            pkg-config

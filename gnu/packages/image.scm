@@ -2904,7 +2904,7 @@ Format) file format decoder and encoder.")
                         (string-append a "\n#include <atomic>")))))))
              '())))
     (native-inputs
-     (list asciidoc doxygen googletest pkg-config python))))
+     (list asciidoc doxygen googletest-1.8 pkg-config python))))
 
 (define-public mtpaint
   (package

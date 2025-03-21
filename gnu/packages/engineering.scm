@@ -4522,7 +4522,7 @@ facilitate the communication between Cura and its backend and similar code.")
         (base32 "0xp2r0m5wwfsh9wdb3biqzvfqfz5jsmyw4bww93aksw0rgli07bp"))))
     (build-system cmake-build-system)
     (native-inputs
-     (list googletest pkg-config))
+     (list googletest-1.13 pkg-config))
     (inputs
      (list libarcus protobuf stb-image))
     (arguments
