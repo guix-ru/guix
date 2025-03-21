@@ -1416,7 +1416,7 @@ be built as a stand-alone REPL interpreter.")
            ed
            inetutils         ;for hostname(1)
            texinfo
-           (texlive-updmap.cfg (list texlive-texinfo))
+           (texlive-local-tree (list texlive-texinfo))
            which))
     (inputs
      (list bash-minimal
