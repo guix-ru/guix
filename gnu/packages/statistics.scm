@@ -710,6 +710,16 @@ also flexible enough to handle most nonstandard requirements.")
          "189q5dlghkj0i8v526d9adv4z3mm1c9iya041aysyb2f9vqbpjm2"))))
     (properties `((upstream-name . "Matrix")))
     (build-system r-build-system)
+    (arguments
+     (list
+      #:phases
+      (if (or (target-x86-32?) (target-arm32?))
+          '(modify-phases %standard-phases
+             (add-after 'unpack 'disable-bad-tests
+               (lambda _
+                 ;; Some of these tests fail on 32 bit architectures.
+                 (delete-file "tests/matprod.R"))))
+          '%standard-phases)))
     (propagated-inputs
      (list r-lattice))
     (native-inputs (list r-mass))
