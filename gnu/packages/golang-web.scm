@@ -8124,7 +8124,11 @@ ObjectStorage, PHY, etc.).")
                      "TestMsglvlGet"
                      "TestStats"
                      "TestDriverName"
-                     "TestBusInfo")
+                     "TestBusInfo"
+                     #$@(if (target-arm?)
+                            ;; Inappropriate ioctl for device.
+                            '("TestFeatures")
+                            '()))
                "|"))))
     (propagated-inputs
      (list go-golang-org-x-sys))
