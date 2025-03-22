@@ -1356,6 +1356,7 @@ when typing parentheses directly or commenting out code line by line.")
                  (base32
                   "1ns2r6nwakdnzjiq84qqzn85wwahc0k738awx9kxn9p0q2prpx5j"))))
       (build-system emacs-build-system)
+      (arguments (list #:tests? #f))    ; no actual tests
       (propagated-inputs (list emacs-with-editor))
       (home-page "https://github.com/AmaiKinono/puni")
       (synopsis "Emacs minor mode for structured editing")
