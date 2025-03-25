@@ -16,6 +16,7 @@
 ;;; Copyright © 2023 muradm <mail@muradm.net>
 ;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2024 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2025 Ian Eure <ian@retrospec.tv>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -43,6 +44,7 @@
   #:use-module (gnu system privilege)
   #:use-module (gnu services base)
   #:use-module (gnu services dbus)
+  #:use-module (gnu services desktop)
   #:use-module (gnu packages base)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages xorg)
@@ -209,6 +211,34 @@
   (server-arguments xorg-configuration-server-arguments ;list of strings
                     (default %default-xorg-server-arguments)))
 
+(define merge-xorg-configurations
+  (case-lambda*
+   (() (xorg-configuration))
+   ((a) a)
+   ((#:rest configs)
+    (let ((configs (reverse configs)))         ; Prefer later configurations.
+      (xorg-configuration
+       (modules (append-map xorg-configuration-modules configs))
+       (fonts (append-map xorg-configuration-fonts configs))
+       (drivers (append-map xorg-configuration-drivers configs))
+       (resolutions (append-map xorg-configuration-resolutions configs))
+       (extra-config (append-map xorg-configuration-extra-config configs))
+       ;; Prefer the more recently set layout.
+       (keyboard-layout (find xorg-configuration-keyboard-layout configs))
+
+       ;; Prefer the last non-default server.
+       (server
+        (or (find (lambda (server) (not (eq? xorg-server server)))
+                  (map xorg-configuration-server configs))
+            xorg-server))
+
+       ;; Prefer the last non-default arguments.
+       (server-arguments
+        (or
+         (find (lambda (config) (not (eq? %default-xorg-server-arguments server)))
+               (map xorg-configuration-server-arguments configs))
+         %default-xorg-server-arguments)))))))
+
 (define (xorg-configuration->file config)
   "Compute an Xorg configuration file corresponding to CONFIG, an
 <xorg-configuration> record."
@@ -227,7 +257,7 @@
           (call-with-output-file #$output
             (lambda (port)
               (define drivers
-                '#$(xorg-configuration-drivers config))
+                (delete-duplicates '#$(xorg-configuration-drivers config)))
 
               (define (device-section driver)
                 (string-append "
@@ -247,7 +277,7 @@ Section \"Screen\"
                       ((x y)
                        (string-append "\"" (number->string x)
                                       "x" (number->string y) "\"")))
-                    resolutions)) "
+                    (delete-duplicates resolutions))) "
   EndSubSection
 EndSection"))
 
@@ -294,7 +324,7 @@ EndSection\n"))
               (display "Section \"Files\"\n" port)
               (for-each (lambda (font)
                           (format port "  FontPath \"~a\"~%" font))
-                        '#$(xorg-configuration-fonts config))
+                        (delete-duplicates '#$(xorg-configuration-fonts config)))
               (for-each (lambda (module)
                           (format port
                                   "  ModulePath \"~a\"~%"
@@ -315,7 +345,7 @@ EndSection\n" port)
               (newline port)
               (display (string-join
                         (map (cut screen-section <>
-                                  '#$(xorg-configuration-resolutions config))
+                                  (delete-duplicates '#$(xorg-configuration-resolutions config)))
                              drivers)
                         "\n")
                        port)
@@ -335,7 +365,8 @@ EndSection\n" port)
                   (newline port)))
 
               (for-each (lambda (config)
-                          (display config port))
+                          (display config port)
+                          (newline port))
                         '#$(xorg-configuration-extra-config config))))))
 
     (computed-file "xserver.conf" build)))
@@ -632,10 +663,7 @@ a `service-extension', as used by `set-xorg-configuration'."
     ((_ configuration-record service-type-definition)
      (service-type
        (inherit service-type-definition)
-       (compose (lambda (extensions)
-                  (match extensions
-                    (() #f)
-                    ((config . _) config))))
+       (compose merge-xorg-configurations)
        (extend (lambda (config xorg-configuration)
                  (if xorg-configuration
                      (configuration-record
