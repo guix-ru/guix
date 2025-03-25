@@ -14425,6 +14425,7 @@ Needleman-Wunsch).")
            (lambda _ (chdir "pairadise")))
          (add-before 'build '2to3
            (lambda _ (invoke "2to3" "--write" "--nobackups" "."))))))
+    (native-inputs (list python-setuptools python-wheel))
     (inputs (list star))
     (propagated-inputs (list python-pysam))
     (home-page "https://github.com/Xinglab/PAIRADISE")
