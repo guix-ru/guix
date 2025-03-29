@@ -5137,7 +5137,7 @@ as a library for other Emacs packages.")
                   (invoke "pdftex" "tex-ref")
                   (install-file "tex-ref.pdf" doc-dir))))))))
     (native-inputs
-     (list perl (texlive-updmap.cfg)))
+     (list perl (texlive-local-tree)))
     (inputs
      (list ghostscript))
     (home-page "https://www.gnu.org/software/auctex/")
