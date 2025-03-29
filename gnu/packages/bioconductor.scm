@@ -23010,7 +23010,7 @@ different graph related packages produced by Bioconductor.")
     (native-inputs
      (list ghostscript
            r-biocgenerics r-knitr r-runit
-           (texlive-updmap.cfg
+           (texlive-local-tree
             (list texlive-bera
                   texlive-booktabs
                   texlive-caption

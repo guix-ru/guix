@@ -421,7 +421,7 @@ graphs in Graphviz's DOT language, written in pure Python.")
                         "-k" "not test_semicolon")))))))
     (native-inputs
      (list python-pytest
-           (texlive-updmap.cfg
+           (texlive-local-tree
             (list texlive-pgf
                   texlive-preview
                   texlive-pstricks
