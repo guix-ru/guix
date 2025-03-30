@@ -26752,8 +26752,33 @@ is defined in the HTML specification.")
     (description "This package provides a fast floating-point number parser.")
     (license (list license:expat license:asl2.0))))
 
+(define-public rust-faster-hex-0.10
+  (package
+    (name "rust-faster-hex")
+    (version "0.10.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "faster-hex" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "0wzvv4a1czxfxmh99cza2y0jps97hm3k1j6r6cs816qp5wnsw8vj"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-serde" ,rust-serde-1))
+       #:cargo-development-inputs (("rust-bytes" ,rust-bytes-1)
+                                   ("rust-criterion" ,rust-criterion-0.5)
+                                   ("rust-heapless" ,rust-heapless-0.8)
+                                   ("rust-hex" ,rust-hex-0.3)
+                                   ("rust-rustc-hex" ,rust-rustc-hex-1))))
+    (home-page "https://github.com/NervosFoundation/faster-hex")
+    (synopsis "Fast hex encoding")
+    (description "Fast hex encoding.")
+    (license license:expat)))
+
 (define-public rust-faster-hex-0.9
   (package
+    (inherit rust-faster-hex-0.10)
     (name "rust-faster-hex")
     (version "0.9.0")
     (source
@@ -26772,11 +26797,7 @@ is defined in the HTML specification.")
                                    ("rust-proptest" ,rust-proptest-1)
                                    ("rust-rustc-hex" ,rust-rustc-hex-1)
                                    ("rust-serde" ,rust-serde-1)
-                                   ("rust-serde-json" ,rust-serde-json-1))))
-    (home-page "https://github.com/NervosFoundation/faster-hex")
-    (synopsis "Fast hex encoding")
-    (description "Fast hex encoding.")
-    (license license:expat)))
+                                   ("rust-serde-json" ,rust-serde-json-1))))))
 
 (define-public rust-faster-hex-0.8
   (package
