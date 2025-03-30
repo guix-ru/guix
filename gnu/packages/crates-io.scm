@@ -30463,8 +30463,34 @@ Rust.")
         ("rust-rustversion" ,rust-rustversion-1)
         ("rust-winapi" ,rust-winapi-0.3))))))
 
+(define-public rust-generic-array-1
+  (package
+    (name "rust-generic-array")
+    (version "1.2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "generic-array" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "00qpb5rxfiv5mvdb2rvqmw40h612ysvwl36car8r66ypr55l9j78"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-inputs (("rust-const-default" ,rust-const-default-1)
+                       ("rust-faster-hex" ,rust-faster-hex-0.10)
+                       ("rust-heapless" ,rust-heapless-0.8)
+                       ("rust-serde" ,rust-serde-1)
+                       ("rust-typenum" ,rust-typenum-1.17)
+                       ("rust-zeroize" ,rust-zeroize-1))
+       #:cargo-development-inputs (("rust-criterion" ,rust-criterion-0.5))))
+    (home-page "https://github.com/fizyk20/generic-array.git")
+    (synopsis "Generic types implementing functionality of arrays")
+    (description "Generic types implementing functionality of arrays.")
+    (license license:expat)))
+
 (define-public rust-generic-array-0.14
   (package
+    (inherit rust-generic-array-1)
     (name "rust-generic-array")
     (version "0.14.7")
     (source
@@ -30486,13 +30512,7 @@ Rust.")
         ("rust-zeroize" ,rust-zeroize-1))
        #:cargo-development-inputs
        (("rust-bincode" ,rust-bincode-1)
-        ("rust-serde-json" ,rust-serde-json-1))))
-    (home-page "https://github.com/fizyk20/generic-array.git")
-    (synopsis
-     "Generic types implementing functionality of arrays")
-    (description
-     "Generic types implementing functionality of arrays.")
-    (license license:expat)))
+        ("rust-serde-json" ,rust-serde-json-1))))))
 
 (define-public rust-generic-array-0.13
   (package
