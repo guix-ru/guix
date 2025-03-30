@@ -779,10 +779,12 @@ loading algorithms.")
     (build-system go-build-system)
     (arguments
      (list
+      #:skip-build? #t
       #:import-path "golang.org/x/net"
-      #:phases
-      #~(modify-phases %standard-phases
-          (delete 'build)))) ; no go files in project's root
+      #:test-flags
+      ;; Golang does not support "-race" on ARM, one test fails with error:
+      ;; ThreadSanitizer: unsupported VMA range.
+      #~(list #$@(if (target-arm?) '("-skip" "TestRace") '()))))
     (propagated-inputs
      (list go-golang-org-x-crypto
            go-golang-org-x-sys
