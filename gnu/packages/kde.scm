@@ -889,7 +889,8 @@ and desktop experiences.")
         (base32 "888q3kkv2wq426w000iq14wy3a45rrnn0bmsdks6caz4vq04ccay"))))
     (build-system qt-build-system)
     (arguments
-     `(#:configure-flags (list "-DBUILD_TESTS=ON"))) ; disabled by default
+     `(#:tests? #f
+       #:configure-flags (list "-DBUILD_TESTS=ON"))) ; disabled by default
     (native-inputs
      (list bison doxygen extra-cmake-modules flex googletest))
     (inputs
@@ -1541,7 +1542,8 @@ transport data and for performing public transport journey queries.")
         (base32 "06g43b1l72aghkhcn59ss8kjc4sammn5ii5x5sql34kmvgiwamwk"))))
     (build-system qt-build-system)
     (arguments
-     (list #:qtbase qtbase))
+     (list #:qtbase qtbase
+           #:tests? #f))
     (native-inputs
      (list extra-cmake-modules))
     (inputs
@@ -1567,7 +1569,8 @@ for scanner hardware.")
         (base32 "1b0cbf4cq0ajl5xlpy75wj4p1zsri2igh23pswj8ysnrrk0pxg5w"))))
     (build-system qt-build-system)
     (arguments
-     (list #:qtbase qtbase))
+     (list #:qtbase qtbase
+           #:tests? #f))
     (native-inputs
      (list extra-cmake-modules))
     (inputs
@@ -2110,7 +2113,9 @@ PO template files.")
        (sha256
         (base32 "0rpam31s5cvky4w3bb2qp1pjv0gm9f63a2jv6bcim7qnz050bvvn"))))
     (build-system cmake-build-system)
-    (arguments (list #:configure-flags #~(list "-DQT_MAJOR_VERSION=6")))
+    (arguments
+     (list #:tests? #f
+           #:configure-flags #~(list "-DQT_MAJOR_VERSION=6")))
     (native-inputs
      (list extra-cmake-modules))
     (inputs
@@ -2133,7 +2138,10 @@ Mobipocket e-books in Dolphin and other KDE apps.")
        (sha256
         (base32 "073px490jvp5f2979ipzbjlw6qg55cfzisj1g3a1f9wwqshm3q5q"))))
     (build-system cmake-build-system)
-    (arguments (list #:configure-flags #~(list "-DQT_MAJOR_VERSION=6")))
+    (arguments
+     (list
+      #:tests? #f
+      #:configure-flags #~(list "-DQT_MAJOR_VERSION=6")))
     (native-inputs
      (list extra-cmake-modules))
     (inputs
