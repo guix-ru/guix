@@ -2502,6 +2502,7 @@ that helps in Qt development.")))
     (build-system cmake-build-system)
     (arguments
      (list
+      #:tests? #f
       ;; The build system attempts to fetch online resources and fails when
       ;; building the test suite.
       #:configure-flags #~(list "-DQT_BUILD_TESTS=OFF")

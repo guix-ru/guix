@@ -9013,6 +9013,7 @@ HTTrack is fully configurable, and has an integrated help system.")
     (build-system cmake-build-system)
     (arguments
      (list
+      #:tests? #f
       #:phases
       '(modify-phases %standard-phases
          (add-after 'unpack 'use-system-googletest

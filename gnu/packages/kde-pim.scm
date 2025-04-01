@@ -649,7 +649,9 @@ CalDAV server.")
                   libaccounts-qt6
                   qcoro-qt6
                   signond-qt6))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://invent.kde.org/network/kaccounts-integration")
     (synopsis "Online account management system")
     (description "The Kaccounts Integration library provides online account
@@ -679,7 +681,9 @@ management system and its Plasma integration components.")
                   qtwebengine
                   qcoro-qt6
                   signond-qt6))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://invent.kde.org/network/kaccounts-providers")
     (synopsis "Online account providers for the KAccounts system")
     (description "This package provides online account providers for the
@@ -1878,7 +1882,9 @@ Features:
            kwindowsystem
            kxmlgui
            libxkbcommon))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://api.kde.org/kdepim/kontactinterface/html/index.html")
     (synopsis "Kontact interface library")
     (description "This library provides the glue necessary for

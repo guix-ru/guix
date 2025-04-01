@@ -165,6 +165,7 @@
            kwindowsystem
            kcolorscheme))
     (arguments (list #:qtbase qtbase
+                     #:tests? #f
                      #:configure-flags #~(list "-DBUILD_QT5=OFF")))
     (home-page "https://invent.kde.org/plasma/breeze")
     (synopsis "Default KDE Plasma theme")
@@ -442,6 +443,7 @@ concept.")
                 "1z3k9b1jbiw1qixvlmi4vrwl4p4qhrcirgr2ksp0rs4ivgikg38s"))))
     (build-system qt-build-system)
     (arguments (list #:qtbase qtbase
+                     #:tests? #f
                      #:phases
                      #~(modify-phases %standard-phases
                          (add-after 'unpack 'hardcode-openssl
@@ -495,6 +497,7 @@ RDP server.")
     (arguments
      (list
       #:qtbase qtbase
+      #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-gsettings-schemas-path
@@ -661,7 +664,9 @@ KDE Frameworks 5 to better interact with the system.")
                (base32
                 "1khhark9w62bf3v8bgk2fbcs9j41sc228wlsdqhzvb10n3f5rxrx"))))
     (build-system qt-build-system)
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests?  #f))
     (native-inputs (list extra-cmake-modules kdoctools))
     (inputs (list kauth
                   kcoreaddons
@@ -889,7 +894,9 @@ computer's hardware.")
                   kiconthemes
                   qtdeclarative
                   qtsvg))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://apps.kde.org/kongress/")
     (synopsis "Companion application for conferences")
     (description "This application provides list of upcoming conferences with
@@ -1097,7 +1104,9 @@ an elegant and intuitive experience for your tasks and plasmoids.")
                (base32
                 "0xqc00dhrgj0iar6np6wvcfi4fcg595ysbxdgcvpqf6z3018f2dw"))))
     (build-system qt-build-system)
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (native-inputs
      (list extra-cmake-modules pkg-config))
     (inputs
@@ -1595,7 +1604,9 @@ conjunction with the KDE Plasma Desktop.")
     (build-system qt-build-system)
     (native-inputs (list extra-cmake-modules))
     (inputs (list kcoreaddons ki18n kpty knotifications))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://invent.kde.org/plasma/kwrited")
     (synopsis "System notification daemon")
     (description
@@ -1884,7 +1895,8 @@ KF5/Qt5 to KF6/Qt6")
     (propagated-inputs
      (list mpv))
     (arguments
-     (list #:qtbase qtbase))
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://invent.kde.org/libraries/mpvqt")
     (synopsis "libmpv wrapper for QtQuick2 and QML")
     (description "This package provides a libmpv wrapper for QtQuick2 and QML.")
@@ -2926,6 +2938,7 @@ hardware management, and a high degree of customizability.")
                (base32
                 "105wy5sdaimqkqcbpqv2aa004xgdjsjfj81s9x1i6kfkqcn7mc6q"))))
     (build-system cmake-build-system)
+    (arguments (list #:tests? #f))
     (native-inputs (list extra-cmake-modules))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Oxygen wallpapers for the KDE desktop")

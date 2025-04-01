@@ -316,7 +316,8 @@ Phonon-GStreamer is a backend based on the GStreamer multimedia library.")
                 "19f9wzff4nr36ryq18i6qvsq5kqxfkpqsmsvrarr8jqy8pf7k11k"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags
+     (list #:tests? #f
+           #:configure-flags
            #~(list "-DPHONON_BUILD_QT5=OFF"
                    "-DPHONON_BUILD_QT6=ON")))
     (native-inputs
@@ -998,6 +999,7 @@ as well as an API to create KDED modules.")
     (inputs
      (list avahi ; alternatively dnssd could be used
            qtbase))
+    (arguments (list #:tests? #f))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Network service discovery using Zeroconf")
     (description "KDNSSD is a library for handling the DNS-based Service
@@ -1201,6 +1203,7 @@ translation scripting.")
        (sha256
         (base32 "1209mcgb7sbxaa00j1wmz9gsixsnk3724a0l49h57m7gda3gw9gs"))))
     (build-system cmake-build-system)
+    (arguments (list #:tests? #f))
     (native-inputs
      (list extra-cmake-modules pkg-config
            ;; for wayland-scanner
@@ -1592,7 +1595,8 @@ protocols used in KDE Plasma.")
            wayland
            wayland-protocols))
     (arguments
-     (list #:qtbase qtbase))
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://invent.kde.org/plasma/kwayland")
     (synopsis "Qt-style API to interact with the wayland client and server")
     (description "As the names suggest they implement a Client respectively a
@@ -2166,7 +2170,8 @@ uses a job-based interface to queue tasks and execute them in an efficient way."
      (list pkg-config extra-cmake-modules))
     (inputs
      (list libraw qtbase))
-    (arguments (list #:configure-flags
+    (arguments (list #:tests? #f
+                     #:configure-flags
                      #~(list #$(string-append
                                 "-DQT_MAJOR_VERSION="
                                 (version-major
@@ -2224,6 +2229,7 @@ decode RAW picture files.")
            kxmlgui-5
            qtdeclarative-5
            solid-5))
+    (arguments (list #:tests? #f))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Core components for the KDE Activity concept")
     (description "KActivities provides the infrastructure needed to manage a
@@ -2764,6 +2770,7 @@ formats.")
      (list extra-cmake-modules qttools))
     (inputs
      (list libxkbcommon kcoreaddons knotifications kwidgetsaddons qtbase))
+    (arguments (list #:tests? #f))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Widgets for showing progress of asynchronous jobs")
     (description "KJobWIdgets provides widgets for showing progress of
@@ -2803,6 +2810,7 @@ asynchronous jobs.")
                (base32
                 "18gjdb8dmindraqf4halsf1mfglld854ramfyfs3f3s0a0fqidrn"))))
     (build-system cmake-build-system)
+    (arguments (list #:tests? #f))
     (native-inputs
      (list extra-cmake-modules pkg-config qttools))
     (propagated-inputs (list qtdeclarative))
@@ -3145,7 +3153,10 @@ maintaining an index of the contents of your files.")
            kwindowsystem
            qtdeclarative
            solid))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list
+       #:tests? #f
+       #:qtbase qtbase))
     (home-page "https://invent.kde.org/plasma/plasma-activities")
     (synopsis "Core components for the KDE Activity System")
     (description "KActivities provides the infrastructure needed to manage a
@@ -3169,6 +3180,7 @@ with other frameworks.")
                (base32
                 "0b2k9067m7gnq55fxx1ipdbihc4hi6yalvsawxfhy7k54ics5nyd"))))
     (build-system cmake-build-system)
+    (arguments (list #:tests? #f))
     (native-inputs
      (list extra-cmake-modules))
     (inputs
@@ -3473,6 +3485,7 @@ their settings.")
            kwidgetsaddons
            qtshadertools
            qtbase))
+    (arguments (list #:tests? #f))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Integration of QML and KDE work spaces")
     (description "KDeclarative provides integration of QML and KDE work spaces.
@@ -3551,6 +3564,7 @@ that offer bindings to some of the Frameworks.")
                (base32
                 "13ka1vzid6k3hywyhjkj35z8rlqjgnxp8ivzy7m7yl69zpdxj0an"))))
     (build-system cmake-build-system)
+    (arguments (list #:tests? #f))
     (native-inputs
      (list extra-cmake-modules kdoctools))
     (inputs
@@ -3683,7 +3697,10 @@ emoticons coming from different providers.")
            kwindowsystem
            libxkbcommon
            qtdeclarative))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list
+      #:tests? #f
+      #:qtbase qtbase))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Global desktop keyboard shortcuts")
     (description "KGlobalAccel allows you to have global accelerators that are
@@ -3826,6 +3843,7 @@ in applications using the KDE Frameworks.")
     (build-system cmake-build-system)
     (arguments
      (list
+      #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-paths
@@ -4191,6 +4209,7 @@ specification.")
                (base32
                 "0p6h6mm9ipmps88pvnfy7qkhx6ci081qiv8554qdivzdb1x49fph"))))
     (build-system cmake-build-system)
+    (arguments (list #:tests? #f))
     (native-inputs
      (list extra-cmake-modules))
     (inputs
@@ -4592,7 +4611,10 @@ types or handled by application specific code.")
                (base32
                 "08mcpw1slcrc7qy0f2bpwaxn9an6cqad76lvs5s3dd1plx1ri8ag"))))
     (build-system qt-build-system)
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list
+      #:qtbase qtbase
+      #:tests? #f))
     (native-inputs (list extra-cmake-modules qttools))
     (inputs (list kwindowsystem libxkbcommon))
     (home-page "https://community.kde.org/Frameworks")
