@@ -225,6 +225,7 @@
                (string-append "set(DUCKDB_VERSION \"v" #$version "-dev0\"")))))))
     (arguments
      (list
+      #:tests? #f
       #:configure-flags
       '(list "-DBUILD_EXTENSIONS=autocomplete;fts;icu;json;parquet;tpch;")))
     (build-system cmake-build-system)

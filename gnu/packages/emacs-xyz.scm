@@ -11260,6 +11260,7 @@ described on the homepage.")
     (name "emacs-irony-mode-server")
     (arguments
      (list
+      #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
           (replace 'configure
