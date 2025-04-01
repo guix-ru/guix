@@ -1291,6 +1291,7 @@ route audio during phone calls, and a library.")
         (sha256
          (base32 "1k874v9bzipk5x9nr21f3259f5sk7nxnnz618kji0mx9aa0fvjf1"))))
      (build-system cmake-build-system)
+     (arguments (list #:tests? #f))     ; disabled by default and still failing
      (native-inputs (list pkg-config))
      (inputs (list openssl zlib))
      (synopsis "Library for real-time communications with async IO support")

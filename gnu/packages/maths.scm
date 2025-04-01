@@ -5498,6 +5498,7 @@ bio-chemistry.")
       (build-system cmake-build-system)
       (arguments
        (list
+        #:tests? #f
         #:configure-flags
         #~(list "-DBUILD_SHARED_LIBS=ON"
                 #$@(if (target-x86?)

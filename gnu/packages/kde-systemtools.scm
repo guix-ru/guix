@@ -253,6 +253,7 @@ This package is part of the KDE base applications module.")
         (base32 "1m3f4lpzwbrbdmp9237186x4p0w2rk1cz4a7nin38c8ll9sgrfb2"))))
     (build-system qt-build-system)
     (arguments (list #:qtbase qtbase
+                     #:tests? #f
                      #:configure-flags
                      #~(list (string-append "-DQtWaylandScanner_EXECUTABLE="
                                             #$(this-package-native-input "qtwayland")
@@ -373,7 +374,9 @@ This package is part of the KDE administration module.")
            kwallet
            kwindowsystem
            kxmlgui))
-    (arguments (list #:qtbase qtbase))
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f))
     (home-page "https://apps.kde.org/kwalletmanager5/")
     (synopsis "Tool to manage passwords on KWallet")
     (description

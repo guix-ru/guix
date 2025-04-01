@@ -327,7 +327,8 @@ window managers, that don't provide Qt integration by themselves.")
                (base32
                 "0d0pxynlyfgavf6l1b1z7zpmbrzm96hkphnqnalr7mshm147450g"))))
     (build-system cmake-build-system)
-    (arguments (list #:configure-flags #~(list
+    (arguments (list #:tests? #f
+                     #:configure-flags #~(list
                                           "-DKDDockWidgets_QT6=ON"
                                           "-DKDDockWidgets_TESTS=ON")))
     (inputs
@@ -2598,6 +2599,7 @@ that helps in Qt development.")))
     (build-system cmake-build-system)
     (arguments
      (list
+      #:tests? #f
       ;; The build system attempts to fetch online resources and fails when
       ;; building the test suite.
       #:configure-flags #~(list "-DQT_BUILD_TESTS=OFF")

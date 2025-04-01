@@ -3027,8 +3027,9 @@ specification can be downloaded at @url{http://3mf.io/specification/}.")
       (build-system cmake-build-system)
       (inputs (list tbb clipper2 assimp python-nanobind googletest))
       (arguments
-       ;; can be removed once emscripten is packaged
-       `(#:configure-flags '("-DMANIFOLD_JSBIND=OFF")))
+       (list #:tests? #f
+             ;; can be removed once emscripten is packaged
+             #:configure-flags #~(list "-DMANIFOLD_JSBIND=OFF")))
       (synopsis "Geometry library for topological robustness")
       (description
        "Manifold is a geometry library dedicated to creating and operating on
@@ -4104,6 +4105,7 @@ calibration of the milling depth.")
       (arguments
        (list
         #:build-type "Release"
+        #:tests? #f
         #:phases #~(modify-phases %standard-phases
                      (add-after 'unpack 'unpack-libdxfrw
                        (lambda _

@@ -2432,7 +2432,8 @@ intended for people who want to learn receiving and sending morse code.")
           (base32 "1lhsmyhljqa6apzbysqar56wpfcdvs3pq9ia1mshqd6d3hz74s78"))))
       (build-system cmake-build-system)
       (arguments
-       (list #:configure-flags #~(list "-DGGMORSE_SUPPORT_SDL2=OFF")
+       (list #:tests? #f                ; no tests
+             #:configure-flags #~(list "-DGGMORSE_SUPPORT_SDL2=OFF")
              #:phases #~(modify-phases %standard-phases
                           (add-after 'unpack 'disable-imgui-build
                             (lambda _
@@ -3117,6 +3118,7 @@ various hardware.")
        (sha256
         (base32 "11v5idwvfi9w60qg4fgqgvm7ahmb0ys4j094qv4c93r92kd9d3f9"))))
     (build-system qt-build-system)
+    (arguments (list #:tests? #f))      ; no tests
     (native-inputs
      (list pkg-config))
     (inputs

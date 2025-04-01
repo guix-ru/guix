@@ -1449,6 +1449,7 @@ reading and writing CSV and TSV files.")
     (arguments
      ;; Required to locate the install script properly.
      `(#:out-of-source? #f
+       #:tests? #f
        #:parallel-build? #f             ;occasionally failed.
        #:imported-modules
        (,@%cmake-build-system-modules

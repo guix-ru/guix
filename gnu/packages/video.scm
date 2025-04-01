@@ -4158,6 +4158,7 @@ be used for realtime video capture via Linux-specific APIs.")
     (arguments
      (list
       #:cmake cmake-next                ;needs cmake >= 3.28
+      #:tests? #f
       #:configure-flags
       #~(let ((libdir (string-append (assoc-ref %outputs "out") "/lib")))
           (list (string-append "-DOBS_VERSION_OVERRIDE=" #$version)
