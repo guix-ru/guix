@@ -459,8 +459,7 @@ usual algorithms you expect from a modern molecular dynamics implementation.")
                             (assoc-ref %build-inputs "inchi")
                             "/lib/inchi/libinchi.so.1")
              (string-append "-DINCHI_INCLUDE_DIR="
-                            (assoc-ref %build-inputs "inchi") "/include/inchi"))
-       #:test-target "test"))
+                            (assoc-ref %build-inputs "inchi") "/include/inchi"))))
     (native-inputs
      (list pkg-config))
     (inputs
@@ -489,22 +488,25 @@ materials, biochemistry, or related areas.")
        (file-name (git-file-name name version))))
     (build-system cmake-build-system)
     (arguments
-     '(#:test-target "check"
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-header-install-dir
-           (lambda _
-             ;; As of the writing of this package, CMake and GNU build systems
-             ;; install the header to two different location.  This patch makes
-             ;; the CMake build system's choice of header directory compatible
-             ;; with the GNU build system's choice and with what avogadrolibs
-             ;; expects.
-             ;; See https://github.com/spglib/spglib/issues/75 and the relevant
-             ;; part of https://github.com/OpenChemistry/avogadroapp/issues/97.
-             (substitute* "CMakeLists.txt"
-               (("\\$\\{CMAKE_INSTALL_INCLUDEDIR\\}" include-dir)
-                (string-append include-dir "/spglib")))
-             #t)))))
+     (list
+      #:modules '((guix build cmake-build-system)
+                  ((guix build gnu-build-system) #:prefix gnu:)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-header-install-dir
+            (lambda _
+              ;; As of the writing of this package, CMake and GNU build systems
+              ;; install the header to two different location.  This patch makes
+              ;; the CMake build system's choice of header directory compatible
+              ;; with the GNU build system's choice and with what avogadrolibs
+              ;; expects.
+              ;; See https://github.com/spglib/spglib/issues/75 and the relevant
+              ;; part of https://github.com/OpenChemistry/avogadroapp/issues/97.
+              (substitute* "CMakeLists.txt"
+                (("\\$\\{CMAKE_INSTALL_INCLUDEDIR\\}" include-dir)
+                 (string-append include-dir "/spglib")))))
+          (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
     (home-page "https://spglib.github.io/spglib/index.html")
     (synopsis "Library for crystal symmetry search")
     (description "Spglib is a library for finding and handling crystal
