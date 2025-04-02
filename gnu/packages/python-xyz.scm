@@ -31692,7 +31692,7 @@ Its algorithms are based on the kakasi library, which is written in C.")
      (list pkg-config
            python-meson-python
            meson
-           ninja
+           ninja/pinned
            patchelf
            python-setuptools
            python-sphinx
@@ -35473,7 +35473,7 @@ and frame grabber interface.")
      (list cmake-minimal
            gfortran
            git-minimal/pinned           ;for tests
-           ninja
+           ninja/pinned
            python-coverage
            python-cython
            python-hatchling
