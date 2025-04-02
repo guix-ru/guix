@@ -1396,7 +1396,6 @@ graphics image formats like PNG, BMP, JPEG, TIFF and others.")
     (native-inputs (list doxygen python-nose python-sphinx))
     (arguments
      (list
-      #:test-target "check"
       #:configure-flags
       #~(list "-Wno-dev" ;suppress developer mode with lots of warnings
               (string-append
@@ -1412,7 +1411,11 @@ graphics image formats like PNG, BMP, JPEG, TIFF and others.")
               ;; needs to be set.
               (string-append "-DCMAKE_CXX_FLAGS=-I"
                              (assoc-ref %build-inputs "ilmbase")
-                             "/include/OpenEXR" " -ffloat-store"))))
+                             "/include/OpenEXR" " -ffloat-store")
+              ;; Tests are not built by default.
+              "-DAUTOBUILD_TESTS=ON"
+              ;; Disable running tests during the build.
+              "-DAUTOEXEC_TESTS=OFF")))
     (synopsis "Computer vision library")
     (description
      "VIGRA stands for Vision with Generic Algorithms.  It is an image
