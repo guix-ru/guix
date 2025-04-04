@@ -24268,7 +24268,8 @@ populations.")
              (substitute* "setup.py"
                (("'sklearn',") "")))))))
     (native-inputs
-     (list python-cython))
+     (list python-cython
+           python-wheel))
     (propagated-inputs
      (list python-scikit-learn
            python-scipy
