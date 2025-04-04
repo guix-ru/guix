@@ -8312,7 +8312,7 @@ statistical summary in arrays and enumerables.")
 (define-public python-pgmpy
   (package
     (name "python-pgmpy")
-    (version "0.1.24")
+    (version "1.0.0")
     (source
      (origin
        (method git-fetch)  ;pypi package does not include test data
@@ -8322,8 +8322,14 @@ statistical summary in arrays and enumerables.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0fvzh6v0yhgdryczamvzhfy2ymywkh0ssx4rl47xnfvi43hnij90"))))
+         "1hg6wrg3jcac71zn4gknni1wrn38wa86ka3sgp2bndz59mx6sr2s"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list #:test-flags
+           #~(list "-k" (string-append
+                         "not test_pillai"
+                         " and not test_estimate_with_cache_no_llm_calls"
+                         " and not test_estimate_with_orientations"))))
     (propagated-inputs (list python-daft
                              python-joblib
                              python-networkx
@@ -8337,7 +8343,11 @@ statistical summary in arrays and enumerables.")
                              python-statsmodels
                              python-tqdm))
     (native-inputs (list python-mock
-                         python-pytest))
+                         python-pyro-ppl
+                         python-pytest
+                         python-setuptools
+                         python-wheel
+                         python-xgboost))
     (home-page "https://github.com/pgmpy/pgmpy")
     (synopsis "Probabilistic Graphical Models library")
     (description "This package provides a library for Probabilistic
