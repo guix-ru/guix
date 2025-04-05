@@ -32251,7 +32251,9 @@ This package also includes a minimal @code{yt-dlp} wrapper.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0x1j1y2pl6a8f97cw04nm0w6g4jh449cjfsr2aryn316ms4nj1a0"))))
+         "0x1j1y2pl6a8f97cw04nm0w6g4jh449cjfsr2aryn316ms4nj1a0"))
+       ;; Contents of makem package, but no tests.
+       (snippet #~(for-each delete-file '("Makefile" "makem.sh")))))
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-compat
@@ -32264,6 +32266,7 @@ This package also includes a minimal @code{yt-dlp} wrapper.")
      (list pandoc))
     (arguments
      (list
+      #:tests? #f                       ; no tests
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-exec-paths
