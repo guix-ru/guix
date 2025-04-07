@@ -25490,6 +25490,54 @@ deserialized from environment variables.")
        (("rust-libc" ,rust-libc-0.2)
         ("rust-str-buf" ,rust-str-buf-1))))))
 
+(define-public rust-error-stack-0.5
+  (package
+    (name "rust-error-stack")
+    (version "0.5.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "error-stack" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1lf5zy1fjjqdwjkc445sw80hpmxi63ymcxgjh3q6642x2hck6hgy"))))
+    (build-system cargo-build-system)
+    (arguments
+     `(#:cargo-test-flags
+         '("--release" "--"
+           "--skip=sources_nested"
+           "--skip=sources_nested_alternate")
+       #:cargo-inputs
+         (("rust-anyhow" ,rust-anyhow-1)
+          ("rust-eyre" ,rust-eyre-0.6)
+          ("rust-rustc-version" ,rust-rustc-version-0.4)
+          ("rust-serde" ,rust-serde-1)
+          ("rust-spin" ,rust-spin-0.9)
+          ("rust-tracing-error" ,rust-tracing-error-0.2))
+       #:cargo-development-inputs
+         (("rust-ansi-to-html" ,rust-ansi-to-html-0.2)
+          ("rust-expect-test" ,rust-expect-test-1)
+          ("rust-futures" ,rust-futures-0.3)
+          ("rust-insta" ,rust-insta-1)
+          ("rust-once-cell" ,rust-once-cell-1)
+          ("rust-owo-colors" ,rust-owo-colors-4)
+          ("rust-regex" ,rust-regex-1)
+          ("rust-serde" ,rust-serde-1)
+          ("rust-serde-json" ,rust-serde-json-1)
+          ("rust-supports-color" ,rust-supports-color-3)
+          ("rust-supports-unicode" ,rust-supports-unicode-3)
+          ("rust-thiserror" ,rust-thiserror-1)
+          ("rust-tracing" ,rust-tracing-0.1)
+          ("rust-tracing-subscriber" ,rust-tracing-subscriber-0.3)
+          ("rust-trybuild" ,rust-trybuild-1))))
+    (home-page "https://github.com/hashintel/hash/tree/main/libs/error-stack")
+    (synopsis
+     "Context-aware error-handling library that supports attaching user data")
+    (description
+     "This package provides a context-aware error-handling library that supports
+arbitrary attached user data.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public rust-escape8259-0.5
   (package
     (name "rust-escape8259")
