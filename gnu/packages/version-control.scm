@@ -4709,7 +4709,7 @@ developer workflow, and project and release management.")
     (native-inputs
      (list scdoc))
     (inputs
-     (list go-git-sr-ht-emersion-go-scfg
+     (list go-codeberg-org-emersion-go-scfg
            go-git-sr-ht-emersion-gqlclient
            go-github-com-dustin-go-humanize
            go-github-com-google-shlex
