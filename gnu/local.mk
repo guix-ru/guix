@@ -1512,9 +1512,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/gnupg-1-build-with-gcc10.patch		\
   %D%/packages/patches/gnutls-no-which.patch			\
   %D%/packages/patches/gobject-introspection-absolute-shlib-path.patch \
-  %D%/packages/patches/gobject-introspection-absolute-shlib-path-1.72.patch \
   %D%/packages/patches/gobject-introspection-cc.patch		\
-  %D%/packages/patches/gobject-introspection-cc-1.72.patch	\
   %D%/packages/patches/gobject-introspection-girepository.patch	\
   %D%/packages/patches/go-fix-script-tests.patch			\
   %D%/packages/patches/go-gopkg-in-yaml-v3-32bit.patch		\
