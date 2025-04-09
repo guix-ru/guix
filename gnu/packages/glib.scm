@@ -613,14 +613,14 @@ be used when cross-compiling."
 (define gobject-introspection-minimal
   (package
     (name "gobject-introspection")
-    (version "1.82.0")
+    (version "1.84.0")
     (source (origin
              (method url-fetch)
              (uri (string-append "mirror://gnome/sources/"
                    "gobject-introspection/" (version-major+minor version)
                    "/gobject-introspection-" version ".tar.xz"))
              (sha256
-              (base32 "029gr80q8749dhcpmf5x1w48adinihb634qyqimz4js210clqnhg"))
+              (base32 "0ya7m2adgdvj52h84z974k20r05y2hfhk7mqcv1faqn2gvd5fnwl"))
              (patches (search-patches
                        "gobject-introspection-cc.patch"
                        "gobject-introspection-girepository.patch"
