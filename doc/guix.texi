@@ -22,7 +22,7 @@
 @set SUBSTITUTE-URLS https://@value{SUBSTITUTE-SERVER-1} https://@value{SUBSTITUTE-SERVER-2}
 
 @copying
-Copyright @copyright{} 2012-2022 Ludovic Courtès@*
+Copyright @copyright{} 2012-2022, 2025 Ludovic Courtès@*
 Copyright @copyright{} 2013, 2014, 2016 Andreas Enge@*
 Copyright @copyright{} 2013 Nikita Karetnikov@*
 Copyright @copyright{} 2014, 2015, 2016 Alex Kost@*
@@ -642,7 +642,7 @@ to join!  @xref{Contributing}, for information about how you can help.
 
 @quotation Note
 We recommend the use of this
-@uref{https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD,
+@uref{https://guix.gnu.org/install.sh,
 shell installer script} to install Guix on top of a running GNU/Linux system,
 thereafter called a @dfn{foreign distro}.@footnote{This section is concerned
 with the installation of the package manager, which can be done on top of a
@@ -691,14 +691,14 @@ GNU@tie{}tar and Xz.
 @c Note duplicated from the ``Installation'' node.
 @quotation Note
 We recommend the use of this
-@uref{https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD,
+@uref{https://guix.gnu.org/install.sh,
 shell installer script}.  The script automates the download, installation, and
 initial configuration steps described below.  It should be run as the root
 user.  As root, you can thus run this:
 
 @example
 cd /tmp
-wget 'https://git.savannah.gnu.org/gitweb/?p=guix.git;a=blob_plain;f=etc/guix-install.sh;hb=HEAD'
+wget -O guix-install.sh https://guix.gnu.org/install.sh
 chmod +x guix-install.sh
 ./guix-install.sh
 @end example
