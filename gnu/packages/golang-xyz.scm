@@ -348,6 +348,30 @@ file along with an index.html file.")
      "Package tcell provides a gruid Driver for making terminal apps.")
     (license license:isc)))
 
+(define-public go-codeberg-org-emersion-go-scfg
+  (package
+    (name "go-codeberg-org-emersion-go-scfg")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/emersion/go-scfg")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0yw35rf6cxk5cwzf9y4qd0rlcryq1pxr9n34q6620i9djhgskwq2"))))
+    (build-system go-build-system)
+    (arguments
+     (list #:import-path "codeberg.org/emersion/go-scfg"))
+    (propagated-inputs
+     (list go-github-com-davecgh-go-spew))
+    (home-page "https://codeberg.org/emersion/go-scfg")
+    (synopsis "Go library for simple configuration file format")
+    (description
+     "Package go-scfg parses scfg files.")
+    (license license:expat)))
+
 (define-public go-dario-cat-mergo
   (package
     (name "go-dario-cat-mergo")
@@ -378,30 +402,6 @@ zero-value fields.  Mergo won't merge unexported (private) fields.  It will do
 recursively any exported one.  It also won't merge structs inside
 maps (because they are not addressable using Go reflection).")
     (license license:bsd-3)))
-
-(define-public go-codeberg-org-emersion-go-scfg
-  (package
-    (name "go-codeberg-org-emersion-go-scfg")
-    (version "0.1.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/emersion/go-scfg")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0yw35rf6cxk5cwzf9y4qd0rlcryq1pxr9n34q6620i9djhgskwq2"))))
-    (build-system go-build-system)
-    (arguments
-     (list #:import-path "codeberg.org/emersion/go-scfg"))
-    (propagated-inputs
-     (list go-github-com-davecgh-go-spew))
-    (home-page "https://codeberg.org/emersion/go-scfg")
-    (synopsis "Go library for simple configuration file format")
-    (description
-     "Package go-scfg parses scfg files.")
-    (license license:expat)))
 
 (define-public go-git-sr-ht-emersion-go-sqlite3-fts5
   (package
