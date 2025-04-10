@@ -11128,7 +11128,7 @@ Mathics3.")
     (propagated-inputs (list python-django-4.2
                              python-mathics-scanner
                              python-mathics-core
-                             python-networkx-next
+                             python-networkx
                              python-pygments
                              python-requests))
     (native-inputs (list python-pytest python-setuptools python-wheel))
