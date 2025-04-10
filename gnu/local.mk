@@ -2476,6 +2476,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/vagrant-bin-vagrant-silence-warning-about-installer.patch	\
   %D%/packages/patches/vagrant-Support-system-installed-plugins.patch	\
   %D%/packages/patches/vagrant-Use-a-private-temporary-dir.patch	\
+  %D%/packages/patches/vala-0.52-fix-valagirparser.patch	\
   %D%/packages/patches/vboot-utils-fix-format-load-address.patch	\
   %D%/packages/patches/vboot-utils-fix-tests-show-contents.patch	\
   %D%/packages/patches/vboot-utils-skip-test-workbuf.patch	\
