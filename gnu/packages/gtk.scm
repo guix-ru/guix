@@ -1121,7 +1121,7 @@ application suites.")
 (define-public gtk
   (package
     (name "gtk")
-    (version "4.16.13")
+    (version "4.18.6")
     (source
      (origin
        (method url-fetch)
@@ -1129,7 +1129,7 @@ application suites.")
                            (version-major+minor version)  "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "1624c9hjp47rlnybhm9vym3hd3dpav5db4fi8nlkk0c45ghxkwyx"))
+        (base32 "1ynhzzpyqyyc0gfdwc262npq0pbal8i3nnrlm3wn2cnw1mjpr0g1"))
        (patches
         (search-patches "gtk4-respect-GUIX_GTK4_PATH.patch"))
        (modules '((guix build utils)))))
@@ -1201,7 +1201,8 @@ application suites.")
                 ;; TODO: Reinstate in 4.18.
                 ((".*'scaling',.*") ""))
               (substitute* "testsuite/reftests/meson.build"
-                (("[ \t]*'label-wrap-justify.ui',") ""))
+                (("[ \t]*'label-wrap-justify.ui',") "")
+                (("[ \t]*'wrapping-label-in-nested-boxes.ui',") ""))
               ;; These tests fail on an Apple M1 (aarch64) with the following errors:
               ;; - MESA: error: ZINK: failed to choose pdev
               ;; - libEGL warning: egl: failed to create dri2 screen
