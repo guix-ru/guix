@@ -207,14 +207,14 @@ All required fonts must be installed on the converting system.")
 (define-public librevenge
   (package
     (name "librevenge")
-    (version "0.0.4")
+    (version "0.0.5")
     (source
      (origin
       (method url-fetch)
       (uri (string-append "mirror://sourceforge/libwpd/librevenge/librevenge-"
                           version "/librevenge-" version ".tar.xz"))
       (sha256 (base32
-               "1cj76cz4mqcy2mgv9l5xlc95bypyk8zbq0ls9cswqrs2y0lhfgwk"))))
+               "0d7bmqd6r23y076j4nk6fxhq2fx8dxk6a14yicsb2234pd20qv8h"))))
     (build-system gnu-build-system)
     (native-inputs
      (list cppunit doxygen pkg-config))
