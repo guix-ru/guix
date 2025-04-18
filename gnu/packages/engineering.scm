@@ -4145,7 +4145,7 @@ perform various useful functions such as:
     ;;      We would need to patch the CMake recipe to build a shared library
     ;;      with all of these.
     (inputs
-     `(("boost" ,boost)
+     `(("boost" ,boost-1.83)
        ("cgal" ,cgal)
        ("eigen" ,eigen)
        ("embree" ,embree-3)
@@ -5240,7 +5240,7 @@ and mogan.")
     (native-inputs
      (list pkg-config))
     (inputs
-     (list glibmm-2.66 gmp python boost gtkmm-3 sqlite python-gmpy2 python-sympy
+     (list glibmm-2.66 gmp python boost-1.83 gtkmm-3 sqlite python-gmpy2 python-sympy
            python-mpmath python-matplotlib texlive-dvipng
            `(,util-linux "lib")))
     (synopsis "Computer algebra system geared towards field theory")

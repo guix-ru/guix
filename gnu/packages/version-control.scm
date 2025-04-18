@@ -3986,7 +3986,7 @@ be served with a HTTP file server of your choice.")
     (native-inputs
      (list pkg-config tzdata-for-tests))
     (inputs
-     (list boost
+     (list boost-1.83
            ftgl
            glew
            glm
