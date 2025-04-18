@@ -208,7 +208,7 @@ across a broad spectrum of applications.")
     (license (license:x11-style "https://www.boost.org/LICENSE_1_0.txt"
                                 "Some components have other similar licences."))))
 
-(define-public boost-for-source-highlight
+(define-public boost-1.83
   (hidden-package (package (inherit boost)
     (name "boost")
     (version "1.83.0")
