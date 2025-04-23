@@ -39501,7 +39501,7 @@ platform using the ActivityPub protocol.")
 (define-public python-lief
   (package
     (name "python-lief")
-    (version "0.12.3")
+    (version "0.16.5")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -39510,19 +39510,22 @@ platform using the ActivityPub protocol.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "11i6hqmcjh56y554kqhl61698n9v66j2qk1c1g63mv2w07h2z661"))))
-    (build-system python-build-system)
-    (native-inputs (list cmake))
+                "1wq57xgnvpqpjnld03a095wb0fjl719sqrg51n80dv0lx0868n2z"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list cmake-minimal
+           ninja))
+    (propagated-inputs
+     (list python-pydantic-2
+           python-pydantic-core
+           python-scikit-build-core))
     (arguments
      (list
       #:tests? #f                  ;needs network
-      #:phases #~(modify-phases %standard-phases
-                   (replace 'build
-                     (lambda _
-                       (invoke
-                        "python" "setup.py" "--sdk" "build"
-                        (string-append
-                         "-j" (number->string (parallel-job-count)))))))))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir
+            (lambda _ (chdir "api/python"))))))
     (home-page "https://github.com/lief-project/LIEF")
     (synopsis "Library to instrument executable formats")
     (description
