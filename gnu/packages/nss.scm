@@ -95,6 +95,18 @@ platform-neutral API for system level and libc-like functions.  It is used
 in the Mozilla clients.")
     (license license:mpl2.0)))
 
+(define (nss-uri version)
+  (let* ((versions (string-split version #\.))
+         (version-with-underscores (string-join versions "_"))
+         (version-with-final-underscore
+          (string-append (car versions) "."
+                         (cadr versions) "_"
+                         (caddr versions))))
+    (string-append
+     "https://ftp.mozilla.org/pub/mozilla.org/security/nss/"
+     "releases/NSS_" version-with-underscores "_RTM/src/"
+     "nss-" version-with-final-underscore ".tar.gz")))
+
 (define-public nss
   (package
     (name "nss")
@@ -104,16 +116,7 @@ in the Mozilla clients.")
     (version "3.101.3")
     (source (origin
               (method url-fetch)
-              (uri (let* ((versions (string-split version #\.))
-                          (version-with-underscores (string-join versions "_"))
-                          (version-with-final-underscore
-                          (string-append (car versions) "."
-                                         (cadr versions) "_"
-                                         (caddr versions))))
-                     (string-append
-                      "https://ftp.mozilla.org/pub/mozilla.org/security/nss/"
-                      "releases/NSS_" version-with-underscores "_RTM/src/"
-                      "nss-" version-with-final-underscore ".tar.gz")))
+              (uri (nss-uri version))
               (sha256
                (base32
                 "1gkpbyh90aw9yhjnyj1bsp79s2bxab886d9ihkaw1i2kzqfvf3dg"))
@@ -186,13 +189,12 @@ in the Mozilla clients.")
               (setenv "CCC" #$(cxx-for-target))
               (setenv "NATIVE_CC" "gcc")
               ;; No VSX on powerpc-linux.
-              #$@(if (target-ppc32?)
-                     #~((setenv "NSS_DISABLE_CRYPTO_VSX" "1"))
-                     #~())
+              (when #$(target-ppc32?)
+                (setenv "NSS_DISABLE_CRYPTO_VSX" "1"))
+
               ;; Tells NSS to build for the 64-bit ABI if we are 64-bit system.
-              #$@(if (target-64bit?)
-                     #~((setenv "USE_64" "1"))
-                     #~())))
+              (when #$(target-64bit?)
+                (setenv "USE_64" "1"))))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (if tests?
@@ -211,15 +213,13 @@ in the Mozilla clients.")
                     (substitute* "nss/tests/dbtests/dbtests.sh"
                       ((" -lt 5") " -lt 50"))
 
-                    #$@(if (target-64bit?)
-                           '()
-                           ;; The script fails to determine the source
-                           ;; directory when running under 'datefudge' (see
-                           ;; <https://issues.guix.gnu.org/72239>).  Help it.
-                           #~((substitute* "nss/tests/gtests/gtests.sh"
-                                (("SOURCE_DIR=.*")
-                                 (string-append "SOURCE_DIR=" (getcwd) "/nss\n")))))
-
+                    (unless #$(target-64bit?)
+                      ;; The script fails to determine the source
+                      ;; directory when running under 'datefudge' (see
+                      ;; <https://issues.guix.gnu.org/72239>).  Help it.
+                      ((substitute* "nss/tests/gtests/gtests.sh"
+                         (("SOURCE_DIR=.*")
+                          (string-append "SOURCE_DIR=" (getcwd) "/nss\n")))))
 
                     (let ((release-date (getenv "GUIX_NSS_RELEASE_DATE")))
                       (when (string=? "" release-date)
