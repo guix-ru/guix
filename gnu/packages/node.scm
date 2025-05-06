@@ -747,14 +747,14 @@ source files.")
 (define-public node-lts
   (package
     (inherit node-bootstrap)
-    (version "22.14.0")
+    (version "24.0.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nodejs.org/dist/v" version
                                   "/node-v" version ".tar.gz"))
               (sha256
                (base32
-                "12msprh604s6qdsgwymxw4kl8ivaldbaydf4v37lbp02aznk2kkc"))
+                "024mr7260zk8n0ny1rdlf9qlmxwrkh0pcbkzcms4dxsnzv9jlbz0"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -846,9 +846,11 @@ source files.")
                (for-each delete-file
                          '("test/parallel/test-https-agent-unref-socket.js"))
 
-               ;; This test is timing-sensitive, and fails sporadically on
+               ;; These tests are timing-sensitive, and fail sporadically on
                ;; slow, busy, or even very fast machines.
-               (delete-file "test/parallel/test-fs-utimes.js")
+               (for-each delete-file
+                         '("test/parallel/test-fs-utimes.js"
+                           "test/sequential/test-performance-eventloopdelay.js"))
 
                ;; FIXME: This test fails randomly:
                ;; https://github.com/nodejs/node/issues/31213
@@ -974,7 +976,8 @@ fi"
            pkg-config
            procps
            python
-           util-linux))
+           util-linux
+           gcc-14))
     (inputs
      (list bash-minimal
            coreutils
