@@ -1674,9 +1674,9 @@ current version of any major web browser.")
    (license license:bsd-3)))
 
 (define-public rapidjson
-  ;; Last release was in 2016, but this commit is from 2023.
-  (let ((commit "949c771b03de448bdedea80c44a4a5f65284bfeb")
-        (revision "1"))
+  ;; Last release was in 2016, but this commit is from 2025.
+  (let ((commit "24b5e7a8b27f42fa16b96fc70aade9106cf7102f")
+        (revision "2"))
     (package
       (name "rapidjson")
       (version (git-version "1.1.0" revision commit))
@@ -1688,7 +1688,7 @@ current version of any major web browser.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "1xlj0cj88ls3avwmlhd2gf5757fjpfbqx6qf49z1mzi381gcl72m"))
+                  "1gwzhp43h8j0id82h87nba16abiw67dv3c20jczvcvyc21hwnwd0"))
                 (modules '((guix build utils)))
                 (snippet
                  '(begin
@@ -1702,7 +1702,21 @@ current version of any major web browser.")
            (add-after 'unpack 'fix-march=native
              (lambda _
                (substitute* "CMakeLists.txt"
-                 (("-m[^-]*=native") "")))))))
+                 (("-m[^-]*=native") ""))))
+           (add-after 'fix-march=native 'skip-deleted-tests
+             (lambda _
+               (substitute* "test/unittest/CMakeLists.txt"
+                 (("jsoncheckertest.cpp") ""))))
+           (add-after 'fix-march=native 'fix-dependencies
+             (lambda _
+               (substitute* "test/CMakeLists.txt"
+                 (("^find_package\\(GTestSrc\\)")
+                  "find_package(GTest REQUIRED)")
+                 ((".*GTEST_SOURCE_DIR.*") "")
+                 (("GTESTSRC_FOUND)")
+                  "GTest_FOUND)")))))))
+      (native-inputs (list valgrind/pinned))
+      (inputs (list googletest))
       (home-page "https://github.com/Tencent/rapidjson")
       (synopsis "JSON parser/generator for C++ with both SAX/DOM style API")
       (description
