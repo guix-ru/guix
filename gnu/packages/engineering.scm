@@ -307,21 +307,25 @@ their devices.")
     (build-system qt-build-system)
     (arguments
      (list
-      #:test-target "check"
+      #:modules '((guix build qt-build-system)
+                  ((guix build gnu-build-system) #:prefix gnu:)
+                  (guix build utils))
       #:phases
       #~(modify-phases %standard-phases
           (replace 'configure
             (lambda _
               (system* "qmake" (string-append "BOOST_DIR="
                                               #$(this-package-input "boost")))))
-         (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((bin   (string-append #$output "/bin"))
-                   (share (string-append #$output "/share/librecad")))
-               (mkdir-p bin)
-               (install-file "unix/librecad" bin)
-               (mkdir-p share)
-               (copy-recursively "unix/resources" share)))))))
+          (replace 'build (assoc-ref gnu:%standard-phases 'build))
+          (replace 'check (assoc-ref gnu:%standard-phases 'check))
+          (replace 'install
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let ((bin   (string-append #$output "/bin"))
+                    (share (string-append #$output "/share/librecad")))
+                (mkdir-p bin)
+                (install-file "unix/librecad" bin)
+                (mkdir-p share)
+                (copy-recursively "unix/resources" share)))))))
     (inputs
      (list bash-minimal boost muparser freetype qtbase-5 qtsvg-5))
     (native-inputs
