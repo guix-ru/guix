@@ -4107,6 +4107,9 @@ instances.")
     (arguments
      (list
       #:qtbase qtbase
+      #:modules '((guix build qt-build-system)
+                  ((guix build gnu-build-system) #:prefix gnu:)
+                  (guix build utils))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'fix-installation-prefix
@@ -4121,6 +4124,7 @@ instances.")
           (replace 'configure
             (lambda _
               (invoke "qmake")))
+          (replace 'build (assoc-ref gnu:%standard-phases 'build))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
@@ -5215,6 +5219,9 @@ programming paradigm.")
       (arguments
        (list #:qtbase qtbase
              #:tests? #f ;no tests
+             #:modules '((guix build qt-build-system)
+                         ((guix build gnu-build-system) #:prefix gnu:)
+                         (guix build utils))
              #:phases
              #~(modify-phases %standard-phases
                  ;; This project does not have any build rule but its demo has
@@ -5231,6 +5238,7 @@ programming paradigm.")
                  (replace 'configure
                    (lambda _
                      (invoke "qmake")))
+                 (replace 'build (assoc-ref gnu:%standard-phases 'build))
                  ;; No install rule exists.
                  (replace 'install
                    (lambda _
@@ -6093,6 +6101,9 @@ a secure way.")))
     (inputs (list dbus glib libaccounts-glib))
     (arguments
      (list #:tests? #f                  ; Figure out how to run tests
+           #:modules '((guix build qt-build-system)
+                       ((guix build gnu-build-system) #:prefix gnu:)
+                       (guix build utils))
            #:phases
            #~(modify-phases %standard-phases
                (replace 'configure
@@ -6115,7 +6126,9 @@ a secure way.")))
                            (string-append "PREFIX=" #$output)
                            (string-append "LIBDIR=" #$output "/lib")
                            (string-append "QMAKE_LFLAGS_RPATH=-Wl,-rpath,"
-                                          #$output "/lib -Wl,-rpath,")))))))
+                                          #$output "/lib -Wl,-rpath,"))))
+               (replace 'build (assoc-ref gnu:%standard-phases 'build))
+               (replace 'install (assoc-ref gnu:%standard-phases 'install)))))
     (home-page "https://accounts-sso.gitlab.io/signond/index.html")
     (synopsis "Perform user authentication over D-Bus")
     (description "This package provides a D-Bus service which performs user
@@ -6165,6 +6178,9 @@ authentication on behalf of its clients.")
     (inputs (list signond))
     (arguments
      (list #:tests? #f                  ;no tests
+           #:modules '((guix build qt-build-system)
+                       ((guix build gnu-build-system) #:prefix gnu:)
+                       (guix build utils))
            #:phases
            #~(modify-phases %standard-phases
                (replace 'configure
@@ -6176,7 +6192,9 @@ authentication on behalf of its clients.")
                            (string-append "PREFIX=" #$output)
                            (string-append "LIBDIR=" #$output "/lib")
                            (string-append "SIGNON_PLUGINS_DIR=" #$output
-                                          "/lib/signon")))))))
+                                          "/lib/signon"))))
+               (replace 'build (assoc-ref gnu:%standard-phases 'build))
+               (replace 'install (assoc-ref gnu:%standard-phases 'install)))))
     (synopsis "OAuth 2 plugin for signon")
     (description
      "This plugin for the Accounts-SSO SignOn daemon handles the OAuth
