@@ -1475,7 +1475,9 @@ by 'html-identifier-indexes'."
 
 
 (let* ((root (canonicalize-path
-              (string-append (current-source-directory) "/..")))
+              (string-append (or (current-source-directory)
+                                 (string-append (getcwd) "/doc"))
+                             "/..")))
        (commit date (latest-commit+date root))
        (version (or (getenv "GUIX_MANUAL_VERSION")
                     (string-take commit 7)))
@@ -1522,7 +1524,8 @@ by 'html-identifier-indexes'."
     (merge-index-alists guix-split-node-indexes guile-split-node-indexes))
 
   (format (current-error-port)
-          "building manual from work tree around commit ~a, ~a~%"
+          "building manual from work tree (~a) around commit ~a, ~a~%"
+          root
           commit
           (let* ((time (make-time time-utc 0 date))
                  (date (time-utc->date time)))
