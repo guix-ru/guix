@@ -116,8 +116,7 @@
     (propagated-inputs
      (list opencl-headers))
     (arguments
-     `(#:configure-flags (list "-DBUILD_EXAMPLES=OFF" "-DBUILD_TESTS=OFF"
-                               "-DBUILD_TESTING=OFF") ;; CTest needs this to be turned off
+     `(#:configure-flags (list "-DBUILD_EXAMPLES=OFF" "-DBUILD_TESTS=OFF")
        ;; The regression tests require a lot more dependencies.
        #:tests? #f))
     (build-system cmake-build-system)

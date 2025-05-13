@@ -10825,7 +10825,6 @@ modification of BPF objects on the system.")
     (arguments
      (list
       #:test-exclude "(runtime_tests|tools-parsing-test)"
-      #:configure-flags #~(list "-DBUILD_TESTING=ON")
       #:phases
       #~(modify-phases %standard-phases
           ;; This patch also fixes broken compilation due to improper detection
