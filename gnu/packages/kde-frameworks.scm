@@ -5225,8 +5225,7 @@ script engines.")
       qtdeclarative
       prison))
     (arguments
-     (list #:tests? #f ;; seem to require network; don't find QTQuick components
-           #:configure-flags #~'("-DBUILD_TESTING=OFF"))) ; not run anyway
+     (list #:tests? #f)) ;; seem to require network; don't find QTQuick components
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Offers available actions for a specific purpose")
     (description "This framework offers the possibility to create integrate
@@ -5264,9 +5263,7 @@ need.")
       qtbase-5
       qtdeclarative-5))
     (arguments
-     (list #:tests? #f ;; seem to require network; don't find QTQuick components
-           ;; not run anyway
-           #:configure-flags #~'("-DBUILD_TESTING=OFF")))))
+     (list #:tests? #f)))) ;; seem to require network; don't find QTQuick components
 
 (define-public ktextaddons
   (package
