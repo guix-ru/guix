@@ -4099,8 +4099,7 @@ A very simple IM client working over the DHT.
       (arguments
        (list
         #:configure-flags #~(list "-DBUILD_DEPENDENCIES=OFF"
-                                  "-DBUILD_SHARED_LIBS=ON"
-                                  "-DBUILD_TESTING=ON")
+                                  "-DBUILD_SHARED_LIBS=ON")
         #:phases
         #~(modify-phases %standard-phases
             (add-after 'unpack 'delete-problematic-tests

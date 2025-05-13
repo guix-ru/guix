@@ -11362,7 +11362,6 @@ seamless support for BCF and VCF files.")
      (list
       #:configure-flags
       '(list "-DMORPHEUS_GUI=OFF"
-             "-DBUILD_TESTING=ON"
              "-DDOWNLOAD_XTENSOR=OFF")
       #:phases
       '(modify-phases %standard-phases

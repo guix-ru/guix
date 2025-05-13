@@ -390,7 +390,6 @@ annotating features.")
      ;; that individual tests can't be skipped.
      (list
       #:qtbase qtbase
-      #:configure-flags #~(list "-DBUILD_TESTING=off")
       #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
@@ -543,9 +542,7 @@ such as addition, trigonometric functions or derivatives.")
         (base32 "0mgpk6879dprhpxmbdgbb6sz3ik9ycav4sihh20qmsgj09h8qp3g"))))
     (build-system qt-build-system)
     (arguments
-     (list #:qtbase qtbase
-           #:configure-flags
-           #~(list "-DBUILD_TESTING=ON")))
+     (list #:qtbase qtbase))
     (native-inputs
      (list extra-cmake-modules kdoctools))
     (inputs
@@ -981,7 +978,7 @@ painting, image manipulating and icon editing.")
     (build-system qt-build-system)
     (arguments
      `(#:tests? #f
-       #:configure-flags (list "-DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS=-fPIC")
+       #:configure-flags (list "-DCMAKE_CXX_FLAGS=-fPIC")
        #:phases (modify-phases %standard-phases
                   (add-after 'unpack 'patch-raqm
                     (lambda _
@@ -1634,8 +1631,7 @@ different notification systems.")
     (arguments
      (list #:qtbase qtbase
            #:configure-flags
-           #~(list "-DBUILD_TESTING=ON"
-                   (string-append "-DQtWaylandScanner_EXECUTABLE="
+           #~(list (string-append "-DQtWaylandScanner_EXECUTABLE="
                                   #$(this-package-native-input "qtwayland")
                                   "/lib/qt6/libexec/qtwaylandscanner")
                    "-DKDE_INSTALL_LIBEXECDIR=libexec"
