@@ -960,6 +960,9 @@ required for Fritzing app.")
      ;; XXX: tests are built for the CMake build option but it seems to be
      ;; broken in 0.8.0.
      (list #:tests? #f
+           #:modules '((guix build qt-build-system)
+                       ((guix build gnu-build-system) #:prefix gnu:)
+                       (guix build utils))
            #:phases
            #~(modify-phases %standard-phases
                (replace 'configure
@@ -967,7 +970,9 @@ required for Fritzing app.")
                    ;; Patch hardcoded path before running qmake.
                    (substitute* "qelectrotech.pro"
                      (("\\/usr\\/local") #$output))
-                   (invoke "qmake"))))))
+                   (invoke "qmake")))
+          (replace 'build (assoc-ref gnu:%standard-phases 'build))
+          (replace 'install (assoc-ref gnu:%standard-phases 'install)))))
     (native-inputs
      (list pkg-config qttools-5))
     (inputs
