@@ -1,0 +1,42 @@
+Copied from #1244 [https://github.com/elalish/manifold/pull/1244]
+
+https://github.com/elalish/manifold/commit/5145d3422b11ebfccb60ae7d69d5dac5f5af70c0
+
+
+From 5145d3422b11ebfccb60ae7d69d5dac5f5af70c0 Mon Sep 17 00:00:00 2001
+From: Daniel Engberg <daniel.engberg.lists@pyret.net>
+Date: Thu, 1 May 2025 10:49:01 +0200
+Subject: [PATCH] Add test target to CMake (#1244)
+
+Add manifold_test as test target for unit testing
+---
+ CMakeLists.txt      | 2 ++
+ test/CMakeLists.txt | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e5e73d234..df6a3be07 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -22,6 +22,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
+ set(CMAKE_VERBOSE_MAKEFILE ON)
+ 
++include(CTest)
++enable_testing()
+ include(GNUInstallDirs)
+ include(CMakeDependentOption)
+ 
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index f6fa4fc7b..fde649298 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -60,7 +60,7 @@ endif()
+ target_compile_options(manifold_test PRIVATE ${MANIFOLD_FLAGS})
+ exportbin(manifold_test)
+ 
+-add_test(test_all manifold_test)
++add_test(NAME manifold_test COMMAND manifold_test)
+ 
+ if(MANIFOLD_FUZZ)
+   fuzztest_setup_fuzzing_flags()

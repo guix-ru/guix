@@ -2939,6 +2939,8 @@ specification can be downloaded at @url{http://3mf.io/specification/}.")
              (url "https://github.com/elalish/manifold")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
+       ;; Patch is from upstream/master. Remove upon next release.
+       (patches (search-patches "manifold-enable-testing.patch"))
        (sha256
         (base32 "1f0k8937gk7b9100k99pmz1f17nzczpdk7797p2aijla0z29ddy1"))))
     (build-system cmake-build-system)

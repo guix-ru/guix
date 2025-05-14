@@ -1846,6 +1846,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/lib-tl-for-telegram-memcpy.patch	\
   %D%/packages/patches/llhttp-ponyfill-object-fromentries.patch	\
   %D%/packages/patches/lvm2-no-systemd.patch    		\
+  %D%/packages/patches/manifold-enable-testing.patch		\
   %D%/packages/patches/maturin-no-cross-compile.patch		\
   %D%/packages/patches/mecab-variable-param.patch		\
   %D%/packages/patches/memtest86+-build-reproducibly.patch	\
