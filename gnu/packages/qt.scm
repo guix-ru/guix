@@ -5035,6 +5035,9 @@ programming paradigm.")
       (arguments
        (list #:qtbase qtbase
              #:tests? #f ;no tests
+             #:modules '((guix build qt-build-system)
+                         ((guix build gnu-build-system) #:prefix gnu:)
+                         (guix build utils))
              #:phases
              #~(modify-phases %standard-phases
                  ;; This project does not have any build rule but its demo has
@@ -5051,6 +5054,7 @@ programming paradigm.")
                  (replace 'configure
                    (lambda _
                      (invoke "qmake")))
+                 (replace 'build (assoc-ref gnu:%standard-phases 'build))
                  ;; No install rule exists.
                  (replace 'install
                    (lambda _
@@ -5892,6 +5896,9 @@ a secure way.")))
     (inputs (list dbus glib libaccounts-glib))
     (arguments
      (list #:tests? #f                  ; Figure out how to run tests
+           #:modules '((guix build qt-build-system)
+                       ((guix build gnu-build-system) #:prefix gnu:)
+                       (guix build utils))
            #:phases
            #~(modify-phases %standard-phases
                (delete 'validate-runpath)
@@ -5913,7 +5920,9 @@ a secure way.")))
                                      #$output "/lib/signon")))
                    (invoke "qmake"
                            (string-append "PREFIX=" #$output)
-                           (string-append "LIBDIR=" #$output "/lib")))))))
+                           (string-append "LIBDIR=" #$output "/lib"))))
+          (replace 'build (assoc-ref gnu:%standard-phases 'build))
+          (replace 'install (assoc-ref gnu:%standard-phases 'install)))))
     (home-page "https://accounts-sso.gitlab.io/signond/index.html")
     (synopsis "Perform user authentication over D-Bus")
     (description "This package provides a D-Bus service which performs user

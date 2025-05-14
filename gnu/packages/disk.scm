@@ -1696,22 +1696,29 @@ wrapper for disk usage querying and visualisation.")
                (base32
                 "04vpdlwk01kgmc4r5rnrmrgd4sf2kfh1rjzb2rjkfxdd4pbghsy9"))))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (replace 'configure
-           (lambda* (#:key outputs #:allow-other-keys)
-             (system* "qmake"
-                      (string-append "INSTALL_PREFIX="
-                                     (assoc-ref outputs "out")))))
-         (add-after 'install 'wrap
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (wrap-program (string-append
-                            (assoc-ref outputs "out")
-                            "/bin/qdirstat-cache-writer")
-               `("PERL5LIB" ":" prefix
-                 (,(string-append
-                    (assoc-ref inputs "perl-uri-escape")
-                    "/lib/perl5/site_perl")))))))))
+     (list
+      #:tests? #f
+      #:modules '((guix build qt-build-system)
+                  ((guix build gnu-build-system) #:prefix gnu:)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda* (#:key outputs #:allow-other-keys)
+              (system* "qmake"
+                       (string-append "INSTALL_PREFIX="
+                                      (assoc-ref outputs "out")))))
+          (replace 'build (assoc-ref gnu:%standard-phases 'build))
+          (replace 'install (assoc-ref gnu:%standard-phases 'install))
+          (add-after 'install 'wrap
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (wrap-program (string-append
+                             (assoc-ref outputs "out")
+                             "/bin/qdirstat-cache-writer")
+                `("PERL5LIB" ":" prefix
+                  (,(string-append
+                     (assoc-ref inputs "perl-uri-escape")
+                     "/lib/perl5/site_perl")))))))))
     (build-system qt-build-system)
     (inputs
      (list bash-minimal
