@@ -4892,11 +4892,11 @@ to the in-kernel OOM killer.")
   (package
     (name "eudev")
     (version "3.2.14")
+    (replacement eudev-fixed)
     (source (origin
               (method git-fetch)
               (uri (git-reference (url "https://github.com/eudev-project/eudev")
                                   (commit (string-append "v" version))))
-              (patches (search-patches "eudev-removable-devices-polling.patch"))
               (file-name (git-file-name name version))
               (sha256
                (base32
@@ -5001,6 +5001,17 @@ to the in-kernel OOM killer.")
 device nodes from /dev/, handles hotplug events and loads drivers at boot
 time.")
     (license license:gpl2+)))
+
+(define eudev-fixed
+  (package
+    (inherit eudev)
+    (source
+     (let ((base-source (package-source eudev)))
+       (origin
+         (inherit base-source)
+         (patches
+          (append (search-patches "eudev-removable-devices-polling.patch")
+                  (origin-patches base-source))))))))
 
 (define-public python-evdev
   (package
