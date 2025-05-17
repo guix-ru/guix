@@ -3159,7 +3159,7 @@ compatible with the well-known scripts of the same name.")
 (define-public xdg-desktop-portal
   (package
     (name "xdg-desktop-portal")
-    (version "1.18.4")
+    (version "1.20.1")
     (source
      (origin
        (method url-fetch)
@@ -3168,37 +3168,42 @@ compatible with the well-known scripts of the same name.")
              version "/xdg-desktop-portal-" version ".tar.xz"))
        (sha256
         (base32
-         "0r8y8qmzcfj7b7brqcxr9lg8pavfds815ffvj0kqc378fhgaln5q"))
-       (patches (search-patches
-                 ;; Disable portal tests since they try to use fuse.
-                 "xdg-desktop-portal-disable-portal-tests.patch"
-                 "xdg-desktop-portal-disable-configuration-search-exit.patch"))))
+         "1pn0q7nn9xzd2wva9zpxn1dd2kqxwjm2a68yv9gaaa4alh9cvkb6"))
+       (patches
+        (search-patches
+         "xdg-desktop-portal-disable-configuration-search-exit.patch"))))
     (build-system meson-build-system)
     (arguments
-     `(#:configure-flags
-       (list "-Dsystemd=disabled")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'po-chmod
-           (lambda _
-             ;; Make sure 'msgmerge' can modify the PO files.
-             (for-each (lambda (po)
-                         (chmod po #o666))
-                       (find-files "po" "\\.po$"))))
-         (add-before 'configure 'relax-gcc-14-strictness
-           (lambda _
-             (setenv "CFLAGS"
-                     "-g -O2 -Wno-error=incompatible-pointer-types")))
-         (add-after 'unpack 'set-home-directory
-           (lambda _ (setenv "HOME" "/tmp"))))))
+     (list
+      #:configure-flags #~(list "-Dsystemd=disabled")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-libumockdev-preload.so-file-name
+            (lambda* (#:key native-inputs inputs #:allow-other-keys)
+              (substitute* "tests/conftest.py"
+                (("libumockdev-preload.so")
+                 (search-input-file (or native-inputs inputs)
+                                    "lib/libumockdev-preload.so")))))
+          (add-after 'unpack 'set-home-directory
+            (lambda _ (setenv "HOME" "/tmp")))
+          (add-before 'check 'prepare-for-tests
+            (lambda _
+              ;; These environment variables must be set when running the
+              ;; tests in an unprivileged container.  It avoids using
+              ;; bubblewrap to validate icon and sound files, which would fail
+              ;; in such an environment.
+              (setenv "XDP_VALIDATE_ICON_INSECURE" "1")
+              (setenv "XDP_VALIDATE_SOUND_INSECURE" "1"))))))
     (native-inputs
      (list gettext-minimal
            `(,glib "bin")
+           gst-plugins-good             ;for wavparse plugin
            pkg-config
            python
            python-dbusmock
            python-pytest
-           python-pytest-xdist))
+           python-pytest-xdist
+           umockdev))
     (inputs
      (list bubblewrap
            dbus
@@ -3208,6 +3213,7 @@ compatible with the well-known scripts of the same name.")
            gdk-pixbuf
            geoclue
            glib
+           gst-plugins-base
            json-glib
            libportal
            pipewire))
