@@ -29009,9 +29009,9 @@ Magit.")
      "The Fantastic File Finder for Emacs.  Find files fast, using helm.")
     (license license:gpl3+)))
 
-(define-public emacs-lice-el
+(define-public emacs-lice
   (package
-    (name "emacs-lice-el")
+    (name "emacs-lice")
     (version "0.3")
     (source (origin
               (method git-fetch)
@@ -29042,6 +29042,9 @@ Magit.")
 @item File header insertion.
 @end itemize\n")
     (license license:gpl3+)))
+
+(define-deprecated/public emacs-lice-el emacs-lice
+  (deprecated-package "emacs-lice-el" emacs-lice))
 
 (define-public emacs-academic-phrases
   (let ((commit "0823ed8c24b26c32f909b896a469833ec4d7b656"))
