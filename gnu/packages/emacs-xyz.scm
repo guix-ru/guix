@@ -5807,9 +5807,9 @@ Its features are:
     ;; Software is dual-licensed.
     (license (list license:unlicense license:wtfpl2))))
 
-(define-public emacs-citeproc-el
+(define-public emacs-citeproc
   (package
-    (name "emacs-citeproc-el")
+    (name "emacs-citeproc")
     (version "0.9.4")
     (source
      (origin
@@ -5822,16 +5822,16 @@ Its features are:
         (base32 "1l74c2f2xjzsp3i331sw3db4fhbvdbwyd856j1ygldwrh4rli9ml"))))
     (build-system emacs-build-system)
     (arguments
-     (list #:emacs emacs                ;need libxml support
-           #:tests? #f))                ;tests require missing data
-    (propagated-inputs
-     (list emacs-compat
-           emacs-dash
-           emacs-f
-           emacs-parsebib
-           emacs-queue
-           emacs-s
-           emacs-string-inflection))
+     (list
+      #:emacs emacs ;need libxml support
+      #:tests? #f)) ;tests require missing data
+    (propagated-inputs (list emacs-compat
+                             emacs-dash
+                             emacs-f
+                             emacs-parsebib
+                             emacs-queue
+                             emacs-s
+                             emacs-string-inflection))
     (home-page "https://github.com/andras-simonyi/citeproc-el")
     (synopsis "Citation Style Language (CSL) processor for Emacs")
     (description
@@ -5840,6 +5840,9 @@ and bibliographies in styles described in the Citation Style
 Language (CSL), an XML-based, open format to describe the formatting
 of bibliographic references.")
     (license license:gpl3+)))
+
+(define-deprecated/public emacs-citeproc-el emacs-citeproc
+  (deprecated-package "emacs-citeproc-el" emacs-citeproc))
 
 (define-public emacs-corfu
   (package
@@ -27054,7 +27057,7 @@ automatically fetched from well-curated sources, and formatted as BibTeX.")
                      (lambda _
                        (setenv "HOME" "/tmp"))))))
     (propagated-inputs (list emacs-auctex
-                             emacs-citeproc-el
+                             emacs-citeproc
                              emacs-embark
                              emacs-org
                              emacs-parsebib
@@ -28515,7 +28518,7 @@ their meaning for the current Emacs major-mode.")
                                   " (skip-unless (libxml-available-p))"))))))))
       (propagated-inputs
        (list emacs-avy
-             emacs-citeproc-el
+             emacs-citeproc
              emacs-dash
              emacs-f
              emacs-helm-bibtex
@@ -37787,7 +37790,7 @@ producing output appropriate for Haunt's @code{html-reader}.")
     (propagated-inputs
      (list emacs-tomelr))
     (native-inputs (list emacs-toc-org
-                         emacs-citeproc-el
+                         emacs-citeproc
                          emacs-org-ref
                          emacs-org))
     (home-page "https://ox-hugo.scripter.co")
