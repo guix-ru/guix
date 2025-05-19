@@ -1524,7 +1524,7 @@ tour of all gnome components and allows the user to set them up.")
 (define-public gnome-user-share
   (package
     (name "gnome-user-share")
-    (version "43.0")
+    (version "48.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -1532,20 +1532,38 @@ tour of all gnome components and allows the user to set them up.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1kiq2n39yz7szcf7wrs5vhd2hdn04zx1pxgp7qskycaq0nm0dwqd"))))
+                "0xxsb3w2x2pzwyzw9h98v3f79qblni2rmfkzmyrdfzzayd7gvg42"))))
     (build-system meson-build-system)
     (arguments
      (list #:glib-or-gtk? #t
+           #:imported-modules
+           `((guix build cargo-build-system)
+             (guix build json)
+             ,@%meson-build-system-modules)
+           #:modules '((guix build meson-build-system)
+                       ((guix build cargo-build-system) #:prefix cargo:)
+                       (guix build utils))
            #:configure-flags
-           #~(list "-Dsystemduserunitdir=/tmp/empty")))
+           #~(list "-Dsystemduserunitdir=/tmp/empty")
+           #:phases
+           (with-extensions (list (cargo-guile-json))
+             #~(modify-phases %standard-phases
+                 (add-after 'unpack 'unpack-rust-crates
+                   (assoc-ref cargo:%standard-phases 'unpack-rust-crates))
+                 (add-before 'configure 'cargo:configure
+                   (assoc-ref cargo:%standard-phases 'configure))
+                 (add-before 'configure 'cargo:patch-checksums
+                   (assoc-ref cargo:%standard-phases 'patch-cargo-checksums))))))
     (native-inputs
      (list gettext-minimal
            `(,glib "bin")
            gobject-introspection
            `(,gtk "bin")
            pkg-config
+           rust-1.80
+           `(,rust-1.80 "cargo")
            yelp-tools))
-    (inputs (list glib gtk))
+    (inputs (cargo-inputs 'gnome-user-share))
     (synopsis "File sharing for GNOME desktop")
     (description "GNOME User Share is a small package that binds together
 various free software projects to bring easy to use user-level file
