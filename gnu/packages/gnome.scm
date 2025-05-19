@@ -11395,7 +11395,7 @@ accessibility infrastructure.")
 (define-public orca
   (package
     (name "orca")
-    (version "46.2")
+    (version "48.6")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -11404,7 +11404,7 @@ accessibility infrastructure.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0ppx7svqpjhljf8by3x9xvm46b3gw6f6m7r2gj2k172g3adjjqwg"))))
+                "15nn76rm1x16xv29pn3dx8c8f9na4nkkljy1nmv29myzw1207igd"))))
     (build-system meson-build-system)
     (arguments
      '(#:glib-or-gtk? #t
