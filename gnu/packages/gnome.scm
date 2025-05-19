@@ -119,6 +119,7 @@
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages cpp)
+  #:use-module (gnu packages crypto)
   #:use-module (gnu packages cups)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages cyrus-sasl)
@@ -8120,7 +8121,7 @@ window manager.")
 (define-public gnome-online-accounts
   (package
     (name "gnome-online-accounts")
-    (version "3.50.7")
+    (version "3.54.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -8128,11 +8129,12 @@ window manager.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1y4dn60vm1dy9hajqbm7hvzs9j2468rxnyg5ma3xx53mssq885kd"))))
+                "14zm3innz8rflvzazqcm2bvh503xfv1a81x6bs4b9p27wx1rjwsm"))))
     (build-system meson-build-system)
     (arguments
      (list
       #:glib-or-gtk? #t
+      #:configure-flags #~(list "-Dc_args=-Wno-error=missing-include-dirs")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'disable-gtk-update-icon-cache
@@ -8144,6 +8146,7 @@ window manager.")
      (list gettext-minimal
            `(,glib "bin")               ; for glib-compile-schemas, etc.
            gobject-introspection
+           gi-docgen
            libxslt
            pkg-config
            vala))
@@ -8155,6 +8158,7 @@ window manager.")
            dbus
            gcr
            json-glib
+           keyutils
            libsecret
            librest
            mit-krb5
