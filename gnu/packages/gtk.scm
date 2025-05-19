@@ -1936,7 +1936,7 @@ text rendering library.")
 (define-public gtkmm
   (package
     (name "gtkmm")
-    (version "4.14.0")
+    (version "4.18.0")
     (source
      (origin
        (method url-fetch)
@@ -1945,7 +1945,7 @@ text rendering library.")
                        (version-major+minor version)  "/"
                        name "-" version ".tar.xz"))
        (sha256
-        (base32 "1npcf6i07riw20rg5x6rnqi0jlh7cwdvsvjqd7fa6k3l9d2a0l4k"))))
+        (base32 "1v1kkrhhakkv952gb8n24b0ppqf8pdgqng5hb3lxii4z8wairqrf"))))
     (build-system meson-build-system)
     (outputs '("out" "doc"))
     (arguments
