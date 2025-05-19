@@ -7018,7 +7018,7 @@ MS Graph APIs.")
 (define-public gvfs
   (package
     (name "gvfs")
-    (version "1.56.1")
+    (version "1.57.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/gvfs/"
@@ -7026,7 +7026,7 @@ MS Graph APIs.")
                                   "gvfs-" version ".tar.xz"))
               (sha256
                (base32
-                "045a17jqh5f3aks5c3wc9ipfxg8f37gb2dz26j3qyr3rqv71qww6"))))
+                "11cmkqlr3cpiqm4p71jm1mwnjmli3v913c2xx0bw3mhzra7fyszi"))))
     (build-system meson-build-system)
     (arguments
      (list
