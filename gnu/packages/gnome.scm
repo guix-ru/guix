@@ -3035,7 +3035,7 @@ configuring CUPS.")
 (define-public libnotify
   (package
     (name "libnotify")
-    (version "0.8.3")
+    (version "0.8.6")
     (source
      (origin
        (method url-fetch)
@@ -3044,7 +3044,7 @@ configuring CUPS.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "1h7nn9pz797bfmpz3d0s46yjv4ydppnzwifzdx0d6shm8vwkx3zf"))))
+         "0n3b9f2dbkvqlzjfbh6hwzn75gjf53r0az2q3hxxdqb0zfp0lm65"))))
     (outputs '("out" "doc"))
     (build-system meson-build-system)
     (arguments
