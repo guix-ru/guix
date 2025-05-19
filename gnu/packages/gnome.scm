@@ -851,7 +851,7 @@ tomorrow, the rest of the week and for special occasions.")
 (define-public gnome-music
   (package
     (name "gnome-music")
-    (version "46.1")
+    (version "48.0")
     (source
      (origin
        (method url-fetch)
@@ -861,7 +861,7 @@ tomorrow, the rest of the week and for special occasions.")
                        name "-" version ".tar.xz"))
        (sha256
         (base32
-         "1zdzafirfhaldbp8m8pmqw0ysfxc7ndbakqc7d1xrr4v51n2vghi"))))
+         "0vnnhvxjr3znnywpqd9j48rjr2bfa6nsq9cac2qkpdk2ab8arnlc"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -913,11 +913,11 @@ tomorrow, the rest of the week and for special occasions.")
            libdazzle
            libmediaart
            libsoup
+           localsearch
            python-pycairo
            python-pygobject
            python
-           tracker
-           tracker-miners))
+           tinysparql))
     (synopsis "Simple music player for GNOME desktop")
     (description "GNOME Music is the new GNOME music playing application that
 aims to combine an elegant and immersive browsing experience with simple
