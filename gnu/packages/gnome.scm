@@ -2179,7 +2179,7 @@ offline sources, providing a centralized place for managing your contacts.")
 (define-public gnome-desktop
   (package
     (name "gnome-desktop")
-    (version "44.0")
+    (version "44.3")
     (source
      (origin
        (method url-fetch)
@@ -2188,7 +2188,7 @@ offline sources, providing a centralized place for managing your contacts.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "0hlxqprraiwnccf98dykbhx80j31c3scdi7i3jy19fl4bms77is2"))))
+         "13agiybpaaan7fmiqcqgw8sxrs9j3rkp0gbs4bczxvshinmakvs0"))))
     (build-system meson-build-system)
     (arguments
      '(#:phases
