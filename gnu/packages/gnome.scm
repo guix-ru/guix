@@ -118,6 +118,7 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages cpp)
   #:use-module (gnu packages cups)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages cyrus-sasl)
@@ -4633,7 +4634,7 @@ targeting the GNOME stack simple.")
 (define-public vte
   (package
     (name "vte")
-    (version "0.78.2")
+    (version "0.80.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/vte/"
@@ -4641,7 +4642,7 @@ targeting the GNOME stack simple.")
                                   "vte-" version ".tar.xz"))
               (sha256
                (base32
-                "144qqk638n7fbql8542a02lp0nvh2vhci098l6s4cs1m0zgbrmrm"))))
+                "16gnyip2f9s6hmi6s4r68il7zhx2yrqlw8k22r9p3fzazg9nyn9f"))))
     (build-system meson-build-system)
     (arguments
      (list #:configure-flags #~(list "-Dgtk3=false"
@@ -4656,7 +4657,7 @@ targeting the GNOME stack simple.")
            gperf
            python
            libxml2))
-    (inputs (list lz4))
+    (inputs (list fast-float lz4))
     (propagated-inputs
      (list gtk                          ; required by vte-2.91.pc
            gnutls                       ; ditto
