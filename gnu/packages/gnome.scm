@@ -9486,7 +9486,7 @@ properties, screen resolution, and other GNOME parameters.")
 (define-public gnome-shell
   (package
     (name "gnome-shell")
-    (version "46.10")
+    (version "48.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -9494,7 +9494,7 @@ properties, screen resolution, and other GNOME parameters.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1dmpv6n05r7ryl4rq39755bv3f1x50kxk049phnlsyfxfn7m1jcs"))))
+                "0awv790zxxp31vdhyjkn37bmylj2y3hih9kka57g34w5fky060pv"))))
     (build-system meson-build-system)
     (arguments
      (let ((disallowed-references
