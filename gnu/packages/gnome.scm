@@ -129,6 +129,7 @@
   #:use-module (gnu packages docbook)
   #:use-module (gnu packages docker)
   #:use-module (gnu packages documentation)
+  #:use-module (gnu packages elf)
   #:use-module (gnu packages enchant)
   #:use-module (gnu packages flex)
   #:use-module (gnu packages fonts)
@@ -13444,7 +13445,7 @@ GObject introspection bindings.")
 (define-public sysprof
   (package
     (name "sysprof")
-    (version "46.0")
+    (version "48.0")
     (source
      (origin
        (method url-fetch)
@@ -13452,7 +13453,7 @@ GObject introspection bindings.")
                            (version-major version) "/"
                            "sysprof-" version ".tar.xz"))
        (sha256
-        (base32 "0xnil6ian02mlgdq9s5rwd4l5vp6ywyp4nm08q4lwgmbxdspxakk"))))
+        (base32 "064d97sar9zh0yzpnyc7z9nv67gfdyh234w2hyx0h1zkya0063qv"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -13472,7 +13473,8 @@ GObject introspection bindings.")
      ;; Listed in sysprof-4.pc or sysprof-ui-5.pc
      (list glib json-glib libadwaita libdex polkit))
     (inputs
-     (list glib
+     (list elfutils
+           glib
            gtk
            json-glib
            libadwaita
