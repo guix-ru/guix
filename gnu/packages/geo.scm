@@ -498,7 +498,7 @@ topology functions.")
 (define-public gnome-maps
   (package
     (name "gnome-maps")
-    (version "46.12")
+    (version "48.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -506,7 +506,7 @@ topology functions.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "09af1kk63h4ks6kv3sixfmjxkfy0qbi2iym6q5ahcsfjp12d3qc4"))))
+                "1jj5xrybjc229p0021f54mnns3xq5q3fj5rcs8zbvzmkn2w1d1xf"))))
     (build-system meson-build-system)
     (arguments
      (list
