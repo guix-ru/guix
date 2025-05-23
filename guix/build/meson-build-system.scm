@@ -2,7 +2,7 @@
 ;;; Copyright © 2017 Peter Mikkelsen <petermikkelsen10@gmail.com>
 ;;; Copyright © 2018 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2018 Marius Bakke <mbakke@fastmail.com>
-;;; Copyright © 2021, 2023 Maxim Cournoyer <maxim.cournoyer@gmail.com>
+;;; Copyright © 2021, 2023, 2025 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -64,20 +64,24 @@
                                             includedir "/include"))
                        '())
                  ,(string-append "--buildtype=" build-type)
-                 ,(string-append "-Dc_link_args=-Wl,-rpath="
-                                 (assoc-ref outputs "out") "/lib")
-                 ,(string-append "-Dcpp_link_args=-Wl,-rpath="
-                                 (assoc-ref outputs "out") "/lib")
-                 ,@configure-flags
-                 ,source-dir)))
+                 ;; XXX: The arguments containing commas or spaces must be
+                 ;; quoted as if we were using the shell and enclosed in the
+                 ;; array syntax, for compatibility with Muon (see:
+                 ;; https://github.com/muon-build/muon/issues/147).
+                 ,(string-append "-Dc_link_args=['-Wl,-rpath="
+                                 (assoc-ref outputs "out") "/lib']")
+                 ,(string-append "-Dcpp_link_args=['-Wl,-rpath="
+                                 (assoc-ref outputs "out") "/lib']")
+                 ,@configure-flags)))
 
-    (mkdir build-dir)
-    (chdir build-dir)
-    (apply invoke "meson" "setup" args)))
+    (apply invoke "meson" "setup" `(,@args ,build-dir))
+    (chdir build-dir)))
 
-(define* (build #:key parallel-build?
-                #:allow-other-keys)
+(define* (build #:key parallel-build? #:allow-other-keys)
   "Build a given meson package."
+  ;; Note: 'meson compile' is not recommended by at least one Meson
+  ;; maintainer; it's also not compatible with Muon, so stick to invoke ninja
+  ;; directly.
   (invoke "ninja" "-j" (if parallel-build?
                            (number->string (parallel-job-count))
                            "1")))
@@ -95,7 +99,7 @@
       (format #t "test suite not run~%")))
 
 (define* (install #:rest args)
-  (invoke "ninja" "install"))
+  (invoke "meson" "install"))
 
 (define* (shrink-runpath #:key (elf-directories '("lib" "lib64" "libexec"
                                                   "bin" "sbin"))
