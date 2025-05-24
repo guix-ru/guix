@@ -1890,4 +1890,38 @@ toolchain.  Among other features it provides
     (properties `((max-silent-time . 9600)
                   ,@(clang-compiler-cpu-architectures "19")))))
 
+
+;;;
+;;; Bootstrap path for next Zig.
+;;;
+
+(define-public zig-next
+  (let ((commit "4315a572335baf8a97ea9e1605d143fc94d23376")
+        (revision "633"))
+    (package
+      (inherit zig-0.14)
+      (name "zig")
+      (version (git-version "0.14.99" revision commit))
+      (source
+       (origin
+         (inherit (zig-source
+                   version commit
+                   "0qb0c82gsva97j0jg4b3bxxdn11babrkdxc3jia4jhzfj3qcqsgv"))
+         (patches
+          (search-patches
+           "zig-0.14-use-baseline-cpu-by-default.patch"
+           "zig-0.14-use-system-paths.patch"
+           "zig-0.14-fix-runpath.patch"))
+         (snippet
+          (origin-snippet (package-source zig-0.14)))))
+      (inputs
+       (modify-inputs (package-inputs zig-0.14)
+         (replace "clang" clang-20)
+         (replace "lld" lld-20)))
+      (native-inputs
+       (modify-inputs (package-native-inputs zig-0.14)
+         (replace "glibc-abi-tool" zig-0.14-glibc-abi-tool)
+         (replace "llvm" llvm-20)
+         (replace "zig" `(,zig-0.14 "zig1")))))))
+
 (define-public zig zig-0.13)
