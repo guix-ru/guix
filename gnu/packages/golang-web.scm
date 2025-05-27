@@ -5891,6 +5891,36 @@ types.")
 sockets (AF_NETLINK).")
     (license license:expat)))
 
+(define-public go-github-com-mdlayher-packet
+  (package
+    (name "go-github-com-mdlayher-packet")
+    (version "1.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mdlayher/packet")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "17jms60j1xygsn5z61r2kz8yywsihf0xjzlhq3v5cpqf08mljwsn"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/mdlayher/packet"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (propagated-inputs
+     (list go-github-com-josharian-native
+           go-github-com-mdlayher-socket
+           go-golang-org-x-net
+           go-golang-org-x-sys))
+    (home-page "https://github.com/mdlayher/packet")
+    (synopsis "Access to Linux packet sockets (AF_PACKET) in Golang")
+    (description
+     "Package packet provides an access to Linux packet sockets (AF_PACKET).")
+    (license license:expat)))
+
 (define-public go-github-com-mdlayher-socket
   (package
     (name "go-github-com-mdlayher-socket")
