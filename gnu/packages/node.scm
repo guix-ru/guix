@@ -608,17 +608,17 @@ Node.js and web browsers.")
 (define-public node-llparse-bootstrap
   (package
     (name "node-llparse")
-    (version "7.1.0")
+    (version "7.3.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/indutny/llparse.git")
+             (url "https://github.com/nodejs/llparse.git")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "10da273iy2if88hp79cwms6c8qpsl1fkgzll6gmqyx5yxv5mkyp6"))
+         "09hqjcynkz5iv7aydzdwgs42r7y2zylplv0ff7w0vkdsgb08j22a"))
        (modules '((guix build utils)))
        (snippet
         '(begin
@@ -642,10 +642,14 @@ Node.js and web browsers.")
          (add-after 'patch-dependencies 'delete-dependencies
            (lambda args
              (modify-json (delete-dependencies
-                           `("@types/debug"
+                           `("@stylistic/eslint-plugin"
+                             "@typescript-eslint/eslint-plugin"
+                             "@typescript-eslint/parser"
+                             "@types/debug"
                              "@types/mocha"
                              "@types/node"
                              "esm"
+                             "eslint"
                              "llparse-test-fixture"
                              "mocha"
                              "ts-node"
