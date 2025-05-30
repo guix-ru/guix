@@ -550,7 +550,7 @@ Node.js and web browsers.")
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/indutny/llparse-frontend.git")
+             (url "https://github.com/nodejs/llparse-frontend.git")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
@@ -599,7 +599,7 @@ Node.js and web browsers.")
      (list node-debug-bootstrap node-llparse-builder-bootstrap))
     (native-inputs
      (list esbuild))
-    (home-page "https://github.com/indutny/llparse-frontend#readme")
+    (home-page "https://github.com/nodejs/llparse-frontend#readme")
     (properties '((hidden? . #t)))
     (synopsis "Frontend for the llparse compiler")
     (description "This package is a frontend for the llparse compiler.")
