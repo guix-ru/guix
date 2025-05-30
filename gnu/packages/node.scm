@@ -748,14 +748,14 @@ source files.")
 (define-public node-lts
   (package
     (inherit node-bootstrap)
-    (version "24.0.1")
+    (version "24.2.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nodejs.org/dist/v" version
                                   "/node-v" version ".tar.gz"))
               (sha256
                (base32
-                "024mr7260zk8n0ny1rdlf9qlmxwrkh0pcbkzcms4dxsnzv9jlbz0"))
+                "0ac9l5azz2jf5w59n55s68d8h7ccn9iz1afdhxjl6aapqknrlwys"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -771,13 +771,17 @@ source files.")
                               "deps/icu-small"
                               "deps/nghttp2"
                               "deps/ngtcp2"
+                              "deps/llhttp"
                               "deps/uv"
-                              "deps/zlib"))))))
+                              "deps/zlib"
+                              "deps/zstd"))))))
     (arguments
      (substitute-keyword-arguments (package-arguments node-bootstrap)
        ((#:configure-flags configure-flags)
         ''("--shared-cares"
            "--shared-libuv"
+           "--shared-http-parser"
+           "--shared-http-parser-libname=llhttp"
            "--shared-nghttp2"
            "--shared-openssl"
            "--shared-zlib"
@@ -785,6 +789,7 @@ source files.")
            "--with-intl=system-icu"
            "--shared-ngtcp2"
            "--shared-nghttp3"
+           "--shared-zstd"
            ;;Needed for correct snapshot checksums
            "--v8-enable-snapshot-compression"))
        ((#:phases phases)
@@ -902,18 +907,6 @@ source files.")
                      "test/parallel/test-http2-invalid-last-stream-id.js")
                  (("client\\.connect\\(address\\)")
                   "client.connect(address.port)"))))
-           (add-after 'delete-problematic-tests 'replace-llhttp-sources
-             (lambda* (#:key inputs #:allow-other-keys)
-               ;; Replace pre-generated llhttp sources
-               (let ((llhttp (assoc-ref inputs "llhttp")))
-                 (copy-file (string-append llhttp "/src/llhttp.c")
-                            "deps/llhttp/src/llhttp.c")
-                 (copy-file (string-append llhttp "/src/api.c")
-                            "deps/llhttp/src/api.c")
-                 (copy-file (string-append llhttp "/src/http.c")
-                            "deps/llhttp/src/http.c")
-                 (copy-file (string-append llhttp "/include/llhttp.h")
-                            "deps/llhttp/include/llhttp.h"))))
            ;; npm installs dependencies by copying their files over a tar
            ;; stream.  A file with more than one hardlink is marked as a
            ;; "Link".  pacote/lib/fetcher.js calls node-tar's extractor with a
@@ -991,7 +984,8 @@ fi"
            nghttp3
            `(,nghttp2 "lib")
            openssl
-           zlib))
+           zlib
+           `(,zstd-1.5.7 "lib")))
     (supported-systems
       (cons "riscv64-linux" (package-supported-systems node-bootstrap)))
     (properties (alist-delete 'hidden? (package-properties node-bootstrap)))))
