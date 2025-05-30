@@ -482,7 +482,7 @@ Node.js and web browsers.")
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/indutny/llparse-builder.git")
+             (url "https://github.com/nodejs/llparse-builder.git")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
@@ -491,10 +491,6 @@ Node.js and web browsers.")
        (modules '((guix build utils)))
        (snippet
         '(begin
-           ;; FIXME: Unneeded runtime dependency.
-           ;; https://github.com/indutny/llparse-builder/pull/2
-           (substitute* "package.json"
-             (("\"@types/debug.*,") ""))
            ;; Fix imports for esbuild.
            ;; https://github.com/evanw/esbuild/issues/477
            (substitute* '("src/node/invoke.ts"
@@ -521,7 +517,8 @@ Node.js and web browsers.")
          (add-after 'patch-dependencies 'delete-dependencies
            (lambda _
              (modify-json (delete-dependencies
-                           `("@types/mocha"
+                           `("@types/debug"
+                             "@types/mocha"
                              "@types/node"
                              "mocha"
                              "ts-node"
@@ -539,7 +536,7 @@ Node.js and web browsers.")
      (list node-binary-search-bootstrap node-debug-bootstrap))
     (native-inputs
      (list esbuild))
-    (home-page "https://github.com/indutny/llparse-builder#readme")
+    (home-page "https://github.com/nodejs/llparse-builder#readme")
     (properties '((hidden? . #t)))
     (synopsis "Graph builder for consumption by llparse")
     (description "This package builds graphs for consumption by llparse.")
