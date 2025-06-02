@@ -2023,7 +2023,6 @@ strategies, such as fixed delay, backoff delay, and random delay.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
       #:import-path "github.com/axiomhq/hyperloglog"))
     (propagated-inputs (list go-github-com-stretchr-testify
                              go-github-com-kamstrup-intmap
@@ -3595,7 +3594,6 @@ the Go language features.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:skip-build? #t
       ;; TODO: More additional packages are required to enable all tests, it's
       ;; used as source only package.
@@ -9167,7 +9165,6 @@ better way of handling YAML when marshaling to and from structs.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.24
       #:import-path "github.com/itchyny/astgen-go"))
     (home-page "https://github.com/itchyny/astgen-go")
     (synopsis "AST build for Golang @code{interface{}} => @code{ast.Node}")
@@ -9865,7 +9862,6 @@ oglematchers.Matcher} for time values
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:import-path "github.com/jba/templatecheck"))
     (propagated-inputs
      (list go-github-com-google-safehtml))
@@ -10549,7 +10545,6 @@ customized globally.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
       #:import-path "github.com/kamstrup/intmap"))
     (home-page "https://github.com/kamstrup/intmap")
     (synopsis "Fast hashmap with integer keys for Golang")
@@ -15579,7 +15574,6 @@ comments.
     (arguments
      (list
       #:skip-build? #t
-      #:go go-1.23
       #:import-path "github.com/rogpeppe/go-internal"
       #:test-flags #~(list "-skip" "TestSimple/cover")))))
 
@@ -15824,7 +15818,6 @@ Lodash}.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
       #:skip-build? #t
       #:import-path "github.com/SAP/go-hdb"
       ;; XXX: The most of the tests require access to database, run some
@@ -17533,7 +17526,6 @@ supported by the time package
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:embed-files #~(list ".*\\.xml")
       #:import-path "github.com/tomwright/dasel/v2"))
     (propagated-inputs
@@ -19298,7 +19290,6 @@ word on a list of words, if none is found, look for a similar word.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:import-path "go.abhg.dev/komplete"))
     (native-inputs
      (list go-github-com-stretchr-testify))
@@ -20968,7 +20959,6 @@ defined in @url{https://editorconfig.org/,https://editorconfig.org/}.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:build-flags
       ;; Gofumpt formats Go files, and therefore modifies them. To help the
       ;; developers diagnose issues, it replaces any occurrence of a
@@ -21025,7 +21015,6 @@ that @code{gofmt} is happy with.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:skip-build? #t ; we need just lib here
       #:import-path "mvdan.cc/sh/v3"
       #:test-flags
@@ -21164,7 +21153,6 @@ prints the Go version used to build that executable.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
       #:import-path "sigs.k8s.io/json"))
     (home-page "https://github.com/kubernetes-sigs/json")
     (synopsis "JSON decoder with enchansed features")

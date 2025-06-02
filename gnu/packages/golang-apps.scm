@@ -137,7 +137,6 @@ import of a 3rd party package at runtime).")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
       #:install-source? #f
       #:import-path "golang.org/x/tools/gopls"
       #:unpack-path "golang.org/x/tools"
