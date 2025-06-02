@@ -402,7 +402,6 @@ one.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:install-source? #f
       #:import-path "miniflux.app/v2"
       #:build-flags
@@ -5811,7 +5810,6 @@ processor.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.22
       #:embed-files #~(list ".*.xml")
       #:install-source? #f
       #:import-path "github.com/noahgorstein/jqp"))
