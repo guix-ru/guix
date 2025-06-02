@@ -1063,7 +1063,6 @@ the date of the most recent commit that modified them
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.24
       #:import-path "go.abhg.dev/gs"
       #:install-source? #f
       #:build-flags
@@ -1655,7 +1654,6 @@ collaboration using typical untrusted file hosts or services.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.24
       #:import-path "github.com/Apteryks/git-repo-go"
       #:build-flags
       #~(list "-ldflags" (string-append
