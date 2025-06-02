@@ -9477,7 +9477,6 @@ currently).")
       (build-system go-build-system)
       (arguments
        (list
-        #:go go-1.24
         #:install-source? #f
         #:import-path "codeberg.org/astronexus/uranimator"))
       (native-inputs
