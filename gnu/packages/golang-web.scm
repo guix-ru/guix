@@ -736,6 +736,7 @@ functions.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/aws/aws-sdk-go"
       #:phases
       #~(modify-phases %standard-phases
@@ -1489,6 +1490,7 @@ and RFC 5389).")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/cenkalti/backoff/v4"))
     (home-page "https://github.com/cenkalti/backoff")
     (synopsis "The exponential backoff algorithm in Go")
@@ -1867,7 +1869,9 @@ Any}.")
         (base32 "180wnxiim622v17xcnrjrg9g07mg4xizmlxxyrl9p42is0abi9c8"))))
     (build-system go-build-system)
     (arguments
-     (list #:import-path "github.com/coreos/go-oidc"))
+     (list
+      #:go go-1.23
+      #:import-path "github.com/coreos/go-oidc"))
     (native-inputs
      (list go-golang-org-x-net))
     (propagated-inputs
@@ -3062,6 +3066,7 @@ Signature headers are to be set (but not both).")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/go-jose/go-jose/v3"))
     (native-inputs
      (list go-github-com-google-go-cmp
@@ -3460,6 +3465,7 @@ projects.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:embed-files #~(list "jsonschema-draft-04\\.json" "schema\\.json")
       #:import-path "github.com/go-openapi/validate"
       #:phases
@@ -3614,6 +3620,7 @@ from CloudFlare's github.com/cloudflare/cfssl/revoke.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/gobwas/httphead"))
     (home-page "https://github.com/gobwas/httphead")
     (synopsis "Tiny HTTP header value parsing library in Golang")
@@ -3760,6 +3767,7 @@ APIs.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:skip-build? #t
       #:import-path "github.com/gogo/protobuf"
       ;; protoc: exec: "protoc-min-version": executable file not found in $PATH
@@ -4030,7 +4038,9 @@ parameters.")
         (base32 "0j2xjy8xrk9y9k6bqpvimj84i6hg1wwsyvwsb0axhmp49cmnrp86"))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/google/safehtml"))
+     (list
+      #:go go-1.23
+      #:import-path "github.com/google/safehtml"))
     (propagated-inputs
      (list go-golang-org-x-text))
     (home-page "https://github.com/google/safehtml")
@@ -4823,8 +4833,10 @@ authenticated identities and their attributes.")
         (base32 "1rv495j8j2x6avw5hqpf7rpiakr5gdsx6pv8rfn0ff7vi35zfa62"))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/jcmturner/gokrb5/v8"
-       #:unpack-path "github.com/jcmturner/gokrb5"))
+     (list
+      #:go go-1.23
+      #:import-path "github.com/jcmturner/gokrb5/v8"
+      #:unpack-path "github.com/jcmturner/gokrb5"))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
@@ -4926,7 +4938,9 @@ Call}.")
         (base32 "1mlgnk0y0d8njx7h66w6bhr95zh2ccg1hxlnm15i2lfh6l58s60q"))))
     (build-system go-build-system)
     (arguments
-     (list #:import-path "github.com/jhillyerd/enmime"))
+     (list
+      #:go go-1.23
+      #:import-path "github.com/jhillyerd/enmime"))
     (native-inputs
      (list go-github-com-go-test-deep
            go-github-com-stretchr-testify))
@@ -4959,6 +4973,7 @@ geared towards parsing MIME encoded emails.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/jlaffaye/ftp"))
     (native-inputs
      (list go-github-com-stretchr-testify))
@@ -4986,7 +5001,9 @@ described in @url{https://www.rfc-editor.org/rfc/rfc959,RFC 959}.")
         (base32 "18zyr9nlywmwp3wpzcjxrgq9s9d2mmc6zg6xhsna00m663nkyc3n"))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/jmespath/go-jmespath"))
+     (list
+      #:go go-1.23
+      #:import-path "github.com/jmespath/go-jmespath"))
     (native-inputs
      (list go-github-com-davecgh-go-spew
            go-github-com-pmezard-go-difflib
@@ -5063,6 +5080,7 @@ controlled.  It is based on netlink messages.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/json-iterator/go"
       #:test-flags
       ;; XXX: Try to skip just "Test_symmetric/map[test.stringKeyType]string".
@@ -5235,6 +5253,7 @@ protocol in Go language.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:skip-build? #t
       #:import-path "github.com/labbsr0x/goh"))
     (propagated-inputs
@@ -5801,6 +5820,7 @@ fixed.")
            go-golang-org-x-text))
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/makeworld-the-better-one/go-gemini"))
     (home-page "https://github.com/makew0rld/go-gemini")
     (synopsis "Client/server library for the Gemini protocol, in Go")
@@ -7078,6 +7098,7 @@ higher-level API for doing so.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/pascaldekloe/goe"
       #:phases
       #~(modify-phases %standard-phases
@@ -7139,6 +7160,7 @@ API.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/perimeterx/marshmallow"))
     (native-inputs
      (list go-github-com-go-test-deep))
@@ -7386,6 +7408,7 @@ part of @url{https://github.com/pion, Pion} WebRTC implementation.")
         (base32 "0f9jy80law69zb26rkb6kl6w1c66vdghdrmifhwlmzngb644ihdb"))))
     (arguments
      (list
+      #:go go-1.23
       #:tests? #f ;Tests require network access.
       #:import-path "github.com/pion/ice/v3"))
     (propagated-inputs
@@ -7691,6 +7714,7 @@ Protocol,SCTP} as specified in
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/pion/stun"))
     (native-inputs
      (list go-github-com-stretchr-testify))
@@ -7725,6 +7749,7 @@ Protocol,SCTP} as specified in
         (base32 "0zli55ls5izpr6cw0wj0gy44872xn9rk20i8ay9cfk7j2rb60y60"))))
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/pion/stun/v2"))
     (propagated-inputs
      (list go-github-com-pion-dtls-v2
@@ -7749,6 +7774,7 @@ Protocol,SCTP} as specified in
         (base32 "0yavl76y0fida9f1jfdmzdg7rm5jhp6kvdgn3smsf93jad1vbr2x"))))
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/pion/stun/v3"))
     (propagated-inputs
      (list go-github-com-pion-dtls-v3
@@ -7855,6 +7881,7 @@ throughout the @url{https://github.com/pion, Pion} modules.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/pion/turn"
       #:test-flags
       #~(list "-skip"
@@ -8385,6 +8412,7 @@ protocol.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/quic-go/webtransport-go"
       ;; Error: "68" is not greater than "80"
       #:test-flags #~(list "-skip" "TestDatagrams")))
@@ -8956,6 +8984,7 @@ StatHat} account.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/swaggo/swag"
       #:unpack-path "github.com/swaggo/swag"
       #:embed-files
@@ -9314,6 +9343,7 @@ encoding library for the MessagePack, CBOR, JSON and the Binc formats.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/urfave/negroni"))
     (home-page "https://github.com/urfave/negroni")
     (synopsis "Idiomatic HTTP Middleware for Golang")
@@ -9339,6 +9369,7 @@ tiny,non-intrusive, and encourages use of @code{net/http} Handlers.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/urfave/negroni/v3"))))
 
 (define-public go-github-com-valyala-fasthttp
@@ -9777,6 +9808,7 @@ programming language.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       ;; validation of time strings.  only RFC3339 not all of ISO 8601 are
       ;; valid.  expects: false, given true Schema: {"format":"time"} Data:
       ;; "01:01:01,1111"
@@ -10143,6 +10175,7 @@ Go.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       ;; Project provides a Go library and also CLI builds.
       #:skip-build? #t
       #:import-path
@@ -10289,6 +10322,7 @@ lists)
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "go.opencensus.io"
       #:test-flags
       #~(list "-skip"
@@ -11110,6 +11144,7 @@ the code or routes.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "maunium.net/go/mautrix"
       #:embed-files
       #~(list
@@ -11310,6 +11345,7 @@ protocol.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:build-flags #~(list (string-append "-ldflags="
                                            "-X main.lyrebirdVersion="
                                            #$version " -s -w"))
@@ -11478,6 +11514,7 @@ go-github-com-tdewolff-minify-v2 source.")))
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:install-source? #f
       #:import-path "github.com/tomnomnom/gron"))
     (native-inputs

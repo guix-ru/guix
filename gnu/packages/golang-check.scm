@@ -303,7 +303,9 @@ test (using testing.TB's @code{TempDir}) and with a few helper methods.")
            "1mkbyzhwq3rby832ikq00nxv3jnckxsm3949wkxd8ya9js2jmg4d"))))
       (build-system go-build-system)
       (arguments
-       '(#:import-path "github.com/cheekybits/is"))
+       (list
+        #:go go-1.23
+        #:import-path "github.com/cheekybits/is"))
       (home-page "https://github.com/cheekybits/is")
       (synopsis "Mini testing helper for Go")
       (description "A mini testing helper for Go.
@@ -445,6 +447,7 @@ strings which may be used in mock tests.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/DATA-DOG/go-sqlmock"
       #:phases
       #~(modify-phases %standard-phases
@@ -972,6 +975,7 @@ package, but can be used in other contexts too.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/google/gofuzz"
       ;; Tests fail on 32bit
       #:tests? (target-64bit?)))
@@ -1647,6 +1651,7 @@ output capturing, mocking, and much more.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/matryer/is"))
     (home-page "https://github.com/matryer/is")
     (synopsis "Lightweight testing mini-framework for Golang")
@@ -1735,6 +1740,7 @@ error messages, preserving the order of @code{have} (actual result) before
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/onsi/ginkgo"
       #:test-flags #~(list "-skip" "TestIntegration")))
     (propagated-inputs
@@ -1849,6 +1855,7 @@ framework.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/otiai10/mint"))
     (home-page "https://github.com/otiai10/mint")
     (synopsis "Minimal assertion for Golang testing framework")
@@ -2011,6 +2018,7 @@ GIT_TRACE mechanism.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/smarty/assertions"))
     (home-page "https://github.com/smarty/assertions")
     (synopsis "Fluent assertion-style functions")
@@ -2109,6 +2117,9 @@ test coverage and has a web user interface that will refresh automatically.")
     (build-system go-build-system)
     (arguments
      (list
+      ;; See the list of supported Golang versions in
+      ;; <testify/.github/workflows/main.yml>.
+      #:go go-1.23
       ;; XXX: Tests are shaky on non x86_64 architectures, check if some may
       ;; be enabled.
       #:tests? (target-x86-64?)
@@ -2333,6 +2344,7 @@ customization
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/warpfork/go-testmark"))
     (propagated-inputs
      (list go-github-com-warpfork-go-fsx))
@@ -2363,6 +2375,7 @@ testmark} format, which itself is a subset of Markdown format.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/warpfork/go-wish"
       #:test-subdirs #~(list "cmp/..." "wishfix" ".")
       #:test-flags
