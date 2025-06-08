@@ -1284,6 +1284,7 @@ formats (e.g. Bibtex, RIS, etc.) using a common XML intermediate.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:install-source? #f
       #:import-path "github.com/benhoyt/goawk"
       #:phases
