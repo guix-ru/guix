@@ -94,6 +94,7 @@
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gnupg)
+  #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
   #:use-module (gnu packages golang-check)
   #:use-module (gnu packages golang-compression)
@@ -3327,6 +3328,7 @@ designed for experienced users.")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       ;; It helps to resolve <golang.org/x/net/publicsuffix/table.go:63:12>:
       ;; pattern data/children: cannot embed irregular file data/children
       #:embed-files #~(list "children" "nodes" "text")
