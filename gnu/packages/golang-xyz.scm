@@ -6192,7 +6192,7 @@ cases (e.g. snake_case, camelCase, kebab-case, etc).")
 (define-public go-github-com-expr-lang-expr
   (package
     (name "go-github-com-expr-lang-expr")
-    (version "1.16.9")
+    (version "1.17.5")
     (source
      (origin
        (method git-fetch)
@@ -6201,7 +6201,7 @@ cases (e.g. snake_case, camelCase, kebab-case, etc).")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "08p7gcxm7psgn1rzhhy2s2va59ssy77x8wd706gdp2pif7wln883"))
+        (base32 "0kcpgycdy9fm4g2i4mhp6hprzkg75r0lfrvc0gbwd2wiir460222"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
@@ -6214,6 +6214,7 @@ cases (e.g. snake_case, camelCase, kebab-case, etc).")
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:import-path "github.com/expr-lang/expr"))
     (home-page "https://expr-lang.org/")
     (synopsis "Expression language and expression evaluation for Go")
