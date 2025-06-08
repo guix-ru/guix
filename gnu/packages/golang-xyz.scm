@@ -7962,7 +7962,7 @@ size.")
 (define-public go-github-com-goccy-go-yaml
   (package
     (name "go-github-com-goccy-go-yaml")
-    (version "1.12.0")
+    (version "1.18.0")
     (home-page "https://github.com/goccy/go-yaml")
     (source
      (origin
@@ -7972,7 +7972,7 @@ size.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "06sf7vpz8gjyivrn3yhzcbbf3qhsqq5n7lsc23j91xw5xwpn37bk"))))
+        (base32 "0abvpywscsi503nq5a6z1jxhvvhk5gc366nk6xdlslp0gdh4sfhq"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -7982,13 +7982,7 @@ size.")
           (add-after 'unpack 'remove-benchmarks
             (lambda* (#:key import-path #:allow-other-keys)
               (delete-file-recursively
-               (string-append "src/" import-path "/benchmarks"))))
-          ;; XXX: Replace when go-build-system supports nested path.
-          (replace 'check
-            (lambda* (#:key import-path tests? #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion (string-append "src/" import-path)
-                  (invoke "go" "test" "-v" "./..."))))))))
+               (string-append "src/" import-path "/benchmarks")))))))
     (native-inputs
      (list go-github-com-go-playground-validator-v10
            go-github-com-google-go-cmp))
