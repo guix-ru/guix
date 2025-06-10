@@ -2064,36 +2064,6 @@ gunit @url{github.com/smarty/gunit,@code{gunit}} for use with the
 functions and even in applications.")
     (license license:expat)))
 
-(define-public go-github-com-smarty-gunit
-  (package
-    (name "go-github-com-smarty-gunit")
-    (version "1.5.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/smarty/gunit")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "13bcb1aq8yshmi5inn7np5lyqhsyy5hksridi8bxbjq35xrknskr"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/smarty/gunit"
-      ;; Expected: [&{ BowlingGameScoringTests [0xc000080020
-      ;; 0xc000080040 0xc000080060 0xc000080080 0xc0000800a0]}]
-      ;; Actual:   [&{ BowlingGameScoringTests [0xc0000da920
-      ;; 0xc0000da940 0xc0000da960 0xc0000da9a0 0xc0000da9c0]}]
-      #:test-flags
-      #~(list "-skip" "TestParseFileWithValidFixturesAndConstructs")))
-    (home-page "https://github.com/smarty/gunit")
-    (synopsis "Golang xUnit-style test fixture test adapter")
-    (description
-     "Package gunit provides @code{testing} package hooks and convenience
-functions for writing tests in an @code{xUnit} style.")
-    (license license:expat)))
-
 (define-public go-github-com-viant-assertly
   (package
     (name "go-github-com-viant-assertly")
