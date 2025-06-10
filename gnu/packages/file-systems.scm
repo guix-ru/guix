@@ -80,6 +80,7 @@
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gnupg)
+  #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
   #:use-module (gnu packages golang-check)
   #:use-module (gnu packages golang-crypto)
@@ -603,7 +604,7 @@ significantly increases the risk of irreversible data loss!")
 (define-public gocryptfs
   (package
     (name "gocryptfs")
-    (version "2.5.1")
+    (version "2.5.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -612,10 +613,11 @@ significantly increases the risk of irreversible data loss!")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0ai30h56qvp31a3rl72biwx8w9blmi7va7d1bflmxbp41zhl6dn9"))))
+                "1glzq6syid1ws3wc9fk16z3vmphvgaf8dwr8hrg4s02bqqqhlcll"))))
     (build-system go-build-system)
     (arguments
      (list
+      #:go go-1.23
       #:install-source? #f
       #:import-path "github.com/rfjakob/gocryptfs"
       #:build-flags
