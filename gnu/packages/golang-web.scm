@@ -6752,7 +6752,7 @@ compatible object storage.")
 (define-public go-github-com-multiformats-go-multiaddr
   (package
     (name "go-github-com-multiformats-go-multiaddr")
-    (version "0.13.0")
+    (version "0.15.0")
     (source
      (origin
        (method git-fetch)
@@ -6761,7 +6761,7 @@ compatible object storage.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0029zjhndbisfsc2msd2h18pcw23rqvf40drkcf7nxic3y2vaff7"))))
+        (base32 "0rnq4b9vn6d0d9b6m0yqwdigrgidky3smrgnp5w8sfw523nk5dkl"))))
     (build-system go-build-system)
     (arguments
      (list
