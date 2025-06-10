@@ -831,8 +831,7 @@ of XDG base directories, such as XDG_CONFIG_HOME.")
     (build-system cmake-build-system)
     (arguments
      (list
-      #:configure-flags #~(list "-DBUILD_TESTS=ON")
-      #:test-target "xtest"))
+      #:configure-flags #~(list "-DBUILD_TESTS=ON")))
     (native-inputs
      (list doctest
            googletest))
@@ -1407,8 +1406,7 @@ for C++17.")
     (build-system cmake-build-system)
     (arguments
      (list
-      #:configure-flags #~(list "-DBUILD_TESTS=ON")
-      #:test-target "xtest"))
+      #:configure-flags #~(list "-DBUILD_TESTS=ON")))
     (native-inputs
      (list doctest
            googletest
@@ -2466,10 +2464,17 @@ provides a number of utilities to make coding with expected cleaner.")
             (sha256
              (base32 "03qkr42h0g6rivj3kq207gzgnv7hq88y69q16l2vg1lbvjcgca2g"))))
    (build-system cmake-build-system)
-   (arguments (list #:test-target "check"
-                    ;; -Werror appears to report false positives.
-                    ;; See <https://github.com/arximboldi/immer/issues/223>.
-                    #:configure-flags #~(list "-DDISABLE_WERROR=ON")))
+   (arguments
+    (list
+     ;; -Werror appears to report false positives.
+     ;; See <https://github.com/arximboldi/immer/issues/223>.
+     #:configure-flags #~'("-DDISABLE_WERROR=ON")
+     #:modules `((guix build cmake-build-system)
+                 ((guix build gnu-build-system) #:prefix gnu:)
+                 (guix build utils))
+     #:phases
+     #~(modify-phases %standard-phases
+         (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
    (inputs (list boost libgc c-rrb))
    (native-inputs (list catch2 doctest fmt pkg-config))
    (home-page "https://sinusoid.es/immer")
@@ -2494,7 +2499,14 @@ written in C++.")
             (modules '((guix build utils)))
             (snippet #~(delete-file-recursively "tools"))))
    (build-system cmake-build-system)
-   (arguments (list #:test-target "check"))
+   (arguments
+    (list
+     #:modules `((guix build cmake-build-system)
+                 ((guix build gnu-build-system) #:prefix gnu:)
+                 (guix build utils))
+     #:phases
+     #~(modify-phases %standard-phases
+         (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
    (native-inputs (list boost catch2))
    (home-page "https://sinusoid.es/zug")
    (synopsis "Higher-order sequence transformers")
@@ -2515,13 +2527,16 @@ composable sequential transformations.")
             (sha256
              (base32 "1by9d49qnkncifyjcq16zy605d7v4ps6hvc01q5nsp1nbswm94m4"))))
    (build-system cmake-build-system)
-   (arguments (list #:test-target "check"
-                    #:configure-flags #~(list "-Dlager_BUILD_EXAMPLES=no")
+   (arguments (list #:configure-flags #~(list "-Dlager_BUILD_EXAMPLES=no")
+                    #:modules `((guix build cmake-build-system)
+                                ((guix build gnu-build-system) #:prefix gnu:)
+                                (guix build utils))
                     #:phases
                     #~(modify-phases %standard-phases
                         (add-after 'unpack 'delete-failing-tests
                           (lambda _
-                            (delete-file-recursively "test/event_loop"))))))
+                            (delete-file-recursively "test/event_loop")))
+                        (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
    (inputs (list boost immer zug))
    (native-inputs (list catch2 cereal))
    (home-page "https://sinusoid.es/lager")

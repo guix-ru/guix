@@ -160,7 +160,6 @@ endif()~%~%"
      (build-system cmake-build-system)
      (arguments
       (list
-       #:test-target "check"         ;otherwise some test binaries are missing
        #:disallowed-references (list imagemagick/stable)
        #:imported-modules `(,@%cmake-build-system-modules
                             (guix build glib-or-gtk-build-system))
@@ -357,6 +356,8 @@ as the native format.")
     (build-system cmake-build-system)
     (arguments
      (substitute-keyword-arguments (package-arguments inkscape/pinned)
+       ((#:modules modules)
+        (append '(((guix build gnu-build-system) #:prefix gnu:)) modules))
        ((#:configure-flags flags ''())
         ;; Enable ImageMagick support.
         #~(delete "-DWITH_IMAGE_MAGICK=OFF" #$flags))
@@ -370,11 +371,7 @@ as the native format.")
                            #$%inkscape-release-year)))))
             #$@(if (target-x86-32?)
                    #~()            ;XXX: there are remaining failures on i686
-                   #~((replace 'check
-                        ;; Re-instate the tests disabled in inkscape/pinned, now that
-                        ;; their ImageMagick requirement is satisfied.
-                        (assoc-ref %standard-phases 'check))))
-
+                   #~((replace 'check (assoc-ref gnu:%standard-phases 'check))))
             (replace 'wrap-program
               ;; Ensure Python is available at runtime.
               (lambda _
