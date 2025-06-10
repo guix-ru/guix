@@ -1137,12 +1137,12 @@ fonts to gEDA.")
       (build-system cmake-build-system)
       (arguments
        (list
+        #:tests? #f ; no tests
         #:imported-modules `((guix build guile-build-system)
                              ,@%cmake-build-system-modules)
         #:modules '((guix build cmake-build-system)
                     ((guix build guile-build-system) #:prefix guile:)
                     (guix build utils))
-        #:test-target "libfive-test"
         #:configure-flags #~(list
                              (string-append
                               "-DPYTHON_SITE_PACKAGES_DIR="

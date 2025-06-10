@@ -532,8 +532,7 @@ usual algorithms you expect from a modern molecular dynamics implementation.")
                             (assoc-ref %build-inputs "inchi")
                             "/lib/inchi/libinchi.so.1")
              (string-append "-DINCHI_INCLUDE_DIR="
-                            (assoc-ref %build-inputs "inchi") "/include/inchi"))
-       #:test-target "test"))
+                            (assoc-ref %build-inputs "inchi") "/include/inchi"))))
     (native-inputs
      (list pkg-config))
     (inputs

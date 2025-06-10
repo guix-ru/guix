@@ -4818,7 +4818,6 @@ the tensors contained therein.")
       (build-system cmake-build-system)
       (arguments
        (list
-        #:test-target "cpptest"
         #:configure-flags
         #~(list "-DUSE_OPENCL=ON"
                 "-DUSE_VULKAN=ON"
@@ -4838,11 +4837,11 @@ the tensors contained therein.")
         #:phases
         #~(modify-phases %standard-phases
             (replace 'check
-              (lambda* (#:key source test-target tests? #:allow-other-keys)
+              (lambda* (#:key source tests? #:allow-other-keys)
                 (when tests?
                   (begin
                     (invoke "make" "-j"
-                            (number->string (parallel-job-count)) test-target)
+                            (number->string (parallel-job-count)) "cpptest")
                     ;; Disable below the actual run of the tests because
                     ;; several fail due to platform variations (for example,
                     ;; fp16 tests fail because not supported on CPUs).

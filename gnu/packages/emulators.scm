@@ -343,6 +343,9 @@ console.")
       (build-system cmake-build-system)
       (arguments
        (list
+        #:modules '((guix build cmake-build-system)
+                    ((guix build gnu-build-system) #:prefix gnu:)
+                    (guix build utils))
         #:phases
         #~(modify-phases %standard-phases
             (add-before 'configure 'remove-unittests-target-post-build-command
@@ -372,6 +375,10 @@ console.")
                     (("\"vulkan\", 1") (string-append "\"vulkan\""))
                     (("\"vulkan\"") (string-append "\"" libvulkan "\""))
                     (("Common::DynamicLibrary::GetVersionedFilename") "")))))
+            (replace 'check
+              (lambda* (#:rest args)
+                (apply (assoc-ref gnu:%standard-phases 'check)
+                       #:test-target "unittests" args)))
             (add-after 'check 'post-check
               (lambda* (#:key tests? #:allow-other-keys)
                 (when tests?
@@ -425,8 +432,7 @@ console.")
                 (string-append "-DX11_LIBRARIES="
                                (search-input-file %build-inputs
                                                   "lib/libX11.so"))
-                "-DX11_FOUND=1")
-        #:test-target "unittests"))
+                "-DX11_FOUND=1")))
       (native-inputs
        (list (cross-gcc "powerpc-linux-gnu")
              gettext-minimal
