@@ -2801,13 +2801,20 @@ thoroughly
 tool."))))
 
 (define-public go-keyify
-  (package
-    (inherit go-honnef-co-go-tools)
+  (package/inherit go-honnef-co-go-tools
     (name "go-keyify")
     (arguments
-     `(#:import-path "honnef.co/go/tools/cmd/keyify"
-       #:unpack-path "honnef.co/go/tools"
-       #:install-source? #f))
+     (substitute-keyword-arguments
+         (package-arguments go-honnef-co-go-tools)
+       ((#:tests? _ #t) #f)
+       ((#:install-source? _ #t) #f)
+       ((#:import-path _) "honnef.co/go/tools/cmd/keyify")
+       ((#:unpack-path _ "") "honnef.co/go/tools")))
+    (native-inputs
+     (append (package-native-inputs go-honnef-co-go-tools)
+             (package-propagated-inputs go-honnef-co-go-tools)))
+    (propagated-inputs '())
+    (inputs '())
     (synopsis "Transform an unkeyed struct literal into a keyed one in Go")
     (description "This package turns unkeyed struct literals (@code{T{1, 2,
 3}}) into keyed ones (@code{T{A: 1, B: 2, C: 3}}) in Go.")))
