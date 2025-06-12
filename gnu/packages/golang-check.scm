@@ -2806,22 +2806,13 @@ used to skip the test
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
-      #:import-path "honnef.co/go/tools"
-      #:phases
-      #~(modify-phases %standard-phases
-          ;; XXX: Workaround for go-build-system's lack of Go modules support.
-          (delete 'build)
-          (replace 'check
-            (lambda* (#:key tests? import-path #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion (string-append "src/" import-path)
-                  (invoke "go" "test" "-v" "./..."))))))))
+      #:skip-build? #t
+      #:import-path "honnef.co/go/tools"))
     (propagated-inputs
      (list go-github-com-burntsushi-toml
            go-golang-org-x-exp
            go-golang-org-x-exp-typeparams
-           go-golang-org-x-mod
+           go-golang-org-x-sys
            go-golang-org-x-tools))
     (home-page "https://staticcheck.dev/")
     (synopsis "Staticcheck advanced Go linter library")
