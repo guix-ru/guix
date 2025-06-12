@@ -4091,85 +4091,90 @@ will reconstruct the object along its delta-base chain and return it.")
     (license license:expat)))
 
 (define-public git-lfs
-  (package
-    (name "git-lfs")
-    (version "3.6.1")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/git-lfs/git-lfs")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "02819i3sd9qjw89lcpv6rmhfqaxkz1pddqw8havw3ysmcmhmb7yd"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:embed-files #~(list "children" "nodes" "text")
-      #:import-path "github.com/git-lfs/git-lfs"
-      #:install-source? #f
-      #:test-flags #~(list "-skip" "TestHistoryRewriterUpdatesRefs")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'patch-/bin/sh
-            (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* "src/github.com/git-lfs/git-lfs/lfs/hook.go"
-                (("/bin/sh")
-                 (search-input-file inputs "bin/sh")))))
-          ;; Only build the man pages if ruby-asciidoctor is available.
-          #$@(if (this-package-native-input "ruby-asciidoctor")
-                 #~((add-before 'build 'man-gen
-                      ;; Without this, the binary generated in 'build
-                      ;; phase won't have any embedded usage-text.
-                      (lambda _
-                        (with-directory-excursion "src/github.com/git-lfs/git-lfs"
-                          (invoke "make" "mangen"))))
-                    (add-after 'build 'build-man-pages
-                      (lambda _
-                        (with-directory-excursion "src/github.com/git-lfs/git-lfs"
-                          (invoke "make" "man"))))
-                    (add-after 'install 'install-man-pages
-                      (lambda* (#:key outputs #:allow-other-keys)
-                        (with-directory-excursion "src/github.com/git-lfs/git-lfs/man"
-                          (for-each
-                           (lambda (manpage)
-                             (install-file manpage
-                                           (string-append #$output "/share/man/man1")))
-                           (find-files "." "^git-lfs.*\\.1$"))))))
-                 #~()))))
-    (native-inputs
-     (append (list git-minimal
-                   go-github-com-avast-retry-go
-                   go-github-com-dpotapov-go-spnego
-                   go-github-com-git-lfs-gitobj-v2
-                   go-github-com-git-lfs-go-netrc
-                   go-github-com-git-lfs-pktline
-                   go-github-com-git-lfs-wildmatch-v2
-                   go-github-com-jmhodges-clock
-                   go-github-com-leonelquinteros-gotext
-                   go-github-com-mattn-go-isatty
-                   go-github-com-olekukonko-ts
-                   go-github-com-pkg-errors
-                   go-github-com-rubyist-tracerx
-                   go-github-com-spf13-cobra
-                   go-github-com-ssgelm-cookiejarparser
-                   go-github-com-stretchr-testify
-                   go-github-com-xeipuuv-gojsonschema
-                   go-golang-org-x-net
-                   go-golang-org-x-sync
-                   go-golang-org-x-sys)
-             ;; make `ronn` available during build for man page generation
-             (if (supported-package? ruby-asciidoctor)
-                 (list ronn-ng ruby-asciidoctor)
-                 '())))
-    (home-page "https://git-lfs.github.com/")
-    (synopsis "Git extension for versioning large files")
-    (description
-     "Git Large File Storage (LFS) replaces large files such as audio samples,
+  ;; XXX: The latest commit contains comparability with go-1.24, revert back
+  ;; to version tag when a fresh release is available.
+  (let ((commit "9e751d16509c9d65bda15b53c7d30a583c66e0c8")
+        (revision "0"))
+    (package
+      (name "git-lfs")
+      (version (git-version "3.6.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/git-lfs/git-lfs")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1vqy6ix48i9k36523800ypgxdsf5mqzj2ibnlq415lapvsql8bcb"))))
+      (build-system go-build-system)
+      (arguments
+       (list
+        #:embed-files #~(list "children" "nodes" "text")
+        #:import-path "github.com/git-lfs/git-lfs/v3"
+        #:install-source? #f
+        #:test-flags #~(list "-skip" "TestHistoryRewriterUpdatesRefs")
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'patch-/bin/sh
+              (lambda* (#:key inputs #:allow-other-keys)
+                (substitute* "src/github.com/git-lfs/git-lfs/v3/lfs/hook.go"
+                  (("/bin/sh")
+                   (search-input-file inputs "bin/sh")))))
+            ;; Only build the man pages if ruby-asciidoctor is available.
+            #$@(if (this-package-native-input "ruby-asciidoctor")
+                   #~((add-before 'build 'man-gen
+                        ;; Without this, the binary generated in 'build
+                        ;; phase won't have any embedded usage-text.
+                        (lambda _
+                          (with-directory-excursion "src/github.com/git-lfs/git-lfs/v3"
+                            (invoke "make" "mangen"))))
+                      (add-after 'build 'build-man-pages
+                        (lambda _
+                          (with-directory-excursion "src/github.com/git-lfs/git-lfs/v3"
+                            (invoke "make" "man"))))
+                      (add-after 'install 'install-man-pages
+                        (lambda* (#:key outputs #:allow-other-keys)
+                          (with-directory-excursion "src/github.com/git-lfs/git-lfs/v3/man"
+                            (for-each
+                             (lambda (manpage)
+                               (install-file manpage
+                                             (string-append #$output "/share/man/man1")))
+                             (find-files "." "^git-lfs.*\\.1$"))))))
+                   #~()))))
+      (native-inputs
+       (append (list git-minimal
+                     go-github-com-avast-retry-go
+                     go-github-com-dpotapov-go-spnego
+                     go-github-com-git-lfs-gitobj-v2
+                     go-github-com-git-lfs-go-netrc
+                     go-github-com-git-lfs-pktline
+                     go-github-com-git-lfs-wildmatch-v2
+                     go-github-com-golang-groupcache
+                     go-github-com-jmhodges-clock
+                     go-github-com-leonelquinteros-gotext
+                     go-github-com-mattn-go-isatty
+                     go-github-com-olekukonko-ts
+                     go-github-com-pkg-errors
+                     go-github-com-rubyist-tracerx
+                     go-github-com-spf13-cobra
+                     go-github-com-ssgelm-cookiejarparser
+                     go-github-com-stretchr-testify
+                     go-github-com-xeipuuv-gojsonschema
+                     go-golang-org-x-net
+                     go-golang-org-x-sync
+                     go-golang-org-x-sys)
+               ;; make `ronn` available during build for man page generation
+               (if (supported-package? ruby-asciidoctor)
+                   (list ronn-ng ruby-asciidoctor)
+                   '())))
+      (home-page "https://git-lfs.github.com/")
+      (synopsis "Git extension for versioning large files")
+      (description
+       "Git Large File Storage (LFS) replaces large files such as audio samples,
 videos, datasets, and graphics with text pointers inside Git, while storing the
 file contents on a remote server.")
-    (license license:expat)))
+      (license license:expat))))
 
 (define-public lfs-s3
   (package
