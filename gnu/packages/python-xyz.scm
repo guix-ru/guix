@@ -35526,7 +35526,7 @@ restores the original state after the string is printed.")
     (native-inputs
      (list python-pytest))
     (inputs
-     (list sane-backends))
+     (list sane))
     (home-page "https://github.com/python-pillow/Sane")
     (synopsis "Python interface to the SANE scanner")
     (description "This package provides Python interface to the SANE scanner
