@@ -2617,7 +2617,7 @@ used to skip the test
 (define-public go-honnef-co-go-tools
   (package
     (name "go-honnef-co-go-tools")
-    (version "0.4.7")
+    (version "0.6.1")
     (source
      (origin
        (method git-fetch)
@@ -2626,25 +2626,17 @@ used to skip the test
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32
-         "1n58skq2a0vhsgdfdkyqi00d3vv13kiw9b4mxx6xfyb6ysrdy7d1"))))
+        (base32 "0y4xbb91mv1rj7aps5g7hz1mhf5pbdc8yp5bxz6dq5ajlmfqwi3s"))))
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "honnef.co/go/tools"
-      #:phases
-      #~(modify-phases %standard-phases
-          ;; XXX: Workaround for go-build-system's lack of Go modules support.
-          (delete 'build)
-          (replace 'check
-            (lambda* (#:key tests? import-path #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion (string-append "src/" import-path)
-                  (invoke "go" "test" "-v" "./..."))))))))
+      #:skip-build? #t
+      #:import-path "honnef.co/go/tools"))
     (propagated-inputs
      (list go-github-com-burntsushi-toml
+           go-golang-org-x-exp
            go-golang-org-x-exp-typeparams
-           go-golang-org-x-mod
+           go-golang-org-x-sys
            go-golang-org-x-tools))
     (home-page "https://staticcheck.dev/")
     (synopsis "Staticcheck advanced Go linter library")
