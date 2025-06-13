@@ -237,7 +237,7 @@ solution (client-side agent)")
                  (lambda _
                    (setenv "HOME" "/tmp"))))))
     (native-inputs
-     (list go pkg-config))
+     (list go-1.21 pkg-config))
     (inputs
      (list openssl pcre2 zlib))))
 
