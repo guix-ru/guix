@@ -10451,7 +10451,7 @@ Go.")
   (package
     (name
      "go-gitlab-torproject-org-tpo-anti-censorship-pluggable-transports-snowflake-v2")
-    (version "2.10.1")
+    (version "2.11.0")
     (source
      (origin
        (method git-fetch)
@@ -10462,20 +10462,20 @@ Go.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "14ypgzj6c6vjw9s85wf2vdfa9l06iandx7gz90i3w6r65q2cp6vj"))))
+        (base32 "0cy0q88bw14fwbyk0nrdc1g73g7623k337w4b9n7hln2jmis5wjm"))))
     (build-system go-build-system)
     (arguments
      (list
       #:go go-1.23
-      ;; Project provides a Go library and also CLI builds.
+      ;; TODO: Project provides a Go library and also CLI builds for service,
+      ;; client and proxy.
       #:skip-build? #t
       #:import-path
       "gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/v2"
       ;; panic: empty transcript [recovered]
       #:test-flags #~(list "-skip" "TestQueuePacketConnWriteToKCP")))
     (native-inputs
-     (list go-github-com-golang-mock
-           go-github-com-stretchr-testify))
+     (list go-github-com-stretchr-testify))
     (propagated-inputs
      (list go-github-com-aws-aws-sdk-go-v2
            go-github-com-aws-aws-sdk-go-v2-config
@@ -10484,16 +10484,15 @@ Go.")
            go-github-com-golang-mock
            go-github-com-gorilla-websocket
            go-github-com-miekg-dns
-           go-github-com-pion-ice-v2
+           go-github-com-pion-ice-v4
            go-github-com-pion-sdp-v3
            go-github-com-pion-stun-v3
-           go-github-com-pion-transport-v2
-           go-github-com-pion-webrtc-v3
+           go-github-com-pion-transport-v3
+           go-github-com-pion-webrtc-v4
            go-github-com-prometheus-client-golang
            go-github-com-realclientip-realclientip-go
            go-github-com-refraction-networking-utls
            go-github-com-smartystreets-goconvey
-           go-github-com-stretchr-testify
            go-github-com-txthinking-socks5
            go-github-com-xtaci-kcp-go-v5
            go-github-com-xtaci-smux
