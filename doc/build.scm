@@ -1025,11 +1025,11 @@ makeinfo OPTIONS."
                      sed
                      tar
                      texinfo
-                     texlive-base
+                     texlive-scheme-basic
                      texlive-bin        ;for GUIX_TEXMF
                      texlive-epsf
-                     texlive-fonts-ec
-                     texlive-tex-texinfo)))))
+                     texlive-ec
+                     texlive-texinfo)))))
 
   (define build
     (with-imported-modules '((guix build utils))
