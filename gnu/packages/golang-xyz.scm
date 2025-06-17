@@ -5653,17 +5653,18 @@ interact with distribution components.")
       #:import-path "github.com/docker/docker"
       #:skip-build? #t
       #:tests? #f))
-    (propagated-inputs (list go-github-com-docker-go-units
-                             go-github-com-containerd-containerd
-                             go-github-com-containerd-log
-                             go-github-com-gogo-protobuf
-                             go-go-opentelemetry-io-otel
-                             go-github-com-moby-sys-user
-                             go-github-com-moby-sys-userns
-                             go-github-com-moby-sys-sequential
-                             go-go-opentelemetry-io-contrib
-                             go-github-com-klauspost-compress
-                             go-github-com-moby-docker-image-spec))
+    (propagated-inputs
+     (list go-github-com-containerd-containerd
+           go-github-com-containerd-log
+           go-github-com-docker-go-units
+           go-github-com-gogo-protobuf
+           go-github-com-klauspost-compress
+           go-github-com-moby-docker-image-spec
+           go-github-com-moby-sys-sequential
+           go-github-com-moby-sys-user
+           go-github-com-moby-sys-userns
+           go-go-opentelemetry-io-contrib-instrumentation-net-http-otelhttp
+           go-go-opentelemetry-io-otel))
     (home-page "https://github.com/docker/docker")
     (synopsis "The Moby Project")
     (description
