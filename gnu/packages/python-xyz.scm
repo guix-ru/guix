@@ -10096,7 +10096,7 @@ writing C extensions for Python as easy as Python itself.")
     ;; - URL <https://raw.githubusercontent.com/numpy/numpy>
     ;; - commit :: 2f3549c9d7c5048621568e431c86bc7530742723
     ;; - file <doc/source/building/understanding_meson.rst>
-    (version "1.26.2")
+    (version "1.26.4") ;; This is the last planned release in the 1.26.x series.
     (source
      (origin
        (method url-fetch)
@@ -10105,7 +10105,7 @@ writing C extensions for Python as easy as Python itself.")
              version "/numpy-" version ".tar.gz"))
        (sha256
         (base32
-         "1snknqb4hmv6b720nsaz21g7h6z1ikdvnsqyy5vmgavnfr23hmzn"))))
+         "0410j6jfz1yzm5s0v0yrc1j0q6ih4322357and7arr0jxnlsn0ia"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -10220,9 +10220,9 @@ include_dirs = ~:*~a/include~%"
            python-mypy
            python-pytest
            python-pytest-xdist
-           python-setuptools
+           python-setuptools-67
            python-typing-extensions
-           python-wheel))
+           python-wheel-0.40))
     (inputs (list bash openblas))
     (home-page "https://numpy.org")
     (synopsis "Fundamental package for scientific computing with Python")
