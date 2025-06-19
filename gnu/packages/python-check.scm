@@ -3675,19 +3675,11 @@ possibly work.")
     (arguments
      (list
       #:test-flags
-      ;; Two tets fail.
+      ;; XXX: Two tests fail.
       #~(list "--exclude-regex" (string-join
                                  (list "test_initialise_expands_user_directory"
                                        "test_open_expands_user_directory")
-                                 "|"))
-      #:phases
-      #~(modify-phases %standard-phases
-          ;; TODO: Implement in pypproject-build-system's  test-backends.
-          (replace 'check
-            (lambda* (#:key tests? test-flags #:allow-other-keys)
-              (when tests?
-                (let ((stestr (string-append #$output "/bin/stestr")))
-                  (apply invoke stestr "run" test-flags))))))))
+                                 "|"))))
     (native-inputs
      (list python-ddt
            python-iso8601
