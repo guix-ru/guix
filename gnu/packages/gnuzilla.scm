@@ -762,8 +762,8 @@ variable defined below.  It requires guile-json to be installed."
           (origin
             (method url-fetch)
             (uri (string-append
-                  "https://ftp.mozilla.org/pub/firefox/releases/"
-                  upstream-firefox-version "/source/"
+                  "https://ftp.mozilla.org/pub/firefox/candidates/"
+                  upstream-firefox-version "-candidates/build1/source/"
                   "firefox-" upstream-firefox-version ".source.tar.xz"))
             (sha256
              (base32
