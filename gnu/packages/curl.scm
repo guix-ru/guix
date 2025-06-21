@@ -106,36 +106,20 @@
               (mkdir-p (string-append #$output:doc "/share/man"))
               (rename-file (string-append #$output "/share/man/man3")
                            (string-append #$output:doc "/share/man/man3"))))
-          (replace 'check
-            (lambda* (#:key tests? parallel-tests? make-flags #:allow-other-keys)
+          (add-after 'unpack 'patch-runtests
+            (lambda _
               (substitute* "tests/runtests.pl"
-                (("/bin/sh") (which "sh")))
-              (when tests?
-                (let* ((job-count (string-append
-                                   "-j"
-                                   (if parallel-tests?
-                                       (number->string (parallel-job-count))
-                                       "1")))
-                       ;; Ignore test 1477 due to a missing file in the 8.5.0
-                       ;; release.  See
-                       ;; <https://github.com/curl/curl/issues/12462>.
-                       (arguments `("-C" "tests" "test"
-                                    ,@make-flags
-                                    ,(if #$(or (system-hurd?)
-                                               (target-arm32?)
-                                               (target-aarch64?))
-                                         ;; protocol FAIL
-                                         (string-append "TFLAGS=~1474 "
-                                                        "!1477 "
-                                                        job-count)
-                                         (string-append "TFLAGS=\"~1477 "
-                                                        job-count "\"")))))
-                  ;; The top-level "make check" does "make -C tests quiet-test", which
-                  ;; is too quiet.  Use the "test" target instead, which is more
-                  ;; verbose.
-                  (apply invoke "make" arguments)))))
-          #$@(if (system-hurd?)
+                (("/bin/sh") (which "sh")))))
+          #$@(if (or (target-arm32?)
+                     (target-aarch64?))
                  #~((add-after 'unpack 'skip-tests
+                      (lambda _
+                        (let ((port (open-file "tests/data/DISABLED" "a")))
+                          (display "1474\n" port)
+                          (close port)))))
+                 #~())
+          #$@(if (system-hurd?)
+                 #~((add-after 'unpack 'skip-tests/hurd
                       (lambda _
                         (let ((port (open-file "tests/data/DISABLED" "a")))
                           (display "526\n" port)
@@ -147,6 +131,7 @@
                           (display "564\n" port)
                           (display "575\n" port)
                           (display "1021\n" port)
+                          (display "1474\n" port)
                           (display "1501\n" port)
                           (close port)))))
                  #~()))))
