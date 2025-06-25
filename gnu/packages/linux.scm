@@ -7923,7 +7923,7 @@ from the ntfs-3g package.  It is meant to be used in initrds.")
            (lambda _
              (invoke "ninja" "install"))))))
     (native-inputs
-     (list ninja pkg-config python-wrapper python-docutils)) ;for 'rst2man'
+     (list ninja pkg-config python-wrapper python-docutils-0.19)) ;for 'rst2man'
     (inputs
      (list libnl eudev))
     (home-page "https://github.com/linux-rdma/rdma-core")
