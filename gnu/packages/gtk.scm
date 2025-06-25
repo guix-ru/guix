@@ -1374,7 +1374,7 @@ application suites.")
            pkg-config
            python-pygobject
            ;; These python modules are required for building documentation.
-           python-docutils
+           python-docutils-0.19
            python-jinja2
            python-markdown
            python-markupsafe
