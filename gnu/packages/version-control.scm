@@ -1795,7 +1795,7 @@ supports AGit-Flow and lifts the requirement to use a manifest file.")
              bash-minimal
              openssl
              python
-             python-docutils
+             python-docutils-0.19
              python-markdown
              python-pygments
              zlib
