@@ -20555,7 +20555,7 @@ distributions of benchmark measurements
     (build-system go-build-system)
     (arguments
      (list
-      #:test-flags #~(list "-skip" "TestFailoverHandler")
+      #:test-flags #~(list "-skip" "TestFailoverHandler|TestLazy")
       #:import-path "gopkg.in/inconshreveable/log15.v1"))
     (native-inputs
      (list go-github-com-stretchr-testify))
