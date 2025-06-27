@@ -2,6 +2,7 @@
 ;;; Copyright © 2016, 2017 Andy Patterson <ajpatter@uwaterloo.ca>
 ;;; Copyright © 2020, 2022 Guillaume Le Vaillant <glv@posteo.net>
 ;;; Copyright © 2022 Pierre Neidhardt <mail@ambrevar.xyz>
+;;; Copyright © 2025 jgart <jgart@dismail.de>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -108,6 +109,8 @@ with PROGRAM."
              "--eval" "(quit)"))
     ("clasp" `(,(%lisp) "--non-interactive"
                ,@(spread-statements program "--eval")))
+    ("abcl" `(,(%lisp) "--batch"
+              ,@(spread-statements program "--eval")))
     (_ (error "The LISP provided is not supported at this time."))))
 
 (define (compile-systems systems directory operation)

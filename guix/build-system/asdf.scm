@@ -44,7 +44,8 @@
             asdf-build-system/source
             sbcl-package->cl-source-package
             sbcl-package->ecl-package
-            sbcl-package->clasp-package))
+            sbcl-package->clasp-package
+            sbcl-package->abcl-package))
 
 ;; Commentary:
 ;;
@@ -70,7 +71,11 @@
 (define (default-lisp implementation)
   "Return the default package for the lisp IMPLEMENTATION."
   ;; Lazily resolve the binding to avoid a circular dependency.
-  (let ((lisp-module (resolve-interface '(gnu packages lisp))))
+  (let ((lisp-module
+         (resolve-interface
+          (if (eq? implementation 'abcl)
+              '(gnu packages java)
+              '(gnu packages lisp)))))
     (module-ref lisp-module implementation)))
 
 (define* (lower/source name
@@ -254,6 +259,7 @@ set up using CL source package conventions."
                       ("sbcl" 'sbcl)
                       ("ecl" 'ecl)
                       ("clasp" 'clasp-cl)
+                      ("abcl" 'abcl)
                       (_ error "The LISP provided is not supported at this time."))))
             #:allow-other-keys
             #:rest arguments)
@@ -353,6 +359,12 @@ set up using CL source package conventions."
     (description "The build system for ASDF binary packages using Clasp")
     (lower (lower "clasp"))))
 
+(define asdf-build-system/abcl
+  (build-system
+    (name 'asdf/abcl)
+    (description "The build system for ASDF binary packages using ABCL")
+    (lower (lower "abcl"))))
+
 (define asdf-build-system/source
   (build-system
     (name 'asdf/source)
@@ -394,6 +406,20 @@ set up using CL source package conventions."
                                      asdf-build-system/clasp
                                      "sbcl-"
                                      "clasp-"
+                                     #:variant-property property
+                                     #:phases-transformer
+                                     'identity)))
+    (lambda (pkg)
+      (transformer
+       (strip-variant-as-necessary property pkg)))))
+
+(define sbcl-package->abcl-package
+  (let* ((property 'abcl-variant)
+         (transformer
+          (package-with-build-system asdf-build-system/sbcl
+                                     asdf-build-system/abcl
+                                     "sbcl-"
+                                     "abcl-"
                                      #:variant-property property
                                      #:phases-transformer
                                      'identity)))
