@@ -300,7 +300,12 @@ information, refer to the @samp{dbus-daemon(1)} man page.")))
             (lambda _
               (with-directory-excursion "glib/tests"
                 (substitute* '("unix.c" "utils.c")
-                  (("[ \t]*g_test_add_func.*;") "")))
+                  (("[ \t]*g_test_add_func.*;") ""))
+
+                ;; This test creates a read-only directory, which later leads to
+                ;; a build error when attempting to clean it up.
+                (substitute* '("fileutils.c")
+                  (("[ \t]*g_test_add_func.*read-only-directory.*;") "")))
               (with-directory-excursion "gio/tests"
                 (substitute* '("contenttype.c"
                                "gdbus-address-get-session.c"
