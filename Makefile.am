@@ -722,7 +722,7 @@ endif !CAN_RUN_TESTS
 
 check-system: $(GOBJECTS)
 	$(AM_V_at)$(top_builddir)/pre-inst-env			\
-	  guix build -m $(top_srcdir)/etc/manifests/system-tests.scm -K
+          guix repl -- $(top_srcdir)/build-aux/run-system-tests.scm -K
 
 # Public keys used to sign substitutes.
 dist_pkgdata_DATA =				\
