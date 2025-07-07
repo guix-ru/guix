@@ -33,7 +33,6 @@
   #:use-module (guix store)
   #:use-module (guix modules)
   #:use-module ((guix packages) #:select (package-version supported-package?))
-  #:autoload   (guix channels) (channel? channel-commit)
   #:use-module (guix platform)
   #:use-module (guix utils)
   #:use-module (guix packages)
@@ -354,15 +353,6 @@ Access documentation at any time by pressing Alt-F2.\x1b[0m
     (define bare-bones-os
       (load "examples/bare-bones.tmpl"))
 
-    (define (guix-package-commit guix)
-      ;; Extract the commit of the GUIX package.
-      (match (package-source guix)
-        ((? channel? source)
-         (channel-commit source))
-        (_
-         (apply (lambda* (#:key commit #:allow-other-keys) commit)
-                (package-arguments guix)))))
-
     (append
      ;; Generic services
      (list (service virtual-terminal-service-type)
@@ -413,7 +403,8 @@ Access documentation at any time by pressing Alt-F2.\x1b[0m
                                ;; Do not leak the local checkout URL.
                                (source (channel
                                         (inherit %default-guix-channel)
-                                        (commit (guix-package-commit guix)))))))))
+                                        (commit (channel-commit
+                                                 (package-source guix))))))))))
 
            ;; Start udev so that useful device nodes are available.
            ;; Use device-mapper rules for cryptsetup & co; enable the CRDA for
