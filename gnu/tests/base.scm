@@ -345,7 +345,7 @@ info --version")
               ;; after we switched to TTY1, we won't be able to login. Make
               ;; sure to wait long enough before switching to TTY1.
               (when #$desktop?
-                (sleep 30))
+                (sleep 60))
 
               (marionette-control "sendkey ctrl-alt-f1" marionette)
               ;; Wait for the 'term-tty1' service to be running (using
