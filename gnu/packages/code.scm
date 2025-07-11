@@ -1200,7 +1200,7 @@ expressions, and its ability to generate emacs-style TAGS files.")
     ;; network access.
     (arguments (list #:tests? #f))
     (native-inputs
-     (list python-setuptools-next))
+     (list python-setuptools))
     (inputs
      (list python-pyyaml
            python-radon

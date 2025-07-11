@@ -3732,7 +3732,7 @@ files.")
     (native-inputs
      (list python-pytest
            python-pytest-cov
-           python-setuptools-next))
+           python-setuptools))
     (inputs
      (list libsndfile
            portaudio))

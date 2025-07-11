@@ -6590,7 +6590,7 @@ can also directly record to WebM or MP4 if you prefer.")
      (list python-dbus
            python-pygobject
            python-pytest
-           python-setuptools-next
+           python-setuptools
            python-wheel))
     (propagated-inputs
      (list python-pylast

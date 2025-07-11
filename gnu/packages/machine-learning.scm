@@ -244,7 +244,7 @@ family of functions.")
                              python-tqdm))
     (native-inputs (list python-numpy
                          python-pytest
-                         python-setuptools-next))
+                         python-setuptools))
     (home-page "https://github.com/SYSTRAN/faster-whisper")
     (synopsis "Whisper transcription reimplementation")
     (description
@@ -1922,7 +1922,7 @@ with a single function call.")
            python-pytest
            python-pytorch
            python-sentencepiece
-           python-setuptools-next))
+           python-setuptools))
     (propagated-inputs
      (list python-coloredlogs
            python-flatbuffers
@@ -2619,7 +2619,7 @@ data by providing clean labels during training.")
                           (lambda* (#:key tests? #:allow-other-keys)
                             (when tests?
                               (invoke "python" "-m" "cma.test")))))))
-    (native-inputs (list python-pytest python-setuptools-next))
+    (native-inputs (list python-pytest python-setuptools))
     (propagated-inputs (list python-numpy))
     (home-page "https://github.com/CMA-ES/pycma")
     (synopsis "Python implementation of CMA-ES")
