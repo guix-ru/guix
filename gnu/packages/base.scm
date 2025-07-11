@@ -431,6 +431,14 @@ interactive means to merge two files.")
                                  "gnulib-tests/test-strerror_r.c"
                                (("(^| )main *\\(.*" all)
                                 (string-append all "{\n  exit (77);//"))))))
+                       '())
+                 ,@(if (string=? "riscv64-linux" (%current-system))
+                       ;; Unmodified test-lock will fail or crash riscv64
+                       '((add-before 'check 'modify-test-lock
+                           (lambda _
+                             (substitute* "gnulib-tests/test-lock.c"
+                               (("#define DO_TEST_RWLOCK 1")
+                                "#define DO_TEST_RWLOCK 0")))))
                        '()))))
    (synopsis "Operating on files matching given criteria")
    (description
