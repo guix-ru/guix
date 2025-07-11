@@ -9989,41 +9989,45 @@ writing C extensions for Python as easy as Python itself.")
   (package
     (inherit python-cython)
     (name "python-cython")
-    (version "0.29.37")         ;it's the latest version of 0.29
+    ;; It's the latest version of 0.29. See
+    ;; <https://github.com/cython/cython/blob/0.29.37/CHANGES.rst>.
+    (version "0.29.37")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "Cython" version))
        (sha256
         (base32 "1ysca2r23h12ai9wrym4ci0nvgwm3lfijrpj9xfyxbclvnkd84zq"))))
-    (build-system python-build-system)
+    (build-system pyproject-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'check 'set-HOME
-           ;; some tests require access to "$HOME/.cython"
-           (lambda _ (setenv "HOME" "/tmp")))
-         (replace 'check
-           (lambda* (#:key tests? #:allow-other-keys)
-             ;; Disable compiler optimizations to greatly reduce the running
-             ;; time of the test suite.
-             (setenv "CFLAGS" "-O0")
-             (when tests?
-               (invoke "python" "runtests.py" "-vv"
-                       "-j" (number->string (parallel-job-count))
-                       ;; XXX: On 32-bit architectures, running the parallel tests
-                       ;; fails on many-core systems, see
-                       ;; <https://github.com/cython/cython/issues/2807>.
-                       ,@(if (not (target-64bit?))
-                             '("-x" "run.parallel")
-                             '())
-                       ,@(if (system-hurd?)
-                             '("-x" "test_class_ref"
-                               "-x" "test_compiler_directives"
-                               "-x" "test_lang_version")
-                             '())
-                       ;; This test fails when running on 24 cores.
-                       "-x" "cpp_stl_conversion")))))))))
+     (list
+      #:test-backend #~'custom
+      #:test-flags
+      #~(list "runtests.py"
+              "-vv"
+              "-j" (number->string (parallel-job-count))
+              ;; XXX: On 32-bit architectures, running the parallel tests
+              ;; fails on many-core systems, see
+              ;; <https://github.com/cython/cython/issues/2807>.
+              #$@(if (not (target-64bit?))
+                     #~("-x" "run.parallel")
+                     #~())
+              #$@(if (system-hurd?)
+                     #~("-x" "test_class_ref"
+                        "-x" "test_compiler_directives"
+                        "-x" "test_lang_version")
+                     #~())
+              ;; This test fails when running on 24 cores.
+              "-x" "cpp_stl_conversion")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'pre-check
+            ;; some tests require access to "$HOME/.cython"
+            (lambda _
+              (setenv "HOME" "/tmp")
+              ;; Disable compiler optimizations to greatly reduce the running
+              ;; time of the test suite.
+              (setenv "CFLAGS" "-O0"))))))))
 
 ;; Needed for scipy
 (define-public python-cython-0.29.35
