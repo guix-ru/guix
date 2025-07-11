@@ -9962,86 +9962,16 @@ For some datatypes the overhead can be reduced by using khash by factor 4-8.")
     (license license:expat)))
 
 (define-public python-cython
+  ;; TODO: Move to python-build.
   (package
     (name "python-cython")
-    (version "0.29.32")
+    (version "3.1.2")
     (source
      (origin
        (method url-fetch)
-       (uri (pypi-uri "Cython" version))
+       (uri (pypi-uri "cython" version))
        (sha256
-        (base32 "1xqsihpqnfal29nb5kmw8z71nd4jbsnbz7p3lkr094xpb13wycw7"))))
-    (build-system python-build-system)
-    ;; we need the full python package and not just the python-wrapper
-    ;; because we need libpython3.3m.so
-    (inputs
-     (list python))
-    (native-inputs
-     ;; Needed for some tests that link against it.
-     (list libxcrypt))
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'check 'set-HOME
-           ;; some tests require access to "$HOME/.cython"
-           (lambda _ (setenv "HOME" "/tmp")))
-         (replace 'check
-           (lambda* (#:key tests? #:allow-other-keys)
-             ;; Disable compiler optimizations to greatly reduce the running
-             ;; time of the test suite.
-             (setenv "CFLAGS" "-O0")
-
-             (when tests?
-               (invoke "python" "runtests.py" "-vv"
-                       "-j" (number->string (parallel-job-count))
-                       ;; XXX: On 32-bit architectures, running the parallel tests
-                       ;; fails on many-core systems, see
-                       ;; <https://github.com/cython/cython/issues/2807>.
-                       ,@(if (not (target-64bit?))
-                             '("-x" "run.parallel")
-                             '())
-                       ,@(if (system-hurd?)
-                             '("-x" "test_class_ref"
-                               "-x" "test_compiler_directives"
-                               "-x" "test_lang_version")
-                             '())
-                       ;; This test fails when running on 24 cores.
-                       "-x" "cpp_stl_conversion")))))))
-    (home-page "https://cython.org/")
-    (synopsis "C extensions for Python")
-    (description "Cython is an optimising static compiler for both the Python
-programming language and the extended Cython programming language.  It makes
-writing C extensions for Python as easy as Python itself.")
-    (license license:asl2.0)))
-
-;; Needed for scipy
-(define-public python-cython-0.29.35
-  (package
-    (inherit python-cython)
-    (name "python-cython")
-    (version "0.29.35")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "Cython" version))
-              (sha256
-               (base32
-                "09y5r22nyswqpwc02agla1bnzh2jx2db25pnq9pc5cq8pyh1yf3f"))))
-    (properties '())))
-
-(define-public python-cython-3
-  (package
-    (inherit python-cython)
-    ;; Cython 3.x is the current stable version, however there are still a lot
-    ;; of packages, which depend on `python-cython` package. Those need to be
-    ;; upgraded.
-    (name "python-cython-next")
-    (version "3.1.2")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "cython" version))
-              (sha256
-               (base32
-                "108k6gsn63qkz98xhnm4440ir9ab0lxmw0gcrpz2sxm67yapmgvb"))))
+        (base32 "108k6gsn63qkz98xhnm4440ir9ab0lxmw0gcrpz2sxm67yapmgvb"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -10085,7 +10015,74 @@ writing C extensions for Python as easy as Python itself.")
      (list libxcrypt
            python-setuptools
            python-wheel))
+    ;; we need the full python package and not just the python-wrapper
+    ;; because we need libpython3.3m.so
+    (inputs
+     (list python))
+    (properties '())
+(home-page "https://cython.org/")
+(synopsis "C extensions for Python")
+(description "Cython is an optimising static compiler for both the Python
+programming language and the extended Cython programming language.  It makes
+writing C extensions for Python as easy as Python itself.")
+(license license:asl2.0)))
+
+(define-public python-cython-0
+  (package
+    (inherit python-cython)
+    (name "python-cython")
+    (version "0.29.32")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "Cython" version))
+       (sha256
+        (base32 "1xqsihpqnfal29nb5kmw8z71nd4jbsnbz7p3lkr094xpb13wycw7"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-before 'check 'set-HOME
+           ;; some tests require access to "$HOME/.cython"
+           (lambda _ (setenv "HOME" "/tmp")))
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             ;; Disable compiler optimizations to greatly reduce the running
+             ;; time of the test suite.
+             (setenv "CFLAGS" "-O0")
+             (when tests?
+               (invoke "python" "runtests.py" "-vv"
+                       "-j" (number->string (parallel-job-count))
+                       ;; XXX: On 32-bit architectures, running the parallel tests
+                       ;; fails on many-core systems, see
+                       ;; <https://github.com/cython/cython/issues/2807>.
+                       ,@(if (not (target-64bit?))
+                             '("-x" "run.parallel")
+                             '())
+                       ,@(if (system-hurd?)
+                             '("-x" "test_class_ref"
+                               "-x" "test_compiler_directives"
+                               "-x" "test_lang_version")
+                             '())
+                       ;; This test fails when running on 24 cores.
+                       "-x" "cpp_stl_conversion")))))))))
+
+;; Needed for scipy
+(define-public python-cython-0.29.35
+  (package
+    (inherit python-cython-0)
+    (name "python-cython")
+    (version "0.29.35")
+    (source (origin
+              (method url-fetch)
+              (uri (pypi-uri "Cython" version))
+              (sha256
+               (base32
+                "09y5r22nyswqpwc02agla1bnzh2jx2db25pnq9pc5cq8pyh1yf3f"))))
     (properties '())))
+
+(define-public python-cython-3
+  (deprecated-package "python-cython-next" python-cython))
 
 ;; NOTE: when upgrading numpy please make sure that python-numba,
 ;; python-pandas and python-scipy still build, as these three packages are
