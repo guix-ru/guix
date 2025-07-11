@@ -5809,7 +5809,7 @@ subgroups.")
     (inputs
      (list ncurses curl zlib))
     (native-inputs
-     (list python-cython
+     (list python-cython-0
            python-pytest
            python-setuptools
            python-wheel
