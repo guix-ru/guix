@@ -5335,7 +5335,7 @@ for the standard @code{argparse} library.")
     (build-system pyproject-build-system)
     (native-inputs
      (list python-pytest
-           python-setuptools-next
+           python-setuptools
            python-wheel))
     (home-page "https://github.com/eerimoq/bitstruct")
     (synopsis "Python values to and C bit field structs converter")
@@ -12970,7 +12970,7 @@ experimental data and metadata at the Laboratory for Fluorescence Dynamics.")
            python-numpy
            python-pillow
            python-pytest
-           python-setuptools-next
+           python-setuptools
            python-wheel))
     (inputs
      (list ffmpeg-7))
@@ -40087,7 +40087,7 @@ with one function call.  IceCream makes print debugging a little sweeter.")
          (string-append "not test_trigrams" " and not test_word_ids")
          "test/test_ngrams.py")))
     (propagated-inputs (list python-cffi))
-    (native-inputs (list python-pytest python-setuptools-next
+    (native-inputs (list python-pytest python-setuptools
                          python-setuptools-scm-next python-wheel))
     (home-page "https://github.com/mideind/Icegrams")
     (synopsis "Trigram statistics for Icelandic")
