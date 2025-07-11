@@ -3521,7 +3521,7 @@ player-like clients.")
     (build-system python-build-system)
     (arguments `(#:tests? #f)) ;no tests
     (native-inputs
-     (list python-cython))
+     (list python-cython-0))
     (inputs
      (list liblo))
     (home-page "http://das.nasophon.de/pyliblo/")
