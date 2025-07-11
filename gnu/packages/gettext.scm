@@ -116,6 +116,12 @@
                          (("/bin/pwd")
                           "pwd"))
 
+                       #$@(if (string=? "riscv64-linux" (%current-system))
+                              ;; Unmodified test-lock will fail or crash riscv64
+                              #~((substitute* "gettext-tools/gnulib-tests/test-lock.c"
+                                   (("#define DO_TEST_RWLOCK 1")
+                                    "#define DO_TEST_RWLOCK 0")))
+                              #~())
                        #$@(if (target-hurd?)
                               #~((substitute*
                                      "gettext-tools/gnulib-tests/Makefile.in"
