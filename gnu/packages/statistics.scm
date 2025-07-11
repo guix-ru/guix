@@ -1181,7 +1181,7 @@ Meier, Nelson Aalen and regression.")
                (base32
                 "1bkikqjya6gkds3n4qj6svvyz6czkwrc5s66ffb62l6wi4v2f89a"))))
     (build-system pyproject-build-system)
-    (native-inputs (list python-pandas python-pytest python-setuptools-next
+    (native-inputs (list python-pandas python-pytest python-setuptools
                          python-wheel))
     (propagated-inputs (list python-numpy python-scikit-learn))
     (home-page "https://github.com/scikit-learn-contrib/MAPIE")
