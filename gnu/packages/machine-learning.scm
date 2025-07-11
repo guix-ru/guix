@@ -2505,7 +2505,7 @@ data by providing clean labels during training.")
                           (lambda* (#:key tests? #:allow-other-keys)
                             (when tests?
                               (invoke "python" "-m" "cma.test")))))))
-    (native-inputs (list python-pytest python-setuptools-next))
+    (native-inputs (list python-pytest python-setuptools))
     (propagated-inputs (list python-numpy))
     (home-page "https://github.com/CMA-ES/pycma")
     (synopsis "Python implementation of CMA-ES")
