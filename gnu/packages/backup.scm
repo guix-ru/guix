@@ -691,12 +691,37 @@ detection, and lossless compression.")
                         "src/borg/platform/posix.c"
                         "src/borg/platform/syncfilerange.c"
                         "src/borg/platform/windows.c"))))))
-    (build-system python-build-system)
+    (build-system pyproject-build-system)
     (arguments
      (list
       #:modules '((srfi srfi-26)        ; for cut
                   (guix build utils)
-                  (guix build python-build-system))
+                  (guix build pyproject-build-system))
+      #:test-flags
+      #~(list "--benchmark-skip"
+              "--numprocesses" (number->string (parallel-job-count))
+              "--pyargs" "borg.testsuite"
+              "-k" (string-join
+                    ;; These tests need to write to '/var'.
+                    (list "not test_get_cache_dir "
+                          "test_get_config_dir "
+                          "test_get_keys_dir "
+                          "test_get_security_dir "
+                          ;; These tests assume there is a root user in '/etc/passwd'.
+                          "test_access_acl "
+                          "test_default_acl "
+                          "test_get_item_uid_gid "
+                          "test_create_content_from_command "
+                          "test_create_content_from_command_with_failed_command "
+                          "test_create_stdin "
+                          ;; These tests assume the kernel supports FUSE.
+                          "test_fuse "
+                          "test_fuse_allow_damaged_files "
+                          "test_mount_hardlinks "
+                          "test_readonly_mount "
+                          "test_fuse_versions_view "
+                          "test_migrate_lock_alive")
+                    " and not "))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'set-env
@@ -711,35 +736,6 @@ detection, and lossless compression.")
                 (setenv "BORG_LIBLZ4_PREFIX" lz4)
                 (setenv "BORG_LIBXXHASH_PREFIX" xxhash)
                 (setenv "BORG_LIBZSTD_PREFIX" zstd))))
-          (replace 'check
-            (lambda* (#:key inputs outputs tests? #:allow-other-keys)
-              (when tests?
-                ;; The tests should be run in an empty directory.
-                (mkdir-p "tests")
-                (with-directory-excursion "tests"
-                  (invoke "py.test" "-v" "--pyargs" "borg.testsuite" "-k"
-                          (string-append
-                           ;; These tests need to write to '/var'.
-                           "not test_get_cache_dir "
-                           "and not test_get_config_dir "
-                           "and not test_get_keys_dir "
-                           "and not test_get_security_dir "
-                           ;; These tests assume there is a root user in '/etc/passwd'.
-                           "and not test_access_acl "
-                           "and not test_default_acl "
-                           "and not test_get_item_uid_gid "
-                           "and not test_create_content_from_command "
-                           "and not test_create_content_from_command_with_failed_command "
-                           "and not test_create_stdin "
-                           ;; We don't need to run benchmarks
-                           "and not benchmark "
-                           ;; These tests assume the kernel supports FUSE.
-                           "and not test_fuse "
-                           "and not test_fuse_allow_damaged_files "
-                           "and not test_mount_hardlinks "
-                           "and not test_readonly_mount "
-                           "and not test_fuse_versions_view "
-                           "and not test_migrate_lock_alive"))))))
           (add-after 'install 'install-doc
             (lambda _
               (let ((man (string-append #$output "/share/man/man1"))
@@ -763,7 +759,14 @@ detection, and lossless compression.")
                   (install-file "fish/borg.fish"
                                 (string-append share "/fish/vendor_completions.d")))))))))
     (native-inputs
-     (list python-cython python-dateutil python-setuptools-scm python-pytest))
+     (list python-cython
+           python-dateutil
+           python-pytest
+           python-pytest-benchmark
+           python-pytest-xdist
+           python-setuptools
+           python-setuptools-scm
+           python-wheel))
     (inputs
      (list acl
            lz4
