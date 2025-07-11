@@ -9989,13 +9989,13 @@ writing C extensions for Python as easy as Python itself.")
   (package
     (inherit python-cython)
     (name "python-cython")
-    (version "0.29.32")
+    (version "0.29.37")         ;it's the latest version of 0.29
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "Cython" version))
        (sha256
-        (base32 "1xqsihpqnfal29nb5kmw8z71nd4jbsnbz7p3lkr094xpb13wycw7"))))
+        (base32 "1ysca2r23h12ai9wrym4ci0nvgwm3lfijrpj9xfyxbclvnkd84zq"))))
     (build-system python-build-system)
     (arguments
      `(#:phases
