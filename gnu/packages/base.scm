@@ -507,6 +507,14 @@ used to apply commands with arbitrarily long arguments.")
                        (("/bin/sh") (which "sh")))
                      (substitute* (find-files "tests" "\\.sh$")
                        (("#!/bin/sh") (string-append "#!" (which "sh"))))))
+                 ,@(if (string=? "riscv64-linux" (%current-system))
+                       ;; Unmodified test-lock will fail or crash riscv64
+                       '((add-before 'check 'modify-test-lock
+                           (lambda _
+                             (substitute* "gnulib-tests/test-lock.c"
+                               (("#define DO_TEST_RWLOCK 1")
+                                "#define DO_TEST_RWLOCK 0")))))
+                       '())
                  (add-after 'unpack 'remove-tests
                    (lambda _
                      ,@(if (system-hurd?)
