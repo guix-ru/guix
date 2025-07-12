@@ -27484,25 +27484,19 @@ functionality like full case-folding for case-insensitive matches in Unicode.")
 (define-public python-rencode
   (package
    (name "python-rencode")
-   (version "1.0.5")
+   (version "1.0.8")
    (source
     (origin
      (method url-fetch)
      (uri (pypi-uri "rencode" version))
      (sha256
       (base32
-       "0mzwdq1is7kyyr32i5k4iz6g5xxdvmiyc132jnc60p9m6lnwjrpv"))))
-   (build-system python-build-system)
-   (arguments
-    `(#:phases
-      (modify-phases %standard-phases
-        (add-before 'check 'delete-bogus-test
-          ;; This test requires /home/aresch/Downloads, which is not provided by
-          ;; the build environment.
-          (lambda _
-            (delete-file "rencode/t.py")
-            #t)))))
-   (native-inputs (list pkg-config python-cython))
+       "08kpkalma901ml8ayy55aypvl6i1g51bf2bsbdhkbp2av2vdkcl3"))))
+   (build-system pyproject-build-system)
+   (native-inputs
+    (list python-cython
+          python-pytest
+          python-poetry-core))
    (home-page "https://github.com/aresch/rencode")
    (synopsis "Serialization of heterogeneous data structures")
    (description
