@@ -1654,7 +1654,7 @@ operate properly.")
                                   version ".tar.xz"))
               (sha256
                (base32
-                "12dkv17mrsdqrm70c30azjw7qi1lfxca7xisw81x6flacddm2il6"))))
+                "1c837agaw8ljhjx6ndp2w7hffi2mkb22vnmb8v0fbfqdbqwq8fbk"))))
     (outputs '("out" "debug"))
     (build-system gnu-build-system)
     (inputs
@@ -1685,13 +1685,16 @@ operate properly.")
             mesa
             openal
             pulseaudio
+            shaderc
             sdl2
             soxr
             speex
+            spirv-tools
             srt
             svt-av1
             twolame
             vidstab
+            vulkan-loader
             x265
             xvid
             zlib)))
@@ -1701,6 +1704,7 @@ operate properly.")
            pkg-config
            texinfo
            speex
+           vulkan-headers
            yasm))
     (arguments
      (list
@@ -1775,6 +1779,7 @@ operate properly.")
          #$@(if (this-package-input "rav1e")
                 '("--enable-librav1e")
                 '())
+         "--enable-libshaderc"
          "--enable-libsoxr"
          "--enable-libspeex"
          "--enable-libsrt"
@@ -1792,6 +1797,7 @@ operate properly.")
          "--enable-opengl"
          "--enable-libdrm"
          "--enable-vaapi"
+         "--enable-vulkan"
 
          "--enable-runtime-cpudetect"
 
