@@ -1672,6 +1672,7 @@ operate properly.")
             libcaca
             libcdio-paranoia
             libdrm
+            libplacebo
             libtheora
             libva
             libvdpau
@@ -1773,6 +1774,7 @@ operate properly.")
          "--enable-libfreetype"
          "--enable-libmp3lame"
          "--enable-libopus"
+         "--enable-libplacebo"
          "--enable-libpulse"
          #$@(if (this-package-input "rav1e")
                 '("--enable-librav1e")
