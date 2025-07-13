@@ -24,6 +24,7 @@
 ;;; Copyright © 2022 John Kehayias <john.kehayias@protonmail.com>
 ;;; Copyright © 2023 Josselin Poiret <dev@jpoiret.xyz>
 ;;; Copyright © 2024, 2025 Zheng Junjie <z572@z572.online>
+;;; Copyright © 2025 Nikita Mitasov <me@ch4og.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -925,6 +926,7 @@ the store.")
   (list "glibc-ldd-powerpc.patch"
         "glibc-2.41-ldd-x86_64.patch"
         "glibc-2.40-dl-cache.patch"
+        "glibc-fix-path-attribute-in-getconf.patch"
         "glibc-2.37-versioned-locpath.patch"
         ;; "glibc-allow-kernel-2.6.32.patch"
         "glibc-reinstate-prlimit64-fallback.patch"

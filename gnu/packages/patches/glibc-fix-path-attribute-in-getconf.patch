@@ -1,0 +1,23 @@
+This patch is based on patch from NixOS/nixpkgs
+pkgs/development/libraries/glibc/fix_path_attribute_in_getconf.patch
+
+It adjusts the CS_PATH definition in sysdeps/unix/confstr.h so that getconf PATH
+includes /run/current-system/profile/bin, which is where Guix stores profile binaries.
+Unlike traditional distributions, Guix does not use /bin or /usr/bin as actual locations
+for executables. This change ensures that tools and scripts relying on getconf PATH
+receive a correct and functional PATH.
+
+
+From bff411feec1f381a51d7127971e5d6fda1167254 Mon Sep 17 00:00:00 2001
+From: Nikita Mitasov <me@ch4og.com>
+Date: Sun, 13 Jul 2025 17:48:19 +0300
+Subject: [PATCH] Add Guix profile path to getconf
+
+
+diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
+index 15859c3b..837837c7 100644
+--- a/sysdeps/unix/confstr.h
++++ b/sysdeps/unix/confstr.h
+@@ -1 +1 @@
+-#define	CS_PATH	"/bin:/usr/bin"
++#define	CS_PATH	"/run/current-system/profile/bin:/bin:/usr/bin"
