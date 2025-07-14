@@ -196,7 +196,18 @@
      (list
       #:modules (%emacs-modules build-system)
       #:configure-flags #~(list "--with-gnutls=no" "--disable-build-details")
-      #:make-flags #~(list (string-append "SELECTOR=" #$%selector))
+      #:make-flags
+      #~(list (string-append "SELECTOR=" #$%selector)
+              ;; XXX: Used to make emacs pdump reproducible, but only on x86_64.
+              #$@(if (supported-package? dettrace)
+                     #~((string-append "RUN_TEMACS="
+                                       #$(this-package-native-input "dettrace")
+                                       "/bin/dettrace"
+                                       " --host-userns --host-pidns "
+                                       " --host-mountns --base-env=host"
+                                       " -- ./temacs"))
+                     #~()))
+      #:parallel-build? (not (supported-package? dettrace))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'enable-elogind
@@ -358,7 +369,10 @@
                  (car (find-files "bin" "^emacs-([0-9]+\\.)+[0-9]+$"))
                  "bin/emacs")))))))
     (inputs (list bash-minimal coreutils findutils gawk gzip ncurses sed))
-    (native-inputs (list autoconf pkg-config texinfo))
+    (native-inputs (append (list autoconf pkg-config texinfo)
+                           (if (supported-package? dettrace)
+                               (list dettrace)
+                               '())))
     (home-page "https://www.gnu.org/software/emacs/")
     (synopsis "The extensible text editor (minimal build for byte-compilation)")
     (description
