@@ -325,6 +325,39 @@ static analysis of the ELF binaries at hand.")
     (description "Libelf is a C library to access ELF object files.")
     (license license:lgpl2.0+)))
 
+(define-public libelfin
+  (let ((commit "e0172767b79b76373044118ef0272b49b02a0894")
+        (revision "0"))
+    (package
+      (name "libelfin")
+      (version (git-version "0.3" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/aclements/libelfin")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1x8gkmpqzcrd97sm5i9g4hwnl95hpw8c2kmxqczm6f4prl67zgn5"))))
+      (build-system gnu-build-system)
+      (arguments
+       (list
+        #:tests? #f
+        #:make-flags
+        #~(list (string-append "PREFIX="
+                               #$output))
+        #:phases
+        #~(modify-phases %standard-phases
+            (delete 'configure))))
+      (native-inputs (list pkg-config python-wrapper))
+      (home-page "https://github.com/aclements/libelfin")
+      (synopsis "C++11 ELF/DWARF parser")
+      (description
+       "This package provides a C++11 library for reading ELF binaries and
+DWARF4 debug information.")
+      (license license:expat))))
+
 (define-public patchelf
   (package
     (name "patchelf")
