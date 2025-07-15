@@ -398,7 +398,7 @@ stored."
 and return the resulting '.go' file. SHEPHERD is used as shepherd package."
   (define shepherd&co
     (cons shepherd
-          (match (lookup-package-input shepherd "guile-fibers")
+          (match (lookup-package-propagated-input shepherd "guile-fibers")
             (#f '())
             (fibers (list fibers)))))
 

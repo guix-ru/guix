@@ -565,8 +565,8 @@ and provides a \"top-like\" mode (monitoring).")
                                  (target-riscv64?))
                              guile-fibers-1.1
                              guile-fibers-1.3))) ;pinned version to avoid rebuilds
-    (inputs (list guile-3.0
-                  (this-package-native-input "guile-fibers")))
+    (propagated-inputs (list (this-package-native-input "guile-fibers")))
+    (inputs (list guile-3.0))
     (synopsis "System service manager")
     (description
      "The GNU Shepherd is a daemon-managing daemon, meaning that it supervises
@@ -618,7 +618,7 @@ interface and is based on GNU Guile.")
                                 (dirname fibers-go)))))))
                    #~%standard-phases)))
     (native-inputs
-     (modify-inputs (package-native-inputs shepherd-0.10)
+     (modify-inputs native-inputs
        (replace "guile-fibers"
          ;; Work around <https://codeberg.org/guile/fibers/issues/89>.
          ;; This affects any system without a functional real-time
@@ -628,10 +628,12 @@ interface and is based on GNU Guile.")
                  (target-riscv64?))
              guile-fibers-1.1
              guile-fibers)))) ;use latest guile-fibers available
-    (inputs
-     (modify-inputs (package-inputs shepherd-0.10)
+    (propagated-inputs
+     (modify-inputs propagated-inputs
        (replace "guile-fibers"
-                (this-package-native-input "guile-fibers"))
+         (this-package-native-input "guile-fibers"))))
+    (inputs
+     (modify-inputs inputs
        (append gzip zstd)))))
 
 (define-public shepherd shepherd-0.10)
@@ -663,7 +665,8 @@ interface and is based on GNU Guile.")
        (synopsis
         "The Shepherd for Guix Home, without @command{halt} and @command{reboot}")
        (native-inputs '())
-       (inputs (list base))))))
+       (inputs (list base))
+       (propagated-inputs '())))))
 
 (define-public shepherd-run
   (package
