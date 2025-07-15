@@ -2359,6 +2359,50 @@ module allows the control of the backlight level or luminance property when
 supported under @file{/sys/class/backlight/}.")
       (license license:gpl2+))))
 
+(define-public dettrace
+  (let ((commit "4ee06373cf8b5ca7052f089060481c69dd889d6f")
+        (revision "0"))
+    (package
+      (name "dettrace")
+      (version (git-version "0.2.3" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               ;; Using an updated fork.
+               (url "https://github.com/bmwiedemann/dettrace")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1s3vk0jzsnic5rf2h3pr164f95bk7zgyk946dl7g9nma99n5qvlh"))))
+      (build-system gnu-build-system)
+      (arguments
+       (list
+        #:tests? #f ;XXX: Deprecated failing behaviour in catch.hpp
+        #:make-flags
+        #~(list (string-append "DESTDIR=" #$output))
+        #:test-target "test"
+        #:phases
+        #~(modify-phases %standard-phases
+            (delete 'configure)
+            (add-before 'check 'disable-check-formatting
+              (lambda _
+                (substitute* "Makefile"
+                  (("^build-tests: check-formatting")
+                   "build-tests:")))))))
+      (inputs (list libarchive libelfin libseccomp openssl))
+      (native-inputs (list clang fuse pkg-config which))
+      (home-page "https://github.com/dettrace/dettrace")
+      (synopsis "A determinizing tracer using Ptrace")
+      (description
+       "This package provides a determinizing tracer that is expected to
+produce deterministic output for a large set of nondeterminism sources.
+Note: This approach is a sledgehammer for solving reproducibilty issues,
+it should only be used for when simpler approaches are not enough.  This
+approach currently only works on x86-64 CPUs.")
+      (supported-systems '("x86_64-linux"))
+      (license license:expat))))
+
 (define-public v4l2loopback-linux-module
   (package
     (name "v4l2loopback-linux-module")
