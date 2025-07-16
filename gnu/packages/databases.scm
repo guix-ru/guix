@@ -4232,6 +4232,42 @@ Tortoise-ORM as a new type of fields, it helps to filter/order by cosine
 similarity distances for scementic search using embeddings.")
     (license license:expat)))
 
+(define-public python-piccolo
+  (package
+    (name "python-piccolo")
+    (version "1.34.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/piccolo-orm/piccolo/")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "03wnwj6gk39c6i1hymwy80ncafby9xy4phg1nw1jzzcmzpf8zps8"))))
+    (build-system pyproject-build-system)
+    (arguments
+     ;; A local database must be running with credentials explained in
+     ;; https://github.com/piccolo-orm/piccolo/tree/master/tests
+     (list #:tests? #f))
+    (native-inputs
+     (list python-setuptools))
+    (propagated-inputs
+     (list python-black         ;this is listed in requirements.txt
+           python-colorama
+           python-email-validator
+           python-inflection
+           python-jinja2
+           python-pydantic
+           python-targ
+           python-typing-extensions))
+    (home-page "https://github.com/piccolo-orm/piccolo")
+    (synopsis "ORM and query builder which supports asyncio")
+    (description
+     "Piccolo is a fast, user friendly @acronym{Object–relational mapping,
+ORM} and query builder which supports asyncio and is fully type-annotated.")
+    (license license:expat)))
+
 (define-public aerich
   (package
     (name "aerich")
