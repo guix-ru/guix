@@ -31739,6 +31739,7 @@ Its algorithms are based on the kakasi library, which is written in C.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      #:tests? #f ;XXX: Tests require setup
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-requirements
@@ -31749,15 +31750,12 @@ Its algorithms are based on the kakasi library, which is written in C.")
                 (("(ninja|patchelf)") "")))))))
     (native-inputs
      (list pkg-config
-           python-meson-python
            meson
            ninja
            patchelf
+           python-meson-python
            python-setuptools
-           python-sphinx
-           python-sphinx-rtd-theme
-           python-tappy
-           python-wheel))
+           python-tappy))
     (inputs
      (list dbus glib))
     (propagated-inputs
