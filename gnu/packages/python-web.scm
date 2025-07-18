@@ -1963,7 +1963,10 @@ Model} (SAM) templates into AWS CloudFormation templates.")
      (list
       #:test-flags
       '(list ;; Tries to connect to external network resources
+             "--ignore=tests/ext/aiohttp/test_client.py"
+             "--ignore=tests/ext/httplib/test_httplib.py"
              "--ignore=tests/ext/httpx"
+             "--ignore=tests/ext/requests/test_requests.py"
              ;; TODO: How to configure Django for these tests?
              "--ignore=tests/ext/django"
              ;; These tests require packages not yet in Guix.
@@ -1981,11 +1984,7 @@ Model} (SAM) templates into AWS CloudFormation templates.")
              "--ignore=tests/ext/flask_sqlalchemy/test_query.py"
              ;; FIXME: Why is this failing?
              "--ignore=tests/test_patcher.py"
-             "--ignore=tests/test_lambda_context.py"
-             ;; These tests want to access httpbin.org.
-             "--ignore=tests/ext/requests/test_requests.py"
-             "--ignore=tests/ext/httplib/test_httplib.py"
-             "--ignore=tests/ext/aiohttp/test_client.py")
+             "--ignore=tests/test_lambda_context.py")
       #:phases
       '(modify-phases %standard-phases
          (add-before 'check 'pre-check
@@ -2002,7 +2001,7 @@ Model} (SAM) templates into AWS CloudFormation templates.")
            python-pymysql
            python-pytest
            python-pytest-aiohttp
-           python-pytest-asyncio
+           python-pytest-asyncio-0.26
            python-pytest-benchmark
            python-requests
            python-sqlalchemy
