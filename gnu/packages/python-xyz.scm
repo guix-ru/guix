@@ -16168,7 +16168,7 @@ applications.")
      (list pkg-config
            python-cython
            python-pytest
-           python-pytest-asyncio
+           python-pytest-asyncio-0.26
            python-tornado-6))
     (home-page "https://github.com/zeromq/pyzmq")
     (synopsis "Python bindings for 0MQ")
