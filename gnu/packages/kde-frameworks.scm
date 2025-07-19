@@ -922,7 +922,7 @@ many more.")
 (define-public kdbusaddons
   (package
     (name "kdbusaddons")
-    (version "6.13.0")
+    (version "6.16.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -931,7 +931,7 @@ many more.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "17kzn6y2lxf9kzvbzrc1r7d5xm5fabsksslls4adpc1qb821cbwv"))))
+                "0ifispgs8k95drw306b0c9pi2vrdmv0amrmwnw9qm8w3hiibk89v"))))
     (build-system qt-build-system)
     (native-inputs
      (list extra-cmake-modules dbus qttools))
