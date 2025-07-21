@@ -2660,13 +2660,13 @@ that helps in Qt development.")
 (define-public qttranslations
   (package
     (name "qttranslations")
-    (version "6.8.2")
+    (version "6.9.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "1ld3sv309shkm267ab0f5f849lw8j8ll062c5iq7gz8bb256w46j"))))
+                "0hd707fpsij9bzl143615a4ags6y0nkwdplzlzmwsizlanjs2qcp"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f))
     (native-inputs (list qtbase qttools))
