@@ -2784,7 +2784,7 @@ formats.")
 (define-public kjobwidgets
   (package
     (name "kjobwidgets")
-    (version "6.13.0")
+    (version "6.16.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -2793,12 +2793,16 @@ formats.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "15dqfg2mb4whz8nv4gavi1h8fyn2a511qq951ln221235j0kiy38"))))
+                "0ajbp7qazybac99rh61529isgqif6b0a53gkk9sxviwf33q06xsi"))))
     (build-system cmake-build-system)
     (native-inputs
      (list extra-cmake-modules qttools))
     (inputs
      (list libxkbcommon kcoreaddons knotifications kwidgetsaddons qtbase))
+    (arguments
+     (list #:configure-flags
+           ;; XXX: build python bindings.
+           #~(list "-DBUILD_PYTHON_BINDINGS=OFF")))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Widgets for showing progress of asynchronous jobs")
     (description "KJobWIdgets provides widgets for showing progress of
