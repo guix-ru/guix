@@ -3207,7 +3207,7 @@ by which applications, and what documents have been linked to which activity.")
 (define-public kbookmarks
   (package
     (name "kbookmarks")
-    (version "6.13.0")
+    (version "6.16.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -3216,7 +3216,7 @@ by which applications, and what documents have been linked to which activity.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1lmjdpk91mg5vq1crxvgwj5p16cz731hbw9mhfpjv39siva567bb"))))
+                "1dddsq5df4rp1j7gv8a6xj1pzr2s383qdhlbnss29mdd96nmcina"))))
     (build-system cmake-build-system)
     (propagated-inputs
      (list kwidgetsaddons))
