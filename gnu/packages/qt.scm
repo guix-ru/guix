@@ -2175,13 +2175,13 @@ compositor libraries.")))
 (define-public qtwayland
   (package
     (name "qtwayland")
-    (version "6.8.2")
+    (version "6.9.1")
     (source
      (origin
        (method url-fetch)
        (uri (qt-url name version))
        (sha256
-        (base32 "0iwnvjas5vqzi48finff72iqnl5hal48qba64kwjnpr911wiaijy"))))
+        (base32 "0gifjc4l85ilr1gb0p9dy2s2aypskjp8c7wskfqyp03id07fl8bx"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags #~(list "-DQT_BUILD_TESTS=ON")
