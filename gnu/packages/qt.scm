@@ -2945,13 +2945,13 @@ graphs by selecting one of the charts themes.")
 (define-public qtcharts
   (package
     (name "qtcharts")
-    (version "6.8.2")
+    (version "6.9.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "0py56kxmp766jp4vxxn91nclhg7sjgwzc3b1xa62yysx3bd88z7c"))))
+                "1ly3mq4hgl4b20grajqy9bw16cx50d4drjxr3ljfj5n8gbmip1xq"))))
     (build-system cmake-build-system)
     (arguments
      (list
