@@ -1,0 +1,37 @@
+from https://codereview.qt-project.org/c/qt/qtbase/+/663298
+
+From dd5193d27ad5683b9c2da0fef1d53b967f702243 Mon Sep 17 00:00:00 2001
+From: Mårten Nordheim <marten.nordheim@qt.io>
+Date: Wed, 23 Jul 2025 16:30:40 +0200
+Subject: [PATCH] QHttp2Stream: send RST_STREAM in most states when destroyed
+
+Apart from Idle (not started) and Closed (nothing more will happen),
+it is quite likely that we benefit from sending an RST_STREAM
+if we are done with it in more states than just
+Open (started, but no one has finished their part) or HalfClosedRemote
+(the peer has finished their part).
+
+Specifically HalfClosedLocal (we finished sending our stuff) makes a lot
+of sense to send, seeing as it means we have likely sent our HEADERS
+and are waiting for a response. Without marking the stream as locally
+reset we would treat any incoming HEADERS as unexpected, and invalid,
+closing the connection.
+
+Task-number: QTBUG-138156
+Pick-to: 6.10 6.9 6.8
+Change-Id: I9ac6144ee85915f8f6a02e73909cdb01a73fe409
+---
+
+diff --git a/src/network/access/qhttp2connection.cpp b/src/network/access/qhttp2connection.cpp
+index 9b339a1..1d5c0d9 100644
+--- a/src/network/access/qhttp2connection.cpp
++++ b/src/network/access/qhttp2connection.cpp
+@@ -44,7 +44,7 @@
+ 
+ QHttp2Stream::~QHttp2Stream() noexcept {
+     if (auto *connection = getConnection()) {
+-        if (m_state == State::Open || m_state == State::HalfClosedRemote) {
++        if (m_state != State::Idle && m_state != State::Closed) {
+             qCDebug(qHttp2ConnectionLog, "[%p] stream %u, destroyed while still open", connection,
+                     m_streamID);
+             // Check if we can still send data, then send RST_STREAM:

@@ -761,13 +761,13 @@ developers using C++ or QML, a CSS & JavaScript like language.")
   (package
     (inherit qtbase-5)
     (name "qtbase")
-    (version "6.8.2")
+    (version "6.9.1")
     (source (origin
               (inherit (package-source qtbase-5))
               (uri (qt-url name version))
               (sha256
                (base32
-                "01gy1p8zvxq8771x6iqkrc7s3kzdddgf1i7xj656w7j1dp746801"))
+                "13pjmha1jpalpy5qc5gijny7i648clsmcc08c5cik6nchfzyvjj0"))
               (modules '((guix build utils)))
               (snippet
                ;; corelib uses bundled harfbuzz, md4, md5, sha3
@@ -777,11 +777,13 @@ developers using C++ or QML, a CSS & JavaScript like language.")
                                   "pcre2" "md4c" "libpng" "libjpeg"
                                   "sqlite" "xcb" "zlib"))))
               (patches
-               (search-patches "qtbase-moc-ignore-gcc-macro.patch"
-                               "qtbase-absolute-runpath.patch"
-                               "qtbase-qmake-use-libname.patch"
-                               "qtbase-qmlimportscanner-qml-import-path.patch"
-                               "qtbase-qmake-fix-includedir.patch"))))
+               (search-patches
+                "qtbase-send-RST_STREAM-states-when-destroyed.patch"
+                "qtbase-moc-ignore-gcc-macro.patch"
+                "qtbase-absolute-runpath.patch"
+                "qtbase-qmake-use-libname.patch"
+                "qtbase-qmlimportscanner-qml-import-path.patch"
+                "qtbase-qmake-fix-includedir.patch"))))
     (build-system cmake-build-system)
     (arguments
      (substitute-keyword-arguments (package-arguments qtbase-5)
@@ -875,7 +877,7 @@ endif()\n" below)))))
                   ;; from PATH anyway.
                   (("original_cmake_path=\"@CMAKE_COMMAND@\"")
                    "original_cmake_path=\"\""))
-                (substitute* "src/gui/platform/unix/qgenericunixservices.cpp"
+                (substitute* "src/gui/platform/unix/qdesktopunixservices.cpp"
                   (("\"xdg-open\"")
                    (format #f "~s" (search-input-file inputs "bin/xdg-open"))))
                 (substitute* '("mkspecs/features/qt_functions.prf"
