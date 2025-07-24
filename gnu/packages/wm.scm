@@ -428,7 +428,7 @@ loginctl commands (lock/unlock/before-sleep) and inhibit.")
            hyprland-qtutils
            hyprlang
            hyprutils
-           libinput-minimal-next
+           libinput-minimal
            libxcursor
            libxkbcommon
            mesa
