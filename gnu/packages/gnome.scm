@@ -5049,6 +5049,17 @@ indicators etc).")
                (base32
                 "17zhkf2pjwrghdgk5nhfvzqakb2xwk2jj19316xjr0s9n3djv3z4"))))
     (build-system meson-build-system)
+    (arguments
+     (list
+      ;; Exclude flaky tests (https://codeberg.org/guix/guix/issues/1377).
+      #:test-options #~(list "--no-suite" "connection")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'mark-tests-for-exclusion
+            (lambda _
+              (substitute* "tls/tests/meson.build"
+                (("test\\(([^)]*)\\)" _ args)
+                 (string-append "test(" args ", suite: program[0])"))))))))
     (native-inputs
      (list `(,glib "bin") ; for gio-querymodules
            pkg-config gettext-minimal))
