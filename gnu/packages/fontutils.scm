@@ -1482,7 +1482,7 @@ high quality, anti-aliased and subpixel rendered text on a display.")
       (list (search-path-specification
              (variable "XDG_DATA_DIRS")
              (files '("share")))))
-     (home-page "https://www.freedesktop.org/wiki/Software/fontconfig"))))
+     (home-page "https://www.freedesktop.org/wiki/Software/fontconfig/"))))
 
 ;;; The documentation of fontconfig is built in a separate package, as it
 ;;; causes a dramatic increase in the size of the closure of fontconfig.
