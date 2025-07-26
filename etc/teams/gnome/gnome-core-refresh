@@ -72,7 +72,9 @@ C < ':'
 NL < '\n'")
 
 (define %names
-  '(("adwaita-fonts" . "font-adwaita")))
+  '(("adwaita-fonts" . "font-adwaita")
+    ("pygobject" . "python-pygobject")
+    ("pyatspi" . "python-pyatspi")))
 
 (define (parse-releng data)
   "Return DATA, a string representing the content of a GNOME releng file, and
