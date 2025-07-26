@@ -22470,6 +22470,7 @@ that @code{gofmt} is happy with.")
                              "TestRunnerRun/#989"
                              "TestRunnerRun/#990"
                              "TestRunnerRun/#991"
+                             "TestRunnerRunConfirm/#152"
                              "TestScript/flags")
                        "|"))))
     (native-inputs
