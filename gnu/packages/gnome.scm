@@ -6703,7 +6703,7 @@ for application developers.")
 (define-public grilo-plugins
   (package
     (name "grilo-plugins")
-    (version "0.3.16")
+    (version "0.3.18")
     (source
      (origin
        (method url-fetch)
@@ -6711,7 +6711,7 @@ for application developers.")
                            (version-major+minor version) "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "1jydhk822sigyda3mswn59j9s01dy81f553382i8nsvcb2z4svzy"))))
+        (base32 "0pkclk4rrd7zan0f45nhlll414dhdgr8s3ybs0ic7hqpwx7ffg4f"))))
     (build-system meson-build-system)
     (native-inputs
      (list gettext-minimal
