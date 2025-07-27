@@ -2,8 +2,14 @@ unix_chkpwd is designed to have a suid bit, but it's not possible to set it
 for files in the store.  This patch tells unix_pam.so to look for
 unix_chkpwd in setuid program directory on Guix System.
 
---- a/modules/pam_unix/Makefile.in
-+++ b/modules/pam_unix/Makefile.in
-@@ -651,1 +651,1 @@
--	-DCHKPWD_HELPER=\"$(sbindir)/unix_chkpwd\" \
-+	-DCHKPWD_HELPER=\"/run/setuid-programs/unix_chkpwd\" \
+--- a/modules/module-meson.build
++++ b/modules/module-meson.build
+@@ -114,7 +114,7 @@ if module == 'pam_unix'
+   if enable_nis
+     pam_module_src += ['yppasswd_xdr.c']
+   endif
+-  pam_module_c_args += ['-DCHKPWD_HELPER="@0@"'.format(sbindir / 'unix_chkpwd'),
++  pam_module_c_args += ['-DCHKPWD_HELPER="@0@"'.format('/run/privileged/bin' / 'unix_chkpwd'),
+                         '-DUPDATE_HELPER="@0@"'.format(sbindir / 'unix_update')]
+   pam_module_deps += [libcrypt, libselinux, libtirpc, libnsl]
+ endif
