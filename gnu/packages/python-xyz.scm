@@ -22842,7 +22842,20 @@ format.")
            python-hyperlink
            python-incremental
            python-typing-extensions
-           python-zope-interface))
+           python-zope-interface
+           ;; [conch]
+           python-appdirs
+           python-bcrypt
+           python-cryptography
+           ;; [http2]
+           python-h2
+           python-priority
+           ;; [tls]
+           python-idna
+           python-pyopenssl
+           python-service-identity
+           ;; [serial]
+           python-pyserial))
     (native-inputs
      (list glibc-utf8-locales ;for OpenTestLogTests.test_utf8
            python-coverage
@@ -22850,11 +22863,8 @@ format.")
            python-hatchling
            python-httpx
            python-hypothesis
-           python-pyflakes
            python-pyhamcrest
-           python-pytest
-           python-sphinx
-           python-sphinx-rtd-theme))
+           python-pytest))
     (home-page "https://twistedmatrix.com/")
     (synopsis "Asynchronous networking framework written in Python")
     (description
