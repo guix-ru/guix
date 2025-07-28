@@ -2184,7 +2184,7 @@ requirements according to version 1.1 of the OpenCL specification.")
                 (setenv "CPPFLAGS" "-fPIC")
                 (setenv "LDFLAGS" (string-append "-Wl,-rpath="
                                                  llvm "/lib"))))))))
-    (native-inputs (list python-setuptools python-wheel))
+    (native-inputs (list python-pytest python-setuptools))
     (inputs
      (list
       (let* ((patches-commit
