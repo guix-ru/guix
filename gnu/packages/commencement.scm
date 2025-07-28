@@ -2609,6 +2609,30 @@ exec " gcc "/bin/" program
                (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
                "--disable-shared")))))
+
+(define musl-boot-static
+  (package
+    (inherit musl-boot)
+    (native-inputs (if (target-x86?)
+                       `(("gcc-wrapper" ,gcc-mesboot1-wrapper)
+                         ("headers" ,glibc-headers-mesboot)
+                         ,@(%boot-mesboot4-inputs))
+                       (%boot-muslboot3-inputs)))
+    (arguments
+     (substitute-keyword-arguments
+       (package-arguments musl-boot)
+       ((#:configure-flags _ #~'())
+        #~(list (string-append "CONFIG_SHELL="
+                               #$(this-package-native-input "bash")
+                               "/bin/sh")
+                (string-append "--syslibdir=" #$output "/lib")
+                "CC=gcc"
+                "--disable-shared"
+                "--enable-gcc-wrapper"))
+       ((#:phases phases #~'%standard-phases)
+        #~(modify-phases #$phases
+            (delete 'symlink-dynamic-linker)))))))
+
 (define gcc-mesboot
   (package
     (inherit gcc-mesboot1)
