@@ -6397,22 +6397,26 @@ instruments.")
     (version "2.22")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "jplephem" version))
+       (method git-fetch)       ;no tests data in the PyPI tarball
+       (uri (git-reference
+              (url "https://github.com/brandon-rhodes/python-jplephem")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0b2rgb7pvwnl72pqjryf9c812mmdxr69fwiym7mnz05l2xrcr6hd"))))
+        (base32 "01hjs0j2pnjn3ijqq5lyhnprkypfhx88qbmfpiyj3drdxjaw725s"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:phases
       #~(modify-phases %standard-phases
+          ;; The test steps are taken from project's GitHub Actions workflow.
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
-                (invoke "python" "-m" "unittest" "discover" "-s" "test")))))))
+                (with-directory-excursion "ci"
+                  (invoke "python" "-m" "unittest" "test" "-v"))))))))
     (native-inputs
-     (list python-setuptools
-           python-wheel))
+     (list python-setuptools))
     (propagated-inputs
      (list python-numpy))
     (home-page "https://github.com/brandon-rhodes/python-jplephem")
