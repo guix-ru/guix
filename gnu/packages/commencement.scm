@@ -3449,6 +3449,195 @@ exec " gcc "/bin/" program
       (inputs (%boot0-inputs))
       (native-inputs '()))))
 
+;; This is used to build libstdc++-boot0-gcc7 when coming from riscv64,
+;; since it doesn't seem that gcc-4.6 can build libstdc++@7 by itself.
+(define gcc-musl-boot0
+  (package
+    (inherit gcc-7)
+    (name "gcc")
+    (source (bootstrap-origin (package-source gcc-7)))
+    (inputs `(;("gmp-source" ,(bootstrap-origin (package-source gmp-6.0)))
+              ;("mpfr-source" ,(bootstrap-origin (package-source mpfr)))
+              ;("mpc-source" ,(bootstrap-origin (package-source mpc)))
+              ("gmp-boot" ,gmp-boot)
+              ("mpfr-boot" ,mpfr-boot)
+              ("mpc-boot" ,mpc-boot)
+              ;,@(modify-inputs (%boot0-inputs)
+              ;                 (replace "libc" musl-boot-static))))
+              ,@(%boot0-inputs)))
+    (propagated-inputs '())
+    (native-inputs '())
+    (arguments
+      (substitute-keyword-arguments (package-arguments gcc-7)
+        ((#:guile _ %bootstrap-guile) %bootstrap-guile)
+        ((#:implicit-inputs? _ #f) #f)
+        ((#:phases phases)
+         #~(modify-phases #$phases
+            (add-after 'patch-source-shebangs 'patch-extra-shebangs
+              (lambda _
+                (substitute* "gcc/genmultilib"
+                  (("#!/bin/sh") (string-append "#!" (which "sh"))))))
+            (add-before 'patch-source-shebangs 'delete-broken-shebangs
+              (lambda _
+                (for-each (lambda (file)
+                           (delete-file-recursively file))
+                   (find-files "gcc/testsuite/gdc.test/compilable" "\\.d$"))))
+            (add-after 'pre-configure 'fix-dynamic-linker-for-musl
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((libc (assoc-ref inputs "libc")))
+                  ;; Fix the dynamic linker's file name.
+                  ;; This should work on gcc-13 for all architectures except loongarch.
+                  (substitute* (find-files "gcc/config"
+                                           "^(aarch64-)?(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
+                    (("(#define MUSL_DYNAMIC_LINKER*).*$" _ dynamic-linker)
+                     ;; TODO: Make this use architecture specific ld-musl-*.so
+                     (string-append dynamic-linker " \"" libc "/lib/libc.so\""))
+                    ;; We also need to adjust the references made for glibc
+                    ;; to point to the musl linker location
+                    #;
+                    (("#define (GLIBC|GNU_USER)_DYNAMIC_LINKER([^ \t]*).*$"
+                      _ gnu-user suffix)
+                     (format #f "#define ~a_DYNAMIC_LINKER~a \"~a\"~%"
+                             gnu-user suffix
+                             (string-append libc "/lib/libc.so")))))))
+            (add-after 'unpack 'adjust-cplus-include-path
+                  (lambda* (#:key outputs #:allow-other-keys)
+                    (let* ((bash (assoc-ref %build-inputs "bash"))
+                           (gcc (assoc-ref %build-inputs "gcc")))
+                      (setenv "C_INCLUDE_PATH" (string-append
+                                                (getenv "C_INCLUDE_PATH") ":"
+                                                gcc "/lib/gcc-lib/"
+                                                #$(commencement-build-target)
+                                                "/4.6.4/include"
+                                                ;":" (getcwd) "/mpfr/src"
+                                                ))
+                      (setenv "CPLUS_INCLUDE_PATH" (string-append
+                                                    (getenv "CPLUS_INCLUDE_PATH") ":"
+                                                    gcc "/lib/gcc-lib/"
+                                                    #$(commencement-build-target)
+                                                    "/4.6.4/include"
+                                                    ;":" (getcwd) "/mpfr/src"
+                                                    ))
+                      (format (current-error-port) "C_INCLUDE_PATH=~a\n" (getenv "C_INCLUDE_PATH"))
+                      (format (current-error-port) "CPLUS_INCLUDE_PATH=~a\n" (getenv "CPLUS_INCLUDE_PATH"))
+                      (format (current-error-port) "LIBRARY_PATH=~a\n"
+                              (getenv "LIBRARY_PATH")))))
+            #;
+            (add-after 'unpack 'unpack-gmp&co
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
+                      (mpfr (assoc-ref %build-inputs "mpfr-source"))
+                      (mpc  (assoc-ref %build-inputs "mpc-source")))
+
+                  ;; To reduce the set of pre-built bootstrap inputs, build
+                  ;; GMP & co. from GCC.
+                  (for-each (lambda (source)
+                              (invoke "tar" "xvf" source))
+                            (list gmp mpfr mpc))
+
+                  ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
+                  #$@(map (lambda (lib)
+                            ;; Drop trailing letters, as gmp-6.0.0a unpacks
+                            ;; into gmp-6.0.0.
+                            #~(symlink #$(string-trim-right
+                                          (package-full-name lib "-")
+                                          char-set:letter)
+                                       #$(package-name lib)))
+                          (list gmp-6.0 mpfr mpc)))))
+            #;
+            (add-before 'configure 'adjust-os-defines-h
+              (lambda _
+                ;; The gnu-linux version chokes on '__GLIBC_PREREQ(2,15)'
+                ;; We need to use the generic version for musl.
+                (copy-file "libstdc++-v3/config/os/generic/os_defines.h"
+                           "libstdc++-v3/config/os/gnu-linux/os_defines.h")
+                #;
+                (with-output-to-file "libstdc++-v3/config/os/gnu-linux/os_defines.h"
+                  (lambda _
+                    (display "#ifndef _GLIBCXX_OS_DEFINES
+#define _GLIBCXX_OS_DEFINES 1
+#define __NO_CTYPE 1
+#include <features.h>
+#endif")))))
+            #;
+            (add-before 'configure 'setenv
+              (lambda _
+                ;; This is needed to wrap gcc to use musl correctly.
+                (setenv "CC" "musl-gcc")))))
+        ;; gimple-match.c:43995:1: internal compiler error: Segmentation fault
+        ;; Only with --disable-bootstrap?
+        ;; Also with plenty of items disabled. Needs more investigation.
+        ((#:parallel-build? _ #t) #f)
+        ((#:make-flags _ #~'())
+         ;; Remove the LDFLAGS for libc from the make-flags
+         #~(list "CFLAGS=-g0 -O2"
+                 "BOOT_CFLAGS=-O2 -g0"
+                 ))
+        ((#:configure-flags _ #~'())
+         #~(let ((out (assoc-ref %outputs "out"))
+                 (musl (assoc-ref %build-inputs "libc")))
+            (list ;"LDFLAGS=-static"
+                  (string-append "--prefix=" out)
+                  ;"--with-local-prefix=/no-gcc-local-prefix"
+                      (string-append "--build=" #$(commencement-build-target))
+                      (string-append "--host=" #$(commencement-build-target))
+                  ;"--host=riscv64-unknown-linux-musl"
+                  ;"--build=riscv64-unknown-linux-musl"
+                  ;(string-append "--host=" #$(commencement-build-target))
+                  ;(string-append "--build=" #$(commencement-build-target))
+                  ;(string-append "--with-build-sysroot=" musl )
+                  (string-append "--with-native-system-header-dir=" musl "/include")
+                  (string-append "--with-gxx-include-dir=" out "/include/c++")
+
+                  ;; These 3 seem necessary after switching CC to musl-gcc.
+                  (string-append "--with-gmp=" (assoc-ref %build-inputs "gmp-boot"))
+                  (string-append "--with-mpfr=" (assoc-ref %build-inputs "mpfr-boot"))
+                  (string-append "--with-mpc=" (assoc-ref %build-inputs "mpc-boot"))
+
+                  ;"--with-stage1-ldflags=-static"
+
+                  "--disable-bootstrap"
+                  "--disable-decimal-float"
+                  "--disable-libatomic"
+                  "--disable-libcilkrts"
+                  "--disable-libgomp"
+                  "--disable-libitm"
+                  "--disable-libmudflap"
+                  "--disable-libquadmath"
+                  "--disable-libsanitizer"
+                  "--disable-libssp"
+                  "--disable-libvtv"
+
+                  ;; Need to recompile musl with -fPIC
+                  ;; ld: unrecognized option '-plugin'
+                  "--disable-lto"
+                  "--disable-lto-plugin"
+
+                  "--disable-multilib"
+
+                  ;;  Building GCC with plugin support requires a host that supports
+                  ;; -fPIC, -shared, -ldl and -rdynamic.
+                  ;; ld: unrecognized option '-plugin'
+                  ;; Is that even relevant for this flag?
+                  ;"--enable-plugin"
+                  "--disable-plugin"
+
+                  "--disable-threads"
+                  ;"--enable-languages=c,c++"
+                  "--enable-languages=c"
+
+                  ;; libgcc recompile with -fPIC
+                  ;"--enable-static"
+                  ;"--disable-static"
+                  "--disable-shared"
+
+                  ;"--enable-threads=single"
+                  "--disable-libstdc++-v3"
+                  "--disable-libstdcxx-pch"
+                  "--disable-build-with-cxx"
+                  "--without-headers"
+                  )))))))
+
 (define (make-libstdc++-boot0 gcc)
   ;; GCC >= 7 is needed by architectures which use C++-14 features.
   (let ((lib (make-libstdc++ gcc)))
