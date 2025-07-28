@@ -1089,14 +1089,14 @@ an elegant and intuitive experience for your tasks and plasmoids.")
 (define-public layer-shell-qt
   (package
     (name "layer-shell-qt")
-    (version "6.3.4")
+    (version "6.4.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/" version
                                   "/layer-shell-qt-" version ".tar.xz"))
               (sha256
                (base32
-                "0ik3l9lqqh9s2574swv045zj1kk8fg33zsacd3bfzayk90zrh37q"))))
+                "0z6vvpwm26s43x8n3hzsh7v6n052sv2akyn3qd3rb7idrp04xrik"))))
     (build-system qt-build-system)
     (arguments (list #:qtbase qtbase))
     (native-inputs
