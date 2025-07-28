@@ -2553,6 +2553,34 @@ exec " gcc "/bin/" program
                "--disable-assembly")
        ;; Gash crashes on mkdir called through install creating %output/share/info
        #:make-flags #~(list "MKDIRPROG=mkdir -p")))))
+
+(define mpfr-boot1
+  (package
+    (inherit mpfr)
+    (outputs '("out"))
+    (name "mpfr-boot1")
+    (source (bootstrap-origin (package-source mpfr)))
+    (native-inputs (if (target-x86?)
+                       `(("gcc-wrapper" ,gcc-mesboot1-wrapper)
+                         ("headers" ,glibc-headers-mesboot)
+                         ,@(%boot-mesboot4-inputs))
+                       (%boot-tcc-musl-inputs)))
+    (inputs '())
+    (propagated-inputs (list gmp-boot1))
+    (arguments
+     (list
+       #:guile %bootstrap-guile
+       #:tests? #f
+       #:implicit-inputs? #f
+       #:parallel-build? #f
+       #:configure-flags
+       #~(list #$@(if (target-x86?)
+                      #~()
+                      #~("CC=tcc"))
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target))
+               "--enable-static"
+               "--disable-shared")))))
 (define gcc-mesboot
   (package
     (inherit gcc-mesboot1)
