@@ -846,7 +846,7 @@ the functionality of the KDE resource and network access abstractions.")
 (define-public kirigami-addons
   (package
     (name "kirigami-addons")
-    (version "1.7.0")
+    (version "1.9.0")
     (source
      (origin
        (method git-fetch)
@@ -855,7 +855,7 @@ the functionality of the KDE resource and network access abstractions.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1w2pxrbvzzpafh1x38rmjqjrpyf1zhkwv354ihpbwkn7grr8d2hy"))))
+        (base32 "099giz2a4pb68pyynwpzq8i49qxqs6mv9qjvi30sqcmkyvmqrpxh"))))
     (build-system qt-build-system)
     (arguments
      (list
