@@ -2735,6 +2735,185 @@ exec " gcc "/bin/" program
                       (format (current-error-port) "LIBRARY_PATH=~a\n"
                               (getenv "LIBRARY_PATH"))))))))))))
 
+(define gcc-mesboot-10
+  (package
+    (inherit gcc-mesboot1)
+    (name "gcc-mesboot")
+    (version "10.4.0")
+    (source (origin
+            (method url-fetch)
+            (uri (string-append "mirror://gnu/gcc/gcc-"
+                                version "/gcc-" version ".tar.xz"))
+            (sha256
+             (base32
+              "1wg4xdizkksmwi66mvv2v4pk3ja8x64m7v9gzhykzd3wrmdpsaf9"))))
+    (native-inputs `(
+                     ("xz" ,xz-mesboot)     ; TODO: Insert properly.
+                     ,@(modify-inputs (%boot-muslboot3-inputs)
+                                      (prepend %bootstrap-gcc)
+                                      (replace "libc" musl-boot-static))))
+                     ;,@(%boot-muslboot3-inputs)))
+    (inputs `(;("gmp-source" ,(bootstrap-origin (package-source gmp-6.0)))
+              ;("mpfr-source" ,(bootstrap-origin (package-source mpfr)))
+              ;("mpc-source" ,(bootstrap-origin (package-source mpc)))
+              ("gmp-boot" ,gmp-boot1)
+              ("mpfr-boot" ,mpfr-boot1)
+              ("mpc-boot" ,mpc-boot1)
+              ))
+    (supported-systems '("riscv64-linux"))
+    (arguments
+     `(#:validate-runpath? #f
+       ,@(substitute-keyword-arguments (package-arguments gcc-mesboot1)
+           ((#:parallel-build? _ #t) #f)    ; Times out
+           ((#:make-flags _ #~'())
+           ;#~(let* ((libc (assoc-ref %build-inputs "libc"))
+           ;         (ldflags (string-append
+           ;                   "-B" libc "/lib "
+           ;                   "-Wl,-dynamic-linker "
+           ;                   "-Wl," libc "/lib/libc.a")))
+           ;    (list (string-append "LDFLAGS=" ldflags)
+           ;          (string-append "LDFLAGS_FOR_TARGET=" ldflags)
+           ;          ;"CFLAGS=-g0 -O2 -lsupc++"
+           ;          )))
+           #~'())
+#;
+           ((#:make-flags flags #~'())
+         ;; Remove the LDFLAGS for libc from the make-flags
+         #~(cons* "CFLAGS=-g0 -O2"
+                 "CXXFLAGS=-g -O2"
+                 "BOOT_CFLAGS=-O2 -g0"
+                 ;"LDFLAGS=-static"
+                 "BOOT_LDFLAGS=-static"
+                 #$flags
+                 ))
+           ((#:configure-flags configure-flags)
+            #~(let ((out (assoc-ref %outputs "out"))
+                    (libc (assoc-ref %build-inputs "libc")))
+                (list (string-append "--prefix=" out)
+                      ;(string-append "--build=" #$(commencement-build-target))
+                      ;(string-append "--host=" #$(commencement-build-target))
+                      (string-append "--build="
+                                     #$(string-replace-substring
+                                         (commencement-build-target)
+                                         "-gnu" "-musl"))
+                      (string-append "--host="
+                                     #$(string-replace-substring
+                                         (commencement-build-target)
+                                         "-gnu" "-musl"))
+
+                      "--with-host-libstdcxx=-lsupc++"
+                      ;"--with-host-libstdcxx=-lstdc++"
+
+                      ;; Maybe not needed with musl-gcc
+                      (string-append "--with-native-system-header-dir=" libc "/include")
+                      ;(string-append "--with-build-sysroot=" libc );"/include")
+                      (string-append "--with-gxx-include-dir=" out "/include/c++")
+
+                  ;; These 3 seem necessary after switching CC to musl-gcc.
+                  (string-append "--with-gmp=" (assoc-ref %build-inputs "gmp-boot"))
+                  (string-append "--with-mpfr=" (assoc-ref %build-inputs "mpfr-boot"))
+                  (string-append "--with-mpc=" (assoc-ref %build-inputs "mpc-boot"))
+
+                  ;"--with-stage1-ldflags=-static"
+
+                      "--disable-bootstrap"
+                      "--disable-decimal-float"
+                      "--disable-libatomic"
+                      "--disable-libcilkrts"
+                      "--disable-libgomp"
+                      "--disable-libitm"
+                      "--disable-libmudflap"
+                      "--disable-libquadmath"
+                      "--disable-libsanitizer"
+                      "--disable-libssp"
+                      "--disable-libvtv"
+                      "--disable-lto"
+                      "--disable-lto-plugin"
+                      "--disable-multilib"
+                      "--disable-plugin"
+                      ;"--disable-threads"
+                      "--enable-languages=c,c++"
+
+                      ;"--enable-static"
+                      ;"--enable-shared"
+                      ;"--enable-threads=single"
+                      "--enable-threads=posix"
+
+                      ;; No pre-compiled libstdc++ headers, to save space.
+                      "--disable-libstdcxx-pch"
+
+                      ;; Maybe?
+                      ;"--enable-__cxa_atexit"
+                      ;"--enable-default-pie"
+                      ;"--enable-host-shared"
+
+                      ;"--disable-libstdc++-v3"
+                      ;; for libcpp ...
+                      ;"--disable-build-with-cxx"
+                      ;"--without-headers"
+                      )))
+           ((#:phases phases)
+            #~(modify-phases #$phases
+                (delete 'apply-boot-patch)
+                (delete 'unpack-g++)     ; sadly, gcc-4.9.4 does not provide
+                                                  ; modular core/language downloads
+                (add-after 'unpack 'setenv
+                  (lambda _
+                    (setenv "CC" "musl-gcc")))
+                #;
+                (add-before 'configure 'configure-libiberty
+                  (lambda _
+                    (with-directory-excursion "libiberty"
+                      (assoc-ref %standard-phases 'configure))))
+                #;
+                (add-after 'unpack 'unpack-gmp&co
+                  (lambda* (#:key inputs #:allow-other-keys)
+                    (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
+                          (mpfr (assoc-ref %build-inputs "mpfr-source"))
+                          (mpc  (assoc-ref %build-inputs "mpc-source")))
+
+                      ;; To reduce the set of pre-built bootstrap inputs, build
+                      ;; GMP & co. from GCC.
+                      (for-each (lambda (source)
+                                  (invoke "tar" "xvf" source))
+                                (list gmp mpfr mpc))
+
+                      ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
+                      #$@(map (lambda (lib)
+                                ;; Drop trailing letters, as gmp-6.0.0a unpacks
+                                ;; into gmp-6.0.0.
+                                #~(symlink #$(string-trim-right
+                                              (package-full-name lib "-")
+                                              char-set:letter)
+                                           #$(package-name lib)))
+                              (list gmp-6.0 mpfr mpc)))))
+                #;
+                (replace 'set-cplus-include-path
+                  (lambda* (#:key outputs #:allow-other-keys)
+                    (let* ((bash (assoc-ref %build-inputs "bash"))
+                           (gcc (assoc-ref %build-inputs "gcc")))
+                      (setenv "CONFIG_SHELL" (string-append bash "/bin/sh"))
+                      (setenv "C_INCLUDE_PATH" (string-append
+                                                (getenv "C_INCLUDE_PATH") ":"
+                                                gcc "/lib/gcc-lib/"
+                                                #$(commencement-build-target)
+                                                "/4.6.4/include"
+                                                ":" (getcwd)
+                                                ;":" (getcwd) "/mpfr/src"
+                                                ))
+                      (setenv "CPLUS_INCLUDE_PATH" (string-append
+                                                    (getenv "CPLUS_INCLUDE_PATH") ":"
+                                                    gcc "/lib/gcc-lib/"
+                                                    #$(commencement-build-target)
+                                                    "/4.6.4/include"
+                                                    ":" (getcwd)
+                                                    ;":" (getcwd) "/mpfr/src"
+                                                    ))
+                      (format (current-error-port) "C_INCLUDE_PATH=~a\n" (getenv "C_INCLUDE_PATH"))
+                      (format (current-error-port) "CPLUS_INCLUDE_PATH=~a\n" (getenv "CPLUS_INCLUDE_PATH"))
+                      (format (current-error-port) "LIBRARY_PATH=~a\n"
+                              (getenv "LIBRARY_PATH"))))))))))))
+
 (define gcc-mesboot-wrapper
   ;; We need this so gcc-mesboot can be used to create shared binaries that
   ;; have the correct interpreter and runpath to libc.
