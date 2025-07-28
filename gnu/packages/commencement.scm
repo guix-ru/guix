@@ -2521,6 +2521,38 @@ exec " gcc "/bin/" program
                     (program (string-append bin "/gcc")))
                (invoke program "--help")))))))))
 
+;; By building these separately we can ensure they build correctly.
+(define gmp-boot1
+  (package
+    (inherit gmp)
+    (outputs '("out"))
+    (name "gmp-boot1")
+    (source (bootstrap-origin (package-source gmp)))
+    (native-inputs (if (target-x86?)
+                       `(("gcc-wrapper" ,gcc-mesboot1-wrapper)
+                         ("headers" ,glibc-headers-mesboot)
+                         ,@(%boot-mesboot4-inputs))
+                       (%boot-tcc-musl-inputs)))
+    (inputs (list m4-boot))
+    (propagated-inputs '())
+    (arguments
+     (list
+       #:guile %bootstrap-guile
+       #:tests? #f
+       #:implicit-inputs? #f
+       #:parallel-build? #f
+       #:configure-flags
+       #~(list #$@(if (target-x86?)
+                      #~()
+                      #~("CC=tcc"))
+               ;; These break building on x86_64-linux.
+               ;(string-append "--build=" #$(commencement-build-target))
+               ;(string-append "--host=" #$(commencement-build-target))
+               "--enable-static"
+               "--disable-shared"
+               "--disable-assembly")
+       ;; Gash crashes on mkdir called through install creating %output/share/info
+       #:make-flags #~(list "MKDIRPROG=mkdir -p")))))
 (define gcc-mesboot
   (package
     (inherit gcc-mesboot1)
