@@ -1898,14 +1898,14 @@ on QtMultimedia and @command{yt-dlp}.")
 (define-public plasma-browser-integration
   (package
     (name "plasma-browser-integration")
-    (version "6.3.4")
+    (version "6.4.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/" version
                                   "/" name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0w7dl50hrbbnnrj1fzlv5fgzc3lvjkxhmqm0j2wqljy9s21vkhpq"))))
+                "1jxbg4qqp8ffa0k8zihxdll26gf8q9kyh1dy32aaxhsfmcbygk2q"))))
     (build-system qt-build-system)
     (native-inputs (list extra-cmake-modules pkg-config))
     ;; TODO: Figure out how to integrate this package into web browsers
