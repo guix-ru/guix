@@ -2545,9 +2545,8 @@ exec " gcc "/bin/" program
        #~(list #$@(if (target-x86?)
                       #~()
                       #~("CC=tcc"))
-               ;; These break building on x86_64-linux.
-               ;(string-append "--build=" #$(commencement-build-target))
-               ;(string-append "--host=" #$(commencement-build-target))
+               (string-append "--build=" #$(commencement-build-target))
+               (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
                "--disable-shared"
                "--disable-assembly")
