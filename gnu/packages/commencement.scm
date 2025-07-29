@@ -3250,7 +3250,20 @@ exec " gcc "/bin/" program
   (package
     (inherit byacc)
     (name "byacc-boot0")
-    (source (bootstrap-origin (package-source byacc)))
+    (version "20241231")
+    (source (bootstrap-origin
+              (origin
+                (method url-fetch)
+                (uri (string-append
+                       "https://invisible-mirror.net/archives/byacc/byacc-"
+                       version ".tgz"))
+                (file-name (string-append name "-" version ".tar.gz"))
+                (sha256
+                 (base32
+                  "0wwnc0zdx7qz34crr0cz15jjfqafkizn4ld49d8pykld0jp2yb0r"))
+                (snippet
+                 '(begin (delete-file "btyaccpar.c")
+                         (delete-file "yaccpar.c"))))))
     (native-inputs '())
     (inputs
      `(("make" ,gnu-make-boot0)
