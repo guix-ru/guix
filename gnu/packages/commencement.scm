@@ -2187,11 +2187,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
 
 ;; We need to introduce byacc in order to process some pre-generated
 ;; files in gawk and possibly elsewhere.
+;; TODO: Use an awk implementation to remove pre-generated files.
 (define byacc-mesboot
   (package
     (inherit byacc)
     (name "byacc")
-    (version "20240109")
+    (version "20241231")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -2200,7 +2201,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (file-name (string-append name "-" version ".tar.gz"))
               (sha256
                (base32
-                "0il4w1vwbglayakywyghiqhcjpg1yvv5ww2p8ylz32bi05wpg2gj"))))
+                "0wwnc0zdx7qz34crr0cz15jjfqafkizn4ld49d8pykld0jp2yb0r"))))
     (native-inputs (if (target-x86?)
                        (%boot-mesboot1-inputs)
                        (%boot-muslboot2-inputs)))
