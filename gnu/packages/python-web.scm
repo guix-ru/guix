@@ -4099,6 +4099,7 @@ data.")
 
 (define-public python-tornado
   (package
+    ;; TODO: Try to refresh and check all dependents.
     (name "python-tornado")
     (version "5.1.1")
     (source
@@ -4108,7 +4109,7 @@ data.")
        (sha256
         (base32
          "02clqk2116jbnq8lnaqmdw3p52nqrd9ib59r4xz2ll43fpcmhlaf"))))
-    (build-system python-build-system)
+    (build-system pyproject-build-system)
     (arguments
      (list
       #:phases
@@ -4138,7 +4139,8 @@ data.")
                (invoke "python" "-m" "tornado.test.runtests"
                        "--verbose=yes")))))))
     (native-inputs
-     (list python-certifi))
+     (list python-certifi
+           python-setuptools))
     (home-page "https://www.tornadoweb.org/")
     (synopsis "Python web framework and asynchronous networking library")
     (description
