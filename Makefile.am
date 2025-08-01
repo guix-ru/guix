@@ -20,7 +20,6 @@
 # Copyright © 2023 Clément Lassieur <clement@lassieur.org>
 # Copyright © 2023, 2024 Wilko Meyer <w@wmeyer.eu>
 # Copyright © 2024 gemmaro <gemmaro.dev@gmail.com>
-# Copyright © 2025 Brice Waegeneire <brice@waegenei.re>
 # Copyright © 2025 Florian Pelz <pelzflorian@pelzflorian.de>
 #
 # This file is part of GNU Guix.
@@ -1295,16 +1294,6 @@ $(GIT_CONFIG_FILE): etc/git/gitconfig
 	    ../etc/git/gitconfig ../etc/git/gitconfig; \
 	fi
 
-COMMIT_MSG_MAGIC = VGhpcyBpcyB0aGUgY29tbWl0LW1zZyBob29rIG9mIEd1aXg=
-$(GIT_HOOKS_DIR)/commit-msg: etc/git/commit-msg | $(GIT_HOOKS_DIR)
-	if [ -n "$(GIT_HOOKS_DIR)" ]; then \
-	  if test -f $@  && ! grep -qF $(COMMIT_MSG_MAGIC) $@; then \
-	    mkdir -p $@.d && mv $@ $@.d && \
-	    echo user commit-msg hook moved to $@.d/commit-msg; \
-	  fi && \
-	  cp etc/git/commit-msg $@; \
-	fi
-
 # Convenience targets.
 GIT_HOOKS_SOURCE_FILES := $(shell find etc/git -type f -executable)
 .PHONY: git-config git-hooks invalidate-hooks
@@ -1317,8 +1306,7 @@ git-config: $(GIT_CONFIG_FILE) git-hooks
 nodist_noinst_DATA =				\
   $(GIT_HOOKS_DIR)/pre-push			\
   $(GIT_HOOKS_DIR)/post-merge			\
-  $(GIT_CONFIG_FILE)				\
-  $(GIT_HOOKS_DIR)/commit-msg
+  $(GIT_CONFIG_FILE)
 endif
 
 # Downloading up-to-date PO files.

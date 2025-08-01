@@ -55,9 +55,6 @@
      (eval . (setq-local guix-directory
                          (locate-dominating-file default-directory
                                                  ".dir-locals.el")))
-     ;; Magit
-     (eval . (with-eval-after-load 'git-commit
-               (add-to-list 'git-commit-trailers "Change-Id")))
 
      ;; TempEl
      (eval . (with-eval-after-load
