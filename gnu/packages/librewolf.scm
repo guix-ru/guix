@@ -212,17 +212,17 @@
 ;; It's used for cache validation and therefore can lead to strange bugs.
 ;; ex: date '+%Y%m%d%H%M%S'
 ;; or: (format-time-string "%Y%m%d%H%M%S")
-(define %librewolf-build-id "20250727200313")
+(define %librewolf-build-id "20250806161508")
 
 (define-public librewolf
   (package
     (name "librewolf")
-    (version "141.0-1")
+    (version "141.0.2-1")
     (source
      (make-librewolf-source
       #:version version
-      #:firefox-hash "1j1m6niw47xi6aj9rlcny8jhqkppjvg22cq7mikim93wpf22m640"
-      #:librewolf-hash "18k3d09dr6jkhr6g8z8c3aa7jj0ynjalkmvc3nj7wd98mgvky2xj"
+      #:firefox-hash "0fkzsfbrn1zlv6cby0pp454ddysa0n6146lgvvrrmlka5zz3fff3"
+      #:librewolf-hash "0mrry4jkdsln9a2qycw4qfndybiyby730w2197f3iqi4j9r5111k"
       #:l10n firefox-l10n))
     (build-system gnu-build-system)
     (arguments
