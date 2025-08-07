@@ -18,6 +18,7 @@
 ;;; Copyright © 2024 Evgeny Pisemsky <mail@pisemsky.site>
 ;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2025 Aiden Isik <aidenisik+git@member.fsf.org>
+;;; Copyright © 2025 John Kehayias <john.kehayias@protonmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -340,6 +341,19 @@ Autoconf/Automake/make combo.  Build specifications, also known as @dfn{Meson
 files}, are written in a custom domain-specific language (@dfn{DSL}) that
 resembles Python.")
     (license license:asl2.0)))
+
+(define-public meson-1.8
+  (package
+    (inherit meson)
+    (version "1.8.3")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://github.com/mesonbuild/meson/"
+                                  "releases/download/" version  "/meson-"
+                                  version ".tar.gz"))
+              (sha256
+               (base32
+                "1gvs2mm6z2b4pgsv1d9gl7cm68gqvcr244nh5p63g8f01y8sl67i"))))))
 
 (define-public meson-python
   (package
