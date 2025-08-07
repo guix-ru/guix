@@ -69400,14 +69400,14 @@ reading and writing BAM files.")
 (define-public rust-rustc-hash-2
   (package
     (name "rust-rustc-hash")
-    (version "2.1.0")
+    (version "2.1.1")
     (source
       (origin
         (method url-fetch)
         (uri (crate-uri "rustc-hash" version))
         (file-name (string-append name "-" version ".tar.gz"))
         (sha256
-         (base32 "15yln6fmqlbg0k35r748h8g9xsd637ri23xihq81jb03ncwq1yy7"))))
+         (base32 "03gz5lvd9ghcwsal022cgkq67dmimcgdjghfb5yb5d352ga06xrm"))))
     (build-system cargo-build-system)
     (arguments `(#:cargo-inputs (("rust-rand" ,rust-rand-0.8))))
     (home-page "https://github.com/rust-lang/rustc-hash")
