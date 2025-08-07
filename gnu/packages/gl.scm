@@ -313,7 +313,7 @@ also known as DXTn or DXTC) for Mesa.")
 (define-public mesa
   (package
     (name "mesa")
-    (version "25.1.6")
+    (version "25.2.0")
     (source
      (origin
        (method url-fetch)
@@ -323,7 +323,7 @@ also known as DXTn or DXTC) for Mesa.")
                                  "mesa-" version ".tar.xz")))
        (sha256
         (base32
-         "116f712h9nwdmjxph9x3idqd7h70lgfqz1m961yp3n6j77mnjawz"))))
+         "0kwdpl87v4damasg3rvw9453qbs286vkimjks8qlvlblq0hnnwkw"))))
     (build-system meson-build-system)
     (propagated-inputs
      ;; The following are in the Requires.private field of gl.pc.
@@ -383,6 +383,7 @@ also known as DXTn or DXTC) for Mesa.")
     (outputs '("out" "bin"))
     (arguments
      (list
+      #:meson meson-1.8
       #:configure-flags
       #~(list
          #$@(cond
@@ -405,8 +406,6 @@ panfrost,r300,r600,svga,softpipe,llvmpipe,tegra,v3d,vc4,virgl,zink"))
          "-Dglx=dri"               ;Thread Local Storage, improves performance
          ;; "-Dopencl=true"
          ;; "-Domx=true"
-         "-Dosmesa=true"
-         "-Dgallium-xa=enabled"
 
          ;; features required by wayland
          "-Dgles2=enabled"
@@ -553,7 +552,8 @@ directory = ~a
                                         (from-crates-io 'rust-unicode-ident-1)
                                         (from-crates-io 'rust-quote-1)
                                         (from-crates-io 'rust-proc-macro2-1)
-                                        (from-crates-io 'rust-paste-1))))))))
+                                        (from-crates-io 'rust-paste-1)
+                                        (from-crates-io 'rust-rustc-hash-2))))))))
                 #~())
          (add-after 'unpack 'set-home-directory
            ;; Build tries to use a shader cache (non-fatal error).

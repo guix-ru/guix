@@ -69397,6 +69397,7 @@ reading and writing BAM files.")
 @code{rustc-demangle} crate.")
     (license (list license:expat license:asl2.0))))
 
+;; WARNING: This package is a dependency of mesa.
 (define-public rust-rustc-hash-2
   (package
     (name "rust-rustc-hash")
