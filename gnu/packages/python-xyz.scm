@@ -18967,7 +18967,7 @@ and other @acronym{IDEs, Integrated Development Environments}.")
 (define-public python-debugpy
   (package
     (name "python-debugpy")
-    (version "1.8.9")
+    (version "1.8.16")
     (source
      (origin
        (method git-fetch)
@@ -18982,8 +18982,8 @@ and other @acronym{IDEs, Integrated Development Environments}.")
        (patches (search-patches "python-debugpy-unbundle-pydevd.patch"))
        (sha256
         (base32
-         "0rq9ndsg4za0np5lnlkdwaqlizay8ndm8ki2m7r7awji262dzzlx"))))
-    (build-system python-build-system)
+         "18dkzw2cvsvjrn6ly08pqwrn04fmvqnjjv0gff6795fnl3xzjvfd"))))
+    (build-system pyproject-build-system)
     (arguments
      (list
       #:tests? #f ; Fail on systems with YAMA LSM’s ptrace scope > 0.
@@ -19030,7 +19030,8 @@ and other @acronym{IDEs, Integrated Development Environments}.")
            python-pytest-cov
            python-pytest-timeout
            python-pytest-xdist
-           python-requests))
+           python-requests
+           python-setuptools))
     (propagated-inputs (list python-pydevd))
     (home-page "https://aka.ms/debugpy")
     (synopsis "Debug Adapter Protocol Python implementation")
