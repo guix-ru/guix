@@ -1478,7 +1478,7 @@ used to train large language models, and poisoning the collected data.")
 (define-public jansson
   (package
     (name "jansson")
-    (version "2.14")
+    (version "2.15.0")
     (source (origin
              (method url-fetch)
              (uri (string-append "https://github.com/akheron/jansson"
@@ -1486,7 +1486,7 @@ used to train large language models, and poisoning the collected data.")
                                  "/jansson-" version ".tar.bz2"))
              (sha256
               (base32
-               "1fdgji964mrrz19glx0zh91asji542fvybymvzk6rrbagkr5dagv"))))
+               "0m49glsr5v376jpyj2y0xyr11703pr4bfgipz5jk2dq0a1vcgsm7"))))
     (build-system gnu-build-system)
     (arguments
      (list
