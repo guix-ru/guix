@@ -5224,7 +5224,7 @@ PyTorch.")
            pocketfft-cpp
            python-expecttest
            python-pytest-flakefinder
-           python-pytest-rerunfailures-13
+           python-pytest-rerunfailures
            python-pytest-shard
            python-pytest-xdist
            python-hypothesis
