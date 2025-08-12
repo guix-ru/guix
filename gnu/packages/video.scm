@@ -1936,8 +1936,12 @@ audio/video codec library.")
               (replace "sdl2" sdl2-2.0)))
     (arguments
      (substitute-keyword-arguments (package-arguments ffmpeg-5)
+       ((#:modules modules %default-gnu-modules)
+        `((srfi srfi-1) ,@modules))
        ((#:configure-flags flags ''())
-        #~(cons "--enable-avresample" #$flags))))))
+        #~(cons "--enable-avresample"
+                (fold delete #$flags '("--enable-libplacebo"
+                                       "--enable-libshaderc"))))))))
 
 (define-public ffmpeg-for-stepmania
   (hidden-package
