@@ -4035,7 +4035,6 @@ linux/libcurl_wrapper.h"
     (inputs
      (modify-inputs (package-inputs qtwebengine-5)
        (replace "ffmpeg" ffmpeg)
-       (replace "icu4c" icu4c-75)
        (replace "re2" re2-next)
        (replace "qtmultimedia" qtmultimedia)
        (append fp16 fxdiv libxkbfile xkeyboard-config)))

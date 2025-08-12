@@ -447,7 +447,7 @@ ElasticSearch server")
     (inputs
      (list boost
            editline
-           icu4c-77
+           icu4c
            libtommath
            ncurses
            zlib))
