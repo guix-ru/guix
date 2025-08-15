@@ -77,6 +77,7 @@
   #:use-module (gnu packages databases)
   #:use-module (gnu packages dbm)
   #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages jupyter)
   #:use-module (gnu packages rails)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages autotools)
@@ -787,55 +788,47 @@ Eval Print Loop).")
 (define-public ruby-iruby
   (package
     (name "ruby-iruby")
-    (version "0.3")
+    (version "0.8.3")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "iruby" version))
        (sha256
         (base32
-         "1wdf2c0x8y6cya0n3y0p3p7b1sxkb2fdavdn2k58rf4rs37s7rzn"))))
+         "13qdw2ykzn6yjs4biiyvy1dr5j5v3kb1q7r98ds0kvg22rbs1s56"))))
     (build-system ruby-build-system)
     (arguments
-     ;; TODO: Tests currently fail.
-     ;;
-     ;; Finished in 1.764405s, 1.1335 runs/s, 5.1009 assertions/s.
-     ;;
-     ;;   1) Failure:
-     ;; IntegrationTest#test_interaction [/tmp/guix-build-ruby-iruby-0.3.drv-0/gem/test/integration_test.rb:25]:
-     ;; In [ expected
-     ;;
-     ;; 2 runs, 9 assertions, 1 failures, 0 errors, 0 skips
-     '(#:tests? #f
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-ipython
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "lib/iruby/command.rb"
-               (("version = `")
-                (string-append
-                 "version = `"
-                 (assoc-ref inputs "python-ipython")
-                 "/bin/"))
-               (("Kernel\\.exec\\('")
-                (string-append
-                 "Kernel.exec('"
-                 (assoc-ref inputs "python-ipython")
-                 "/bin/"))))))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'prepare-for-tests
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Remove Bundler setup.
+              (substitute* "test/run-test.rb"
+                (("require \"bundler/setup\"") ""))
+              ;; Set an exact Ruby executable path.
+              (substitute* "test/iruby/application/register_test.rb"
+                (("#!/usr/bin/env ruby")
+                 (string-append "#!"
+                                (search-input-file inputs "/bin/ruby"))))
+              (delete-file "test/integration_test.rb")
+              (setenv "HOME" (getcwd)))))))
+    (native-inputs (list ruby-rake ruby-test-unit ruby-test-unit-rr jupyter))
     (inputs
      (list python-ipython))
     (propagated-inputs
-     (list ruby-bond
-           ruby-data_uri
-           ruby-mimemagic
-           ruby-multi-json
-           ruby-cztop
+     (list ruby-data_uri
+           ruby-ffi-rzmq
+           ruby-irb
+           ruby-logger
+           ruby-mime-types
            ;; Optional inputs
            ruby-pry))
     (synopsis "Ruby kernel for Jupyter/IPython")
     (description
-     "This package provides a Ruby kernel for Jupyter/IPython frontends (e.g.
-notebook).")
+     "This package provides a Ruby kernel for Jupyter/IPython frontends
+(e.g. notebook).  Please note that to work, it requires the @samp{jupyter}
+package.")
     (home-page "https://github.com/SciRuby/iruby")
     (license license:expat)))
 
