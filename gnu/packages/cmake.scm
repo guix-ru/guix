@@ -367,7 +367,7 @@ and workspaces that can be used in the compiler environment of your choice.")
   (package
     (inherit cmake-minimal)
     (name "cmake")
-    (version "4.0.3")
+    (version "4.1.2")
     (source (origin
               (inherit (package-source cmake-minimal))
               (method url-fetch)
@@ -382,7 +382,7 @@ and workspaces that can be used in the compiler environment of your choice.")
                                   ,@rest))))
               (sha256
                (base32
-                "1yrzkwkr2nxl8hcjkk333l9ycbw9prkg363k4km609kknyvkfdcd"))))
+                "059a53p3yizhdqh55a4866x9rdsg2f2zf9pm66mj78vv5cc08gv4"))))
     (outputs '("out" "doc"))
     (arguments
      (substitute-keyword-arguments (package-arguments cmake-minimal)
