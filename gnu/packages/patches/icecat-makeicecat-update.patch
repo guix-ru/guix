@@ -1,0 +1,1070 @@
+Upstream-status: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=79355
+
+diff --git a/data/branding/icecat/configure.sh b/data/branding/icecat/configure.sh
+index 7481c2c..edcf9a8 100644
+--- a/data/branding/icecat/configure.sh
++++ b/data/branding/icecat/configure.sh
+@@ -2,4 +2,4 @@
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ 
+-MOZ_APP_DISPLAYNAME=IceCat
++MOZ_APP_DISPLAYNAME=GNU IceCat
+diff --git a/data/extensions/jsr@javascriptrestrictor/update.js b/data/extensions/jsr@javascriptrestrictor/update.js
+index 83ccbb8..df19c28 100644
+--- a/data/extensions/jsr@javascriptrestrictor/update.js
++++ b/data/extensions/jsr@javascriptrestrictor/update.js
+@@ -21,10 +21,6 @@
+ //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ //
+ 
+-let defaultNbsWhitelistDomain = "duckduckgo.com";
+-let defaultNbsWhitelist = {};
+-defaultNbsWhitelist[defaultNbsWhitelistDomain] = true;
+-
+ async function installUpdate() {
+ 	/**
+ 	 * 0.3+ storage
+@@ -367,7 +363,7 @@ async function installUpdate() {
+ 				};
+ 			}
+ 			item.fpDetectionOn = true;
+-			item.nbsWhitelist = item.whitelistedHosts ? item.whitelistedHosts : defaultNbsWhitelist;
++			item.nbsWhitelist = item.whitelistedHosts ? item.whitelistedHosts : {};
+ 			delete item.whitelistedHosts;
+ 			item.nbsSettings = {
+ 				notifications: 1
+@@ -482,7 +478,6 @@ async function installUpdate() {
+ 					l.wasm = 1;
+ 				}
+ 			}
+-			item.nbsWhitelist[defaultNbsWhitelistDomain] = true;
+ 			item.version = 7;
+ 		}
+ 
+@@ -529,7 +524,7 @@ async function checkAndSaveConfig(conf, check_default = true) {
+ 		conf.__default__ = "2";
+ 	}
+ 	checkExistAndType("domains", "object", {});
+-	checkExistAndType("nbsWhitelist", "object", defaultNbsWhitelist);
++	checkExistAndType("nbsWhitelist", "object", {});
+ 	checkExistAndType("nbsSettings", "object", {});
+ 	checkSettingRange("nbsSettings", "blocking", [0,1], 1);
+ 	checkSettingRange("nbsSettings", "notifications", [0,1], 1);
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/reddit.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/reddit.js
+index e37972b..9e7846c 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/reddit.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/reddit.js
+@@ -8,20 +8,22 @@ const targets = [
+ ];
+ const redirects = [
+   // libreddit: privacy w/ modern UI
+-  "https://safereddit.com",
+-  "https://reddit.rtrace.io",
+-  "https://libreddit.privacydev.net",
+-  "https://l.opnxng.com",
+-  "https://libreddit.projectsegfau.lt",
+-  "https://discuss.whatever.social",
+-  "https://snoo.habedieeh.re",
+-  "https://redlib.pussthecat.org",
+-  "https://redlib.northboot.xyz",
+-  "https://redlib.kylrth.com",
+-  "https://red.artemislena.eu",
++  "https://libredd.it",
++  "https://libreddit.spike.codes",
++  "https://libreddit.kavin.rocks",
++  "https://libreddit.insanity.wtf",
++  "https://libreddit.dothq.co",
++  "https://libreddit.silkky.cloud",
++  "https://libreddit.himiko.cloud",
++  "https://reddit.artemislena.eu",
++  "https://reddit.git-bruh.duckdns.org",
++  // teddit: privacy w/ old UI
++  "https://teddit.net",
++  "https://teddit.ggc-project.de",
++  "https://teddit.kavin.rocks",
+   "https://old.reddit.com", // desktop
+-  "http://red.lpoaj7z2zkajuhgnlltpeqh3zyq7wk2iyeggqaduhgxhyajtdt2j7wad.onion",
+-  "http://snoo.habeehrhadazsw3izbrbilqajalfyqqln54mrja3iwpqxgcuxnus7eid.onion",
++  "https://i.reddit.com", // mobile
++  "https://snew.notabug.io", // anti-censorship
+ ];
+ const bypassPaths = /\/(gallery\/poll\/rpan\/settings\/topics)/;
+ 
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/twitter.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/twitter.js
+index f57fb68..f520d76 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/twitter.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/twitter.js
+@@ -4,8 +4,6 @@
+     when updating this list:
+   */
+ const targets = [
+-  "x.com",
+-  "mobile.x.com",
+   "twitter.com",
+   "www.twitter.com",
+   "mobile.twitter.com",
+@@ -18,10 +16,26 @@ const targets = [
+     (const nitterInstances) when updating this list:
+   */
+ const redirects = [
+-  "https://nitter.privacydev.net",
+-  "https://xcancel.com",
+-  "http://nitter.pjsfkvpxlinjamtawaksbnnaqs2fc2mtvmozrzckxh7f3kis6yea25ad.onion",
+-  "http://nitter.g4c3eya4clenolymqbpgwz3q3tawoxw56yhzk4vugqrl6dtu3ejvhjid.onion",
++  "https://nitter.net",
++  "https://nitter.snopyta.org",
++  "https://nitter.42l.fr",
++  "https://nitter.nixnet.services",
++  "https://nitter.pussthecat.org",
++  "https://nitter.dark.fail",
++  "https://nitter.tedomum.net",
++  "https://nitter.cattube.org",
++  "https://nitter.fdn.fr",
++  "https://nitter.1d4.us",
++  "https://nitter.kavin.rocks",
++  "https://tweet.lambda.dance",
++  "https://nitter.cc",
++  "https://nitter.vxempire.xyz",
++  "https://nitter.unixfox.eu",
++  "https://bird.trom.tf",
++  "http://3nzoldnxplag42gqjs23xvghtzf6t6yzssrtytnntc6ppc7xxuoneoad.onion",
++  "http://nitter.l4qlywnpwqsluw65ts7md3khrivpirse744un3x7mlskqauz5pyuzgqd.onion",
++  "http://nitterlgj3n5fgwesu3vxc5h67ruku33nqaoeoocae2mvlzhsu6k7fqd.onion",
++  "http://npf37k3mtzwxreiw52ccs5ay4e6qt2fkcs2ndieurdyn2cuzzsfyfvid.onion",
+ ];
+ 
+ export default {
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/youtube.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/youtube.js
+index 53aa099..df6dda4 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/youtube.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/helpers/youtube.js
+@@ -8,7 +8,6 @@ const targets = [
+   "youtu.be",
+   "s.ytimg.com",
+   "music.youtube.com",
+-  "piped.video",
+ ];
+ /*
+     Please remember to also update the manifest.json file
+@@ -16,8 +15,29 @@ const targets = [
+     when updating this list:
+   */
+ const redirects = [
+-  "https://inv.nadeko.net",
+-  "http://inv.nadekonw7plitnjuawu6ytjsl7jlglk2t6pyq6eftptmiv3dvqndwvyd.onion",
++  "https://invidious.snopyta.org",
++  "https://invidious.xyz",
++  "https://invidious.kavin.rocks",
++  "https://tube.connect.cafe",
++  "https://invidious.zapashcanon.fr",
++  "https://invidiou.site",
++  "https://vid.mint.lgbt",
++  "https://invidious.site",
++  "https://yewtu.be",
++  "https://invidious.tube",
++  "https://invidious.silkky.cloud",
++  "https://invidious.himiko.cloud",
++  "https://inv.skyn3t.in",
++  "https://tube.incognet.io",
++  "https://invidious.tinfoil-hat.net",
++  "https://invidious.namazso.eu",
++  "https://vid.puffyan.us",
++  "https://dev.viewtube.io",
++  "https://invidious.048596.xyz",
++  "http://fz253lmuao3strwbfbmx46yu7acac2jz27iwtorgmbqlkurlclmancad.onion",
++  "http://qklhadlycap4cnod.onion",
++  "http://c7hqkpkpemu6e7emz5b4vyz7idjgdvgaaa3dyimmeojqbgpea3xqjoid.onion",
++  "http://w6ijuptxiku4xpnnaetxvnkc5vqcdu7mgns2u77qefoixi63vbvnpnqd.onion",
+ ];
+ 
+ export default {
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/remove-twitter-sw.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/remove-twitter-sw.js
+index f8d9e76..d431f1a 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/remove-twitter-sw.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/assets/javascripts/remove-twitter-sw.js
+@@ -1,8 +1,22 @@
+ "use strict";
+ 
+ const nitterInstances = [
+-  "https://nitter.privacydev.net",
+-  "https://nitter.lucabased.xyz"
++  "https://nitter.net",
++  "https://nitter.snopyta.org",
++  "https://nitter.42l.fr",
++  "https://nitter.nixnet.services",
++  "https://nitter.pussthecat.org",
++  "https://nitter.dark.fail",
++  "https://nitter.tedomum.net",
++  "https://nitter.cattube.org",
++  "https://nitter.fdn.fr",
++  "https://nitter.1d4.us",
++  "https://nitter.kavin.rocks",
++  "https://tweet.lambda.dance",
++  "https://nitter.cc",
++  "https://nitter.vxempire.xyz",
++  "https://nitter.unixfox.eu",
++  "https://bird.trom.tf"
+ ];
+ 
+ let disableNitter;
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/manifest.json b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/manifest.json
+index d3bcec2..856e0dc 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/manifest.json
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/manifest.json
+@@ -33,8 +33,6 @@
+   "content_scripts": [
+     {
+       "matches": [
+-        "*://x.com/*",
+-        "*://mobile.x.com/*",
+         "*://twitter.com/*",
+         "*://www.twitter.com/*",
+         "*://mobile.twitter.com/*",
+@@ -48,8 +46,29 @@
+     },
+     {
+       "matches": [
+-        "*://inv.nadeko.net/*",
+-        "*://inv.nadekonw7plitnjuawu6ytjsl7jlglk2t6pyq6eftptmiv3dvqndwvyd.onion/*"
++        "*://invidious.snopyta.org/*",
++        "*://invidious.xyz/*",
++        "*://invidious.kavin.rocks/*",
++        "*://tube.connect.cafe/*",
++        "*://invidious.zapashcanon.fr/*",
++        "*://invidiou.site/*",
++        "*://vid.mint.lgbt/*",
++        "*://invidious.site/*",
++        "*://yewtu.be/*",
++        "*://invidious.tube/*",
++        "*://invidious.silkky.cloud/*",
++        "*://invidious.himiko.cloud/*",
++        "*://inv.skyn3t.in/*",
++        "*://tube.incognet.io/*",
++        "*://invidious.tinfoil-hat.net/*",
++        "*://invidious.namazso.eu/*",
++        "*://vid.puffyan.us/*",
++        "*://dev.viewtube.io/*",
++        "*://invidious.048596.xyz/*",
++        "*://fz253lmuao3strwbfbmx46yu7acac2jz27iwtorgmbqlkurlclmancad.onion/*",
++        "*://qklhadlycap4cnod.onion/*",
++        "*://c7hqkpkpemu6e7emz5b4vyz7idjgdvgaaa3dyimmeojqbgpea3xqjoid.onion/*",
++        "*://w6ijuptxiku4xpnnaetxvnkc5vqcdu7mgns2u77qefoixi63vbvnpnqd.onion/*"
+       ],
+       "js": [
+         "assets/javascripts/persist-invidious-prefs.js"
+@@ -70,4 +89,4 @@
+       "strict_min_version": "67.0"
+     }
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/background/background.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/background/background.js
+index c08d7b4..9b8c3a1 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/background/background.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/background/background.js
+@@ -595,17 +595,10 @@ browser.webRequest.onBeforeRequest.addListener(
+       redirect = {
+         redirectUrl: redirectTwitter(url, initiator),
+       };
+-//
+-// Bibliogram has been discontinued.
+-// See <https://cadence.moe/blog/2022-09-01-discontinuing-bibliogram>
+-// We'll keep this code in case the project is resurrected, but for
+-// now we disable Bibliogram redirects and hide the associated UI.
+-//
+-//  } else if (instagramDomains.includes(url.host)) {
+-//    redirect = {
+-//      redirectUrl: redirectInstagram(url, initiator, details.type),
+-//    };
+-//
++    } else if (instagramDomains.includes(url.host)) {
++      redirect = {
++        redirectUrl: redirectInstagram(url, initiator, details.type),
++      };
+     } else if (url.href.match(googleMapsRegex)) {
+       redirect = {
+         redirectUrl: redirectGoogleMaps(url, initiator),
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.html b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.html
+index c5d0096..65f1e9a 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.html
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.html
+@@ -76,7 +76,7 @@
+           </tbody>
+         </table>
+       </section>
+-<!--  <section class="settings-block">
++      <section class="settings-block">
+         <table class="option" aria-label="Toggle Bibliogram redirects">
+           <tbody>
+             <tr>
+@@ -97,7 +97,7 @@
+             </tr>
+           </tbody>
+         </table>
+-      </section>  -->
++      </section>
+       <section class="settings-block">
+         <table class="option" aria-label="Toggle OpenStreetMap redirects">
+           <tbody>
+@@ -225,7 +225,7 @@
+           />
+         </div>
+       </section>
+-<!--  <section class="settings-block">
++      <section class="settings-block">
+         <h1 data-localise="__MSG_bibliogramInstance__">Bibliogram Instance</h1>
+         <div class="autocomplete">
+           <input
+@@ -235,7 +235,7 @@
+             placeholder="Random instance (none selected)"
+           />
+         </div>
+-      </section>  -->
++      </section>
+       <section class="settings-block">
+         <h1 data-localise="__MSG_osmInstance__">OpenStreetMap Instance</h1>
+         <div class="autocomplete">
+@@ -252,7 +252,7 @@
+           <input
+             id="reddit-instance"
+             type="url"
+-            placeholder="https://libreddit.de"
++            placeholder="https://libredd.it"
+           />
+         </div>
+       </section>
+@@ -543,7 +543,7 @@
+         </section>
+         <hr>
+       </div>
+-<!--  <button type="button" class="collapsible">
++      <button type="button" class="collapsible">
+         Bibliogram
+       </button>
+       <div class="collapsible-content">
+@@ -558,7 +558,7 @@
+           />
+         </section>
+         <hr>
+-      </div>  -->
++      </div>
+     </div>
+ 
+     <div id="exceptions" class="tabcontent">
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.js
+index 8309aab..91e7ac0 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/options/options.js
+@@ -21,7 +21,7 @@ const wikipediaInstances = wikipediaHelper.redirects;
+ const autocompletes = [
+   { id: "nitter-instance", instances: nitterInstances },
+   { id: "invidious-instance", instances: invidiousInstances },
+-//  { id: "bibliogram-instance", instances: bibliogramInstances },
++  { id: "bibliogram-instance", instances: bibliogramInstances },
+   { id: "osm-instance", instances: osmInstances },
+   { id: "reddit-instance", instances: redditInstances },
+   {
+@@ -35,7 +35,7 @@ const domparser = new DOMParser();
+ 
+ let nitterInstance = document.getElementById("nitter-instance");
+ let invidiousInstance = document.getElementById("invidious-instance");
+-// let bibliogramInstance = document.getElementById("bibliogram-instance");
++let bibliogramInstance = document.getElementById("bibliogram-instance");
+ let osmInstance = document.getElementById("osm-instance");
+ let redditInstance = document.getElementById("reddit-instance");
+ let searchEngineInstance = document.getElementById("search-engine-instance");
+@@ -45,7 +45,7 @@ let simplyTranslateInstance = document.getElementById(
+ let wikipediaInstance = document.getElementById("wikipedia-instance");
+ let disableNitter = document.getElementById("disable-nitter");
+ let disableInvidious = document.getElementById("disable-invidious");
+-// let disableBibliogram = document.getElementById("disable-bibliogram");
++let disableBibliogram = document.getElementById("disable-bibliogram");
+ let disableOsm = document.getElementById("disable-osm");
+ let disableReddit = document.getElementById("disable-reddit");
+ let disableSearchEngine = document.getElementById("disable-search-engine");
+@@ -67,7 +67,7 @@ let theme = document.getElementById("theme");
+ let useFreeTube = document.getElementById("use-freetube");
+ let nitterRandomPool = document.getElementById("nitter-random-pool");
+ let invidiousRandomPool = document.getElementById("invidious-random-pool");
+-// let bibliogramRandomPool = document.getElementById("bibliogram-random-pool");
++let bibliogramRandomPool = document.getElementById("bibliogram-random-pool");
+ let exceptions;
+ 
+ window.browser = window.browser || window.chrome;
+@@ -136,7 +136,7 @@ browser.storage.sync.get(
+     if (result.theme) document.body.classList.add(result.theme);
+     nitterInstance.value = result.nitterInstance || "";
+     invidiousInstance.value = result.invidiousInstance || "";
+-//    bibliogramInstance.value = result.bibliogramInstance || "";
++    bibliogramInstance.value = result.bibliogramInstance || "";
+     osmInstance.value = result.osmInstance || "";
+     redditInstance.value = result.redditInstance || "";
+     searchEngineInstance.value =
+@@ -145,7 +145,7 @@ browser.storage.sync.get(
+     wikipediaInstance.value = result.wikipediaInstance || "";
+     disableNitter.checked = !result.disableNitter;
+     disableInvidious.checked = !result.disableInvidious;
+-//    disableBibliogram.checked = !result.disableBibliogram;
++    disableBibliogram.checked = !result.disableBibliogram;
+     disableOsm.checked = !result.disableOsm;
+     disableReddit.checked = !result.disableReddit;
+     disableSearchEngine.checked = !result.disableSearchEngine;
+@@ -172,9 +172,9 @@ browser.storage.sync.get(
+     invidiousRandomPool.value =
+       result.invidiousRandomPool ||
+       commonHelper.filterInstances(invidiousInstances);
+-//    bibliogramRandomPool.value =
+-//      result.bibliogramRandomPool ||
+-//      commonHelper.filterInstances(bibliogramInstances);
++    bibliogramRandomPool.value =
++      result.bibliogramRandomPool ||
++      commonHelper.filterInstances(bibliogramInstances);
+   }
+ );
+ 
+@@ -284,14 +284,14 @@ const invidiousInstanceChange = debounce(() => {
+ }, 500);
+ invidiousInstance.addEventListener("input", invidiousInstanceChange);
+ 
+-// const bibliogramInstanceChange = debounce(() => {
+-//   if (bibliogramInstance.checkValidity()) {
+-//     browser.storage.sync.set({
+-//       bibliogramInstance: parseURL(bibliogramInstance.value),
+-//     });
+-//   }
+-// }, 500);
+-// bibliogramInstance.addEventListener("input", bibliogramInstanceChange);
++const bibliogramInstanceChange = debounce(() => {
++  if (bibliogramInstance.checkValidity()) {
++    browser.storage.sync.set({
++      bibliogramInstance: parseURL(bibliogramInstance.value),
++    });
++  }
++}, 500);
++bibliogramInstance.addEventListener("input", bibliogramInstanceChange);
+ 
+ const osmInstanceChange = debounce(() => {
+   if (osmInstance.checkValidity()) {
+@@ -357,9 +357,9 @@ disableInvidious.addEventListener("change", (event) => {
+   browser.storage.sync.set({ disableInvidious: !event.target.checked });
+ });
+ 
+-// disableBibliogram.addEventListener("change", (event) => {
+-//   browser.storage.sync.set({ disableBibliogram: !event.target.checked });
+-// });
++disableBibliogram.addEventListener("change", (event) => {
++  browser.storage.sync.set({ disableBibliogram: !event.target.checked });
++});
+ 
+ disableOsm.addEventListener("change", (event) => {
+   browser.storage.sync.set({ disableOsm: !event.target.checked });
+@@ -447,12 +447,12 @@ const invidiousRandomPoolChange = debounce(() => {
+ }, 500);
+ invidiousRandomPool.addEventListener("input", invidiousRandomPoolChange);
+ 
+-// const bibliogramRandomPoolChange = debounce(() => {
+-//   browser.storage.sync.set({
+-//     bibliogramRandomPool: bibliogramRandomPool.value,
+-//   });
+-// }, 500);
+-// bibliogramRandomPool.addEventListener("input", bibliogramRandomPoolChange);
++const bibliogramRandomPoolChange = debounce(() => {
++  browser.storage.sync.set({
++    bibliogramRandomPool: bibliogramRandomPool.value,
++  });
++}, 500);
++bibliogramRandomPool.addEventListener("input", bibliogramRandomPoolChange);
+ 
+ theme.addEventListener("change", (event) => {
+   const value = event.target.options[theme.selectedIndex].value;
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.html b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.html
+index 0f3792b..ada7e75 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.html
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.html
+@@ -69,7 +69,7 @@
+         </tbody>
+       </table>
+     </section>
+-<!--
++
+     <section class="settings-block">
+       <table class="option" aria-label="Toggle Bibliogram redirects">
+         <tbody>
+@@ -91,7 +91,7 @@
+           </tr>
+         </tbody>
+       </table>
+-    </section>  -->
++    </section>
+ 
+     <section class="settings-block">
+       <table class="option" aria-label="Toggle OpenStreetMap redirects">
+diff --git a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.js b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.js
+index b4699ca..4309c60 100644
+--- a/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.js
++++ b/data/extensions/{b7f9d2cd-d772-4302-8c3f-eb941af36f76}/pages/popup/popup.js
+@@ -2,7 +2,7 @@
+ 
+ let disableNitter = document.querySelector("#disable-nitter");
+ let disableInvidious = document.querySelector("#disable-invidious");
+-// let disableBibliogram = document.querySelector("#disable-bibliogram");
++let disableBibliogram = document.querySelector("#disable-bibliogram");
+ let disableOsm = document.querySelector("#disable-osm");
+ let disableReddit = document.querySelector("#disable-reddit");
+ let disableSearchEngine = document.querySelector("#disable-searchEngine");
+@@ -28,7 +28,7 @@ browser.storage.sync.get(
+     if (result.theme) document.body.classList.add(result.theme);
+     disableNitter.checked = !result.disableNitter;
+     disableInvidious.checked = !result.disableInvidious;
+-//    disableBibliogram.checked = !result.disableBibliogram;
++    disableBibliogram.checked = !result.disableBibliogram;
+     disableOsm.checked = !result.disableOsm;
+     disableReddit.checked = !result.disableReddit;
+     disableSearchEngine.checked = !result.disableSearchEngine;
+@@ -47,9 +47,9 @@ disableInvidious.addEventListener("change", (event) => {
+   browser.storage.sync.set({ disableInvidious: !event.target.checked });
+ });
+ 
+-// disableBibliogram.addEventListener("change", (event) => {
+-//   browser.storage.sync.set({ disableBibliogram: !event.target.checked });
+-// });
++disableBibliogram.addEventListener("change", (event) => {
++  browser.storage.sync.set({ disableBibliogram: !event.target.checked });
++});
+ 
+ disableOsm.addEventListener("change", (event) => {
+   browser.storage.sync.set({ disableOsm: !event.target.checked });
+diff --git a/data/patches/hide-firefox-view-button.patch b/data/patches/hide-firefox-view-button.patch
+index ef24a34..52bad1c 100644
+--- a/data/patches/hide-firefox-view-button.patch
++++ b/data/patches/hide-firefox-view-button.patch
+@@ -1,10 +1,10 @@
+---- a/browser/base/content/navigator-toolbox.inc.xhtml
+-+++ b/browser/base/content/navigator-toolbox.inc.xhtml
+-@@ -43,6 +43,7 @@
+-                          oncommand="FirefoxViewHandler.openTab();"
+-                          onmousedown="FirefoxViewHandler.openToolbarMouseEvent(event);"
+-                          cui-areatype="toolbar"
+-+                         hidden="true"
+-                          removable="true"/>
++--- a/browser/base/content/navigator-toolbox.inc.xhtml	2025-08-12 02:31:44.000000000 +0900
+++++ b/browser/base/content/navigator-toolbox.inc.xhtml	2025-08-26 21:10:15.709368257 +0900
++@@ -41,6 +41,7 @@
++                        role="button"
++                        aria-pressed="false"
++                        cui-areatype="toolbar"
+++                       hidden="true"
++                        removable="true"/>
+  
+-           <tabs id="tabbrowser-tabs"
++         <tabs id="tabbrowser-tabs"
+diff --git a/data/patches/hide-submit-feedback-menu-item.patch b/data/patches/hide-submit-feedback-menu-item.patch
+index 402ba31..5278da7 100644
+--- a/data/patches/hide-submit-feedback-menu-item.patch
++++ b/data/patches/hide-submit-feedback-menu-item.patch
+@@ -1,10 +1,10 @@
+---- a/browser/base/content/browser-menubar.inc
+-+++ b/browser/base/content/browser-menubar.inc
+-@@ -465,6 +465,7 @@
+-                           hidden="true"
+-                           appmenu-data-l10n-id="menu-report-broken-site"/>
++--- a/browser/base/content/browser-menubar.inc	2025-08-26 21:16:57.929903122 +0900
+++++ b/browser/base/content/browser-menubar.inc	2025-08-26 21:17:09.257918204 +0900
++@@ -431,6 +431,7 @@
++                           disabled="true"
++                           appmenu-data-l10n-id="appmenuitem-report-broken-site"/>
+                  <menuitem id="feedbackPage"
+ +                          hidden="true"
+-                           oncommand="openFeedbackPage()"
+                            data-l10n-id="menu-help-share-ideas"
+                            appmenu-data-l10n-id="appmenu-help-share-ideas"/>
++                 <menuitem id="helpSafeMode"
+diff --git a/data/patches/icecat-about-dialog.patch b/data/patches/icecat-about-dialog.patch
+index c7e77b0..87dc835 100644
+--- a/data/patches/icecat-about-dialog.patch
++++ b/data/patches/icecat-about-dialog.patch
+@@ -1,16 +1,16 @@
+---- a/browser/base/content/aboutDialog.xhtml
+-+++ b/browser/base/content/aboutDialog.xhtml
+-@@ -148,7 +148,6 @@
++--- a/browser/base/content/aboutDialog.xhtml	2025-08-26 21:23:08.866394736 +0900
+++++ b/browser/base/content/aboutDialog.xhtml	2025-08-26 21:23:19.986408921 +0900
++@@ -139,7 +139,6 @@
+        <hbox pack="center">
+          <label is="text-link" class="bottom-link" useoriginprincipal="true" href="about:license" data-l10n-id="bottomLinks-license"/>
+-         <label is="text-link" class="bottom-link" useoriginprincipal="true" href="about:rights" data-l10n-id="bottomLinks-rights"/>
+--        <label is="text-link" class="bottom-link" href="https://www.mozilla.org/privacy/?utm_source=firefox-browser&#38;utm_medium=firefox-desktop&#38;utm_campaign=about-dialog" data-l10n-id="bottomLinks-privacy"/>
++         <label is="text-link" class="bottom-link" href="https://www.mozilla.org/about/legal/terms/firefox/" data-l10n-id="bottom-links-terms"/>
++-        <label is="text-link" class="bottom-link" href="https://www.mozilla.org/privacy/firefox/?utm_source=firefox-browser&#38;utm_medium=firefox-desktop&#38;utm_campaign=about-dialog" data-l10n-id="bottom-links-privacy"/>
+        </hbox>
+        <description id="trademark" data-l10n-id="trademarkInfo"></description>
+      </vbox>
+---- a/browser/base/content/aboutDialog.css
+-+++ b/browser/base/content/aboutDialog.css
+-@@ -38,10 +38,9 @@
++--- a/browser/base/content/aboutDialog.css	2025-08-26 21:26:43.618669160 +0900
+++++ b/browser/base/content/aboutDialog.css	2025-08-26 21:31:54.207067616 +0900
++@@ -32,10 +32,9 @@
+  #rightBox {
+    background-image: url("chrome://branding/content/about-wordmark.svg");
+    background-repeat: no-repeat;
+@@ -19,6 +19,9 @@
+    padding-top: 38px;
+ -  margin-top: 20px;
+ +  margin-top: 60px;
+- }
+- 
++   /* We don't want this box to contribute arbitrarily to the intrinsic size of
++    * the dialog, so set the width to a reasonable size, but let it flex to take
++    * all available space. */
++--- a/browser/base/content/aboutDialog.css
+++++ b/browser/base/content/aboutDialog.css
+  #rightBox:-moz-locale-dir(rtl) {
+diff --git a/data/patches/icecat-preferences.patch b/data/patches/icecat-preferences.patch
+index f8f00cd..5b3b24f 100644
+--- a/data/patches/icecat-preferences.patch
++++ b/data/patches/icecat-preferences.patch
+@@ -1,6 +1,63 @@
++diff --git a/browser/base/content/appmenu-viewcache.inc.xhtml b/browser/base/content/appmenu-viewcache.inc.xhtml
++index ec44a3b1a354..e469b754d93d 100644
++--- a/browser/base/content/appmenu-viewcache.inc.xhtml
+++++ b/browser/base/content/appmenu-viewcache.inc.xhtml
++@@ -139,6 +139,9 @@
++                      key="key_preferencesCmdMac"
++ #endif
++                      />
+++      <toolbarbutton id="appMenu-icecatsettings-button"
+++                     class="subviewbutton"
+++                     data-l10n-id="appmenuitem-icecat-settings"/>
++       <toolbarbutton id="appMenu-more-button2"
++                      class="subviewbutton subviewbutton-nav"
++                      data-l10n-id="appmenuitem-more-tools"
++diff --git a/browser/base/content/browser-menubar.inc b/browser/base/content/browser-menubar.inc
++index 01bca4ecb0de..7c755439d1d5 100644
++--- a/browser/base/content/browser-menubar.inc
+++++ b/browser/base/content/browser-menubar.inc
++@@ -116,6 +116,8 @@
++                           />
++ #endif
++ #endif
+++              <menuitem id="menu_icecat_preferences"
+++	          data-l10n-id="appmenuitem-icecat-settings"/>
++               </menupopup>
++             </menu>
++ 
++diff --git a/browser/base/content/browser-menubar.js b/browser/base/content/browser-menubar.js
++index 61ae54a0884c..6d4c315427bc 100644
++--- a/browser/base/content/browser-menubar.js
+++++ b/browser/base/content/browser-menubar.js
++@@ -16,6 +16,9 @@ document.addEventListener(
++         case "menu_preferences":
++           openPreferences(undefined);
++           break;
+++        case "menu_icecat_preferences":
+++          openPreferences("privacy-icecatPreferences");
+++          break;
++ 
++         // == view-menu ==
++         case "menu_pageStyleNoStyle":
++diff --git a/browser/components/customizableui/content/panelUI.js b/browser/components/customizableui/content/panelUI.js
++index 689205034d9d..a80bbcfe2926 100644
++--- a/browser/components/customizableui/content/panelUI.js
+++++ b/browser/components/customizableui/content/panelUI.js
++@@ -379,6 +379,9 @@ const PanelUI = {
++       case "appMenu-settings-button":
++         openPreferences();
++         break;
+++      case "appMenu-icecatsettings-button":
+++        openPreferences("privacy-icecatPreferences");
+++        break;
++       case "appMenu-more-button2":
++         this.showMoreToolsPanel(target);
++         break;
++diff --git a/browser/components/preferences/privacy.inc.xhtml b/browser/components/preferences/privacy.inc.xhtml
++index 28e325c938de..fb7e669e07f6 100644
+ --- a/browser/components/preferences/privacy.inc.xhtml
+ +++ b/browser/components/preferences/privacy.inc.xhtml
+-@@ -705,6 +705,83 @@
++@@ -691,6 +691,83 @@
+    </hbox>
+  </groupbox>
+  
+@@ -84,11 +141,13 @@
+  <hbox id="permissionsCategory"
+        class="subcategory"
+        hidden="true"
++diff --git a/browser/components/preferences/privacy.js b/browser/components/preferences/privacy.js
++index 5722057a0665..3d825f40fa3b 100644
+ --- a/browser/components/preferences/privacy.js
+ +++ b/browser/components/preferences/privacy.js
+-@@ -155,6 +155,16 @@
+-   { id: PREF_URLBAR_QUICKSUGGEST_BLOCKLIST, type: "string" },
+-   { id: PREF_URLBAR_WEATHER_USER_ENABLED, type: "bool" },
++@@ -156,6 +156,16 @@ Preferences.addAll([
++   { id: "browser.urlbar.suggest.quicksuggest.sponsored", type: "bool" },
++   { id: "browser.urlbar.quicksuggest.dataCollection.enabled", type: "bool" },
+  
+ +  // IceCat-specific
+ +  { id: "javascript.enabled", type: "bool" },
+@@ -103,7 +162,7 @@
+    // History
+    { id: "places.history.enabled", type: "bool" },
+    { id: "browser.formfill.enable", type: "bool" },
+-@@ -1177,6 +1187,24 @@
++@@ -1150,6 +1160,24 @@ var gPrivacyPane = {
+      setSyncFromPrefListener("enableOCSP", () => this.readEnableOCSP());
+      setSyncToPrefListener("enableOCSP", () => this.writeEnableOCSP());
+  
+@@ -128,7 +187,7 @@
+      if (AlertsServiceDND) {
+        let notificationsDoNotDisturbBox = document.getElementById(
+          "notificationsDoNotDisturbBox"
+-@@ -1290,6 +1318,62 @@
++@@ -1259,6 +1287,62 @@ var gPrivacyPane = {
+      SiteDataManager.updateSites();
+    },
+  
+@@ -191,28 +250,3 @@
+    // CONTENT BLOCKING
+  
+    /**
+---- a/browser/base/content/appmenu-viewcache.inc.xhtml
+-+++ b/browser/base/content/appmenu-viewcache.inc.xhtml
+-@@ -126,6 +126,10 @@
+-                      key="key_preferencesCmdMac"
+- #endif
+-                      />
+-+      <toolbarbutton id="appMenu-icecatsettings-button"
+-+                     class="subviewbutton"
+-+                     data-l10n-id="appmenuitem-icecat-settings"
+-+                     oncommand="switchToTabHavingURI('about:preferences#privacy-icecatPreferences', true)"/>
+-       <toolbarbutton id="appMenu-more-button2"
+-                      class="subviewbutton subviewbutton-nav"
+-                      data-l10n-id="appmenuitem-more-tools"
+---- a/browser/base/content/browser-menubar.inc
+-+++ b/browser/base/content/browser-menubar.inc
+-@@ -127,6 +127,9 @@
+-                           />
+- #endif
+- #endif
+-+              <menuitem id="menu_icecat_preferences"
+-+	          oncommand="switchToTabHavingURI('about:preferences#privacy-icecatPreferences', true)"
+-+	          data-l10n-id="appmenuitem-icecat-settings"/>
+-               </menupopup>
+-             </menu>
+- 
+diff --git a/data/patches/moz-configure-changes.patch b/data/patches/moz-configure-changes.patch
+index 6f0525e..9711a2f 100644
+--- a/data/patches/moz-configure-changes.patch
++++ b/data/patches/moz-configure-changes.patch
+@@ -1,18 +1,43 @@
++diff --git a/browser/moz.configure b/browser/moz.configure
++index e8b401a7dfb2..d5b3117ce3d8 100644
+ --- a/browser/moz.configure
+ +++ b/browser/moz.configure
+-@@ -5,11 +5,11 @@
++@@ -5,16 +5,19 @@
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  
+  imply_option("MOZ_PLACES", True)
+ -imply_option("MOZ_SERVICES_HEALTHREPORT", True)
+-+imply_option("MOZ_SERVICES_HEALTHREPORT", False)
+- imply_option("MOZ_SERVICES_SYNC", True)
++-imply_option("MOZ_SERVICES_SYNC", True)
+ -imply_option("MOZ_DEDICATED_PROFILES", True)
+ -imply_option("MOZ_BLOCK_PROFILE_DOWNGRADE", True)
+ -imply_option("MOZ_NORMANDY", True)
+++imply_option("MOZ_SERVICES_HEALTHREPORT", False)
+++ # Disabling MOZ_SERVICES_SYNC would break runtime javascript,
+++ # see <https://bugzilla.mozilla.org/show_bug.cgi?id=1816969>.
+++imply_option("MOZ_SERVICES_SYNC", True)
+ +imply_option("MOZ_DEDICATED_PROFILES", False)
+ +imply_option("MOZ_BLOCK_PROFILE_DOWNGRADE", False)
+ +imply_option("MOZ_NORMANDY", False)
++ imply_option("MOZ_PROFILE_MIGRATOR", True)
++ 
++ 
++-imply_option("MOZ_APP_VENDOR", "Mozilla")
+++imply_option("MOZ_APP_VENDOR", "GNU")
++ imply_option("MOZ_APP_ID", "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}")
+++imply_option("MOZ_APP_PROFILE", "mozilla/icecat")
++ # Include the DevTools client, not just the server (which is the default)
++ imply_option("MOZ_DEVTOOLS", "all")
++ imply_option("BROWSER_CHROME_URL", "chrome://browser/content/browser.xhtml")
++diff --git a/build/moz.configure/init.configure b/build/moz.configure/init.configure
++index 193272588caa..da8a729548c8 100644
++--- a/build/moz.configure/init.configure
+++++ b/build/moz.configure/init.configure
++@@ -991,7 +991,7 @@ set_config("MOZ_BUILD_APP", build_project)
++ set_define("MOZ_BUILD_APP", build_project)
++ 
++ 
++-option(env="MOZILLA_OFFICIAL", help="Build an official release")
+++option(env="MOZILLA_OFFICIAL", help="Build an official release", default=False)
++ 
+  
+- with only_when(target_has_linux_kernel & compile_environment):
+-     option(env="MOZ_NO_PIE_COMPAT", help="Enable non-PIE wrapper")
++ @depends("MOZILLA_OFFICIAL")
+diff --git a/data/update-extensions.sh b/data/update-extensions.sh
+old mode 100644
+new mode 100755
+index 66ea9ad..2c4db94
+--- a/data/update-extensions.sh
++++ b/data/update-extensions.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ 
+ set -e
+ 
+diff --git a/makeicecat b/makeicecat
+index fc0bb76..d7b75b2 100755
+--- a/makeicecat
++++ b/makeicecat
+@@ -21,12 +21,13 @@
+ 
+ 
+ # metadata
+-readonly FFMAJOR=128
+-readonly FFMINOR=14
++readonly FFMAJOR=140
++readonly FFMINOR=2
+ readonly FFSUB=0
+ readonly FFBUILD=1
+ readonly GNUVERSION=1
+-readonly SOURCEBALL_CHECKSUM='93b9ef6229f41cb22ff109b95bbf61a78395a0fe4b870192eeca22947cb09a53'
++# SHA-256
++readonly SOURCEBALL_CHECKSUM='956dce675c3b706d563caf07ed3ca9af632ab830be710dfd4351da78a0a2ef55'
+ readonly SOURCEBALL_SIGNINGKEY='14F26682D0916CDD81E37B6D61B7B526D98F0353'
+ readonly FFVERSION=${FFMAJOR}.${FFMINOR}.${FFSUB}
+ readonly SOURCEBALL=firefox-${FFVERSION}esr.source.tar.xz
+@@ -41,7 +42,7 @@ readonly LIST_URL=lists.gnu.org/mailman/listinfo/bug-gnuzilla
+ 
+ # l10n
+ readonly L10N_URL=https://github.com/mozilla-l10n/firefox-l10n
+-readonly L10N_REV=fcd0300e8478d1ec4d1c097a073ddb8e1e0351e3
++readonly L10N_REV=a0c1ffda4ed19c0399e4175610361179e09829de
+ readonly L10N_CMP_URL=https://github.com/mozilla/compare-locales
+ readonly L10N_CMP_REV=RELEASE_9_0_4
+ readonly L10N_PREFS_DIR=browser/chrome/browser/preferences
+@@ -377,7 +378,7 @@ configure()
+     sed '/"datareporting\.healthreport\.uploadEnabled"/s/true/false/' -i modules/libpref/init/all.js
+ 
+     # Custom privacy statement link
+-    sed "s|https://www\\.mozilla\\.org/legal/privacy/|https://${LEGALINFO_URL}|" -i ./browser/app/profile/firefox.js ./toolkit/content/aboutRights.xhtml
++    sed "s|https://www\\.mozilla\\.org/legal/privacy/|https://${LEGALINFO_URL}|" -i ./browser/app/profile/firefox.js
+ 
+     # Sanitize lists
+     local plugin_file
+@@ -393,8 +394,8 @@ configure()
+     # Disable activity-stream anti-features.
+     # These are not condensed into a single sed script so that it
+     # fails on individual commands that didn't change the source
+-    local activity_stream=browser/components/newtab/lib/ActivityStream.sys.mjs
+-    sed '/^const DEFAULT_SITES/,/^])\;/c const DEFAULT_SITES = new Map\([[""]]\);' -i browser/components/newtab/lib/DefaultSites.sys.mjs
++    local activity_stream=browser/extensions/newtab/lib/ActivityStream.sys.mjs
++    sed '/^const DEFAULT_SITES/,/^])\;/c const DEFAULT_SITES = new Map\([[""]]\);' -i browser/extensions/newtab/lib/DefaultSites.sys.mjs
+     sed '/"showSponsored"/,/value/s/value: true/value: false/' -i $activity_stream
+     sed '/  "telemetry"/,/value/s/value: true/value: false/' -i $activity_stream
+     sed '/"section\.highlights\.includePocket"/,/value/s/value: true/value: false/' -i $activity_stream
+@@ -405,11 +406,10 @@ configure()
+     sed '/"telemetry\.structuredIngestion\.endpoint"/,/value/s/value: .*/value: "",/' -i $activity_stream
+     sed '/name: "telemetry"/,/value/s/value: true/value: false/' -i $activity_stream
+     sed '/name: "system\.topstories"/,/},/s/.*!!locales.*/false/' -i $activity_stream
+-    sed 's/Ubuntu, //' -i browser/components/newtab/css/activity-stream*.css
+ 
+-    sed '/^]$/d' -i browser/components/newtab/data/content/tippytop/top_sites.json
+-    sed 's/}$/},/' -i browser/components/newtab/data/content/tippytop/top_sites.json
+-    cat << EOF >> browser/components/newtab/data/content/tippytop/top_sites.json
++    sed '/^]$/d' -i browser/components/topsites/content/tippytop/top_sites.json
++    sed 's/}$/},/' -i browser/components/topsites/content/tippytop/top_sites.json
++    cat << EOF >> browser/components/topsites/content/tippytop/top_sites.json
+ {
+   "domains": ["gnu.org"],
+   "image_url": "images/gnu.png",
+@@ -505,8 +505,8 @@ EOF
+ }
+ EOF
+ 
+-    cp "${DATADIR}"/newtab/*.ico browser/components/newtab/data/content/tippytop/favicons/
+-    cp "${DATADIR}"/newtab/*.png browser/components/newtab/data/content/tippytop/images/
++    cp "${DATADIR}"/newtab/*.ico browser/components/topsites/content/tippytop/favicons/
++    cp "${DATADIR}"/newtab/*.png browser/components/topsites/content/tippytop/images/
+ 
+     # IceCat menu l10n
+     /bin/sed '/appmenuitem-settings/,+1s/\(.*.label = \)\(.*\)/\1\2\nappmenuitem-icecat-settings =\n\1IceCat \2/' -i ./l10n/*/browser/browser/appmenu.ftl ./browser/locales/en-US/browser/appmenu.ftl
+@@ -541,7 +541,6 @@ configure_mobile()
+ 
+     cat << EOF >> mobile/android/confvars.sh
+ # IceCat settings
+-MOZ_APP_VENDOR=GNU
+ MOZ_APP_VERSION=${FFVERSION}
+ MOZ_PAY=0
+ MOZ_SERVICES_HEALTHREPORT=0
+@@ -550,7 +549,6 @@ MOZ_SERVICES_FXACCOUNTS=0
+ MOZ_SERVICES_METRICS=0
+ MOZ_DATA_REPORTING=0
+ MOZ_NORMANDY=0
+-MOZ_SERVICES_SYNC=0
+ MOZ_DEVICES=0
+ MOZ_ANDROID_GOOGLE_PLAY_SERVICES=0
+ MOZ_ADDON_SIGNING=0
+@@ -606,15 +604,6 @@ apply_branding()
+ 
+     # Custom legal about pages
+     find l10n -wholename '*/brand.ftl' | xargs /bin/sed 's/^trademarkInfo = .*/trademarkInfo = The IceCat logo is Copyright 2008-2015 Free Software Foundation, released under the terms of the GNU Lesser General Public License, version 3 or any later version./' -i
+-    local string
+-    for string in rights-intro-point-2 rights-intro-point-3 rights-intro-point-4 rights-intro-point-5 rights-intro-point-6 rights-webservices rights-safebrowsing
+-    do
+-        find -name aboutRights.ftl | xargs sed -i "s/^${string}.*/${string} = /"
+-    done
+-    for string in helpus community-2 community-exp
+-    do
+-        find -wholename '*/browser/aboutDialog.ftl' | xargs sed -i "s/^${string}.*/${string} = /"
+-    done
+     cp "${DATADIR}"/aboutRights.xhtml toolkit/content/aboutRights.xhtml
+     cp "${DATADIR}"/aboutRights.xhtml toolkit/content/aboutRights-unbranded.xhtml
+     sed -i 's|<a href="http://www\.mozilla\.org/">Mozilla Project</a>|<a href="http://www.gnu.org/">GNU Project</a>|g' browser/base/content/overrides/app-license.html
+@@ -632,8 +621,10 @@ apply_branding()
+ 
+ apply_batch_branding()
+ {
+-    find . -depth | grep -i fennec  | rename_files -e s/fennec/icecatmobile/g -e s/Fennec/IceCatMobile/g
+-    find . -depth | grep -i firefox | rename_files -e s/firefox/icecat/g -e s/Firefox/IceCat/g
++    find . -depth | grep -i fennec |
++        rename_files -e s/fennec/icecatmobile/g -e s/Fennec/IceCatMobile/g
++    find . -depth | grep -i firefox |
++        rename_files -e s/firefox/icecat/g -e s/Firefox/IceCat/g
+ 
+     echo "Running batch rebranding (this will take a while)"
+     local sed_script="
+@@ -672,7 +663,9 @@ s|https://www\\.mozilla\\.org/icecat/?utm_source=synceol|https://www.mozilla.org
+ 
+ s|www\\.gnu\\.org/software/gnuzilla/icecat-help|libreplanet.org/wiki/Group:IceCat/Help|g;
+ "
+-    find . -type f -not -iregex '.*changelog.*' -not -iregex '.*copyright.*' -not -iregex '.*third_party/rust.*' -execdir /bin/sed --follow-symlinks -i "${sed_script}" '{}' ';'
++    find . -type f -not -iregex '.*changelog.*' -not -iregex '.*copyright.*' \
++         -not -iregex '.*third_party/rust.*' \
++         -execdir /bin/sed --follow-symlinks -i "${sed_script}" '{}' ';'
+ 
+     find l10n -type f -execdir /bin/sed --follow-symlinks -i "s/from GNU/from Mozilla/g" '{}' ';'
+ 
+@@ -713,27 +706,18 @@ s/OpenSource/Free Software/g;
+     # Ditto for browser/modules/moz.build
+     sort_inner_list_in_file "EXTRA_JS_MODULES += [" "]" browser/modules/moz.build
+ 
++    # Adjust the capitalization of IceCat to match the expected symbol
++    # names in build-time generated source files like TelemetryEventEnums.h.
++    sed 's/IceCatview/Icecatview/g' -i browser/components/icecatview/metrics.yaml
++
+     # Copy js settings
+     cat "${DATADIR}"/settings.js >> browser/app/profile/icecat.js
+ 
+     cat << EOF >> browser/confvars.sh
+ # IceCat settings
+ MOZ_APP_BASENAME=IceCat
+-MOZ_APP_UA_NAME=Firefox
+-MOZ_APP_VENDOR=GNU
+ MOZ_APP_VERSION=${FFVERSION}
+-MOZ_APP_PROFILE=mozilla/icecat
+-MOZ_PAY=0
+-MOZ_SERVICES_HEALTHREPORT=0
+-MOZ_SERVICES_HEALTHREPORTER=0
+-MOZ_SERVICES_FXACCOUNTS=0
+-MOZ_SERVICES_METRICS=0
+ MOZ_DATA_REPORTING=0
+-MOZ_NORMANDY=0
+-MOZ_SERVICES_SYNC=0
+-MOZ_DEVICES=0
+-MOZ_ANDROID_GOOGLE_PLAY_SERVICES=0
+-MOZ_ADDON_SIGNING=0
+ EOF
+ }
+ 
+diff --git a/tools/process-json-files.py b/tools/process-json-files.py
+index d449057..2407fa9 100644
+--- a/tools/process-json-files.py
++++ b/tools/process-json-files.py
+@@ -148,48 +148,6 @@ class Changes(RemoteSettings):
+         return File(cls.OUTPUT_PATH, changes)
+ 
+ 
+-class SearchConfig(RemoteSettings):
+-    JSON_PATHS = (
+-        RemoteSettings.DUMPS_PATH_ABSOLUTE /
+-        'main/search-config.json',
+-    )
+-    SCHEMA_PATH = arguments.MAIN_PATH / \
+-        'toolkit/components/search/schema/search-config-schema.json'
+-    OUTPUT_PATH = JSON_PATHS[0]
+-
+-    _DUCKDUCKGO_SEARCH_ENGINE_ID = 'ddg@search.mozilla.org'
+-
+-    @classmethod
+-    def should_drop_record(cls, search_engine):
+-        return search_engine['webExtension']['id'] not in (
+-            cls._DUCKDUCKGO_SEARCH_ENGINE_ID, 'wikipedia@search.mozilla.org')
+-
+-    @classmethod
+-    def process_record(cls, search_engine):
+-        [search_engine.pop(key, None)
+-         for key in ['extraParams', 'telemetryId']]
+-
+-        general_specifier = {}
+-        for specifier in search_engine['appliesTo'].copy():
+-            if 'application' in specifier:
+-                if 'distributions' in specifier['application']:
+-                    search_engine['appliesTo'].remove(specifier)
+-                    continue
+-                specifier['application'].pop('extraParams', None)
+-
+-            if 'included' in specifier and 'everywhere' in specifier[
+-                    'included'] and specifier['included']['everywhere']:
+-                general_specifier = specifier
+-
+-        if not general_specifier:
+-            general_specifier = {'included': {'everywhere': True}}
+-            search_engine['appliesTo'].insert(0, general_specifier)
+-        if search_engine['webExtension']['id'] == cls._DUCKDUCKGO_SEARCH_ENGINE_ID:
+-            general_specifier['default'] = 'yes'
+-
+-        return search_engine
+-
+-
+ class SearchConfigV2(RemoteSettings):
+     JSON_PATHS = (
+         RemoteSettings.DUMPS_PATH_ABSOLUTE /
+@@ -224,20 +182,6 @@ class SearchConfigV2(RemoteSettings):
+         return record
+ 
+ 
+-class SearchConfigOverrides(RemoteSettings):
+-    JSON_PATHS = (
+-        RemoteSettings.DUMPS_PATH_ABSOLUTE /
+-        'main/search-config-overrides.json',
+-    )
+-    SCHEMA_PATH = arguments.MAIN_PATH / \
+-        'toolkit/components/search/schema/search-config-overrides-schema.json'
+-    OUTPUT_PATH = JSON_PATHS[0]
+-
+-    @classmethod
+-    def should_drop_record(cls, record):
+-        return True
+-
+-
+ class SearchConfigOverridesV2(RemoteSettings):
+     JSON_PATHS = (
+         RemoteSettings.DUMPS_PATH_ABSOLUTE /
+@@ -295,8 +239,7 @@ class TopSites(RemoteSettings):
+ 
+ # To reflect the latest timestamps, Changes class should always come after
+ # all other RemoteSettings subclasses
+-processors = (SearchConfig,   SearchConfigOverrides,
+-              SearchConfigV2, SearchConfigOverridesV2,
++processors = (SearchConfigV2, SearchConfigOverridesV2,
+               Changes)
+ 
+ for processor in processors:
