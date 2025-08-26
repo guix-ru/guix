@@ -167,7 +167,7 @@ algorithms library for calendar dates and durations.  It also provides the
 (define-public libical
   (package
     (name "libical")
-    (version "3.0.17")
+    (version "3.0.20")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -175,7 +175,7 @@ algorithms library for calendar dates and durations.  It also provides the
                     version "/libical-" version ".tar.gz"))
               (sha256
                (base32
-                "06vqbxg4f3i03087grjncfy9pbvmlhg4v1ajhwr400l7nrnrmnmw"))))
+                "1hml20smr79c1b58x6401bgqrc52j2r4cr1h00dlrs3cb8pyjgg7"))))
     (build-system cmake-build-system)
     (arguments
      (list
