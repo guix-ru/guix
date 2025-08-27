@@ -10697,6 +10697,10 @@
   (crate-source "hashbrown" "0.14.0"
                 "0yj3nf0w30pf30w503kgaw4sbjnh62l5cbmc7dd0mnczzywh2qic"))
 
+(define rust-hashbrown-0.14.1
+  (crate-source "hashbrown" "0.14.1"
+                "04hdcir5sqgw9318c3sjnhf3jid1mq5ipy0ma2pawpgm28madzbx"))
+
 (define rust-hashbrown-0.14.5
   (crate-source "hashbrown" "0.14.5"
                 "1wa1vy1xs3mp11bn3z9dv0jricgr6a2j0zkf1g19yz3vw4il89z5"))
@@ -11761,6 +11765,10 @@
 (define rust-indexmap-2.0.1
   (crate-source "indexmap" "2.0.1"
                 "0kmi1dhkmnv937mbkzlqq9kmkdr8k5030vfk19bi8jcxy4x7q8md"))
+
+(define rust-indexmap-2.2.6
+  (crate-source "indexmap" "2.2.6"
+                "09hgwi2ig0wyj5rjziia76zmhgfj95k0jb4ic3iiawm4vlavg3qn"))
 
 (define rust-indexmap-2.10.0
   (crate-source "indexmap" "2.10.0"
@@ -13073,6 +13081,10 @@
 (define rust-libc-0.2.162
   (crate-source "libc" "0.2.162"
                 "1633a00yyx45kzx9r54fndvr8njsjqyr7zl12mzgsmgyczg8glhq"))
+
+(define rust-libc-0.2.168
+  (crate-source "libc" "0.2.168"
+                "0vab4inpw0dz78nii02hsxp1skqn06xzh64psw8wl1h63scb5bjs"))
 
 (define rust-libc-0.2.169
   (crate-source "libc" "0.2.169"
@@ -17007,13 +17019,17 @@
   (crate-source "password-hash" "0.5.0"
                 "0ri1mim11zk0a9s40zdi288dfqvmdiryc7lw8vl46b59ifa08vrl"))
 
-(define rust-paste-0.1.18
-  (crate-source "paste" "0.1.18"
-                "10587zrlmzhq66yhd0z36fzglf32m1nlhi9bxxm6dgl0gp3j1jj5"))
+(define rust-paste-1.0.14
+  (crate-source "paste" "1.0.14"
+                "0k7d54zz8zrz0623l3xhvws61z5q2wd3hkwim6gylk8212placfy"))
 
 (define rust-paste-1.0.15
   (crate-source "paste" "1.0.15"
                 "02pxffpdqkapy292harq6asfjvadgp1s005fip9ljfsn9fvxgh2p"))
+
+(define rust-paste-0.1.18
+  (crate-source "paste" "0.1.18"
+                "10587zrlmzhq66yhd0z36fzglf32m1nlhi9bxxm6dgl0gp3j1jj5"))
 
 (define rust-paste-impl-0.1.18
   (crate-source "paste-impl" "0.1.18"
@@ -19014,6 +19030,10 @@
   (crate-source "quote" "1.0.33"
                 "1biw54hbbr12wdwjac55z1m2x2rylciw83qnjn564a3096jgqrsj"))
 
+(define rust-quote-1.0.35
+  (crate-source "quote" "1.0.35"
+                "1vv8r2ncaz4pqdr78x7f138ka595sp2ncr1sa2plm4zxbsmwj7i9"))
+
 (define rust-quote-1.0.36
   (crate-source "quote" "1.0.36"
                 "19xcmh445bg6simirnnd4fvkmp6v2qiwxh5f6rw4a70h76pnm9qg"))
@@ -19807,6 +19827,10 @@
 (define rust-relative-path-2.0.1
   (crate-source "relative-path" "2.0.1"
                 "1c4jm6x0p88722c77xx53mb7zcs4xznp9d3whdsbmn1248qhm95w"))
+
+(define rust-remain-0.2.12
+  (crate-source "remain" "0.2.12"
+                "157pzbzkwrj1m111ns3mmr3yla4qnrd0qiij0m6jgb8c4c8y1m8s"))
 
 (define rust-remoteprocess-0.5.0
   (crate-source "remoteprocess" "0.5.0"
@@ -23994,6 +24018,10 @@
   (crate-source "thiserror" "1.0.69"
                 "0lizjay08agcr5hs9yfzzj6axs53a2rgx070a1dsi3jpkcrzbamn"))
 
+(define rust-thiserror-2.0.11
+  (crate-source "thiserror" "2.0.11"
+                "1z0649rpa8c2smzx129bz4qvxmdihj30r2km6vfpcv9yny2g4lnl"))
+
 (define rust-thiserror-2.0.18
   (crate-source "thiserror" "2.0.18"
                 "1i7vcmw9900bvsmay7mww04ahahab7wmr8s925xc083rpjybb222"))
@@ -24041,6 +24069,10 @@
 (define rust-thiserror-impl-2.0.6
   (crate-source "thiserror-impl" "2.0.6"
                 "04k3dz901mymm06j3x6f65hpbsqlk6g51fmiky9g2kqgnk550myn"))
+
+(define rust-thiserror-impl-2.0.11
+  (crate-source "thiserror-impl" "2.0.11"
+                "1hkkn7p2y4cxbffcrprybkj0qy1rl1r6waxmxqvr764axaxc3br6"))
 
 (define rust-thiserror-impl-2.0.12
   (crate-source "thiserror-impl" "2.0.12"
@@ -25578,6 +25610,10 @@
 (define rust-ubyte-0.10.4
   (crate-source "ubyte" "0.10.4"
                 "1spj3k9sx6xvfn7am9vm1b463hsr79nyvj8asi2grqhyrvvdw87p"))
+
+(define rust-ucd-trie-0.1.6
+  (crate-source "ucd-trie" "0.1.6"
+                "1ff4yfksirqs37ybin9aw71aa5gva00hw7jdxbw8w668zy964r7d"))
 
 (define rust-ucd-trie-0.1.7
   (crate-source "ucd-trie" "0.1.7"
@@ -29203,6 +29239,10 @@
   (crate-source "zerocopy" "0.7.35"
                 "1w36q7b9il2flg0qskapgi9ymgg7p985vniqd09vi0mwib8lz6qv"))
 
+(define rust-zerocopy-0.8.13
+  (crate-source "zerocopy" "0.8.13"
+                "07g29nsr3hvf2vyh9wk39l3yg144hprjx7aykvkd5gzka6s4m4b7"))
+
 (define rust-zerocopy-0.8.24
   (crate-source "zerocopy" "0.8.24"
                 "0yb8hyzfnwzr2wg4p7cnqmjps8fsw8xqnprafgpmfs8qisigx1i5"))
@@ -29242,6 +29282,10 @@
 (define rust-zerocopy-derive-0.7.35
   (crate-source "zerocopy-derive" "0.7.35"
                 "0gnf2ap2y92nwdalzz3x7142f2b83sni66l39vxp2ijd6j080kzs"))
+
+(define rust-zerocopy-derive-0.8.13
+  (crate-source "zerocopy-derive" "0.8.13"
+                "0pgjqk2w5wrw752wfsxgf7rwqjlk1r4vq5iky2fjijh38cxdg23r"))
 
 (define rust-zerocopy-derive-0.8.24
   (crate-source "zerocopy-derive" "0.8.24"
@@ -29656,15 +29700,6 @@
 ;;;
 ;;; Cargo inputs.
 ;;;
-
-;; TODO: Maintain this automatically too.
-(define-public mesa-cargo-inputs
-  `(("paste" ,rust-paste-1.0.15)
-    ("proc-macro2" ,rust-proc-macro2-1.0.94)
-    ("quote" ,rust-quote-1.0.40)
-    ("rustc-hash" ,rust-rustc-hash-2.1.1)
-    ("syn" ,rust-syn-2.0.100)
-    ("unicode-ident" ,rust-unicode-ident-1.0.18)))
 
 (define-cargo-inputs lookup-cargo-inputs
                      (aardvark-dns =>
@@ -47175,6 +47210,34 @@
                                   rust-zstd-0.13.3
                                   rust-zstd-safe-7.2.4
                                   rust-zstd-sys-2.0.16+zstd.1.5.7))
+                     (mesa =>           ; TODO: Maintain this automatically.
+                           (list rust-bitflags-2.9.1
+                                 rust-cfg-if-1.0.0
+                                 rust-equivalent-1.0.1
+                                 rust-errno-0.3.12
+                                 rust-hashbrown-0.14.1
+                                 rust-indexmap-2.2.6
+                                 rust-libc-0.2.168
+                                 rust-log-0.4.27
+                                 ;rust-once-cell-1.8.0  ; Unavailable upstream.
+                                 rust-paste-1.0.14
+                                 rust-pest-2.8.0
+                                 rust-pest-derive-2.8.0
+                                 rust-pest-generator-2.8.0
+                                 rust-pest-meta-2.8.0
+                                 rust-proc-macro2-1.0.86
+                                 rust-quote-1.0.35
+                                 rust-remain-0.2.12
+                                 rust-roxmltree-0.20.0
+                                 rust-rustc-hash-2.1.1
+                                 rust-rustix-1.0.7
+                                 rust-syn-2.0.87
+                                 rust-thiserror-2.0.11
+                                 rust-thiserror-impl-2.0.11
+                                 rust-ucd-trie-0.1.6
+                                 rust-unicode-ident-1.0.12-unpatched
+                                 rust-zerocopy-0.8.13
+                                 rust-zerocopy-derive-0.8.13))
                      (mollysocket =>
                                   (list rust-ahash-0.8.12
                                    rust-aho-corasick-1.1.3
