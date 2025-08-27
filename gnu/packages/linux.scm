@@ -514,6 +514,21 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 ;; The current "stable" kernels. That is, the most recently released major
 ;; versions that are still supported upstream.
 
+(define-public linux-libre-6.16-version "6.16.3")
+(define-public linux-libre-6.16-gnu-revision "gnu")
+(define deblob-scripts-6.16
+  (linux-libre-deblob-scripts
+   linux-libre-6.16-version
+   linux-libre-6.16-gnu-revision
+   (base32 "1s44yaxib45834mjmvqkl70s2lazbzvpxhp4z7qwxkrkpw94mdxx")
+   (base32 "1i4kba2wpkc7jmj7b2qjkrgqsl0g0s1h7j9pfvc7zqyyn9v3kkqr")))
+(define-public linux-libre-6.16-pristine-source
+  (let ((version linux-libre-6.16-version)
+        (hash (base32 "118bg72mdrf75r36gki5zi18ynl2kcygrf24pwd58by1anh9nhw0")))
+   (make-linux-libre-source version
+                            (%upstream-linux-source version hash)
+                            deblob-scripts-6.16)))
+
 (define-public linux-libre-6.15-version "6.15.11")
 (define-public linux-libre-6.15-gnu-revision "gnu")
 (define deblob-scripts-6.15
@@ -651,6 +666,11 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
     (patches (append (origin-patches source)
                      patches))))
 
+(define-public linux-libre-6.16-source
+  (source-with-patches linux-libre-6.16-pristine-source
+                       (list %boot-logo-patch
+                             %linux-libre-arm-export-__sync_icache_dcache-patch)))
+
 (define-public linux-libre-6.15-source
   (source-with-patches linux-libre-6.15-pristine-source
                        (list %boot-logo-patch
@@ -777,6 +797,11 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
     (description "Headers of the Linux-Libre kernel.")
     (license license:gpl2)))
 
+(define-public linux-libre-headers-6.16
+  (make-linux-libre-headers* linux-libre-6.16-version
+                             linux-libre-6.16-gnu-revision
+                             linux-libre-6.16-source))
+
 (define-public linux-libre-headers-6.15
   (make-linux-libre-headers* linux-libre-6.15-version
                              linux-libre-6.15-gnu-revision
@@ -822,7 +847,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 ;; linux-libre-headers-latest points to the latest headers package
 ;; and should be used as a dependency for packages that depend on
 ;; the headers.
-(define-public linux-libre-headers-latest linux-libre-headers-6.15)
+(define-public linux-libre-headers-latest linux-libre-headers-6.16)
 
 
 ;;;
@@ -1148,6 +1173,14 @@ Linux kernel.  It has been modified to remove all non-free binary blobs.")
 ;;;
 ;;; Generic kernel packages.
 ;;;
+
+(define-public linux-libre-6.16
+  (make-linux-libre* linux-libre-6.16-version
+                     linux-libre-6.16-gnu-revision
+                     linux-libre-6.16-source
+                     '("x86_64-linux" "aarch64-linux" "powerpc64le-linux"
+                       "riscv64-linux")
+                     #:configuration-file kernel-config))
 
 (define-public linux-libre-6.15
   (make-linux-libre* linux-libre-6.15-version
