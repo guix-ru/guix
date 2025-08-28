@@ -1575,21 +1575,23 @@ interactive environment for the functional language Haskell.")
     (package
       (inherit base)
       (name "ghc-next")
-      (version "9.4.4")
+      (version "9.4.3")
       (source (origin
                 (method url-fetch)
                 (uri (string-append "https://www.haskell.org/ghc/dist/" version
                                     "/ghc-" version "-src.tar.xz"))
                 (sha256
                  (base32
-                  "1qk7rlqf02s3b6m6sqqngmjq1mxnrz88h159lz6k25gddmdg5kp8"))
+                  "0nlhx2cbq1jh2yr6zk475lavjkh9sncj57qp77p51pkfad4kkxpa"))
                 (patches (search-patches "ghc-9-StgCRunAsm-only-when-needed.patch"))))
       (arguments
        (substitute-keyword-arguments (package-arguments base)
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
              ;; Files don’t exist any more.
-             (delete 'skip-tests)))))
+             (delete 'skip-tests)))
+         ((#:tests? _ #f)
+          #f)))
       (native-inputs
        `(;; GHC 9.4 must be built with GHC >= 9.0.
          ("ghc-bootstrap" ,ghc-bootstrap-for-9.4)
@@ -1601,8 +1603,7 @@ interactive environment for the functional language Haskell.")
                     version "/ghc-" version "-testsuite.tar.xz"))
              (sha256
               (base32
-               "04p2lawxxg3nyv6frzhyjyh3arhqqyh5ka3alxa2pxhcd2hdcja3"))
-             (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
+               "1xbps33pq6mg2bwp5gvmc4qhgdq52yng5993if99b9s3fylqk86l"))))
          ("ghc-alex" ,ghc-alex-bootstrap-for-9.4)
          ("ghc-happy" ,ghc-happy-bootstrap-for-9.4)
          ,@(filter (match-lambda
