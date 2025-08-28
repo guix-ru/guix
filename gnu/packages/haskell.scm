@@ -1856,4 +1856,82 @@ interactive environment for the functional language Haskell.")
 interactive environment for the functional language Haskell.")
       (license license:bsd-3))))
 
+(define-public ghc-9.10
+  (let ((base ghc-9.8))
+    (package
+      (inherit base)
+      (name "ghc-next")
+      (version "9.10.2")
+      (source
+        (origin
+          (method url-fetch)
+          (uri (string-append "https://downloads.haskell.org/~ghc/" version
+                              "/ghc-" version "-src.tar.xz"))
+          (sha256
+            (base32
+             "1pm84cgr3yg99r3srdjllgz6zig8h7dbwa597srwcnjp0nh41zam"))))
+      (arguments
+        (substitute-keyword-arguments (package-arguments base)
+          ((#:phases phases #~%standard-phases)
+           #~(modify-phases #$phases
+               (replace 'check
+                 (lambda* (#:key (tests? #t) (parallel-tests? #f) (make-flags '())
+                           #:allow-other-keys)
+                   (if tests?
+                     (apply invoke "_build/bin/hadrian"
+                            `(,@(if parallel-tests?
+                                  (list (string-append
+                                         "-j"
+                                         (number->string (parallel-job-count))))
+                                  '())
+                              ,@make-flags
+                              "test"
+                              ,(string-append
+                                "--broken-test="
+                                (string-join
+                                 (list  "T15904" ; ld-wrapper, apparently
+                                        "T16521" ; no idea
+                                        ;; These fail due to gcc
+                                        ;; -Wincompatible-pointer-types, which
+                                        ;; apparently is not used in GHC's CI
+                                        ;; https://gitlab.haskell.org/ghc/ghc/-/issues/22263
+                                        "list_threads_and_misc_roots"
+                                        "stack_misc_closures")))
+                              "--skip-perf"))
+                     (format #t "test suite not run~%"))))))))
+      (native-inputs
+       `(("ghc-bootstrap" ,base)
+         ("ghc-testsuite"
+          ,(origin
+             (method url-fetch)
+             (uri (string-append
+                    "https://downloads.haskell.org/~ghc/"
+                    version "/ghc-" version "-testsuite.tar.xz"))
+             (sha256
+              (base32
+               "143ifc4g3jc6s9hcry5qha913rzwg4hpsvk6pqvxk5r0qigfxjwx"))
+             (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
+         ("hadrian-bootstrap"
+          ,(origin
+             (method url-fetch)
+             (uri (string-append "https://downloads.haskell.org/~ghc/" version
+                                 "/hadrian-bootstrap-sources/"
+                                 "hadrian-bootstrap-sources-"
+                                 (package-version base) ".tar.gz"))
+             (sha256
+               (base32
+                 "162lbafvdamfhx1jldax3shgk8jbbqn4an97ny363lxbdjgdn708"))))
+         ,@(filter (match-lambda
+                     (("ghc-bootstrap" . _) #f)
+                     (("ghc-testsuite" . _) #f)
+                     (("hadrian-bootstrap" . _) #f)
+                     (_ #t))
+                   (package-native-inputs base))))
+      (native-search-paths
+       (list (search-path-specification
+              (variable "GHC_PACKAGE_PATH")
+              (files (list (string-append "lib/ghc-" version)))
+              (file-pattern ".*\\.conf\\.d$")
+              (file-type 'directory)))))))
+
 ;;; haskell.scm ends here
