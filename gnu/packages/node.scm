@@ -748,14 +748,14 @@ source files.")
 (define-public node-lts
   (package
     (inherit node-bootstrap)
-    (version "24.6.0")
+    (version "24.7.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nodejs.org/dist/v" version
                                   "/node-v" version ".tar.gz"))
               (sha256
                (base32
-                "1vcp20an041gqc10g2afvda4hgjdycrpg7dvpvhdbn5wm2vjp8gb"))
+                "12hk2lh7jpqvg09a5askxhnyk5640hz3krw9n8wx89yh49qdzqjw"))
               (modules '((guix build utils)))
               (snippet
                '(begin
