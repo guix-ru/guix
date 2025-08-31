@@ -4,7 +4,7 @@
  	# number of sections)
  	'$(TEST_HC)' $(TEST_HC_OPTS) Generate.hs
  	./Generate > ManySections.s
-+	echo '.section .note.GNU-stack,"",@progbits' > ManySections.s
++	echo '.section .note.GNU-stack,"",@progbits' >> ManySections.s
  	echo 'main = putStrLn "Running main..."' > Main.hs
  	'$(TEST_HC)' $(TEST_HC_OPTS) -c ManySections.s
  	'$(TEST_HC)' $(TEST_HC_OPTS) --make -O Main.hs ManySections.o
