@@ -1091,6 +1091,9 @@ tst_qt_cmake_create.cpp"
                        ;; "/home", "/etc" or "/root" and fail.
                        "tst_qcompleter"
                        "tst_qfiledialog"
+                       ;; When using non-root daemon, the environment:wrong-owner
+                       ;; subtest fails.
+                       "tst_qstandardpaths"
                        ;; The following tests fail with: "Generation of UI
                        ;; files were triggered in the second build", but could
                        ;; pass in `guix shell --container`.
