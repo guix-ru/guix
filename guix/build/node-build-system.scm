@@ -67,24 +67,11 @@ to be written as json to the replacement FILE."
     (lambda (in out)
       (scm->json (proc (json->scm in)) out))))
 
-(define* (modify-json #:key (file "package.json") #:rest all-arguments)
+(define* (modify-json #:key (file "package.json") #:rest modifications)
   "Provide package.json modifying callbacks such as (delete-dependencies ...)"
-  (let
-    (
-      (modifications
-        (let loop ((arguments all-arguments))
-          (cond
-            ((null? arguments) '())
-            ((keyword? (car arguments)) (loop (cddr arguments)))
-            (else (cons (car arguments) (loop (cdr arguments))))))))
-    (with-atomic-json-file-replacement
-      (lambda (package)
-        (fold
-          (lambda (modification package)
-            (modification package))
-          package
-          modifications))
-      file)))
+  (with-atomic-json-file-replacement
+   (apply compose modifications)
+   file))
 
 (define (delete-dependencies dependencies-to-remove)
   "Rewrite 'package.json' to allow the build to proceed without packages
