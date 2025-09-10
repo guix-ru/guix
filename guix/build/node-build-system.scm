@@ -30,6 +30,7 @@
   #:use-module (ice-9 match)
   #:use-module (json)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-71)
   #:export (%standard-phases
             delete-dependencies
@@ -41,27 +42,17 @@
             replace-fields
             with-atomic-json-file-replacement))
 
-(define* (alist-pop alist key #:optional (= equal?))
-  "Return two values, the first pair in ALIST with key KEY, and the other
-elements.  Equality calls are made as (= KEY ALISTCAR)."
-  (define (found? pair)
-    (= key (car pair)))
-
-  (let ((before after (break found? alist)))
-    (if (pair? after)
-        (values (car after) (append before (cdr after)))
-        (values #f before))))
-
 (define* (alist-update alist key proc #:optional (= equal?))
   "Return an association list like ALIST, but with KEY mapped to the result of
 PROC applied to the first value found under the comparison (= KEY ALISTCAR).
-If no such value exists, return the list unchanged.
-Unlike acons, this removes the previous association of KEY (assuming it is
-unique), but the result may still share storage with ALIST."
-  (let ((pair rest (alist-pop alist key =)))
-    (if (pair? pair)
-      (acons key (proc (cdr pair)) rest)
-      alist)))
+If no such value exists, return the list unchanged."
+  (map
+   (match-lambda
+     (((? (cut = key <>)) . value)
+      (cons key (proc value)))
+     (pair
+      pair))
+   alist))
 
 ;;;
 ;;; package.json modification procedures
