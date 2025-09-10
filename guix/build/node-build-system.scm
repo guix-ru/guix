@@ -5,6 +5,7 @@
 ;;; Copyright © 2021, 2022 Philip McGrath <philip@philipmcgrath.com>
 ;;; Copyright © 2022 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2024 Daniel Khodabakhsh <d.khodabakhsh@gmail.com>
+;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -39,12 +40,6 @@
             node-build
             replace-fields
             with-atomic-json-file-replacement))
-
-(define* (assoc-ref* alist key #:optional default)
-  "Like assoc-ref, but return DEFAULT instead of #f if no value exists."
-  (match (assoc key alist)
-    (#f default)
-    ((_ . value) value)))
 
 (define* (alist-pop alist key #:optional (= equal?))
   "Return two values, the first pair in ALIST with key KEY, and the other
@@ -291,8 +286,8 @@ only after the 'patch-dependencies' phase."
                 (fold
                   (lambda (dependency dependencies)
                     (assoc-set! dependencies (car dependency) (cdr dependency)))
-                  (assoc-ref* pkg-meta "peerDependencies" '())
-                  (assoc-ref* pkg-meta "dependencies" '())))))))))
+                  (or (assoc-ref pkg-meta "peerDependencies") '())
+                  (or (assoc-ref pkg-meta "dependencies") '())))))))))
   #t)
 
 (define* (delete-lockfiles #:key inputs #:allow-other-keys)
@@ -312,8 +307,9 @@ exist."
     #t))
 
 (define* (build #:key inputs #:allow-other-keys)
-  (let ((package-meta (call-with-input-file "package.json" json->scm)))
-    (if (assoc-ref* (assoc-ref* package-meta "scripts" '()) "build" #f)
+  (let* ((package-meta (call-with-input-file "package.json" json->scm))
+         (scripts (assoc-ref package-meta "scripts")))
+    (if (and scripts (assoc-ref scripts "build"))
         (let ((npm (string-append (assoc-ref inputs "node") "/bin/npm")))
           (invoke npm "run" "build"))
         (format #t "there is no build script to run~%"))
@@ -386,9 +382,9 @@ would try to run 'node-gyp rebuild'."
   (define pkg-meta
     (call-with-input-file installed-package.json json->scm))
   (define scripts
-    (assoc-ref* pkg-meta "scripts" '()))
+    (or (assoc-ref pkg-meta "scripts") '()))
 
-  (when (equal? "node-gyp rebuild" (assoc-ref* scripts "install" #f))
+  (when (equal? "node-gyp rebuild" (assoc-ref scripts "install"))
     (call-with-output-file installed-package.json
       (lambda (out)
         (scm->json
