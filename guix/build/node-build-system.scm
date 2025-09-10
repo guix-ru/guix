@@ -92,23 +92,19 @@ listed in 'dependencies-to-remove', a list of strings naming npm packages.
 
 To prevent the deleted dependencies from being reintroduced, use this function
 only after the 'patch-dependencies' phase."
-  (lambda (pkg-meta)
-    (fold
-      (lambda (dependency-key pkg-meta)
-        (alist-update
-          pkg-meta
-          dependency-key
-          (lambda (dependencies)
-            (remove
-              (lambda (dependency)
-                (member (car dependency) dependencies-to-remove))
-              dependencies))))
-      pkg-meta
-      (list
-        "devDependencies"
-        "dependencies"
-        "peerDependencies"
-        "optionalDependencies"))))
+  (let ((predicate (lambda (dependency)
+                     (member (car dependency) dependencies-to-remove)))
+        (dependency? (cut member <> (list "devDependencies"
+                                          "dependencies"
+                                          "peerDependencies"
+                                          "optionalDependencies"))))
+    (lambda (pkg-meta)
+      (map (match-lambda
+             (((? dependency? key) . dependencies)
+              (cons key (remove predicate dependencies)))
+             (otherwise
+              otherwise))
+           pkg-meta))))
 
 (define* (modify-json-fields
     fields
