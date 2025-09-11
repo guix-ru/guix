@@ -42,18 +42,6 @@
             replace-fields
             with-atomic-json-file-replacement))
 
-(define* (alist-update alist key proc #:optional (= equal?))
-  "Return an association list like ALIST, but with KEY mapped to the result of
-PROC applied to the first value found under the comparison (= KEY ALISTCAR).
-If no such value exists, return the list unchanged."
-  (map
-   (match-lambda
-     (((? (cut = key <>)) . value)
-      (cons key (proc value)))
-     (pair
-      pair))
-   alist))
-
 ;;;
 ;;; package.json modification procedures
 ;;;
@@ -232,37 +220,35 @@ only after the 'patch-dependencies' phase."
     index))
 
 (define* (patch-dependencies #:key inputs #:allow-other-keys)
+  "Replace versions by paths when found among INPUTS in `package.json'."
 
-  (define index (index-modules (map cdr inputs)))
+  (define resolve-dependencies
+    (let ((index (index-modules (map cdr inputs))))
+      (cut map
+           (match-lambda
+             ((dependency . version)
+              (cons dependency (hash-ref index dependency version))))
+           <>)))
 
-  (define (resolve-dependencies dependencies)
-    (map
-      (match-lambda
-        ((dependency . version)
-          (cons dependency (hash-ref index dependency version))))
-      dependencies))
-
-  (with-atomic-json-file-replacement
+  (define (resolve key getter)
     (lambda (pkg-meta)
-      (fold
-        (lambda (proc pkg-meta) (proc pkg-meta))
-        pkg-meta
-        (list
-          (lambda (pkg-meta)
-            (alist-update pkg-meta "devDependencies" resolve-dependencies))
-          (lambda (pkg-meta)
-            (assoc-set!
-              pkg-meta
-              "dependencies"
-              (resolve-dependencies
-                ; Combined "peerDependencies" and "dependencies" dependencies
-                ; with "dependencies" taking precedent.
-                (fold
-                  (lambda (dependency dependencies)
-                    (assoc-set! dependencies (car dependency) (cdr dependency)))
-                  (or (assoc-ref pkg-meta "peerDependencies") '())
-                  (or (assoc-ref pkg-meta "dependencies") '())))))))))
-  #t)
+      (assoc-set! pkg-meta key
+                  (resolve-dependencies (getter pkg-meta)))))
+
+  (modify-json
+   (resolve "devDependencies"
+            (lambda (pkg-meta)
+              (or (assoc-ref pkg-meta "devDependencies") '())))
+   (resolve "dependencies"
+            ;; Combined "peerDependencies" and "dependencies" dependencies
+            ;; with "dependencies" taking precedent.
+            (lambda (pkg-meta)
+              (fold
+               (lambda (dependency dependencies)
+                 (assoc-set! dependencies
+                             (car dependency) (cdr dependency)))
+               (or (assoc-ref pkg-meta "peerDependencies") '())
+               (or (assoc-ref pkg-meta "dependencies") '()))))))
 
 (define* (delete-lockfiles #:key lockfiles #:allow-other-keys)
   "Delete LOCKFILES if they exist."
