@@ -193,8 +193,7 @@ only after the 'patch-dependencies' phase."
             (begin
               (mkdir dir)
               (setenv "HOME" (string-append (getcwd) "/" dir))
-              (format #t "set HOME to ~s~%" (getenv "HOME")))))))
-  #t)
+              (format #t "set HOME to ~s~%" (getenv "HOME"))))))))
 
 (define (module-name module)
   (let* ((package.json (string-append module "/package.json"))
@@ -259,8 +258,7 @@ only after the 'patch-dependencies' phase."
 
 (define* (configure #:key outputs inputs #:allow-other-keys)
   (let ((npm (string-append (assoc-ref inputs "node") "/bin/npm")))
-    (invoke npm "--offline" "--ignore-scripts" "--install-links" "install")
-    #t))
+    (invoke npm "--offline" "--ignore-scripts" "--install-links" "install")))
 
 (define* (build #:key inputs #:allow-other-keys)
   (let* ((package-meta (call-with-input-file "package.json" json->scm))
@@ -268,8 +266,7 @@ only after the 'patch-dependencies' phase."
     (if (and scripts (assoc-ref scripts "build"))
         (let ((npm (string-append (assoc-ref inputs "node") "/bin/npm")))
           (invoke npm "run" "build"))
-        (format #t "there is no build script to run~%"))
-    #t))
+        (format #t "there is no build script to run~%"))))
 
 (define* (check #:key tests? inputs test-target #:allow-other-keys)
   "Run 'npm run TEST-TARGET' if TESTS?"
@@ -286,8 +283,7 @@ only after the 'patch-dependencies' phase."
           "--owner=0"
           "--group=0"
           "--numeric-owner"
-          "-czf" "../package.tgz" ".")
-  #t)
+          "-czf" "../package.tgz" "."))
 
 (define* (install #:key outputs inputs #:allow-other-keys)
   "Install the node module to the output store item."
@@ -299,8 +295,7 @@ only after the 'patch-dependencies' phase."
             "--loglevel" "info"
             "--production"
             "--install-links"
-            "install" "../package.tgz")
-    #t))
+            "install" "../package.tgz")))
 
 (define* (avoid-node-gyp-rebuild #:key outputs #:allow-other-keys)
   "Adjust the installed 'package.json' to remove an 'install' script that
