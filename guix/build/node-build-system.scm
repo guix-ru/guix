@@ -264,16 +264,12 @@ only after the 'patch-dependencies' phase."
                   (or (assoc-ref pkg-meta "dependencies") '())))))))))
   #t)
 
-(define* (delete-lockfiles #:key inputs #:allow-other-keys)
-  "Delete 'package-lock.json', 'yarn.lock', and 'npm-shrinkwrap.json', if they
-exist."
+(define* (delete-lockfiles #:key lockfiles #:allow-other-keys)
+  "Delete LOCKFILES if they exist."
   (for-each (lambda (pth)
               (when (file-exists? pth)
                 (delete-file pth)))
-            '("package-lock.json"
-              "yarn.lock"
-              "npm-shrinkwrap.json"))
-  #t)
+            lockfiles))
 
 (define* (configure #:key outputs inputs #:allow-other-keys)
   (let ((npm (string-append (assoc-ref inputs "node") "/bin/npm")))
