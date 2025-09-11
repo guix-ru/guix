@@ -47,6 +47,10 @@
   "Return the default Node package, resolved lazily."
   (@* (gnu packages node) node-lts))
 
+(define (default-guile-json)
+  "Return the default guile-json package, resolved lazily."
+  (@* (gnu packages guile) guile-json-4))
+
 (define* (lower name
                 #:key source inputs native-inputs outputs system target
                 (node (default-node))
@@ -77,12 +81,6 @@
          (outputs outputs)
          (build node-build)
          (arguments (strip-keyword-arguments private-keywords arguments)))))
-
-(define (default-guile-json)
-  "Return the default guile-json package."
-  ;; Lazily resolve the binding to avoid a circular dependency.
-  (let ((mod (resolve-interface '(gnu packages guile))))
-    (module-ref mod 'guile-json-4)))
 
 (define* (node-build name inputs
                      #:key
