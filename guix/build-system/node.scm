@@ -34,6 +34,11 @@
             node-build
             node-build-system))
 
+(define %default-lockfiles
+  (list "package-lock.json"
+        "yarn.lock"
+        "npm-shrinkwrap.json"))
+
 (define %node-build-system-modules
   ;; Build-side modules imported by default.
   `((guix build node-build-system)
@@ -87,6 +92,7 @@
                      source
                      (npm-flags ''())
                      (test-target "test")
+                     (lockfiles %default-lockfiles)
                      (tests? #t)
                      (phases '%standard-phases)
                      (outputs '("out"))
@@ -108,6 +114,7 @@
                         #:system #$system
                         #:npm-flags #$npm-flags
                         #:test-target #$test-target
+                        #:lockfiles '#$lockfiles
                         #:tests? #$tests?
                         #:phases #$phases
                         #:outputs #$(outputs->gexp outputs)
