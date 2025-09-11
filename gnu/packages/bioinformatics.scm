@@ -23592,7 +23592,7 @@ The output is in SAM format.")
                                #$(this-package-input "libxml2")
                                "/include/libxml2"))))
     (propagated-inputs
-     (list libxml2-next))
+     (list libxml2))
     (native-inputs
      (list check swig))
     (home-page "https://sbml.org/Software/libSBML")
