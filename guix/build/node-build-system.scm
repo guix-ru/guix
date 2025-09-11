@@ -323,28 +323,25 @@ would try to run 'node-gyp rebuild'."
   ;; For further details, see:
   ;; - https://docs.npmjs.com/cli/v8/configuring-npm/package-json#default-values
   ;; - https://docs.npmjs.com/cli/v8/using-npm/scripts#best-practices
-  (define installed-package.json
-    (search-input-file outputs (string-append "/lib/node_modules/"
-                                              (module-name ".")
-                                              "/package.json")))
-  ;; We don't want to use an atomic replacement here, because we often don't
-  ;; even need to overwrite this file.  Therefore, let's use some helpers
-  ;; that we'd otherwise not need.
-  (define pkg-meta
-    (call-with-input-file installed-package.json json->scm))
-  (define scripts
-    (or (assoc-ref pkg-meta "scripts") '()))
-
-  (when (equal? "node-gyp rebuild" (assoc-ref scripts "install"))
-    (call-with-output-file installed-package.json
-      (lambda (out)
-        (scm->json
-          (assoc-set! pkg-meta
-                      "scripts"
-                      (assoc-set! scripts
-                                  "install"
-                                  "echo Guix: avoiding node-gyp rebuild"))
-          out)))))
+  (let* ((installed-package.json
+          (search-input-file outputs (string-append "/lib/node_modules/"
+                                                    (module-name ".")
+                                                    "/package.json")))
+         ;; We don't want to use an atomic replacement here, because we often
+         ;; don't even need to overwrite this file.  Therefore, let's use some
+         ;; helpers that we'd otherwise not need.
+         (pkg-meta (call-with-input-file installed-package.json json->scm))
+         (scripts (or (assoc-ref pkg-meta "scripts") '())))
+    (when (equal? "node-gyp rebuild" (assoc-ref scripts "install"))
+      (call-with-output-file installed-package.json
+        (lambda (out)
+          (scm->json
+           (assoc-set! pkg-meta
+                       "scripts"
+                       (assoc-set! scripts
+                                   "install"
+                                   "echo Guix: avoiding node-gyp rebuild"))
+           out))))))
 
 (define %standard-phases
   (modify-phases gnu:%standard-phases
