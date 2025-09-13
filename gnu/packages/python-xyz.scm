@@ -1808,6 +1808,7 @@ be displayed terminal.")
                   ((guix build pyproject-build-system) #:prefix py:)
                   (guix build utils))
       #:phases
+      (with-extensions (list (pyproject-guile-json))
       #~(modify-phases %standard-phases
           (add-after 'build 'build-python-module
             (assoc-ref py:%standard-phases 'build))
@@ -1819,7 +1820,7 @@ be displayed terminal.")
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
                 (with-directory-excursion #$output
-                  (invoke "pytest" "-vv"))))))
+                  (invoke "pytest" "-vv")))))))
       #:install-source? #false))
     (native-inputs
      (list maturin
