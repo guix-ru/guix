@@ -5480,6 +5480,7 @@ definite approximations of Optimal Transport (Wasserstein) distances.
                   ((guix build pyproject-build-system) #:prefix py:)
                   (guix build utils))
       #:phases
+      (with-extensions (list (pyproject-guile-json))
       #~(modify-phases %standard-phases
           (add-after 'check 'python-check
             (lambda _
@@ -5503,7 +5504,7 @@ definite approximations of Optimal Transport (Wasserstein) distances.
                 (copy-file "PKG-INFO" (string-append info "/METADATA"))
                 (copy-recursively
                  "py_src/tokenizers"
-                 (string-append lib "tokenizers"))))))))
+                 (string-append lib "tokenizers")))))))))
     (native-inputs
      (list pkg-config python-minimal python-pytest))
     (inputs
