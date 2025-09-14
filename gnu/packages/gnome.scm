@@ -3660,6 +3660,7 @@ for dealing with different structured file formats.")
         (guix build gnu-build-system)
         (guix build utils))
       #:phases
+      (with-extensions (list (cargo-guile-json))
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-gdk-pixbuf-thumbnailer
             (lambda* (#:key inputs #:allow-other-keys)
@@ -3711,7 +3712,7 @@ for dealing with different structured file formats.")
                '(unpack-rust-crates
                  configure
                  check-for-pregenerated-files
-                 patch-cargo-checksums)))))))
+                 patch-cargo-checksums))))))))
     (native-inputs
      (append
       (list gdk-pixbuf
