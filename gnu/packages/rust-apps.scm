@@ -1301,6 +1301,7 @@ repositories.")
                   (guix build meson-build-system)
                   (guix build utils))
       #:phases
+      (with-extensions (list (cargo-guile-json))
       #~(modify-phases %standard-phases
           (add-after 'unpack 'prepare-for-build
             (lambda _
@@ -1323,7 +1324,7 @@ repositories.")
                '(unpack-rust-crates
                  configure
                  check-for-pregenerated-files
-                 patch-cargo-checksums)))))))
+                 patch-cargo-checksums))))))))
     (native-inputs (list clang pkg-config rust `(,rust "cargo")))
     (inputs (cons* glib gtk libadwaita pipewire (cargo-inputs 'helvum)))
     (home-page "https://gitlab.freedesktop.org/pipewire/helvum")
