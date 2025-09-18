@@ -3777,6 +3777,7 @@ Cesium.")
            python-pytest
            python-pytest-benchmark
            python-pytest-cov
+           python-pytest-asdf-plugin
            python-pytest-doctestplus
            python-pytest-filter-subpackage
            python-pytest-httpserver
