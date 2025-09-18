@@ -7796,6 +7796,7 @@ of axis order, spatial projections, and spectral units that exist in the wild.
               (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list python-matplotlib
+           python-pytest-asdf-plugin
            python-pytest-astropy
            python-setuptools-next
            python-setuptools-scm
