@@ -8086,6 +8086,7 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
            python-crds
            python-psutil
            python-pytest
+           python-pytest-asdf-plugin
            python-pytest-doctestplus
            python-pytest-xdist
            python-scipy
@@ -8093,7 +8094,7 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
            python-setuptools-scm-next
            python-wheel))
     (propagated-inputs
-     (list python-asdf
+     (list python-asdf-4
            python-asdf-astropy
            python-astropy
            python-numpy))
