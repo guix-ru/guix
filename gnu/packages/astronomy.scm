@@ -10251,7 +10251,7 @@ n-body file formats (nemo, Gadget binaries 1 and 2, Gadget hdf5, Ramses).")
 (define-public uraniborg
   (package
     (name "uraniborg")
-    (version "0.0.10")
+    (version "0.0.11")
     (source
      (origin
        (method git-fetch)
@@ -10260,10 +10260,12 @@ n-body file formats (nemo, Gadget binaries 1 and 2, Gadget hdf5, Ramses).")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bz2k2x06nyvhr9v4z6f21cf29pqsj9m4qyn8sdbl421wsqj31wg"))))
+        (base32 "1xak1m345dhjb8xzkwk81wl1jk6zy8x8gv36n5wkkwkjagdnwbkb"))))
     (build-system go-build-system)
     (arguments
      (list
+      ;; See: <https://codeberg.org/astronexus/uraniborg/issues/2>.
+      #:tests? #f
       #:install-source? #f
       #:import-path "bitbucket.org/dpnash/uraniborg"
       #:phases
