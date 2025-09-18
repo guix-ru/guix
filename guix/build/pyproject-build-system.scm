@@ -304,10 +304,15 @@ file entry_points.txt.  This is necessary, because wheels do not contain
 these binaries and installers are expected to create them."
 
   (define (parse-entry-point item-match)
-    "Parse an entry point.  Return a list of script, module and function."
-    (list (match:substring item-match 1)
-          (match:substring item-match 2)
-          (match:substring item-match 3)))
+    "Parse an entry point.  Return a list of script, module and function.
+Handle the case where the entry-point last part has a module prefixed."
+    (match (reverse (string-split (match:substring item-match 3) #\.))
+      ((name . reverse-modules)
+       (list (match:substring item-match 1)
+             (string-join (cons* (match:substring item-match 2)
+                                 (reverse reverse-modules))
+                          ".")
+             name))))
 
   (define (parse-line inside line)
     (cond
