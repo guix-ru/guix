@@ -9336,13 +9336,13 @@ using (multivariate) polynomials.")
 (define-public python-yt-astro-analysis
   (package
     (name "python-yt-astro-analysis")
-    (version "1.1.3")
+    (version "1.1.4")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "yt_astro_analysis" version))
        (sha256
-        (base32 "1fb3sdp6hq2c4c28pd33v9yj14x9l7qizf3y3qpl594qdq1ffmpi"))))
+        (base32 "0dy96084wvb7ccnnp22b6wacyjzn1n62i4mwq0q7nkp90bzx44a2"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -9355,11 +9355,10 @@ using (multivariate) polynomials.")
             (lambda _
               (invoke "python" "setup.py" "build_ext" "--inplace"))))))
     (native-inputs
-     (list python-cython
+     (list python-cython-3
            python-pytest
-           python-setuptools
-           python-tomli
-           python-wheel))
+           python-setuptools-next
+           python-tomli))
     (propagated-inputs
      (list python-h5py
            python-numpy
