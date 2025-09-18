@@ -2074,7 +2074,7 @@ Astropy objects.")
                          (delete 'sanity-check))))
      (native-inputs
       (list python-setuptools-next
-            python-wheel))
+            python-setuptools-scm-next))
     (propagated-inputs
      (list python-importlib-metadata
            python-numpy
