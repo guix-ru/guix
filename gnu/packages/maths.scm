@@ -7742,7 +7742,7 @@ in finite element programs.")
 (define-public flann
   (package
     (name "flann")
-    (version "1.9.1")
+    (version "1.9.2")
     (home-page "https://github.com/mariusmuja/flann/")
     (source
       (origin
@@ -7751,12 +7751,14 @@ in finite element programs.")
         (file-name (git-file-name name version))
         (sha256
           (base32
-           "0p56fl2yx1r86ds1mgjq40926jdcgq3hka7p3l1hv2acv9jxp15x"))
-        (patches (search-patches "flann-cmake-3.11.patch"))))
+           "1954azd78qx1dkcs47cyyhb34845zdg0qrhs9z649sfc5mf2gbhp"))
+        (patches (search-patches "flann-pc-file.patch"))))
     (build-system cmake-build-system)
     (outputs '("out"))
     (native-inputs
-     (list unzip))
+     (list pkg-config unzip))
+    (propagated-inputs (list lz4))
+        ;; utils/serialization.h includes lz.4
     (inputs
       (list
         hdf5
@@ -7765,8 +7767,7 @@ in finite element programs.")
         ;;  ld: cannot find -loctave
         ;; Disable it for now.
         ;; octave-cli
-        python
-        zlib))
+        python))
     (arguments
      (list
        #:tests? #f ; The test data are downloaded from the Internet.

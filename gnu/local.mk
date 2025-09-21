@@ -1331,8 +1331,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/findutils-localstatedir.patch		\
   %D%/packages/patches/firebird-riscv64-support-pt1.patch	\
   %D%/packages/patches/firebird-riscv64-support-pt2.patch	\
-  %D%/packages/patches/flann-cmake-3.11.patch			\
   %D%/packages/patches/flatpak-fix-fonts-icons.patch	\
+  %D%/packages/patches/flann-pc-file.patch                      \
   %D%/packages/patches/flatpak-fix-icon-validation.patch	\
   %D%/packages/patches/flatpak-unset-gdk-pixbuf-for-sandbox.patch	\
   %D%/packages/patches/fluxbox-1.3.7-no-dynamic-cursor.patch	\

@@ -1,0 +1,91 @@
+Taken from https://github.com/flann-lib/flann/pull/481 .
+From 910099bcf51e8e4ad48bc7adee88fd26abef982a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20Hamb=C3=BCchen?= <mail@nh2.me>
+Date: Tue, 2 Nov 2021 00:13:27 +0100
+Subject: [PATCH] Fix lz4 / HDF5 missing from flann.pc `Requires:` line.
+
+lz4 is an unconditional dependency of flann (see #399),
+but until now was not correctly generated into the
+`Requires: lz4` line of `flann.pc`,
+because the `PKG_EXTERNAL_DEPS` variable used in `flann.pc.in`
+was not defined at all.
+
+This fixes build error `lz4.h: No such file or directory`
+for properly sandboxed builds, in which undeclared dependencies
+are not made available.
+
+Same thing for HDF5, but conditionally.
+
+For lz4, also remove the hardcode of `@LZ4_STATIC_LDFLAGS@`
+from `flann.pc.in`, as this is no longer necessary.
+That fixes an incorrect `-L` flag being generated in there, e.g.
+`-L/usr/lib;-llz4`. Thus fixes #480.
+---
+ CMakeLists.txt       | 8 ++++++++
+ cmake/CMakeLists.txt | 9 +++++++++
+ cmake/flann.pc.in    | 2 +-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f79d173a..a3fe9ddd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -62,6 +62,9 @@ option(USE_MPI "Use MPI" OFF)
+ 
+ set(NVCC_COMPILER_BINDIR "" CACHE PATH  "Directory where nvcc should look for C++ compiler. This is passed to nvcc through the --compiler-bindir option.")
+ 
++# pkg-config dependencies to be generated into the .pc file
++set(PKGCONFIG_EXTERNAL_DEPS_LIST "")
++
+ if (NOT BUILD_C_BINDINGS)
+     set(BUILD_PYTHON_BINDINGS OFF)
+     set(BUILD_MATLAB_BINDINGS OFF)
+@@ -81,6 +84,7 @@ if (NOT HDF5_FOUND)
+ 	message(WARNING "hdf5 library not found, some tests will not be run")
+ else()
+     include_directories(${HDF5_INCLUDE_DIR})
++    list(APPEND PKGCONFIG_EXTERNAL_DEPS_LIST "hdf5")
+ endif()
+ 
+ if (USE_MPI OR HDF5_IS_PARALLEL)
+@@ -150,6 +154,10 @@ endif(BUILD_CUDA_LIB)
+ find_package(PkgConfig REQUIRED)
+ pkg_check_modules(LZ4 REQUIRED liblz4)
+ include_directories(${LZ4_INCLUDE_DIRS})
++# flann is exposing lz4 headers e.g. in `util/serialization.h`
++# we need lz4 to appear in `Requires` (not `Requires.private`) in the
++# `.pc` file, see https://people.freedesktop.org/~dbn/pkg-config-guide.html
++list(APPEND PKGCONFIG_EXTERNAL_DEPS_LIST "liblz4")
+ 
+ #set the C/C++ include path to the "include" directory
+ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/cpp)
+diff --git a/cmake/CMakeLists.txt b/cmake/CMakeLists.txt
+index fb70f4cc..be6c1dc0 100644
+--- a/cmake/CMakeLists.txt
++++ b/cmake/CMakeLists.txt
+@@ -1,4 +1,13 @@
+ set(PKG_DESC "Fast Library for Approximate Nearest Neighbors")
++
++# Compute `PKG_EXTERNAL_DEPS` string from `PKGCONFIG_EXTERNAL_DEPS_LIST`.
++# Once the project has `cmake_minimum_required(VERSION 2.6)`, this
++# can be replaced by `list(JOIN ...)`.
++set(PKG_EXTERNAL_DEPS "")
++foreach(_dep ${PKGCONFIG_EXTERNAL_DEPS_LIST})
++    string(APPEND PKG_EXTERNAL_DEPS " ${_dep}")
++endforeach()
++
+ set(pkg_conf_file ${CMAKE_CURRENT_BINARY_DIR}/flann.pc)
+ configure_file(flann.pc.in ${pkg_conf_file} @ONLY)
+ install(FILES ${pkg_conf_file}
+diff --git a/cmake/flann.pc.in b/cmake/flann.pc.in
+index 07b8d649..82eee5e6 100644
+--- a/cmake/flann.pc.in
++++ b/cmake/flann.pc.in
+@@ -8,6 +8,6 @@ Name: @PROJECT_NAME@
+ Description: @PKG_DESC@
+ Version: @FLANN_VERSION@
+ Requires: @PKG_EXTERNAL_DEPS@
+-Libs: -L${libdir} @LZ4_STATIC_LDFLAGS@ -lflann -lflann_cpp
++Libs: -L${libdir} -lflann -lflann_cpp
+ Cflags: -I${includedir}
+ 
