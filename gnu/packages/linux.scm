@@ -532,7 +532,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
   (linux-libre-deblob-scripts
    linux-libre-6.16-version
    linux-libre-6.16-gnu-revision
-   (base32 "1s44yaxib45834mjmvqkl70s2lazbzvpxhp4z7qwxkrkpw94mdxx")
+   (base32 "0qwh82z5bjmq7hhx7s41mnybpr8ihdk2g0bgjb3hzd95x6pw4w51")
    (base32 "1i4kba2wpkc7jmj7b2qjkrgqsl0g0s1h7j9pfvc7zqyyn9v3kkqr")))
 (define-public linux-libre-6.16-pristine-source
   (let ((version linux-libre-6.16-version)
