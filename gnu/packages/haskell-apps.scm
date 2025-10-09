@@ -96,13 +96,13 @@ library.  It is primarily used with HLint's @code{--refactor} flag.")
 (define-public cabal-install
  (package
    (name "cabal-install")
-   (version "3.6.2.0")
-   (source (origin
-             (method url-fetch)
-             (uri (hackage-uri "cabal-install" version))
-             (sha256
-              (base32
-               "0dihpm4h3xh13vnpvwflnb7v614qdvljycc6ffg5cvhwbwfrxyfw"))))
+   (version "3.12.1.0")
+   (source
+    (origin
+      (method url-fetch)
+      (uri (hackage-uri "cabal-install" version))
+      (sha256
+       (base32 "1cmifq189i4x0r0yha3dl8nrzzfh92bnd2saak7dqvvjkkysqj38"))))
    (build-system haskell-build-system)
    (properties '((upstream-name . "cabal-install")))
    (inputs (list ghc-async
@@ -117,13 +117,35 @@ library.  It is primarily used with HLint's @code{--refactor} flag.")
                  ghc-tar
                  ghc-zlib
                  ghc-hackage-security
+                 ghc-open-browser
                  ghc-regex-base
                  ghc-regex-posix
+                 ghc-safe-exceptions
+                 ghc-semaphore-compat
                  ghc-resolv
                  ghc-lukko))
+   (native-inputs (list ghc-tasty
+                        ghc-tasty-golden
+                        ghc-tasty-quickcheck
+                        ghc-tasty-expected-failure
+                        ghc-tasty-hunit
+                        ghc-tree-diff
+                        ghc-quickcheck
+                        ghc-tasty
+                        ghc-tasty-hunit
+                        ghc-tasty
+                        ghc-tasty-hunit
+                        ghc-tagged
+                        ghc-tagged
+                        ghc-tasty
+                        ghc-tasty-expected-failure
+                        ghc-tasty-hunit
+                        ghc-tasty-quickcheck
+                        ghc-quickcheck
+                        ghc-pretty-show))
    (arguments
     `(#:cabal-revision ("2"
-                        "1kpgyfl5njxp4c8ax5ziag1bhqvph3h0pn660v3vpxalz8d1j6xv")))
+                        "0fdzqdkg2vbyg0lnbk9bdskr2d23hwjpmnc7jnvpzkcmxmcvl99n")))
    (home-page "https://www.haskell.org/cabal/")
    (synopsis "Command-line interface for Cabal and Hackage")
    (description
@@ -145,11 +167,10 @@ installation of Haskell libraries and programs.")
          "17wi7fma2qaqdm1hwgaam3fd140v9bpa8ky0wg708h1pqc5v2nbz"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "cpphs")))
-    (inputs
-     (list ghc-polyparse ghc-old-locale ghc-old-time))
+    (inputs (list ghc-polyparse))
     (arguments
-     `(#:cabal-revision ("1"
-                         "1f8jzs8zdh4wwbcq8fy6qqxkv75ypnvsm4yzw49wpr3b9vpnzlha")))
+     `(#:cabal-revision ("2"
+                         "0vxav36p0kplp4dpd17i4cfzrsl3r437d840xwv83lf1bqp7mrxc")))
     (home-page "https://projects.haskell.org/cpphs/")
     (synopsis "Liberalised re-implementation of cpp, the C pre-processor")
     (description "Cpphs is a re-implementation of the C pre-processor that is
@@ -269,20 +290,18 @@ unique algebra of patches called @url{http://darcs.net/Theory,Patchtheory}.
 (define-public ghcid
   (package
     (name "ghcid")
-    (version "0.8.7")
+    (version "0.8.9")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "ghcid" version))
        (sha256
-        (base32 "0yqc1pkfajnr56gnh43sbj50r7c3r41b2jfz07ivgl6phi4frjbq"))))
+        (base32 "1dq8lc0dwzib8y21279q4j54cmm7lvx64b3hw2yiym1kzi9rrhj4"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "ghcid")))
-    (inputs
-     (list ghc-extra ghc-ansi-terminal ghc-cmdargs ghc-fsnotify
-           ghc-terminal-size))
-    (native-inputs
-     (list ghc-tasty ghc-tasty-hunit))
+    (inputs (list ghc-extra ghc-ansi-terminal ghc-cmdargs ghc-fsnotify
+                  ghc-terminal-size))
+    (native-inputs (list ghc-tasty ghc-tasty-hunit))
     (home-page "https://github.com/ndmitchell/ghcid#readme")
     (synopsis "GHCi based bare bones IDE")
     (description
@@ -404,95 +423,97 @@ to @code{cabal repl}).")
                         (string-append bin "/git-remote-annex"))
                (symlink (string-append bin "/git-annex")
                         (string-append bin "/git-remote-tor-annex"))))))))
-    (inputs
-     (list curl
-           ghc-aeson
-           ghc-ansi-terminal
-           ghc-async
-           ghc-attoparsec
-           ghc-aws
-           ghc-bloomfilter
-           ghc-byteable
-           ghc-case-insensitive
-           ghc-clientsession
-           ghc-concurrent-output
-           ghc-conduit
-           ghc-connection
-           ghc-crypto-api
-           ghc-cryptonite
-           ghc-data-default
-           ghc-dav
-           ghc-dbus
-           ghc-disk-free-space
-           ghc-dlist
-           ghc-edit-distance
-           ghc-exceptions
-           ghc-fdo-notify
-           ghc-feed
-           ghc-filepath-bytestring
-           ghc-free
-           ghc-git-lfs
-           ghc-hinotify
-           ghc-http-client
-           ghc-http-client-tls
-           ghc-http-client-restricted
-           ghc-http-conduit
-           ghc-http-types
-           ghc-ifelse
-           ghc-magic
-           ghc-memory
-           ghc-microlens
-           ghc-monad-control
-           ghc-monad-logger
-           ghc-mountpoints
-           ghc-network
-           ghc-network-bsd
-           ghc-network-info
-           ghc-network-multicast
-           ghc-network-uri
-           ghc-old-locale
-           ghc-optparse-applicative
-           ghc-persistent
-           ghc-persistent-sqlite
-           ghc-persistent-template
-           ghc-quickcheck
-           ghc-random
-           ghc-regex-tdfa
-           ghc-resourcet
-           ghc-safesemaphore
-           ghc-sandi
-           ghc-securemem
-           ghc-servant-client
-           ghc-servant-server
-           ghc-socks
-           ghc-split
-           ghc-stm-chans
-           ghc-tagsoup
-           ghc-torrent
-           ghc-transformers
-           ghc-unbounded-delays
-           ghc-unix-compat
-           ghc-unliftio-core
-           ghc-unordered-containers
-           ghc-utf8-string
-           ghc-uuid
-           ghc-vector
-           ghc-wai
-           ghc-wai-extra
-           ghc-warp
-           ghc-warp-tls
-           ghc-yesod
-           ghc-yesod-core
-           ghc-yesod-form
-           ghc-yesod-static
-           lsof
-           rsync
-           xdg-utils))
+    (inputs (list ghc-network-uri
+                  ghc-optparse-applicative
+                  ghc-uuid
+                  ghc-data-default
+                  ghc-case-insensitive
+                  ghc-random
+                  ghc-dlist
+                  ghc-unix-compat
+                  ghc-safesemaphore
+                  ghc-async
+                  ghc-disk-free-space
+                  ghc-ifelse
+                  ghc-monad-logger
+                  ghc-free
+                  ghc-utf8-string
+                  ghc-sandi
+                  ghc-monad-control
+                  ghc-bloomfilter
+                  ghc-edit-distance
+                  ghc-resourcet
+                  ghc-http-client
+                  ghc-http-client-tls
+                  ghc-http-types
+                  ghc-http-conduit
+                  ghc-http-client-restricted
+                  ghc-conduit
+                  ghc-old-locale
+                  ghc-persistent-sqlite
+                  ghc-persistent
+                  ghc-persistent-template
+                  ghc-unliftio-core
+                  ghc-microlens
+                  ghc-aeson
+                  ghc-vector
+                  ghc-tagsoup
+                  ghc-unordered-containers
+                  ghc-feed
+                  ghc-regex-tdfa
+                  ghc-socks
+                  ghc-byteable
+                  ghc-stm-chans
+                  ghc-securemem
+                  ghc-crypto-api
+                  ghc-memory
+                  ghc-split
+                  ghc-attoparsec
+                  ghc-concurrent-output
+                  ghc-unbounded-delays
+                  ghc-quickcheck
+                  ghc-tasty
+                  ghc-tasty-hunit
+                  ghc-tasty-quickcheck
+                  ghc-tasty-rerun
+                  ghc-ansi-terminal
+                  ghc-aws
+                  ghc-dav
+                  ghc-network
+                  ghc-network-bsd
+                  ghc-git-lfs
+                  ghc-clock
+                  ghc-crypton
+                  ghc-servant
+                  ghc-servant-server
+                  ghc-servant-client
+                  ghc-servant-client-core
+                  ghc-warp
+                  ghc-warp-tls
+                  ghc-os-string
+                  ghc-file-io
+                  ghc-mountpoints
+                  ghc-yesod
+                  ghc-yesod-static
+                  ghc-yesod-form
+                  ghc-yesod-core
+                  ghc-path-pieces
+                  ghc-wai
+                  ghc-wai-extra
+                  ghc-blaze-builder
+                  ghc-clientsession
+                  ghc-shakespeare
+                  ghc-hinotify
+                  ghc-dbus
+                  ghc-fdo-notify
+                  ghc-network-multicast
+                  ghc-network-info
+                  ghc-torrent
+                  ghc-magic
+                  ghc-criterion))
     (propagated-inputs
      (list git))
-    (native-inputs
-     (list ghc-tasty ghc-tasty-hunit ghc-tasty-quickcheck ghc-tasty-rerun
-           perl))
+    (native-inputs (list ghc-filepath-bytestring))
     (home-page "https://git-annex.branchable.com/")
     (synopsis "Manage files with Git, without checking in their contents")
     (description "This package allows managing files with Git, without
@@ -513,13 +534,13 @@ used to keep a folder in sync between computers.")
 (define-public hlint
   (package
     (name "hlint")
-    (version "3.4.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "hlint" version))
-              (sha256
-               (base32
-                "0bkk03c9hacvfd73dk89g4r81b50g7pjgw5pavldali4qwss34cz"))))
+    (version "3.10")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "hlint" version))
+       (sha256
+        (base32 "0dzy7spc45v88yplczhd3la464bhcbaihi619a45bd06ghrp55nr"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hlint")))
     (inputs (list ghc-unordered-containers
@@ -536,12 +557,10 @@ used to keep a folder in sync between computers.")
                   ghc-aeson
                   ghc-deriving-aeson
                   ghc-filepattern
+                  ghc-lib-parser
                   ghc-lib-parser-ex
                   hscolour
                   ghc-yaml))
-    (arguments
-     `(#:cabal-revision ("1"
-                         "1rdaffg5n179yfcn5zjwjb0bki09qy13gz2ijky455y9pbaz8yz9")))
     (home-page "https://github.com/ndmitchell/hlint#readme")
     (synopsis "Suggest improvements for Haskell source code")
     (description
@@ -553,13 +572,13 @@ unwanted suggestions, and to add your own custom suggestions.")
 (define-public hoogle
   (package
     (name "hoogle")
-    (version "5.0.18.3")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "hoogle" version))
-              (sha256
-               (base32
-                "0v6k75w0an9pqgb7a6cicnpf9rz77xd2lmxfbafc5l4f99jg83bn"))))
+    (version "5.0.18.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "hoogle" version))
+       (sha256
+        (base32 "08z32d87vqzhapb2vw21h25jb2g74csxlpvd8f54xl91k3ijs3wx"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hoogle")))
     (inputs (list ghc-quickcheck
@@ -569,7 +588,7 @@ unwanted suggestions, and to add your own custom suggestions.")
                   ghc-cmdargs
                   ghc-conduit
                   ghc-conduit-extra
-                  ghc-connection
+                  ghc-crypton-connection
                   ghc-extra
                   ghc-foundation
                   ghc-old-locale
@@ -582,6 +601,7 @@ unwanted suggestions, and to add your own custom suggestions.")
                   ghc-mmap
                   ghc-process-extras
                   ghc-resourcet
+                  ghc-safe
                   ghc-storable-tuple
                   ghc-tar
                   ghc-uniplate
@@ -593,6 +613,9 @@ unwanted suggestions, and to add your own custom suggestions.")
                   ghc-warp-tls
                   ghc-zlib
                   ghc-semigroups))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "1129flhhb1992rijw46dclvmpqlylmbrzl4swsnk2knylx6jgw5a")))
     (home-page "https://hoogle.haskell.org/")
     (synopsis "Haskell API Search")
     (description
@@ -604,14 +627,13 @@ or by approximate type signature.")
 (define-public hscolour
   (package
     (name "hscolour")
-    (version "1.24.4")
+    (version "1.25")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "hscolour" version))
        (sha256
-        (base32
-         "079jwph4bwllfp03yfr26s5zc6m6kw3nhb1cggrifh99haq34cr4"))))
+        (base32 "0z679khnmb6as1zcdb44n9qjk7in32jpm4ldscpqg7jrapd31kjl"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hscolour")))
     (home-page "https://hackage.haskell.org/package/hscolour")
@@ -760,7 +782,7 @@ Wayland, and Linux console environments alike.")
                   ghc-text-zipper
                   ghc-timezone-olson
                   ghc-timezone-series
-                  ghc-unix-compat-7
+                  ghc-unix-compat
                   ghc-unordered-containers
                   ghc-utf8-string
                   ghc-uuid
@@ -954,6 +976,7 @@ too slow and you'll get wound up in the scroll and crushed.")
     (build-system haskell-build-system)
     (arguments
      (list #:haddock? #f ; TODO: Fails to build.
+           #:cabal-revision '("1" "1935jrzy1r3g9cc74b330fmxnz2i1j8hsdk9jnl557qgk6xjqzs7")
            #:phases
            #~(modify-phases %standard-phases
                (add-after 'build 'build-man-page
@@ -993,13 +1016,13 @@ advanced user's otherwise working script to fail under future circumstances.
 (define-public shelltestrunner
   (package
     (name "shelltestrunner")
-    (version "1.9")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "shelltestrunner" version))
-              (sha256
-               (base32
-                "1a5kzqbwg6990249ypw0cx6cqj6663as1kbj8nzblcky8j6kbi6b"))))
+    (version "1.10")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "shelltestrunner" version))
+       (sha256
+        (base32 "1c6bjyxqa4mgnh3w4pqp6sbr5cf160n7jf9i1b4b9sdxzdjk7g87"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "shelltestrunner")))
     (arguments
@@ -1022,17 +1045,19 @@ advanced user's otherwise working script to fail under future circumstances.
                            "tests/examples")
                    (format #t "test suite not run~%"))
                #t))))))
-    (inputs
-     (list ghc-diff
-           ghc-cmdargs
-           ghc-filemanip
-           ghc-hunit
-           ghc-pretty-show
-           ghc-regex-tdfa
-           ghc-safe
-           ghc-utf8-string
-           ghc-test-framework
-           ghc-test-framework-hunit))
+    (inputs (list ghc-diff
+                  ghc-filemanip
+                  ghc-hunit
+                  ghc-cmdargs
+                  ghc-pretty-show
+                  ghc-regex-tdfa
+                  ghc-safe
+                  ghc-test-framework
+                  ghc-test-framework-hunit
+                  ghc-utf8-string
+                  ghc-hspec
+                  ghc-hspec-core
+                  ghc-hspec-contrib))
     (home-page "https://github.com/simonmichael/shelltestrunner")
     (synopsis "Test CLI programs")
     (description
@@ -1045,13 +1070,13 @@ output, stderr, and exit status.")
 (define-public stylish-haskell
   (package
     (name "stylish-haskell")
-    (version "0.14.3.0")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "stylish-haskell" version))
-              (sha256
-               (base32
-                "17w92v0qnwj7m6yqdq5cxbr04xiz0yfnnyx5q54218wdl7n5lf6d"))))
+    (version "0.15.1.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "stylish-haskell" version))
+       (sha256
+        (base32 "06y6f7bv5j5k7q81194v9jqcbmmqcv7h8ii3lq1783bpfnyd6h19"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "stylish-haskell")))
     (inputs (list ghc-aeson
@@ -1061,6 +1086,7 @@ output, stderr, and exit status.")
                   ghc-hsyaml-aeson
                   ghc-hsyaml
                   ghc-semigroups
+                  ghc-lib-parser
                   ghc-lib-parser-ex
                   ghc-strict
                   ghc-optparse-applicative))

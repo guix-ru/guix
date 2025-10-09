@@ -31,13 +31,13 @@
 (define-public dhall
   (package
     (name "dhall")
-    (version "1.41.2")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "dhall" version))
-              (sha256
-               (base32
-                "14m5rrvkid76qnvg0l14xw1mnqclhip3gjrz20g1lp4fd5p056ka"))))
+    (version "1.42.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "dhall" version))
+       (sha256
+        (base32 "0fvvqvh6diqi55dmncfs06rvcw8k0a1hs2gq228yxvsfbzcpv44s"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "dhall")))
     (inputs (list ghc-aeson
@@ -73,8 +73,8 @@
                   ghc-text-manipulate
                   ghc-text-short
                   ghc-th-lift-instances
+                  ghc-unix-compat
                   ghc-unordered-containers
-                  ghc-uri-encode
                   ghc-vector
                   ghc-cryptohash-sha256
                   ghc-http-types
@@ -86,7 +86,6 @@
                          ghc-quickcheck-instances
                          ghc-special-values
                          ghc-spoon
-                         ghc-system-filepath
                          ghc-tasty
                          ghc-tasty-expected-failure
                          ghc-tasty-hunit
@@ -97,9 +96,8 @@
                          ghc-mockery
                          ghc-doctest))
     (arguments
-     `(#:tests? #f ; Tries to access httpbin.org
-       #:cabal-revision ("4"
-                         "0innb3cn98ynb8bd83jdyrm64ij7wcvajg5qcwzdwbyzpr62anfx")))
+     `(#:cabal-revision ("2"
+                         "1h9kxpn3kzwmxj07mqc0cxjj2ak3dyxnifb78z5vn34xn747j5bk")))
     (home-page "http://hackage.haskell.org/package/dhall")
     (synopsis "Configuration language guaranteed to terminate")
     (description

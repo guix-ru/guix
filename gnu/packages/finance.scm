@@ -284,37 +284,41 @@ based on Qt.")
 (define-public ghc-hledger
   (package
     (name "ghc-hledger")
-    (version "1.27.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "hledger" version))
-              (sha256
-               (base32
-                "0qdg87m7ys2ykqqq32p7h7aw827w4f5bcqx4dspxxq6zqlvzddqb"))))
+    (version "1.43.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "hledger" version))
+       (sha256
+        (base32 "043gw3amc29fbjxlzyc4m97bw5i5462352lmk61adlxcd12l47i1"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hledger")))
     (inputs (list ghc-decimal
                   ghc-diff
                   ghc-aeson
                   ghc-ansi-terminal
-                  ghc-breakpoint
                   ghc-cmdargs
                   ghc-data-default
                   ghc-extra
                   ghc-githash
                   ghc-hashable
                   ghc-hledger-lib
+                  ghc-http-client
+                  ghc-http-types
                   ghc-lucid
                   ghc-math-functions
                   ghc-megaparsec
                   ghc-microlens
+                  ghc-modern-uri
                   ghc-regex-tdfa
+                  ghc-req
                   ghc-safe
                   ghc-shakespeare
                   ghc-split
                   ghc-tabular
                   ghc-tasty
                   ghc-temporary
+                  ghc-text-ansi
                   ghc-timeit
                   ghc-unordered-containers
                   ghc-utf8-string
@@ -345,8 +349,8 @@ Accounting.")
       #~(modify-phases %standard-phases
           (add-after 'install 'install-doc
             (lambda _
-              (install-file "hledger.info" (string-append #$output "/share/info"))
-              (install-file "hledger.1" (string-append #$output "/man/man1"))))
+              (install-file "embeddedfiles/hledger.info" (string-append #$output "/share/info"))
+              (install-file "embeddedfiles/hledger.1" (string-append #$output "/man/man1"))))
            (add-after 'register 'remove-libraries
              (lambda* (#:key outputs #:allow-other-keys)
                (delete-file-recursively (string-append (assoc-ref outputs "out") "/lib")))))))))
@@ -2284,13 +2288,13 @@ software Beancount with a focus on features and usability.")
 (define-public hledger-web
   (package
     (name "hledger-web")
-    (version "1.27.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "hledger-web" version))
-              (sha256
-               (base32
-                "151dxci7dld8626dzw823sr3d9iaac92wfzbfcbdz4jh9f7n07wa"))))
+    (version "1.43.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "hledger-web" version))
+       (sha256
+        (base32 "0d4sv9k3m7s0764lbq2l8w9p2p47cby177l0avl5w3fa9y8d0gyd"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hledger-web")))
     (inputs (list ghc-decimal
@@ -2298,7 +2302,6 @@ software Beancount with a focus on features and usability.")
                   ghc-base64
                   ghc-blaze-html
                   ghc-blaze-markup
-                  ghc-breakpoint
                   ghc-case-insensitive
                   ghc-clientsession
                   ghc-cmdargs
@@ -2306,6 +2309,8 @@ software Beancount with a focus on features and usability.")
                   ghc-conduit-extra
                   ghc-data-default
                   ghc-extra
+                  ghc-file-embed
+                  ghc-githash
                   ghc-hjsmin
                   ghc-hledger
                   ghc-hledger-lib
@@ -2315,6 +2320,7 @@ software Beancount with a focus on features and usability.")
                   ghc-http-types
                   ghc-megaparsec
                   ghc-network
+                  ghc-safe
                   ghc-shakespeare
                   ghc-unix-compat
                   ghc-unordered-containers

@@ -1,0 +1,58 @@
+From 4617d2682738aeaece613ea61390dd47447c2d9f Mon Sep 17 00:00:00 2001
+From: Potato Hatsue <1793913507@qq.com>
+Date: Fri, 12 Sep 2025 06:07:02 -0700
+Subject: [PATCH] Allow QuickCheck 2.15.0
+
+---
+ Test/Chell/QuickCheck.hs | 8 ++++++++
+ chell-quickcheck.cabal   | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Test/Chell/QuickCheck.hs b/Test/Chell/QuickCheck.hs
+index ea1c488..3227b8e 100644
+--- a/Test/Chell/QuickCheck.hs
++++ b/Test/Chell/QuickCheck.hs
+@@ -1,3 +1,4 @@
++{-# LANGUAGE CPP #-}
+ module Test.Chell.QuickCheck (property) where
+ 
+ import Test.Chell qualified as Chell
+@@ -30,7 +31,12 @@ property name prop = Chell.test name $ \opts -> Text.withNullTerminal $ \term ->
+             { State.terminal = term,
+               State.maxSuccessTests = QuickCheck.maxSuccess args,
+               State.maxDiscardedRatio = QuickCheck.maxDiscardRatio args,
++#if MIN_VERSION_QuickCheck(2,15,0)
++              State.replayStartSize = Nothing,
++              State.maxTestSize = QuickCheck.maxSize args,
++#else
+               State.computeSize = computeSize (QuickCheck.maxSize args) (QuickCheck.maxSuccess args),
++#endif
+               State.numSuccessTests = 0,
+               State.numDiscardedTests = 0,
+               State.classes = mempty,
+@@ -59,6 +65,7 @@ property name prop = Chell.test name $ \opts -> Text.withNullTerminal $ \term ->
+         Test.GaveUp {} -> Chell.TestAborted notes output
+         Test.NoExpectedFailure {} -> Chell.TestFailed notes [failure]
+ 
++#if !MIN_VERSION_QuickCheck(2,15,0)
+ -- copied from quickcheck-2.4.1.1/src/Test/QuickCheck/Test.hs
+ computeSize :: Int -> Int -> Int -> Int -> Int
+ computeSize maxSize maxSuccess n d
+@@ -79,3 +86,4 @@ computeSize maxSize maxSuccess n d
+ 
+ roundTo :: Int -> Int -> Int
+ roundTo n m = (n `div` m) * m
++#endif
+diff --git a/chell-quickcheck.cabal b/chell-quickcheck.cabal
+index e854412..1f3a1d9 100644
+--- a/chell-quickcheck.cabal
++++ b/chell-quickcheck.cabal
+@@ -34,7 +34,7 @@ library
+     build-depends:
+       , base ^>= 4.16 || ^>= 4.17 || ^>= 4.18 || ^>= 4.19 || ^>= 4.20 || ^>= 4.21
+       , chell ^>= 0.5
+-      , QuickCheck ^>= 2.14.2
++      , QuickCheck ^>= 2.14.2 || ^>= 2.15.0
+       , random ^>= 1.2.1 || ^>= 1.3.0
+ 
+     exposed-modules:
