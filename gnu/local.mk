@@ -1418,6 +1418,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/ghc-aeson-encodeDouble.patch		\
   %D%/packages/patches/ghc-basement-fix-32bit.patch		\
   %D%/packages/patches/ghc-bytestring-handle-ghc9.patch	\
+  %D%/packages/patches/ghc-chell-quickcheck-enable-qc-2.15.patch	\
   %D%/packages/patches/ghc-clock-realfrag.patch	\
   %D%/packages/patches/ghc-language-haskell-extract-ghc-8.10.patch	\
   %D%/packages/patches/ghc-memory-fix-32bit.patch		\

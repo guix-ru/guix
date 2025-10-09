@@ -37,6 +37,7 @@
   #:use-module (gnu packages haskell-crypto)
   #:use-module (gnu packages haskell-xyz)
   #:use-module (guix build-system haskell)
+  #:use-module (guix gexp)
   #:use-module (guix download)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
@@ -72,13 +73,13 @@ for screen-scraping.")
 (define-public ghc-cookie
   (package
     (name "ghc-cookie")
-    (version "0.4.6")
+    (version "0.5.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "cookie" version))
        (sha256
-        (base32 "1ajbcsk4k0jc6v2fqn36scs6l8wa6fq46gd54pak75rbqdbajhcc"))))
+        (base32 "187plsi53i0hmkg44f7n5xd2qpsg1kz189f08zhvp8z34qkydp8s"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "cookie")))
     (inputs (list ghc-data-default-class))
@@ -92,24 +93,21 @@ for screen-scraping.")
 (define-public ghc-crypton-connection
   (package
     (name "ghc-crypton-connection")
-    (version "0.3.2")
+    (version "0.4.5")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "crypton-connection" version))
        (sha256
-        (base32 "07lrkv6lwphsyp4797yp8ywnndzd270bk58r8gwyby0hr4xy52r0"))))
+        (base32 "1pi56aw3yr4zjfvdrcp6q4vwggml040c5m6bdd916zzbjpqbkpdw"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "crypton-connection")))
-    (inputs (list ghc-basement
-                  ghc-data-default-class
+    (inputs (list ghc-data-default
                   ghc-network
-                  ghc-tls-1.9
-                  ghc-socks
-                  ghc-crypton-x509
+                  ghc-tls
+                  ghc-crypton-socks
                   ghc-crypton-x509-store
-                  ghc-crypton-x509-system
-                  ghc-crypton-x509-validation))
+                  ghc-crypton-x509-system))
     (home-page "https://github.com/kazu-yamamoto/crypton-connection")
     (synopsis "Simple and easy network connections API")
     (description
@@ -123,16 +121,19 @@ SSL/TLS, and SOCKS.")
   (package
     (name "ghc-curl")
     (version "1.3.8")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "curl" version))
-              (sha256
-               (base32
-                "0vj4hpaa30jz7c702xpsfvqaqdxz28zslsqnsfx6bf6dpwvck1wh"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "curl" version))
+       (sha256
+        (base32 "0vj4hpaa30jz7c702xpsfvqaqdxz28zslsqnsfx6bf6dpwvck1wh"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "curl")))
     (inputs
      (list curl))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "02sq2bjw5igc2k9f9ssh58k2ivii2xsvk5r00ky3cxh8j61qy86q")))
     (home-page "https://hackage.haskell.org/package/curl")
     (synopsis "Haskell bindings for libcurl")
     (description
@@ -143,18 +144,19 @@ This package provides a Haskell binding to libcurl.")
 (define-public ghc-httpd-shed
   (package
     (name "ghc-httpd-shed")
-    (version "0.4.1.1")
+    (version "0.4.1.2")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "httpd-shed" version))
        (sha256
-        (base32
-         "19dgdimpzr7pxk7pqvyin6j87gmvnf0rm35gzhmna8qr835wy3sr"))))
+        (base32 "0ls6aim2glhmn8ncskvgkjbh3cyq3a6r7a5623ciir57nwd5g85k"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "httpd-shed")))
-    (inputs
-     (list ghc-network-bsd ghc-network-uri ghc-network))
+    (inputs (list ghc-network-uri ghc-network ghc-network-bsd))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "0f6ffi5gb77ma78fwvnq8ahzz8cj671dq0klbxd0sbnkmibvs3xb")))
     (home-page "https://hackage.haskell.org/package/httpd-shed")
     (synopsis "Simple web-server with an interact style API")
     (description
@@ -166,22 +168,32 @@ requests, and the library is intended for implementing Ajax APIs.")
 (define-public ghc-http-types
   (package
     (name "ghc-http-types")
-    (version "0.12.3")
+    (version "0.12.4")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "http-types" version))
        (sha256
-        (base32
-         "05j00b9nqmwh9zaq9y9x50k81v2pd3j7a71kd91zlnbl8xk4m2jf"))))
+        (base32 "0jg53cw8dzry951m042sqh0d7x39gxjcjxlw1kpmyzl1rjq1njsd"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-types")))
-    (native-inputs
-     (list ghc-doctest ghc-hspec ghc-quickcheck ghc-quickcheck-instances
-           hspec-discover))
-    (inputs
-     (list ghc-case-insensitive))
-    (home-page "https://github.com/aristidb/http-types")
+    (arguments
+      (list
+       #:phases
+       #~(modify-phases %standard-phases
+           (replace 'check
+             (lambda* (#:key tests? #:allow-other-keys)
+               (if tests?
+                 (let* ((tmpdir (or (getenv "TMP") "/tmp"))
+                        (package-db (string-append tmpdir "/package.conf.d")))
+                   (invoke "runhaskell" "Setup.hs" "test" "spec")
+                   (setenv "GHC_PACKAGE_PATH" package-db)
+                   (invoke "./dist/build/doctests/doctests"))
+                 (format #t "Testsuite not run.%~")))))))
+    (inputs (list ghc-case-insensitive))
+    (native-inputs (list ghc-quickcheck ghc-quickcheck-instances ghc-hspec
+                         ghc-doctest hspec-discover))
+    (home-page "https://github.com/Vlix/http-types")
     (synopsis "Generic HTTP types for Haskell")
     (description "This package provides generic HTTP types for Haskell (for
 both client and server code).")
@@ -191,12 +203,12 @@ both client and server code).")
   (package
     (name "ghc-http")
     (version "4000.4.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "HTTP" version))
-              (sha256
-               (base32
-                "0lyl5lpkk51xn3dfndh8ksgvwcdsviyigmsnp3d28lbpxkpxhcfz"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "HTTP" version))
+       (sha256
+        (base32 "0lyl5lpkk51xn3dfndh8ksgvwcdsviyigmsnp3d28lbpxkpxhcfz"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "HTTP")))
     (inputs (list ghc-network ghc-network-uri))
@@ -208,8 +220,8 @@ both client and server code).")
                          ghc-test-framework-hunit))
     (arguments
      `(#:tests? #f ; Tests fail due to missing /etc/protocols?
-       #:cabal-revision ("1"
-                         "04y04vbxbnblpmqqmpl8km4bkcjaj96nbxkssdr1zgbhqisxay5q")))
+       #:cabal-revision ("6"
+                         "0piw36hhsjndc9rmcahscrawfk38iapgz2qwfl13n85wnfhwcdmd")))
     (home-page "https://github.com/haskell/HTTP")
     (synopsis "Library for client-side HTTP")
     (description
@@ -221,13 +233,13 @@ responses coming back.")
 (define-public ghc-http-client
   (package
     (name "ghc-http-client")
-    (version "0.7.13.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "http-client" version))
-              (sha256
-               (base32
-                "09qfmakjk285jz2rnb53c1m9c764fg8vngfq43ipga1g72h8d3n9"))))
+    (version "0.7.19")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "http-client" version))
+       (sha256
+        (base32 "0qdd547j4jz8h6a66hh97qwd9y05li40l5f7kaaqrx78hbh1nb50"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-client")))
     (inputs (list ghc-http-types
@@ -260,26 +272,30 @@ for more user-friendly packages.")
 (define-public ghc-http-client-tls
   (package
     (name "ghc-http-client-tls")
-    (version "0.3.6.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "http-client-tls" version))
-              (sha256
-               (base32
-                "03f8p9gxdzl6slyw1r6vpv2dqhsyjvbaawbjv75kaq0vlj3gz7xi"))))
+    (version "0.3.6.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "http-client-tls" version))
+       (sha256
+        (base32 "18qqzif376hv5lqv1c7sp4b90mq5cyfhybip472j9fcaxrph0mkp"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-client-tls")))
-    ;; Tests require Internet access
-    (arguments `(#:tests? #f))
-    (inputs
-     (list ghc-data-default-class
-           ghc-http-client
-           ghc-connection
-           ghc-network
-           ghc-tls
-           ghc-http-types))
-    (native-inputs
-     (list ghc-hspec))
+    (inputs (list ghc-data-default
+                  ghc-http-client
+                  ghc-crypton-connection
+                  ghc-network
+                  ghc-tls
+                  ghc-case-insensitive
+                  ghc-http-types
+                  ghc-crypton
+                  ghc-memory
+                  ghc-network-uri))
+    (native-inputs (list ghc-hspec))
+    (arguments
+     `(#:tests? #f ; Tests require Internet access
+       #:cabal-revision ("2"
+                         "1wqn9mjwsk5qgir5l1mj74p5k8zzpvkvdhdrbsiqx8y3b4ns7q7g")))
     (home-page "https://github.com/snoyberg/http-client")
     (synopsis "Backend for http-client using the TLS library")
     (description
@@ -291,23 +307,22 @@ libraries, such as http-conduit.")
 (define-public ghc-http-client-restricted
   (package
     (name "ghc-http-client-restricted")
-    (version "0.0.5")
+    (version "0.1.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "http-client-restricted" version))
        (sha256
-        (base32 "1vfm9qc3zr0rmq2ddgyg13i67020cdk8xqhyzfc2zcn1km2p6r85"))))
+        (base32 "12rzkzqgv32rw0z1m38d0mi5dbdn07j3myqp3wfdqfaygib0a6i4"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-client-restricted")))
-    (inputs
-     (list ghc-http-client
-           ghc-http-client-tls
-           ghc-connection
-           ghc-data-default
-           ghc-network
-           ghc-network-bsd
-           ghc-utf8-string))
+    (inputs (list ghc-http-client
+                  ghc-http-client-tls
+                  ghc-crypton-connection
+                  ghc-data-default
+                  ghc-network
+                  ghc-network-bsd
+                  ghc-utf8-string))
     (home-page "https://hackage.haskell.org/package/http-client-restricted")
     (synopsis "Restrict the servers used by http-client")
     (description
@@ -330,6 +345,22 @@ servers on localhost or only allow connections to a specific server.")
          "1lzlrj2flcnz3k5kfhf11nk5n8m6kcya0lkwrsnzxgfr3an27y9j"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-date")))
+    (arguments
+      (list
+       #:phases
+       #~(modify-phases %standard-phases
+           ;; Doctests require GHC_PACKAGE_PATH but Setup.hs fails
+           ;; if it is defined, so we run them separately
+           (replace 'check
+             (lambda* (#:key tests? #:allow-other-keys)
+               (if tests?
+                 (let* ((tmpdir (or (getenv "TMP") "/tmp"))
+                        (package-db (string-append tmpdir "/package.conf.d")))
+                   (invoke "runhaskell" "Setup.hs" "test" "spec")
+                   (setenv "GHC_PACKAGE_PATH" package-db)
+                   (invoke "./dist/build/doctests/doctests")
+                   (unsetenv "GHC_PACKAGE_PATH"))
+                 (format #t "Testsuite not run.%~")))))))
     (inputs
      (list ghc-attoparsec))
     (native-inputs
@@ -343,39 +374,37 @@ Date in Haskell.")
 (define-public ghc-http2
   (package
     (name "ghc-http2")
-    (version "3.0.3")
+    (version "5.3.10")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "http2" version))
               (sha256
                (base32
-                "1kv99i3pnnx31xndlkaczrpd2j5mvzbqlfz1kaw6cwlwkdnl5bhv"))))
+                "0rs21pgnmd0qcg1j360pm8r9c4hm18bcivhnq3krqjl32zb1frpl"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http2")))
     (inputs (list ghc-async
                   ghc-case-insensitive
+                  ghc-http-semantics
                   ghc-http-types
+                  ghc-iproute
                   ghc-network
                   ghc-network-byte-order
-                  ghc-psqueues
+                  ghc-network-control
                   ghc-time-manager
                   ghc-unix-time
-                  ghc-network-run
-                  ghc-cryptonite
-                  ghc-aeson
-                  ghc-aeson-pretty
-                  ghc-base16-bytestring
-                  ghc-unordered-containers
-                  ghc-vector
-                  ghc-word8))
-    (native-inputs (list ghc-doctest
-                         ghc-hspec
-                         ghc-typed-process
-                         ghc-hspec
-                         ghc-typed-process
-                         ghc-hspec
+                  ghc-utf8-string))
+    (native-inputs (list ghc-aeson
+                         ghc-aeson-pretty
+                         ghc-base16-bytestring
+                         ghc-crypton
                          ghc-glob
                          ghc-hspec
+                         ghc-network-run
+                         ghc-random
+                         ghc-typed-process
+                         ghc-unordered-containers
+                         ghc-vector
                          hspec-discover))
     (home-page "https://github.com/kazu-yamamoto/http2")
     (synopsis "HTTP/2 library including frames, priority queues and HPACK")
@@ -387,15 +416,23 @@ and HPACK.  Currently HTTP/2 16 framing and HPACK 10 is supported.")
 (define-public ghc-http-conduit
   (package
     (name "ghc-http-conduit")
-    (version "2.3.8.1")
+    (version "2.3.9.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "http-conduit" version))
        (sha256
-        (base32 "11zf4hyw8f1gpj0w1cmgc9g62xwy2v4hhzqazdsla4q49iqbzxgd"))))
+        (base32 "1bs12v0vh4ik87imfp4xrvpyr3kb3dm4m8y8h1djlcyjxhans10k"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-conduit")))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'relax-dependencies
+            (lambda _
+              (substitute* "http-conduit.cabal"
+                (("warp [ ><=&|0-9.^]*") "warp")))))))
     (inputs (list ghc-attoparsec
                   ghc-resourcet
                   ghc-conduit
@@ -404,10 +441,12 @@ and HPACK.  Currently HTTP/2 16 framing and HPACK 10 is supported.")
                   ghc-http-client
                   ghc-http-client-tls
                   ghc-unliftio-core
-                  ghc-aeson))
+                  ghc-aeson
+                  ghc-attoparsec-aeson))
     (native-inputs (list ghc-hunit
                          ghc-hspec
-                         ghc-data-default-class
+                         ghc-data-default
+                         ghc-crypton-connection
                          ghc-warp-tls
                          ghc-tls
                          ghc-blaze-builder
@@ -421,15 +460,6 @@ and HPACK.  Currently HTTP/2 16 framing and HPACK 10 is supported.")
                          ghc-streaming-commons
                          ghc-temporary
                          ghc-network))
-    (arguments
-     `(#:cabal-revision ("1"
-                         "1wvr0v948s5fmlf47r4pqjan355x6v65rm7dz7y65ngj10xwk5f9")
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'update-constraints
-           (lambda _
-             (substitute* "http-conduit.cabal"
-               ((", network") ", network\n                 , connection\n")))))))
     (home-page "https://github.com/snoyberg/http-client")
     (synopsis "HTTP/HTTPS client with conduit interface")
     (description
@@ -441,29 +471,29 @@ which allow you to avoid direct usage of conduits.")
 (define-public ghc-http-reverse-proxy
   (package
     (name "ghc-http-reverse-proxy")
-    (version "0.6.0.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "http-reverse-proxy" version))
-              (sha256
-               (base32
-                "0a0fc9rqr1crbb1sbq3gzbkwjcfff662d4bgmy3vzspk7ky697ld"))))
+    (version "0.6.2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "http-reverse-proxy" version))
+       (sha256
+        (base32 "144jp4yz4i5an04yspzw0pnsxcqrfbhb5jq3bsfb8ji4zbhjzy8m"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-reverse-proxy")))
-    (inputs (list ghc-case-insensitive
-                  ghc-http-types
-                  ghc-word8
-                  ghc-blaze-builder
-                  ghc-http-client
-                  ghc-wai
-                  ghc-network
+    (inputs (list ghc-blaze-builder
+                  ghc-case-insensitive
                   ghc-conduit
                   ghc-conduit-extra
-                  ghc-wai-logger
+                  ghc-http-client
+                  ghc-http-types
+                  ghc-network
                   ghc-resourcet
+                  ghc-streaming-commons
                   ghc-unliftio
-                  ghc-streaming-commons))
-    (native-inputs (list ghc-hspec ghc-warp ghc-http-conduit))
+                  ghc-wai
+                  ghc-wai-logger
+                  ghc-word8))
+    (native-inputs (list ghc-hspec ghc-http-conduit ghc-warp))
     (home-page "https://github.com/fpco/http-reverse-proxy")
     (synopsis
      "Reverse proxy HTTP requests, either over raw sockets or with WAI")
@@ -476,58 +506,39 @@ approach performs full request/response parsing via WAI and http-conduit.")
 (define-public ghc-wai
   (package
     (name "ghc-wai")
-    (version "3.2.3")
+    (version "3.2.4")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "wai" version))
        (sha256
-        (base32
-         "1y19h9v0cq1fl17ywcyyvd6419fhgyw2s0yk0ki8z60021adcx2m"))))
+        (base32 "153dpwrspanvcz6dg29ixfbx343n7k071lcjf1v7qvc8gn28y256"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "wai")))
-    (inputs
-     (list ghc-bytestring-builder
-           ghc-unix-compat
-           ghc-vault
-           ghc-blaze-builder
-           ghc-network
-           ghc-http-types))
+    (inputs (list ghc-network ghc-http-types ghc-vault))
     (native-inputs
      (list hspec-discover ghc-quickcheck ghc-hunit ghc-hspec))
-    (home-page "https://hackage.haskell.org/package/wai")
+    (home-page "https://github.com/yesodweb/wai")
     (synopsis "Web application interface for Haskell")
     (description "This package provides a Web Application Interface (WAI)
 library for the Haskell language.  It defines a common protocol for
 communication between web applications and web servers.")
-    (license license:bsd-3)))
+    (license license:expat)))
 
 (define-public ghc-wai-logger
   (package
     (name "ghc-wai-logger")
-    (version "2.4.0")
+    (version "2.5.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "wai-logger" version))
        (sha256
-        (base32
-         "02i9jsy5gdglqwwk5gcvax8y498lz9flrfp4v9nrv8rmrmd66zh5"))))
+        (base32 "1171qfz6wlmq69virwvlg79j4smk6sqhdvrdpnisr50zdc3x7ysw"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "wai-logger")))
-    (arguments `(#:tests? #f)) ; FIXME: Tests cannot find libraries exported
-                               ; by propagated-inputs.
-    (inputs
-     (list ghc-auto-update
-           ghc-byteorder
-           ghc-easy-file
-           ghc-unix-time
-           ghc-blaze-builder
-           ghc-case-insensitive
-           ghc-fast-logger
-           ghc-http-types
-           ghc-network
-           ghc-wai))
+    (inputs (list ghc-byteorder ghc-fast-logger ghc-http-types ghc-network
+                  ghc-wai))
     (home-page "https://hackage.haskell.org/package/wai-logger")
     (synopsis "Logging system for WAI")
     (description "This package provides the logging system for WAI.")
@@ -536,13 +547,13 @@ communication between web applications and web servers.")
 (define-public ghc-wai-extra
   (package
     (name "ghc-wai-extra")
-    (version "3.1.13.0")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "wai-extra" version))
-              (sha256
-               (base32
-                "1h4cqd5akrq0vhv3l0fzryy7qw0c2jb58lngx7x8ij63bckjs3fz"))))
+    (version "3.1.17")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "wai-extra" version))
+       (sha256
+        (base32 "0jq1vr3sc4gbcan0w9mzvrj6p20m825zb1y4bq1yjccka146xmn7"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "wai-extra")))
     (inputs (list ghc-aeson
@@ -551,7 +562,7 @@ communication between web applications and web servers.")
                   ghc-call-stack
                   ghc-case-insensitive
                   ghc-cookie
-                  ghc-data-default-class
+                  ghc-data-default
                   ghc-fast-logger
                   ghc-http-types
                   ghc-hunit
@@ -565,9 +576,6 @@ communication between web applications and web servers.")
                   ghc-warp
                   ghc-word8))
     (native-inputs (list ghc-hspec ghc-temporary ghc-zlib hspec-discover))
-    (arguments
-     `(#:cabal-revision ("1"
-                         "0dyvg2bb37im790757khncxpnf45451dd8575p736ry4g8rpqgpw")))
     (home-page "http://github.com/yesodweb/wai")
     (synopsis "Some basic WAI handlers and middleware")
     (description "This library provides basic WAI handlers and middleware
@@ -583,12 +591,10 @@ functionality.")
        (method url-fetch)
        (uri (hackage-uri "wai-conduit" version))
        (sha256
-        (base32
-         "07yn41rn2skd5p3wqqa09wa761vj7ibl8l19gh4bi4i8slxhk417"))))
+        (base32 "07yn41rn2skd5p3wqqa09wa761vj7ibl8l19gh4bi4i8slxhk417"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "wai-conduit")))
-    (inputs
-     (list ghc-conduit ghc-http-types ghc-wai ghc-blaze-builder))
+    (inputs (list ghc-wai ghc-conduit ghc-http-types))
     (home-page "https://github.com/yesodweb/wai")
     (synopsis "Conduit wrappers for Haskell's WAI")
     (description "This package provides data streaming abstraction for
@@ -611,7 +617,7 @@ Haskell's Web Application Interface (WAI).")
     (arguments
      `(#:tests? #f ; Tests fail: Variable not in scope.
        #:cabal-revision
-       ("3" "15hg352id2f4x0dnvv47bdiz6gv5hp5a2mki9yzmhc7ajpk31mdd")))
+       ("4" "0fx431lgf3mhlg4fg9yqs49c43pwrypf4mdi7vx3q78vqdqp7khw")))
     (native-inputs
      (list ghc-attoparsec
            ghc-blaze-builder
@@ -630,47 +636,37 @@ transfers.")
 (define-public ghc-warp
   (package
     (name "ghc-warp")
-    (version "3.3.23")
+    (version "3.4.8")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "warp" version))
        (sha256
-        (base32 "0y1r7czq5zrgklqrx1b9pmxn5lhmf7zpqdjz7hfmnzsmr3vndmms"))))
+        (base32 "0l67bz23l5sbhsmi9pz5vr0cf2mkkzpl0gjkf9309g0lxfq0mpyl"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "warp")))
-    (inputs
-     (list ghc-async
-           ghc-auto-update
-           ghc-bsb-http-chunked
-           ghc-case-insensitive
-           ghc-hashable
-           ghc-http-types
-           ghc-iproute
-           ghc-network
-           ghc-streaming-commons
-           ghc-time-manager
-           ghc-unix-compat
-           ghc-vault
-           ghc-wai
-           ghc-word8
-           ghc-http-date
-           ghc-simple-sendfile
-           ghc-unliftio
-           ghc-x509
-           ghc-http2
-           ghc-recv))
-    (native-inputs
-     (list curl
-           ghc-silently
-           ghc-hspec
-           ghc-doctest
-           ghc-lifted-base
-           ghc-quickcheck
-           ghc-hunit
-           ghc-http-client
-           hspec-discover))
-    (home-page "https://github.com/yesodweb/wai")
+    (inputs (list ghc-auto-update
+                  ghc-async
+                  ghc-bsb-http-chunked
+                  ghc-case-insensitive
+                  ghc-hashable
+                  ghc-http-date
+                  ghc-http-types
+                  ghc-http2
+                  ghc-iproute
+                  ghc-recv
+                  ghc-simple-sendfile
+                  ghc-streaming-commons
+                  ghc-time-manager
+                  ghc-vault
+                  ghc-wai
+                  ghc-word8
+                  ghc-crypton-x509
+                  ghc-semigroups
+                  ghc-network))
+    (native-inputs (list ghc-doctest ghc-quickcheck ghc-hspec hspec-discover
+                         ghc-http-client curl))
+    (home-page "http://github.com/yesodweb/wai")
     (synopsis "HTTP server library for Haskell's WAI")
     (description "Warp is a server library for HTTP/1.x and HTTP/2
 based WAI (Web Application Interface in Haskell).")
@@ -678,46 +674,48 @@ based WAI (Web Application Interface in Haskell).")
 
 (define-public ghc-tls-session-manager
   (package
-  (name "ghc-tls-session-manager")
-  (version "0.0.4")
-  (source
-    (origin
-      (method url-fetch)
-      (uri (hackage-uri "tls-session-manager" version))
-      (sha256
-        (base32
-          "134kb5nz668f4xrr5g98g7fc1bwb3ri6q433a1i6asjkniwpy85s"))))
-  (build-system haskell-build-system)
-  (properties '((upstream-name . "tls-session-manager")))
-  (inputs
-    (list ghc-auto-update ghc-clock ghc-psqueues ghc-tls))
-  (home-page "https://hackage.haskell.org/package/tls-session-manager")
-  (synopsis "In-memory TLS session manager")
-  (description "This Haskell library provides a TLS session manager with
+    (name "ghc-tls-session-manager")
+    (version "0.0.8")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "tls-session-manager" version))
+       (sha256
+        (base32 "1nijzmapkjzg88aa03wznjk8hc94klph3g0mazrlmp0w4nr4hzww"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "tls-session-manager")))
+    (inputs (list ghc-auto-update
+                  ghc-clock
+                  ghc-crypto-token
+                  ghc-memory
+                  ghc-psqueues
+                  ghc-serialise
+                  ghc-tls))
+    (home-page "https://hackage.haskell.org/package/tls-session-manager")
+    (synopsis "In-memory TLS session manager")
+    (description "This Haskell library provides a TLS session manager with
 limitation, automatic pruning, energy saving and replay resistance.")
-  (license license:bsd-3)))
+    (license license:bsd-3)))
 
 (define-public ghc-warp-tls
   (package
     (name "ghc-warp-tls")
-    (version "3.3.4")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "warp-tls" version))
-              (sha256
-               (base32
-                "00vgs9v7k0fapl05knqii9g47svf4lapb7ixkll7xr4zvmkk0r0m"))))
+    (version "3.4.13")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "warp-tls" version))
+       (sha256
+        (base32 "0xxcd5202qcvd1jkiaj85gd8r3www3p7mxwf2j92awvg75jh9lsi"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "warp-tls")))
     (inputs (list ghc-wai
                   ghc-warp
-                  ghc-data-default-class
                   ghc-tls
-                  ghc-cryptonite
                   ghc-network
                   ghc-streaming-commons
                   ghc-tls-session-manager
-                  ghc-unliftio))
+                  ghc-recv))
     (home-page "http://github.com/yesodweb/wai")
     (synopsis "SSL/TLS support for Warp")
     (description "This package provides SSL/TLS support for Warp,
@@ -727,21 +725,19 @@ a WAI handler, via the native Haskell TLS implementation.")
 (define-public ghc-websockets
   (package
     (name "ghc-websockets")
-    (version "0.12.7.3")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "websockets" version))
-              (sha256
-               (base32
-                "0g3z0n4irf3gvbdf9p97jq05ybdg0gwjy5bj4nfc7ivsvyhaic6k"))))
+    (version "0.13.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "websockets" version))
+       (sha256
+        (base32 "1da95b71akggyikbxdmja3gcaqrz8sp6ri5jrsyavc2ickvi9y4s"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "websockets")))
     (inputs (list ghc-async
                   ghc-attoparsec
                   ghc-base64-bytestring
-                  ghc-bytestring-builder
                   ghc-case-insensitive
-                  ghc-clock
                   ghc-network
                   ghc-random
                   ghc-sha
@@ -751,8 +747,8 @@ a WAI handler, via the native Haskell TLS implementation.")
                          ghc-test-framework-hunit
                          ghc-test-framework-quickcheck2))
     (arguments
-     `(#:cabal-revision ("1"
-                         "1yx97y6jl74vy200y43vjxfyzx338kh10dx8vxkjhr0mfh36wldq")))
+     `(#:cabal-revision ("5"
+                         "0nm0lj8cv5z5y2d0bz0rfl3bz100swhind4wn95b7q2ma2x80dlv")))
     (home-page "http://jaspervdj.be/websockets")
     (synopsis "Write WebSocket-capable servers in Haskell")
     (description
@@ -832,17 +828,16 @@ attacks.")
        (method url-fetch)
        (uri (hackage-uri "css-text" version))
        (sha256
-        (base32
-         "0ynd9f4hn2sfwqzbsa0y7phmxq8za7jiblpjwx0ry8b372zhgxaz"))))
+        (base32 "0ynd9f4hn2sfwqzbsa0y7phmxq8za7jiblpjwx0ry8b372zhgxaz"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "css-text")))
-    (inputs
-     (list ghc-attoparsec ghc-hspec ghc-quickcheck))
+    (inputs (list ghc-attoparsec))
+    (native-inputs (list ghc-quickcheck ghc-hspec))
     (home-page "https://www.yesodweb.com/")
     (synopsis "CSS parser and renderer")
     (description "This package provides a CSS parser and renderer for
 Haskell.")
-    (license license:bsd-3)))
+    (license license:expat)))
 
 (define-public ghc-mattermost-api
   (package
@@ -908,13 +903,13 @@ library to allow use of the API library without testing dependencies.")
 (define-public ghc-mime-types
   (package
     (name "ghc-mime-types")
-    (version "0.1.0.9")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "mime-types" version))
-              (sha256
-               (base32
-                "1lkipa4v73z3l5lqs6sdhl898iq41kyxv2jb9agsajzgd58l6cha"))))
+    (version "0.1.2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "mime-types" version))
+       (sha256
+        (base32 "0qagjx5mxzl62ajlvhdqsjkh7f8zzvrq5s343bws89hp9j5f8fh1"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "mime-types")))
     (home-page "https://github.com/yesodweb/wai")
@@ -941,12 +936,10 @@ library to allow use of the API library without testing dependencies.")
                   ghc-profunctors
                   ghc-reflection
                   ghc-tagged))
-    (native-inputs (list ghc-hspec
-                         ghc-hspec-megaparsec
-                         ghc-hspec-discover))
+    (native-inputs (list ghc-hspec ghc-hspec-megaparsec ghc-hspec-discover))
     (arguments
-     `(#:cabal-revision ("1"
-                         "0c0mr8aqs963nmy7i8yfih24snaijgwkxim2q2khw12capshac0q")))
+     `(#:cabal-revision ("3"
+                         "0snpm04nhll3y25c1dypbjsq736cfpiiynijpfahcnv9gsyhzw0z")))
     (home-page "https://github.com/mrkkrp/modern-uri")
     (synopsis "Library for working with URIs")
     (description "This is a library for working with URIs in Haskell as
@@ -1032,25 +1025,22 @@ module.")
 (define-public ghc-blaze-html
   (package
     (name "ghc-blaze-html")
-    (version "0.9.1.2")
+    (version "0.9.2.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "blaze-html" version))
        (sha256
-        (base32
-         "0k1r1hddjgqighazcazxrx6xfhvy2gm8il8l82ainv3cai13yl30"))))
+        (base32 "13v0l776b4dmzh9p6ssi8xllqcrydnbypbgwdbbs6i3nkzrjwm35"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "blaze-html")))
+    (inputs (list ghc-blaze-builder ghc-blaze-markup))
+    (native-inputs (list ghc-hunit ghc-quickcheck ghc-test-framework
+                         ghc-test-framework-hunit
+                         ghc-test-framework-quickcheck2))
     (arguments
-     `(#:tests? #f ; TODO: Depends on quickcheck<2.14
-       #:cabal-revision
-       ("1" "0wvlfb3rd9cm3p894p5rl9kggrsr5da3n8x9ydrbagx91yvkxns9")))
-    (inputs
-     (list ghc-blaze-builder ghc-blaze-markup))
-    (native-inputs
-     (list ghc-hunit ghc-quickcheck ghc-test-framework
-           ghc-test-framework-hunit ghc-test-framework-quickcheck2))
+     `(#:cabal-revision ("1"
+                         "0n4w9id53mckgrh3hb9jncxvplxdd588dq7v8j4c9lpayj22zi45")))
     (home-page "https://jaspervdj.be/blaze")
     (synopsis "Fast HTML combinator library")
     (description "This library provides HTML combinators for Haskell.")
@@ -1059,23 +1049,25 @@ module.")
 (define-public ghc-aeson
   (package
     (name "ghc-aeson")
-    (version "2.0.3.0")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "aeson" version))
-              (sha256
-               (base32
-                "09dk0j33n262dm75vff3y3i9fm6lh06dyqswwv7a6kvnhhmhlxhr"))
-              (patches (search-patches "ghc-aeson-encodeDouble.patch"))))
+    (version "2.2.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "aeson" version))
+       (sha256
+        (base32 "1akbrh8iz47f0ai30yabg1n4vcf1fx0a9gzj45fx0si553s5r8ns"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "aeson")))
-    (inputs (list ghc-base-compat-batteries
+    (inputs (list ghc-generically
                   ghc-time-compat
-                  ghc-attoparsec
+                  ghc-character-ps
                   ghc-data-fix
                   ghc-dlist
                   ghc-hashable
                   ghc-indexed-traversable
+                  ghc-integer-conversion
+                  ghc-integer-logarithms
+                  ghc-network-uri
                   ghc-onetuple
                   ghc-primitive
                   ghc-quickcheck
@@ -1083,6 +1075,7 @@ module.")
                   ghc-semialign
                   ghc-strict
                   ghc-tagged
+                  ghc-text-iso8601
                   ghc-text-short
                   ghc-th-abstraction
                   ghc-these
@@ -1095,15 +1088,15 @@ module.")
                          ghc-base16-bytestring
                          ghc-diff
                          ghc-generic-deriving
-                         ghc-integer-logarithms
                          ghc-quickcheck-instances
                          ghc-tasty
                          ghc-tasty-golden
                          ghc-tasty-hunit
-                         ghc-tasty-quickcheck))
+                         ghc-tasty-quickcheck
+                         ghc-nothunks))
     (arguments
-     `(#:cabal-revision ("1"
-                         "1zrgn63jzrpk3n3vd44zkzgw7kb5qxlvhx4nk6g3sswwrsz5j32i")))
+     `(#:cabal-revision ("4"
+                         "0yw5kahz82kls4svn0qssckvx143k73h5nqg0z1d4s7ibqww4j3x")))
     (home-page "https://github.com/haskell/aeson")
     (synopsis "Fast JSON parsing and encoding")
     (description
@@ -1115,23 +1108,23 @@ naming: in Greek mythology, Aeson was the father of Jason.)")
 (define-public ghc-aeson-pretty
   (package
     (name "ghc-aeson-pretty")
-    (version "0.8.9")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "aeson-pretty" version))
-              (sha256
-               (base32
-                "021az9az6xik9c9s3rnar5fr1lgy2h3igibf5ixnc7ps3m2lzg2x"))))
+    (version "0.8.10")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "aeson-pretty" version))
+       (sha256
+        (base32 "1rbsz9f6kzqq5cbq0xhyj599alb4ssg26w57xff19jxdg36z489a"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "aeson-pretty")))
-    (inputs
-     (list ghc-aeson
-           ghc-base-compat
-           ghc-scientific
-           ghc-vector
-           ghc-unordered-containers
-           ghc-attoparsec
-           ghc-cmdargs))
+    (inputs (list ghc-aeson
+                  ghc-base-compat
+                  ghc-scientific
+                  ghc-vector
+                  ghc-unordered-containers
+                  ghc-attoparsec
+                  ghc-attoparsec-aeson
+                  ghc-cmdargs))
     (home-page "https://github.com/informatikr/aeson-pretty")
     (synopsis "JSON pretty-printing library and command-line tool")
     (description
@@ -1176,13 +1169,13 @@ of a JSON value into a @code{Data.Aeson.Value}.")
 (define-public ghc-aeson-better-errors
   (package
     (name "ghc-aeson-better-errors")
-    (version "0.9.1.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "aeson-better-errors" version))
-              (sha256
-               (base32
-                "05yibq9kqbjb8rh84n12sbax05amvd8jccpja0hyadz58pjy4jnk"))))
+    (version "0.9.1.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "aeson-better-errors" version))
+       (sha256
+        (base32 "1jsnpa1ry1iyzz5qmg58za7i0d4944gcidj12jgwdslmpvcxb436"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "aeson-better-errors")))
     (inputs (list ghc-aeson
@@ -1192,9 +1185,6 @@ of a JSON value into a @code{Data.Aeson.Value}.")
                   ghc-vector
                   ghc-transformers-compat
                   ghc-void))
-    (arguments
-     `(#:cabal-revision ("1"
-                         "0wzvrmhn5q2x1mcv43cyxhlck815ldkhx7c7gz5ijjyva1iicgn2")))
     (home-page "https://github.com/hdgarrood/aeson-better-errors")
     (synopsis "Better error messages when decoding JSON values in Haskell")
     (description
@@ -1202,6 +1192,38 @@ of a JSON value into a @code{Data.Aeson.Value}.")
 good error messages when parsing fails.  See also
 @url{http://harry.garrood.me/blog/aeson-better-errors/}.")
     (license license:expat)))
+
+(define-public ghc-authenticate-oauth
+  (package
+    (name "ghc-authenticate-oauth")
+    (version "1.7")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "authenticate-oauth" version))
+       (sha256
+        (base32 "0y4v46rn0cvm0sr1v8qq1zgzllrlrr3ji5gij1xprgf1zsazcvvl"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "authenticate-oauth")))
+    (inputs (list ghc-http-client
+                  ghc-crypto-pubkey-types
+                  ghc-rsa
+                  ghc-data-default
+                  ghc-base64-bytestring
+                  ghc-sha
+                  ghc-random
+                  ghc-http-types
+                  ghc-blaze-builder
+                  ghc-transformers-compat))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "198xm2qdaqwg2m9kgrkw5gdk2bh19mmj6c4d5fsbpcjnhxlh6axg")))
+    (home-page "http://github.com/yesodweb/authenticate")
+    (synopsis
+     "Library to authenticate with OAuth for Haskell web applications.")
+    (description "API docs and the README are available at
+<http://www.stackage.org/package/authenticate-oauth>.")
+    (license license:bsd-3)))
 
 (define-public ghc-multipart
   (package
@@ -1212,21 +1234,16 @@ good error messages when parsing fails.  See also
        (method url-fetch)
        (uri (hackage-uri "multipart" version))
        (sha256
-        (base32
-         "0p6n4knxpjv70nbl6cmd6x7gkdjsjqp4ya7fz00bfrqp7jvhlivn"))))
+        (base32 "0p6n4knxpjv70nbl6cmd6x7gkdjsjqp4ya7fz00bfrqp7jvhlivn"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "multipart")))
-    (inputs
-     (list ghc-stringsearch))
+    (inputs (list ghc-stringsearch))
     (arguments
-     `(#:cabal-revision ("1"
-                         "03gaapwnvn843hpm5qwdci9df1wf383msd42p8w9ghilpfjj4qy9")))
-    (home-page
-     "http://www.github.com/silkapp/multipart")
-    (synopsis
-     "HTTP multipart library")
-    (description
-     "HTTP multipart split out of the cgi package, for Haskell.")
+     `(#:cabal-revision ("2"
+                         "0nansxxrd6153bwwm825iarsxqgyhx924spvx5rrd2i1spp0972m")))
+    (home-page "http://www.github.com/silkapp/multipart")
+    (synopsis "HTTP multipart library")
+    (description "HTTP multipart split out of the cgi package, for Haskell.")
     (license license:bsd-3)))
 
 (define-public ghc-uri-encode
@@ -1238,15 +1255,13 @@ good error messages when parsing fails.  See also
        (method url-fetch)
        (uri (hackage-uri "uri-encode" version))
        (sha256
-        (base32
-         "0lj2h701af12539p957rw24bxr07mfqd5r4h52i42f43ax165767"))))
+        (base32 "0lj2h701af12539p957rw24bxr07mfqd5r4h52i42f43ax165767"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "uri-encode")))
-    (inputs
-     (list ghc-utf8-string ghc-network-uri))
+    (inputs (list ghc-utf8-string ghc-network-uri))
     (arguments
-     `(#:cabal-revision ("2"
-                         "03pmvbi56gmg1z2wr3glncc7dbyh666bqp565inh31qzsp9zwmgj")))
+     `(#:cabal-revision ("3"
+                         "007c8lv0x2p75f7m57c2hvp82i1c7jblwszbxaghba1xwi7jwhqv")))
     (home-page "https://hackage.haskell.org/package/uri-encode")
     (synopsis "Unicode aware uri-encoding")
     (description "Unicode aware uri-encoding for Haskell.")
@@ -1261,15 +1276,53 @@ good error messages when parsing fails.  See also
        (method url-fetch)
        (uri (hackage-uri "path-pieces" version))
        (sha256
-        (base32
-         "0vx3sivcsld76058925hym2j6hm3g71f0qjr7v59f1g2afgx82q8"))))
+        (base32 "0vx3sivcsld76058925hym2j6hm3g71f0qjr7v59f1g2afgx82q8"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "path-pieces")))
     (native-inputs (list ghc-hunit ghc-hspec ghc-quickcheck))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "0p7wsphh513s8l5d62lzgbhk2l1h6kj5y7bc27qqjsry9g8ah4y7")))
     (home-page "https://github.com/yesodweb/path-pieces")
     (synopsis "Used in Yesod to automatically marshall data in the request path")
-    (description  "This Haskell package provides two typeclasses for converting
+    (description "This Haskell package provides two typeclasses for converting
 Haskell data types to and from route pieces.")
+    (license license:bsd-3)))
+
+(define-public ghc-req
+  (package
+    (name "ghc-req")
+    (version "3.13.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "req" version))
+       (sha256
+        (base32 "0s80kl29b7d35v044yvkfa6ja40k4sm3wh26qpnscqzv2n6w8zzk"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "req")))
+    (inputs (list ghc-aeson
+                  ghc-authenticate-oauth
+                  ghc-blaze-builder
+                  ghc-case-insensitive
+                  ghc-crypton-connection
+                  ghc-data-default-class
+                  ghc-http-api-data
+                  ghc-http-client
+                  ghc-http-client-tls
+                  ghc-http-types
+                  ghc-modern-uri
+                  ghc-monad-control
+                  ghc-retry
+                  ghc-transformers-base
+                  ghc-unliftio-core))
+    (native-inputs (list ghc-quickcheck ghc-hspec ghc-hspec-core hspec-discover))
+    (arguments
+     `(#:cabal-revision ("4"
+                         "14r4xkchdpwcvsmsqx6wq77wj79yd6xa0lxf5rphl21gpsdcym4k")))
+    (home-page "https://github.com/mrkkrp/req")
+    (synopsis "HTTP client library")
+    (description "HTTP client library.")
     (license license:bsd-3)))
 
 (define-public ghc-skein
@@ -1281,15 +1334,15 @@ Haskell data types to and from route pieces.")
        (method url-fetch)
        (uri (hackage-uri "skein" version))
        (sha256
-        (base32
-         "1jdqdk0rz2wnvw735clnj8jh0a9rkrbqjg7vk3w6wczdql6cm0pq"))))
+        (base32 "1jdqdk0rz2wnvw735clnj8jh0a9rkrbqjg7vk3w6wczdql6cm0pq"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "skein")))
     (inputs (list ghc-cereal ghc-tagged ghc-crypto-api))
     (native-inputs (list ghc-hspec))
-    (home-page "https://github.com/yesodweb/path-pieces")
+    (home-page "https://github.com/meteficha/skein")
     (synopsis "Skein family of cryptographic hash functions for Haskell")
-    (description "@uref{(http://www.skein-hash.info, Skein} is a family of
+    (description
+     "@uref{(http://www.skein-hash.info, Skein} is a family of
 fast secure cryptographic hash functions designed by Niels Ferguson, Stefan
 Lucks, Bruce Schneier, Doug Whiting, Mihir Bellare, Tadayoshi Kohno, Jon
 Callas and Jesse Walker.
@@ -1300,14 +1353,13 @@ This Haskell package uses bindings to the optimized C implementation of Skein.")
 (define-public ghc-clientsession
   (package
     (name "ghc-clientsession")
-    (version "0.9.1.2")
+    (version "0.9.3.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "clientsession" version))
        (sha256
-        (base32
-         "0s6h4ykj16mpf7nlw2iqn2ji0p8g1fn5ni0s7yqaili6vv2as5ar"))))
+        (base32 "1ahvk9h580dch46b5743zd7630rzanbnmv9v57srp7aqllk21q9q"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "clientsession")))
     (inputs (list ghc-cereal
@@ -1316,15 +1368,14 @@ This Haskell package uses bindings to the optimized C implementation of Skein.")
                   ghc-skein
                   ghc-base64-bytestring
                   ghc-entropy
-                  ghc-cprng-aes
-                  ghc-cipher-aes
-                  ghc-crypto-random
+                  ghc-crypton
                   ghc-setenv))
-    (native-inputs (list ghc-hunit ghc-hspec ghc-quickcheck))
+    (native-inputs (list ghc-hspec ghc-quickcheck ghc-hunit))
     (home-page "https://github.com/yesodweb/clientsession/tree/master")
     (synopsis "Haskell library for securely store session data in a
 client-side cookie")
-    (description "This Haskell package achieves security through AES-CTR
+    (description
+     "This Haskell package achieves security through AES-CTR
 encryption and Skein-MAC-512-256 authentication.  Uses Base64 encoding to
 avoid any issues with characters.")
     (license license:expat)))
@@ -1332,16 +1383,17 @@ avoid any issues with characters.")
 (define-public ghc-yesod-core
   (package
     (name "ghc-yesod-core")
-    (version "1.6.24.2")
+    (version "1.6.27.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "yesod-core" version))
        (sha256
-        (base32 "0cql4gk83ya0lyv0nyrp387nljpab4dwwy288rzp8klq9z5r2a7j"))))
+        (base32 "0v5pq8ks93b4rrxwl088izl8hrfalkbf3ssgxgqgjsl4x1r5n0kz"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "yesod-core")))
     (inputs (list ghc-aeson
+                  ghc-attoparsec-aeson
                   ghc-auto-update
                   ghc-blaze-html
                   ghc-blaze-markup
@@ -1351,6 +1403,7 @@ avoid any issues with characters.")
                   ghc-conduit
                   ghc-conduit-extra
                   ghc-cookie
+                  ghc-data-default
                   ghc-entropy
                   ghc-fast-logger
                   ghc-http-types
@@ -1389,12 +1442,12 @@ functions, widgets, etc.")
   (package
     (name "ghc-yesod-persistent")
     (version "1.6.0.8")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "yesod-persistent" version))
-              (sha256
-               (base32
-                "02vm0qm0yxqn6x61iir81wf6ibwnf8gkia8lw71fgpxgav154ig6"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "yesod-persistent" version))
+       (sha256
+        (base32 "02vm0qm0yxqn6x61iir81wf6ibwnf8gkia8lw71fgpxgav154ig6"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "yesod-persistent")))
     (inputs (list ghc-yesod-core
@@ -1404,8 +1457,7 @@ functions, widgets, etc.")
                   ghc-conduit
                   ghc-resourcet
                   ghc-resource-pool))
-    (native-inputs (list ghc-hspec ghc-wai-extra ghc-persistent-sqlite
-                         hspec-discover))
+    (native-inputs (list ghc-hspec hspec-discover ghc-wai-extra ghc-persistent-sqlite))
     (home-page "http://www.yesodweb.com/")
     (synopsis "Helpers for using Persistent from Yesod")
     (description "This Haskell package provides helpers for using Persistent
@@ -1415,13 +1467,13 @@ from Yesod.")
 (define-public ghc-yesod-form
     (package
       (name "ghc-yesod-form")
-      (version "1.7.4")
+      (version "1.7.9")
       (source
        (origin
          (method url-fetch)
          (uri (hackage-uri "yesod-form" version))
          (sha256
-          (base32 "012w6pq0zznwqn19nx5h30rmd7dazcd0d75a6426d7brxvf9vn98"))))
+          (base32 "1s59d3ccf76dmi43ivcfzbah9b0y18i9c3gv66dmcwy5f6wqhd52"))))
       (build-system haskell-build-system)
       (properties '((upstream-name . "yesod-form")))
       (inputs (list ghc-aeson
@@ -1454,12 +1506,12 @@ providing richtext field using Nic editor.")
   (package
     (name "ghc-yesod")
     (version "1.6.2.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "yesod" version))
-              (sha256
-               (base32
-                "1qglaxqx96c7wi4817ff67c9g2fxlnjzdpgic458i80khpdlmb5c"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "yesod" version))
+       (sha256
+        (base32 "1qglaxqx96c7wi4817ff67c9g2fxlnjzdpgic458i80khpdlmb5c"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "yesod")))
     (inputs (list ghc-aeson
@@ -1543,13 +1595,12 @@ ignored.")
        (method url-fetch)
        (uri (hackage-uri "hxt-regex-xmlschema" version))
        (sha256
-        (base32
-         "0ynrf65m7abq2fjnarlwq6i1r99pl89npibxx05rlplcgpybrdmr"))))
+        (base32 "0ynrf65m7abq2fjnarlwq6i1r99pl89npibxx05rlplcgpybrdmr"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hxt-regex-xmlschema")))
-    (inputs
-     (list ghc-hxt-charproperties ghc-hunit))
-    (home-page "https://wiki.haskell.org/Regular_expressions_for_XML_Schema")
+    (inputs (list ghc-hxt-charproperties))
+    (native-inputs (list ghc-hunit ghc-hunit))
+    (home-page "https://www.haskell.org/haskellwiki/Regular_expressions_for_XML_Schema")
     (synopsis "Regular expression library for W3C XML Schema regular expressions")
     (description
      "This library supports full W3C XML Schema regular expressions inclusive
@@ -1622,7 +1673,7 @@ from them.  Some primitives have both a functional and an arrow interface.")
            ghc-network
            ghc-random
            ghc-unordered-containers))
-    (home-page "https://github.com/afcowie/http-streams/")
+    (home-page "https://github.com/aesiniath/http-common")
     (synopsis "Common types for HTTP clients and servers")
     (description "Base types used by a variety of HTTP clients and
 servers.  See http-streams @code{Network.Http.Client} or pipes-http
@@ -1631,16 +1682,39 @@ servers.  See http-streams @code{Network.Http.Client} or pipes-http
 pipes-http re-export this package's types and functions.")
     (license license:bsd-3)))
 
+(define-public ghc-http-semantics
+  (package
+    (name "ghc-http-semantics")
+    (version "0.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "http-semantics" version))
+       (sha256
+        (base32 "0kviffsmvggzpbwxnqxshjq3w3yz5v367l5fywq9zcmzrc5ykklw"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "http-semantics")))
+    (inputs (list ghc-case-insensitive
+                  ghc-http-types
+                  ghc-network
+                  ghc-network-byte-order
+                  ghc-time-manager
+                  ghc-utf8-string))
+    (home-page "https://github.com/kazu-yamamoto/http-semantics")
+    (synopsis "HTTP senmatics libarry")
+    (description "Version-independent common parts of HTTP.")
+    (license license:bsd-3)))
+
 (define-public ghc-http-streams
   (package
     (name "ghc-http-streams")
-    (version "0.8.9.6")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "http-streams" version))
-              (sha256
-               (base32
-                "1h8nnp1y4ngv6mwr3fxv428kcvrd3ming179sza8fkn49pcwdlxs"))))
+    (version "0.8.9.9")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "http-streams" version))
+       (sha256
+        (base32 "1yvabr0bh7b5pbklhq6aw8pam2zasp77g38fakgjnpgb76s4mwqv"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "http-streams")))
     (inputs (list ghc-attoparsec
@@ -1652,6 +1726,7 @@ pipes-http re-export this package's types and functions.")
                   ghc-openssl-streams
                   ghc-unordered-containers
                   ghc-aeson
+                  ghc-attoparsec-aeson
                   ghc-http-common
                   ghc-network-uri
                   ghc-network))
@@ -1684,48 +1759,46 @@ deal with the result.")
 (define-public ghc-snap-core
   (package
     (name "ghc-snap-core")
-    (version "1.0.5.0")
+    (version "1.0.5.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "snap-core" version))
        (sha256
-        (base32
-         "0hf671g7h4nikfvi05q3mmcxhfcsh874dkansssn0mc68k9fsak4"))))
+        (base32 "00h5xijkjvnhcgxpw3vmkpf5nwfpknqflvxgig6gvsy4wahc2157"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "snap-core")))
+    (inputs (list ghc-old-locale
+                  ghc-hunit
+                  ghc-attoparsec
+                  ghc-bytestring-builder
+                  ghc-case-insensitive
+                  ghc-lifted-base
+                  ghc-io-streams
+                  ghc-hashable
+                  ghc-monad-control
+                  ghc-random
+                  ghc-readable
+                  ghc-regex-posix
+                  ghc-transformers-base
+                  ghc-unix-compat
+                  ghc-unordered-containers
+                  ghc-vector
+                  ghc-network-uri
+                  ghc-network))
+    (native-inputs (list ghc-quickcheck
+                         ghc-parallel
+                         ghc-test-framework
+                         ghc-test-framework-hunit
+                         ghc-test-framework-quickcheck2
+                         ghc-zlib))
     (arguments
-     `(#:cabal-revision
-       ("3" "02r6plphl4vqig3xap9amdib0qjd98nqpn5jhy6hsbiwh3p7cy9b")))
-    (inputs
-     (list ghc-old-locale
-           ghc-hunit
-           ghc-attoparsec
-           ghc-bytestring-builder
-           ghc-case-insensitive
-           ghc-lifted-base
-           ghc-io-streams
-           ghc-hashable
-           ghc-monad-control
-           ghc-random
-           ghc-readable
-           ghc-regex-posix
-           ghc-transformers-base
-           ghc-unix-compat
-           ghc-unordered-containers
-           ghc-vector
-           ghc-network-uri
-           ghc-network))
-    (native-inputs
-     (list ghc-quickcheck
-           ghc-parallel
-           ghc-test-framework
-           ghc-test-framework-hunit
-           ghc-test-framework-quickcheck2
-           ghc-zlib))
+     `(#:cabal-revision ("6"
+                         "0sc559ahr96y0xzahxj25rrr6mhq3d12ljj42rwvnpnfyaynqbqc")))
     (home-page "http://snapframework.com/")
     (synopsis "Haskell Web Framework (core interfaces and types)")
-    (description "Snap is a simple and fast web development framework
+    (description
+     "Snap is a simple and fast web development framework
 and server written in Haskell.  For more information, you can visit the
 Snap project website at @uref{http://snapframework.com/}.  This library
 contains the core definitions and types for the Snap framework.")
@@ -1734,54 +1807,47 @@ contains the core definitions and types for the Snap framework.")
 (define-public ghc-snap-server
   (package
     (name "ghc-snap-server")
-    (version "1.1.2.0")
+    (version "1.1.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "snap-server" version))
        (sha256
-        (base32
-         "0w4yv9a5ilpma0335ariwap2iscmdbaaif88lq3cm7px910nyc4j"))))
+        (base32 "0znadz0av6k31s8d175904d2kajxayl38sva3dqh5ckdfkymfx54"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "snap-server")))
-    (inputs
-     (list ghc-attoparsec
-           ghc-blaze-builder
-           ghc-bytestring-builder
-           ghc-case-insensitive
-           ghc-clock
-           ghc-io-streams
-           ghc-io-streams-haproxy
-           ghc-lifted-base
-           ghc-network
-           ghc-old-locale
-           ghc-snap-core
-           ghc-unix-compat
-           ghc-vector))
-    (native-inputs
-     (list ghc-base16-bytestring
-           ghc-monad-control
-           ghc-random
-           ghc-threads
-           ghc-hunit
-           ghc-quickcheck
-           ghc-http-streams-bootstrap
-           ghc-http-common
-           ghc-parallel
-           ghc-test-framework
-           ghc-test-framework-hunit
-           ghc-test-framework-quickcheck2))
+    (inputs (list ghc-attoparsec
+                  ghc-blaze-builder
+                  ghc-case-insensitive
+                  ghc-clock
+                  ghc-io-streams
+                  ghc-io-streams-haproxy
+                  ghc-lifted-base
+                  ghc-network
+                  ghc-old-locale
+                  ghc-snap-core
+                  ghc-unix-compat
+                  ghc-vector
+                  ghc-bytestring-builder))
+    (native-inputs (list ghc-base16-bytestring
+                         ghc-monad-control
+                         ghc-random
+                         ghc-threads
+                         ghc-hunit
+                         ghc-quickcheck
+                         ghc-http-streams-bootstrap
+                         ghc-http-common
+                         ghc-parallel
+                         ghc-test-framework
+                         ghc-test-framework-hunit
+                         ghc-test-framework-quickcheck2))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'update-constraints
-           (lambda _
-             (substitute* "snap-server.cabal"
-               (("\\b(attoparsec|base|bytestring|time)\\s+[^,]+" all dep)
-                dep)))))))
+     `(#:cabal-revision ("5"
+                         "0hpbnxbyfsngnx816i92hccimbsc1zx7smajjzaz58647cxkgm1y")))
     (home-page "http://snapframework.com/")
     (synopsis "Web server for the Snap Framework")
-    (description "Snap is a simple and fast web development framework
+    (description
+     "Snap is a simple and fast web development framework
 and server written in Haskell.  For more information, you can visit the
 Snap project website at @uref{http://snapframework.com/}.  The Snap HTTP
 server is a high performance web server library written in Haskell.
@@ -1790,24 +1856,47 @@ clean and efficient Haskell programming interface to the HTTP
 protocol.")
     (license license:bsd-3)))
 
-(define-public ghc-js-jquery
+(define-public ghc-js-chart
   (package
-    (name "ghc-js-jquery")
-    (version "3.3.1")
+    (name "ghc-js-chart")
+    (version "2.9.4.1")
     (source
      (origin
        (method url-fetch)
-       (uri
-        (hackage-uri "js-jquery" version))
+       (uri (hackage-uri "js-chart" version))
        (sha256
-        (base32
-         "16q68jzbs7kp07dnq8cprdcc8fd41rim38039vg0w4x11lgniq70"))))
+        (base32 "03mxr6xr9z20m2hy7hvl9cq3a67k0n9zaqwi7wlqy6xx6pfyy20a"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "js-chart")))
+    (home-page "https://github.com/jonascarpay/js-chart#readme")
+    (synopsis "Obtain minified chart.js code")
+    (description
+     "This package bundles the minified @url{http://www.chartjs.org/, chart.js}
+code into a Haskell package, so it can be depended upon by Cabal packages. The
+first three components of the version number match the upstream chart.js
+version.  The package is designed to meet the redistribution requirements of
+downstream users (e.g. Debian).  This package is a fork of @code{ghc-js-flot}
+using chart.js instead of flot.")
+    (license license:expat)))
+
+(define-public ghc-js-jquery
+  (package
+    (name "ghc-js-jquery")
+    (version "3.7.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "js-jquery" version))
+       (sha256
+        (base32 "01mizq5s0nkbss800wjkdfss9ia193v5alrzsj356by5l40zm1x0"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "js-jquery")))
     (arguments `(#:tests? #f)) ; tests do network IO
+    (native-inputs (list ghc-http))
     (home-page "https://github.com/ndmitchell/js-jquery")
     (synopsis "Obtain minified jQuery code")
-    (description "This package bundles the minified
+    (description
+     "This package bundles the minified
 @url{http://jquery.com/, jQuery} code into a Haskell package, so it can
 be depended upon by Cabal packages.  The first three components of the
 version number match the upstream jQuery version.  The package is
@@ -1822,18 +1911,16 @@ users (e.g. Debian).")
     (source
      (origin
        (method url-fetch)
-       (uri
-        (hackage-uri "js-flot" version))
+       (uri (hackage-uri "js-flot" version))
        (sha256
-        (base32
-         "0yjyzqh3qzhy5h3nql1fckw0gcfb0f4wj9pm85nafpfqp2kg58hv"))))
+        (base32 "0yjyzqh3qzhy5h3nql1fckw0gcfb0f4wj9pm85nafpfqp2kg58hv"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "js-flot")))
-    (inputs
-     (list ghc-http))
+    (native-inputs (list ghc-http))
     (home-page "https://github.com/ndmitchell/js-flot")
     (synopsis "Obtain minified flot code")
-    (description "This package bundles the minified
+    (description
+     "This package bundles the minified
 @url{http://www.flotcharts.org/, Flot} code (a jQuery plotting library)
 into a Haskell package, so it can be depended upon by Cabal packages.
 The first three components of the version number match the upstream flot
@@ -1844,13 +1931,13 @@ requirements of downstream users (e.g. Debian).")
 (define-public ghc-happstack-server
   (package
     (name "ghc-happstack-server")
-    (version "7.7.2")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "happstack-server" version))
-              (sha256
-               (base32
-                "175aal1l4g558y89skck3s04db0bjblkxp77bijf1s9iyc07n669"))))
+    (version "7.9.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "happstack-server" version))
+       (sha256
+        (base32 "1p2gi2knkrkdhip6ynsha76hwmfa9jjrq9q0n0xlm85agwsh57mb"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "happstack-server")))
     (inputs (list ghc-network
@@ -1861,14 +1948,11 @@ requirements of downstream users (e.g. Debian).")
                   ghc-hslogger
                   ghc-html
                   ghc-monad-control
-                  ghc-old-locale
-                  ghc-semigroups
                   ghc-sendfile
                   ghc-system-filepath
                   ghc-syb
                   ghc-threads
                   ghc-transformers-base
-                  ghc-transformers-compat
                   ghc-utf8-string
                   ghc-zlib))
     (native-inputs (list ghc-hunit))
@@ -1883,13 +1967,13 @@ cookies, serving files, and more.")
 (define-public ghc-sendfile
   (package
     (name "ghc-sendfile")
-    (version "0.7.11.4")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "sendfile" version))
-              (sha256
-               (base32
-                "1i2i0w18l2ysambyylv93jzy0adiiqwwnhg7zagqb7p2srybxc3k"))))
+    (version "0.7.11.6")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "sendfile" version))
+       (sha256
+        (base32 "07927m3d1v3w28yhiad6gfkkrbm31c1f9zz98yx5hbi4qspxvri9"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "sendfile")))
     (inputs (list ghc-network))
@@ -1902,13 +1986,13 @@ cookies, serving files, and more.")
 (define-public ghc-scalpel-core
   (package
     (name "ghc-scalpel-core")
-    (version "0.6.2.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "scalpel-core" version))
-              (sha256
-               (base32
-                "1yl1lsi5xm3qdlww2sb6vyppjiisj54f4yzvffv3qg8dgkfjfdra"))))
+    (version "0.6.2.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "scalpel-core" version))
+       (sha256
+        (base32 "07byri7i3mz04axlxbrbiavm6yqigii9xw8fbyf2944xph564dba"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "scalpel-core")))
     (inputs (list ghc-data-default
@@ -1930,13 +2014,13 @@ non-Haskell dependencies.")
 (define-public ghc-scalpel
   (package
     (name "ghc-scalpel")
-    (version "0.6.2.1")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "scalpel" version))
-              (sha256
-               (base32
-                "0w3l38czfsgbyd3x6yir7qw9bl8nmhclrbpbwfyhs39728jlscnc"))))
+    (version "0.6.2.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "scalpel" version))
+       (sha256
+        (base32 "0cv43mf4sb3yii2dnv3pxqwlq31m0k39vqahqww9bjphqzny5ms5"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "scalpel")))
     (inputs (list ghc-scalpel-core
@@ -1957,20 +2041,19 @@ declarative and monadic interface.")
   (package
     (name "ghc-sourcemap")
     (version "0.1.7")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "sourcemap" version))
-              (sha256
-               (base32
-                "09i340mhzlfi5ayy9cb0378glnygdmpdhhsgikm3zrvwf2wmwr2h"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "sourcemap" version))
+       (sha256
+        (base32 "09i340mhzlfi5ayy9cb0378glnygdmpdhhsgikm3zrvwf2wmwr2h"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "sourcemap")))
     (inputs (list ghc-aeson ghc-unordered-containers ghc-attoparsec
                   ghc-utf8-string))
     ;(native-inputs (list node))
     (arguments (list #:tests? #f)) ; Needs node and module source-map.
-    (home-page
-     "https://hackage.haskell.org/package/sourcemap")
+    (home-page "https://hackage.haskell.org/package/sourcemap")
     (synopsis
      "Implementation of source maps as proposed by Google and Mozilla")
     (description
@@ -1988,16 +2071,13 @@ proposed by Google and Mozilla here
        (method url-fetch)
        (uri (hackage-uri "language-javascript" version))
        (sha256
-        (base32
-         "0s6igb54cxm2jywgc3sq53f52gcsc39wd3g78yisfzvl9jm3d86i"))))
+        (base32 "0s6igb54cxm2jywgc3sq53f52gcsc39wd3g78yisfzvl9jm3d86i"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "language-javascript")))
-    (inputs
-     (list ghc-blaze-builder ghc-utf8-string))
-    (native-inputs
-     (list ghc-alex ghc-quickcheck ghc-happy ghc-hspec ghc-utf8-light))
-    (home-page
-     "https://github.com/erikd/language-javascript")
+    (inputs (list ghc-blaze-builder ghc-utf8-string))
+    (native-inputs (list ghc-quickcheck ghc-hspec ghc-utf8-light ghc-happy
+                         ghc-alex))
+    (home-page "https://github.com/erikd/language-javascript")
     (synopsis "Parser for JavaScript")
     (description
      "Parses Javascript into an Abstract Syntax Tree (AST).  Initially intended
@@ -2067,13 +2147,13 @@ Authoring and Versioning (WebDAV) extensions to HTTP as well an executable,
 (define-public ghc-yesod-test
   (package
     (name "ghc-yesod-test")
-    (version "1.6.15")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "yesod-test" version))
-              (sha256
-               (base32
-                "16q4f1l3m4l8iy5vmaa8c0vm2iiqhpghf3kykymlh41xy96mqpn3"))))
+    (version "1.6.19")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "yesod-test" version))
+       (sha256
+        (base32 "0snq06yps28lkxfc1mhsvbv2kq0h0mi16zjdfrahm4zaz8axkqka"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "yesod-test")))
     (inputs (list ghc-hunit
@@ -2111,13 +2191,13 @@ HTML responses using CSS selectors.")
 (define-public ghc-wai-app-static
   (package
     (name "ghc-wai-app-static")
-    (version "3.1.7.4")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "wai-app-static" version))
-              (sha256
-               (base32
-                "1h8zy3dprqjxvlqxrids65yg5qf1h4f63ddspwxrbp0r9d28hwb4"))))
+    (version "3.1.9")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "wai-app-static" version))
+       (sha256
+        (base32 "0rjaivvfdpi512iik78hdhapngpikm8cgw5rzb0ax27ml56x8wxk"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "wai-app-static")))
     (inputs (list ghc-wai
@@ -2134,9 +2214,9 @@ HTML responses using CSS selectors.")
                   ghc-wai-extra
                   ghc-optparse-applicative
                   ghc-warp
-                  ghc-cryptonite
+                  ghc-crypton
                   ghc-memory))
-    (native-inputs (list ghc-hspec ghc-network ghc-temporary ghc-mockery))
+    (native-inputs (list ghc-hspec ghc-temporary ghc-mockery))
     (home-page "http://www.yesodweb.com/book/web-application-interface")
     (synopsis "WAI application for static serving")
     (description
@@ -2148,32 +2228,32 @@ helper functions and datatypes for use outside of WAI.")
 (define-public ghc-hjsmin
   (package
     (name "ghc-hjsmin")
-    (version "0.2.0.4")
+    (version "0.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "hjsmin" version))
        (sha256
-        (base32
-         "1r2p5rjdjr25j3w4s57q5hxw2c3ymw12x7ms18yvglnq2ivr9fc1"))))
+        (base32 "146d4b9k11msqf1q12rzh5bfdrqddkcgsf42w6wpkzfdlhskid2d"))))
     (build-system haskell-build-system)
-    (properties '((upstream-name . "hjsmin")))
     (arguments
-     `(#:cabal-revision ("2"
-                         "184g49wsj2sfm8d75kgr7ylfw29gbyrqbqp4syyz30ch047jd0af")
+      (list
        #:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'fix-dist-directory-for-tests
-           (lambda _
-             (substitute* '("test/test-cli.hs" "test/cli/core/runner")
-               (("dist-newstyle") "dist")))))))
-    (inputs
-     (list ghc-language-javascript ghc-optparse-applicative))
-    (native-inputs
-     (list ghc-extra))
+       #~(modify-phases %standard-phases
+           (add-before 'build 'fix-tests
+             (lambda _
+               (substitute* "test/test-cli.hs"
+                 (("\"dist-newstyle\"") "\"dist\""))
+               (chmod "test/cli/core/runner" #o755)
+               (chmod "test/cli/empty-input/run" #o755)
+               (chmod "test/cli/minimal-input/run" #o755))))))
+    (properties '((upstream-name . "hjsmin")))
+    (inputs (list ghc-language-javascript ghc-optparse-applicative))
+    (native-inputs (list ghc-extra))
     (home-page "https://github.com/erikd/hjsmin")
     (synopsis "Haskell implementation of a JavaScript minifier")
-    (description "This library provides tools reduce the size of
+    (description
+     "This library provides tools reduce the size of
 JavaScript files by stripping out extraneous whitespace and other
 syntactic elements, without changing the semantics.")
     (license license:bsd-3)))
@@ -2229,16 +2309,18 @@ for the Yesod Web Framework.")
        (method url-fetch)
        (uri (hackage-uri "wai-handler-launch" version))
        (sha256
-        (base32
-         "1ifqgyc1ccig5angh5l1iq7vyms4lvi8wzvysg5dw82nml49n02m"))))
+        (base32 "1ifqgyc1ccig5angh5l1iq7vyms4lvi8wzvysg5dw82nml49n02m"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "wai-handler-launch")))
-    (inputs
-     (list ghc-wai ghc-warp ghc-http-types ghc-streaming-commons
-           ghc-async))
-    (home-page "https://hackage.haskell.org/package/wai-handler-launch")
+    (inputs (list ghc-wai ghc-warp ghc-http-types ghc-streaming-commons
+                  ghc-async))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "1jp1lngryrg4v84q4q6c5g7h93kasdk3bgp4x0miivvx8s8iibs6")))
+    (home-page "http://hackage.haskell.org/package/wai-handler-launch")
     (synopsis "Launch a Web application in the default browser")
-    (description "This package handles cross-platform Web browser
+    (description
+     "This package handles cross-platform Web browser
 launching and inserts JavaScript code to ping the server.  When the
 server no longer receives pings, it shuts down.")
     (license license:expat)))
@@ -2286,19 +2368,38 @@ Resource Sharing (CORS) for the Web Application Framework (WAI) that
 aims to be compliant with @url{https://www.w3.org/TR/cors}.")
     (license license:expat)))
 
+(define-public ghc-network-control
+  (package
+    (name "ghc-network-control")
+    (version "0.1.7")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "network-control" version))
+       (sha256
+        (base32 "042vg6v81m5s97c0xrl0535gnmxlfwlfidq9nbpvwwjw3qw0vm05"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "network-control")))
+    (inputs (list ghc-psqueues ghc-unix-time))
+    (native-inputs (list ghc-hspec hspec-discover ghc-quickcheck ghc-pretty-simple))
+    (home-page "http://hackage.haskell.org/package/network-control")
+    (synopsis "Library to control network protocols")
+    (description "Common parts to control network protocols.")
+    (license license:bsd-3)))
+
 (define-public ghc-network-run
   (package
     (name "ghc-network-run")
-    (version "0.2.5")
+    (version "0.4.4")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "network-run" version))
        (sha256
-        (base32 "08662w7ja9w4a4fwikaawxnxcszkd0mdmaajmshas2dd25xyikwi"))))
+        (base32 "1l4zgzf0ljpda72cpzzkin6shg6idm4pzx8aa2ca7v9jh3vr6g2p"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "network-run")))
-    (inputs (list ghc-network))
+    (inputs (list ghc-network ghc-time-manager))
     (home-page "https://hackage.haskell.org/package/network-run")
     (synopsis "Simple network runner library")
     (description

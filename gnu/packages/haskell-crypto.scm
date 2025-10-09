@@ -62,18 +62,19 @@ format.")
   (package
     (name "ghc-asn1-encoding")
     (version "0.9.6")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "asn1-encoding" version))
-              (sha256
-               (base32
-                "02nsr30h5yic1mk7znf0q4z3n560ip017n60hg7ya25rsfmxxy6r"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "asn1-encoding" version))
+       (sha256
+        (base32 "02nsr30h5yic1mk7znf0q4z3n560ip017n60hg7ya25rsfmxxy6r"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "asn1-encoding")))
-    (inputs
-     (list ghc-hourglass ghc-asn1-types))
-    (native-inputs
-     (list ghc-tasty ghc-tasty-quickcheck))
+    (inputs (list ghc-hourglass ghc-asn1-types))
+    (native-inputs (list ghc-tasty ghc-tasty-quickcheck))
+    (arguments
+     `(#:cabal-revision ("2"
+                         "16503ryhq15f2rfdav2qnkq11dg2r3vk3f9v64q9dmxf8dh8zv97")))
     (home-page "https://github.com/vincenthz/hs-asn1")
     (synopsis "ASN1 data reader and writer in RAW, BER and DER forms")
     (description
@@ -111,15 +112,18 @@ when ASN1 pattern matching is not convenient.")
        (method url-fetch)
        (uri (hackage-uri "crypto-api" version))
        (sha256
-        (base32
-         "19bsmkqkpnvh01b77pmyarx00fic15j4hvg4pzscrj4prskrx2i9"))))
+        (base32 "19bsmkqkpnvh01b77pmyarx00fic15j4hvg4pzscrj4prskrx2i9"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "crypto-api")))
     (inputs (list ghc-cereal ghc-tagged ghc-entropy))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "1z6n1sa5pn3iqvqjrd8hv4bc2pxzsrhm5sh0l8z7g9lbqp6w0wp5")))
     (home-page "https://github.com/TomMD/crypto-api")
     (synopsis "Provides generic interface for cryptographic operations
 for Haskell")
-    (description "This Haskell package provides a generic interface for
+    (description
+     "This Haskell package provides a generic interface for
 cryptographic operations (hashes, ciphers, randomness).
 
 Maintainers of hash and cipher implementations are encouraged to add instances
@@ -197,13 +201,15 @@ that hides the C implementation.")
        (method url-fetch)
        (uri (hackage-uri "cryptohash-md5" version))
        (sha256
-        (base32
-         "018g13hkmq5782i24b4518hcd926fl6x6fh5hd7b9wlxwc5dn21v"))))
+        (base32 "018g13hkmq5782i24b4518hcd926fl6x6fh5hd7b9wlxwc5dn21v"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "cryptohash-md5")))
     (native-inputs (list ghc-base16-bytestring ghc-puremd5 ghc-tasty
-                         ghc-tasty-hunit ghc-tasty-quickcheck))
-    (home-page "https://github.com/hvr/cryptohash-md5")
+                         ghc-tasty-quickcheck ghc-tasty-hunit))
+    (arguments
+     `(#:cabal-revision ("6"
+                         "0m7f9mgw4w9vcch37ja9zgbn0knq8rjppqr9x2ylkcdxfdnmhhif")))
+    (home-page "https://github.com/haskell-hvr/cryptohash-md5")
     (synopsis "MD5 implementation for Haskell")
     (description "This Haskell package provides implementation of MD5.")
     (license license:bsd-3)))
@@ -212,20 +218,20 @@ that hides the C implementation.")
   (package
     (name "ghc-cryptohash-sha1")
     (version "0.11.101.0")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "cryptohash-sha1" version))
-              (sha256
-               (base32
-                "0h9jl9v38gj0vnscqx7xdklk634p05fa6z2pcvknisq2mnbjq154"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "cryptohash-sha1" version))
+       (sha256
+        (base32 "0h9jl9v38gj0vnscqx7xdklk634p05fa6z2pcvknisq2mnbjq154"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "cryptohash-sha1")))
     (native-inputs (list ghc-base16-bytestring ghc-sha ghc-tasty
                          ghc-tasty-quickcheck ghc-tasty-hunit))
     (arguments
-     `(#:cabal-revision ("1"
-                         "0bz9rfl7b2iwn45m0lxcmsyi5rrv3xdgzx2lzr79bds91dw6i25b")))
-    (home-page "https://github.com/hvr/cryptohash-sha1")
+     `(#:cabal-revision ("6"
+                         "1cxdw2y10z4v0mz91wki7f233jziipx85j4qy5msig4nv3djkprb")))
+    (home-page "https://github.com/haskell-hvr/cryptohash-sha1")
     (synopsis "SHA-1 implementation for Haskell")
     (description
      "This Haskell package provides an incremental and one-pass,
@@ -246,20 +252,18 @@ the C implementation.")
        (method url-fetch)
        (uri (hackage-uri "cryptohash-sha256" version))
        (sha256
-        (base32
-         "1xkb7iqplbw4fy1122p79xf1zcb7k44rl0wmfj1q06l7cdqxr9vk"))))
+        (base32 "1xkb7iqplbw4fy1122p79xf1zcb7k44rl0wmfj1q06l7cdqxr9vk"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "cryptohash-sha256")))
+    (native-inputs (list ghc-base16-bytestring ghc-sha ghc-tasty
+                         ghc-tasty-quickcheck ghc-tasty-hunit))
     (arguments
-     `(#:cabal-revision
-       ("1" "1hyzqv30rpj920ddnr0zypyjjlh52vyp2d140pn2byayj820rkgs")
-       #:tests? #f)) ; TODO: tasty ==1.1.*
-    (native-inputs
-     (list ghc-base16-bytestring ghc-sha ghc-tasty ghc-tasty-hunit
-           ghc-tasty-quickcheck))
-    (home-page "https://github.com/hvr/cryptohash-sha1")
+     `(#:cabal-revision ("6"
+                         "01s12sl5mxvraj5fj3cs0pkb03pm8xpjz13y09dpl7i6rv6f578f")))
+    (home-page "https://github.com/haskell-hvr/cryptohash-sha256")
     (synopsis "SHA-256 implementation for Haskell")
-    (description "This Haskell package provides an incremental and
+    (description
+     "This Haskell package provides an incremental and
 one-pass, pure API to the @uref{https://en.wikipedia.org/wiki/SHA-2,
 SHA-256 cryptographic hash algorithm}, with performance close to the
 fastest implementations available in other languages.
@@ -272,12 +276,12 @@ the C implementation.")
   (package
     (name "ghc-cryptonite")
     (version "0.30")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "cryptonite" version))
-              (sha256
-               (base32
-                "07bb97iszhnrfddh5ql6p3dqd0c13xycjw5n2kljw7d0ia59q2an"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "cryptonite" version))
+       (sha256
+        (base32 "07bb97iszhnrfddh5ql6p3dqd0c13xycjw5n2kljw7d0ia59q2an"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "cryptonite")))
     (inputs (list ghc-memory ghc-basement))
@@ -326,19 +330,17 @@ elsewhere.")
 (define-public ghc-digest
   (package
     (name "ghc-digest")
-    (version "0.0.1.7")
+    (version "0.0.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "digest" version))
        (sha256
-        (base32 "02jzw0bsng87y1n2kgpy7vb30lvqsnpbfd8dpg4hmvbg9s06qgdj"))))
+        (base32 "163418p50bqdxn8ajzj6x3455xbch9jq1w6psbkdz5qzw017py6b"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "digest")))
     (arguments
-     `(#:extra-directories ("zlib")
-       #:cabal-revision ("1"
-                         "0wh34kyag2vhwvsdwv8qmvm13gy32nc94yfyqfdnl67nyc2sx8wl")))
+     `(#:extra-directories ("zlib")))
     (inputs (list zlib))
     (native-inputs (list pkg-config))
     (home-page "http://hackage.haskell.org/package/digest")
@@ -352,13 +354,13 @@ are implemented as FFI bindings to efficient code from zlib.")
 (define-public ghc-entropy
   (package
     (name "ghc-entropy")
-    (version "0.4.1.10")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "entropy" version))
-              (sha256
-               (base32
-                "1rbx4ydabrjs8kkdg9laznkh9nisiq6b5z93vnp9bh6iy59ivb45"))))
+    (version "0.4.1.11")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "entropy" version))
+       (sha256
+        (base32 "1slj5n783k2amsx2hqs5qwvcw4rgfhdhgmiyg7cii0wg4w0mmpgm"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "entropy")))
     (home-page "https://github.com/TomMD/entropy")
@@ -413,6 +415,35 @@ Mail} (PEM) format.")
     (description "This package provides a Haskell-only implementation of
 the MD5 digest (hash) algorithm.  This now supports the @code{crypto-api} class
 interface.")
+    (license license:bsd-3)))
+
+(define-public ghc-rsa
+  (package
+    (name "ghc-rsa")
+    (version "2.4.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "RSA" version))
+       (sha256
+        (base32 "0hchsqrxpfw7mqrqwscfy8ig1w2di6w3nxpzi873w0gibv2diibj"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "RSA")))
+    (inputs (list ghc-crypto-api ghc-crypto-pubkey-types ghc-sha))
+    (native-inputs (list ghc-quickcheck ghc-tagged ghc-test-framework
+                         ghc-test-framework-quickcheck2))
+    (arguments
+     `(#:cabal-revision ("2"
+                         "090yzm99fmh7c6z4m9hbkasqhc3xlw104g2b6wnk77n1abd13ryj")))
+    (home-page "http://hackage.haskell.org/package/RSA")
+    (synopsis
+     "Implementation of RSA, using the padding schemes of PKCS#1 v2.1.")
+    (description
+     "This library implements the RSA encryption and signature algorithms for
+arbitrarily-sized @code{ByteStrings}.  While the implementations work, they are
+not necessarily the fastest ones on the planet.  Particularly key generation.
+The algorithms included are based of RFC 3447, or the Public-Key Cryptography
+Standard for RSA, version 2.1 (a.k.a, PKCS#1 v2.1).")
     (license license:bsd-3)))
 
 (define-public ghc-sha
@@ -594,6 +625,24 @@ implementation.  If it matters for your case, you should make sure you have
 AES-NI available, or you'll need to use a different implementation.")
     (license license:bsd-3)))
 
+(define-public ghc-crypto-pubkey-types
+  (package
+    (name "ghc-crypto-pubkey-types")
+    (version "0.4.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "crypto-pubkey-types" version))
+       (sha256
+        (base32 "0q0wlzjmpx536h1zcdzrpxjkvqw8abj8z0ci38138kpch4igbnby"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "crypto-pubkey-types")))
+    (inputs (list ghc-asn1-types ghc-asn1-encoding))
+    (home-page "http://github.com/vincenthz/hs-crypto-pubkey-types")
+    (synopsis "Generic cryptography Public keys algorithm types")
+    (description "Generic cryptography public keys algorithm types.")
+    (license license:bsd-3)))
+
 (define-public ghc-crypto-random
   (package
     (name "ghc-crypto-random")
@@ -617,13 +666,13 @@ abstraction for CPRNGs.")
 (define-public ghc-crypton
   (package
     (name "ghc-crypton")
-    (version "0.34")
+    (version "1.0.4")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "crypton" version))
        (sha256
-        (base32 "1mhypjhzn95in853bp7ary0a2xc6lsji6j8hrrgn2mfa4ilq8i24"))))
+        (base32 "06h1qjvqd8gmiyzvh31sc061vcgns101l0774c44a8k44015925l"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "crypton")))
     (inputs (list ghc-memory ghc-basement))
@@ -653,13 +702,13 @@ abstraction for CPRNGs.")
 (define-public ghc-crypton-x509
   (package
     (name "ghc-crypton-x509")
-    (version "1.7.6")
+    (version "1.7.7")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "crypton-x509" version))
        (sha256
-        (base32 "1zyaz0krf08g36g30zr5wn8f2x51l4dj2zcjnhpiw9h05p54mdzb"))))
+        (base32 "10pkva9wvm6ih48bprxlnyhnn3nr6xq9dhkrk4hfxpsaij6f9v7g"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "crypton-x509")))
     (inputs (list ghc-memory
@@ -669,13 +718,7 @@ abstraction for CPRNGs.")
                   ghc-asn1-encoding
                   ghc-asn1-parse
                   ghc-crypton))
-    (native-inputs (list ghc-tasty ghc-tasty-quickcheck ghc-x509))
-    (arguments
-     `(#:cabal-revision ("1"
-                         "10a2x47znhbayyfr6fqgq27623akpycyjbfxz4hnavavf1x6ary5")
-       ;; build phase fails when tests are activated.
-       ;; See https://github.com/kazu-yamamoto/crypton-certificate/pull/7
-       #:tests? #f))
+    (native-inputs (list ghc-tasty ghc-tasty-quickcheck))
     (home-page "https://github.com/kazu-yamamoto/crypton-certificate")
     (synopsis "X509 reader and writer")
     (description "This package provides generic X509 support for Haskell.")
@@ -684,13 +727,13 @@ abstraction for CPRNGs.")
 (define-public ghc-crypton-x509-store
   (package
     (name "ghc-crypton-x509-store")
-    (version "1.6.9")
+    (version "1.6.11")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "crypton-x509-store" version))
        (sha256
-        (base32 "0vr5b9cyf9x016wn1g0bryslf5nz8jq2sy8r3llwqfg02apihqiy"))))
+        (base32 "07vq7f883cm5krqz2kc0qkh9ks54jknrwdqvfqsk91s12b693a83"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "crypton-x509-store")))
     (inputs (list ghc-pem ghc-asn1-types ghc-asn1-encoding ghc-crypton
@@ -727,29 +770,68 @@ storage methods, and accessors.")
 (define-public ghc-crypton-x509-validation
   (package
     (name "ghc-crypton-x509-validation")
-    (version "1.6.12")
+    (version "1.6.14")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "crypton-x509-validation" version))
        (sha256
-        (base32 "1xjhwvmkcy47a6xiqxb3xy944ca7g660203jdrz5xzd46zibfq0f"))))
+        (base32 "07b09kgrd3m5ahxpj458r5ycd30bz8ldwjwf19mdcnfv4x0kj3pd"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "crypton-x509-validation")))
     (inputs (list ghc-memory
                   ghc-hourglass
-                  ghc-data-default-class
+                  ghc-data-default
                   ghc-pem
                   ghc-asn1-types
                   ghc-asn1-encoding
                   ghc-crypton-x509
                   ghc-crypton-x509-store
-                  ghc-crypton))
+                  ghc-crypton
+                  ghc-iproute))
     (native-inputs (list ghc-tasty ghc-tasty-hunit))
     (home-page "https://github.com/kazu-yamamoto/crypton-certificate")
     (synopsis "X.509 Certificate and CRL validation")
     (description "This package provides Haskell tools for X.509 certificate
 and @dfn{Certificates revocation list} (CRL) validation.")
+    (license license:bsd-3)))
+
+(define-public ghc-crypton-socks
+  (package
+    (name "ghc-crypton-socks")
+    (version "0.6.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "crypton-socks" version))
+       (sha256
+        (base32 "0fwzlvndyxjwhxambxdjzzm63yvb6jzsg53dkv3i6x17biz0hdm8"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "crypton-socks")))
+    (inputs (list ghc-cereal ghc-network ghc-network-bsd))
+    (home-page "http://github.com/mpilgrem/crypton-socks")
+    (synopsis "SOCKS Protocol Version 5")
+    (description
+     "This package provides a library implementing SOCKS Protocol Version 5.")
+    (license license:bsd-3)))
+
+(define-public ghc-crypto-token
+  (package
+    (name "ghc-crypto-token")
+    (version "0.1.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "crypto-token" version))
+       (sha256
+        (base32 "18xphlvn6wzyi6lqrvm5vic97pkcbiph1938p5l1mb22rj5215zm"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "crypto-token")))
+    (inputs (list ghc-crypton ghc-memory ghc-network-byte-order))
+    (native-inputs (list ghc-hspec hspec-discover))
+    (home-page "http://hackage.haskell.org/package/crypto-token")
+    (synopsis "crypto tokens")
+    (description "Encrypted tokens/tickets to keep state in the client side.")
     (license license:bsd-3)))
 
 (define-public ghc-cprng-aes
@@ -804,20 +886,17 @@ percent.
        (method url-fetch)
        (uri (hackage-uri "ed25519" version))
        (sha256
-        (base32
-         "0v8msqvgzimhs7p5ri25hrb1ni2wvisl5rmdxy89fc59py79b9fq"))))
+        (base32 "0v8msqvgzimhs7p5ri25hrb1ni2wvisl5rmdxy89fc59py79b9fq"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "ed25519")))
+    (native-inputs (list ghc-quickcheck ghc-doctest))
     (arguments
-     `(#:cabal-revision
-       ("6" "0qyx6cl52fnll8lp6v9133wfvv3zhvq7v2crn441mng520j9wp48")
-       ;; We omit these test suites because they require old versions of
-       ;; packages and packages we do not have.
-       #:configure-flags
-       '("--flags=-test-hlint -test-doctests -test-properties")))
-    (home-page "http://thoughtpolice.github.com/hs-ed25519")
+     `(#:cabal-revision ("9"
+                         "0y5vfdcys18waa5k5zxiq9n8jq0l05j76riml23i0gxmwgdhsmgi")))
+    (home-page "https://github.com/thoughtpolice/hs-ed25519/")
     (synopsis "Ed25519 cryptographic signatures")
-    (description "This package provides a simple, fast, self-contained
+    (description
+     "This package provides a simple, fast, self-contained
 copy of the Ed25519 public-key signature system with a clean interface.
 It also includes support for detached signatures, and thorough
 documentation on the design and implementation, including usage
@@ -827,29 +906,41 @@ guidelines.")
 (define-public ghc-tls
   (package
     (name "ghc-tls")
-    (version "1.5.8")
+    (version "2.1.8")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "tls" version))
               (sha256
                (base32
-                "0rxdv8ab98kd4nqql7djmmi51k4vayq21s38s43sx3rzn0iyla3b"))))
+                "1csdy3426lva1a5f7gh9qm96vzfraqj91jbxlm79wbf1jsdzfhsq"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "tls")))
-    (inputs (list ghc-cereal
-                  ghc-data-default-class
-                  ghc-memory
-                  ghc-cryptonite
-                  ghc-asn1-types
+    (inputs (list ghc-asn1-types
                   ghc-asn1-encoding
-                  ghc-x509
-                  ghc-x509-store
-                  ghc-x509-validation
-                  ghc-async
-                  ghc-hourglass
-                  ghc-network))
-    (native-inputs (list ghc-tasty ghc-tasty-quickcheck ghc-quickcheck))
-    (home-page "http://github.com/vincenthz/hs-tls")
+                  ghc-base16-bytestring
+                  ghc-cereal
+                  ghc-crypton
+                  ghc-crypton-x509
+                  ghc-crypton-x509-store
+                  ghc-crypton-x509-validation
+                  ghc-data-default
+                  ghc-memory
+                  ghc-network
+                  ghc-serialise
+                  ghc-transformers
+                  ghc-unix-time
+                  ghc-zlib))
+    (native-inputs (list ghc-quickcheck
+                         ghc-asn1-types
+                         ghc-async
+                         ghc-crypton
+                         ghc-crypton-x509
+                         ghc-crypton-x509-validation
+                         ghc-hourglass
+                         ghc-hspec
+                         ghc-serialise
+                         hspec-discover))
+    (home-page "http://github.com/haskell-tls/hs-tls")
     (synopsis "TLS/SSL protocol native implementation (Server and Client)")
     (description
      "Native Haskell TLS and SSL protocol implementation for server and client.
@@ -859,43 +950,6 @@ type system, high level constructions and common Haskell features.  Currently
 implement the SSL3.0, TLS1.0, TLS1.1 and TLS1.2 protocol, and support RSA and
 Ephemeral (Elliptic curve and regular) Diffie Hellman key exchanges, and many
 extensions.")
-    (license license:bsd-3)))
-
-(define-public ghc-tls-1.9
-  (package
-    (name "ghc-tls")
-    (version "1.9.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "tls" version))
-       (sha256
-        (base32 "0gj3af9sqd0bw7dpcqfyvbslpxsk2ij00a77kl710fwhw35vj1an"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "tls")))
-    (inputs (list ghc-cereal
-                  ghc-data-default-class
-                  ghc-memory
-                  ghc-crypton
-                  ghc-asn1-types
-                  ghc-asn1-encoding
-                  ghc-crypton-x509
-                  ghc-crypton-x509-store
-                  ghc-crypton-x509-validation
-                  ghc-async
-                  ghc-unix-time
-                  ghc-network))
-    (native-inputs (list ghc-tasty ghc-tasty-quickcheck ghc-quickcheck))
-    (home-page "https://github.com/haskell-tls/hs-tls")
-    (synopsis "TLS/SSL protocol native implementation (server and client)")
-    (description
-     "This package provides a native Haskell TLS and SSL protocol
-implementation for server and client.  It provides a high-level implementation
-of a sensitive security protocol, eliminating a common set of security issues
-through the use of the advanced type system, high level constructions and
-common Haskell features.  It currently implements the SSL3.0, TLS1.0, TLS1.1
-and TLS1.2 protocol, and supports RSA and Ephemeral (Elliptic curve and
-regular) Diffie Hellman key exchanges, and many extensions.")
     (license license:bsd-3)))
 
 (define-public ghc-hsopenssl
@@ -960,17 +1014,14 @@ the tls package, and borrows some ideas from x509-system.")
        (method url-fetch)
        (uri (hackage-uri "openssl-streams" version))
        (sha256
-        (base32
-         "10pnnpzgb5xr811kc9qdk7h2cgn6hk2yiyhnzz8f8p0fjzc0pwjm"))))
+        (base32 "10pnnpzgb5xr811kc9qdk7h2cgn6hk2yiyhnzz8f8p0fjzc0pwjm"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "openssl-streams")))
-    (inputs
-     (list ghc-hsopenssl ghc-io-streams ghc-network))
-    (native-inputs
-     (list ghc-hunit ghc-test-framework ghc-test-framework-hunit))
+    (inputs (list ghc-hsopenssl ghc-io-streams ghc-network))
+    (native-inputs (list ghc-hunit ghc-test-framework ghc-test-framework-hunit))
     (arguments
-     `(#:cabal-revision ("1"
-                         "0vfawnfcjrw29qg1n7k6z6bk4bmnk869gjlr9mxw4mzxgl80b2vp")))
+     `(#:cabal-revision ("3"
+                         "1vizl9yajkbd59rrnfb38xwq7hfj36avbv6vwqnkhbvz3qaj3dwg")))
     (home-page "https://hackage.haskell.org/package/openssl-streams")
     (synopsis "OpenSSL network support for io-streams")
     (description "This library contains io-streams routines for secure
