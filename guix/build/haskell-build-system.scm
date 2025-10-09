@@ -84,7 +84,6 @@ and parameters ~s~%"
          (lib (assoc-ref outputs "lib"))
          (name-version (strip-store-file-name out))
          (extra-dirs (filter-map (cut assoc-ref inputs <>) extra-directories))
-         (ghc-path (getenv "GHC_PACKAGE_PATH"))
          (params `(,(string-append "--prefix=" out)
                    ,(string-append "--libdir=" (or lib out) "/lib")
                    ,(string-append "--docdir=" (or doc out)
@@ -120,9 +119,7 @@ and parameters ~s~%"
     ;; <https://www.haskell.org/cabal/users-guide/developing-packages.html>.
     (when (file-exists? "configure")
       (setenv "CONFIG_SHELL" "sh"))
-    (run-setuphs "configure" params)
-
-    (setenv "GHC_PACKAGE_PATH" ghc-path)))
+    (run-setuphs "configure" params)))
 
 (define* (build #:key parallel-build? #:allow-other-keys)
   "Build a given Haskell package."
