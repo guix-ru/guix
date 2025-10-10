@@ -1,0 +1,63 @@
+https://github.com/NixOS/nixpkgs/tree/d916df777523d75f7c5acca79946652f032f633e/pkgs/os-specific/linux/yt6801
+
+diff --git a/src/fuxi-gmac-net.c b/src/fuxi-gmac-net.c
+index d5baa9c..1667cc9 100755
+--- a/src/fuxi-gmac-net.c
++++ b/src/fuxi-gmac-net.c
+@@ -870,9 +870,9 @@ static void fxgmac_stop_timers(struct fxgmac_pdata *pdata)
+             if (!channel->tx_ring)
+                 break;
+ 
+-            del_timer_sync(&channel->tx_timer);
++            timer_delete_sync(&channel->tx_timer);
+ #if FXGMAC_TX_HANG_TIMER_ENABLED
+-            del_timer_sync(&channel->tx_hang_timer);
++            timer_delete_sync(&channel->tx_hang_timer);
+             channel->tx_hang_timer_active = 0;
+ #endif
+         }
+diff --git a/src/fuxi-gmac-phy.c b/src/fuxi-gmac-phy.c
+index b2e9455..8123d41 100755
+--- a/src/fuxi-gmac-phy.c
++++ b/src/fuxi-gmac-phy.c
+@@ -368,6 +368,6 @@ int fxgmac_phy_timer_init(struct fxgmac_pdata *pdata)
+ 
+ void fxgmac_phy_timer_destroy(struct fxgmac_pdata *pdata)
+ {
+-    del_timer_sync(&pdata->expansion.phy_poll_tm);
++    timer_delete_sync(&pdata->expansion.phy_poll_tm);
+     DPRINTK("fxgmac_phy_timer removed\n");
+ }
+--- a/src/fuxi-gmac-phy.c	2025-08-03 00:00:00.000000000 +0000
++++ b/src/fuxi-gmac-phy.c	2025-08-03 00:00:00.000000000 +0000
+@@ -322,8 +322,10 @@
+ static void fxgmac_phy_link_poll(unsigned long data)
+ #endif
+ {
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,16,0))
++    struct fxgmac_pdata *pdata = container_of(t, struct fxgmac_pdata, expansion.phy_poll_tm);
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
+     struct fxgmac_pdata *pdata = from_timer(pdata, t, expansion.phy_poll_tm);
+ #else
+     struct fxgmac_pdata *pdata = (struct fxgmac_pdata*)data;
+ #endif
+@@ -350,13 +352,17 @@
+
+ int fxgmac_phy_timer_init(struct fxgmac_pdata *pdata)
+ {
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,16,0))
++    timer_setup(&pdata->expansion.phy_poll_tm, fxgmac_phy_link_poll, 0);
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
+     init_timer_key(&pdata->expansion.phy_poll_tm, NULL, 0, "fuxi_phy_link_update_timer", NULL);
+ #else
+     init_timer_key(&pdata->expansion.phy_poll_tm, 0, "fuxi_phy_link_update_timer", NULL);
+ #endif
+     pdata->expansion.phy_poll_tm.expires = jiffies + HZ / 2;
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,16,0))
+     pdata->expansion.phy_poll_tm.function = (void *)(fxgmac_phy_link_poll);
++#endif
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0))
+     pdata->expansion.phy_poll_tm.data = (unsigned long)pdata;
+ #endif

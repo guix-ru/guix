@@ -12537,3 +12537,28 @@ DualSense controller.  It has to be already connected via USB or connected
 via Bluetooth.")
     (home-page "https://github.com/nowrep/dualsensectl")
     (license license:gpl2)))
+
+(define-public yt6801-linux-module
+  (let ((upload-date "20250430"))
+    (package
+      (name "yt6801-linux-module")
+      (version "1.0.30")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append
+               "https://www.motor-comm.com/Public/Uploads/uploadfile/files/"
+               upload-date "/yt6801-linux-driver-" version ".zip"))
+         (sha256
+          (base32 "1i6n3f8znrs60n8q0bniq68axlynyhmzsdx5vywhz8axjcx1gmrx"))
+         (patches (search-patches "yt6801-linux-module-kernel_6.16_fix.patch"))))
+      (build-system linux-module-build-system)
+      (arguments
+       (list
+        #:tests? #f)) ;no tests provided
+      (home-page "https://www.motor-comm.com/product/ethernet-control-chip")
+      (synopsis "Motorcomm YT6801 Ethernet controller driver")
+      (description
+       "This package provides a Linux kernel driver for the Motorcomm
+YT6801 Ethernet controller.")
+      (license license:gpl2+))))
