@@ -12599,7 +12599,7 @@ desktop environment.")
            libsoup
            telepathy-glib
            telepathy-logger
-           tracker))
+           tinysparql))
     (propagated-inputs
      (list telepathy-idle
            telepathy-mission-control))
