@@ -10392,10 +10392,10 @@ playing media, scanning, and much more.")
            gnome-system-monitor
            gnome-text-editor
            gnome-weather
+           localsearch
            nautilus
            simple-scan
            totem
-           tracker-miners
            xdg-desktop-portal-gnome
            yelp))))
 
