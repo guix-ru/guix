@@ -12669,7 +12669,7 @@ integrate seamlessly with the GNOME desktop.")
            libxml2
            qemu-minimal                 ;for qemu-img
            sparql-query
-           tracker
+           tinysparql
            webkitgtk-for-gtk3))
     (propagated-inputs
      ;; Propagating spice-gtk is necessary so that the gnome-desktop-service
