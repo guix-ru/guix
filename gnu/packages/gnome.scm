@@ -1240,22 +1240,22 @@ in the GNOME desktop.")
            (lambda _
              (invoke "autoreconf" "-vif"))))))
     (native-inputs
-     `(("autoconf" ,autoconf)
-       ("automake" ,automake)
-       ("gettext" ,gettext-minimal)
-       ("glib:bin" ,glib "bin")
-       ("gobject-introspection" ,gobject-introspection)
-       ("gtk+:bin" ,gtk+ "bin")
-       ("libtool" ,libtool)
-       ("pkg-config" ,pkg-config)))
+     (list autoconf
+           automake
+           gettext-minimal
+           `(,glib "bin")
+           gobject-introspection
+           `(,gtk+ "bin")
+           libtool
+           pkg-config))
     (inputs
-     `(("gnome-online-accounts" ,gnome-online-accounts)
-       ("grilo" ,grilo)
-       ("libgdata" ,libgdata)
-       ("libgfbgraph" ,gfbgraph)
-       ("libzapojit" ,libzapojit)
-       ("rest" ,rest)
-       ("tracker" ,tracker)))
+     (list gnome-online-accounts
+           grilo
+           libgdata
+           gfbgraph
+           libzapojit
+           rest
+           tinysparql))
     (synopsis "Web Crawlers for GNOME")
     (description "GNOME Online Miners provides a set of crawlers that
 go through your online content and index them locally in Tracker.
