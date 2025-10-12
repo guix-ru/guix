@@ -912,10 +912,10 @@ tomorrow, the rest of the week and for special occasions.")
            libportal
            libpng
            (librsvg-for-system)
+           localsearch
            python-pygobject
            rest
-           tracker
-           tracker-miners))
+           tinysparql))
     (synopsis "Access, organize and share your photos on GNOME desktop")
     (description "GNOME Photos is a simple and elegant replacement for using a
 file manager to deal with photos.  Enhance, crop and edit in a snap.  Seamless
