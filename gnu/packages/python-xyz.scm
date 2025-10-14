@@ -29192,21 +29192,17 @@ implementation of the D-Bus protocol.")
 (define-public python-dbusmock
   (package
     (name "python-dbusmock")
-    (version "0.30.0")
+    (version "0.37.1")
     (source
      (origin
        (method url-fetch)
-       (uri (pypi-uri "python-dbusmock" version))
+       (uri (pypi-uri "python_dbusmock" version))
        (sha256
         (base32
-         "1hanz6x76jq66ypdirga5h15zjs67kwysl6rmsf0i22dbdqrxdfv"))))
-    (build-system python-build-system)
+         "1565bzcyw5s1zad7pmw2k1hlhk4ii1cjj2rzpzqc3fyq2zffwnm6"))))
+    (build-system pyproject-build-system)
     (arguments
-     (list #:modules `((guix build python-build-system)
-                       (guix build utils)
-                       (ice-9 match))
-
-           #:phases
+     (list #:phases
            #~(modify-phases %standard-phases
                (add-after 'unpack 'patch-paths
                  (lambda* (#:key inputs #:allow-other-keys)
@@ -29217,29 +29213,16 @@ implementation of the D-Bus protocol.")
                      (("/bin/bash")
                       (which "bash")))
                    (substitute* "dbusmock/testcase.py"
-                     (("'dbus-daemon'")
+                     (("\"dbus-daemon\"")
                       (object->string
-                       (search-input-file inputs "/bin/dbus-daemon"))))))
-               (replace 'check
-                 (lambda* (#:key tests? #:allow-other-keys)
-                   (when tests?
-                     (match (primitive-fork)
-                       (0 ;child process
-                        (execlp "pytest" "pytest" "-vv"))
-                       (pytest-pid
-                        (let loop ()
-                          ;; Reap child processes; otherwise, python-dbusmock
-                          ;; would waste time polling for the dbus processes
-                          ;; it spawns to be reaped, in vain.
-                          (match (waitpid WAIT_ANY)
-                            ((pid . status)
-                             (if (= pid pytest-pid)
-                                 (unless (zero? status)
-                                   (error "`pytest' exited with status"
-                                          status))
-                                 (loop)))))))))))))
+                       (search-input-file inputs "/bin/dbus-daemon")))))))))
     (native-inputs
-     (list dbus python-pytest upower which))
+     (list
+      upower
+      which
+      python-setuptools
+      python-setuptools-scm
+      python-pytest))
     (inputs
      (list dbus))
     (propagated-inputs
@@ -29260,7 +29243,9 @@ services to what you expect in your tests.")
     (arguments
      (substitute-keyword-arguments (package-arguments python-dbusmock)
        ((#:tests? _ #t) #f)))
-    (native-inputs (list which))
+    (native-inputs (list python-setuptools
+                         python-setuptools-scm
+                         which))
     (properties '((hidden? . #t)))))
 
 (define-public python-jsonplus
