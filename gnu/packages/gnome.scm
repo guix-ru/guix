@@ -7068,6 +7068,125 @@ side panel;
     ;; ".gresource.eog_postasa_plugin" ELF section.
     (license license:gpl2+)))
 
+(define-public glycin
+  (package
+    (name "glycin")
+    (version "2.0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitlab.gnome.org/GNOME/glycin.git")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "022j3y1sgyl9j0wp85kvfpzn1013svv7n21m8jcsp0029sdxbj27"))
+       (patches (search-patches "glycin-sandbox-Adapt-bwrap-invocation.patch"))))
+    (build-system meson-build-system)
+    (arguments
+     (list
+      #:imported-modules `(,@%meson-build-system-modules
+                           ,@%cargo-build-system-modules)
+      #:modules `(((guix build cargo-build-system) #:prefix cargo:)
+                  (guix build meson-build-system)
+                  (guix build utils))
+      ;; Tests fail at creating the bwrap sandbox.
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'unpack-test-images
+            (lambda _
+              (copy-recursively
+               #$(this-package-native-input "glycin-test-images")
+               "tests/test-images")))
+          (add-after 'unpack 'prepare-for-build
+            (lambda _
+              ;; Avoid checking the lock checksums.
+              (delete-file "Cargo.lock")
+              (setenv "RUST_LOG" "debug")
+              ;; libglycin-gtk4-2.so does not have libglycin-2.so.0 in its
+              ;; runpath.
+              (setenv
+               "RUSTFLAGS"
+               (string-append "-C link-arg=-Wl,-rpath," #$output "/lib"))))
+          (add-after 'unpack 'set-bwrap-path
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "glycin/src/sandbox.rs"
+                (("@bwrap@")
+                 (search-input-file inputs "bin/bwrap"))
+                (("/usr/bin/true")
+                 (search-input-file inputs "bin/true")))))
+          ;; Ensure that bubblewrap is working in the build environment.
+          (add-after 'set-bwrap-path 'preliminary-bwrap-test
+            (lambda* (#:key inputs #:allow-other-keys)
+              (invoke
+               (search-input-file inputs "bin/bwrap")
+               "--unshare-all"
+               "--die-with-parent"
+               "--chdir" "/"
+               "--ro-bind-try" "/usr" "/usr"
+               "--dev" "/dev"
+               "--ro-bind-try" "/etc/ld.so.cache" "/etc/ld.so.cache"
+               "--ro-bind-try" "/nix/store" "/nix/store"
+               "--ro-bind-try" "/gnu/store" "/gnu/store"
+               "--ro-bind-try" "/gnu/store" "/gnu/store"
+               "--tmpfs" "/tmp-home"
+               "--tmpfs" "/tmp-run"
+               "--clearenv"
+               "--setenv" "HOME" "/tmp-home"
+               "--setenv" "XDG_RUNTIME_DIR" "/tmp/run"
+               "--setenv" "RUST_LOG" "warn"
+               (search-input-file inputs "bin/true"))))
+          ;; The meson 'configure phase changes to a different directory and
+          ;; we need it created before unpacking the crates.
+          (add-after 'configure 'prepare-cargo-build-system
+            (lambda args
+              (for-each
+               (lambda (phase)
+                 (format #t "Running cargo phase: ~a~%" phase)
+                 (apply (assoc-ref cargo:%standard-phases phase)
+                        #:vendor-dir "vendor"
+                        #:cargo-target #$(cargo-triplet)
+                        args))
+               '(unpack-rust-crates
+                 configure
+                 check-for-pregenerated-files
+                 patch-cargo-checksums)))))))
+    (native-inputs (list gettext-minimal
+                         gobject-introspection
+                         pkg-config
+                         python-minimal
+                         rust
+                         `(,rust "cargo")
+                         vala           ;for vapigen
+                         ;; Dependencies for tests.
+                         bubblewrap
+                         gtk
+                         lcms-next
+                         (origin
+                           (method git-fetch)
+                           (uri (git-reference
+                                  (url "https://gitlab.gnome.org/sophie-h/test-images.git")
+                                  (commit "b148bcf70847d6f126a8e83e27e1c59d2e474adf")))
+                           (file-name "glycin-test-images")
+                           (sha256
+                            (base32
+                             "16s3lss4cbny5d0ixhc0vaxxcvq2n7rcnbklrxdm84p2m21192vm")))))
+    (inputs (cons* bubblewrap
+                   fontconfig
+                   glib
+                   libseccomp
+                   libheif
+                   libjxl
+                   librsvg
+                   (cargo-inputs 'glycin)))
+    (home-page "https://gitlab.gnome.org/GNOME/glycin")
+    (synopsis "Sandboxed image decoding")
+    (description "Glycin is a sandbox image decoder for image viewers and
+thumbnails to display untrusted content safely.")
+    (license (list license:mpl2.0 license:lgpl2.1+))))
+
 (define-public libgudev
   (package
     (name "libgudev")
