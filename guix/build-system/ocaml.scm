@@ -2,6 +2,7 @@
 ;;; Copyright © 2016, 2017, 2018 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2017 Ben Woodcroft <donttrustben@gmail.com>
 ;;; Copyright © 2021-2022 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2025 Jason Conroy <jconroy@tscripta.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -33,6 +34,8 @@
             strip-ocaml4.09-variant
             package-with-ocaml5.0
             strip-ocaml5.0-variant
+            package-with-ocaml5.3
+            strip-ocaml5.3-variant
             default-findlib
             default-ocaml
             lower
@@ -105,6 +108,15 @@
 
 (define (default-ocaml5.0-dune)
   (@* (gnu packages ocaml) ocaml5.0-dune))
+
+(define (default-ocaml5.3)
+  (@* (gnu packages ocaml) ocaml-5.3))
+
+(define (default-ocaml5.3-findlib)
+  (@* (gnu packages ocaml) ocaml5.3-findlib))
+
+(define (default-ocaml5.3-dune)
+  (@* (gnu packages ocaml) ocaml5.3-dune))
 
 (define* (package-with-explicit-ocaml ocaml findlib dune old-prefix new-prefix
                                        #:key variant-property)
@@ -206,6 +218,19 @@ pre-defined variants."
   (package
     (inherit p)
     (properties (alist-delete 'ocaml5.0-variant (package-properties p)))))
+
+(define package-with-ocaml5.3
+  (package-with-explicit-ocaml (delay (default-ocaml5.3))
+                               (delay (default-ocaml5.3-findlib))
+                               (delay (default-ocaml5.3-dune))
+                               "ocaml-" "ocaml5.3-"
+                               #:variant-property 'ocaml5.3-variant))
+
+(define (strip-ocaml5.3-variant p)
+  "Remove the 'ocaml5.3-variant' property from P."
+  (package
+    (inherit p)
+    (properties (alist-delete 'ocaml5.3-variant (package-properties p)))))
 
 (define* (lower name
                 #:key source inputs native-inputs outputs system target
