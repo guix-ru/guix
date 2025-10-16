@@ -32,6 +32,7 @@
 ;;; Copyright © 2023 Arnaud DABY-SEESARAM <ds-ac@nanein.fr>
 ;;; Copyright © 2024 Sören Tempel <soeren@soeren-tempel.net>
 ;;; Copyright © 2025 Jussi Timperi <jussi.timperi@iki.fi>
+;;; Copyright © 2025 Jason Conroy <jconroy@tscripta.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1685,6 +1686,13 @@ compilers that can directly deal with packages.")
     (name "ocaml5.0-findlib")
     (native-inputs
      (list m4 ocaml-5.0))))
+
+(define-public ocaml5.3-findlib
+  (package
+    (inherit ocaml-findlib)
+    (name "ocaml5.3-findlib")
+    (native-inputs
+     (list m4 ocaml-5.3))))
 
 (define-public ocaml-ounit2
   (package
