@@ -9952,7 +9952,7 @@ are primarily intended as internal utilities to support the @code{optics} and
     (properties '((upstream-name . "project-template")))
     (inputs (list ghc-base64-bytestring ghc-conduit ghc-conduit-extra
                   ghc-resourcet))
-    (native-inputs (list ghc-hspec ghc-quickcheck))
+    (native-inputs (list ghc-hspec hspec-discover ghc-quickcheck))
     (home-page "https://github.com/fpco/haskell-ide")
     (synopsis "Specify Haskell project templates and generate files")
     (description
