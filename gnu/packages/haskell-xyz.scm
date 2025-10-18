@@ -8806,7 +8806,7 @@ plus the length of the UTF-8 encoded payload.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "text-zipper")))
     (inputs (list ghc-vector))
-    (native-inputs (list ghc-hspec ghc-quickcheck))
+    (native-inputs (list ghc-hspec hspec-discover ghc-quickcheck))
     (home-page "https://github.com/jtdaugherty/text-zipper/")
     (synopsis "Text editor zipper library")
     (description
