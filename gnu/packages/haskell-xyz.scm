@@ -7198,7 +7198,7 @@ Same combinator can be used for attributes and elements
     (build-system haskell-build-system)
     (properties '((upstream-name . "lzma")))
     (native-inputs (list ghc-quickcheck ghc-tasty ghc-tasty-hunit
-                         ghc-tasty-quickcheck))
+                         ghc-tasty-quickcheck pkg-config))
     (arguments
      `(#:cabal-revision ("1"
                          "1lby8y4pf5kagdnywyjadv3hv9mfv3ygfdjrlh9gakyqgj8wjjhb")))
