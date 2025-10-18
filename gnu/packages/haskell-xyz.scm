@@ -10882,7 +10882,7 @@ expose it from another module in the hierarchy.
          (add-before 'configure 'update-constraints
            (lambda _
              (substitute* "roman-numerals.cabal"
-               (("\\b(bytestring)\\s+[^,]+" all dep)
+               (("\\b(bytestring|text)\\s+[^,\n]+" all dep)
                 dep)))))))
     (home-page "https://github.com/roelvandijk/roman-numerals")
     (synopsis "Parsing and pretty printing of Roman numerals")
