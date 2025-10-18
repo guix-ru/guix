@@ -5634,17 +5634,19 @@ functions for Haskell.")
 (define-public ghc-hookup
   (package
     (name "ghc-hookup")
-    (version "0.7")
+    (version "0.8")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "hookup" version))
        (sha256
-        (base32 "02prkwj4rj8g330z17bpjh7hpwfdvasaxsk74mcvbi03gjpydrib"))))
+        (base32 "1p8mkb71bbs3lv7n1krcngaskn2s2icm3sl30qs8dsla7ww8afqm"))
+       (snippet
+         #~(substitute* "hookup.cabal"
+             (("(base|network)  *[0-9<>=^&|. ]*" _ package)
+              package)))
+       (modules '((guix build utils)))))
     (build-system haskell-build-system)
-    (arguments
-     `(#:cabal-revision ("1"
-                         "1x4hxcb81rczpywcda3s9jbh2gs1sfwvd7wzv3cxxkbd4smlrh1r")))
     (inputs
      (list ghc-async
            ghc-network
