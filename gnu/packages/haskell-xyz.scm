@@ -12071,8 +12071,23 @@ in the @code{IO} monad, like @code{IORef}s or parts of the OpenGL state.")
                          ghc-tasty-expected-failure
                          ghc-doctest))
     (arguments
-     `(#:cabal-revision ("1"
-                         "1996zyq4n7c5zh36h3nhzx5xyd7z6fa3mqsldrgii56g7ixq1rkz")))
+     (list
+      #:cabal-revision
+      '("1" "1996zyq4n7c5zh36h3nhzx5xyd7z6fa3mqsldrgii56g7ixq1rkz")
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (if tests?
+                (let* ((tmpdir (or (getenv "TMP")
+                                   "/tmp"))
+                       (dependency-package-db
+                        (string-append tmpdir "/package.conf.d")))
+                  (invoke "runhaskell" "Setup.hs" "test" "statistics-tests")
+                  (setenv "GHC_PACKAGE_PATH" dependency-package-db)
+                  (invoke "./dist/build/statistics-doctests/statistics-doctests")
+                  (unsetenv "GHC_PACKAGE_PATH"))
+                (format #t "Testsuite not run.%~")))))))
     (home-page "https://github.com/haskell/statistics")
     (synopsis "Haskell library of statistical types, data, and functions")
     (description
