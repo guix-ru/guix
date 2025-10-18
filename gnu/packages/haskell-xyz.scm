@@ -805,7 +805,7 @@ pragmas in your code.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "base-compat-batteries")))
     (inputs (list ghc-base-compat))
-    (native-inputs (list ghc-hspec ghc-quickcheck))
+    (native-inputs (list ghc-hspec hspec-discover ghc-quickcheck))
     (home-page "http://hackage.haskell.org/package/base-compat-batteries")
     (synopsis "Extra batteries included base-compat")
     (description
