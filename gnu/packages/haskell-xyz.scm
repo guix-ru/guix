@@ -6782,8 +6782,24 @@ is the shared internal logic of the @code{generic-lens} and
                          ghc-doctest
                          ghc-lens))
     (arguments
-     `(#:cabal-revision ("1"
-                         "0ib9848rh56v0dc1giiax2zi2w7is6ahb2cj6ry3p0hwapfd3p49")))
+     (list
+      #:cabal-revision '("1"
+                         "0ib9848rh56v0dc1giiax2zi2w7is6ahb2cj6ry3p0hwapfd3p49")
+      #:phases
+      #~ (modify-phases %standard-phases
+           ;; The doctests require GHC_PACKAGE_PATH but Setup.hs fails
+           ;; if it is defined, so we run them separately
+           (replace 'check
+             (lambda* (#:key tests? #:allow-other-keys)
+               (if tests?
+                 (let* ((tmpdir (or (getenv "TMP") "/tmp"))
+                        (package-db (string-append tmpdir "/package.conf.d")))
+                   (invoke "runhaskell" "Setup.hs" "test" "inspection-tests"
+                           "generic-lens-syb-tree" "generic-lens-bifunctor")
+                   (setenv "GHC_PACKAGE_PATH" package-db)
+                   (invoke "./dist/build/doctests/doctests")
+                   (unsetenv "GHC_PACKAGE_PATH"))
+                 (format #t "Testsuite not run.%~")))))))
     (home-page "https://github.com/kcsongor/generic-lens")
     (synopsis "Generically derive traversals, lenses and prisms")
     (description
