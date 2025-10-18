@@ -8468,7 +8468,7 @@ version 1.3).")
         (base32 "07nk0rgm6jcxz6yshwhv5lj5frs6371w3hdjxwa4biws2kmbs6hj"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "OpenGLRaw")))
-    (inputs (list ghc-fixed ghc-half))
+    (inputs (list ghc-fixed ghc-half glu))
     (arguments
      `(#:cabal-revision ("3"
                          "1wbqfgcswng27v76r7rgy1zlb4wpap2ibjf3hbcrdz39sbxlbdq1")))
