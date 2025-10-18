@@ -9645,16 +9645,19 @@ which supports real-time MIDI input and output.")
 (define-public ghc-pqueue
   (package
     (name "ghc-pqueue")
-    (version "1.4.3.0")
+    (version "1.5.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "pqueue" version))
        (sha256
         (base32
-         "0kl608jw0xz0n4ysw7p3cvlm1s71xrysw8862cddrzbr38bv8jvq"))))
+         "00hzrhz3n55ahyv2h183l72jsl3q01p4ns0063p0vjaa5j6qpy0v"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "pqueue")))
+    (arguments
+     (list #:cabal-revision
+           '("3" "0g7zaidq3gf08kzwp4xrbi3f76qdv4ckx6nblzi5j55awcsp08xy")))
     (inputs (list ghc-indexed-traversable))
     (native-inputs
      (list ghc-tasty ghc-tasty-quickcheck))
