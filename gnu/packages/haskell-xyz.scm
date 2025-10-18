@@ -6213,7 +6213,7 @@ in migrated modules.")
     (properties '((upstream-name . "interpolate")))
     (inputs (list ghc-haskell-src-meta))
     (native-inputs (list ghc-quickcheck ghc-base-compat ghc-hspec
-                         ghc-quickcheck-instances))
+                         hspec-discover ghc-quickcheck-instances))
     (home-page "https://github.com/sol/interpolate#readme")
     (synopsis "String interpolation library")
     (description "This package provides a string interpolation library for
