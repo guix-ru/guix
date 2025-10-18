@@ -833,20 +833,31 @@ Wayland, and Linux console environments alike.")
 (define-public nixfmt
   (package
     (name "nixfmt")
-    (version "0.5.0")
+    (version "1.1.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (hackage-uri "nixfmt" version))
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/NixOS/nixfmt")
+          (commit (string-append "v" version))))
        (sha256
-        (base32 "0rxi8zrd2xr72w673nvgnhb0g3r7rssc1ahlhz8rmdpc6c1a82wl"))))
+        (base32 "19sydkdw1579qmvzx0zq06s23bm6m6l9wp1kvsfhxawk8pkz2pc2"))
+       (snippet
+        #~(substitute* "nixfmt.cabal"
+            (("(megaparsec|filepath)  *[0-9<>=^&|. ]*" _ package)
+             package)))
+       (modules '((guix build utils)))))
     (build-system haskell-build-system)
-    (properties '((upstream-name . "nixfmt")))
-    (inputs
-     (list ghc-megaparsec ghc-parser-combinators ghc-cmdargs
-           ghc-safe-exceptions))
-    (home-page "https://github.com/serokell/nixfmt")
-    (synopsis "Opinionated formatter for Nix")
+    (inputs (list ghc-megaparsec
+                  ghc-parser-combinators
+                  ghc-scientific
+                  ghc-pretty-simple
+                  ghc-cmdargs
+                  ghc-file-embed
+                  ghc-safe-exceptions))
+    (home-page "https://github.com/NixOS/nixfmt")
+    (synopsis "Official formatter for Nix code")
     (description
      "Nixfmt is a formatter for Nix that ensures consistent and clear
 formatting by forgetting all existing formatting during parsing.")
