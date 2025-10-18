@@ -4113,7 +4113,8 @@ encourages inductive, recursive definitions of graph algorithms.")
          (add-before 'configure 'update-constraints
            (lambda _
              (substitute* "fgl-arbitrary.cabal"
-               (("hspec >= 2\\.1 && < 2\\.8") "hspec")))))))
+               (("hspec >= 2\\.1 && < 2\\.8") "hspec")
+               (("QuickCheck >= 2.3 && < 2.15") "QuickCheck")))))))
     (home-page "https://hackage.haskell.org/package/fgl-arbitrary")
     (synopsis "QuickCheck support for fgl")
     (description
