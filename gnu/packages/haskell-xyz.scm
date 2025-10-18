@@ -9489,16 +9489,37 @@ libraries.")
 (define-public ghc-pgp-wordlist
   (package
     (name "ghc-pgp-wordlist")
-    (version "0.1.0.3")
+    ;; The 0.1.0.3 release no longer builds and the maintainer
+    ;; has not made a new release with the fix
+    (version (git-version "0.1.0.3" "1"
+                          "1f0cfd90d62179952cbfd59c3405283a1d364272"))
     (source
      (origin
-       (method url-fetch)
-       (uri (hackage-uri "pgp-wordlist" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/quchen/pgp-wordlist")
+              (commit "1f0cfd90d62179952cbfd59c3405283a1d364272")))
        (sha256
         (base32
-         "15g6qh0fb7kjj3l0w8cama7cxgnhnhybw760md9yy7cqfq15cfzg"))))
+         "1n6wf85302hv19gy4h0gpzn5cscnb10mw9fyn85yiaxasn1508aq"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "pgp-wordlist")))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (if tests?
+                (let* ((tmpdir (or (getenv "TMP")
+                                   "/tmp"))
+                       (dependency-package-db
+                        (string-append tmpdir "/package.conf.d")))
+                  (invoke "runhaskell" "Setup.hs" "test" "tasty")
+                  (setenv "GHC_PACKAGE_PATH" dependency-package-db)
+                  (invoke "./dist/build/doctest/doctest")
+                  (unsetenv "GHC_PACKAGE_PATH"))
+                (format #t "Testsuite not run.%~")))))))
     (inputs
      (list ghc-vector))
     (native-inputs
