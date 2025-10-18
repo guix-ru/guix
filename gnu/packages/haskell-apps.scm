@@ -64,16 +64,17 @@
 (define-public apply-refact
   (package
     (name "apply-refact")
-    (version "0.10.0.0")
+    (version "0.15.0.0")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "apply-refact" version))
               (sha256
                (base32
-                "129bf8n66kpwh5420rxprngg43bqr2agyd8q8d7l49k2rxsjl1fb"))))
+                "0iny8ynxx46afbzjp14rvpd4sqk8c1p5883mbln53gmlxcm8zq53"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "apply-refact")))
     (inputs (list ghc-refact
+                  ghc-data-default
                   ghc-exactprint
                   ghc-paths
                   ghc-extra
