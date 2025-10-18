@@ -5802,7 +5802,12 @@ MODS-format XML intermediate.")
               (uri (hackage-uri "hs-conllu" version))
               (sha256
                (base32
-                "1azh4g5kdng8v729ldgblkmrdqrc501rgm9wwqx6gkqwwzn8w3r4"))))
+                "1azh4g5kdng8v729ldgblkmrdqrc501rgm9wwqx6gkqwwzn8w3r4"))
+              (snippet
+               #~(substitute* "hs-conllu.cabal"
+                  (("(containers|filepath)  *[0-9<>=^&|.* ]*" _ package)
+                   package)))
+              (modules '((guix build utils)))))
     (build-system haskell-build-system)
     (inputs (list ghc-megaparsec ghc-void))
     (home-page "https://github.com/arademaker/hs-conllu")
