@@ -14457,14 +14457,15 @@ vector.")
 (define-public ghc-vector-hashtables
   (package
     (name "ghc-vector-hashtables")
-    (version "0.1.1.2")
+    (version "0.1.2.1")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "vector-hashtables" version))
               (sha256
                (base32
-                "0hrjvy9qg1m5g3w91zxy4syqmp8jk7ajjbxbzkhy282dwfigkyd2"))))
+                "1cdfvrpnia7bgqaw8yg0n23svbsdz72gss0hrkrvc5rwzxwhz49k"))))
     (build-system haskell-build-system)
+    (properties '((upstream-name . "vector-hashtables")))
     (inputs (list ghc-primitive ghc-vector ghc-hashable))
     (native-inputs (list ghc-hspec ghc-quickcheck ghc-quickcheck-instances
                          hspec-discover))
