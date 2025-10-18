@@ -11063,7 +11063,9 @@ built-in profiling support.")
         (base32 "1r5kffjfwpas45g74sip8glrj1m9nygrnxjm7xgw898rq9pnafgn"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "say")))
-    (native-inputs (list ghc-hspec ghc-unliftio))
+    (native-inputs (list ghc-hspec hspec-discover ghc-unliftio))
+    ; XXX: Tests fail on GHC 9.10.2. See https://github.com/fpco/say/issues/5
+    (arguments (list #:tests? #f))
     (home-page "https://github.com/fpco/say#readme")
     (synopsis "Send textual messages to a Handle in a thread-friendly way")
     (description
