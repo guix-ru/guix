@@ -16064,7 +16064,8 @@ to @code{MonadIO}.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "string-conversions")))
     (inputs (list ghc-utf8-string))
-    (native-inputs (list ghc-hspec ghc-quickcheck-instances ghc-quickcheck))
+    (native-inputs (list ghc-hspec hspec-discover
+                         ghc-quickcheck-instances ghc-quickcheck))
     (arguments
      `(#:cabal-revision ("1"
                          "1g3wxx579mhs2icxngi78pvjfybbk606a6vgns88pg6ws5hrvx4s")))
