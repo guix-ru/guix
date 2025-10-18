@@ -6406,13 +6406,13 @@ instances for conversion to and from JSON .ipynb files.")
 (define-public ghc-irc-core
   (package
   (name "ghc-irc-core")
-  (version "2.11")
+  (version "2.13")
   (source
    (origin
      (method url-fetch)
      (uri (hackage-uri "irc-core" version))
      (sha256
-      (base32 "13jkfb30kynqd55c2slxjg98lr076rn1ymsxniwp0bssjzizgnfc"))))
+      (base32 "0z95cl8pg6zhzmz642bzgxc0525645whvxbmz6h1i8g1mll3i6kx"))))
   (build-system haskell-build-system)
   (native-inputs
    (list ghc-hunit))
