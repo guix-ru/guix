@@ -5390,33 +5390,6 @@ It uses efficient parsing and building combinators for binary data stored in Byt
 hexadecimal string representation.")
     (license license:bsd-3)))
 
-(define-public ghc-highlighting-kate
-  (package
-    (name "ghc-highlighting-kate")
-    (version "0.6.4")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "highlighting-kate" version))
-              (sha256
-               (base32
-                "1bqv00gfmrsf0jjr4qf3lhshvfkyzmhbi3pjb6mafbnsyn2k7f6q"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "highlighting-kate")))
-    (inputs
-     (list ghc-diff ghc-regex-pcre-builtin))
-    (native-inputs
-     (list ghc-blaze-html ghc-utf8-string))
-    (home-page "https://github.com/jgm/highlighting-kate")
-    (synopsis "Syntax highlighting library")
-    (description
-     "Highlighting-kate is a syntax highlighting library with support for
-nearly one hundred languages.  The syntax parsers are automatically generated
-from @uref{https://kate-editor.org/, Kate syntax descriptions}, so any syntax
-supported by Kate can be added.  An (optional) command-line program is
-provided, along with a utility for generating new parsers from Kate XML syntax
-descriptions.")
-    (license license:gpl2+)))
-
 (define-public ghc-hindent
   (package
     (name "ghc-hindent")
