@@ -6074,7 +6074,7 @@ lines continued at an indented level below.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "infer-license")))
     (inputs (list ghc-text-metrics))
-    (native-inputs (list ghc-hspec))
+    (native-inputs (list ghc-hspec hspec-discover))
     (home-page "http://hackage.haskell.org/package/infer-license")
     (synopsis "Infer software license from a given license file")
     (description "This library provides tools to infer a software
