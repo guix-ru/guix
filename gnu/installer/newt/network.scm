@@ -117,9 +117,8 @@ network devices were found. Do you want to continue anyway?"))
 FULL-VALUE tentatives, spaced by 1 second."
   (define (url-alive? url)
     (false-if-exception
-     (begin
-       (http-request url)
-       #t)))
+     (= (response-code (http-request url))
+        200)))
 
   (define (ci-available?)
     (dynamic-wind
