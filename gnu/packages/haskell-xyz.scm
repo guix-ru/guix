@@ -664,6 +664,7 @@ periodic, on-demand actions in Haskell.")
         (base32 "0x78fydxg8qsr77mn7sy544xzl35jwc9j44vl3l868l51xkx3jwj"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "aws")))
+    (arguments (list #:tests? #f)) ; tests require AWS credentials and networking
     (inputs (list ghc-aeson
                   ghc-attoparsec
                   ghc-attoparsec-aeson
