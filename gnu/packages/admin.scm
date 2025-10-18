@@ -6821,7 +6821,7 @@ Discover other RouterOS devices or @command{mactelnetd} hosts.
 (define-public bfs
   (package
     (name "bfs")
-    (version "3.0.4")
+    (version "4.1.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -6830,22 +6830,33 @@ Discover other RouterOS devices or @command{mactelnetd} hosts.
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0n2y9m81278j85m8vk242m9nsxdcw62rxsar4hzwszs6p5cjz5ny"))))
+                "1pjxbbqcw0931bg28k20lacifc6p33pf71f919vnl0d4sd5xbrah"))))
     (build-system gnu-build-system)
     (arguments
-     (list #:make-flags #~(list (string-append "CC="
-                                               #$(cc-for-target))
-                                (string-append "PREFIX="
-                                               #$output) "bfs")
-           #:phases #~(modify-phases %standard-phases
-                        (delete 'configure)
-                        (add-before 'check 'disable-exec-no-path-test
-                          (lambda _
-                            ;; This test unsets PATH. It then probably cannot find
-                            ;; echo since it's not inside _PATH_STDPATH (?). We
-                            ;; delete the test to disable it.
-                            (delete-file "tests/posix/exec_nopath.sh"))))))
-    (inputs (list acl attr libcap oniguruma))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda _
+              ;; bfs uses a custom configure script.
+              (invoke "./configure"
+                      "--enable-release"
+                      (string-append "CC=" #$(cc-for-target))
+                      (string-append "--prefix=" #$output))))
+          (add-before 'check 'disable-exec-no-path-test
+            (lambda _
+              ;; This test unsets PATH. It then probably cannot find
+              ;; echo since it's not inside _PATH_STDPATH (?). We
+              ;; delete the test to disable it.
+              (delete-file "tests/posix/exec_nopath.sh")))
+          (add-after 'disable-exec-no-path-test 'set-paths-in-tests
+            (lambda* (#:key inputs tests? #:allow-other-keys)
+              (when tests?
+                (substitute* '("tests/bfs/execdir_path_relative_slash.sh"
+                               "tests/gnu/execdir_self.sh"
+                               "tests/xspawn.c")
+                  (("/bin/sh\\>") (search-input-file inputs "bin/sh")))))))))
+    (inputs (list acl attr libcap liburing oniguruma))
     (synopsis "Breadth-first search for your files")
     (description
      "Bfs is a variant of the UNIX @command{find} command that operates
