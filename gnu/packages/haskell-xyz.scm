@@ -15898,6 +15898,8 @@ Haskell newer than 2.8.")
         (base32 "051w428arxbix06a52dacqjpnkfx42zbazxsd3l9d857dsd0kl3g"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "mysql")))
+    (arguments `(#:tests? #f)) ; TODO: Fails to connect to server.
+    (inputs (list (list mariadb "dev") openssl zlib))
     (native-inputs (list ghc-hspec))
     (home-page "https://github.com/paul-rouse/mysql")
     (synopsis "Low-level MySQL client library")
