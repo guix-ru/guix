@@ -14523,43 +14523,6 @@ given term should not exist.")
 (define-public ghc-vty
   (package
     (name "ghc-vty")
-    (version "5.37")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "vty" version))
-       (sha256
-        (base32 "1w6dc25npvlaflxcyzdssnymgi7x03zkwg7swyjw6cjjfdmkgqb7"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "vty")))
-    (inputs (list ghc-blaze-builder
-                  ghc-microlens
-                  ghc-microlens-mtl
-                  ghc-microlens-th
-                  ghc-hashable
-                  ghc-parallel
-                  ghc-utf8-string
-                  ghc-vector
-                  ghc-ansi-terminal))
-    (native-inputs (list ghc-hunit
-                         ghc-quickcheck
-                         ghc-quickcheck-assertions
-                         ghc-random
-                         ghc-smallcheck
-                         ghc-string-qq
-                         ghc-test-framework
-                         ghc-test-framework-hunit
-                         ghc-test-framework-smallcheck))
-    (home-page "https://github.com/jtdaugherty/vty")
-    (synopsis "Simple terminal UI library")
-    (description
-     "vty is a terminal GUI library in the niche of ncurses, intended to be easy
-to use and to provide good support for common terminal types.")
-    (license license:bsd-3)))
-
-(define-public ghc-vty-6
-  (package
-    (name "ghc-vty")
     (version "6.4")
     (source
      (origin
@@ -14568,6 +14531,9 @@ to use and to provide good support for common terminal types.")
        (sha256
         (base32 "0iha15inmig2j2f4kljwb2jhbqa8vsh2aa8l7y5fsanjiciscrbi"))))
     (build-system haskell-build-system)
+    (arguments
+     `(#:cabal-revision ("2"
+                         "1dcnkfghflgn3qv72pdpa6npfdrrjqhil3wnxd75rbd4mf7812hf")))
     (properties '((upstream-name . "vty")))
     (inputs (list ghc-blaze-builder ghc-microlens ghc-microlens-mtl
                   ghc-utf8-string ghc-vector))
@@ -16521,7 +16487,7 @@ an event handler and a drawing function and the library does the rest.")
         (base32 "1nw2x9zn0jlvykm89v80fh4187bxgn8l4cljgnf4mp4ci7aqjmkr"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "brick-skylighting")))
-    (inputs (list ghc-brick ghc-vty-6 ghc-skylighting-core))
+    (inputs (list ghc-brick ghc-vty ghc-skylighting-core))
     (home-page "https://github.com/jtdaugherty/brick-skylighting/")
     (synopsis "Show syntax-highlighted text in your Brick UI")
     (description

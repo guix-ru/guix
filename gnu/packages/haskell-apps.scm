@@ -787,7 +787,7 @@ Wayland, and Linux console environments alike.")
                   ghc-utf8-string
                   ghc-uuid
                   ghc-vector
-                  ghc-vty-6
+                  ghc-vty
                   ghc-vty-crossplatform
                   ghc-word-wrap
                   ghc-xdg-basedir))
