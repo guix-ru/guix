@@ -11100,8 +11100,12 @@ award winning Linux port of \"Civilization: Call To Power.\"")
         (base32 "1k60zwqr0kgalw3lyqy6vs9bg8bg40cp64snx8n6rh99050y5cr5"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "sdl2")))
-    (inputs (list ghc-statevar ghc-vector ghc-linear))
-    (native-inputs (list ghc-weigh))
+    ; the tests fail due to wrong performance scaling. The issue is reported
+    ; upstream but no solution seems to exist at the moment
+    ; https://github.com/haskell-game/sdl2/issues/298
+    (arguments (list #:tests? #f))
+    (inputs (list ghc-statevar ghc-vector ghc-linear sdl2))
+    (native-inputs (list ghc-weigh pkg-config))
     (home-page "http://hackage.haskell.org/package/sdl2")
     (synopsis "High- and low-level bindings to the SDL library")
     (description
