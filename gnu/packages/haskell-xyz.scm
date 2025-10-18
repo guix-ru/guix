@@ -207,46 +207,6 @@ diagrams framework}.")
 for Haskell.")
     (license license:bsd-2)))
 
-;; Deprecated package.
-(define-public ghc-aeson-compat
-  (package
-    (name "ghc-aeson-compat")
-    (version "0.3.10")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "aeson-compat" version))
-       (sha256
-        (base32
-         "0ia3qfdpbrzhwwg4ywpdwca0z1m85k081pcz6jh1sx8qjsvcr71w"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "aeson-compat")))
-    (inputs (list ghc-base-compat
-                  ghc-aeson
-                  ghc-attoparsec
-                  ghc-attoparsec-iso8601
-                  ghc-hashable
-                  ghc-scientific
-                  ghc-time-locale-compat
-                  ghc-unordered-containers
-                  ghc-vector
-                  ghc-tagged))
-    (native-inputs
-     (list ghc-tasty
-           ghc-tasty-hunit
-           ghc-tasty-quickcheck
-           ghc-quickcheck
-           ghc-quickcheck-instances
-           ghc-base-orphans))
-    (arguments
-     `(#:cabal-revision ("4"
-                         "001w7pck3q5k4cnx53npllil5cblkg1ssqza4s9v347dfih3zmss")))
-    (home-page "https://github.com/phadej/aeson-compat")
-    (synopsis "Compatibility layer for ghc-aeson")
-    (description "This Haskell package provides compatibility layer for
-ghc-aeson.")
-    (license license:bsd-3)))
-
 (define-public ghc-aeson-diff
   (package
     (name "ghc-aeson-diff")
