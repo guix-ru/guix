@@ -3684,27 +3684,6 @@ error function, erf, and related functions.  Instances for Float and
 Double.")
     (license license:bsd-3)))
 
-(define-public ghc-errorcall-eq-instance
-  (package
-    (name "ghc-errorcall-eq-instance")
-    (version "0.3.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "errorcall-eq-instance" version))
-       (sha256
-        (base32 "0hqw82m8bbrxy5vgdwb83bhzdx070ibqrm9rshyja7cb808ahijm"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "errorcall-eq-instance")))
-    (inputs (list ghc-base-orphans))
-    (native-inputs (list ghc-quickcheck ghc-hspec))
-    (home-page "http://hackage.haskell.org/package/errorcall-eq-instance")
-    (synopsis "Orphan Eq instance for ErrorCall")
-    (description
-     "Prior to @code{base-4.7.0.0} there was no @code{Eq} instance for @code{ErrorCall}.
-This package provides an orphan instance.")
-    (license license:expat)))
-
 (define-public ghc-errors
   (package
     (name "ghc-errors")
