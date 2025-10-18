@@ -4608,7 +4608,7 @@ properties for functions operating on them.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "getopt-generics")))
     (inputs (list ghc-base-compat ghc-base-orphans ghc-generics-sop ghc-tagged))
-    (native-inputs (list ghc-quickcheck ghc-hspec ghc-safe ghc-silently))
+    (native-inputs (list ghc-quickcheck ghc-hspec hspec-discover ghc-safe ghc-silently))
     (home-page "https://github.com/soenkehahn/getopt-generics#readme")
     (synopsis "Create command line interfaces with ease")
     (description "This library provides tools to create command line
