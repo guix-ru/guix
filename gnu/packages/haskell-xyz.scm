@@ -8705,13 +8705,15 @@ require aeson
         (base32 "1nzd7al2vpm07xa19w9vy6f696bm4z48h0m4fljsxjg4v0wblbj4"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "text-icu")))
+    (inputs (list icu4c))
     (native-inputs (list ghc-hunit
                          ghc-quickcheck
                          ghc-random
                          ghc-test-framework
                          ghc-test-framework-hunit
                          ghc-test-framework-quickcheck2
-                         ghc-semigroups))
+                         ghc-semigroups
+                         pkg-config))
     (arguments
      `(#:cabal-revision ("1"
                          "1zqbcsnf9943mk8i9lyj1ab2xvg6dw9k6jfjhblxqcliq53c3dpp")))
