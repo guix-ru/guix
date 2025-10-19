@@ -120,14 +120,14 @@ command-line arguments, multiple languages, and so on.")
 (define-public grep
   (package
    (name "grep")
-   (version "3.11")
+   (version "3.12")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnu/grep/grep-"
                                 version ".tar.xz"))
             (sha256
              (base32
-              "1avf4x8skxbqrjp5j2qr9sp5vlf8jkw2i5bdn51fl3cxx3fsxchx"))
+              "1f87i907dzw31xy1xr8xjj6z9979qq3bwmypvkm35rlh1ryb4j96"))
             (patches (search-patches "grep-timing-sensitive-test.patch"))))
    (build-system gnu-build-system)
    (native-inputs (list perl))                   ;some of the tests require it
