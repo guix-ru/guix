@@ -37,7 +37,7 @@
                 #:select (raw-derivation derivation-input derivation->output-path))
   #:use-module (guix utils)
   #:use-module ((guix build utils) #:select (elf-file?))
-  #:use-module ((guix gexp) #:select (lower-object local-file))
+  #:use-module (guix gexp)
   #:use-module (guix monads)
   #:use-module (guix memoization)
   #:use-module (guix i18n)
@@ -203,7 +203,7 @@ for system '~a'")
            (uri (map (cute string-append <>
                            (bootstrap-executable-file-name system program))
                      %bootstrap-executable-base-urls))
-           (file-name program)
+           (file-name (string-append "bootstrap-" program))
            (hash (content-hash bv sha256))))))))
 
 
@@ -260,32 +260,33 @@ or false to signal an error."
     (version "0")
     (build-system trivial-build-system)
     (arguments
-     `(#:guile ,%bootstrap-guile
-       #:modules ((guix build utils))
-       #:builder
-       (begin
-         (use-modules (guix build utils))
+     (list
+      #:guile %bootstrap-guile
+      #:modules '((guix build utils))
+      #:builder
+      #~(begin
+          (use-modules (guix build utils))
 
-         (let ((out     (assoc-ref %outputs "out"))
-              (tar     (assoc-ref %build-inputs "tar"))
-              (xz      (assoc-ref %build-inputs "xz"))
-              (tarball (assoc-ref %build-inputs "tarball")))
+          (let ((tar     (assoc-ref %build-inputs "bootstrap-tar"))
+                (xz      (assoc-ref %build-inputs "bootstrap-xz"))
+                (tarball (assoc-ref %build-inputs
+                                    #$(string-append name ".tar.xz"))))
 
-          (mkdir out)
-          (copy-file tarball "binaries.tar.xz")
-          (invoke xz "-d" "binaries.tar.xz")
-          (let ((builddir (getcwd)))
-            (with-directory-excursion out
-              (invoke tar "xvf"
-                      (string-append builddir "/binaries.tar"))
-              ,@(if snippet (list snippet) '())
-              (or (not ,program-to-test)
-                  (invoke (string-append "bin/" ,program-to-test)
-                          "--version"))))))))
+            (mkdir #$output)
+            (copy-file tarball "binaries.tar.xz")
+            (invoke xz "-d" "binaries.tar.xz")
+            (let ((builddir (getcwd)))
+              (with-directory-excursion #$output
+                (invoke tar "xvf"
+                        (string-append builddir "/binaries.tar"))
+                #$@(if snippet (list snippet) '())
+                (or (not #$program-to-test)
+                    (invoke (string-append "bin/" #$program-to-test)
+                            "--version"))))))))
     (inputs
-     `(("tar" ,(bootstrap-executable "tar" (%current-system)))
-       ("xz"  ,(bootstrap-executable "xz" (%current-system)))
-       ("tarball" ,(bootstrap-origin (source (%current-system))))))
+     (list (bootstrap-executable "tar" (%current-system))
+           (bootstrap-executable "xz" (%current-system))
+           (bootstrap-origin (source (%current-system)))))
     (source #f)
     (synopsis description)
     (description description)
@@ -627,37 +628,29 @@ $out/bin/guile --version~%"
                                             (_
                                              "/20131110/static-binaries.tar.xz")))
                                      %bootstrap-base-urls))
+                           (file-name "bootstrap-binaries.tar.xz")
                            (sha256
-                            (match system
-                              ("x86_64-linux"
-                               (base32
-                                "0c533p9dhczzcsa1117gmfq3pc8w362g4mx84ik36srpr7cx2bg4"))
-                              ("i686-linux"
-                               (base32
-                                "0s5b3jb315n13m1k8095l0a5hfrsz8g0fv1b6riyc5hnxqyphlak"))
-                              ("armhf-linux"
-                               (base32
-                                "0gf0fn2kbpxkjixkmx5f4z6hv6qpmgixl69zgg74dbsfdfj8jdv5"))
-                              ("aarch64-linux"
-                               (base32
-                                "18dfiq6c6xhsdpbidigw6480wh0vdgsxqq3xindq4lpdgqlccpfh"))
-                              ("powerpc64le-linux"
-                               (base32
-                                "0afs2j9z2d1hjq42myz4iwjh0aqgzf59inifw87x6b6p1z9wv92v"))
-                              ("i586-gnu"
-                               (base32
-                                "17kllqnf3fg79gzy9ansgi801c46yh9c23h4d923plvb0nfm1cfn"))
-                              ("x86_64-gnu"
-                               (base32
-                                "04zksa2457h1vcl5ry2hyzhhsg8fckvfdgadp0viba3anwms2463"))
-                              ("powerpc-linux"
-                               (base32
-                                "0kspxy0yczan2vlih6aa9hailr2inz000fqa0gn5x9d1fxxa5y8m"))
-                              ("riscv64-linux"
-                               (base32
-                                "0x0xjlpmyh6rkr51p00gp6pscgl6zjida1rsg8vk3rinyi6rrbkg"))
-                              ("mips64el-linux"
-                               (base32
+                            (base32
+                             (match system
+                               ("x86_64-linux"
+                                "0c533p9dhczzcsa1117gmfq3pc8w362g4mx84ik36srpr7cx2bg4")
+                               ("i686-linux"
+                                "0s5b3jb315n13m1k8095l0a5hfrsz8g0fv1b6riyc5hnxqyphlak")
+                               ("armhf-linux"
+                                "0gf0fn2kbpxkjixkmx5f4z6hv6qpmgixl69zgg74dbsfdfj8jdv5")
+                               ("aarch64-linux"
+                                "18dfiq6c6xhsdpbidigw6480wh0vdgsxqq3xindq4lpdgqlccpfh")
+                               ("powerpc64le-linux"
+                                "0afs2j9z2d1hjq42myz4iwjh0aqgzf59inifw87x6b6p1z9wv92v")
+                               ("i586-gnu"
+                                "17kllqnf3fg79gzy9ansgi801c46yh9c23h4d923plvb0nfm1cfn")
+                               ("x86_64-gnu"
+                                "04zksa2457h1vcl5ry2hyzhhsg8fckvfdgadp0viba3anwms2463")
+                               ("powerpc-linux"
+                                "0kspxy0yczan2vlih6aa9hailr2inz000fqa0gn5x9d1fxxa5y8m")
+                               ("riscv64-linux"
+                                "0x0xjlpmyh6rkr51p00gp6pscgl6zjida1rsg8vk3rinyi6rrbkg")
+                               ("mips64el-linux"
                                 "072y4wyfsj1bs80r6vbybbafy8ya4vfy7qj25dklwk97m6g71753"))))))
                         "fgrep"                    ; the program to test
                         "Bootstrap binaries of Coreutils, Awk, etc."
@@ -685,6 +678,7 @@ $out/bin/guile --version~%"
                        "/i686-linux/20190815/"
                        "linux-libre-headers-stripped-4.14.67-i686-linux.tar.xz")
                  %bootstrap-base-urls))
+       (file-name "linux-libre-headers-bootstrap.tar.xz")
        (sha256
         (base32
          "0sm2z9x4wk45bh6qfs94p0w1d6hsy6dqx9sw38qsqbvxwa1qzk8s"))))
@@ -758,99 +752,91 @@ $out/bin/guile --version~%"
     (source #f)
     (build-system trivial-build-system)
     (arguments
-     `(#:guile ,%bootstrap-guile
-       #:modules ((guix build utils))
-       #:builder
-       (begin
-         (use-modules (guix build utils))
+     (list
+      #:guile %bootstrap-guile
+      #:modules '((guix build utils))
+      #:builder
+      #~(begin
+          (use-modules (guix build utils))
 
-         (let ((out     (assoc-ref %outputs "out"))
-              (tar     (assoc-ref %build-inputs "tar"))
-              (xz      (assoc-ref %build-inputs "xz"))
-              (tarball (assoc-ref %build-inputs "tarball")))
+          (let ((tar     (assoc-ref %build-inputs "bootstrap-tar"))
+                (xz      (assoc-ref %build-inputs "bootstrap-xz"))
+                (tarball (assoc-ref %build-inputs "glibc.tar.xz")))
 
-          (mkdir out)
-          (copy-file tarball "binaries.tar.xz")
-          (invoke xz "-d" "binaries.tar.xz")
-          (let ((builddir (getcwd)))
-            (with-directory-excursion out
-              (invoke tar "xvf"
-                      (string-append builddir
-                                     "/binaries.tar"))
-              (chmod "lib" #o755)
+            (mkdir #$output)
+            (copy-file tarball "binaries.tar.xz")
+            (invoke xz "-d" "binaries.tar.xz")
+            (let ((builddir (getcwd)))
+              (with-directory-excursion #$output
+                (invoke tar "xvf"
+                        (string-append builddir
+                                       "/binaries.tar"))
+                (chmod "lib" #o755)
 
-              ;; Patch linker scripts so they refer to the right file-names.
-              (substitute* ,(cond ((target-hurd64?)
-                                   ''("lib/libc.so" "lib/libm.so"))
-                                  ((and (not (target-hurd?))
-                                        (or (target-x86?)
-                                            (target-arm?)))
-                                   ''("lib/libc.so" "lib/libpthread.so"))
-                                  (else
-                                   ''("lib/libc.so")))
-                (("/[^ ]+/lib/(libc|libh|libm|libpthread|ld)" _ prefix)
-                 (string-append out "/lib/" prefix)))
-              ,@(if (target-arm32?)
-                    `((substitute* "lib/libpthread.so"
-                        (("/[^ ]+/lib/libpthread_nonshared\\.a") "")))
-                    `())))))))
+                ;; Patch linker scripts so they refer to the right file-names.
+                (substitute* #$(cond ((target-hurd64?)
+                                      ''("lib/libc.so" "lib/libm.so"))
+                                     ((and (not (target-hurd?))
+                                           (or (target-x86?)
+                                               (target-arm?)))
+                                      ''("lib/libc.so" "lib/libpthread.so"))
+                                     (else
+                                      ''("lib/libc.so")))
+                  (("/[^ ]+/lib/(libc|libh|libm|libpthread|ld)" _ prefix)
+                   (string-append #$output "/lib/" prefix)))
+                #$@(if (target-arm32?)
+                       #~((substitute* "lib/libpthread.so"
+                            (("/[^ ]+/lib/libpthread_nonshared\\.a") "")))
+                       #~())))))))
     (inputs
-     `(("tar" ,(bootstrap-executable "tar" (%current-system)))
-       ("xz"  ,(bootstrap-executable "xz" (%current-system)))
-       ("tarball" ,(bootstrap-origin
-                    (origin
-                     (method url-fetch)
-                     (uri (map (cut string-append <> "/" (%current-system)
-                                    (match (%current-system)
-                                      ("armhf-linux"
-                                       "/20150101/glibc-2.20.tar.xz")
-                                      ("aarch64-linux"
-                                       "/20170217/glibc-2.25.tar.xz")
-                                      ("powerpc64le-linux"
-                                       "/20210106/glibc-stripped-2.31-powerpc64le-linux-gnu.tar.xz")
-                                      ("i586-gnu"
-                                       "/20240816/glibc-stripped-2.39-i586-pc-gnu.tar.xz")
-                                      ("x86_64-gnu"
-                                       "/20241122/glibc-stripped-2.39-x86_64-pc-gnu.tar.xz")
-                                      ("powerpc-linux"
-                                       "/20200923/glibc-2.32.tar.xz")
-                                      ("riscv64-linux"
-                                       "/20210725/glibc-2.31.tar.xz")
-                                      (_
-                                       "/20131110/glibc-2.18.tar.xz")))
-                               %bootstrap-base-urls))
-                     (sha256
-                      (match (%current-system)
-                        ("x86_64-linux"
-                         (base32
-                          "0jlqrgavvnplj1b083s20jj9iddr4lzfvwybw5xrcis9spbfzk7v"))
-                        ("i686-linux"
-                         (base32
-                          "1hgrccw1zqdc7lvgivwa54d9l3zsim5pqm0dykxg0z522h6gr05w"))
-                        ("armhf-linux"
-                         (base32
-                          "18cmgvpllqfpn6khsmivqib7ys8ymnq0hdzi3qp24prik0ykz8gn"))
-                        ("aarch64-linux"
-                         (base32
-                          "07nx3x8598i2924rjnlrncg6rm61c9bmcczbbcpbx0fb742nvv5c"))
-                        ("powerpc64le-linux"
-                         (base32
-                          "1a1df6z8gkaq09md3jy94lixnh20599p58p0s856p10xwjaqr1iz"))
-                        ("riscv64-linux"
-                         (base32
-                          "0d9x80vm7ca1pd2whcmpm1h14zxpb58kqajlxlwffzm04xfsjnxm"))
-                        ("i586-gnu"
-                         (base32
-                          "0x2x6w611k6v9qdabacawamw2475p04hm3s0q95xcg063wjq4ig2"))
-                        ("x86_64-gnu"
-                         (base32
-                          "1w4h91kxl64a62l646966i73zp2cj6w4dmyc64fh0c1hhdykxass"))
-                        ("powerpc-linux"
-                         (base32
-                          "0smmssyjrlk5cvx49586smmk81gkwff0i6r91n4rir4jm6ba25sb"))
-                        ("mips64el-linux"
-                         (base32
-                          "0k97a3whzx3apsi9n2cbsrr79ad6lh00klxph9hw4fqyp1abkdsg")))))))))
+     (list (bootstrap-executable "tar" (%current-system))
+           (bootstrap-executable "xz" (%current-system))
+           (bootstrap-origin
+            (origin
+              (method url-fetch)
+              (uri (map (cut string-append <> "/" (%current-system)
+                             (match (%current-system)
+                               ("armhf-linux"
+                                "/20150101/glibc-2.20.tar.xz")
+                               ("aarch64-linux"
+                                "/20170217/glibc-2.25.tar.xz")
+                               ("powerpc64le-linux"
+                                "/20210106/glibc-stripped-2.31-powerpc64le-linux-gnu.tar.xz")
+                               ("i586-gnu"
+                                "/20240816/glibc-stripped-2.39-i586-pc-gnu.tar.xz")
+                               ("x86_64-gnu"
+                                "/20241122/glibc-stripped-2.39-x86_64-pc-gnu.tar.xz")
+                               ("powerpc-linux"
+                                "/20200923/glibc-2.32.tar.xz")
+                               ("riscv64-linux"
+                                "/20210725/glibc-2.31.tar.xz")
+                               (_
+                                "/20131110/glibc-2.18.tar.xz")))
+                        %bootstrap-base-urls))
+              (file-name "glibc.tar.xz")
+              (sha256
+               (base32
+                (match (%current-system)
+                  ("x86_64-linux"
+                   "0jlqrgavvnplj1b083s20jj9iddr4lzfvwybw5xrcis9spbfzk7v")
+                  ("i686-linux"
+                   "1hgrccw1zqdc7lvgivwa54d9l3zsim5pqm0dykxg0z522h6gr05w")
+                  ("armhf-linux"
+                   "18cmgvpllqfpn6khsmivqib7ys8ymnq0hdzi3qp24prik0ykz8gn")
+                  ("aarch64-linux"
+                   "07nx3x8598i2924rjnlrncg6rm61c9bmcczbbcpbx0fb742nvv5c")
+                  ("powerpc64le-linux"
+                   "1a1df6z8gkaq09md3jy94lixnh20599p58p0s856p10xwjaqr1iz")
+                  ("riscv64-linux"
+                   "0d9x80vm7ca1pd2whcmpm1h14zxpb58kqajlxlwffzm04xfsjnxm")
+                  ("i586-gnu"
+                   "0x2x6w611k6v9qdabacawamw2475p04hm3s0q95xcg063wjq4ig2")
+                  ("x86_64-gnu"
+                   "1w4h91kxl64a62l646966i73zp2cj6w4dmyc64fh0c1hhdykxass")
+                  ("powerpc-linux"
+                   "0smmssyjrlk5cvx49586smmk81gkwff0i6r91n4rir4jm6ba25sb")
+                  ("mips64el-linux"
+                   "0k97a3whzx3apsi9n2cbsrr79ad6lh00klxph9hw4fqyp1abkdsg"))))))))
     (synopsis "Bootstrap binaries and headers of the GNU C Library")
     (description synopsis)
     (home-page #f)
@@ -865,110 +851,102 @@ $out/bin/guile --version~%"
     (source #f)
     (build-system trivial-build-system)
     (arguments
-     `(#:guile ,%bootstrap-guile
-       #:modules ((guix build utils))
-       #:builder
-       (begin
-         (use-modules (guix build utils)
-                      (ice-9 popen))
+     (list
+      #:guile %bootstrap-guile
+      #:modules '((guix build utils))
+      #:builder
+      #~(begin
+          (use-modules (guix build utils)
+                       (ice-9 popen))
 
-         (let ((out     (assoc-ref %outputs "out"))
-               (tar     (assoc-ref %build-inputs "tar"))
-               (xz      (assoc-ref %build-inputs "xz"))
-               (bash    (assoc-ref %build-inputs "bash"))
-               (libc    (assoc-ref %build-inputs "libc"))
-               (tarball (assoc-ref %build-inputs "tarball")))
+          (let ((tar     (assoc-ref %build-inputs "bootstrap-tar"))
+                (xz      (assoc-ref %build-inputs "bootstrap-xz"))
+                (bash    (assoc-ref %build-inputs "bootstrap-bash"))
+                (libc    (assoc-ref %build-inputs "glibc-bootstrap"))
+                (tarball (assoc-ref %build-inputs "gcc.tar.xz")))
 
-           (mkdir out)
-           (copy-file tarball "binaries.tar.xz") ;avoid: more than one hard link
-           (invoke xz "-d" "binaries.tar.xz")
-           (let ((builddir (getcwd))
-                 (bindir   (string-append out "/bin")))
+            (mkdir #$output)
+            (copy-file tarball "binaries.tar.xz") ;avoid: more than one hard link
+            (invoke xz "-d" "binaries.tar.xz")
+            (let ((builddir (getcwd))
+                  (bindir   (string-append #$output "/bin")))
 
-             (define (wrap-program program)
-               (let ((wrapped (format #f ".~a-wrapped" program)))
-                 (rename-file program wrapped)
-                 (call-with-output-file program
-                   (lambda (p)
-                     (format p "#!~a
+              (define (wrap-program program)
+                (let ((wrapped (format #f ".~a-wrapped" program)))
+                  (rename-file program wrapped)
+                  (call-with-output-file program
+                    (lambda (p)
+                      (format p "#!~a
 exec ~a/bin/~a -B~a/lib \
      -Wl,-rpath -Wl,~a/lib \
      -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
-                             bash
-                             out wrapped
-                             libc libc libc
-                             ,(glibc-dynamic-linker)))))
-               (chmod program #o555))
+                              bash
+                              #$output wrapped
+                              libc libc libc
+                              ,(glibc-dynamic-linker)))))
+                (chmod program #o555))
 
-             (with-directory-excursion out
-               (invoke tar "xvf"
-                       (string-append builddir "/binaries.tar")))
+              (with-directory-excursion #$output
+                (invoke tar "xvf"
+                        (string-append builddir "/binaries.tar")))
 
-             (with-directory-excursion bindir
-               (chmod "." #o755)
-               (for-each wrap-program
-                         ,(if (target-hurd64?)
-                              ''("gcc" "g++")
-                              ''("gcc")))))))))
+              (with-directory-excursion bindir
+                (chmod "." #o755)
+                (for-each wrap-program
+                          ,(if (target-hurd64?)
+                               ''("gcc" "g++")
+                                 ''("gcc")))))))))
     (inputs
-     `(("tar" ,(bootstrap-executable "tar" (%current-system)))
-       ("xz"  ,(bootstrap-executable "xz" (%current-system)))
-       ("bash" ,(bootstrap-executable "bash" (%current-system)))
-       ("libc" ,%bootstrap-glibc)
-       ("tarball" ,(bootstrap-origin
-                    (origin
-                      (method url-fetch)
-                      (uri (map (cut string-append <> "/" (%current-system)
-                                     (match (%current-system)
-                                       ("armhf-linux"
-                                        "/20150101/gcc-4.8.4.tar.xz")
-                                       ("aarch64-linux"
-                                        "/20170217/gcc-5.4.0.tar.xz")
-                                       ("powerpc64le-linux"
-                                        "/20210106/gcc-stripped-5.5.0-powerpc64le-linux-gnu.tar.xz")
-                                       ("i586-gnu"
-                                        "/20200326/gcc-stripped-5.5.0-i586-pc-gnu.tar.xz")
-                                       ("x86_64-gnu"
-                                        "/20241122/gcc-stripped-14.2.0-x86_64-pc-gnu.tar.xz")
-                                       ("powerpc-linux"
-                                        "/20200923/gcc-5.5.0.tar.xz")
-                                       ("riscv64-linux"
-                                        "/20210725/gcc-7.5.0.tar.xz")
-                                       (_
-                                        "/20131110/gcc-4.8.2.tar.xz")))
-                                %bootstrap-base-urls))
-                      (sha256
-                       (match (%current-system)
-                         ("x86_64-linux"
-                          (base32
-                           "17ga4m6195n4fnbzdkmik834znkhs53nkypp6557pl1ps7dgqbls"))
-                         ("i686-linux"
-                          (base32
-                           "150c1arrf2k8vfy6dpxh59vcgs4p1bgiz2av5m19dynpks7rjnyw"))
-                         ("armhf-linux"
-                          (base32
-                           "0ghz825yzp43fxw53kd6afm8nkz16f7dxi9xi40bfwc8x3nbbr8v"))
-                         ("aarch64-linux"
-                          (base32
-                           "1ar3vdzyqbfm0z36kmvazvfswxhcihlacl2dzdjgiq25cqnq9ih1"))
-                         ("powerpc64le-linux"
-                          (base32
-                           "151kjsai25vz2s667bgzpisx8f281fpl3n9pxz2yrp9jlnadz3m1"))
-                         ("riscv64-linux"
-                          (base32
-                           "1k4mbnb54wj2q37fgshf5dfixixqnhn002vhzvi9pnb57xb9v14d"))
-                         ("i586-gnu"
-                          (base32
-                           "1j2zc58wzil71a34h7c70sd68dmqvcscrw3rmn2whq79vd70zvv5"))
-                         ("x86_64-gnu"
-                          (base32
-                           "1cgbhc76hlccx6v2z7kk7z173lryyq3la5mmbwivl6hbl1zcqg3m"))
-                         ("powerpc-linux"
-                          (base32
-                           "1p7df3yixhm87dw5sccc6yn1i9db1r9hnmsg87wq5xi4rfmirq7w"))
-                         ("mips64el-linux"
-                          (base32
-                           "1m5miqkyng45l745n0sfafdpjkqv9225xf44jqkygwsipj2cv9ks")))))))))
+     (list (bootstrap-executable "tar" (%current-system))
+           (bootstrap-executable "xz" (%current-system))
+           (bootstrap-executable "bash" (%current-system))
+           %bootstrap-glibc
+           (bootstrap-origin
+            (origin
+              (method url-fetch)
+              (uri (map (cut string-append <> "/" (%current-system)
+                             (match (%current-system)
+                               ("armhf-linux"
+                                "/20150101/gcc-4.8.4.tar.xz")
+                               ("aarch64-linux"
+                                "/20170217/gcc-5.4.0.tar.xz")
+                               ("powerpc64le-linux"
+                                "/20210106/gcc-stripped-5.5.0-powerpc64le-linux-gnu.tar.xz")
+                               ("i586-gnu"
+                                "/20200326/gcc-stripped-5.5.0-i586-pc-gnu.tar.xz")
+                               ("x86_64-gnu"
+                                "/20241122/gcc-stripped-14.2.0-x86_64-pc-gnu.tar.xz")
+                               ("powerpc-linux"
+                                "/20200923/gcc-5.5.0.tar.xz")
+                               ("riscv64-linux"
+                                "/20210725/gcc-7.5.0.tar.xz")
+                               (_
+                                "/20131110/gcc-4.8.2.tar.xz")))
+                        %bootstrap-base-urls))
+              (file-name "gcc.tar.xz")
+              (sha256
+               (base32
+                (match (%current-system)
+                  ("x86_64-linux"
+                   "17ga4m6195n4fnbzdkmik834znkhs53nkypp6557pl1ps7dgqbls")
+                  ("i686-linux"
+                   "150c1arrf2k8vfy6dpxh59vcgs4p1bgiz2av5m19dynpks7rjnyw")
+                  ("armhf-linux"
+                   "0ghz825yzp43fxw53kd6afm8nkz16f7dxi9xi40bfwc8x3nbbr8v")
+                  ("aarch64-linux"
+                   "1ar3vdzyqbfm0z36kmvazvfswxhcihlacl2dzdjgiq25cqnq9ih1")
+                  ("powerpc64le-linux"
+                   "151kjsai25vz2s667bgzpisx8f281fpl3n9pxz2yrp9jlnadz3m1")
+                  ("riscv64-linux"
+                   "1k4mbnb54wj2q37fgshf5dfixixqnhn002vhzvi9pnb57xb9v14d")
+                  ("i586-gnu"
+                   "1j2zc58wzil71a34h7c70sd68dmqvcscrw3rmn2whq79vd70zvv5")
+                  ("x86_64-gnu"
+                   "1cgbhc76hlccx6v2z7kk7z173lryyq3la5mmbwivl6hbl1zcqg3m")
+                  ("powerpc-linux"
+                   "1p7df3yixhm87dw5sccc6yn1i9db1r9hnmsg87wq5xi4rfmirq7w")
+                  ("mips64el-linux"
+                   "1m5miqkyng45l745n0sfafdpjkqv9225xf44jqkygwsipj2cv9ks"))))))))
     (native-search-paths
      (list (search-path-specification
             (variable "C_INCLUDE_PATH")
