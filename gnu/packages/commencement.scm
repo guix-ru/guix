@@ -2194,7 +2194,8 @@ exec " gcc-bin "/" program
        #:implicit-inputs? #f
        #:guile ,%bootstrap-guile
        #:strip-binaries? #f
-       #:validate-runpath? #f))))
+       #:validate-runpath? #f
+       ,@(package-arguments gawk)))))
 
 (define patch-boot0
   (package
