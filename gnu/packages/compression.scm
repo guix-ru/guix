@@ -724,7 +724,7 @@ Like its ancestor, BZip3 excels at compressing text or code.")
 (define-public xz
   (package
    (name "xz")
-   (version "5.4.5")
+   (version "5.8.1")
    (source (origin
             (method url-fetch)
             (uri (list (string-append "http://tukaani.org/xz/xz-" version
@@ -733,7 +733,7 @@ Like its ancestor, BZip3 excels at compressing text or code.")
                                       version ".tar.gz")))
             (sha256
              (base32
-              "1mmpwl4kg1vs6n653gkaldyn43dpbjh8gpk7sk0gps5f6jwr0p0k"))))
+              "0hsmg58a27jd1vq0lc6yp405978c1nfhqwndl7f10v1mk6sjay2h"))))
    (build-system gnu-build-system)
    (arguments
     `(#:phases
