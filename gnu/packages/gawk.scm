@@ -41,13 +41,13 @@
 (define-public gawk
   (package
    (name "gawk")
-   (version "5.3.0")
+   (version "5.3.2")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnu/gawk/gawk-" version
                                 ".tar.xz"))
             (sha256
-             (base32 "02x97iyl9v84as4rkdrrkfk2j4vy4r3hpp3rkp3gh3qxs79id76a"))))
+             (base32 "1k699kfajwzw4dyw1m9h9kld1gdv00nfy04b2f952w6y15jlihzq"))))
    (build-system gnu-build-system)
    (arguments
     (list #:phases
@@ -56,7 +56,7 @@
                 (lambda* (#:key inputs #:allow-other-keys)
                   ;; Refer to the right shell.
                   (let ((/bin/sh (search-input-file inputs "bin/sh")))
-                    (substitute* "io.c"
+                    (substitute* '("io.c" "builtin.c")
                       (("/bin/sh") /bin/sh))
 
                     ;; When cross-compiling, remove dependencies on the
@@ -73,7 +73,7 @@
                   ;; Remove dependency on 'more' (from util-linux), which
                   ;; would needlessly complicate bootstrapping.
                   (substitute* "test/Makefile"
-                    (("\\| more") ""))
+                    (("\\| \\$\\$\\{PAGER:-more\\}") ""))
 
                   ;; Adjust the shebang in that file since it is then diff'd
                   ;; against the actual test output.
