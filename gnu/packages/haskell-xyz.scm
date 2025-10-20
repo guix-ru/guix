@@ -15857,6 +15857,14 @@ of Netlink families.")
         (base32 "0x6d2crc8jibixq0fdzbbqls7l79hb8la3mp9yd1dgikwp1bbncz"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "doctest-driver-gen")))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'add-doctest-driver-to-PATH
+            (lambda _
+              (setenv "PATH" (string-append (getenv "PATH")
+                                            ":dist/build/doctest-driver-gen")))))))
     (native-inputs (list ghc-doctest))
     (home-page "https://github.com/Hexirp/doctest-driver-gen#readme")
     (synopsis "Generate driver file for Doctest's Cabal integration")
