@@ -65,6 +65,12 @@
 
           (mkdir-p "/srv/git")
           (rename-file "/tmp/test-repo/.git" "/srv/git/test")
+          ;; Make sure that the gitile user can access the /srv/git directory
+          ;; and its child.
+          (let ((user (getpw "gitile")))
+            (for-each (lambda (dir)
+                        (chown dir (passwd:uid user) (passwd:gid user)))
+                      '("/srv/git" "/srv/git/test")))
           (with-output-to-file "/srv/git/test/git-daemon-export-ok"
             (lambda _
               (display "")))))))
