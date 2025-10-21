@@ -22,8 +22,11 @@
 
 (define-module (test-syscalls)
   #:use-module (guix utils)
+  #:use-module (guix build io)
   #:use-module (guix build syscalls)
+  #:use-module (guix build utils)
   #:use-module (gnu build linux-container)
+  #:use-module (rnrs bytevectors)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-64)
@@ -31,7 +34,7 @@
   #:use-module (system foreign)
   #:use-module ((ice-9 ftw) #:select (scandir))
   #:use-module (ice-9 match)
-  #:use-module (ice-9 threads))
+  #:use-module (ice-9 textual-ports))
 
 ;; Test the (guix build syscalls) module, although there's not much that can
 ;; actually be tested without being root.
@@ -734,6 +737,37 @@
     (lambda args
       (member (system-error-errno args)
               (list EPERM ENOSYS)))))
+
+(test-assert "mmap"
+  (begin
+    (call-with-output-file temp-file
+      (lambda (p)
+        (display "abcdefghij")))
+    (mmap (open-fdes temp-file O_RDONLY) 5)))
+
+(test-equal "file->bytevector, reading"
+  #\6
+  (begin
+    (call-with-output-file temp-file
+      (lambda (p)
+        (display "0123456789\n" p)))
+    (sync)
+    (integer->char
+     (bytevector-u8-ref (file->bytevector temp-file) 6))))
+
+(test-equal "file->bytevector, writing"
+  "0000000700"
+  (begin
+    (call-with-output-file temp-file
+      (lambda (p)
+        (display "0000000000" p)))
+    (sync)
+    (let ((bv (file->bytevector temp-file
+                                #:protections (protection-set write))))
+
+      (bytevector-u8-set! bv 7 (char->integer #\7))
+      (msync bv))                       ;ensure the file gets written
+    (call-with-input-file temp-file get-string-all)))
 
 (test-end)
 

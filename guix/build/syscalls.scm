@@ -31,6 +31,7 @@
   #:use-module (system foreign)
   #:use-module (system base target)
   #:use-module (rnrs bytevectors)
+  #:use-module (rnrs enums)
   #:autoload   (ice-9 binary-ports) (get-bytevector-n)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
@@ -42,8 +43,18 @@
   #:use-module (ice-9 regex)
   #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
-  #:use-module (ice-9 threads)
-  #:export (MS_RDONLY
+  #:export (protection
+            protection-set
+            mmap-flag
+            mmap-flag-set
+            mmap
+
+            MS_ASYNC
+            MS_INVALIDATE
+            MS_SYNC
+            msync
+
+            MS_RDONLY
             MS_NOSUID
             MS_NODEV
             MS_NOEXEC
@@ -1105,6 +1116,145 @@ backend device."
           (throw 'system-error "setxattr" "~S: ~A"
                  (list file key value (strerror err))
                  (list err)))))))
+
+
+;;;
+;;; Memory maps.
+;;;
+
+;;; Constants from <sys/mman.h>.  Enums are used given the actual values vary
+;;; between Linux and the Hurd, hence must be lazily resolved at the time of
+;;; use (runtime).
+(define-enumeration protection
+  (none                                 ;page can not be accessed
+   read                                 ;page can be read
+   write                                ;page can be written
+   exec)                                ;page can be executed
+  protection-set)
+
+(define-enumeration mmap-flag
+  (shared                               ;share changes with other processes
+   private)                             ;private copy-on-write mapping
+  mmap-flag-set)
+
+(define (hurd?)
+  (string=? "GNU" (utsname:sysname (uname))))
+
+(define (protection-symbol->value s)
+  ;; The values for the Hurd are taken from glibc's bits/mman.h, while those
+  ;; for Linux from include/uapi/asm-generic/mman-common.h.
+  (let ((hurd? (hurd?)))
+    (cond
+     ((eq? (protection none) s)
+      #x0)
+     ((eq? (protection read) s)
+      (if hurd? #x4 #x1))
+     ((eq? (protection write) s)
+      #x2)
+     ((eq? (protection exec) s)
+      (if hurd? #x1 #x4))
+     (else (error "unexpected protection symbol" s)))))
+
+(define (protection-set->value protections)
+  "Take PROTECTIONS, a set of protection set, and compute the platform-specific
+value for use with `mmap'."
+  (unless (enum-set-subset? protections (enum-set-universe (protection-set)))
+    (error "invalid mmap protection value; expected a protection enum set"
+           protections))
+  (apply logior (map protection-symbol->value (enum-set->list protections))))
+
+(define (mmap-flag-symbol->value s)
+  ;; The values for the Hurd are taken from glibc's bits/mman.h, while those
+  ;; for Linux from include/uapi/linux/mman.h.
+  (let ((hurd? (hurd?)))
+    (cond
+     ((eq? (mmap-flag private) s)
+      (if hurd? #x0 #x2))
+     ((eq? (mmap-flag shared) s)
+      (if hurd? #x10 #x1))
+     (else (error "unexpected mmap-flag symbol" s)))))
+
+(define (mmap-flag-set->value flags)
+  (unless (enum-set-subset? flags (enum-set-universe (mmap-flag-set)))
+    (error "invalid mmap flags value; expected a mmap-flag enum set"
+           flags))
+  (apply logior (map mmap-flag-symbol->value (enum-set->list flags))))
+
+(define (%map-failed)      ;mmap failure sentinel
+  (if (= 8 (sizeof '*))
+      #xffffffffffffffff                ;64-bit
+      #xffffffff))                      ;32-bit
+
+(define %mmap
+  (syscall->procedure '* "mmap" (list '* size_t int int int long)))
+
+(define %mmap-guardian
+  (make-guardian))
+
+(define (pump-mmap-guardian)
+  (let ((bv (%mmap-guardian)))
+    (when bv
+      (munmap bv)
+      (pump-mmap-guardian))))
+
+(add-hook! after-gc-hook pump-mmap-guardian)
+
+(define* (mmap fd len #:key
+               (protections (protection-set read))
+               (flags (if (enum-set-member? (protection write) protections)
+                          (mmap-flag-set shared)
+                          (mmap-flag-set private)))
+               (offset 0))
+  "Return a bytevector to a memory-mapped region of length LEN bytes
+for the open file descriptor FD.  The mapping is created with the given memory
+PROTECTIONS and FLAGS, which are PROTECTION and MMAP-FLAGS enum sets,
+respectively.  These values are internally converted to the correct values and
+bitwise OR'd, and determine whether updates are visible to other processes
+and/or carried through to the underlying file.  Raise a 'system-error'
+exception on error.  The memory is automatically unmapped with `munmap' when
+the bytevector object is no longer referenced."
+  (let*-values (((protections*) (protection-set->value protections))
+                ((flags*) (mmap-flag-set->value flags))
+                ((ptr err) (%mmap %null-pointer len protections* flags*
+                                  fd offset)))
+    (when (= (%map-failed) (pointer-address ptr))
+      (throw 'system-error "mmap" "mmap ~S with len ~S: ~A"
+             (list fd len (strerror err))
+             (list err)))
+    (let ((bv (pointer->bytevector ptr len)))
+      (%mmap-guardian bv)
+      bv)))
+
+(define %munmap
+  (syscall->procedure int "munmap" (list '* size_t)))
+
+(define (munmap bv)
+  "Unmap the memory region described by BV, a bytevector object."
+  (let*-values (((ptr) (bytevector->pointer bv))
+                ((len) (bytevector-length bv))
+                ((ret err) (%munmap ptr len)))
+    (unless (zero? ret)
+      (throw 'system-error "munmap" "munmap ~S with len ~S: ~A"
+             (list ptr len (strerror err))
+             (list err)))))
+
+(define MS_ASYNC 1)                     ;sync memory asynchronously
+(define MS_INVALIDATE 2)                ;invalidate the caches
+(define MS_SYNC 4)                      ;synchronous memory sync
+
+(define %msync
+  (syscall->procedure int "msync" (list '* size_t int)))
+
+(define* (msync bv #:key (flags MS_SYNC))
+  "Flush changes made to the in-core copy of a file that was mapped into memory
+using `mmap' back to the file system."
+  (let*-values (((ptr) (bytevector->pointer bv))
+                ((len) (bytevector-length bv))
+                ((ret err) (%msync ptr len flags)))
+    (unless (zero? ret)
+      (throw 'system-error "msync" "msync ~S with len ~S: ~A"
+             (list ptr len (strerror err))
+             (list err)))))
 
 
 ;;;
