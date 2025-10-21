@@ -286,6 +286,14 @@ HTTP-PORT."
           (test-equal "clone"
             '#$README-contents
             (begin
+              ;; Make sure that the fcgiwrap user can access the /srv/git
+              ;; directory and its child.
+              (marionette-eval
+               '(let ((user (getpw (pk "fcgiwrap"))))
+                  (for-each (lambda (dir)
+                              (chown dir (passwd:uid user) (passwd:gid user)))
+                            '("/srv/git" "/srv/git/test")))
+               marionette)
               (invoke #$(file-append git "/bin/git") "clone" "-v"
                       "http://localhost:8080/git/test" "/tmp/clone")
               (call-with-input-file "/tmp/clone/README"
