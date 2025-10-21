@@ -15760,6 +15760,14 @@ platform independent way.")
        (sha256
         (base32 "0cn9n5jyzn9h1ab76rr2cyxaysh2rk7ywcj92lxsf49fah4vx35g"))))
     (build-system haskell-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'relax-dependencies
+            (lambda _
+              (substitute* "template-haskell.cabal"
+                (("ghc-boot-th [0-9 &|<>=*^.]*") "ghc-boot-th")))))))
     (properties '((upstream-name . "template-haskell")))
     (home-page "http://hackage.haskell.org/package/template-haskell")
     (synopsis "Support library for Template Haskell")
