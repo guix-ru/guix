@@ -892,7 +892,9 @@ percent.
     (native-inputs (list ghc-quickcheck ghc-doctest))
     (arguments
      `(#:cabal-revision ("9"
-                         "0y5vfdcys18waa5k5zxiq9n8jq0l05j76riml23i0gxmwgdhsmgi")))
+                         "0y5vfdcys18waa5k5zxiq9n8jq0l05j76riml23i0gxmwgdhsmgi")
+       ;; the tests don't work with current versions of the test frameworks
+       #:tests? #f))
     (home-page "https://github.com/thoughtpolice/hs-ed25519/")
     (synopsis "Ed25519 cryptographic signatures")
     (description
