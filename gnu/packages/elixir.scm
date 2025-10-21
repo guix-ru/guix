@@ -51,7 +51,8 @@
        (file-name (git-file-name name version))
        (sha256
         (base32 "1i10a5d7mlcrav47k7qirqvrqn2kbl5265fbcp8fzavr86xz67m6"))
-       (patches (search-patches "elixir-path-length.patch"))))
+       (patches (search-patches "elixir-path-length.patch"
+                                "elixir-vendoring-support.patch"))))
     (build-system gnu-build-system)
     (arguments
      (list
