@@ -1254,6 +1254,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/einstein-build.patch			\
   %D%/packages/patches/elfutils-tests-ptrace.patch		\
   %D%/packages/patches/elixir-path-length.patch			\
+  %D%/packages/patches/elixir-vendoring-support.patch		\
   %D%/packages/patches/elm-ghc9.2.patch	\
   %D%/packages/patches/exaile-gstreamer-1.28.patch	\
   %D%/packages/patches/python-treelib-remove-python2-compat.patch	\

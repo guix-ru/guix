@@ -1,0 +1,56 @@
+Author: Igorj Gorjaĉev <igor@goryachev.org>
+Date:   Wed Oct 22 10:10:13 2025 +0300
+
+    vendoring support for guix
+
+diff --git a/lib/mix/lib/mix/dep/loader.ex b/lib/mix/lib/mix/dep/loader.ex
+index e47bfc556..0ddd49fe5 100644
+--- a/lib/mix/lib/mix/dep/loader.ex
++++ b/lib/mix/lib/mix/dep/loader.ex
+@@ -198,6 +198,10 @@ defp with_scm_and_app(app, req, opts, original, locked?) do
+       )
+     end
+ 
++    scm = Mix.Guix.scm(scm)
++    req = Mix.Guix.req(req)
++    opts = Mix.Guix.opts(opts, app)
++
+     %Mix.Dep{
+       scm: scm,
+       app: app,
+diff --git a/lib/mix/lib/mix/guix.ex b/lib/mix/lib/mix/guix.ex
+new file mode 100644
+index 000000000..9c821704c
+--- /dev/null
++++ b/lib/mix/lib/mix/guix.ex
+@@ -0,0 +1,30 @@
++defmodule Mix.Guix do
++  @moduledoc false
++
++  @guix_vendorize "GUIX_MIX_VENDOR_DIR"
++
++  def scm(scm), do: (vendorize?() && Mix.SCM.Path) || scm
++
++  def req(req), do: (vendorize?() && nil) || req
++
++  def opts(opts, app) do
++    if vendorize?() do
++      if Keyword.has_key?(opts, :path) do
++        opts
++      else
++        dep_dir = vendor_dep_dir(app)
++
++        [path: dep_dir, dest: dep_dir] ++
++          Keyword.drop(opts, [:hex, :override, :repo, :lock, :dest])
++      end
++    else
++      opts
++    end
++  end
++
++  defp vendorize?, do: not is_nil(vendor_dir())
++
++  defp vendor_dir, do: System.get_env(@guix_vendorize)
++
++  defp vendor_dep_dir(name), do: "#{vendor_dir()}/#{name}"
++end
