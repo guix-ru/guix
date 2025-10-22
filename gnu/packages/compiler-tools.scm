@@ -88,7 +88,8 @@ C programming language.")
              "flex-" version ".tar.gz"))
        (sha256
         (base32
-         "15g9bv236nzi665p9ggqjlfn4dwck5835vf0bbw2cz7h5c1swyp8"))))
+         "15g9bv236nzi665p9ggqjlfn4dwck5835vf0bbw2cz7h5c1swyp8"))
+       (patches (search-patches "flex-fix-make-dependencies.patch"))))
     (build-system gnu-build-system)
     (arguments
      (if (%current-target-system)
