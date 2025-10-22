@@ -643,26 +643,6 @@ AES-NI available, or you'll need to use a different implementation.")
     (description "Generic cryptography public keys algorithm types.")
     (license license:bsd-3)))
 
-(define-public ghc-crypto-random
-  (package
-    (name "ghc-crypto-random")
-    (version "0.0.9")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "crypto-random" version))
-       (sha256
-        (base32
-         "0139kbbb2h7vshf68y3fvjda29lhj7jjwl4vq78w4y8k8hc7l2hp"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "crypto-random")))
-    (inputs (list ghc-securemem ghc-vector))
-    (home-page "https://github.com/vincenthz/hs-crypto-random")
-    (synopsis "Simple cryptographic random related types for Haskell")
-    (description "Simple cryptographic random related types: a safe
-abstraction for CPRNGs.")
-    (license license:bsd-3)))
-
 (define-public ghc-crypton
   (package
     (name "ghc-crypton")
