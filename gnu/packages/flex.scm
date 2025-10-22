@@ -55,9 +55,8 @@
          '()))
     ;; m4 is not present in PATH when cross-building
     (native-inputs
-     (list help2man m4))
-    (inputs
-     (list (package
+     (let ((bison-for-tests
+            (package
              (inherit bison)
              (arguments
               ;; Disable tests, since they require flex.
@@ -65,6 +64,7 @@
                 ((#:tests? _ #f) #f)))
              (inputs (modify-inputs inputs
                        (delete "flex"))))))
+       (list bison-for-tests help2man m4)))
     (propagated-inputs (list m4))
     (home-page "https://github.com/westes/flex")
     (synopsis "Fast lexical analyser generator")
