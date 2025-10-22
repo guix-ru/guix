@@ -1848,8 +1848,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/libtgvoip-disable-webrtc.patch 		\
   %D%/packages/patches/libtheora-config-guess.patch		\
   %D%/packages/patches/libtirpc-hurd.patch			\
-  %D%/packages/patches/libtool-grep-compat.patch		\
-  %D%/packages/patches/libtool-skip-tests2.patch		\
   %D%/packages/patches/libtpms-pkgconfigdir.patch	\
   %D%/packages/patches/libtree-fix-check-non-x86.patch		\
   %D%/packages/patches/libusb-0.1-disable-tests.patch		\
