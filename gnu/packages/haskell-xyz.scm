@@ -13708,30 +13708,6 @@ functions that do not escape non-ascii characters.")
 normalization in Haskell (normalization forms C, KC, D, and KD).")
     (license license:bsd-3)))
 
-(define-public ghc-union-find
-  (package
-    (name "ghc-union-find")
-    (version "0.2")
-    (source (origin
-              (method url-fetch)
-              (uri (hackage-uri "union-find" version))
-              (sha256
-               (base32
-                "1v7hj42j9w6jlzi56jg8rh4p58gfs1c5dx30wd1qqvn0p0mnihp6"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "union-find")))
-    (home-page "https://github.com/nominolo/union-find")
-    (synopsis "Efficient union and equivalence testing of sets")
-    (description
-     "The Union/Find algorithm implements these operations in (effectively)
-constant-time:
-@enumerate
-@item Check whether two elements are in the same equivalence class.
-@item Create a union of two equivalence classes.
-@item Look up the descriptor of the equivalence class.
-@end enumerate\n")
-    (license license:bsd-3)))
-
 (define-public ghc-uniplate
   (package
     (name "ghc-uniplate")
