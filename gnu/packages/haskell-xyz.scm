@@ -2808,8 +2808,15 @@ Accessor to access state in transformers State monad.")
     (properties '((upstream-name . "data-clist")))
     (native-inputs (list ghc-quickcheck))
     (arguments
-     `(#:cabal-revision ("1"
-                         "09922p8ydfgqsy29p9qfiss70bks85bzz6g9s3gzrd93lpzhiba7")))
+     (list
+      #:cabal-revision '("1"
+                         "09922p8ydfgqsy29p9qfiss70bks85bzz6g9s3gzrd93lpzhiba7")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'relax-dependency-contraints
+            (lambda _
+              (substitute* "data-clist.cabal"
+                (("QuickCheck [0-9 .&|<>=*]*") "QuickCheck")))))))
     (home-page "https://github.com/sw17ch/data-clist")
     (synopsis "Simple, functional, bidirectional circular list type")
     (description
