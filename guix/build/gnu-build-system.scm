@@ -22,6 +22,7 @@
 (define-module (guix build gnu-build-system)
   #:use-module (guix build utils)
   #:use-module (guix build gremlin)
+  #:use-module (guix build io)
   #:use-module (guix elf)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
@@ -521,9 +522,8 @@ makefiles."
 
   (define (guile-bytecode? file)
     (and (string-suffix? ".go" file)
-         (elf-section-by-name
-          (parse-elf (call-with-input-file file get-bytevector-all))
-          ".guile.procprops")))
+         (elf-section-by-name (parse-elf (file->bytevector file))
+                              ".guile.procprops")))
 
   (define (strip-dir dir)
     (format #t "stripping binaries in ~s with ~s and flags ~s~%"
@@ -593,9 +593,7 @@ makefiles."
            (shared-object-file?
             (lambda (file)
               (and (elf-file? file)
-                   (member (call-with-input-file file
-                             (compose elf-type parse-elf
-                                      get-bytevector-all))
+                   (member ((compose elf-type parse-elf file->bytevector) file)
                            (list ET_EXEC ET_DYN)))))
            (objcopy-can-compress?
             (let* ((input-pipe (open-pipe* OPEN_READ "objcopy" "--help"))
@@ -643,10 +641,7 @@ makefiles."
                                               "bin" "sbin"))
                            outputs #:allow-other-keys)
   "When VALIDATE-RUNPATH? is true, validate that all the ELF files in
-ELF-DIRECTORIES have their dependencies found in their 'RUNPATH'.
-
-Since the ELF parser needs to have a copy of files in memory, better run this
-phase after stripping."
+ELF-DIRECTORIES have their dependencies found in their 'RUNPATH'."
   (define (sub-directory parent)
     (lambda (directory)
       (let ((directory (string-append parent "/" directory)))

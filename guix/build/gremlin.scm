@@ -1,5 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2015, 2018, 2020 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -18,6 +19,7 @@
 
 (define-module (guix build gremlin)
   #:use-module (guix elf)
+  #:use-module (guix build io)
   #:use-module ((guix build utils) #:select (store-file-name?))
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
@@ -248,9 +250,7 @@ string table if the type is a string."
 (define (file-dynamic-info file)
   "Return the <elf-dynamic-info> record of FILE, or #f if FILE lacks dynamic
 info."
-  (call-with-input-file file
-    (lambda (port)
-      (elf-dynamic-info (parse-elf (get-bytevector-all port))))))
+  (elf-dynamic-info (parse-elf (file->bytevector file))))
 
 (define (file-runpath file)
   "Return the DT_RUNPATH dynamic entry of FILE as a list of strings, or #f if
@@ -362,8 +362,7 @@ exceeds total size~%"
                        (elf-segment-type segment))
                #f)))
 
-    (let* ((elf     (call-with-input-file file
-                      (compose parse-elf get-bytevector-all)))
+    (let* ((elf     (parse-elf (file->bytevector file)))
            (expand  (cute expand-origin <> (dirname file)))
            (dyninfo (elf-dynamic-info elf)))
       (when dyninfo
@@ -402,38 +401,32 @@ according to DT_NEEDED."
                         needed)))
             runpath))
 
-  (define port
-    (open-file file "r+b"))
-
-  (catch #t
-    (lambda ()
-      (let* ((elf      (parse-elf (get-bytevector-all port)))
-             (entries  (dynamic-entries elf (dynamic-link-segment elf)))
-             (needed   (filter-map (lambda (entry)
-                                     (and (= (dynamic-entry-type entry)
-                                             DT_NEEDED)
-                                          (dynamic-entry-value entry)))
-                                   entries))
-             (runpath  (find (lambda (entry)
-                               (= DT_RUNPATH (dynamic-entry-type entry)))
-                             entries))
-             (old      (search-path->list
-                        (dynamic-entry-value runpath)))
-             (new      (minimal-runpath needed old)))
-        (unless (equal? old new)
-          (format (current-error-port)
-                  "~a: stripping RUNPATH to ~s (removed ~s)~%"
-                  file new
-                  (lset-difference string=? old new))
-          (seek port (dynamic-entry-offset runpath) SEEK_SET)
-          (put-bytevector port (string->utf8 (string-join new ":")))
-          (put-u8 port 0))
-        (close-port port)
-        new))
-    (lambda (key . args)
-      (false-if-exception (close-port port))
-      (apply throw key args))))
-
+  (let* ((bv (file->bytevector file #:protections
+                               (protection-set read write)))
+         (elf (parse-elf bv))
+         (entries  (dynamic-entries elf (dynamic-link-segment elf)))
+         (needed   (filter-map (lambda (entry)
+                                 (and (= (dynamic-entry-type entry)
+                                         DT_NEEDED)
+                                      (dynamic-entry-value entry)))
+                               entries))
+         (runpath  (find (lambda (entry)
+                           (= DT_RUNPATH (dynamic-entry-type entry)))
+                         entries))
+         (old      (search-path->list
+                    (dynamic-entry-value runpath)))
+         (new      (minimal-runpath needed old)))
+    (unless (equal? old new)
+      (format (current-error-port)
+              "~a: stripping RUNPATH to ~s (removed ~s)~%"
+              file new
+              (lset-difference string=? old new))
+      ;; Write to bytevector directly.
+      (let ((src (string->utf8 (string-append (string-join new ":")
+                                              "\0"))))
+        (bytevector-copy! src 0 bv (dynamic-entry-offset runpath)
+                          (bytevector-length src))))
+    new))
 
 (define-condition-type &missing-runpath-error &elf-error
   missing-runpath-error?
@@ -447,36 +440,26 @@ according to DT_NEEDED."
   "Set the value of the DT_RUNPATH dynamic entry of FILE, which must name an
 ELF file, to PATH, a list of strings.  Raise a &missing-runpath-error or
 &runpath-too-long-error when appropriate."
-  (define (call-with-input+output-file file proc)
-    (let ((port (open-file file "r+b")))
-      (guard (c (#t (close-port port) (raise c)))
-        (proc port)
-        (close-port port))))
+  (let* ((bv (file->bytevector file #:protections
+                               (protection-set read write)))
+         (elf     (parse-elf bv))
+         (entries (dynamic-entries elf (dynamic-link-segment elf)))
+         (runpath (find (lambda (entry)
+                          (= DT_RUNPATH (dynamic-entry-type entry)))
+                        entries))
+         (path    (string->utf8 (string-append (string-join path ":")
+                                               "\0"))))
+    (unless runpath
+      (raise (condition (&missing-runpath-error (elf elf)
+                                                (file file)))))
 
-  (call-with-input+output-file file
-    (lambda (port)
-      (let* ((elf     (parse-elf (get-bytevector-all port)))
-             (entries (dynamic-entries elf (dynamic-link-segment elf)))
-             (runpath (find (lambda (entry)
-                              (= DT_RUNPATH (dynamic-entry-type entry)))
-                            entries))
-             (path    (string->utf8 (string-join path ":"))))
-        (unless runpath
-          (raise (condition (&missing-runpath-error (elf elf)
-                                                    (file file)))))
+    ;; There might be padding left beyond RUNPATH in the string table, but
+    ;; we don't know, so assume there's no padding.
+    (unless (<= (bytevector-length path)
+                (bytevector-length
+                 (string->utf8 (dynamic-entry-value runpath))))
+      (raise (condition (&runpath-too-long-error (elf #f #;elf)
+                                                 (file file)))))
 
-        ;; There might be padding left beyond RUNPATH in the string table, but
-        ;; we don't know, so assume there's no padding.
-        (unless (<= (bytevector-length path)
-                    (bytevector-length
-                     (string->utf8 (dynamic-entry-value runpath))))
-          (raise (condition (&runpath-too-long-error (elf #f #;elf)
-                                                     (file file)))))
-
-        (seek port (dynamic-entry-offset runpath) SEEK_SET)
-        (put-bytevector port path)
-        (put-u8 port 0)))))
-
-;;; Local Variables:
-;;; eval: (put 'call-with-input+output-file 'scheme-indent-function 1)
-;;; End:
+    (bytevector-copy! path 0 bv (dynamic-entry-offset runpath)
+                      (bytevector-length path))))
