@@ -56,6 +56,8 @@
   '((guix build gnu-build-system)
     (guix build utils)
     (guix build gremlin)
+    (guix build io)                     ;used by gremlin
+    (guix build syscalls)               ;used by io
     (guix elf)))
 
 (define-deprecated/public-alias %gnu-build-system-modules

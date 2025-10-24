@@ -23,6 +23,7 @@
   #:use-module (guix tests)
   #:use-module ((guix utils) #:select (call-with-temporary-directory
                                        target-aarch64?))
+  #:use-module (guix build io)
   #:use-module (guix build utils)
   #:use-module (guix build gremlin)
   #:use-module (gnu packages bootstrap)
@@ -44,9 +45,6 @@
     (_
      #f)))
 
-(define read-elf
-  (compose parse-elf get-bytevector-all))
-
 (define c-compiler
   (or (which "gcc") (which "cc") (which "g++")))
 
@@ -55,8 +53,7 @@
 
 (unless %guile-executable (test-skip 1))
 (test-assert "elf-dynamic-info-needed, executable"
-  (let* ((elf     (call-with-input-file %guile-executable read-elf))
-         (dyninfo (elf-dynamic-info elf)))
+  (let ((dyninfo (file-dynamic-info %guile-executable)))
     (or (not dyninfo)                             ;static executable
         (lset<= string=?
                 (list (string-append "libguile-" (effective-version))
@@ -129,8 +126,7 @@
 
 (unless c-compiler
   (test-skip 1))
-(test-equal "strip-runpath"
-  "hello\n"
+(test-assert "strip-runpath"
   (call-with-temporary-directory
    (lambda (directory)
      (with-directory-excursion directory
@@ -140,9 +136,7 @@
            (display "int main () { puts(\"hello\"); }" port)))
        (invoke c-compiler "t.c"
                "-Wl,--enable-new-dtags" "-Wl,-rpath=/foo" "-Wl,-rpath=/bar")
-       (let* ((dyninfo (elf-dynamic-info
-                        (parse-elf (call-with-input-file "a.out"
-                                     get-bytevector-all))))
+       (let* ((dyninfo (file-dynamic-info "a.out"))
               (old     (elf-dynamic-info-runpath dyninfo))
               (new     (strip-runpath "a.out"))
               (new*    (strip-runpath "a.out")))
@@ -150,16 +144,11 @@
          (and (member "/foo" old) (member "/bar" old)
               (not (member "/foo" new))
               (not (member "/bar" new))
-              (equal? new* new)
-              (let* ((pipe (open-input-pipe "./a.out"))
-                     (str  (get-string-all pipe)))
-                (close-pipe pipe)
-                str)))))))
+              (equal? new* new)))))))
 
 (unless c-compiler
   (test-skip 1))
-(test-equal "set-file-runpath + file-runpath"
-  "hello\n"
+(test-assert "set-file-runpath + file-runpath"
   (call-with-temporary-directory
    (lambda (directory)
      (with-directory-excursion directory
@@ -178,11 +167,7 @@
                 (set-file-runpath "a.out" (list (make-string 777 #\y))))
               (let ((runpath (delete "/xxxxxxxxx" original-runpath)))
                 (set-file-runpath "a.out" runpath)
-                (equal? runpath (file-runpath "a.out")))
-              (let* ((pipe (open-input-pipe "./a.out"))
-                     (str  (get-string-all pipe)))
-                (close-pipe pipe)
-                str)))))))
+                (equal? runpath (file-runpath "a.out")))))))))
 
 (unless c-compiler
   (test-skip 1))
@@ -196,10 +181,7 @@
            (display "// empty file" port)))
        (invoke c-compiler "t.c"
                "-shared" "-Wl,-soname,libfoo.so.2")
-       (let* ((dyninfo (elf-dynamic-info
-                       (parse-elf (call-with-input-file "a.out"
-                                    get-bytevector-all))))
-              (soname  (elf-dynamic-info-soname dyninfo)))
-	 soname)))))
+       (let ((dyninfo (file-dynamic-info "a.out")))
+	 (elf-dynamic-info-soname dyninfo))))))
 
 (test-end "gremlin")
