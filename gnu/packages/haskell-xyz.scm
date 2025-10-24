@@ -3561,7 +3561,8 @@ diagrams framework}, but potentially has other applications as well.")
        (method url-fetch)
        (uri (hackage-uri "easyplot" version))
        (sha256
-        (base32 "18kndgvdj2apjpfga6fp7m16y1gx8zrwp3c5vfj03sx4v6jvciqk"))))
+        (base32 "18kndgvdj2apjpfga6fp7m16y1gx8zrwp3c5vfj03sx4v6jvciqk"))
+       (snippet #~(rename-file "Setup.lhs" "Setup.hs")))) ; the file lacks lhs syntax
     (build-system haskell-build-system)
     (properties '((upstream-name . "easyplot")))
     (home-page "http://hub.darcs.net/scravy/easyplot")
