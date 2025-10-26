@@ -46,7 +46,7 @@ Documentation License''.
 
 @titlepage
 @title GNU Guix Cookbook
-@subtitle Tutorials and examples for using the GNU Guix Functional Package Manager
+@subtitle Tutorials and examples for GNU Guix
 @author The GNU Guix Developers
 
 @page
