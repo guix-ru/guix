@@ -40478,10 +40478,8 @@ but portable.")
      (append
       (list maturin
             python-anyio
-            python-coverage
             python-dirty-equals
             python-pytest
-            python-pytest-cov
             python-pytest-mock
             python-pytest-timeout
             rust
