@@ -23,7 +23,8 @@
   #:use-module (guix build utils)
   #:use-module (guix build gremlin)
   #:use-module (guix build io)
-  #:use-module (guix elf)
+  #:use-module ((guix build syscalls) #:select
+                (has-access-to-libc-shared-library?))
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (ice-9 regex)
@@ -50,6 +51,21 @@
 ;; builder-side code.
 ;;
 ;; Code:
+
+;;; This is a lazy module loading hack that is necessary until our
+;;; %bootstrap-guile package is new enough (>= 2.1.0) to have (system vm elf).
+(define has-system-vm-elf-module? #t)
+(catch 'misc-error
+ (lambda ()
+   (module-use! (current-module) (resolve-interface '(system vm elf))))
+ (lambda args
+   (set! has-system-vm-elf-module? #f)
+   (format (current-warning-port)
+           "lacking (system vm elf) module; some phases will be skipped~%")))
+
+(define has-elf-editing-support?
+  (and has-system-vm-elf-module?
+       (has-access-to-libc-shared-library?)))
 
 (cond-expand
   (guile-2.2
@@ -522,8 +538,10 @@ makefiles."
 
   (define (guile-bytecode? file)
     (and (string-suffix? ".go" file)
-         (elf-section-by-name (parse-elf (file->bytevector file))
-                              ".guile.procprops")))
+         (if has-elf-editing-support?
+             (elf-section-by-name (parse-elf (file->bytevector file))
+                                  ".guile.procprops")
+             #t)))
 
   (define (strip-dir dir)
     (format #t "stripping binaries in ~s with ~s and flags ~s~%"
@@ -586,7 +604,7 @@ makefiles."
           (dwz-command (which "dwz"))
           #:allow-other-keys)
   (define debug-output (assoc-ref outputs "debug"))
-  (when debug-output
+  (when (and has-elf-editing-support? debug-output)
     (let* ((common-file (string-append debug-output
                                        "/lib/debug/" (assoc-ref outputs "out")
                                        "/common.debug"))
@@ -663,7 +681,7 @@ ELF-DIRECTORIES have their dependencies found in their 'RUNPATH'."
               (length files) directory)
       (every* validate-needed-in-runpath files)))
 
-  (if validate-runpath?
+  (if (and has-elf-editing-support? validate-runpath?)
       (let ((dirs (append-map (match-lambda
                                 (("debug" . _)
                                  ;; The "debug" output is full of ELF files
@@ -925,7 +943,7 @@ that traversing all the RUNPATH entries entails."
         (format #t "created '~a' from ~a library search path entries~%"
                 cache-file (length library-path)))))
 
-  (if make-dynamic-linker-cache?
+  (if (and has-elf-editing-support? make-dynamic-linker-cache?)
       (match outputs
         (((_ . directories) ...)
          (for-each make-cache-for-output directories)))

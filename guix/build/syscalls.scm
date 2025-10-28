@@ -43,7 +43,9 @@
   #:use-module (ice-9 regex)
   #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
-  #:export (protection
+  #:export (has-access-to-libc-shared-library?
+
+            protection
             protection-set
             mmap-flag
             mmap-flag-set
@@ -256,6 +258,9 @@
 ;;; syscalls from this module in static or dynamic Guile context.
 ;;;
 ;;; Code:
+
+(define (has-access-to-libc-shared-library?)
+  (false-if-exception (dynamic-link "libc.so.6")))
 
 
 ;;;

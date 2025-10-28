@@ -18,7 +18,6 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (guix build gremlin)
-  #:use-module (guix elf)
   #:use-module (guix build io)
   #:use-module ((guix build utils) #:select (store-file-name?))
   #:use-module (ice-9 match)
@@ -63,6 +62,17 @@
 ;;; to deal with dynamic-link information from ELF files.
 ;;;
 ;;; Code:
+
+;;; This is a lazy module loading hack that is necessary until our
+;;; %bootstrap-guile package is new enough (>= 2.1.0) to have (system vm elf).
+(define has-system-vm-elf-module? #t)
+(catch 'misc-error
+ (lambda ()
+   (module-use! (current-module) (resolve-interface '(system vm elf))))
+ (lambda args
+   (set! has-system-vm-elf-module? #f)
+   (format (current-warning-port)
+           "no (system vm elf) module; (guix build gremlin) unusable~%")))
 
 (define-condition-type &elf-error &error
   elf-error?
