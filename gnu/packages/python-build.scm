@@ -41,6 +41,7 @@
 (define-module (gnu packages python-build)
   #:use-module (gnu packages)
   #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix build-system gnu)
   #:use-module (guix build-system python)
   #:use-module (guix build-system pyproject)
   #:use-module (guix gexp)
@@ -375,6 +376,53 @@ facilitate packaging Python projects, where packaging includes:
                    license:expat        ;six, appdirs, pyparsing
                    license:asl2.0       ;packaging is dual ASL2/BSD-2
                    license:bsd-2))))
+
+(define-public python-setuptools-bootstrap
+  (package/inherit python-setuptools
+    (name "python-setuptools-bootstrap")
+    ;; version and source are purposefully not inherited, to allow
+    ;; updating python-setuptools in the python-team scope, whereas
+    ;; python-setuptools-bootstrap is in the core-packages-team scope.
+    (version "80.9.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "setuptools" version))
+       (sha256
+        (base32 "175iixi2h2jz8y2bpwziak360hvv43jfhipwzbdniryd5r04fszk"))
+       (modules '((guix build utils)))
+       (snippet
+        ;; TODO: setuptools now bundles the following libraries:
+        ;; packaging, pyparsing, six and appdirs.  How to unbundle?
+        ;; Remove included binaries which are used to build self-extracting
+        ;; installers for Windows.
+        '(for-each delete-file (find-files "setuptools"
+                                           "^(cli|gui).*\\.exe$")))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;disabled to avoid extra dependencies
+      ;; Essentially a lighter copy of the former python-build-system.
+      ;; Using it rather than pyproject-build-system allows to edit the latter
+      ;; without a world rebuild (for the meson package in particular).
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'bootstrap)
+          (delete 'configure)
+          (replace 'build
+            (lambda _
+              (invoke "python" "./setup.py" "build")))
+          (replace 'install
+            (lambda _
+              (invoke "python" "./setup.py" "install"
+                      (string-append "--prefix=" #$output) "--no-compile")
+              (invoke "python" "-m" "compileall"
+                      "--invalidation-mode=unchecked-hash" #$output))))))
+    (native-inputs (list))
+    ;; Avoid introducing an additional module-dependency.
+    (inputs (list (module-ref (resolve-interface '(gnu packages python))
+                              'python-wrapper)))
+    (propagated-inputs (list))))
 
 (define-public python-setuptools-67
   (package
