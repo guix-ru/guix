@@ -748,14 +748,14 @@ source files.")
 (define-public node-lts
   (package
     (inherit node-bootstrap)
-    (version "24.9.0")
+    (version "24.11.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nodejs.org/dist/v" version
                                   "/node-v" version ".tar.gz"))
               (sha256
                (base32
-                "0q34zr3wb9m54033ghr9shyp611yvmmaz9klfvc5xc3w6y48v1iw"))
+                "07xprlib8n1x55sxpnvycimhq86ch0pna5v8i712ddas1jsxsyrg"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -931,30 +931,22 @@ source files.")
            ;;   https://github.com/npm/pacote/issues/285
            (add-after 'install 'ignore-number-of-hardlinks
              (lambda* (#:key outputs #:allow-other-keys)
-               (let ((file (string-append (assoc-ref outputs "out")
-                                          "/lib/node_modules/npm/node_modules"
-                                          "/tar/lib/write-entry.js")))
-                 (substitute* file
+               (let ((dir (string-append (assoc-ref outputs "out")
+                                         "/lib/node_modules/npm/node_modules"
+                                         "/tar/dist")))
+                 (substitute*
+                     (list (string-append dir "/esm/write-entry.js")
+                           (string-append dir "/commonjs/write-entry.js"))
                    (("this.stat.nlink > 1") "false")))))
-           (add-after 'install 'install-node-gyp-wrapper
+           (replace 'fix-node-gyp-reference
              (lambda* (#:key inputs outputs #:allow-other-keys)
-               (let* ((out (assoc-ref outputs "out"))
-                      (dir (string-append out "/lib/node_modules/npm/bin/node-gyp-bin"))
-                      (file (string-append dir "/node-gyp")))
-                 (mkdir-p dir)
-                 ;; See https://github.com/npm/cli/issues/6842
-                 (call-with-output-file file
-                   (lambda (port)
-                     (format port "#!~a/bin/sh
-if [ \"x$npm_config_node_gyp\" = \"x\" ]; then
-  ~a/bin/node \"~a/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js\" \"$@\"
-else
-  \"$npm_config_node_gyp\" \"$@\"
-fi"
-                             (assoc-ref inputs "bash")
-                             out
-                             out)))
-                 (chmod file #o555))))))))
+               (let ((out (assoc-ref outputs "out")))
+                 (for-each
+                  (lambda (spec)
+                    (wrap-program (string-append out spec)
+                      `("npm_package_config_node_gyp_nodedir" = (,out))))
+                  '("/bin/npm"
+                    "/bin/npx")))))))))
     (native-inputs
      (list ;; Runtime dependencies for binaries used as a bootstrap.
            c-ares-for-node-lts
