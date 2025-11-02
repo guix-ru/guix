@@ -26303,7 +26303,7 @@ http://semver.org/}.")
            #~(list "-k"
                    (string-join
                     ;; Those tests require network.
-                    (list "testBCstart"
+                    (list "not testBCstart"
                           "testAutoClean"
                           "testDaemonPyroObj"
                           "testLookupAndRegister"
@@ -26323,18 +26323,12 @@ http://semver.org/}.")
                           "testGetIP"
                           ;; XXX: Unclear why this test fails.
                           "testCustomClassFail")
-                    " and not "))
-           #:phases
-           #~(modify-phases %standard-phases
-               (replace 'check
-                 (lambda* (#:key tests? test-flags #:allow-other-keys)
-                   (if tests?
-                       (apply invoke "python" "-m" "unittest" test-flags)
-                       (format #t "test suite not run.~%")))))))
+                    " and not "))))
     (native-inputs
      (list python-cloudpickle
            python-dill
            python-msgpack
+           python-pytest
            python-setuptools
            python-wheel))
     (propagated-inputs
