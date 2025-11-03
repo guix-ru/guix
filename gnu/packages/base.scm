@@ -107,6 +107,7 @@
               (sha256
                (base32
                 "1aqq1379syjckf0wdn9vs6wfbapnj9zfikhiykf29k4jq9nrk6js"))))
+    (outputs (list "out" "debug"))
     (build-system gnu-build-system)
     (synopsis "Example GNU package")
     (description
