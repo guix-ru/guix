@@ -1577,6 +1577,10 @@
   (crate-source "aws-lc-rs" "1.14.0"
                 "11i7l7pddlw808xidvm5fb0qi2qnc2lclh9nlmnv2myd15ngzf4l"))
 
+(define rust-aws-lc-rs-1.15.2
+  (crate-source "aws-lc-rs" "1.15.2"
+                "1252fxzkb0pk2xla0jq5fki88xjv9k40fyma7d2ja7sg8sram23a"))
+
 (define rust-aws-lc-rs-1.16.0
   (crate-source "aws-lc-rs" "1.16.0"
                 "1acsazi40b19inwq96c04a2d9jsnfb1jnc4q4q86f5xvwd8b79yr"))
@@ -1617,6 +1621,11 @@
   (crate-source "aws-lc-sys" "0.31.0"
                 "1kcxz4rdglzmw7r6ni45ys1hnn35pp7956w9r6g6mbxcg1kx2i0f"
                 #:snippet '(delete-file-recursively "builder/prebuilt-nasm")))
+
+(define rust-aws-lc-sys-0.35.0
+  ;; TODO: Unbundle aws-lc.
+  (crate-source "aws-lc-sys" "0.35.0"
+                "18c8ww8ql7hg39awj5nsj4fz8iy7vn6zhla7h4k92z0yxvyzynml"))
 
 (define rust-aws-lc-sys-0.37.1
   ;; TODO: Unbundle aws-lc.
@@ -10954,6 +10963,10 @@
   (crate-source "google-cloud-token" "0.1.2"
                 "0pvjdnfnz6qrz7mq1xhm8k7gnxv94iamjn785j5147djm0mw2jcg"))
 
+(define rust-governor-0.10.1
+  (crate-source "governor" "0.10.1"
+                "06da7qlv0ffbchxmvlsrhwflmd9kjm16km9dl9x3hqm7n6xhai24"))
+
 (define rust-governor-0.10.4
   (crate-source "governor" "0.10.4"
                 "1f132b6a625j4gskmdlvhhyn1xv82sz42ajsybqhyn2q34yapz4y"
@@ -17698,6 +17711,10 @@
   (crate-source "openssl-probe" "0.1.6"
                 "0bl52x55laalqb707k009h8kfawliwp992rlsvkzy49n47p2fpnh"))
 
+(define rust-openssl-probe-0.2.0
+  (crate-source "openssl-probe" "0.2.0"
+                "14bk0gw4sqw4fqywl2032d69k538r91a42mdf7byq2dvvarxjl4z"))
+
 (define rust-openssl-probe-0.2.1
   (crate-source "openssl-probe" "0.2.1"
                 "1gpwpb7smfhkscwvbri8xzbab39wcnby1jgz1s49vf1aqgsdx1vw"))
@@ -21267,6 +21284,10 @@
 (define rust-reqwest-0.12.28
   (crate-source "reqwest" "0.12.28"
                 "0iqidijghgqbzl3bjg5hb4zmigwa4r612bgi0yiq0c90b6jkrpgd"))
+
+(define rust-reqwest-0.13.1
+  (crate-source "reqwest" "0.13.1"
+                "0qig3k8sh6lcwygjsq89wrqkbaxff4rg180nrhq5ykl1kn603s84"))
 
 (define rust-reqwest-0.13.2
   (crate-source "reqwest" "0.13.2"
@@ -25488,6 +25509,10 @@
 (define rust-termion-1.5.6
   (crate-source "termion" "1.5.6"
                 "0zk023f0zkws358ll399cawvwdnd0wg8wad4g61kz766xbi8aw87"))
+
+(define rust-termion-4.0.5
+  (crate-source "termion" "4.0.5"
+                "1fr2q51grjia1ysl9q3vsixx6b3ybzsi79ss38rdd6b7wafscs9n"))
 
 (define rust-termion-4.0.6
   (crate-source "termion" "4.0.6"
@@ -31336,6 +31361,10 @@
 (define rust-zmij-1.0.12
   (crate-source "zmij" "1.0.12"
                 "1y3ryrh5rg1aqv92vndmf0680jyczni5m6fy3cjz32q741madi9g"))
+
+(define rust-zmij-1.0.13
+  (crate-source "zmij" "1.0.13"
+                "1v69z4425x3cpxzc793qfs3zvh559wjaqjkp9j3246vnbcpl74xc"))
 
 (define rust-zmij-1.0.14
   (crate-source "zmij" "1.0.14"
