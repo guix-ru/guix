@@ -3,7 +3,7 @@
 ;;; Copyright © 2015 Eric Bavier <bavier@member.fsf.org>
 ;;; Copyright © 2016-2025 Nicolas Goaziou <mail@nicolasgoaziou.fr>
 ;;; Copyright © 2018 Tobias Geerinckx-Rice <me@tobias.gr>
-;;; Copyright © 2020 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2020, 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2022 Antero Mejr <antero@mailbox.org>
 ;;; Copyright © 2023 gemmaro <gemmaro.dev@gmail.com>
 ;;;
@@ -45,6 +45,7 @@
   #:use-module (gnu packages flex)
   #:use-module (gnu packages ghostscript)
   #:use-module (gnu packages gl)
+  #:use-module (gnu packages graphics)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages image)
@@ -375,17 +376,27 @@ colors, styles, options and details.")
                   (substitute* "libplot/z_write.c"
                     (("png_ptr->jmpbuf")
                      "png_jmpbuf (png_ptr)"))
-                  #t))
+                  ;; Unbundle libxmi.
+                  (delete-file-recursively "libxmi")))
               (patches
-               ;; The test suite fails on some architectures such as i686 (see:
-               ;; https://lists.gnu.org/archive/html/bug-plotutils/2016-04/msg00002.html).
-               ;; The following Debian patch works around it.
-               (search-patches "plotutils-spline-test.patch"))))
+               (search-patches
+                "plotutils-c23.patch"
+                "plotutils-configure-c99.patch"
+                "plotutils-cxx17-fix.patch"
+                "plotutils-format-security.patch"
+                "plotutils-libxmi.patch"
+                "plotutils-makefile.patch"
+                "plotutils-rangecheck.patch"
+                ;; The test suite fails on some architectures such as i686
+                ;; (see:
+                ;; https://lists.gnu.org/archive/html/bug-plotutils/2016-04/msg00002.html).
+                ;; The following Debian patch works around it.
+                "plotutils-spline-test.patch"))))
     (build-system gnu-build-system)
     (arguments
      (list #:configure-flags
            #~(list "--enable-libplotter"
-
+                   "--disable-static"
                    ;; On i686 some tests fail due to excess floating point
                    ;; precision; work around it.  However, libplotter is C++
                    ;; and thus unaffected by CFLAGS, but '-fexcess-precision'
@@ -395,16 +406,21 @@ colors, styles, options and details.")
                           #~()))
 
            #:phases
-           (if (target-x86-32?)
-               #~(modify-phases %standard-phases
-                   (add-before 'check 'skip-sloppy-test
-                     (lambda _
-                       ;; This test reveals a slight difference in the SVG
-                       ;; output due to floating point inequalities.  Skip it.
-                       (substitute* "test/plot2svg.test"
-                         (("^exit .*") "exit 77")))))
-               #~%standard-phases)))
-    (inputs (list libpng libx11 libxt libxaw))
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'force-bootstrap
+                 (lambda _
+                   (delete-file "configure")))
+               #$@(if (target-x86-32?)
+                      #~((add-before 'check 'skip-sloppy-test
+                           (lambda _
+                             ;; This test reveals a slight difference in the
+                             ;; SVG output due to floating point inequalities.
+                             ;; Skip it.
+                             (substitute* "test/plot2svg.test"
+                               (("^exit .*") "exit 77")))))
+                      #~()))))
+    (native-inputs (list autoconf automake libtool))
+    (inputs (list libpng libx11 libxaw libxmi libxt))
     (home-page "https://www.gnu.org/software/plotutils/")
     (synopsis "Plotting utilities and library")
     (description

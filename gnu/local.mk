@@ -1761,6 +1761,13 @@ dist_patch_DATA =						\
   %D%/packages/patches/libmpeg2-global-symbol-test.patch	\
   %D%/packages/patches/liblinphone-jsoncpp.patch		\
   %D%/packages/patches/libphonenumber-reproducible-build.patch	\
+  %D%/packages/patches/plotutils-c23.patch                      \
+  %D%/packages/patches/plotutils-configure-c99.patch            \
+  %D%/packages/patches/plotutils-cxx17-fix.patch                \
+  %D%/packages/patches/plotutils-format-security.patch          \
+  %D%/packages/patches/plotutils-libxmi.patch                   \
+  %D%/packages/patches/plotutils-makefile.patch                 \
+  %D%/packages/patches/plotutils-rangecheck.patch               \
   %D%/packages/patches/libqalculate-3.8.0-libcurl-ssl-fix.patch	\
   %D%/packages/patches/libquicktime-ffmpeg.patch 		\
   %D%/packages/patches/libsecret-fix-test-paths.patch		\
