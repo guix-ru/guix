@@ -1733,7 +1733,9 @@ command.")
                      (copy-recursively (string-append out "/share/zoneinfo-leaps")
                                        (string-append out "/share/zoneinfo/right"))
                      (delete-file-recursively
-                      (string-append out "/share/zoneinfo-leaps")))))
+                      (string-append out "/share/zoneinfo-leaps"))
+                     (install-file "leap-seconds.list"
+                                   (string-append out "/share/zoneinfo")))))
                (delete 'configure))))
     (inputs (list (origin
                     (method url-fetch)
@@ -1761,20 +1763,6 @@ and daylight-saving rules.")
 ;;; Please make this a hidden-package if it is different from the primary tzdata
 ;;; package.
 (define-public tzdata-for-tests tzdata)
-
-;;; TODO: Move the 'install-leap-seconds' phase into the main package's
-;;; 'post-install' phase on the next rebuild cycle.
-(define-public tzdata/leap-seconds
-  (hidden-package
-    (package/inherit tzdata
-      (arguments
-        (substitute-keyword-arguments (package-arguments tzdata)
-          ((#:phases phases)
-           #~(modify-phases #$phases
-               (add-after 'post-install 'install-leap-seconds
-                 (lambda _
-                   (install-file "leap-seconds.list"
-                     (string-append #$output "/share/zoneinfo")))))))))))
 
 (define-public libiconv
   (package
