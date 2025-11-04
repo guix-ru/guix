@@ -1233,13 +1233,18 @@ basic geometries.")
 (define-public libxmi
   (package
     (name "libxmi")
-    (version "1.2")
+    (version "1.3")                     ;version bundled in plotutils
     (source (origin
               (method url-fetch)
-              (uri (string-append "mirror://gnu/libxmi/libxmi-" version ".tar.gz"))
+              ;; XXX: Use this Gentoo-maintained fork, which is the more
+              ;; up-to-date 1.3 version bundled with plotutils.
+              (uri (string-append "http://gentoo.osuosl.org/distfiles/65/"
+                                  name "-" version ".tar.xz"))
               (sha256
                (base32
-                "03d4ikh29l38rl1wavb0icw7m5pp7yilnv7bb2k8qij1dinsymlx"))))
+                "04npjh8k2ipmpwflfivqchga5r2qw7qbhbyk9n6kgccsm3aaxwl6"))
+              (patches (search-patches "libxmi-gcc15.patch"
+                                       "libxmi-implicit.patch"))))
     (build-system gnu-build-system)
     (arguments (list #:configure-flags #~(list "--disable-static")
                      #:phases #~(modify-phases %standard-phases
