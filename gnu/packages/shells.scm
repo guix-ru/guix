@@ -896,7 +896,7 @@ A @code{andglob} program is also provided along with s.")
 (define-public oksh
   (package
     (name "oksh")
-    (version "7.5")
+    (version "7.8")
     (source
      (origin
        (method url-fetch)
@@ -905,7 +905,7 @@ A @code{andglob} program is also provided along with s.")
              version "/oksh-" version ".tar.gz"))
        (sha256
         (base32
-         "0pgdxvy8jgydsyzk7vcc93pm09bihqvrn3i35gz1ncg9z31rbf20"))))
+         "0l59x9mm6nbixcpz3zf3iplqili2gyw8l382rj89b0iv32hxac1v"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f   ; there are no tests available
