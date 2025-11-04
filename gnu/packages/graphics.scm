@@ -1230,6 +1230,34 @@ basic geometries.")
     ;; https://gitlab.com/inkscape/inkscape/issues/784).
     (license license:gpl3+)))
 
+(define-public libxmi
+  (package
+    (name "libxmi")
+    (version "1.2")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/libxmi/libxmi-" version ".tar.gz"))
+              (sha256
+               (base32
+                "03d4ikh29l38rl1wavb0icw7m5pp7yilnv7bb2k8qij1dinsymlx"))))
+    (build-system gnu-build-system)
+    (arguments (list #:configure-flags #~(list "--disable-static")
+                     #:phases #~(modify-phases %standard-phases
+                                  (add-before 'bootstrap 'force-bootstrap
+                                    (lambda _
+                                      (delete-file "configure"))))))
+    (native-inputs (list autoconf automake libtool))
+    (home-page "https://www.gnu.org/software/libxmi/libxmi.html")
+    (synopsis "Library for rasterizing 2-d vector graphics")
+    (description "GNU libxmi is a library for rasterizing 2D vector graphics for C and
+C++.  It supports drawing 2D primitives into a user-supplied matrix of pixels.
+It also supports the specification of sophisticated line styles such as
+multi-colored dashed patterns.  Filling and texturing polygons is also
+supported.")
+    ;; For the combined work, with some files (mi_*.c and mi_*.h) under X11
+    ;; and X11-style licenses.
+    (license license:gpl2+)))
+
 (define-public python-booleanoperations
   (package
     (name "python-booleanoperations")
