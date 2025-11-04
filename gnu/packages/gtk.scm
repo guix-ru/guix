@@ -1099,22 +1099,22 @@ application suites.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'disable-failing-tests
             (lambda _
-                ;; These tests fail only in the containerized environment, for
-                ;; unknown reasons.
-                (substitute* "testsuite/gtk/meson.build"
-                  ((".*\\['defaultvalue'],.*") "")
-                  ((".*\\['objects-finalize',.*") ""))
-                ;; The 'flipping-icons.ui' and 'gtk-icontheme-sizing.ui' tests
-                ;; fail for unknown reasons (see:
-                ;; <https://gitlab.gnome.org/GNOME/gtk/-/issues/7679>).
-                (substitute* "testsuite/reftests/meson.build"
-                  (("  'flipping-icons.ui',.*") "")
-                  (("  'gtk-icontheme-sizing.ui',.*") ""))
-                ;; This test fails just on i686-linux, for unknown reasons.
-                #$@(if (target-x86-32?)
-                       #~((substitute* "testsuite/reftests/meson.build"
-                            (("  'linear-gradient.ui',.*") "")))
-                       #~())))
+              ;; These tests fail only in the containerized environment, for
+              ;; unknown reasons.
+              (substitute* "testsuite/gtk/meson.build"
+                ((".*\\['defaultvalue'],.*") "")
+                ((".*\\['objects-finalize',.*") ""))
+              ;; The 'flipping-icons.ui' and 'gtk-icontheme-sizing.ui' tests
+              ;; fail for unknown reasons (see:
+              ;; <https://gitlab.gnome.org/GNOME/gtk/-/issues/7679>).
+              (substitute* "testsuite/reftests/meson.build"
+                (("  'flipping-icons.ui',.*") "")
+                (("  'gtk-icontheme-sizing.ui',.*") ""))
+              ;; This test fails just on i686-linux, for unknown reasons.
+              #$@(if (target-x86-32?)
+                     #~((substitute* "testsuite/reftests/meson.build"
+                          (("  'linear-gradient.ui',.*") "")))
+                     #~())))
           (add-after 'unpack 'generate-gdk-pixbuf-loaders-cache-file
             (assoc-ref glib-or-gtk:%standard-phases
                        'generate-gdk-pixbuf-loaders-cache-file))
@@ -1138,8 +1138,8 @@ application suites.")
                                           "/share/applications")))))))
     (native-search-paths
      (list (search-path-specification
-            (variable "GUIX_GTK3_PATH")
-            (files '("lib/gtk-3.0")))))))
+             (variable "GUIX_GTK3_PATH")
+             (files '("lib/gtk-3.0")))))))
 
 (define-public gtk+/fixed
   (let* ((base gtk+)
