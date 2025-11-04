@@ -677,20 +677,18 @@ def contents() -> str:
   (package
     (inherit python-3.10)
     (name "python")
-    (version "3.11.11")
-    (replacement python-3.11/fixed)
+    (version "3.11.14")
     (source (origin
               (method url-fetch)
-              (uri (string-append "https://www.python.org/ftp/python/"
-                                  version "/Python-" version ".tar.xz"))
+              (uri (string-append "https://www.python.org/ftp/python/" version
+                                  "/Python-" version ".tar.xz"))
               (patches (search-patches
                         "python-3-deterministic-build-info.patch"
                         "python-3.11-fix-tests.patch"
                         "python-3-hurd-configure.patch"
                         "python-3-search-paths.patch"))
-              (sha256
-               (base32
-                "1qrvsxg5g0b0pgz2iigxic2j3g6b2c59iva46vins8ydl33j169a"))
+              (sha256 (base32
+                       "0y4v42qm66nvizjxbnixh59283a54nki51jmbrgwkhc8bkndhgld"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -1080,16 +1078,6 @@ def contents() -> str:
            (search-path-specification
             (variable "PYTHONTZPATH")
             (files (list "share/zoneinfo")))))))
-
-(define-public python-3.11/fixed
-  (package/inherit python-3.11
-    (version "3.11.14")
-    (source (origin
-              (inherit (package-source python-3.11))
-              (uri (string-append "https://www.python.org/ftp/python/" version
-                                  "/Python-" version ".tar.xz"))
-              (sha256 (base32
-                       "0y4v42qm66nvizjxbnixh59283a54nki51jmbrgwkhc8bkndhgld"))))))
 
 (define-public python-3.12
   (package
