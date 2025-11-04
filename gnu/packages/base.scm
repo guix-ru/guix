@@ -1668,13 +1668,13 @@ command.")
     ;; in (gnu packages time).
     (version "2025b")
     (source (origin
-             (method url-fetch)
-             (uri (string-append
-                   "https://data.iana.org/time-zones/releases/tzdata"
-                   version ".tar.gz"))
-             (sha256
-              (base32
-               "0x0lswl5v3q3ml8ig4djc76p9zc593xajzp22x881isz6h9h908i"))))
+              (method url-fetch)
+              (uri (string-append
+                    "https://data.iana.org/time-zones/releases/tzdata"
+                    version ".tar.gz"))
+              (sha256
+               (base32
+                "0x0lswl5v3q3ml8ig4djc76p9zc593xajzp22x881isz6h9h908i"))))
     (build-system gnu-build-system)
     (arguments
      (list #:tests? #f
