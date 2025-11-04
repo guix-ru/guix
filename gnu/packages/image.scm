@@ -25,7 +25,7 @@
 ;;; Copyright © 2018 Rutger Helling <rhelling@mykolab.com>
 ;;; Copyright © 2020 Giacomo Leidi <goodoldpaul@autistici.org>
 ;;; Copyright © 2020 R Veera Kumar <vkor@vkten.in>
-;;; Copyright © 2020, 2023 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2020, 2023, 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2020, 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2020 Zhu Zihao <all_but_last@163.com>
 ;;; Copyright © 2020, 2021, 2022, 2023, 2024 Vinicius Monego <monego@posteo.net>
@@ -292,70 +292,6 @@ library.  It supports almost all PNG features and is extensible.")
   ;; The APNG patch is maintained separately and may lag behind upstream libpng.
   (package
     (name "libpng-apng")
-    (version "1.6.39")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (list (string-append "mirror://sourceforge/libpng/libpng16/"
-                                 version "/libpng-" version ".tar.xz")
-                  (string-append
-                   "ftp://ftp.simplesystems.org/pub/libpng/png/src"
-                   "/libpng16/libpng-" version ".tar.xz")
-                  (string-append
-                   "ftp://ftp.simplesystems.org/pub/libpng/png/src/history"
-                   "/libpng16/libpng-" version ".tar.xz")))
-       (sha256
-        (base32 "0dv90dxvmqpk7mbywyjbz8lh08cv4b0ksqp1y62mzvmlf379cihz"))))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:modules ((guix build gnu-build-system)
-                  (guix build utils)
-                  (srfi srfi-1))
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-apng
-           (lambda* (#:key inputs #:allow-other-keys)
-             (define (apply-patch file)
-               (invoke "patch" "-p1" "--force"
-                       "--input" file))
-             (let ((apng.gz (assoc-ref inputs "apng")))
-               (format #t "Applying APNG patch '~a'...~%"
-                       apng.gz)
-               (invoke "sh" "-c"
-                       (string-append "gunzip < " apng.gz " > the-patch"))
-               (apply-patch "the-patch"))))
-         (add-before 'configure 'no-checks
-           (lambda _
-             (substitute* "Makefile.in"
-               (("^scripts/symbols.chk") "")
-               (("check: scripts/symbols.chk") "")))))))
-    (inputs
-     `(("apng" ,(origin
-                  (method url-fetch)
-                  (uri
-                   (string-append "mirror://sourceforge/libpng-apng/libpng16/"
-                                  version "/libpng-" version "-apng.patch.gz"))
-                  (sha256
-                   (base32
-                    "1z8cx011a2c7vagwgi92rbmky1wi8awmrdldqh9f5k80pbmbdi2a"))))))
-    (native-inputs
-     (list libtool))
-    ;; libpng.la says "-lz", so propagate it.
-    (propagated-inputs
-     (list zlib))
-    (synopsis "APNG patch for libpng")
-    (description
-     "APNG (Animated Portable Network Graphics) is an unofficial
-extension of the APNG (Portable Network Graphics) format.
-APNG patch provides APNG support to libpng.")
-    (home-page "https://sourceforge.net/projects/libpng-apng/")
-    (license license:zlib)))
-
-;; Temporary, until 76798 merges into core-packages-team, and that merges into
-;; master.
-(define-public libpng-apng-next
-  (package
-    (inherit libpng-apng)
     (version "1.6.50")
     (source
      (origin
@@ -371,17 +307,49 @@ APNG patch provides APNG support to libpng.")
        (sha256
         (base32
          "01r34c31gq136jwshdfira44wbl6nb8qfgj4a4vam9r0hr8rdwsd"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:modules '((guix build gnu-build-system)
+                  (guix build utils)
+                  (srfi srfi-1))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-apng
+            (lambda* (#:key inputs #:allow-other-keys)
+              (define (apply-patch file)
+                (invoke "patch" "-p1" "--force"
+                        "--input" file))
+              (let ((apng.gz (assoc-ref inputs "apng")))
+                (format #t "Applying APNG patch '~a'...~%"
+                        apng.gz)
+                (invoke "sh" "-c"
+                        (string-append "gunzip < " apng.gz " > the-patch"))
+                (apply-patch "the-patch"))))
+          (add-before 'configure 'no-checks
+            (lambda _
+              (substitute* "Makefile.in"
+                (("^scripts/symbols.chk") "")
+                (("check: scripts/symbols.chk") "")))))))
     (inputs
-     (modify-inputs (package-inputs libpng-apng)
-       (replace "apng"
-         (origin
-           (method url-fetch)
-           (uri
-            (string-append "mirror://sourceforge/libpng-apng/libpng16/"
-                           version "/libpng-" version "-apng.patch.gz"))
-           (sha256
-            (base32
-             "0r811izi40qzy69jmhz0xlkpqlsjj89bang1b3ma6a5igh6dqzb8"))))))))
+     `(("apng" ,(origin
+                  (method url-fetch)
+                  (uri
+                   (string-append "mirror://sourceforge/libpng-apng/libpng16/"
+                                  version "/libpng-" version "-apng.patch.gz"))
+                  (sha256
+                   (base32
+                    "0r811izi40qzy69jmhz0xlkpqlsjj89bang1b3ma6a5igh6dqzb8"))))))
+    (native-inputs (list libtool))
+    ;; libpng.la says "-lz", so propagate it.
+    (propagated-inputs (list zlib))
+    (synopsis "APNG patch for libpng")
+    (description
+     "APNG (Animated Portable Network Graphics) is an unofficial
+extension of the APNG (Portable Network Graphics) format.
+APNG patch provides APNG support to libpng.")
+    (home-page "https://sourceforge.net/projects/libpng-apng/")
+    (license license:zlib)))
 
 (define-public pngcrush
   (package
