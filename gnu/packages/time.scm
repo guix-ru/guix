@@ -281,14 +281,14 @@ you will remove support for the pytz-specific interface.")
   (package
     (name "python-pytz")
     ;; This package should be kept in sync with tzdata in (gnu packages base).
-    (version "2025.1")
+    (version "2025.2")
     (source
      (origin
       (method url-fetch)
       (uri (pypi-uri "pytz" version))
       (sha256
        (base32
-        "13hpf2my8mgqkr38ch7s3rym9zz60m6pq87rcn7b46155az45ny2"))))
+        "1hw1drs4cdc1cp3j92dk93h46dj5zg3hj66n3b10k8j9pcyrw2rn"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:test-backend #~'unittest
