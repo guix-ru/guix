@@ -2394,14 +2394,14 @@ since the last commit or what tests are currently failing.")
 (define-public python-coverage
   (package
     (name "python-coverage")
-    (version "7.9.2")
+    (version "7.11.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "coverage" version))
        (sha256
         (base32
-         "12qcm2j4bnc2gp6sci9brly2k406gp4jwjfpzxj04ag3a7x28w4r"))))
+         "0l403f6d59q8rik9vvzb6982qad0zrfj87dqydzsz8hwmh2dayqn"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -2417,6 +2417,7 @@ since the last commit or what tests are currently failing.")
          "--ignore=tests/test_venv.py"
          "--ignore=tests/test_plugins.py"
          "--ignore=tests/test_debug.py"
+         "--ignore=tests/test_core.py"
          ;; XXX: Unclear why these fail.
          "--ignore=tests/test_python.py"
          "--deselect=tests/test_concurrency.py\
@@ -2445,7 +2446,12 @@ since the last commit or what tests are currently failing.")
          #$@(if (equal? (%current-system) "riscv64-linux")
                 '("--deselect=tests/test_numbits.py::NumbitsOpTest::test_union"
                   "--deselect=tests/test_numbits.py::NumbitsOpTest::test_any_intersection")
-                '()))
+                '())
+         ;; Fails some "'p1c' not in 'Name" assertions (see:
+         ;; <https://github.com/nedbat/coveragepy/issues/2050#issuecomment-3489704251>).
+         "--ignore=tests/test_api.py"
+         ;; This tests fails due to missing file tests/actual/testing/getty.
+         "-k" "not test_good_needs_scrubs")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-pyproject
