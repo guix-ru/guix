@@ -594,7 +594,7 @@ freedesktop.org project.")
   ;; Updating this will rebuild over 700 packages through libinput-minimal.
   (package
     (name "libinput")
-    (version "1.29.1")
+    (version "1.29.901")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -603,24 +603,15 @@ freedesktop.org project.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "11n2vqkdz40vbqdjwm19i7rv2lzqf4i7anlla0havf7h0glqin60"))))
+                "0lzkns9k6zfa04d8y76fgca4i7ag92w33yrdnnnmgfdv5lng5psn"))))
     (build-system meson-build-system)
     (arguments
-     `(#:configure-flags '("-Ddocumentation=false")
-
-       ;; XXX: Using 'debug' or 'debugoptimized' pulls in an additional test that
-       ;; hangs, and the comments around it suggests that we should be using this
-       ;; Meson target anyway.
-       #:build-type "release"
-       #:phases
-       ,@(if (target-64bit?)
-             `(%standard-phases)
-             `((modify-phases %standard-phases
-                 ;; Backported from a commit after the 1.29.0 release.
-                 (add-after 'unpack 'correct-value-type-in-atou64_test
-                   (lambda _
-                     (substitute* "test/test-utils.c"
-                       (("unsigned long val") "uint64_t val")))))))))
+     (list
+      #:configure-flags '(list "-Ddocumentation=false")
+      ;; XXX: Using 'debug' or 'debugoptimized' pulls in an additional test that
+      ;; hangs, and the comments around it suggests that we should be using this
+      ;; Meson target anyway.
+      #:build-type "release"))
     (native-inputs
      (append (list check pkg-config python-minimal-wrapper python-pytest)
              (if (%current-target-system)
@@ -654,10 +645,10 @@ other applications that need to directly deal with input devices.")
            '("cairo" "glib" "gtk+" "libwacom")))
     (arguments
      (substitute-keyword-arguments (package-arguments libinput)
-      ((#:configure-flags flags ''())
-       `(cons* "-Dlibwacom=false"
-               "-Ddebug-gui=false"    ;requires gtk+@3
-               ,flags))))))
+       ((#:configure-flags flags ''())
+        #~(cons* "-Dlibwacom=false"
+                 "-Ddebug-gui=false"    ;requires gtk+@3
+                 #$flags))))))
 
 (define-public libei
   (package
