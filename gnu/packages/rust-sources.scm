@@ -1,6 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2025 Hilton Chain <hako@ultrarare.space>
 ;;; Copyright © 2023-2025 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2025 Noé Lopez <noelopez@free.fr>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -23,8 +24,10 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
+  #:use-module (guix search-paths)
   #:use-module (guix build-system cargo)
   #:use-module (guix build-system trivial)
+  #:use-module ((guix config) #:select (%storedir))
   #:use-module (guix utils)
   #:use-module (gnu packages)
   #:use-module (gnu packages assembly)
@@ -36,7 +39,8 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages rust)
-  #:use-module (gnu packages textutils))
+  #:use-module (gnu packages textutils)
+  #:use-module (gnu packages virtualization))
 
 ;;;
 ;;; Cargo workspaces and Rust libraries requiring external inputs to unbundle.
@@ -662,3 +666,48 @@ intelligence.")
 webview, a tiny cross-platform library to render web-based GUIs as desktop
 applications.")
        (license license:expat)))))
+
+;; Also update (@ (gnu packages gnome) glycin-loaders) when updating this.
+(define-public rust-glycin-3
+  (package
+    (name "rust-glycin")
+    (version "3.0.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitlab.gnome.org/GNOME/glycin.git")
+              ;; Rust library version is different from the tagged version.
+              (commit "2.0.7")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0v6szxk5h8a4b28xb0lrhqrq6b4vka2ha4qgpdp35f6c49v9pdyp"))
+       (patches (search-patches "glycin-sandbox-Adapt-bwrap-invocation.patch"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:cargo-package-crates ''("glycin-common" "glycin-utils" "glycin")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'set-bin-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "glycin/src/sandbox.rs"
+                (("@bwrap@")
+                 (search-input-file inputs "bin/bwrap"))
+                (("@storedir@")
+                   #$%storedir)
+                (("/usr/bin/true")
+                 (search-input-file inputs "bin/true"))))))))
+    (inputs (cons* bubblewrap (cargo-inputs 'glycin)))
+    ;; Uses XDG_DATA_DIRS to search for the loaders. See Config::data_dirs() in
+    ;; config.rs.  Using a specific search path was discussed in
+    ;; <https://codeberg.org/guix/guix/pulls/1653> and
+    ;; <https://gitlab.gnome.org/GNOME/glycin/-/merge_requests/343>.
+    (native-search-paths (list $XDG_DATA_DIRS))
+    (home-page "https://gitlab.gnome.org/GNOME/glycin")
+    (synopsis "Rust library for sandboxed image decoding")
+    (description "Glycin is a sandbox image decoder for image viewers and
+thumbnails to display untrusted content safely.")
+    (license (list license:mpl2.0 license:lgpl2.1+))))
