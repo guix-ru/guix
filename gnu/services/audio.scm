@@ -67,7 +67,6 @@
             mpd-configuration?
             mpd-configuration-package
             mpd-configuration-user
-            mpd-configuration-group
             mpd-configuration-shepherd-requirement
             mpd-configuration-log-file
             mpd-configuration-log-level
@@ -173,29 +172,24 @@
 (define (mpd-serialize-user-account field-name value)
   (mpd-serialize-string field-name (user-account-name value)))
 
-(define (mpd-serialize-user-group field-name value)
-  (mpd-serialize-string field-name (user-group-name value)))
-
 (define-maybe string (prefix mpd-))
 (define-maybe list-of-strings (prefix mpd-))
 (define-maybe boolean (prefix mpd-))
-
-(define %mpd-user
-  (user-account
-   (name "mpd")
-   ;; XXX: This is a place-holder to be lazily substituted in (…-accounts)
-   ;; with the value from the 'group' field of <mpd-configuration>.
-   (group %lazy-group)
-   (system? #t)
-   (comment "Music Player Daemon (MPD) user")
-   ;; MPD can use $HOME (or $XDG_CONFIG_HOME) to place its data.
-   (home-directory "/var/lib/mpd")
-   (shell (file-append shadow "/sbin/nologin"))))
 
 (define %mpd-group
   (user-group
    (name "mpd")
    (system? #t)))
+
+(define %mpd-user
+  (user-account
+   (name "mpd")
+   (group (user-group-name %mpd-group))
+   (system? #t)
+   (comment "Music Player Daemon (MPD) user")
+   ;; MPD can use $HOME (or $XDG_CONFIG_HOME) to place its data.
+   (home-directory "/var/lib/mpd")
+   (shell (file-append shadow "/sbin/nologin"))))
 
 ;;; TODO: Procedures for deprecated fields, to be removed.
 
@@ -238,17 +232,6 @@ user-account instead~%"))
           (name value)))
         (else
          (configuration-field-error #f 'user value))))
-
-(define (mpd-group-sanitizer value)
-  (cond ((user-group? value) value)
-        ((string? value)
-         (warning (G_ "string value for 'group' is deprecated, use \
-user-group instead~%"))
-         (user-group
-          (inherit %mpd-group)
-          (name value)))
-        (else
-         (configuration-field-error #f 'group value))))
 
 (define (mpd-log-file-sanitizer value)
   ;; XXX: While leaving the 'sys_log' option out of the mpd.conf file is
@@ -416,11 +399,6 @@ to be appended to the audio output configuration.")
    (user-account %mpd-user)
    "The user to run mpd as."
    (sanitizer mpd-user-sanitizer))
-
-  (group
-   (user-group %mpd-group)
-   "The group to run mpd as."
-   (sanitizer mpd-group-sanitizer))
 
   (shepherd-requirement
    (list-of-symbols '())
@@ -650,12 +628,12 @@ appended to the configuration.")
                         (format #t "Service MPD is not running.")))))))))))
 
 (define (mpd-accounts config)
-  (match-record config <mpd-configuration> (user group)
-    ;; TODO: Deprecation code, to be removed.
-    (let ((user (if (eq? (user-account-group user) %lazy-group)
-                    (set-user-group user group)
-                    user)))
-      (list user group))))
+  (match-record config <mpd-configuration> (user)
+    `(,user
+      ;; Create %mpd-group if that's what we're using.
+      ,(when (string=? (user-group-name %mpd-group)
+                       (user-account-group user))
+         %mpd-group))))
 
 (define mpd-service-type
   (service-type
