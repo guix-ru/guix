@@ -188,6 +188,7 @@
   (user-account
    (name "mpd")
    (group (user-group-name %mpd-group))
+   (supplementary-groups '("audio"))
    (system? #t)
    (comment "Music Player Daemon (MPD) user")
    ;; MPD can use $HOME (or $XDG_CONFIG_HOME) to place its data.
