@@ -39,7 +39,10 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-71)
-  #:export (mpd-output
+  #:export (%mpd-user
+            %mpd-group
+
+            mpd-output
             mpd-output?
             mpd-output-name
             mpd-output-type
