@@ -3186,7 +3186,7 @@ some form of information without getting in the user's way.")
      (list gtk+
            glade3
            python
-           python-pygobject))
+           python-pygobject-3.50))
     (native-inputs
      (list pkg-config
            gettext-minimal
@@ -3233,7 +3233,7 @@ API.")
            ;; lua-5.1
            ;; lua5.1-lgi
            python
-           python-pygobject))))
+           python-pygobject-3.50))))
 
 (define-public gtkglext
   (package
@@ -3326,7 +3326,7 @@ API add-ons to make GTK+ widgets OpenGL-capable.")
            itstool
            libxslt                      ;for xsltproc
            python
-           python-pygobject
+           python-pygobject-3.50
            pkg-config
            xorg-server-for-tests))
     (home-page "https://glade.gnome.org")
@@ -5337,7 +5337,7 @@ and the GLib main loop, to integrate well with GNOME applications.")
            pkg-config
            python
            python-dbus
-           python-pygobject
+           python-pygobject-3.50
            vala))
     (propagated-inputs
      (list glib libgcrypt))             ;required by libsecret-1.pc
@@ -6781,7 +6781,7 @@ discovery protocols.")
            libxtst
            libxxf86vm
            python
-           python-pygobject
+           python-pygobject-3.50
            totem-pl-parser
            vala
            xorgproto))
@@ -6907,7 +6907,7 @@ which can read a large number of file formats.")
            lirc
            pango
            python
-           python-pygobject
+           python-pygobject-3.50
            tdb
            totem-pl-parser))
     (home-page "https://wiki.gnome.org/Apps/Rhythmbox")
@@ -7918,7 +7918,7 @@ javascript engine and the GObject introspection framework.")
            libpeas
            libsoup
            python
-           python-pygobject
+           python-pygobject-3.50
            tepl))
     (home-page "https://wiki.gnome.org/Apps/Gedit")
     (synopsis "GNOME text editor")
@@ -8524,7 +8524,7 @@ users.")
            perl
            pkg-config
            python-dbus
-           python-pygobject
+           python-pygobject-3.50
            python-wrapper
            vala))
     (inputs
@@ -10832,7 +10832,7 @@ desktop.  It supports multiple calendars, month, week and year view.")
            libical
            libpeas
            libportal
-           python-pygobject
+           python-pygobject-3.50
            gnome-online-accounts
            gsettings-desktop-schemas))
     (propagated-inputs
@@ -13703,7 +13703,7 @@ GtkTextView widgets.")
            llvm
            libostree
            python
-           python-pygobject
+           python-pygobject-3.50
            sysprof
            template-glib
            vte
