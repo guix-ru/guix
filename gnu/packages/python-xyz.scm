@@ -13731,7 +13731,12 @@ wraps Python's standard library threading and multiprocessing objects.")
     (arguments
      (list
       #:test-flags
-      #~(list "-k" (string-join
+      #~(list "-n" (number->string (parallel-job-count))
+              ;; The socket tests fail when run in parallel with xdist (see:
+              ;; <https://github.com/pexpect/pexpect/issues/809>).
+              "--ignore=tests/test_socket.py"
+              "--ignore=tests/test_socket_fd.py"
+              "-k" (string-join
                     (list
                      ;; Disable failing test, see
                      ;; <https://github.com/pexpect/pexpect/issues/568>.
@@ -13763,9 +13768,10 @@ wraps Python's standard library threading and multiprocessing objects.")
                 ;; and unlikely to change.
                 (("/bin'") "/dev'")))))))
     (native-inputs
-     (list bash    ;full Bash for 'test_replwrap.py'
+     (list bash                         ;full Bash for 'test_replwrap.py'
            man-db
            python-pytest
+           python-pytest-xdist
            python-setuptools
            python-wheel
            which))
