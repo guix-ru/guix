@@ -723,13 +723,13 @@ timestamps.")
 (define-public python-arrow
   (package
     (name "python-arrow")
-    (version "1.3.0")
+    (version "1.4.0")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "arrow" version))
               (sha256
                (base32
-                "11bssv25jix57igvfmvg2v8dmwk55b4dh6hgffazidccchbhcm6l"))))
+                "1mr6wlbd289bb1asc147x2bwajlc16q63m44krvvh0c0x58c037d"))))
     (build-system pyproject-build-system)
     ;; Tests: 1837 passed, 2 xpassed.
     (native-inputs
@@ -742,7 +742,8 @@ timestamps.")
            python-simplejson))
     (propagated-inputs
      (list python-dateutil
-           python-types-python-dateutil))
+           python-types-python-dateutil
+           python-tzdata))
     (home-page "https://github.com/arrow-py/arrow")
     (synopsis "Dates and times for Python")
     (description
