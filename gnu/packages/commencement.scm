@@ -1962,7 +1962,8 @@ exec " gcc-bin "/" program
          (prepend sed-mesboot)))
       (arguments (substitute-keyword-arguments arguments
                    ((#:configure-flags flags #~(list))
-                    #~(cons "--disable-year2038" #$flags)))))))
+                    #~(cons* "--disable-year2038"
+                             "utils_cv_avx2_intrinsic_exists=no" #$flags)))))))
 
 (define grep-mesboot
   (let ((pkg (mesboot-package "grep-mesboot" grep)))
