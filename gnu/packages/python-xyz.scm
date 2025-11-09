@@ -3010,6 +3010,34 @@ runs on older Pythons.")
 edit distance algorithm for Python in Cython for high performance.")
     (license license:bsd-3)))
 
+(define-public python-qrcodegen
+  (package
+    (name "python-qrcodegen")
+    (version "1.8.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/nayuki/QR-Code-generator")
+              (commit (string-append "v" version))))
+       (sha256
+        (base32 "0dk9ci5gchxa8gh0hyhlj3d5jwxqlnfm85xyp791ldaia14bkj39"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f                  ;no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'chdir
+            (lambda _
+              (chdir "python"))))))
+    (native-inputs (list python-setuptools))
+    (home-page "https://www.nayuki.io/page/qr-code-generator-library")
+    (synopsis "QR Code generator")
+    (description
+     "@code{python-qrcodegen} is a QR code generator library in Python.")
+    (license license:expat)))
+
 (define-public python-represent
   (package
     (name "python-represent")
