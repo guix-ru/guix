@@ -1318,19 +1318,16 @@ Angus Johnson}.")
 (define-public pstoedit
   (package
     (name "pstoedit")
-    ;; Do not yet upgrade to 4.0.0, as its include file fails to compile for C
-    ;; project (see: https://github.com/reviczky/pstoedit/issues/2).
-    (version "4.00")
+    (version "4.02")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://sourceforge/pstoedit/pstoedit/"
                                   version "/pstoedit-" version ".tar.gz"))
               (sha256
                (base32
-                "1sk2mhrjgnlz4a1650p3qxrv6av6qc66ibmy48ckspx7mfp7snh7"))
+                "0bzpknndsf2cvsh1z90j6cx9mzqkb3m1ajdl52cavcn6s8rb922m"))
               (patches
                (search-patches "pstoedit-fix-gcc12.patch"
-                               "pstoedit-fix-plainC.patch"
                                "pstoedit-pkglibdir.patch"))))
     (build-system gnu-build-system)
     (arguments
