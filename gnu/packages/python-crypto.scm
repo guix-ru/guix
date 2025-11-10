@@ -534,14 +534,14 @@ is used by the Requests library to verify HTTPS requests.")
 (define-public python-cryptography
   (package
     (name "python-cryptography")
-    (version "44.0.0")
+    (version "44.0.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "cryptography" version))
        (sha256
         (base32
-         "00is2nzcl2pyhr90llga5mnbw3rvakn75rq10x1r6hhb6i7q6knd"))
+         "0lrhbl0zwqkv86l9jigmbmn1p0s11a42hcqkm0j1ma9nanydh6gy"))
        (snippet
         #~(begin (use-modules (guix build utils))
                  (for-each delete-file
