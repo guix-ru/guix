@@ -2451,13 +2451,13 @@ ASGI server.")
 (define-public python-a2wsgi
   (package
     (name "python-a2wsgi")
-    (version "1.10.7")
+    (version "1.10.10")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "a2wsgi" version))
               (sha256
                (base32
-                "13ikyfmkx7hlrbg5rpcdm6kw4wcsy00giil3f72hpb6sw7vjyinf"))))
+                "0i8zzq4zijvpp91r6f2278pdj6gqqr7qi6jy1pgkkfl142szzg55"))))
     (build-system pyproject-build-system)
     (arguments
      (list
