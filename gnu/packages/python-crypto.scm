@@ -512,14 +512,14 @@ is used by the Requests library to verify HTTPS requests.")
 (define-public python-cryptography-vectors
   (package
     (name "python-cryptography-vectors")
-    (version "44.0.0")
+    (version "44.0.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "cryptography_vectors" version))
        (sha256
         (base32
-         "1aw06msy65rs27yxfp4xlwfq432ny1af5cx8s7zsbfa5div2hqhh"))))
+         "0jrska8814y6m0jcnpmhh40f3r2qmfsbya61pq5ims6vsw6pj3il"))))
     (build-system pyproject-build-system)
     (arguments (list #:tests? #f))  ; No tests included.
     (native-inputs
