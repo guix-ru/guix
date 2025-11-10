@@ -28,7 +28,7 @@
 ;;; Copyright © 2018 Tomáš Čech <sleep_walker@gnu.org>
 ;;; Copyright © 2018, 2019, 2021, 2024 Nicolas Goaziou <mail@nicolasgoaziou.fr>
 ;;; Copyright © 2018 Mathieu Othacehe <m.othacehe@gmail.com>
-;;; Copyright © 2018, 2020, 2021, 2022, 2023 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2018, 2020-2023, 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2018 swedebugia <swedebugia@riseup.net>
 ;;; Copyright © 2019 Vagrant Cascadian <vagrant@debian.org>
 ;;; Copyright © 2019, 2023 Brendan Tildesley <mail@brendan.scot>
@@ -9395,7 +9395,7 @@ cython_always = true"))))))))
 (define-public python-uvicorn
   (package
     (name "python-uvicorn")
-    (version "0.34.0")
+    (version "0.38.0")
     (source
      (origin
        ;; PyPI tarball has no tests.
@@ -9405,24 +9405,33 @@ cython_always = true"))))))))
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "05lkxnpzmr0kik81kdcvavjvvc4d1lgmw88mr4vbwsqk147wgqbc"))))
+        (base32 "0bfib7wsbg0h48y5wipk93gn3sgv7jkxvdxzvxd0xfnf1wa2jih3"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
-      #~(list "-o" "asyncio_mode=auto"
-              ;; For some reason tests stacked in infinity re-invocation loop:
-              ;; AssertionError where is_alive =
-              ;; <uvicorn.supervisors.multiprocess.Process object at
-              ;; 0x7ffff39b6110>.is_alive.
-              ;; Maybe this <https://github.com/encode/uvicorn/issues/2466>.
-              "--ignore=tests/supervisors/test_multiprocess.py"
+      #~(list
+         "-o" "asyncio_mode=auto"
+         ;; For some reason tests stacked in infinity re-invocation loop:
+         ;; AssertionError where is_alive =
+         ;; <uvicorn.supervisors.multiprocess.Process object at
+         ;; 0x7ffff39b6110>.is_alive.
+         ;; Maybe this <https://github.com/encode/uvicorn/issues/2466>.
+         "--ignore=tests/supervisors/test_multiprocess.py"
 
-              #$@(cond
-                  ((or (target-aarch64?)
-                       (target-riscv64?))
-                   '("-k not test_send_binary_data_to_server_bigger_than_default_on_websockets"))
-                  (#t '())))))
+         ;; There are websockets related deprecation warnings breaking
+         ;; the test suite (see:
+         ;; <https://github.com/Kludex/uvicorn/discussions/2755>).
+         "-W" "ignore::DeprecationWarning"
+         ;; The test_ssl_config test fails due to the following warning:
+         ;; "ResourceWarning: unclosed <socket.socket fd=13, family=1, type=1,
+         ;; proto=0>".
+         "-W" "ignore::ResourceWarning"
+
+         ;; This test does not raise a ConnectionClosedError exception as
+         ;; expected (see:
+         ;; <https://github.com/Kludex/uvicorn/discussions/2755#discussioncomment-14918784>).
+         "-k not test_send_binary_data_to_server_bigger_than_default_on_websockets")))
     (native-inputs
      (list nss-certs-for-test
            python-a2wsgi
@@ -9431,6 +9440,7 @@ cython_always = true"))))))))
            python-pytest
            python-pytest-asyncio-0.26
            python-pytest-mock
+           python-pytest-xdist
            python-requests
            python-trustme
            python-wsproto))
