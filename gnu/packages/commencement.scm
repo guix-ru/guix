@@ -1963,7 +1963,15 @@ exec " gcc-bin "/" program
       (arguments (substitute-keyword-arguments arguments
                    ((#:configure-flags flags #~(list))
                     #~(cons* "--disable-year2038"
-                             "utils_cv_avx2_intrinsic_exists=no" #$flags)))))))
+                             "utils_cv_avx2_intrinsic_exists=no" #$flags))
+                   ((#:phases phases)
+                    #~(modify-phases #$phases
+                        (add-after 'unpack 'fix-gnulib-test
+                          (lambda _
+                            ;; vma-iter test needs <linux/fs.h> which is not public
+                            ;; in %bootstrap-linux-libre-headers
+                            (substitute* '("gnulib-tests/vma-iter.c")
+                              (("# include <linux/fs.h>") "")))))))))))
 
 (define grep-mesboot
   (let ((pkg (mesboot-package "grep-mesboot" grep)))
