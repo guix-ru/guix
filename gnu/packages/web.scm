@@ -75,7 +75,7 @@
 ;;; Copyright © 2025 Remco van 't Veer <remco@remworks.net>"
 ;;; Copyright © 2025 Daniel Khodabakhsh <d@niel.khodabakh.sh>
 ;;; Copyright © 2025 Josep Bigorra <jjbigorra@gmail.com>
-;;; Copyright © 2025 Ashish SHUKLA <ashish.is@lostca.se>
+;;; Copyright © 2025, 2026 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2025 Philippe Swartvagher <phil.swart@gmx.fr>
 ;;; Copyright © 2025 pinoaffe <pinoaffe@gmail.com>
 ;;; Copyright © 2025, 2026 gemmaro <gemmaro.dev@gmail.com>
@@ -9227,7 +9227,7 @@ derivation by David Revoy from the original MonsterID by Andreas Gohr.")
 (define-public nghttp2
   (package
     (name "nghttp2")
-    (version "1.58.0")
+    (version "1.68.1")
     (source
      (origin
        (method url-fetch)
@@ -9236,7 +9236,7 @@ derivation by David Revoy from the original MonsterID by Andreas Gohr.")
                            "nghttp2-" version ".tar.xz"))
        (sha256
         (base32
-         "1q4ps8acr7nyia7mf2z11m0yh3fn1imhyv855j3xjbx91l2a6s2a"))))
+         "1cph2j688zxxxl3944g5grjma15qbv4b6z252ichsn7ilyq7mgba"))))
     (build-system gnu-build-system)
     (outputs (list "out"
                    "lib"))              ; only libnghttp2
