@@ -2107,6 +2107,7 @@ exec " gcc-bin "/" program
        ;; to fail to build with coreutils-9.0+.
        #:configure-flags
        `("--disable-year2038"
+         "utils_cv_avx2_intrinsic_exists=no"
          ,@(if ,(target-arm?)
                `(,(string-append
                    "--enable-no-install-program="
