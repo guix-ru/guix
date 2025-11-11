@@ -751,6 +751,10 @@
   (crate-source "arc-swap" "1.8.0"
                 "0zi02pwgn0vj615k6gpsr36fa6ix8qqsys88ywpcr8lcpd4k9l2i"))
 
+(define rust-arc-swap-1.8.1
+  (crate-source "arc-swap" "1.8.1"
+                "0wqfhlaljb6y6w1cb92hikf2rlrch7p02ld2p38j93xc0fd5zvcx"))
+
 (define rust-arc-swap-1.8.2
   (crate-source "arc-swap" "1.8.2"
                 "19aas8y3kz0v6jr6yijvw6cad9grpl3lw1a25k0cws2m2iy69wzr"))
@@ -23910,6 +23914,10 @@
   (crate-source "simple_logger" "4.3.3"
                 "1w9ypyn5n7bxw6aylbkwz3hfsjpvkx0qm2xj11yx8l82r744czlf"))
 
+(define rust-simple-logger-5.1.0
+  (crate-source "simple_logger" "5.1.0"
+                "00lp2x1l6xxxp1gf3ixpir3b85smabhdggr1lw70ncg7gijfw6r9"))
+
 (define rust-simple-logger-5.2.0
   (crate-source "simple_logger" "5.2.0"
                 "05qw0xv4ifhlpwd79gyrcqzndwynyrp6y6kyck7gj6v6jq78s0y7"))
@@ -26726,6 +26734,10 @@
 (define rust-tree-house-bindings-0.2.1
   (crate-source "tree-house-bindings" "0.2.1"
                 "11k03s0yqcn5adqacrbnhpc36wyzb3sx1dciw7wdpbz0ixw4c5iz"))
+
+(define rust-tree-house-bindings-0.2.2
+  (crate-source "tree-house-bindings" "0.2.2"
+                "02y2h5r20yggrms7rzp9g7g0lw5a4v0qhqh445aym9l8x1xh6kzj"))
 
 (define rust-tree-house-bindings-0.2.3
   (crate-source "tree-house-bindings" "0.2.3"
