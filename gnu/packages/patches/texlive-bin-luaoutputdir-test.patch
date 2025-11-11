@@ -1,0 +1,10 @@
+Retrieved from: <https://tug.org/pipermail/tex-live/2025-September/051785.html>
+
+--- a/texk/web2c/luatexdir/luaoutputdir.test	(revision 76261)
++++ b/texk/web2c/luatexdir/luaoutputdir.test	(working copy)
+@@ -14,4 +14,5 @@
+ outdir=tests/outdirlua
+ outfile=outfileLUA.tex
+ rm -rf $outdir  # don't let previous runs interfere
++test -d tests || mkdir -p tests # ensure subdir exists
+ mkdir $outdir || exit 1
