@@ -1885,12 +1885,13 @@ This package is part of the KDE games module.")
     (arguments
      (list #:builder #~(mkdir #$output)))
     (propagated-inputs
-     ;; TODO: kpat, klickety, katomic.
+     ;; TODO: kpat and klickety.
      (list bomber
            bovo
            granatier
            kajongg
            kapman
+           katomic
            kblackbox
            kblocks
            kbounce
