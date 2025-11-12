@@ -93,6 +93,44 @@
     (description "Runtime library for kdegames")
     (license (list license:gpl2+  license:fdl1.2+))))
 
+(define-public katomic
+  (package
+    (name "katomic")
+    (version "25.08.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://kde/stable/release-service/" version
+                           "/src/katomic-" version ".tar.xz"))
+       (sha256
+        (base32 "1k22md9hbaa0mq51nqmalc7bzjv6rlhcdd9c70jhv8ndxwdvw8ch"))))
+    (build-system qt-build-system)
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f )) ;no tests
+    (native-inputs
+     (list extra-cmake-modules kdoctools))
+    (inputs
+     (list kcompletion
+           kconfig
+           kcoreaddons
+           kcrash
+           kdbusaddons
+           ki18n
+           kiconthemes
+           knewstuff
+           kwidgetsaddons
+           kxmlgui
+           libkdegames))
+    (home-page "https://apps.kde.org/katomic/")
+    (synopsis "Molecular game")
+    (description "KAtomic is a fun educational game built around molecular
+geometry.  It employs simplistic two-dimensional looks at different chemical
+elements.
+
+This package is part of the KDE games module.")
+    (license license:gpl2+)))
+
 (define-public ktuberling
   (package
     (name "ktuberling")
