@@ -749,6 +749,44 @@ More information at http://en.wikipedia.org/wiki/Sudoku
 This package is part of the KDE games module.")
     (license (list license:gpl2+ license:fdl1.2+))))
 
+(define-public klickety
+  (package
+    (name "klickety")
+    (version "25.08.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://kde/stable/release-service/" version
+                           "/src/klickety-" version ".tar.xz"))
+       (sha256
+        (base32 "167c5y8kqi30j3p0iwhm9lqvls3dljpwbgv15rbya16iba5r2rgw"))))
+    (build-system qt-build-system)
+    (arguments
+     (list #:qtbase qtbase
+           #:tests? #f )) ;no tests
+    (native-inputs
+     (list extra-cmake-modules kdoctools))
+    (inputs
+     (list kconfig
+           kconfigwidgets
+           kcoreaddons
+           kcrash
+           kdbusaddons
+           ki18n
+           kiconthemes
+           kio
+           kwidgetsaddons
+           kxmlgui
+           libkdegames))
+    (home-page "https://apps.kde.org/klickety/")
+    (synopsis "Molecular game")
+    (description "KAtomic is a fun educational game built around molecular
+geometry.  It employs simplistic two-dimensional looks at different chemical
+elements.
+
+This package is part of the KDE games module.")
+    (license license:gpl2+)))
+
 (define-public klines
   (package
     (name "klines")
