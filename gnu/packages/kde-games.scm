@@ -1923,7 +1923,7 @@ This package is part of the KDE games module.")
     (arguments
      (list #:builder #~(mkdir #$output)))
     (propagated-inputs
-     ;; TODO: kpat and klickety.
+     ;; TODO: kpat.
      (list bomber
            bovo
            granatier
@@ -1941,6 +1941,7 @@ This package is part of the KDE games module.")
            killbots
            kiriki
            kjumpingcube
+           klickety
            klines
            kmahjongg
            kmines
