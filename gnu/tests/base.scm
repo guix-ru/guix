@@ -1168,6 +1168,21 @@ to supplementary group ~a...~%" other)
                                hello))
                          #$marionette))
 
+
+      ;; Check that guix-daemon is up and running and that the build
+      ;; environment is properly set up (build users, etc.).
+      (test-equal "containerized guix shell"
+        0
+        (marionette-eval
+         '(system "guix shell --no-cwd --bootstrap -C hello -- hello")
+         #$marionette))
+
+      (test-equal "containerized guix shell, unprivileged user"
+        0
+        (marionette-eval
+         '(system "su - user -c 'guix shell --bootstrap -C hello -- hello'")
+         #$marionette))
+
       (test-equal "guix build hello"
         0
         ;; Check that guix-daemon is up and running and that the build
