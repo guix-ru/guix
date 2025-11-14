@@ -1,0 +1,56 @@
+Adapted from https://cgit.git.savannah.gnu.org/cgit/texinfo.git/commit/?id=f4ac5b857cf59a58d13e103fe5b7d0d5fe2a52a7
+for texinfo 6.
+
+
+diff --git a/tp/Texinfo/Convert/Converter.pm b/tp/Texinfo/Convert/Converter.pm
+index 258ef30..c4752bc 100644
+--- a/tp/Texinfo/Convert/Converter.pm
++++ b/tp/Texinfo/Convert/Converter.pm
+@@ -1089,7 +1089,7 @@ sub output_no_split($$)
+   return undef unless $self->_create_destination_directory();
+   
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf(__("could not open %s for writing: %s"),
+diff --git a/tp/Texinfo/Convert/DocBook.pm b/tp/Texinfo/Convert/DocBook.pm
+index a689976..8658dbd 100644
+--- a/tp/Texinfo/Convert/DocBook.pm
++++ b/tp/Texinfo/Convert/DocBook.pm
+@@ -312,7 +312,7 @@ sub output($$)
+   return undef unless $self->_create_destination_directory();
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out ($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf(__("could not open %s for writing: %s"),
+diff --git a/tp/Texinfo/Convert/Info.pm b/tp/Texinfo/Convert/Info.pm
+index af4fbee..aa8282e 100644
+--- a/tp/Texinfo/Convert/Info.pm
++++ b/tp/Texinfo/Convert/Info.pm
+@@ -89,7 +89,7 @@ sub output($)
+   my $elements = Texinfo::Structuring::split_by_node($root);
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     if ($self->get_conf('VERBOSE')) {
+       print STDERR "Output file $self->{'output_file'}\n";
+     }
+diff --git a/tp/Texinfo/Convert/TexinfoXML.pm b/tp/Texinfo/Convert/TexinfoXML.pm
+index 5a962a4..217e810 100644
+--- a/tp/Texinfo/Convert/TexinfoXML.pm
++++ b/tp/Texinfo/Convert/TexinfoXML.pm
+@@ -454,7 +454,7 @@ sub output($$)
+   return undef unless $self->_create_destination_directory();
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf(__("could not open %s for writing: %s"),
