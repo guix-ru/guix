@@ -9322,6 +9322,7 @@ rules.")
         (base32 "1rhlp0v32ahwlh5293xyq04my8f2ln1mfycpg01cm0qvmng2irmw"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "pcre-light")))
+    (inputs (list pcre))
     (native-inputs (list ghc-hunit))
     (arguments
      `(#:cabal-revision ("1"
