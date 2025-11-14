@@ -5944,10 +5944,8 @@ pulsar timing tool.")
     (native-inputs
      (list python-pytest
            python-pytest-astropy
-           python-pytest-cov
            python-setuptools
-           python-setuptools-scm
-           python-wheel))
+           python-setuptools-scm))
     (propagated-inputs
      (list python-astropy
            python-h5py
