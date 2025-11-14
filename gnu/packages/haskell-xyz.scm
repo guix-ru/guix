@@ -549,7 +549,7 @@ This library provides a safer method based on the concept of @code{Ticket}s.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "atomic-write")))
     (inputs (list ghc-temporary ghc-unix-compat))
-    (native-inputs (list ghc-hspec))
+    (native-inputs (list ghc-hspec hspec-discover))
     (home-page "https://github.com/stackbuilders/atomic-write")
     (synopsis "Atomically write to a file")
     (description
