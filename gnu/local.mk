@@ -2558,6 +2558,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/tensorflow-c-api-fix.patch		\
   %D%/packages/patches/texinfo-headings-single.patch		\
   %D%/packages/patches/texinfo-5-perl-compat.patch		\
+  %D%/packages/patches/texinfo-6-perl-compat.patch		\
   %D%/packages/patches/telegram-desktop-hashmap-incomplete-value.patch	\
   %D%/packages/patches/telegram-desktop-qguiapp.patch		\
   %D%/packages/patches/telegram-desktop-unbundle-cppgir.patch   \
