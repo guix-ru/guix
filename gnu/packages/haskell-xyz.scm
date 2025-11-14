@@ -5262,6 +5262,7 @@ Haskeline runs both on POSIX-compatible systems and on Windows.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "haskell-src")))
     (inputs (list ghc-syb))
+    (native-inputs (list ghc-happy))
     (home-page "http://hackage.haskell.org/package/haskell-src")
     (synopsis "Support for manipulating Haskell source code")
     (description
