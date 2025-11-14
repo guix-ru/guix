@@ -14309,7 +14309,7 @@ example of, \"An applicative functor that is not a monad.\"")
         (base32 "1px6qaabr1k1szx9sl4vjqnwwlyj590s6h21p54ycfjj744md2p2"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "validity")))
-    (native-inputs (list ghc-hspec))
+    (native-inputs (list ghc-hspec hspec-discover))
     (home-page "https://github.com/NorfairKing/validity#readme")
     (synopsis "Validity typeclass")
     (description
