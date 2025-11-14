@@ -6899,6 +6899,7 @@ Music Player Daemon.")
        (sha256
         (base32 "1lscfnbpmyv0fahl9y33kwiypnp45iljljax69dxhlr9zdijv7x4"))))
     (build-system haskell-build-system)
+    (native-inputs (list ghc-alex ghc-happy))
     (properties '((upstream-name . "ghc-lib-parser")))
     (home-page "https://github.com/digital-asset/ghc-lib")
     (synopsis "The GHC API, decoupled from GHC versions")
