@@ -7857,24 +7857,23 @@ PSF} describing how the optical system spreads light from sources.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2062 passed, 398 skipped, 3 warnings
+      ;; tests: 2063 passed, 398 skipped, 15 warnings
       #:test-flags
       #~(list "--arraydiff"
               "--arraydiff-default-format=fits"
-              "--numprocesses" (number->string (min 8 (parallel-job-count)))
-              "--pyargs" "reproject"
-              ;; ValueError: Could not determine celestial frame corresponding
-              ;; to the specified WCS object
-              "-k" "not test_solar_wcs")
+              "--numprocesses" (number->string (min 8 (parallel-job-count))))
       #:phases
       #~(modify-phases %standard-phases
-          ;; Use built library for tests.
           (replace 'check
             (lambda* (#:key tests? test-flags #:allow-other-keys)
               (when tests?
                 (with-directory-excursion #$output
                   (setenv "HOME" "/tmp")
-                  (apply invoke "pytest" "-vv" test-flags))))))))
+                  (apply invoke "pytest" "-vv" test-flags)))))
+          (add-before 'check 'post-check
+            (lambda _
+              (for-each delete-file-recursively
+                        (find-files #$output "__pycache__" #:directories? #t)))))))
     (native-inputs
      (list python-cython
            python-extension-helpers
