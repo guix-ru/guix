@@ -17,3 +17,82 @@ Fix a deprecation warning with newer Perl that breaks some tests.
        $has_comment = 1 if (defined($4));
      } else {
        $self->line_error (sprintf($self->__(
+
+diff --git a/tp/DebugTexinfo/DebugTree.pm b/tp/DebugTexinfo/DebugTree.pm
+index 866255a..21926f8 100644
+--- a/tp/DebugTexinfo/DebugTree.pm
++++ b/tp/DebugTexinfo/DebugTree.pm
+@@ -57,7 +57,7 @@ sub output($$)
+   return undef unless $self->_create_destination_directory();
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out ($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf($self->__("could not open %s for writing: %s"),
+diff --git a/tp/Texinfo/Convert/Converter.pm b/tp/Texinfo/Convert/Converter.pm
+index 69877e5..013ffa0 100644
+--- a/tp/Texinfo/Convert/Converter.pm
++++ b/tp/Texinfo/Convert/Converter.pm
+@@ -815,7 +815,7 @@ sub output($$)
+   return undef unless $self->_create_destination_directory();
+   
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf($self->__("could not open %s for writing: %s"),
+diff --git a/tp/Texinfo/Convert/DocBook.pm b/tp/Texinfo/Convert/DocBook.pm
+index 53b7552..ad7cf06 100644
+--- a/tp/Texinfo/Convert/DocBook.pm
++++ b/tp/Texinfo/Convert/DocBook.pm
+@@ -305,7 +305,7 @@ sub output($$)
+   return undef unless $self->_create_destination_directory();
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out ($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf($self->__("could not open %s for writing: %s"),
+diff --git a/tp/Texinfo/Convert/IXIN.pm b/tp/Texinfo/Convert/IXIN.pm
+index bda2055..98b7766 100644
+--- a/tp/Texinfo/Convert/IXIN.pm
++++ b/tp/Texinfo/Convert/IXIN.pm
+@@ -287,7 +287,7 @@ sub output_ixin($$)
+   return undef unless $self->_create_destination_directory();
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf($self->__("could not open %s for writing: %s"),
+diff --git a/tp/Texinfo/Convert/Info.pm b/tp/Texinfo/Convert/Info.pm
+index 5267d89..cdbab9d 100644
+--- a/tp/Texinfo/Convert/Info.pm
++++ b/tp/Texinfo/Convert/Info.pm
+@@ -87,7 +87,7 @@ sub output($)
+   my $elements = Texinfo::Structuring::split_by_node($root);
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     if ($self->get_conf('VERBOSE')) {
+       print STDERR "Output file $self->{'output_file'}\n";
+     }
+diff --git a/tp/Texinfo/Convert/TexinfoXML.pm b/tp/Texinfo/Convert/TexinfoXML.pm
+index 4962c33..8aecbab 100644
+--- a/tp/Texinfo/Convert/TexinfoXML.pm
++++ b/tp/Texinfo/Convert/TexinfoXML.pm
+@@ -451,7 +451,7 @@ sub output($$)
+   return undef unless $self->_create_destination_directory();
+ 
+   my $fh;
+-  if (! $self->{'output_file'} eq '') {
++  if ($self->{'output_file'} ne '') {
+     $fh = $self->Texinfo::Common::open_out($self->{'output_file'});
+     if (!$fh) {
+       $self->document_error(sprintf($self->__("could not open %s for writing: %s"),
