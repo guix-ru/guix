@@ -16976,6 +16976,7 @@ and is shipped with <https://www.haskell.org/ghc/ GHC>.")
        (sha256
         (base32 "1d045h470yykabz5d89896d6v2p1vng373s7bgysfdmzqhgd7wp5"))))
     (build-system haskell-build-system)
+    (native-inputs (list ghc-alex))
     (properties '((upstream-name . "Cabal-syntax")))
     (home-page "http://www.haskell.org/cabal/")
     (synopsis "Library for working with .cabal files")
