@@ -8267,7 +8267,7 @@ sending UDP datagrams over multicast (class D) addresses.")
         (base32 "0km7cp041bgdgrxrbrawz611mcylxp943880a2yg228a09961b51"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "newtype-generics")))
-    (native-inputs (list ghc-hspec))
+    (native-inputs (list ghc-hspec hspec-discover))
     (arguments
      `(#:cabal-revision ("5"
                          "0arlqrq482ai3j6cwgb8kc34zc8y3ghg8fgrxxcnw752hzrl1g71")))
