@@ -2514,6 +2514,7 @@ documentation for the file format.")
        (sha256
         (base32 "0pkcwxg91wali7986k03d7q940hb078hlsxfknqhkp2spr3d1f3w"))))
     (build-system haskell-build-system)
+    (native-inputs (list ghc-alex ghc-happy))
     (properties '((upstream-name . "config-value")))
     (arguments
      `(#:cabal-revision ("9"
