@@ -10,6 +10,7 @@
 ;;; Copyright © 2020, 2023, 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2021 Maxime Devos <maximedevos@telenet.be>
 ;;; Copyright © 2022 ( <paren@disroot.org>
+;;; Copyright © 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -233,8 +234,9 @@ is on expressing the content semantically, avoiding physical markup commands.")
                (add-after 'unpack 'absolute-binary-path
                  (lambda* (#:key inputs #:allow-other-keys)
                    (substitute* "info/filesys.c"
-                     (("gunzip") (search-input-file inputs "/bin/gunzip"))
-                     (("gzip") (search-input-file inputs "/bin/gzip")))))
+                     (("gunzip") (search-input-file inputs "bin/gunzip"))
+                     (("gzip") (search-input-file inputs "bin/gzip"))
+                     (("unzstd") (search-input-file inputs "bin/unzstd")))))
                (add-after 'install 'keep-only-info-reader
                  (lambda* (#:key outputs #:allow-other-keys)
                    ;; Remove everything but 'bin/info' and associated
@@ -252,14 +254,13 @@ is on expressing the content semantically, avoiding physical markup commands.")
                      (with-directory-excursion (string-append out "/share")
                        (for-each delete-file-recursively
                                  (fold delete (files)
-                                       '("info" "locale"))))
-                     #t))))))
+                                       '("info" "locale"))))))))))
        #:disallowed-references ,(list (this-package-input "perl"))
        #:modules ((ice-9 ftw) (srfi srfi-1)
                   ,@%default-gnu-modules)))
     (synopsis "Standalone Info documentation reader")
     (inputs (modify-inputs (package-inputs texinfo)
-              (prepend gzip)))))
+              (prepend gzip zstd)))))
 
 (define-public texi2html
   (package
