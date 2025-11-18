@@ -7,7 +7,7 @@
 ;;; Copyright © 2016, 2017, 2018, 2019, 2021, 2022 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2016 Chris Marusich <cmmarusich@gmail.com>
 ;;; Copyright © 2017 Huang Ying <huang.ying.caritas@gmail.com>
-;;; Copyright © 2017, 2021, 2024 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2017, 2021, 2024-2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2019 Kyle Meyer <kyle@kyleam.com>
 ;;; Copyright © 2019 Mathieu Othacehe <m.othacehe@gmail.com>
 ;;; Copyright © 2020 Danny Milosavljevic <dannym@scratchpost.org>
@@ -1006,11 +1006,9 @@ if not found."
 (define* (info-dir-file manifest #:optional system)
   "Return a derivation that builds the 'dir' file for all the entries of
 MANIFEST."
-  (define texinfo                                 ;lazy reference
+  (define texinfo                       ;lazy reference
     (module-ref (resolve-interface '(gnu packages texinfo)) 'texinfo))
-  (define gzip                                    ;lazy reference
-    (module-ref (resolve-interface '(gnu packages compression)) 'gzip))
-  (define libc-utf8-locales-for-target            ;lazy reference
+  (define libc-utf8-locales-for-target  ;lazy reference
     (module-ref (resolve-interface '(gnu packages base))
                 'libc-utf8-locales-for-target))
 
@@ -1022,8 +1020,9 @@ MANIFEST."
                        (ice-9 ftw))
 
           (define (info-file? file)
-            (or (string-suffix? ".info" file)
-                (string-suffix? ".info.gz" file)))
+            (or (string-suffix? ".info.zst" file)
+                (string-suffix? ".info.gz" file)
+                (string-suffix? ".info" file)))
 
           (define (info-files top)
             (let ((infodir (string-append top "/share/info")))
@@ -1031,9 +1030,12 @@ MANIFEST."
                    (or (scandir infodir info-file?) '()))))
 
           (define (info-file-language file)
-            (let* ((base (if (string-suffix? ".gz" file)
-                             (basename file ".info.gz")
-                             (basename file ".info")))
+            (let* ((base (cond ((string-suffix? ".zst" file)
+                                (basename file ".info.zst"))
+                               ((string-suffix? ".gz" file)
+                                (basename file ".info.gz"))
+                               (else
+                                (basename file ".info"))))
                    (dot  (string-rindex base #\.)))
               (if dot
                   (string-drop base (+ 1 dot))
@@ -1052,7 +1054,6 @@ MANIFEST."
                                    '("")
                                    `("." ,language)))))))
 
-          (setenv "PATH" (string-append #+gzip "/bin")) ;for info.gz files
           (setenv "GUIX_LOCPATH"
                   #+(file-append (libc-utf8-locales-for-target system)
                                  "/lib/locale"))
