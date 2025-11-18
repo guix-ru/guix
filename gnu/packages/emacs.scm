@@ -9,7 +9,7 @@
 ;;; Copyright © 2016 David Thompson <dthompson2@worcester.edu>
 ;;; Copyright © 2016 Nikita <nikita@n0.is>
 ;;; Copyright © 2017 Marius Bakke <mbakke@fastmail.com>
-;;; Copyright © 2017, 2019, 2020, 2023, 2024 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2017, 2019, 2020, 2023-2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2017 Alex Vong <alexvong1995@gmail.com>
 ;;; Copyright © 2017, 2018 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2017, 2023, 2024, 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
@@ -384,7 +384,8 @@
                        ,(map dirname
                              (list (search-input-file inputs "/bin/gzip")
                                    ;; for coreutils
-                                   (search-input-file inputs "/bin/yes"))))
+                                   (search-input-file inputs "/bin/yes")
+                                   (search-input-file inputs "/bin/zstd"))))
                      `("EMACSLOADPATH" suffix ,lisp-dirs)))
                  (find-files (string-append out "/bin")
                              ;; Matches versioned and unversioned emacs binaries.
@@ -402,7 +403,7 @@
                 (copy-file
                  (car (find-files "bin" "^emacs-([0-9]+\\.)+[0-9]+$"))
                  "bin/emacs")))))))
-    (inputs (list bash-minimal coreutils findutils gawk gzip ncurses sed))
+    (inputs (list bash-minimal coreutils findutils gawk gzip ncurses sed zstd))
     (native-inputs (list autoconf libfaketime pkg-config texinfo))
     (home-page "https://www.gnu.org/software/emacs/")
     (synopsis "The extensible text editor (minimal build for byte-compilation)")
