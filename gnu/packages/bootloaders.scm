@@ -907,7 +907,7 @@ also initializes the boards (RAM etc).")
                      (lambda* (#:key make-flags #:allow-other-keys)
                        (let* ((info-dir (string-append #$output "/share/info"))
                               (info (string-append info-dir
-                                                   "/DasUBoot.info.gz")))
+                                                   "/DasUBoot.info.zst")))
                          (with-directory-excursion "doc/output"
                            (apply invoke "make" "-C" "texinfo" "install-info"
                                   (string-append "infodir=" info-dir)
