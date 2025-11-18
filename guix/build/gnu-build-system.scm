@@ -736,23 +736,23 @@ and 'man/'.  This phase moves directories to the right place if needed."
 (define* (compress-documentation #:key
                                  outputs
                                  (compress-documentation? #t)
-                                 (info-compressor "gzip")
+                                 (info-compressor (if (which "zstd")
+                                                      "zstd"
+                                                      "gzip"))
                                  (info-compressor-flags
-                                  '("--best" "--no-name"))
-                                 (info-compressor-file-extension ".gz")
-                                 (man-compressor (if (which "zstd")
-                                                     "zstd"
-                                                     info-compressor))
-                                 (man-compressor-flags
                                   (if (which "zstd")
                                       (list "-19" "--rm"
                                             "--threads" (number->string
                                                          (parallel-job-count)))
-                                      info-compressor-flags))
-                                 (man-compressor-file-extension
+                                      '("--best" "--no-name")))
+                                 (info-compressor-file-extension
                                   (if (which "zstd")
                                       ".zst"
-                                      info-compressor-file-extension))
+                                      ".gz"))
+                                 (man-compressor info-compressor)
+                                 (man-compressor-flags info-compressor-flags)
+                                 (man-compressor-file-extension
+                                  info-compressor-file-extension)
                                  #:allow-other-keys)
   "When COMPRESS-INFO-MANUALS? is true, compress Info files found in OUTPUTS
 using INFO-COMPRESSOR, called with INFO-COMPRESSOR-FLAGS.  Similarly, when
