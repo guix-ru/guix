@@ -111,14 +111,14 @@ is on expressing the content semantically, avoiding physical markup commands.")
 (define-public texinfo-7
   (package
     (inherit texinfo)
-    (version "7.1.1")
+    (version "7.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/texinfo/texinfo-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "10kcdb3pf7yakniccvv0krchs2fh3vh1rvhvnqr98ll3cbj3gbii"))))
+                "19k38dqmsk4p03h6yr7p1p7498wpl6f8i06bhbx17wdyixwdfa83"))))
     (inputs (modify-inputs (package-inputs texinfo)
               (append perl-archive-zip           ;needed for 'tex2any --epub3'
                       perl-unicode-eastasianwidth perl-text-unidecode
