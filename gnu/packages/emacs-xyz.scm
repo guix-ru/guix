@@ -6931,12 +6931,10 @@ returns multiple locations, a list is displayed to choose from.")
           (add-after 'install 'install-info
             (lambda _
               (let ((info (string-append #$output "/share/info")))
-                (install-file "texinfo/graphviz-dot-mode.info.gz" info)))))))
-    (native-inputs
-     (list gzip texinfo))
+                (install-file "texinfo/graphviz-dot-mode.info.zst" info)))))))
+    (native-inputs (list gzip texinfo))
     (inputs (list graphviz))
-    (propagated-inputs
-     (list emacs-company))
+    (propagated-inputs (list emacs-company))
     (home-page "http://ppareit.github.com/graphviz-dot-mode")
     (synopsis "Major mode for editing Graphviz DOT files")
     (description
