@@ -123,12 +123,12 @@ manual."
                          (infodir  "/run/current-system/profile/share/info")
                          (per-lang (lambda (code)
                                      (string-append infodir "/guix." code
-                                                    ".info.gz")))
+                                                    ".info.zst")))
                          (file ((@ (srfi srfi-1) find) file-exists?
                                 (list (per-lang with-region)
                                       (per-lang language)
                                       (string-append infodir
-                                                     "/guix.info.gz"))))
+                                                     "/guix.info.zst"))))
                          (node     (or (assoc-ref '#$%installation-node-names
                                                   with-region)
                                        (assoc-ref '#$%installation-node-names
