@@ -3333,13 +3333,13 @@ GnuPG-based password manager like @code{pass}.")
                      (lambda _
                        (let* ((info-dir (string-append #$output "/share/info"))
                               (info (string-append info-dir
-                                                   "/TheLinuxKernel.info.gz")))
+                                                   "/TheLinuxKernel.info.zst")))
                          (with-directory-excursion "Documentation/output"
                            (invoke "make" "-C" "texinfo" "install-info"
                                    (string-append "infodir=" info-dir)))
                          ;; Create a symlink, for convenience.
                          (symlink info (string-append info-dir
-                                                      "/linux.info.gz"))))))))
+                                                      "/linux.info.zst"))))))))
     (native-inputs
      (list graphviz
            perl
