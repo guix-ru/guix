@@ -9314,7 +9314,7 @@ properties, screen resolution, and other GNOME parameters.")
 (define-public gnome-shell
   (package
     (name "gnome-shell")
-    (version "46.10")
+    (version "48.6")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -9322,7 +9322,7 @@ properties, screen resolution, and other GNOME parameters.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1dmpv6n05r7ryl4rq39755bv3f1x50kxk049phnlsyfxfn7m1jcs"))))
+                "0rgrxb7cp6mvj1kgkabw1zs3w245biw1a6c8x4hi16iw64g9a4jh"))))
     (build-system meson-build-system)
     (arguments
      (let ((disallowed-references
@@ -9337,7 +9337,9 @@ properties, screen resolution, and other GNOME parameters.")
         #~(list "-Dsystemd=false"
                 ;; Otherwise, the RUNPATH will lack the final path component.
                 (string-append "-Dc_link_args=-Wl,-rpath="
-                               #$output "/lib/gnome-shell"))
+                               #$output "/lib/gnome-shell")
+                ;; TODO: Unbundle jasmine
+                "--wrap-mode=nodownload")
         #:modules '((guix build meson-build-system)
                     (guix build utils)
                     (ice-9 match)
@@ -9353,6 +9355,10 @@ properties, screen resolution, and other GNOME parameters.")
                   (substitute* "meson.build"
                     (("keysdir =.*")
                      (string-append "keysdir = '" keysdir "'\n"))))))
+            (add-after 'unpack 'patch-jasmine
+              (lambda _
+                (substitute* (find-files "subprojects/jasmine-gjs/bin")
+                  (("/usr/bin/env") (which "env")))))
             (add-after 'unpack 'skip-gtk-update-icon-cache
               ;; Don't create 'icon-theme.cache'.
               (lambda _
@@ -9451,6 +9457,7 @@ printf '~a is deprecated.  Use the \"gnome-extensions\" CLI or \
                         #:outputs outputs))))))))
     (native-inputs
      (list asciidoc
+           coreutils-minimal            ;for env
            gettext-minimal
            `(,glib "bin")               ;for glib-compile-schemas, etc.
            desktop-file-utils           ;for update-desktop-database
@@ -9460,8 +9467,9 @@ printf '~a is deprecated.  Use the \"gnome-extensions\" CLI or \
            perl
            pkg-config
            python
-           python-dbus-1.2
+           python-dbus
            python-dbusmock
+           python-docutils
            ruby-sass
            sassc
            ;; For tests
