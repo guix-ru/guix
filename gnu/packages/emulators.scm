@@ -3683,7 +3683,7 @@ de-interlacing patches for use with PCSX2.")
                             (string-append #$output "/share/resources")))))))
     (inputs (list (module-ref
                    (resolve-interface '(gnu packages debug)) 'libbacktrace)
-                  `(,zstd-1.5.7 "lib")
+                  `(,zstd "lib")
                   curl
                   dbus
                   eudev
