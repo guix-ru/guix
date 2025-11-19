@@ -1850,6 +1850,10 @@ or junctions, and always follows hard links.")
                             ;; This isn't picked up correctly in the Makefiles.
                             "EXT=.exe")
                           '())
+                   #$@(if (target-hurd?)
+                          ;; Uses symbols from pthread.
+                          `("PCMTLIB=-pthread")
+                          '())
                    ;; Auto-detection is over-engineered and buggy.
                    "PCLIBDIR=lib"
                    "PCINCDIR=include"
