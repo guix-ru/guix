@@ -174,6 +174,7 @@
   #:use-module (gnu packages oneapi)
   #:use-module (gnu packages pciutils)
   #:use-module (gnu packages perl)
+  #:use-module (gnu packages photo)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages polkit)
   #:use-module (gnu packages popt)

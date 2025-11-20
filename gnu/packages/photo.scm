@@ -2,14 +2,14 @@
 ;;; Copyright © 2014, 2015, 2017, 2019, 2021 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2015, 2025, 2026 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2015, 2017 Andreas Enge <andreas@enge.fr>
-;;; Copyright © 2016-2019, 2021, 2023, 2024 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2016-2019, 2021, 2023, 2024, 2026 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2017 Roel Janssen <roel@gnu.org>
 ;;; Copyright © 2018–2022 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2018 Leo Famulari <leo@famulari.name>
 ;;; Copyright © 2020 Sebastian Schott <sschott@mailbox.org>
 ;;; Copyright © 2020 Vincent Legoll <vincent.legoll@gmail.com>
 ;;; Copyright © 2020, 2024. 2021, 2022, 2024 Vinicius Monego <monego@posteo.net>
-;;; Copyright © 2025-2026 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2023, 2025-2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2021 Maxime Devos <maximedevos@telenet.be>
 ;;; Copyright © 2022, 2023, 2025 John Kehayias <john.kehayias@protonmail.com>
 ;;; Copyright © 2022 Sharlatan Hellseher <sharlatanus@gmail.com>
@@ -79,7 +79,9 @@
   #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages iso-codes)
   #:use-module (gnu packages libcanberra)
+  #:use-module (gnu packages libevent)
   #:use-module (gnu packages libusb)
+  #:use-module (gnu packages linux)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages lua)
   #:use-module (gnu packages m4)
@@ -98,7 +100,9 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages ruby)
+  #:use-module (gnu packages serialization)
   #:use-module (gnu packages sdl)
+  #:use-module (gnu packages sphinx)
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages tex)
   #:use-module (gnu packages time)
@@ -336,6 +340,116 @@ include:
      "This package provides tools to import photos and videos from cameras,
 phones and memory cards and generate meaningful file and folder names.")
     (license license:gpl2+)))
+
+(define-public libcamera-minimal
+  (package
+    (name "libcamera-minimal")
+    (version "0.6.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+         (url "https://git.libcamera.org/libcamera/libcamera.git")
+         (commit (string-append "v" version))))
+       (patches (search-patches
+                 "libcamera-ipa_manager-disable-signature-verification.patch"))
+       (file-name (git-file-name "libcamera" version))
+       (sha256
+        (base32 "0g6rphsa1hi9y22l2vw5cj75bf57clq3cggviwd1bnjhpp61nryc"))))
+    (build-system meson-build-system)
+    (arguments
+     (list #:glib-or-gtk? #t         ; To wrap binaries and/or compile schemas
+           #:configure-flags
+           #~(list "-Dudev=enabled"
+                   "-Dv4l2=enabled"
+                   "-Dtest=true")
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'disable-gstreamer-tests
+                 ;; these require /dev/udmabuf
+                 (lambda _
+                   (substitute* "test/meson.build"
+                     (("subdir\\('gstreamer'\\)") ""))))
+               #$@(if (target-aarch64?)
+                      #~((add-after 'unpack 'disable-problematic-tests
+                           (lambda _
+                             ;; The 'log_process' test fails on aarch64-linux with a
+                             ;; SIGinvalid error (see:
+                             ;; https://bugs.libcamera.org/show_bug.cgi?id=173).
+                             (substitute* "test/log/meson.build"
+                               ((".*'name': 'log_process'.*")
+                                ""))
+                             ;; The 'file' test fails on aarch64-linux with SIGinvalid.
+                             (substitute* "test/meson.build"
+                               ((".*'name': 'file'.*")
+                                "")))))
+                      #~()))))
+    (native-inputs
+     (list pkg-config
+           python-wrapper
+           python-pyyaml
+           python-packaging))
+    (inputs
+     (append
+      (list eudev
+            glib
+            gstreamer
+            gst-plugins-base
+            libjpeg-turbo
+            libyaml
+            libyuv
+            pybind11-2
+            python-jinja2
+            python-ply)
+      ;; libpisp is only needed for the rpi/pisp pipeline on ARM.
+      (if (target-arm?)
+          (list libpisp)
+          '())))
+    (synopsis "Camera stack and framework")
+    (description "LibCamera is a complex camera support library for GNU+Linux,
+Android, and ChromeOS.")
+    (home-page "https://libcamera.org/")
+    (license license:lgpl2.1+)))
+
+;; Drop the documentation and the sample utilities.
+;; The README.rst gives a nice list of what packages are required.
+(define-public libcamera
+  (package/inherit libcamera-minimal
+    (name "libcamera")
+    (outputs '("out" "doc" "gst" "tools"))
+    (arguments
+     (substitute-keyword-arguments (package-arguments libcamera-minimal)
+       ((#:configure-flags flags #~'())
+        #~(cons (string-append "-Dbindir=" #$output:tools "/bin")
+                #$flags))
+       ((#:phases phases #~%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'set-sphinx-theme
+              ;; sphinx_book_theme requires node for packaging
+              ;; use the default sphinx theme instead
+              (lambda _
+                (substitute* "Documentation/conf.py.in"
+                  (("sphinx_book_theme") "alabaster"))))
+            (add-after 'install 'move-doc-and-gst
+              (lambda _
+                (mkdir-p (string-append #$output:doc "/share"))
+                (rename-file (string-append #$output "/share/doc")
+                             (string-append #$output:doc "/share/doc"))
+                (mkdir-p (string-append #$output:gst "/lib"))
+                (rename-file
+                 (string-append #$output "/lib/gstreamer-1.0")
+                 (string-append #$output:gst "/lib/gstreamer-1.0"))))))))
+    (native-inputs
+     (modify-inputs (package-native-inputs libcamera-minimal)
+       (append googletest
+               doxygen
+               graphviz
+               python-sphinx
+               python-sphinxcontrib-doxylink)))
+    (inputs
+     (modify-inputs (package-inputs libcamera-minimal)
+       (append libevent libtiff qtbase)))))
 
 (define-public libraw
   (package

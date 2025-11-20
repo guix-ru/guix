@@ -200,6 +200,7 @@
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system qt)
   #:use-module (guix build-system trivial)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -480,115 +481,10 @@ Raspberry Pi ISP (PiSP), consisting of the Frontend and Backend hardware
 components.")
     (license license:bsd-2)))
 
-(define-public libcamera-minimal
-  (package
-    (name "libcamera-minimal")
-    (version "0.6.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri
-        (git-reference
-         (url "https://git.libcamera.org/libcamera/libcamera.git")
-         (commit (string-append "v" version))))
-       (patches (search-patches
-                 "libcamera-ipa_manager-disable-signature-verification.patch"))
-       (file-name (git-file-name "libcamera" version))
-       (sha256
-        (base32 "0g6rphsa1hi9y22l2vw5cj75bf57clq3cggviwd1bnjhpp61nryc"))))
-    (build-system meson-build-system)
-    (arguments
-     (list #:glib-or-gtk? #t         ; To wrap binaries and/or compile schemas
-           #:configure-flags
-           #~(list "-Dudev=enabled"
-                   "-Dv4l2=enabled"
-                   "-Dtest=true")
-           #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'unpack 'disable-gstreamer-tests
-                 ;; these require /dev/udmabuf
-                 (lambda _
-                   (substitute* "test/meson.build"
-                     (("subdir\\('gstreamer'\\)") ""))))
-               #$@(if (target-aarch64?)
-                      #~((add-after 'unpack 'disable-problematic-tests
-                           (lambda _
-                             ;; The 'log_process' test fails on aarch64-linux with a
-                             ;; SIGinvalid error (see:
-                             ;; https://bugs.libcamera.org/show_bug.cgi?id=173).
-                             (substitute* "test/log/meson.build"
-                               ((".*'name': 'log_process'.*")
-                                ""))
-                             ;; The 'file' test fails on aarch64-linux with SIGinvalid.
-                             (substitute* "test/meson.build"
-                               ((".*'name': 'file'.*")
-                                "")))))
-                      #~()))))
-    (native-inputs
-     (list pkg-config
-           python-wrapper
-           python-pyyaml
-           python-packaging))
-    (inputs
-     (append
-      (list eudev
-            glib
-            gstreamer
-            gst-plugins-base
-            libjpeg-turbo
-            libyaml
-            libyuv
-            pybind11-2
-            python-jinja2
-            python-ply)
-      ;; libpisp is only needed for the rpi/pisp pipeline on ARM.
-      (if (target-arm?)
-          (list libpisp)
-          '())))
-    (synopsis "Camera stack and framework")
-    (description "LibCamera is a complex camera support library for GNU+Linux,
-Android, and ChromeOS.")
-    (home-page "https://libcamera.org/")
-    (license license:lgpl2.1+)))
+(define-deprecated/public-alias libcamera-minimal (@ (gnu packages photo)
+                                                     libcamera-minimal))
 
-;; Drop the documentation and the sample utilities.
-;; The README.rst gives a nice list of what packages are required.
-(define-public libcamera
-  (package/inherit libcamera-minimal
-    (name "libcamera")
-    (outputs '("out" "doc" "gst" "tools"))
-    (arguments
-     (substitute-keyword-arguments (package-arguments libcamera-minimal)
-       ((#:configure-flags flags #~'())
-        #~(cons (string-append "-Dbindir=" #$output:tools "/bin")
-                #$flags))
-       ((#:phases phases #~%standard-phases)
-        #~(modify-phases #$phases
-            (add-after 'unpack 'set-sphinx-theme
-              ;; sphinx_book_theme requires node for packaging
-              ;; use the default sphinx theme instead
-              (lambda _
-                (substitute* "Documentation/conf.py.in"
-                  (("sphinx_book_theme") "alabaster"))))
-            (add-after 'install 'move-doc-and-gst
-              (lambda _
-                (mkdir-p (string-append #$output:doc "/share"))
-                (rename-file (string-append #$output "/share/doc")
-                             (string-append #$output:doc "/share/doc"))
-                (mkdir-p (string-append #$output:gst "/lib"))
-                (rename-file
-                 (string-append #$output "/lib/gstreamer-1.0")
-                 (string-append #$output:gst "/lib/gstreamer-1.0"))))))))
-    (native-inputs
-     (modify-inputs (package-native-inputs libcamera-minimal)
-       (append googletest
-               doxygen
-               graphviz
-               python-sphinx
-               python-sphinxcontrib-doxylink)))
-    (inputs
-     (modify-inputs (package-inputs libcamera-minimal)
-       (append libevent libtiff qtbase)))))
+(define-deprecated/public-alias libcamera (@ (gnu packages photo) libcamera))
 
 (define-public libdnet
   (package
