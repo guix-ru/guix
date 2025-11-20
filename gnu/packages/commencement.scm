@@ -1241,7 +1241,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
               "--build=i686-unknown-linux-gnu"
               "--host=i686-unknown-linux-gnu"
               "--with-sysroot=/"
-              ,(string-append "--prefix=" out))))))))
+              ,(string-append "--prefix=" out))))))
+    (properties '((max-silent-time . 7200)))))
 
 (define gnu-make-mesboot
   (package
