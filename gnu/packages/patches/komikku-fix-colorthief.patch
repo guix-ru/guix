@@ -1,0 +1,23 @@
+Upstream-Status: Absorbed (commit bb8b06debad74d45d703479a64d867d0986b687a, versions 1.90+)
+diff --git a/komikku/models/database/mangas.py b/komikku/models/database/mangas.py
+index 47651e2e..483f10cc 100644
+--- a/komikku/models/database/mangas.py
++++ b/komikku/models/database/mangas.py
+@@ -13,7 +13,7 @@ from pathlib import Path
+ import shutil
+ import time
+ 
+-from modern_colorthief import get_palette
++from colorthief import ColorThief
+ from PIL import Image
+ from PIL import ImageFilter
+ from PIL import ImageStat
+@@ -139,7 +139,7 @@ class Manga:
+                 if '@define-color' not in data:
+                     return data
+ 
+-        palette = get_palette(cover_path, color_count=2)
++        palette = ColorThief(cover_path).get_palette(color_count=2, quality=1)[:2]
+         if len(palette) != 2:
+             # Single color image?
+             return None
