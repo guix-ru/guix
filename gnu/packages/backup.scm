@@ -21,7 +21,7 @@
 ;;; Copyright © 2021 Timothy Sample <samplet@ngyro.com>
 ;;; Copyright © 2021 Brice Waegeneire <brice@waegenei.re>
 ;;; Copyright © 2021 Sarah Morgensen <iskarian@mgsn.dev>
-;;; Copyright © 2022 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2022, 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2022 Feng Shu <tumashu@163.com>
 ;;; Copyright © 2023 Timo Wilken <guix@twilken.net>
 ;;; Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
@@ -264,7 +264,7 @@ backups (called chunks) to allow easy burning to CD/DVD.")
 (define-public libarchive
   (package
     (name "libarchive")
-    (version "3.7.7")
+    (version "3.8.3")
     (source
      (origin
        (method url-fetch)
@@ -275,7 +275,7 @@ backups (called chunks) to allow easy burning to CD/DVD.")
                                  version ".tar.xz")))
        (sha256
         (base32
-         "1vps57mrpqmrk4zayh5g5amqfq7031s5zzkkxsm7r71rqf1wv6l7"))))
+         "124pp4w6n8xqdwjswc5d4d6kkrgxv67f9xlhgg7934zii4mizqlh"))))
     (build-system gnu-build-system)
     (inputs
      (list bzip2
@@ -295,24 +295,33 @@ backups (called chunks) to allow easy burning to CD/DVD.")
           "--without-openssl")
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'build 'patch-pwd
+          (add-before 'build 'patch-commands
             (lambda _
               (substitute* "Makefile"
-                (("/bin/pwd") (which "pwd")))))
+                (("/bin/pwd") (which "pwd")))
+              (substitute* "test_utils/test_main.c"
+                (("/bin/sh") (which "sh")))))
           (replace 'check
-            (lambda* (#:key tests? #:allow-other-keys)
+            (lambda* (#:key parallel-build? tests? #:allow-other-keys)
               (if tests?
-		  ;; XXX: The test_owner_parse, test_read_disk, and
-		  ;; test_write_disk_lookup tests expect user 'root' to
-		  ;; exist, but the chroot's /etc/passwd doesn't have
-		  ;; it.  Turn off those tests.
                   (begin
-		    ;; The tests allow one to disable tests matching a globbing pattern.
-		    (invoke "make"
+                    ;; These environment variables are taken from
+                    ;; <https://raw.githubusercontent.com/libarchive/libarchive/refs/heads/master/.github/workflows/ci.yml>
+                    (setenv "SKIP_OPEN_FD_ERR_TEST" "1")
+                    (setenv "IGNORE_TRAVERSALS_TEST4" "1")
+
+		    ;; XXX: The test_owner_parse, test_read_disk, and
+		    ;; test_write_disk_lookup tests expect user 'root' to
+		    ;; exist, but the chroot's /etc/passwd doesn't have it
+		    ;; (see:
+		    ;; <https://github.com/libarchive/libarchive/issues/2794>).
+		    (invoke "make" "-j" (number->string
+                                         (if parallel-build?
+                                             (parallel-job-count)
+                                             1))
 			    "libarchive_test"
 			    "bsdcpio_test"
 			    "bsdtar_test")
-
 		    ;; XXX: This glob disables too much.
 		    (invoke "./libarchive_test" "^test_*_disk*")
 		    (invoke "./bsdcpio_test" "^test_owner_parse")
