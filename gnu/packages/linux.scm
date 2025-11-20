@@ -4215,9 +4215,7 @@ Zerofree requires the file system to be unmounted or mounted read-only.")
       ''("--with-libunwind"
          ;; Don't fail if the architecture doesn't support different
          ;; personalities.
-         "--enable-mpers=check")
-      ;; See <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=32459>.
-      #:parallel-tests? #f))           ; undeterministic failures
+         "--enable-mpers=check")))
     (inputs (list libunwind))
     (native-inputs
      (list autoconf
