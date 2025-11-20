@@ -445,7 +445,7 @@ and a high score table.")
 (define-public komikku
   (package
     (name "komikku")
-    (version "1.72.0")
+    (version "1.87.0")
     (source
      (origin
        (method git-fetch)
@@ -455,9 +455,9 @@ and a high score table.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "13mz3ijrmfh002pw977mzdnilgkfl0knr3xrxr0zdicx8nf7inr9"))
+         "0fsmhigvvr9fahvczbwc5lv7xcvl9px9c10dv8sqx5j9sr1fhlcq"))
        (patches (search-patches "komikku-python-3.11-compat.patch"
-                                "komikku-future-servers-compat.patch"))))
+                                "komikku-fix-colorthief.patch"))))
     (build-system meson-build-system)
     (arguments
      (list
