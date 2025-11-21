@@ -42041,25 +42041,26 @@ message.
       (license license:gpl2+))))
 
 (define-public emacs-gnus-desktop-notify
-  (package
-    (name "emacs-gnus-desktop-notify")
-    ;; There is no version tag; use a MELPA style date corresponding to that
-    ;; of the last commit.
-    (version "20250616.0809")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://gitlab.com/wavexx/gnus-desktop-notify.el.git")
-             (commit "12d2a52c0340a6d822f23cf8bc3f4d929c2d8838")))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "15gs8j5z88yvbpxjx9760isdiv6rz43m11f38yp5xh8i79x2gzwp"))))
-    (build-system emacs-build-system)
-    (home-page "https://www.thregr.org/wavexx/software/gnus-desktop-notify.el/")
-    (synopsis "Gnus desktop notification global minor mode")
-    (description
-     "@code{gnus-desktop-notify} provides a simple mechanism to notify the
+  ;; No tagged releases; version taken from source code
+  (let ((commit "12d2a52c0340a6d822f23cf8bc3f4d929c2d8838")
+        (revision "0"))
+    (package
+      (name "emacs-gnus-desktop-notify")
+      (version (git-version "1.4" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://gitlab.com/wavexx/gnus-desktop-notify.el.git")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "15gs8j5z88yvbpxjx9760isdiv6rz43m11f38yp5xh8i79x2gzwp"))))
+      (build-system emacs-build-system)
+      (home-page "https://www.thregr.org/wavexx/software/gnus-desktop-notify.el/")
+      (synopsis "Gnus desktop notification global minor mode")
+      (description
+       "@code{gnus-desktop-notify} provides a simple mechanism to notify the
 user when new messages are received.  To get started, place the following
 configuration snippet in your @file{~/.gnus.el} configuration file:
 @lisp
@@ -42072,7 +42073,13 @@ configuration snippet in your @file{~/.gnus.el} configuration file:
 The above causes Gnus to scan all configured groups every two hours when
 Emacs has been idle for one hour, with desktop notifications emitted for new
 messages received.")
-    (license license:gpl3+)))
+      (license license:gpl3+))))
+
+(define-public emacs-gnus-desktop-notify-superseded-version
+  (package
+    (inherit emacs-gnus-desktop-notify)
+    (version "20250616.0809")
+    (properties (list (cons 'superseded emacs-gnus-desktop-notify)))))
 
 (define-public emacs-ox-epub
   (package
