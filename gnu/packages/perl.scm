@@ -12694,7 +12694,7 @@ statements: @code{switch} and @code{case}.")
 (define-public perl-syntax-keyword-try
   (package
     (name "perl-syntax-keyword-try")
-    (version "0.28")
+    (version "0.31")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -12702,10 +12702,9 @@ statements: @code{switch} and @code{case}.")
                     version ".tar.gz"))
               (sha256
                (base32
-                "1j02z9w0p9a77maf62cy5324vmc01hks0bfm5qjidc50hafmzbfc"))))
+                "0jja85cz91rvzbw4cmlxw34yqgbxy0sxwd4vb4m9hy33fhnj9ikv"))))
     (build-system perl-build-system)
-    (native-inputs (list perl-module-build))
-    (inputs (list perl-xs-parse-keyword))
+    (native-inputs (list perl-module-build perl-xs-parse-keyword))
     (home-page "https://metacpan.org/pod/Syntax::Keyword::Try")
     (synopsis "Try/catch/finally syntax for perl")
     (description
