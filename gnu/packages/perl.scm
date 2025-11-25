@@ -8641,14 +8641,14 @@ readable.  A 65-character subset ([A-Za-z0-9+/=]) of US-ASCII is used, enabling
 (define-public perl-mime-charset
   (package
     (name "perl-mime-charset")
-    (version "1.012.2")
+    (version "1.013.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://cpan/authors/id/N/NE/NEZUMI/"
                                   "MIME-Charset-" version ".tar.gz"))
               (sha256
                (base32
-                "04qxgcg9mvia121i3zcqxgp20y0d9kg0qv6hddk93ian0af7g347"))))
+                "1w3h13k0g4fkwkz5nisqxi7bgiggmp4q9gv0dqyz4lfjq3haddqv"))))
     (build-system perl-build-system)
     (home-page "https://metacpan.org/release/MIME-Charset")
     (synopsis "Charset information for MIME messages")
