@@ -14650,7 +14650,7 @@ neither visible nor modifiable from Perl space).")
 (define-public perl-xs-parse-keyword
   (package
     (name "perl-xs-parse-keyword")
-    (version "0.34")
+    (version "0.49")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -14658,10 +14658,10 @@ neither visible nor modifiable from Perl space).")
                     version ".tar.gz"))
               (sha256
                (base32
-                "1hfny6bbpj5n2bmr213bpi547825jzbs2143nd19skcj16sdscqh"))))
+                "1fxhxw8w9ll123vlm1gy884cr0rxr20rd11m4ggz38dv58afvibn"))))
     (build-system perl-build-system)
-    (native-inputs (list perl-extutils-cchecker perl-module-build
-                         perl-test2-suite))
+    (native-inputs (list perl-extutils-cchecker perl-module-build))
+    (propagated-inputs (list perl-file-sharedir))
     (home-page "https://metacpan.org/dist/XS-Parse-Keyword")
     (synopsis "XS functions to assist in parsing keyword syntax")
     (description
