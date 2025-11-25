@@ -2602,17 +2602,15 @@ CPAN::Meta object are present.")
 (define-public perl-cpanel-json-xs
   (package
     (name "perl-cpanel-json-xs")
-    (version "4.30")
+    (version "4.40")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://cpan/authors/id/R/RU/RURBAN/"
                            "Cpanel-JSON-XS-" version ".tar.gz"))
        (sha256
-        (base32 "1d5xwk3j3pvc2s439vjrnhwcx44wkskda9mrwv3ix2c6pp7slpsn"))))
+        (base32 "0k2isdy8iimypvbm3pra9c5ywsfrbr2fjr4rqbhrgcbkfvq76m3q"))))
     (build-system perl-build-system)
-    (propagated-inputs
-     (list perl-common-sense))
     (home-page "https://metacpan.org/release/Cpanel-JSON-XS")
     (synopsis "JSON::XS for Cpanel")
     (description "This module converts Perl data structures to JSON and vice
