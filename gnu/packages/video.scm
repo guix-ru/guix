@@ -2502,7 +2502,7 @@ media, 2D/3D graphics and ECMAScript.")
            speex
            speexdsp
            srt
-           taglib
+           taglib-1
            twolame
            unzip
            wayland
