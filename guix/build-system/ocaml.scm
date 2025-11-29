@@ -155,6 +155,12 @@ pre-defined variants."
                     variant-property))
         (const #f)))
 
+  (define (has-ocaml-build-system? p)
+    (eq? 'ocaml (build-system-name (package-build-system p))))
+
+  (define (has-dune-build-system? p)
+    (eq? 'dune (build-system-name (package-build-system p))))
+
   (define (transform p)
     (cond
      ;; If VARIANT-PROPERTY is present, use that.
@@ -162,8 +168,7 @@ pre-defined variants."
       => force)
 
      ;; Otherwise build the new package object graph.
-     ((or (eq? (package-build-system p) ocaml-build-system)
-          (eq? (package-build-system p) (default-dune-build-system)))
+     ((or (has-ocaml-build-system? p) (has-dune-build-system? p))
       (package
         (inherit p)
         (location (package-location p))
@@ -180,15 +185,13 @@ pre-defined variants."
            (ensure-keyword-arguments (package-arguments p)
                                      `(#:ocaml   ,ocaml
                                        #:findlib ,findlib
-                                       ,@(if (eq? (package-build-system p)
-                                                  (default-dune-build-system))
+                                       ,@(if (has-dune-build-system? p)
                                              `(#:dune ,dune)
                                              '())))))))
      (else p)))
 
   (define (cut? p)
-    (or (not (or (eq? (package-build-system p) ocaml-build-system)
-                 (eq? (package-build-system p) (default-dune-build-system))))
+    (or (not (or (has-ocaml-build-system? p) (has-dune-build-system? p)))
         (package-variant p)))
 
   (package-mapping transform cut?))
