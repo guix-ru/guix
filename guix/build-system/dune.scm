@@ -45,16 +45,9 @@
   `((guix build dune-build-system)
     ,@ocaml:%ocaml-build-system-modules))
 
-(define (default-dune)
-  "Return the default OCaml package."
-
-  ;; Do not use `@' to avoid introducing circular dependencies.
-  (let ((module (resolve-interface '(gnu packages ocaml))))
-    (module-ref module 'dune)))
-
 (define* (lower name
                 #:key source inputs native-inputs outputs system target
-                (dune (default-dune))
+                (dune (ocaml:default-dune))
                 (ocaml (ocaml:default-ocaml))
                 (findlib (ocaml:default-findlib))
                 #:allow-other-keys
