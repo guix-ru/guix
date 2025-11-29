@@ -248,33 +248,34 @@ pre-defined variants."
     (inherit p)
     (properties (alist-delete 'ocaml5.3-variant (package-properties p)))))
 
-(define* (lower name
-                #:key source inputs native-inputs outputs system target
-                (ocaml (default-ocaml))
-                (findlib (default-findlib))
-                #:allow-other-keys
-                #:rest arguments)
-  "Return a bag for NAME."
-  (define private-keywords
-    '(#:target #:ocaml #:findlib #:inputs #:native-inputs))
+(define (make-lower default-ocaml default-findlib)
+  (lambda* (name
+            #:key source inputs native-inputs outputs system target
+            (ocaml (default-ocaml))
+            (findlib (default-findlib))
+            #:allow-other-keys
+            #:rest arguments)
+    "Return a bag for NAME."
+    (define private-keywords
+      '(#:target #:ocaml #:findlib #:inputs #:native-inputs))
 
-  (and (not target)                               ;XXX: no cross-compilation
-       (bag
-         (name name)
-         (system system)
-         (host-inputs `(,@(if source
-                              `(("source" ,source))
-                              '())
-                        ,@inputs))
-         (build-inputs `(("ocaml" ,ocaml)
-                         ("findlib" ,findlib)
-                         ,@native-inputs
+    (and (not target)                   ;XXX: no cross-compilation
+         (bag
+           (name name)
+           (system system)
+           (host-inputs `(,@(if source
+                                `(("source" ,source))
+                                '())
+                          ,@inputs))
+           (build-inputs `(("ocaml" ,ocaml)
+                           ("findlib" ,findlib)
+                           ,@native-inputs
 
-                         ;; Keep the standard inputs of 'gnu-build-system'.
-                         ,@(standard-packages)))
-         (outputs outputs)
-         (build ocaml-build)
-         (arguments (strip-keyword-arguments private-keywords arguments)))))
+                           ;; Keep the standard inputs of 'gnu-build-system'.
+                           ,@(standard-packages)))
+           (outputs outputs)
+           (build ocaml-build)
+           (arguments (strip-keyword-arguments private-keywords arguments))))))
 
 (define* (ocaml-build name inputs
                       #:key
@@ -333,6 +334,8 @@ provides a 'setup.ml' file as its build system."
                     #:target #f
                     #:graft? #f
                     #:guile-for-build guile))
+
+(define lower (make-lower default-ocaml default-findlib))
 
 (define ocaml-build-system
   (build-system
