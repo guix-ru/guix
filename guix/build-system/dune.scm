@@ -45,47 +45,49 @@
   `((guix build dune-build-system)
     ,@ocaml:%ocaml-build-system-modules))
 
-(define* (lower name
-                #:key source inputs native-inputs outputs system target
-                (dune (ocaml:default-dune))
-                (ocaml (ocaml:default-ocaml))
-                (findlib (ocaml:default-findlib))
-                #:allow-other-keys
-                #:rest arguments)
-  "Return a bag for NAME."
+(define (make-lower default-ocaml default-findlib default-dune)
+  (lambda* (name
+            #:key source inputs native-inputs outputs system target
+            (dune (default-dune))
+            (ocaml (default-ocaml))
+            (findlib (default-findlib))
+            #:allow-other-keys
+            #:rest arguments)
+    "Return a bag for NAME."
 
-  ;; Flags that put dune into reproducible build mode.
-  (define dune-release-flags
-    (if (version>=? (package-version dune) "2.5.0")
-        ;; For dune >= 2.5.0 this is just --release.
-        ''("--release")
-        ;; --release does not exist before 2.5.0.  Replace with flags compatible
-        ;; with our old ocaml4.07-dune (1.11.3)
-        ''("--root" "." "--ignore-promoted-rules" "--no-config"
-           "--profile" "release")))
+    ;; Flags that put dune into reproducible build mode.
+    (define dune-release-flags
+      (if (version>=? (package-version dune) "2.5.0")
+          ;; For dune >= 2.5.0 this is just --release.
+          ''("--release")
+          ;; --release does not exist before 2.5.0.  Replace with flags compatible
+          ;; with our old ocaml4.07-dune (1.11.3)
+          ''("--root" "." "--ignore-promoted-rules" "--no-config"
+             "--profile" "release")))
 
-  (define private-keywords
-    '(#:target #:dune #:findlib #:ocaml #:inputs #:native-inputs))
+    (define private-keywords
+      '(#:target #:dune #:findlib #:ocaml #:inputs #:native-inputs))
 
-  (and (not target)                               ;XXX: no cross-compilation
-       (let ((base (ocaml:lower name
-                                #:source source
-                                #:inputs inputs
-                                #:native-inputs native-inputs
-                                #:outputs outputs
-                                #:system system
-                                #:target target
-                                #:ocaml ocaml
-                                #:findlib findlib
-                                arguments)))
-         (bag
-           (inherit base)
-           (build-inputs `(("dune" ,dune)
-                           ,@(bag-build-inputs base)))
-           (build dune-build)
-           (arguments (append
-                       `(#:dune-release-flags ,dune-release-flags)
-                       (strip-keyword-arguments private-keywords arguments)))))))
+    (and (not target)                   ;XXX: no cross-compilation
+         (let ((base (ocaml:lower
+                      name
+                      #:source source
+                      #:inputs inputs
+                      #:native-inputs native-inputs
+                      #:outputs outputs
+                      #:system system
+                      #:target target
+                      #:ocaml ocaml
+                      #:findlib findlib
+                      arguments)))
+           (bag
+             (inherit base)
+             (build-inputs `(("dune" ,dune)
+                             ,@(bag-build-inputs base)))
+             (build dune-build)
+             (arguments (append
+                         `(#:dune-release-flags ,dune-release-flags)
+                         (strip-keyword-arguments private-keywords arguments))))))))
 
 (define* (dune-build name inputs
                      #:key
@@ -150,6 +152,10 @@ provides a 'setup.ml' file as its build system."
                     #:target #f
                     #:graft? #f
                     #:guile-for-build guile))
+
+(define lower (make-lower ocaml:default-ocaml
+                          ocaml:default-findlib
+                          ocaml:default-dune))
 
 (define dune-build-system
   (build-system
