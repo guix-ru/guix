@@ -38,6 +38,7 @@
             strip-ocaml5.3-variant
             default-findlib
             default-ocaml
+            default-dune
             lower
             ocaml-build
             ocaml-build-system))
@@ -77,6 +78,10 @@
 (define (default-findlib)
   "Return the default OCaml-findlib package, resolved lazily."
   (@* (gnu packages ocaml) ocaml-findlib))
+
+(define (default-dune)
+  "Return the default Dune package, resolved lazily."
+  (@* (gnu packages ocaml) dune))
 
 (define (default-dune-build-system)
   "Return the dune-build-system, resolved lazily."
