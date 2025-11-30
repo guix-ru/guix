@@ -40,29 +40,46 @@
             default-ocaml
             default-dune
             lower
+            default-ocaml5-findlib
+            default-ocaml5
+            default-ocaml5-dune
+            make-lower
             ocaml-build
-            ocaml-build-system))
+            ocaml-build-system
+            ocaml5-build-system))
 
 ;; Commentary:
 ;;
-;; Standard build procedure for packages using ocaml. This is implemented as an
-;; extension of `gnu-build-system'.
+;; Standard build procedures for packages using ocaml. These are implemented
+;; as extensions of `gnu-build-system'.
 ;;
-;; OCaml packages don't use a single standard for their build system. Some use
-;; autotools, other use custom configure scripts with Makefiles, others use
-;; oasis to generate the configure script and Makefile and lastly, some use
-;; custom ocaml scripts.
+;; OCaml packages don't use a single standard for their build
+;; system. Historically, some use autotools, other use custom configure
+;; scripts with Makefiles, others use oasis to generate the configure script
+;; and Makefile, and some use custom ocaml scripts. The majority of new
+;; packages instead use Dune, which has a separate `dune-build-system`.
 ;;
-;; Each phase in the build system will try to figure out what the build system
-;; is for that package. Most packages come with a custom configure script and
-;; a Makefile that in turn call custom build tools. Packages built with oasis
-;; will have a `setup.ml' file in the top directory, that can be used for all
-;; phases. In that case the Makefile is here only to call that script. In case
-;; the setup.ml do not work as expected, the @var{use-make} argument can be
-;; used to ignore the setup.ml file and run make instead.
+;; Each phase in this build system will try to figure out which of the
+;; approaches above is used for the package. Most packages come with a custom
+;; configure script and a Makefile that in turn call custom build
+;; tools. Packages built with oasis will have a `setup.ml' file in the top
+;; directory, that can be used for all phases. In that case the Makefile is
+;; here only to call that script. In case the setup.ml do not work as
+;; expected, the @var{use-make} argument can be used to ignore the setup.ml
+;; file and run make instead. Some packages use their own custom scripts
+;; (e.g., `pkg/pkg.ml' or `pkg/build.ml') which can be used here too.
 ;;
-;; Some packages use their own custom scripts, `pkg/pkg.ml' or
-;; `pkg/build.ml'. They can be used here too.
+;; Multiple instances of the build system exist to support different versions
+;; of the OCaml compiler and its associated tools. Choose `ocaml-build-system`
+;; for a build system that works with Guix's default version of the compiler,
+;; or choose `ocamlX-build-system` for some other compiler version X.
+;;
+;; Adaptor functions of the form `package-with-ocamlX.Y` transform a package
+;; to use a different compiler version for its own build and for those of all
+;; transitive dependencies. These adaptors exist for user convenience, but a
+;; package shipped with the distribution should generally use the
+;; `build-system` field instead to identify the version of the OCaml stack
+;; that it supports.
 ;;
 ;; Code:
 
@@ -337,10 +354,19 @@ provides a 'setup.ml' file as its build system."
 
 (define lower (make-lower default-ocaml default-findlib))
 
-(define ocaml-build-system
+(define (make-ocaml-build-system default-ocaml default-findlib)
   (build-system
     (name 'ocaml)
     (description "The standard OCaml build system")
-    (lower lower)))
+    (lower (make-lower default-ocaml default-findlib))))
+
+(define ocaml-build-system
+  ;; The default instance of the build system, using Guix's default OCaml
+  ;; compiler version.
+  (make-ocaml-build-system default-ocaml default-findlib))
+
+(define ocaml5-build-system
+  (make-ocaml-build-system default-ocaml5 default-ocaml5-findlib))
+
 
 ;;; ocaml.scm ends here
