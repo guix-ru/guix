@@ -3,6 +3,7 @@
 ;;; Copyright © 2017 Ben Woodcroft <donttrustben@gmail.com>
 ;;; Copyright © 2021, 2022 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2021 pukkamustard <pukkamustard@posteo.net>
+;;; Copyright © 2025 Jason Conroy <jconroy@tscripta.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -31,12 +32,22 @@
   #:use-module (srfi srfi-1)
   #:export (%dune-build-system-modules
             dune-build
-            dune-build-system))
+            dune-build-system
+            ocaml5-dune-build-system))
 
 ;; Commentary:
 ;;
-;; Standard build procedure for packages using dune. This is implemented as an
-;; extension of `ocaml-build-system'.
+;; Standard build procedures for packages using dune. These are implemented as
+;; extensions of `ocaml-build-system'.
+;;
+;; Multiple instances of the build system exist to support different versions
+;; of the OCaml compiler and its associated tools. Choose `dune-build-system`
+;; for a build system that works with Guix's default version of the compiler,
+;; or choose `ocamlX-dune-build-system` for some other compiler version X.
+;;
+;; Adaptor functions of the form `package-with-ocamlX.Y` defined in the OCaml
+;; build system will also work on packages with the Dune build system, subject
+;; to the same caveats.
 ;;
 ;; Code:
 
@@ -69,7 +80,7 @@
       '(#:target #:dune #:findlib #:ocaml #:inputs #:native-inputs))
 
     (and (not target)                   ;XXX: no cross-compilation
-         (let ((base (ocaml:lower
+         (let ((base ((ocaml:make-lower default-ocaml default-findlib)
                       name
                       #:source source
                       #:inputs inputs
@@ -153,14 +164,26 @@ provides a 'setup.ml' file as its build system."
                     #:graft? #f
                     #:guile-for-build guile))
 
-(define lower (make-lower ocaml:default-ocaml
-                          ocaml:default-findlib
-                          ocaml:default-dune))
-
-(define dune-build-system
+(define (make-dune-build-system default-ocaml
+                                default-findlib
+                                default-dune)
   (build-system
     (name 'dune)
     (description "The standard Dune build system")
-    (lower lower)))
+    (lower (make-lower default-ocaml
+                       default-findlib
+                       default-dune))))
+
+(define dune-build-system
+  ;; The default instance of the build system, using Guix's default OCaml
+  ;; compiler version.
+  (make-dune-build-system ocaml:default-ocaml
+                          ocaml:default-findlib
+                          ocaml:default-dune))
+
+(define ocaml5-dune-build-system
+  (make-dune-build-system ocaml:default-ocaml5
+                          ocaml:default-ocaml5-findlib
+                          ocaml:default-ocaml5-dune))
 
 ;;; dune.scm ends here
