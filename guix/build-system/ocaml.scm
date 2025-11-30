@@ -39,7 +39,6 @@
             default-findlib
             default-ocaml
             default-dune
-            lower
             default-ocaml5-findlib
             default-ocaml5
             default-ocaml5-dune
@@ -351,8 +350,6 @@ provides a 'setup.ml' file as its build system."
                     #:target #f
                     #:graft? #f
                     #:guile-for-build guile))
-
-(define lower (make-lower default-ocaml default-findlib))
 
 (define (make-ocaml-build-system default-ocaml default-findlib)
   (build-system
