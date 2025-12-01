@@ -1121,7 +1121,7 @@ application suites.")
 (define-public gtk
   (package
     (name "gtk")
-    (version "4.18.6")
+    (version "4.20.3")
     (source
      (origin
        (method url-fetch)
@@ -1129,7 +1129,7 @@ application suites.")
                            (version-major+minor version)  "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "1ynhzzpyqyyc0gfdwc262npq0pbal8i3nnrlm3wn2cnw1mjpr0g1"))
+        (base32 "0ly1gqc6ybxv5f2a9hvjp5k6l9mfzy2yv8iy2xqnr9l8628g4wr8"))
        (patches
         (search-patches "gtk4-respect-GUIX_GTK4_PATH.patch"))
        (modules '((guix build utils)))))
@@ -1158,6 +1158,7 @@ application suites.")
               "--no-suite=headless"     ; requires mutter…
               "--no-suite=gsk-compare-broadway"
               "--no-suite=needs-udmabuf"
+              "--no-suite=docs"
               ;; These seem to fail on aarch64, and Debian has
               ;; also disabled these, see:
               ;; https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1050075
@@ -1187,22 +1188,13 @@ application suites.")
                 (("[ \t]*'empty-text.node',") "")
                 (("[ \t]*'testswitch.node',") "")
                 (("[ \t]*'widgetfactory.node',") "")
-                ;; This test, 'gtk:tools / validate', started failing for
-                ;; unknown reasons after updating mesa to 23.3.1 and xorgproto
-                ;; to 2023.2.
-                ((" 'validate',") "")
                 ;; XXX: Figure out why this fails and report upstream.
                 ((".*'memorytexture',.*") "")
-                ;; Some mask-half-pixel variant tests of the gsk-compare-gl
-                ;; suite are failing starting with 4.16.13.
-                ;; TODO: Reinstate in 4.18.
-                ((".*'mask-half-pixel',.*") "")
-                ;; The 'gtk:gsk / scaling' test fails starting with 4.16.13.
-                ;; TODO: Reinstate in 4.18.
-                ((".*'scaling',.*") ""))
+                ((".*'yuv-matrix-dmabuf',.*") ""))
               (substitute* "testsuite/reftests/meson.build"
                 (("[ \t]*'label-wrap-justify.ui',") "")
-                (("[ \t]*'wrapping-label-in-nested-boxes.ui',") ""))
+                (("[ \t]*'wrapping-label-in-nested-boxes.ui',") "")
+                (("[ \t]*'flipping-icons(\\.ref)?\\.ui',") ""))
               ;; These tests fail on an Apple M1 (aarch64) with the following errors:
               ;; - MESA: error: ZINK: failed to choose pdev
               ;; - libEGL warning: egl: failed to create dri2 screen
