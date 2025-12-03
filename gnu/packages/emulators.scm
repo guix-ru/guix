@@ -5464,6 +5464,44 @@ Python 3.11 for Python >=3.8.6.")
 information.  Useful for cross-architecture tools (such as @code{python-pyvex}).")
     (license license:bsd-2)))
 
+(define-public python-pypcode
+  (package
+    (name "python-pypcode")
+    (version "3.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/angr/pypcode")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0q3bf82x38xisx752jicaq5j0pczd4ldccrwhlibf8ckgvb1wwcv"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; tests: 46 passed
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-pytest-config
+            (lambda _
+              (substitute* "pyproject.toml"
+                ((".*--cov.*") "")))))))
+    (native-inputs
+     (list cmake-minimal
+           python-nanobind
+           python-pytest
+           python-setuptools))
+    (home-page "https://api.angr.io/projects/pypcode/en/latest/")
+    (synopsis "Machine code disassembly and IR translation library")
+    (description
+     "pypcode is a machine code disassembly and IR translation library for Python
+using the @url{https://ghidra.re/courses/languages/html/sleigh.html, SLEIGH}
+library from the @url{https://ghidra-sre.org/, Ghidra} framework.  This
+library was created primarily for use with angr, which provides analyses and
+symbolic execution of p-code.")
+    (license license:asl2.0)))
+
 (define-public emu8051
   (let ((commit "5dc681275151c4a5d7b85ec9ff4ceb1b25abd5a8")
         (revision "1"))
