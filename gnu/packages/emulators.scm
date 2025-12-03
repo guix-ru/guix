@@ -5431,32 +5431,22 @@ Python 3.11 for Python >=3.8.6.")
   (package
     (name "python-archinfo")
     ;; Must be the same version as python-angr.
-    (version "9.2.112")
+    (version "9.2.186")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "archinfo" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/angr/archinfo")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "011n9vrrsbqbnw2i38ls7f0xkd85kxcnn14fm4lhxjpi91p7hshb"))))
+        (base32 "1m68vbqz3bgyi8n6ls7i0w22djv8aaad62za2ixhzfbdsxwv39vl"))))
     (build-system pyproject-build-system)
-    (arguments
-     `(#:phases (modify-phases %standard-phases
-                  (add-after 'unpack 'patch
-                    (lambda _
-                      (substitute* "setup.cfg"
-                        (("backports.strenum")
-                         "backports_strenum"))))
-                  (replace 'check
-                    (lambda* (#:key tests? #:allow-other-keys)
-                      (when tests?
-                        (with-directory-excursion "tests"
-                          (invoke "python" "-m" "unittest"))))))))
-    (propagated-inputs
-     (list python-backports-strenum
-           python-capstone
-           python-keystone-engine))
     (native-inputs
-     (list python-setuptools python-wheel))
+     (list python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-capstone python-pypcode))
     (home-page "https://github.com/angr/archinfo")
     (synopsis "Extract architecture-specific information from binaries")
     (description
