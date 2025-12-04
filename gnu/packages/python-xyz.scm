@@ -309,6 +309,7 @@
   #:use-module (gnu packages time)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages tree-sitter)
+  #:use-module (gnu packages valgrind)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages video)
   #:use-module (gnu packages web)
@@ -33374,29 +33375,42 @@ it was loader by the operating system's loader.")
   (package
     (name "python-pyvex")
     ;; Must be the same version as python-angr.
-    (version "9.2.112")
+    (version "9.2.186")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "pyvex" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/angr/pyvex")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0z1jiflp7h07mfc26am3v7v5z2n6mw9hkfylbs86qgpm93qcf6i3"))))
+        (base32 "1ql6rn5n8jfmz8v2453283qdgpxvjkfgqdxwqsgs005j9lrhqa7z"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:phases #~(modify-phases %standard-phases
-                   (replace 'check
-                     (lambda* (#:key tests? #:allow-other-keys)
-                       (when tests?
-                         (with-directory-excursion "tests"
-                           (invoke "python" "-m" "unittest")))))
-
-                   (add-before 'build 'set-cc
-                     (lambda _
-                       (setenv "CC" #$(cc-for-target))
-                       (setenv "CC_NATIVE" "gcc"))))))
-    (propagated-inputs (list python-archinfo python-bitstring python-cffi))
-    (native-inputs (list python-setuptools python-wheel))
+      ;; tests: 57 passed
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'copy-submodule-package
+            ;; XXX: ensure-no-mtimes-pre-1980 and build phases fail when using
+            ;; symlink: "Read-only file system".
+            (lambda _
+              (copy-recursively
+               #+(package-source (this-package-native-input "vex"))
+               (string-append (getcwd) "/vex"))))
+          (add-before 'build 'set-cc
+            (lambda _
+              (setenv "AR" #$(ar-for-target))
+              (setenv "CC" #$(cc-for-target))
+              (setenv "CC_NATIVE" "gcc"))))))
+    (native-inputs
+     (list cmake-minimal
+           python-pytest
+           python-scikit-build-core
+           vex))
+    (propagated-inputs
+     (list python-bitstring
+           python-cffi))
     (home-page "https://github.com/angr/pyvex")
     (synopsis "Python interface to libVEX and VEX IR")
     (description
@@ -33404,7 +33418,8 @@ it was loader by the operating system's loader.")
 VEX is the intermediate representation (also known as intermediate
 language) used by the Valgrind analysis tool.  As such, VEX is designed
 to enable all kinds of binary analysis tasks.")
-    (license license:bsd-2)))
+    (license (list license:bsd-2
+                   license:gpl2))))
 
 (define-public python-claripy
   (package
