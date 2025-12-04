@@ -772,7 +772,7 @@ fingerprinting library and the Acoustid API.")
     (native-inputs
      (list python-cython python-pytest))
     (inputs
-     (list taglib))
+     (list taglib-1))
     (home-page
      "https://github.com/supermihi/pytaglib")
     (synopsis
