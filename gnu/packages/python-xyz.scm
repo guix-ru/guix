@@ -33444,35 +33444,39 @@ to enable all kinds of binary analysis tasks.")
   (package
     (name "python-claripy")
     ;; Must be the same version as python-angr.
-    (version "9.2.112")
+    (version "9.2.186")
     (source
      (origin
-       ;; Fetching from Git as pypi release doesn't include all test files.
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/angr/claripy")
-             (commit (string-append "v" version))))
+              (url "https://github.com/angr/claripy")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0c6q6imxjwhxn87d9yz8zvyrszk94r25w8x0g1lr6mrpa9bx7wai"))
-       (modules '((guix build utils)))
-       (snippet '(begin
-                   (substitute* "setup.cfg"
-                     ;; Relax the z3 version constraint.
-                     ;; See https://github.com/angr/claripy/commit/d1fe2df
-                     (("z3-solver==4.13.0.0")
-                      ""))))))
+        (base32 "1vlvscjn098100i2hfcsxllj19bnzs6vagnkg0fr18ps2gvbzcnv"))))
     (build-system pyproject-build-system)
     (arguments
-     `(#:phases (modify-phases %standard-phases
-                  (replace 'check
-                    (lambda* (#:key tests? #:allow-other-keys)
-                      (when tests?
-                        (with-directory-excursion "tests"
-                          (invoke "python" "-m" "unittest"))))))))
-    (propagated-inputs (list python-cachetools python-decorator python-pysmt
-                             z3))
-    (native-inputs (list python-setuptools python-wheel))
+     (list
+      ;; tests: 329 passed, 1 skipped
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              (substitute* "pyproject.toml"
+                ;; Current version of z3 in Guix is 4.13.0 and sanity check
+                ;; failes to detect it (similar like OpenCV), relax the
+                ;; version constraint, see:
+                ;; <https://github.com/angr/claripy/commit/d1fe2df>.
+                ((", \"z3-solver==4.13.0.0\"")
+                 "")))))))
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-cachetools
+           python-decorator
+           python-pysmt
+           z3))
     (home-page "https://github.com/angr/claripy")
     (synopsis "Abstraction layer for constraint solvers")
     (description
