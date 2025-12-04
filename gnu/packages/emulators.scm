@@ -235,6 +235,43 @@ Here are some supported systems:
     (home-page "https://ares-emu.net/")
     (license license:isc)))
 
+;; This repository ships several binaries used only for testing purpose.  The
+;; binaries are not executed and not part of the angr distribution, they are
+;; only used to test angr's binary analysis capabilities.  In the context of
+;; the GNU FSDG, these files should be considered non-functional data.
+(define-public angr-binaries
+  (hidden-package
+   (package
+     (name "angr-binaries")
+     (version "9.2.186")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/angr/binaries")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "0d5c7w7phkm5ii5gzrz5mgvw2jj3sc1vqpn3h59cjf47v2xpgr1v"))))
+     (build-system copy-build-system)
+     (arguments
+      (list
+       #:install-plan
+       #~'(("./archr" "share/archr")
+           ("./decompiler_corpus/cgc-linux64" "share/decompiler_corpus/cgc-linux64")
+           ("./tests" "share/tests")
+           ("./tests_data" "share/tests_data")
+           ("./tests_src" "share/tests_src")
+           ("./tests_util" "share/tests_util"))))
+     (home-page "https://github.com/angr/binaries")
+     (synopsis "Binaries for angr tests and examples")
+     (description
+      "This package provides binaries for testing angr.")
+     ;; These files come from various sources and have different
+     ;; licenses. Unless otherwise specified, the files are authored by
+     ;; members of the angr team and are subject to the MIT
+     (license license:expat))))
+
 (define-public vice
   (package
     (name "vice")
