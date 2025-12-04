@@ -1100,7 +1100,7 @@ enable professional yet simple and intuitive pattern-based drum programming.")
            libvorbis
            opusfile
            speex
-           taglib
+           taglib-1
            wavpack
            yelp))
     (arguments
