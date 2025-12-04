@@ -29,6 +29,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (guix build-system gnu)
   #:use-module (guix download)
+  #:use-module (guix git-download)
   #:use-module (guix gexp)
   #:use-module (guix licenses)
   #:use-module (guix packages)
@@ -116,3 +117,44 @@ also use Valgrind to build new tools.")
            `(,(canonical-package (libc-for-target)) "debug")
            python))                     ;for cg_* shebangs
     (properties '())))
+
+(define-public vex
+  (let ((commit "61f2373464af0a8df436bd88be36bdf129c2032f")
+        (revision "0"))
+    (package
+      (name "vex")
+      (version "0.0.0")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/angr/vex")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1wf1vxkjq81mv18nf6dm2sc2zfzwpf2fdwjqhkkm2xxsxc48gzb1"))))
+      (build-system gnu-build-system)
+      (arguments
+       (list
+        #:tests? #f ;XXX: there is no easy way to run them
+        #:make-flags
+        #~(list (string-append "AR=" #$(ar-for-target))
+                (string-append "CC=" #$(cc-for-target))
+                (string-append "CC_NATIVE=" #$(cc-for-target))
+                "--makefile=Makefile-gcc")
+        #:phases
+        #~(modify-phases %standard-phases
+            (delete 'configure) ;no configure
+            ;; TODO: Check how to add "include" as well.
+            (replace 'install
+              (lambda _
+                (let ((lib (string-append #$output "/lib")))
+                  (install-file "libvex.a" lib)
+                  (install-file "libvex.so" lib)))))))
+      (home-page "https://github.com/angr/vex")
+      (synopsis "Patched version of VEX to work with PyVEX")
+      (description
+       "This package provides an alternative variant of libVEX (of the Valgrind
+project: valgrind.org) for use with @url{https://github.com/angr/pyvex,
+PyVEX}.")
+      (license gpl2+))))
