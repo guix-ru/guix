@@ -33349,20 +33349,39 @@ binary analysis platform.")
   (package
     (name "python-cle")
     ;; Must be the same version as python-angr.
-    (version "9.2.112")
+    (version "9.2.186")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "cle" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/angr/cle")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "11jbvg12wqxz74iy83ax0q8k156xrw6iqv75dix5cpqgacds3gdj"))))
+        (base32 "1ycrqysvxgm369cwf0zcyykl1xgma71apbxkbq0z9yakpajgli1s"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:tests? #f))
-    (propagated-inputs (list python-pefile python-pyelftools python-pyvex
-                             python-sortedcontainers python-cart))
-    (native-inputs (list python-cffi python-setuptools python-wheel))
+      ;; tests: 112 passed, 12 skipped, 1 warning
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'check-setup
+            (lambda _
+              (copy-recursively
+               (string-append #$(this-package-native-input "angr-binaries") "/share")
+               "../binaries"))))))
+    (native-inputs
+     (list angr-binaries
+           python-cffi
+           python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-archinfo
+           python-cart
+           python-pefile
+           python-pyelftools
+           python-pyvex
+           python-sortedcontainers))
     (home-page "https://github.com/angr/cle")
     (synopsis "Python loader for binaries and their associated libraries")
     (description
