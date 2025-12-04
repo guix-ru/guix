@@ -8,13 +8,13 @@ For Guix, this files as the glibc shared objects cannot be found.
 Additionally, we don't really want to execute pre-compiled binaries
 on Guix, hence we disable those tests.
 
-diff --git a/tests/procedures/glibc/test_ctype_locale.py b/tests/procedures/glibc/test_ctype_locale.py
-index ac3e1ee16..1fb0fd095 100755
+diff --git a/tests/procedures/glibc/test_ctype_locale.py b/tests/procedures/glib>
+index 005a1444e..c5649a54d 100755
 --- a/tests/procedures/glibc/test_ctype_locale.py
 +++ b/tests/procedures/glibc/test_ctype_locale.py
 @@ -15,7 +15,7 @@ test_location = os.path.join(bin_location, "tests")
- 
- 
+
+
  class TestCtypeLocale(unittest.TestCase):
 -    @skip_if_not_linux
 +    @unittest.skip("test executes pre-compiled binaries")
@@ -24,7 +24,7 @@ index ac3e1ee16..1fb0fd095 100755
 @@ -61,7 +61,7 @@ class TestCtypeLocale(unittest.TestCase):
          output = subprocess.check_output(bin_path, shell=True)
          assert result == output
- 
+
 -    @skip_if_not_linux
 +    @unittest.skip("test executes pre-compiled binaries")
      def test_ctype_tolower_loc(self):
@@ -33,56 +33,10 @@ index ac3e1ee16..1fb0fd095 100755
 @@ -110,7 +110,7 @@ class TestCtypeLocale(unittest.TestCase):
          output = subprocess.check_output(bin_path, shell=True)
          assert result == output
- 
+
 -    @skip_if_not_linux
 +    @unittest.skip("test executes pre-compiled binaries")
      def test_ctype_toupper_loc(self):
          """
          test_ctype_locale.test_ctype_toupper_loc
-diff --git a/tests/procedures/libc/test_sscanf.py b/tests/procedures/libc/test_sscanf.py
-index 7c2da6f5e..e20952f54 100755
---- a/tests/procedures/libc/test_sscanf.py
-+++ b/tests/procedures/libc/test_sscanf.py
-@@ -14,7 +14,7 @@ test_location = os.path.join(bin_location, "tests")
- 
- 
- class TestSscanf(unittest.TestCase):
--    @unittest.skipUnless(sys.platform.startswith("linux"), "linux only")
-+    @unittest.skip("test executes pre-compiled binaries")
-     def test_sscanf(self):
-         test_bin = os.path.join(test_location, "x86_64", "sscanf_test")
-         b = angr.Project(test_bin, auto_load_libs=False)
-diff --git a/tests/procedures/libc/test_strtol.py b/tests/procedures/libc/test_strtol.py
-index 4d7982b86..8818ced3b 100755
---- a/tests/procedures/libc/test_strtol.py
-+++ b/tests/procedures/libc/test_strtol.py
-@@ -15,7 +15,7 @@ class TestStrtol(unittest.TestCase):
-     # pylint: disable=no-self-use
- 
-     @slow_test
--    @unittest.skipUnless(sys.platform.startswith("linux"), "linux-only")
-+    @unittest.skip("test executes pre-compiled binaries")
-     def test_strtol(self, threads=None):
-         test_bin = os.path.join(bin_location, "tests", "x86_64", "strtol_test")
-         # disabling auto_load_libs increases the execution time of the test case.
-diff --git a/tests/sim/exec_insn/test_signed_div.py b/tests/sim/exec_insn/test_signed_div.py
-index 46581020f..d5acc5370 100755
---- a/tests/sim/exec_insn/test_signed_div.py
-+++ b/tests/sim/exec_insn/test_signed_div.py
-@@ -2,6 +2,7 @@
- # pylint: disable=missing-class-docstring,no-self-use,line-too-long
- __package__ = __package__ or "tests.sim.exec_insn"  # pylint:disable=redefined-builtin
- 
-+import pytest
- import os
- import subprocess
- import sys
-@@ -16,7 +17,7 @@ test_location = os.path.join(bin_location, "tests")
- 
- 
- class TestSignedDiv(TestCase):
--    @skipUnless(sys.platform.startswith("linux"), "linux only")
-+    @pytest.mark.skip(reason="test executes pre-compiled binaries")
-     def test_signed_div(self):
-         test_bin = os.path.join(test_location, "x86_64", "test_signed_div")
-         b = angr.Project(test_bin, auto_load_libs=False)
+

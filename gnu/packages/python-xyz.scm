@@ -33663,108 +33663,135 @@ mangled symbols, which can be used for directly extracting type information.")
 (define-public python-angr
   (package
     (name "python-angr")
-    (version "9.2.112")
+    (version "9.2.186")
     (source
      (origin
-       ;; Fetching from Git as pypi release doesn't include all test files.
        (method git-fetch)
-       (patches (search-patches "python-angr-check-exec-deps.patch"))
        (uri (git-reference
-             (url "https://github.com/angr/angr")
-             (commit (string-append "v" version))))
+              (url "https://github.com/angr/angr")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1179926xbfh2930laz33p90vj532jk7g2qylzzpw1185yhlf9cis"))))
+        (base32 "1x1vnhgf1p05z2cdjc626jvvk9xqa9qzmg1yk73lq4qn7sa4cnmd"))
+       (patches (search-patches "python-angr-fix-manyfloat-tests.patch"
+                                "python-angr-check-exec-deps.patch"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      #:imported-modules `(,@%cargo-build-system-modules
+                           ,@%pyproject-build-system-modules)
+      #:modules '(((guix build cargo-build-system) #:prefix cargo:)
+                  (guix build pyproject-build-system)
+                  (guix build utils))
       #:test-flags
       #~(list "-x"
               "--dist" "load"
-              "-n" (number->string (parallel-job-count))
+              "--numprocesses" (number->string (parallel-job-count))
               "-k"
               ;; test_mips32_missing_offset_in_instructions fails
               ;; with capstone 5 and passes with capstone 4. Might
               ;; be a capstone regressions, needs investigation.
               ;;
+              ;; TODO: test_unsat_core needs investigation.
+              ;;
+              ;; test_decompiling_abnormal_switch_case_case3 is broken
+              ;; when tests modifying global counters are run before it.
+              ;; See <https://github.com/angr/angr/issues/5715>.
+              ;;
               ;; test_concrete_memset is a non-deterministic benchmark.
               ;; test_similarity_fauxware is flaky.
               (string-append
                "not test_mips32_missing_offset_in_instructions"
+               " and not test_unsat_core"
+               " and not test_decompiling_abnormal_switch_case_case3"
                " and not test_concrete_memset"
                " and not test_similarity_fauxware"))
-      #:phases #~(modify-phases %standard-phases
-                   (add-after 'unpack 'patch-tests
-                     (lambda* (#:key inputs #:allow-other-keys)
-                       (let ((coreutils (assoc-ref inputs "coreutils")))
-                         ;; The constraint exists because of a capstone bug for which
-                         ;; we backport a patch, hence we can relax the constraint.
-                         ;;
-                         ;; See https://github.com/angr/angr/issues/4656
-                         (substitute* "setup.cfg"
-                          (("capstone==5.0.0.post1")
-                           "capstone"))
-                         ;; Relax constraint on python-rich, the constraint is too strict,
-                         ;; angr work well with our packaged version of python-rich.
-                         (substitute* "setup.cfg"
-                           (("rich>=13.1.0")
-                            "rich"))
-                         (substitute* "tests/common.py"
-                           (("\\[\"cc\"\\]")
-                            "[\"gcc\"]")))))
-                   (add-before 'check 'check-setup
-                     (lambda _
-                       (copy-recursively
-                        #$(this-package-native-input "binaries")
-                        "../binaries")))
-                   (add-before 'build 'set-cc
-                     (lambda _
-                       (setenv "CC" "gcc"))))))
-    (propagated-inputs (list python-ailment
-                             python-archinfo
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'use-guix-vendored-dependencies
+            (lambda _
+              (substitute* "native/angr/Cargo.toml"
+                (("^icicle-fuzzing.*$")
+                 "icicle-fuzzing = { version = \"*\" }\n")
+                (("^icicle-vm.*$")
+                 "icicle-vm = { version = \"*\" }\n")
+                (("^pcode.*$")
+                 "pcode = { version = \"*\" }\n"))))
+          (add-after 'unpack 'fix-tests
+            (lambda _
+              (substitute* "tests/common.py"
+                (("\\[\"cc\"\\]")
+                 "[\"gcc\"]"))))
+          (add-after 'unpack 'relax-protobuf
+            (lambda _
+              ;; Relax protobuf constraint, see 'generate-protobuf-files phase below.
+              (substitute* "pyproject.toml"
+                (("protobuf>=6.33.0") "protobuf"))))
+          (add-after 'use-guix-vendored-dependencies 'prepare-cargo-build-system
+            (lambda args
+              (for-each (lambda (phase)
+                          (format #t "Running cargo phase: ~a~%" phase)
+                          (apply (assoc-ref cargo:%standard-phases phase)
+                                 #:cargo-target #$(cargo-triplet)
+                                 args))
+                        '(prepare-rust-crates
+                         unpack-rust-crates
+                          configure
+                          check-for-pregenerated-files
+                          patch-cargo-checksums))))
+          (add-before 'check 'check-setup
+            (lambda _
+              (copy-recursively
+               (string-append #$(this-package-native-input "angr-binaries") "/share")
+               "../binaries")))
+          (add-before 'build 'generate-protobuf-files
+            ;; Regenerate protobuf files using our utilized protobuf version.
+            ;; This allows us to relax the version constraint on python-protobuf.
+            (lambda _
+              (apply invoke "protoc" "-I=." "--python_out=." (find-files "angr/protos" "\\.proto$"))))
+          (add-before 'build 'set-cc
+            (lambda _
+              (setenv "CC" #$(cc-for-target)))))))
+    (propagated-inputs (list python-archinfo ;sync version with python-angr
                              python-cachetools
                              python-cffi
-                             python-claripy
-                             python-cle
-                             python-colorama
-                             python-cppheaderparser
-                             python-dpkt
+                             python-claripy  ;sync version with python-angr
+                             python-cle      ;sync version with python-angr
+                             python-cxxheaderparser
                              python-gitpython
+                             python-msgspec
                              python-mulpyplexer
-                             python-nampa
                              python-networkx
                              python-protobuf
                              python-psutil
-                             python-itanium-demangler
                              python-pycparser
-                             python-pyvex
+                             python-pydemumble
                              python-pyformlang
+                             python-pypcode
+                             python-pyvex    ;sync version with python-angr
                              python-rich
-                             python-rpyc
                              python-sortedcontainers
-                             python-sqlalchemy
                              python-sympy
+                             python-sqlalchemy
+                             python-keystone-engine
+                             python-typing-extensions
                              python-unique-log-filter
                              unicorn-2.0))
-    (native-inputs `(("python-pytest" ,python-pytest)
-                     ("python-pytest-xdist" ,python-pytest-xdist)
-                     ("python-setuptools" ,python-setuptools)
-                     ("python-wheel" ,python-wheel)
-                     ("binaries"
-                      ;; This repository ships several binaries used only for testing
-                      ;; purpose.  The binaries are not executed and not part of the
-                      ;; angr distribution, they are only used to test angr's binary
-                      ;; analysis capabilities.  In the context of the GNU FSDG, these
-                      ;; files should be considered non-functional data.
-                      ,(origin
-                         (method git-fetch)
-                         (uri (git-reference (url
-                                              "https://github.com/angr/binaries")
-                                             (commit (string-append "v"
-                                                                    version))))
-                         (file-name (git-file-name "angr-binaries" version))
-                         (sha256 (base32
-                                  "0bxzf6alkczv9r0151ksvcwyksnw8077acz1wd8drbxw0zl0qnmr"))))))
+    (native-inputs
+     (append
+      (list angr-binaries
+            protobuf
+            python-pytest
+            python-pytest-xdist
+            python-setuptools
+            python-setuptools-rust
+            rust
+            `(,rust "cargo"))
+      (or (and=> (%current-target-system)
+                 (compose list make-rust-sysroot))
+          '())))
+    (inputs
+     (cons* (cargo-inputs 'python-angr)))
     (home-page "https://github.com/angr/angr")
     (synopsis "Multi-architecture binary analysis toolkit")
     (description

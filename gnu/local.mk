@@ -2264,6 +2264,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-3-fix-tests.patch			\
   %D%/packages/patches/python-3-hurd-configure.patch		\
   %D%/packages/patches/python-angr-check-exec-deps.patch	\
+  %D%/packages/patches/python-angr-fix-manyfloat-tests.patch	\
   %D%/packages/patches/python-3-reproducible-build.patch	\
   %D%/packages/patches/python-cross-compile.patch		\
   %D%/packages/patches/python-colour-remove-d2to1.patch		\

@@ -181,6 +181,58 @@
       "This package provides Rust types for the Debug Adapter Protocol.")
      (license (list license:asl2.0 license:expat)))))
 
+(define-public rust-icicle-emu-0.1.0.4d7ed93
+  (let ((commit "4d7ed93254a20b7e5c16bd7b0c6b46db49e1c72e")
+        (revision "0"))
+    (package
+      (name "rust-icicle-emu")
+      (version (git-version "0.1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/icicle-emu/icicle-emu.git")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "09g5gp4v18r8f5blzpmgxy7kmgx016zjph2affa5zlxm07d866gk"))))
+      (build-system cargo-build-system)
+      (arguments
+       (list
+        #:skip-build? #t
+        #:cargo-package-crates ''("pcode" "sleigh-parse"
+                                  "sleigh-runtime"
+                                  "sleigh-compile"
+                                  "icicle-mem"
+                                  "icicle-cpu"
+                                  "icicle-linux"
+                                  "icicle-jit"
+                                  "icicle-vm"
+                                  "icicle-fuzzing")
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'use-guix-vendored-dependencies
+              (lambda _
+                (for-each (lambda (file)
+                            (substitute* file
+                              (("^pcode = \\{ ([^}]+) \\}" all opts)
+                               (format #f "pcode = { ~a, version = \"*\" }~%" opts))
+                              (("^sleigh-parse = \\{ ([^}]+) \\}" all opts)
+                               (format #f "sleigh-parse = { ~a, version = \"*\" }~%" opts))
+                              (("^sleigh-compile = \\{ ([^}]+) \\}" all opts)
+                               (format #f "sleigh-compile = { ~a, version = \"*\" }~%" opts))
+                              (("^sleigh-runtime = \\{ ([^}]+) \\}" all opts)
+                               (format #f "sleigh-runtime = { ~a, version = \"*\" }~%" opts))
+                              (("^icicle-([a-z]+).*$" all pkg)
+                               (format #f "icicle-~a = { version = \"*\" }\n" pkg))))
+                          (find-files "." "Cargo.toml")))))))
+      (inputs (cargo-inputs 'rust-icicle-emu-0.1.0.4d7ed93))
+      (home-page "https://github.com/icicle-emu/icicle-emu")
+      (synopsis "Core emulator components for Icicle")
+      (description
+       "Experimental fuzzing-specific, multi-architecture emulation framework.")
+      (license (list license:asl2.0 license:expat)))))
+
 (define-public rust-deunicode-1
   (hidden-package
    (package
