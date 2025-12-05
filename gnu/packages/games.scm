@@ -6665,7 +6665,7 @@ safety of the Chromium vessel.")
            python-pytmx
            python-pillow
            python-prompt-toolkit
-           python-pydantic-2
+           python-pydantic
            python-pygame-menu
            python-pyyaml
            python-requests))
