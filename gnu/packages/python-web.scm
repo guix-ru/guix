@@ -406,7 +406,7 @@ and JSON.
      (list ;; python-azure-identity
            python-dotenv
            python-flit-core
-           python-pydantic-2
+           python-pydantic
            python-pytest
            python-pytest-cases
            python-pytest-xdist
@@ -1330,7 +1330,7 @@ of a fake DNS resolver.")
            python-mypy
            python-numpy
            python-pillow
-           python-pydantic-2
+           python-pydantic
            python-pytest
            python-pytest-asyncio
            python-pytest-cov
@@ -2581,7 +2581,7 @@ routes using HTTP Digest Authentication.")
     (propagated-inputs
      (list python-boto3
            python-jsonschema
-           python-pydantic-2
+           python-pydantic
            python-typing-extensions))
     (home-page "https://github.com/aws/serverless-application-model")
     (synopsis "Transform AWS SAM templates into AWS CloudFormation templates")
@@ -4562,7 +4562,7 @@ with very acceptable performance.")
      (list python-cloudpathlib
            python-confection
            python-packaging
-           python-pydantic-2
+           python-pydantic
            python-requests
            python-smart-open
            python-srsly
@@ -4706,7 +4706,7 @@ service.")
      (list python-aiohttp
            python-distro
            python-httpx
-           python-pydantic-2
+           python-pydantic
            python-requests
            python-tqdm
            python-typing-extensions))
@@ -12957,7 +12957,7 @@ Amazon S3 or any other external service.")
                              python-jinja2
                              python-multipart
                              python-orjson
-                             python-pydantic-2
+                             python-pydantic
                              python-pydantic-settings
                              python-pyyaml
                              python-starlette
@@ -12994,7 +12994,7 @@ starlette.")
     (build-system pyproject-build-system)
     (propagated-inputs
      (list python-fastapi python-itsdangerous
-           python-pydantic-2))
+           python-pydantic))
     (native-inputs
      (list python-poetry-core
            python-pytest))
@@ -13025,7 +13025,7 @@ pattern.")
     ;; These are the only required dependencies,
     ;; please add all optional dependencies to the
     ;; full python-fastapi-pagination below.
-    (propagated-inputs (list python-fastapi python-pydantic-2))
+    (propagated-inputs (list python-fastapi python-pydantic))
     (native-inputs (list python-poetry-core))
     (home-page "https://github.com/uriyyo/fastapi-pagination")
     (synopsis "FastAPI pagination library")
@@ -13068,7 +13068,7 @@ return paginated responses to your clients.")
                 python-databases
                 python-django
                 python-fastapi
-                python-pydantic-2
+                python-pydantic
                 python-sqlalchemy
                 (package
                   (inherit python-tortoise-orm)

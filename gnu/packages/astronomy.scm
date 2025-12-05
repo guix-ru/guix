@@ -4263,7 +4263,7 @@ Observatory}.")
     (propagated-inputs
      (list python-dateutil
            python-numpy
-           python-pydantic-2
+           python-pydantic
            python-strenum
            python-typing-extensions
            python-w3lib))
@@ -4544,7 +4544,7 @@ implemented using the astropy.modeling framework.")
            python-tinydb
            python-frozendict
            python-jinja2
-           python-pydantic-2
+           python-pydantic
            python-psutil))
     (home-page "https://www.eso.org/sci/software/edps.html")
     (synopsis "ESO's Data Processing System")
@@ -5558,7 +5558,7 @@ observationally-derived galaxy merger catalogs.")
            python-setuptools
            python-wheel))
     (propagated-inputs
-     (list python-pydantic-2
+     (list python-pydantic
            python-pydantic-settings
            python-requests))
     (home-page "https://helioviewer.org/")
