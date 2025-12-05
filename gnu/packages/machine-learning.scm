@@ -1599,7 +1599,7 @@ natural language processing framework.")
                              python-numpy-2
                              python-packaging
                              python-preshed
-                             python-pydantic-2
+                             python-pydantic
                              python-requests
                              python-spacy-legacy
                              python-spacy-loggers
@@ -2276,7 +2276,7 @@ and are compatible with its API.")
                              python-numpy-2
                              python-packaging
                              python-preshed
-                             python-pydantic-2
+                             python-pydantic
                              python-setuptools
                              python-srsly
                              python-wasabi))

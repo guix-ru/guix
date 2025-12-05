@@ -1401,7 +1401,7 @@ to establish class invariants.")
            python-freezegun
            python-hatchling
            python-hypothesis
-           python-pydantic-2
+           python-pydantic
            python-pytest-bootstrap
            python-pytest-freezer
            python-pytest-mock
