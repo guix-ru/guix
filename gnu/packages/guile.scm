@@ -4,7 +4,7 @@
 ;;; Copyright © 2014, 2016, 2018 David Thompson <davet@gnu.org>
 ;;; Copyright © 2014, 2017, 2018 Mark H Weaver <mhw@netris.org>
 ;;; Copyright © 2015, 2017 Christine Lemmer-Webber <cwebber@dustycloud.org>
-;;; Copyright © 2016, 2023, 2024, 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright © 2016, 2023-2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2016, 2017 Leo Famulari <leo@famulari.name>
 ;;; Copyright © 2016, 2019, 2020 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2017 Andy Wingo <wingo@igalia.com>
@@ -212,6 +212,10 @@ without requiring the source code to be rewritten.")
       ;; <https://bugs.gnu.org/20272>, which affects 2.0, 2.2, and 3.0 so far.
       #:parallel-build? #f
 
+      #:modules ((guix build gnu-build-system)
+                 (guix build utils)
+                 (ice-9 regex))
+
       #:phases
       (modify-phases %standard-phases
         ,@(if (system-hurd?)
@@ -263,8 +267,26 @@ without requiring the source code to be rewritten.")
                   (find-files (string-append out "/lib/pkgconfig")
                               ".*\\.pc")
                 (("-lcrypt")
-                 (string-append "-L" libxcrypt " -lcrypt")))))))))
-
+                  (string-append "-L" libxcrypt " -lcrypt"))))))
+        ,@(if (target-mingw?)
+              '()
+              '((add-after 'install 'install-major.minor-symlinks
+                  (lambda* (#:key outputs #:allow-other-keys)
+                    (let* ((out (assoc-ref outputs "out"))
+                           (bin (in-vicinity out "bin"))
+                           (m (string-match
+                               ".*-([0-9]+[.][0-9]+)[.][0-9]+$" out))
+                           (effective-version (match:substring m 1)))
+                      (define (symlink-version name)
+                        (let ((name-version
+                               (string-append name "-" effective-version)))
+                          (symlink name (in-vicinity bin name-version))))
+                      (for-each symlink-version
+                                '("guild"
+                                  "guile"
+                                  "guile-config"
+                                  "guile-snarf"
+                                  "guile-tools"))))))))))
    (native-search-paths
     (list (search-path-specification
            (variable "GUILE_LOAD_PATH")
