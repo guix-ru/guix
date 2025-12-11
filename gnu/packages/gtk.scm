@@ -1038,7 +1038,7 @@ application suites.")
            iso-codes/pinned
            json-glib-minimal
            libxml2
-           rest))
+           librest))
     (native-inputs
      (list docbook-xml-4.3
            docbook-xsl
@@ -1354,9 +1354,9 @@ application suites.")
            libgudev                     ;for gstreamer-gl
            libjpeg-turbo
            libpng
+           librest
            libtiff
            python
-           rest
            tinysparql))                 ;for filechooser search support
     (propagated-inputs
      ;; Following dependencies are referenced in .pc files.
