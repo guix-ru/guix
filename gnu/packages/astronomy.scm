@@ -5278,16 +5278,7 @@ specifically pulsar timing array signals.")
        (sha256
         (base32 "0r9r6ns4gcszq199pwiw4pb4lydp16i4zdp136az8y6f994lrzqb"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      ;; tests: 1023 passed, 10 skipped, 10 warnings 
-      #:phases
-      #~(modify-phases %standard-phases
-         (add-after 'unpack 'relax-requirements
-           (lambda _
-             (substitute* "pyproject.toml"
-               ;; scipy>=1.14.1
-               ((">=1.14.1") ">=1.12.0")))))))
+    ;; tests: 1023 passed, 10 skipped, 10 warnings
     (native-inputs
      (list python-pytest
            python-pytest-astropy
