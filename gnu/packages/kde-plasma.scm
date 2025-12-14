@@ -285,7 +285,7 @@ the Plasma Desktop.  Breeze is the default theme for the KDE Plasma desktop.")
 (define-public breeze-gtk
   (package
     (name "breeze-gtk")
-    (version "6.5.2")
+    (version "6.5.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/"
@@ -293,7 +293,7 @@ the Plasma Desktop.  Breeze is the default theme for the KDE Plasma desktop.")
                                   "-" version ".tar.xz"))
               (sha256
                (base32
-                "1fgxmslq3k720j7i1ysl5lpn7hx1i8kqk5spasw3vl0nyvsxm0n6"))))
+                "0jrni8b2v0714sizmszwk4dkywajl3mzm0lpp5f6x7gw1ga0xalw"))))
     (build-system qt-build-system)
     (arguments
      (list
