@@ -1657,7 +1657,7 @@ conjunction with the KDE Plasma Desktop.")
 (define-public kwrited
   (package
     (name "kwrited")
-    (version "6.5.2")
+    (version "6.5.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/"
@@ -1665,7 +1665,7 @@ conjunction with the KDE Plasma Desktop.")
                                   version ".tar.xz"))
               (sha256
                (base32
-                "12895frz78vsabc9072d8jn6v5a38x1z6wrqc2mcwv3hmhlmz580"))))
+                "19p9nzd6a3qlbnvxnlra07x1fyiidx26fwlf9nbllqnf45fhy4wf"))))
     (build-system qt-build-system)
     (native-inputs (list extra-cmake-modules))
     (inputs (list kcoreaddons ki18n kpty knotifications))
