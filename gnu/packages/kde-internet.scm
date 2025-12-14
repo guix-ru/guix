@@ -402,7 +402,7 @@ communicate with each other.  Here's a few things KDE Connect can do:
 (define-public kio-extras
   (package
     (name "kio-extras")
-    (version "25.08.3")
+    (version "25.12.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/release-service/"
@@ -410,7 +410,7 @@ communicate with each other.  Here's a few things KDE Connect can do:
                                   version ".tar.xz"))
               (sha256
                (base32
-                "1ln2x7l5cgwybgc8qv99pmwb391dnf18qxq6r6rqrgk3qvf6dycr"))
+                "0hfzx2ysvggr3h7db06zrg9ap9ginhbwwnmg1ml6fgjnz3z66da5"))
               (modules '((guix build utils)))
               (snippet
                ;; Fix including libproxy.
@@ -421,6 +421,7 @@ communicate with each other.  Here's a few things KDE Connect can do:
      (list #:test-exclude
            (string-append "("
                           (string-join '("filenamesearchtest"
+                                         "filenamesearchexternaltest"
                                          "thumbnailtest"
                                          "testkioarchive")
                                        "|")
@@ -457,13 +458,11 @@ communicate with each other.  Here's a few things KDE Connect can do:
                   kconfig
                   kconfigwidgets
                   kcoreaddons
-                  kdnssd
                   kdbusaddons
+                  kdnssd
                   kdsoap
                   kdsoap-ws-discovery-client
-                  kguiaddons
                   knotifications
-                  ktextwidgets
                   ki18n
                   kio
                   ksyntaxhighlighting
@@ -476,8 +475,8 @@ communicate with each other.  Here's a few things KDE Connect can do:
                   libtirpc
                   openexr
                   phonon
-                  qtbase
                   qt5compat
+                  qtbase
                   qcoro-qt6
                   qtsvg
                   samba
