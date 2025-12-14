@@ -77,6 +77,7 @@
 # Copyright © 2025 Cayetano Santos <csantosb@disroot.org>
 # Copyright © 2025 bdunahu <bdunahu@operationnull.com>
 # Copyright © 2026 Simen Endsjø <contact@simendsjo.me>
+# Copyright © 2025 Jason Conroy <jconroy@tscripta.net>
 #
 # This file is part of GNU Guix.
 #
@@ -528,6 +529,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/nwg-shell.scm		\
   %D%/packages/nx.scm				\
   %D%/packages/ocaml.scm			\
+  %D%/packages/ocaml5.scm			\
   %D%/packages/ocr.scm				\
   %D%/packages/openkinect.scm			\
   %D%/packages/onc-rpc.scm			\

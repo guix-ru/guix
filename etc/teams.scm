@@ -980,6 +980,7 @@ and Firefox."
 importer, and the ocaml-build-system."
         #:scope
         (list "gnu/packages/ocaml.scm"
+              "gnu/packages/ocaml5.scm"
               "gnu/packages/coq.scm"
               "gnu/packages/rocq.scm"
               "guix/build/ocaml-build-system.scm"
