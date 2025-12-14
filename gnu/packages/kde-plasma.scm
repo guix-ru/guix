@@ -2067,14 +2067,14 @@ the KDE Plasma 6 desktop.")
 (define-public plasma-desktop
   (package
     (name "plasma-desktop")
-    (version "6.5.2")
+    (version "6.5.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/" version
                                   "/" name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0n3sdhq70g8xcmgfcgcx1ridznbj0x7bprvk0qzzbrn83wsv7cmh"))))
+                "034c9fccsqfv4p4z5q8g4fidbw7j9d5611hw03qlldzsmm0ii3g0"))))
     (build-system qt-build-system)
     (native-inputs (list extra-cmake-modules
                          dbus
