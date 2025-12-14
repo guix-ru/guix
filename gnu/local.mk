@@ -73,6 +73,7 @@
 # Copyright © 2024 James Smith <jsubuntuxp@disroot.org>
 # Copyright © 2025 Nigko Yerden <nigko.yerden@gmail.com>
 # Copyright © 2025 Cayetano Santos <csantosb@inventati.org>
+# Copyright © 2025 Jason Conroy <jconroy@tscripta.net>
 #
 # This file is part of GNU Guix.
 #
@@ -512,6 +513,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/nvi.scm				\
   %D%/packages/nx.scm				\
   %D%/packages/ocaml.scm			\
+  %D%/packages/ocaml5.scm			\
   %D%/packages/ocr.scm				\
   %D%/packages/openkinect.scm			\
   %D%/packages/onc-rpc.scm			\

@@ -270,6 +270,7 @@ gnu/packages/librewolf\.scm                        @guix/mozilla
 gnu/packages/tor-browsers\.scm                     @guix/mozilla
 
 gnu/packages/ocaml\.scm                            @guix/ocaml
+gnu/packages/ocaml5\.scm                           @guix/ocaml
 gnu/packages/coq\.scm                              @guix/ocaml
 guix/build/ocaml-build-system\.scm                 @guix/ocaml
 guix/build/dune-build-system\.scm                  @guix/ocaml
