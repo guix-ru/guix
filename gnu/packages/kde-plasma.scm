@@ -795,7 +795,7 @@ KDE Frameworks 5 to better interact with the system.")
 (define-public kglobalacceld
   (package
     (name "kglobalacceld")
-    (version "6.5.2")
+    (version "6.5.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/"
@@ -803,7 +803,7 @@ KDE Frameworks 5 to better interact with the system.")
                                   version ".tar.xz"))
               (sha256
                (base32
-                "1xpmlimr6y67r3m32mdwyyc1giz0b8ghdx4yyzbzyap2ajvwfm49"))))
+                "1ljqv2fvgrk27bpa8v1dwnfjch6kkzjh7z30lvim99bgdc0va1hn"))))
     (build-system qt-build-system)
     (arguments (list #:qtbase qtbase
                      #:phases
