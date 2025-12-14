@@ -1458,7 +1458,7 @@ you login.")
 (define-public kwin
   (package
     (name "kwin")
-    (version "6.5.2")
+    (version "6.5.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/plasma/"
@@ -1467,7 +1467,7 @@ you login.")
               (patches (search-patches "kwin-unwrap-executable-name-for-dot-desktop-search.patch"))
               (sha256
                (base32
-                "0x072hzmk4mgx0w41s01nrb70bd3znpbdfjrx3gasb9lzrlxbq1v"))))
+                "0w0xpgbm1klk0wlkcxw661zfd8hllx8vnh5l860mmkw047vl7115"))))
     (build-system qt-build-system)
     (arguments
      (list
@@ -1517,7 +1517,9 @@ you login.")
                            "kwin-testFractionalRepaint"
                            "kwin-testDrmLegacy"
                            "kwin-testInputCapture"
-                           "kwin-testMockDrm")
+                           "kwin-testMockDrm"
+
+                           "kwin-testA11yKeyboardMonitor")
                          "|")
                      ")")
       #:phases
