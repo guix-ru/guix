@@ -6742,7 +6742,8 @@ easily extensible.")
                              python-matplotlib
                              python-pylems
                              python-setuptools
-                             python-setuptools-scm))
+                             python-setuptools-scm
+                             python-tables))
     (native-inputs (list python-pytest))
     (home-page "https://github.com/brian-team/brian2tools")
     (synopsis "Tools for the Brian 2 simulator")
