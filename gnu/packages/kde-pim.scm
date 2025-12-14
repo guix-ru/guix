@@ -464,14 +464,14 @@ wrapping notes into KMime::Message objects.")
 (define-public akonadi-search
   (package
     (name "akonadi-search")
-    (version "25.08.3")
+    (version "25.12.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://kde/stable/release-service/" version
                            "/src/akonadi-search-" version ".tar.xz"))
        (sha256
-        (base32 "0lfzg7gbj2v0f5nc4v4q2v2pknlhp88zr00nhc0rdd03h0npv39w"))))
+        (base32 "1xmq9jjz8dvxgc8prbdg9pgdrdrv0d6k31qkpggfd220ygvrri4d"))))
     (build-system qt-build-system)
     (native-inputs
      (list extra-cmake-modules
