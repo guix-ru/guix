@@ -17187,8 +17187,7 @@ traversal from leaf to root.")
 (define-public python-loompy
   (package
     (name "python-loompy")
-    (version "3.0.7")
-    ;; The tarball on Pypi does not include the tests.
+    (version "3.0.8")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -17197,7 +17196,7 @@ traversal from leaf to root.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0xmw2yv1y3y7vh5jcbrmlkn43nmfs0pf6z78k1yxqs3qy248m9b0"))))
+                "1v01imvhj3i7pz720y18cq00yc9w4qkwi0ds01claaxxddjclwsp"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -17226,7 +17225,7 @@ traversal from leaf to root.")
            python-pandas
            python-scipy))
     (native-inputs
-     (list python-pytest python-setuptools python-wheel))
+     (list python-pytest python-setuptools))
     (home-page "https://github.com/linnarsson-lab/loompy")
     (synopsis "Work with .loom files for single-cell RNA-seq data")
     (description "The loom file format is an efficient format for very large
