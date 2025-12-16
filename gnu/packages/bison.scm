@@ -21,14 +21,15 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages bison)
-  #:use-module (guix licenses)
-  #:use-module (guix packages)
-  #:use-module (guix download)
-  #:use-module (guix utils)
-  #:use-module (guix build-system gnu)
+  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (gnu packages flex)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages perl)
-  #:use-module (gnu packages flex)
+  #:use-module (guix build-system gnu)
+  #:use-module (guix download)
+  #:use-module (guix gexp)
+  #:use-module (guix packages)
+  #:use-module (guix utils)
   #:use-module (srfi srfi-1))
 
 (define-public bison
@@ -45,24 +46,29 @@
         "1wjvbbzrr16k1jlby3l436an3kvv492h08arbnf0gwgprha05flv"))))
     (build-system gnu-build-system)
     (arguments
-     `(;; Building in parallel on many-core systems may cause an error such as
-       ;; "mv: cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or
-       ;; directory".  See <https://bugs.gnu.org/36238>.
-       #:parallel-build? #f
-       ;; Similarly, when building tests in parallel, Make may produce this error:
-       ;; "./examples/c/reccalc/scan.l:13:10: fatal error: parse.h: No such file
-       ;; or directory".  Full log in <https://bugs.gnu.org/36238>.
-       #:parallel-tests? #f
-       ;; On the Hurd with glibc 2.41 bison uses weak symbols from pthread
-       ;; but does not link to it.
-       ,@(if (target-hurd?)
-             (list #:configure-flags ''("LIBS=-lpthread"))
-             '())))
-    (native-inputs (list perl
-                         ;; m4 is not present in PATH when cross-building.
-                         m4))
-    (inputs (list flex))
-    (propagated-inputs (list m4))
+     (list
+      ;; Building in parallel on many-core systems may cause an error such as
+      ;; "mv: cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or
+      ;; directory".  See <https://bugs.gnu.org/36238>.
+      #:parallel-build? #f
+      ;; Similarly, when building tests in parallel, Make may produce this error:
+      ;; "./examples/c/reccalc/scan.l:13:10: fatal error: parse.h: No such file
+      ;; or directory".  Full log in <https://bugs.gnu.org/36238>.
+      #:parallel-tests? #f
+      #:configure-flags
+      ;; On the Hurd with glibc 2.41 bison uses weak symbols from pthread
+      ;; but does not link to it.
+      (if (target-hurd?)
+          #~(list "LIBS=-lpthread")
+          #~(list))))
+    (native-inputs
+     (list perl
+           ;; m4 is not present in PATH when cross-building.
+           m4))
+    (inputs
+     (list flex))
+    (propagated-inputs
+     (list m4))
     (home-page "https://www.gnu.org/software/bison/")
     (synopsis "Yacc-compatible parser generator")
     (description
@@ -72,7 +78,7 @@ grammar.  It is versatile enough to have many applications, from parsers for
 simple tools through complex programming languages.
 
 Bison also provides an implementation of @command{yacc}, as specified by POSIX.")
-    (license gpl3+)))
+    (license license:gpl3+)))
 
 (define-public bison-3.0
   (package
