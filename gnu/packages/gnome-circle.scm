@@ -210,6 +210,3 @@ It features:
 Aegis (encrypted / plain-text), andOTP, Google Authenticator
 @end itemize")
     (license license:gpl3+)))
-
-(define-deprecated-package authenticator
-  gnome-authenticator)

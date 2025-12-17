@@ -10654,8 +10654,6 @@ specified duration and save it as a GIF encoded animated image file.")
 
 (define-deprecated/public-alias gnome-authenticator
   (@ (gnu packages gnome-circle) gnome-authenticator))
-(define-deprecated/public-alias authenticator
-  (@ (gnu packages gnome-circle) gnome-authenticator))
 
 (define-public gsound
   (package
