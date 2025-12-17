@@ -786,13 +786,13 @@ shell services and remote host selection.")
 (define-public python-asyncssh
   (package
     (name "python-asyncssh")
-    (version "2.18.0")
+    (version "2.21.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "asyncssh" version))
        (sha256
-        (base32 "08viv0k32l6f40sbraq4bqzizrkivf09zwy8kmqvjq0zq1hj2chs"))))
+        (base32 "034r3i3dg1jhf85ysdwr74x9fmlgqsn1mrxiq8v1a4z2allq0hwr"))))
     (build-system pyproject-build-system)
     (arguments
      (list
