@@ -2142,9 +2142,6 @@ Descriptions of projects, libraries and executables are provided in
 (define-public ocaml5.0-dune-bootstrap
   (package-with-ocaml5.0 dune-bootstrap))
 
-(define-public ocaml5.3-dune-bootstrap
-  (package-with-ocaml5.3 dune-bootstrap))
-
 (define-public dune-configurator
   (package
     (inherit dune-bootstrap)
@@ -2209,7 +2206,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
     (name "ocaml5.3-dune-configurator")
     (arguments
      `(,@(package-arguments dune-configurator)
-       #:dune ,ocaml5.3-dune-bootstrap
+       #:dune ,ocaml5:ocaml5.3-dune-bootstrap
        #:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5:ocaml5.3-findlib))
     (propagated-inputs (list ocaml5.3-csexp))))
@@ -2252,7 +2249,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
 
 (define-public ocaml5.3-dune
   (package
-    (inherit ocaml5.3-dune-bootstrap)
+    (inherit ocaml5:ocaml5.3-dune-bootstrap)
     (propagated-inputs
      (list ocaml5.3-dune-configurator))))
 
@@ -2431,7 +2428,7 @@ module of this library is parameterised by the type of S-expressions.")
      `(#:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5:ocaml5.3-findlib
        ,@(substitute-keyword-arguments (package-arguments ocaml-csexp)
-           ((#:dune _) ocaml5.3-dune-bootstrap))))
+           ((#:dune _) ocaml5:ocaml5.3-dune-bootstrap))))
     (propagated-inputs
      `(("ocaml-result" ,ocaml5.3-result)))))
 
@@ -2586,7 +2583,7 @@ defined in this library.")
     (inherit ocaml-result)
     (name "ocaml5.3-result")
     (arguments
-     `(#:dune ,ocaml5.3-dune-bootstrap
+     `(#:dune ,ocaml5:ocaml5.3-dune-bootstrap
        #:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5:ocaml5.3-findlib))))
 
