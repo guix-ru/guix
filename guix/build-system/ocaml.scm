@@ -137,7 +137,7 @@
   (@* (gnu packages ocaml5) ocaml5.3-findlib))
 
 (define (default-ocaml5.3-dune)
-  (@* (gnu packages ocaml) ocaml5.3-dune))
+  (@* (gnu packages ocaml5) ocaml5.3-dune))
 
 ;; The default versions of core packages within the 5.x series.
 
