@@ -225,23 +225,6 @@ OCaml and can effectively bootstrap OCaml 4.07.
 This package produces a native @command{ocamlc} and a bytecode @command{ocamllex}.")
       (license license:expat))))
 
-;; WARNING: this older release of the compiler has known vulnerabilities and
-;; is NOT supported. It remains in the distribution only to aid in building a
-;; bootstrap chain.
-(define-public ocaml-5.3
-  (package
-    (inherit ocaml5:ocaml-5.0)
-    (version "5.3.0")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/ocaml/ocaml")
-                    (commit version)))
-              (file-name (git-file-name "ocaml" version))
-              (sha256
-               (base32
-                "05jhy9zn53v12rn3sg3vllqf5blv1gp7f06803npimc58crxy6rv"))))))
-
 (define-public ocaml-5.4
   (package
     (inherit ocaml-5.0)
@@ -1844,7 +1827,7 @@ compilers that can directly deal with packages.")
     (inherit ocaml-findlib)
     (name "ocaml5.3-findlib")
     (native-inputs
-     (list m4 ocaml-5.3))))
+     (list m4 ocaml5:ocaml-5.3))))
 
 (define-public ocaml-ounit2
   (package
@@ -2248,7 +2231,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
     (arguments
      `(,@(package-arguments dune-configurator)
        #:dune ,ocaml5.3-dune-bootstrap
-       #:ocaml ,ocaml-5.3
+       #:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5.3-findlib))
     (propagated-inputs (list ocaml5.3-csexp))))
 
@@ -2466,7 +2449,7 @@ module of this library is parameterised by the type of S-expressions.")
     (inherit ocaml-csexp)
     (name "ocaml5.3-csexp")
     (arguments
-     `(#:ocaml ,ocaml-5.3
+     `(#:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5.3-findlib
        ,@(substitute-keyword-arguments (package-arguments ocaml-csexp)
            ((#:dune _) ocaml5.3-dune-bootstrap))))
@@ -2625,7 +2608,7 @@ defined in this library.")
     (name "ocaml5.3-result")
     (arguments
      `(#:dune ,ocaml5.3-dune-bootstrap
-       #:ocaml ,ocaml-5.3
+       #:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5.3-findlib))))
 
 (define-public ocaml-iso8601
