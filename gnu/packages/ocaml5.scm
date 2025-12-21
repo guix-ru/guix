@@ -279,6 +279,12 @@ config.h files for instance.  Among other things, dune-configurator allows one t
 @item generate config.h file
 @end itemize")))
 
+(define-public ocaml5.3-dune
+  (package
+    (inherit ocaml5.3-dune-bootstrap)
+    (propagated-inputs (list ocaml5.3-dune-configurator))
+    (properties '())))
+
 (define-public ocaml5.3-findlib
   (package
     (name "ocaml5.3-findlib")
