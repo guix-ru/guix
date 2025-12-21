@@ -2005,7 +2005,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
     (properties `((ocaml4.07-variant . ,(delay ocaml4.07-dune))
                   (ocaml4.09-variant . ,(delay ocaml4.09-dune))
                   (ocaml5.0-variant . ,(delay ocaml5.0-dune))
-                  (ocaml5.3-variant . ,(delay ocaml5.3-dune))))))
+                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-dune))))))
 
 (define-public ocaml4.09-dune
   (package
@@ -2032,12 +2032,6 @@ config.h files for instance.  Among other things, dune-configurator allows one t
     (inherit ocaml5.0-dune-bootstrap)
     (propagated-inputs
      (list ocaml5.0-dune-configurator))))
-
-(define-public ocaml5.3-dune
-  (package
-    (inherit ocaml5:ocaml5.3-dune-bootstrap)
-    (propagated-inputs
-     (list ocaml5:ocaml5.3-dune-configurator))))
 
 (define-public ocaml-pp
   (package
