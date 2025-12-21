@@ -248,6 +248,37 @@ To avoid a dependency on a particular S-expression library, the only
 module of this library is parameterised by the type of S-expressions.")
     (license license:expat)))
 
+(define-public ocaml5.3-dune-configurator
+  (package
+    (inherit ocaml5.3-dune-bootstrap)
+    (name "ocaml5.3-dune-configurator")
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "dune-configurator"
+       #:dune ,ocaml5.3-dune-bootstrap
+       ;; require ppx_expect
+       #:tests? #f
+       #:phases (modify-phases %standard-phases
+                  ;; When building dune, these directories are normally removed after
+                  ;; the bootstrap.
+                  (add-before 'build 'remove-vendor
+                    (lambda _
+                      (delete-file-recursively "vendor/csexp")
+                      (delete-file-recursively "vendor/pp"))))))
+    (propagated-inputs (list ocaml5.3-csexp))
+    (synopsis "Dune helper library for gathering system configuration")
+    (description
+     "Dune-configurator is a small library that helps writing
+OCaml scripts that test features available on the system, in order to generate
+config.h files for instance.  Among other things, dune-configurator allows one to:
+
+@itemize
+@item test if a C program compiles
+@item query pkg-config
+@item import #define from OCaml header files
+@item generate config.h file
+@end itemize")))
+
 (define-public ocaml5.3-findlib
   (package
     (name "ocaml5.3-findlib")

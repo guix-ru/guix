@@ -1961,7 +1961,7 @@ Descriptions of projects, libraries and executables are provided in
      (list ocaml-csexp))
     (properties `((ocaml4.09-variant . ,(delay ocaml4.09-dune-configurator))
                   (ocaml5.0-variant . ,(delay ocaml5.0-dune-configurator))
-                  (ocaml5.3-variant . ,(delay ocaml5.3-dune-configurator))))
+                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-dune-configurator))))
     (synopsis "Dune helper library for gathering system configuration")
     (description "Dune-configurator is a small library that helps writing
 OCaml scripts that test features available on the system, in order to generate
@@ -1996,17 +1996,6 @@ config.h files for instance.  Among other things, dune-configurator allows one t
        #:ocaml ,ocaml5:ocaml-5.0
        #:findlib ,ocaml5.0-findlib))
     (propagated-inputs (list ocaml5.0-csexp))))
-
-(define-public ocaml5.3-dune-configurator
-  (package
-    (inherit dune-configurator)
-    (name "ocaml5.3-dune-configurator")
-    (arguments
-     `(,@(package-arguments dune-configurator)
-       #:dune ,ocaml5:ocaml5.3-dune-bootstrap
-       #:ocaml ,ocaml5:ocaml-5.3
-       #:findlib ,ocaml5:ocaml5.3-findlib))
-    (propagated-inputs (list ocaml5:ocaml5.3-csexp))))
 
 (define-public dune
   (package
@@ -2048,7 +2037,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
   (package
     (inherit ocaml5:ocaml5.3-dune-bootstrap)
     (propagated-inputs
-     (list ocaml5.3-dune-configurator))))
+     (list ocaml5:ocaml5.3-dune-configurator))))
 
 (define-public ocaml-pp
   (package
