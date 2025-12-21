@@ -125,7 +125,7 @@
   (@* (gnu packages ocaml5) ocaml-5.0))
 
 (define (default-ocaml5.0-findlib)
-  (@* (gnu packages ocaml) ocaml5.0-findlib))
+  (@* (gnu packages ocaml5) ocaml5.0-findlib))
 
 (define (default-ocaml5.0-dune)
   (@* (gnu packages ocaml) ocaml5.0-dune))
