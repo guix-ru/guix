@@ -50,8 +50,85 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages ocaml5)
+  #:use-module (gnu packages compression)
+  #:use-module (gnu packages gcc)
+  #:use-module (gnu packages parallel)
+  #:use-module (gnu packages perl)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages xorg)
   #:use-module ((guix build-system ocaml)
-                #:select ((ocaml5-build-system . ocaml-build-system))))
+                #:select ((ocaml5-build-system . ocaml-build-system)))
+  #:use-module (guix build-system gnu)
+  #:use-module (guix git-download)
+  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix packages))
+
+(define-public ocaml-5.0
+  (package
+    (name "ocaml")
+    (version "5.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/ocaml")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1p0p8wldrnbr61wfy3x4122017g4k5gjvfwlg3mvlqn8r2fxn2m5"))))
+    (build-system gnu-build-system)
+    (native-search-paths
+     (list (search-path-specification
+            (variable "OCAMLPATH")
+            (files (list "lib/ocaml" "lib/ocaml/site-lib")))
+           (search-path-specification
+            (variable "CAML_LD_LIBRARY_PATH")
+            (files (list "lib/ocaml/site-lib/stubslibs"
+                         "lib/ocaml/site-lib/stublibs")))))
+    (native-inputs (list parallel perl pkg-config))
+    (inputs (list libx11 libiberty ;needed for objdump support
+                  zlib)) ;also needed for objdump support
+    (arguments
+     `(#:configure-flags '("--enable-ocamltest")
+       #:test-target "tests"
+       ;; This doesn't have the desired effect and makes test runs less
+       ;; stable. See https://codeberg.org/guix/guix/pulls/2933.
+       #:parallel-tests? #f
+       #:make-flags '("defaultentry")
+       #:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'enable-parallel-tests
+                    (lambda _
+                      ;; Patch the `tests` build target to enable a special parallel
+                      ;; execution mode based on GNU Parallel.
+                      (substitute* "Makefile"
+                        (("-C testsuite all")
+                         "-C testsuite parallel"))))
+                  (add-after 'unpack 'patch-/bin/sh-references
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let* ((sh (search-input-file inputs "/bin/sh"))
+                             (quoted-sh (string-append "\"" sh "\"")))
+                        (with-fluids ((%default-port-encoding #f))
+                                     (for-each (lambda (file)
+                                                 (substitute* file
+                                                   (("\"/bin/sh\"")
+                                                    (begin
+                                                      (format (current-error-port)
+                                                       "patch-/bin/sh-references: ~a: changing `\"/bin/sh\"' to `~a'~%"
+                                                       file quoted-sh)
+                                                      quoted-sh))))
+                                               (find-files "." "\\.ml$")))))))))
+    (home-page "https://ocaml.org/")
+    (synopsis "The OCaml programming language")
+    (description
+     "OCaml is a general purpose industrial-strength programming language with
+an emphasis on expressiveness and safety.  Developed for more than 20 years at
+Inria it benefits from one of the most advanced type systems and supports
+functional, imperative and object-oriented styles of programming.")
+    ;; The compiler is distributed under qpl1.0 with a change to choice of
+    ;; law: the license is governed by the laws of France.  The library is
+    ;; distributed under lgpl2.0.
+    (license (list license:qpl license:lgpl2.0))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
