@@ -57,6 +57,8 @@
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages xorg)
+  #:use-module ((guix build-system dune)
+                #:select ((ocaml5-dune-build-system . dune-build-system)))
   #:use-module ((guix build-system ocaml)
                 #:select ((ocaml5-build-system . ocaml-build-system)))
   #:use-module (guix build-system gnu)
@@ -144,6 +146,30 @@ functional, imperative and object-oriented styles of programming.")
               (sha256
                (base32
                 "05jhy9zn53v12rn3sg3vllqf5blv1gp7f06803npimc58crxy6rv"))))))
+
+(define-public ocaml5.3-result
+  (package
+    (name "ocaml5.3-result")
+    (version "1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/janestreet/result")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "166laj8qk7466sdl037c6cjs4ac571hglw4l5qpyll6df07h6a7q"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:dune ,ocaml5.3-dune-bootstrap))
+    (home-page "https://github.com/janestreet/result")
+    (synopsis "Compatibility Result module")
+    (description
+     "Uses the new result type defined in OCaml >= 4.03 while
+staying compatible with older version of OCaml should use the Result module
+defined in this library.")
+    (license license:bsd-3)))
 
 (define-public ocaml5.3-dune-bootstrap
   (package

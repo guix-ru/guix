@@ -2227,7 +2227,7 @@ module of this library is parameterised by the type of S-expressions.")
        ,@(substitute-keyword-arguments (package-arguments ocaml-csexp)
            ((#:dune _) ocaml5:ocaml5.3-dune-bootstrap))))
     (propagated-inputs
-     `(("ocaml-result" ,ocaml5.3-result)))))
+     `(("ocaml-result" ,ocaml5:ocaml5.3-result)))))
 
 (define-public ocaml-migrate-parsetree
   (package
@@ -2349,7 +2349,7 @@ bitsrings in Erlang style as primitives to the language.")))
      `(#:dune ,dune-bootstrap))
     (properties `((ocaml4.09-variant . ,(delay ocaml4.09-result))
                   (ocaml5.0-variant . ,(delay ocaml5.0-result))
-                  (ocaml5.3-variant . ,(delay ocaml5.3-result))))
+                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-result))))
     (home-page "https://github.com/janestreet/result")
     (synopsis "Compatibility Result module")
     (description "Uses the new result type defined in OCaml >= 4.03 while
@@ -2374,15 +2374,6 @@ defined in this library.")
      `(#:dune ,ocaml5.0-dune-bootstrap
        #:ocaml ,ocaml5:ocaml-5.0
        #:findlib ,ocaml5.0-findlib))))
-
-(define-public ocaml5.3-result
-  (package
-    (inherit ocaml-result)
-    (name "ocaml5.3-result")
-    (arguments
-     `(#:dune ,ocaml5:ocaml5.3-dune-bootstrap
-       #:ocaml ,ocaml5:ocaml-5.3
-       #:findlib ,ocaml5:ocaml5.3-findlib))))
 
 (define-public ocaml-iso8601
   (package
