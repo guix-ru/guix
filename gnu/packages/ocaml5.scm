@@ -52,6 +52,7 @@
 (define-module (gnu packages ocaml5)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages gcc)
+  #:use-module (gnu packages m4)
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
@@ -142,6 +143,60 @@ functional, imperative and object-oriented styles of programming.")
               (sha256
                (base32
                 "05jhy9zn53v12rn3sg3vllqf5blv1gp7f06803npimc58crxy6rv"))))))
+
+(define-public ocaml5.3-findlib
+  (package
+    (name "ocaml5.3-findlib")
+    (version "1.9.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/ocamlfind")
+             (commit (string-append "findlib-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1a0mxwf3mwl2n6ryqqsvcg73ly8ji0xi0xa2v1p02695495grkki"))))
+    (build-system gnu-build-system)
+    (native-inputs (list m4 ocaml-5.3))
+    (arguments
+     `(#:tests? #f ;no test suite
+       #:parallel-build? #f
+       #:make-flags (list "all" "opt")
+       #:phases (modify-phases %standard-phases
+                  (replace 'configure
+                    (lambda* (#:key inputs outputs #:allow-other-keys)
+                      (let ((out (assoc-ref outputs "out")))
+                        (invoke "./configure"
+                                "-bindir"
+                                (string-append out "/bin")
+                                "-config"
+                                (string-append out "/etc/ocamfind.conf")
+                                "-mandir"
+                                (string-append out "/share/man")
+                                "-sitelib"
+                                (string-append out "/lib/ocaml/site-lib")
+                                "-with-toolbox"))))
+                  (replace 'install
+                    (lambda* (#:key outputs #:allow-other-keys)
+                      (let ((out (assoc-ref outputs "out")))
+                        (invoke "make" "install"
+                                (string-append "OCAML_CORE_STDLIB=" out
+                                               "/lib/ocaml/site-lib"))))))))
+    (home-page "http://projects.camlcity.org/projects/findlib.html")
+    (synopsis "Management tool for OCaml libraries")
+    (description
+     "The \"findlib\" library provides a scheme to manage reusable software
+components (packages), and includes tools that support this scheme.  Packages
+are collections of OCaml modules for which metainformation can be stored.  The
+packages are kept in the file system hierarchy, but with strict directory
+structure.  The library contains functions to look the directory up that
+stores a package, to query metainformation about a package, and to retrieve
+dependency information about multiple packages.  There is also a tool that
+allows the user to enter queries on the command-line.  In order to simplify
+compilation and linkage, there are new frontends of the various OCaml
+compilers that can directly deal with packages.")
+    (license license:x11)))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
