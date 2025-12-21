@@ -207,6 +207,15 @@ Descriptions of projects, libraries and executables are provided in
     (properties '((hidden? . #t)))
     (license license:expat)))
 
+(define-public ocaml5.0-dune-bootstrap
+  (package
+    (inherit ocaml5.3-dune-bootstrap)
+    (name "ocaml5.0-dune-bootstrap")
+    (arguments
+     `(,@(package-arguments ocaml5.3-dune-bootstrap)
+       #:ocaml ,ocaml-5.0
+       #:findlib ,ocaml5.0-findlib))))
+
 (define-public ocaml5.3-csexp
   (package
     (name "ocaml5.3-csexp")
