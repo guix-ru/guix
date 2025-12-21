@@ -60,6 +60,7 @@
   #:use-module ((guix build-system ocaml)
                 #:select ((ocaml5-build-system . ocaml-build-system)))
   #:use-module (guix build-system gnu)
+  #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages))
@@ -143,6 +144,42 @@ functional, imperative and object-oriented styles of programming.")
               (sha256
                (base32
                 "05jhy9zn53v12rn3sg3vllqf5blv1gp7f06803npimc58crxy6rv"))))))
+
+(define-public ocaml5.3-dune-bootstrap
+  (package
+    (name "ocaml5.3-dune")
+    (version "3.19.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/ocaml/dune")
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "01ys792jnld5yihhyirwkk4jlqm59bk0vrqjvvk5xjn8pp26vryq"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f; require odoc
+       #:make-flags ,#~(list "release"
+                             (string-append "PREFIX=" #$output)
+                             (string-append "LIBDIR=" #$output
+                                            "/lib/ocaml/site-lib"))
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'configure
+           (lambda* (#:key outputs #:allow-other-keys)
+             (mkdir-p "src/dune")
+             (invoke "./configure")
+             #t)))))
+    (home-page "https://github.com/ocaml/dune")
+    (synopsis "OCaml build system")
+    (description "Dune is a build system for OCaml.  It provides a consistent
+experience and takes care of the low-level details of OCaml compilation.
+Descriptions of projects, libraries and executables are provided in
+@file{dune} files following an s-expression syntax.")
+    (properties '((hidden? . #t)))
+    (license license:expat)))
 
 (define-public ocaml5.3-findlib
   (package
