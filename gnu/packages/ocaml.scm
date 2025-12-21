@@ -2006,7 +2006,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
        #:dune ,ocaml5:ocaml5.3-dune-bootstrap
        #:ocaml ,ocaml5:ocaml-5.3
        #:findlib ,ocaml5:ocaml5.3-findlib))
-    (propagated-inputs (list ocaml5.3-csexp))))
+    (propagated-inputs (list ocaml5:ocaml5.3-csexp))))
 
 (define-public dune
   (package
@@ -2176,7 +2176,7 @@ executables and libraries")))
      (list ocaml-result))
     (properties `((ocaml4.09-variant . ,(delay ocaml4.09-csexp))
                   (ocaml5.0-variant . ,(delay ocaml5.0-csexp))
-                  (ocaml5.3-variant . ,(delay ocaml5.3-csexp))))
+                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-csexp))))
     (home-page "https://github.com/ocaml-dune/csexp")
     (synopsis "Parsing and printing of S-expressions in Canonical form")
     (description "This library provides minimal support for Canonical
@@ -2216,18 +2216,6 @@ module of this library is parameterised by the type of S-expressions.")
            ((#:dune _) ocaml5.0-dune-bootstrap))))
     (propagated-inputs
      `(("ocaml-result" ,ocaml5.0-result)))))
-
-(define-public ocaml5.3-csexp
-  (package
-    (inherit ocaml-csexp)
-    (name "ocaml5.3-csexp")
-    (arguments
-     `(#:ocaml ,ocaml5:ocaml-5.3
-       #:findlib ,ocaml5:ocaml5.3-findlib
-       ,@(substitute-keyword-arguments (package-arguments ocaml-csexp)
-           ((#:dune _) ocaml5:ocaml5.3-dune-bootstrap))))
-    (propagated-inputs
-     `(("ocaml-result" ,ocaml5:ocaml5.3-result)))))
 
 (define-public ocaml-migrate-parsetree
   (package

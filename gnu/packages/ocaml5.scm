@@ -207,6 +207,47 @@ Descriptions of projects, libraries and executables are provided in
     (properties '((hidden? . #t)))
     (license license:expat)))
 
+(define-public ocaml5.3-csexp
+  (package
+    (name "ocaml5.3-csexp")
+    (version "1.5.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml-dune/csexp")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0p3ajswxwc43cvpbmi7c897jhp9z7nlys1qic960cwgpgvfa95d4"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:tests? #f ;FIXME: needs ppx_expect, but which version?
+       #:dune ,ocaml5.3-dune-bootstrap
+       #:phases (modify-phases %standard-phases
+                  (add-before 'build 'chmod
+                    (lambda _
+                      (for-each (lambda (file)
+                                  (chmod file #o644))
+                                (find-files "." ".*")) #t)))))
+    (propagated-inputs (list ocaml5.3-result))
+    (home-page "https://github.com/ocaml-dune/csexp")
+    (synopsis "Parsing and printing of S-expressions in Canonical form")
+    (description
+     "This library provides minimal support for Canonical
+S-expressions.  Canonical S-expressions are a binary encoding of
+S-expressions that is super simple and well suited for communication
+between programs.
+
+This library only provides a few helpers for simple applications.  If
+you need more advanced support, such as parsing from more fancy input
+sources, you should consider copying the code of this library given
+how simple parsing S-expressions in canonical form is.
+
+To avoid a dependency on a particular S-expression library, the only
+module of this library is parameterised by the type of S-expressions.")
+    (license license:expat)))
+
 (define-public ocaml5.3-findlib
   (package
     (name "ocaml5.3-findlib")
