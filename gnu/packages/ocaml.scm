@@ -1598,13 +1598,6 @@ compilers that can directly deal with packages.")
     (native-inputs
      (list m4 ocaml-4.09))))
 
-(define-public ocaml5.0-findlib
-  (package
-    (inherit ocaml-findlib)
-    (name "ocaml5.0-findlib")
-    (native-inputs
-     (list m4 ocaml5:ocaml-5.0))))
-
 (define-public ocaml-ounit2
   (package
     (name "ocaml-ounit2")
@@ -1994,7 +1987,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
      `(,@(package-arguments dune-configurator)
        #:dune ,ocaml5.0-dune-bootstrap
        #:ocaml ,ocaml5:ocaml-5.0
-       #:findlib ,ocaml5.0-findlib))
+       #:findlib ,ocaml5:ocaml5.0-findlib))
     (propagated-inputs (list ocaml5.0-csexp))))
 
 (define-public dune
@@ -2194,7 +2187,7 @@ module of this library is parameterised by the type of S-expressions.")
     (name "ocaml5.0-csexp")
     (arguments
      `(#:ocaml ,ocaml5:ocaml-5.0
-       #:findlib ,ocaml5.0-findlib
+       #:findlib ,ocaml5:ocaml5.0-findlib
        ,@(substitute-keyword-arguments (package-arguments ocaml-csexp)
            ((#:dune _) ocaml5.0-dune-bootstrap))))
     (propagated-inputs
@@ -2344,7 +2337,7 @@ defined in this library.")
     (arguments
      `(#:dune ,ocaml5.0-dune-bootstrap
        #:ocaml ,ocaml5:ocaml-5.0
-       #:findlib ,ocaml5.0-findlib))))
+       #:findlib ,ocaml5:ocaml5.0-findlib))))
 
 (define-public ocaml-iso8601
   (package

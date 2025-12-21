@@ -339,6 +339,12 @@ compilation and linkage, there are new frontends of the various OCaml
 compilers that can directly deal with packages.")
     (license license:x11)))
 
+(define-public ocaml5.0-findlib
+  (package
+    (inherit ocaml5.3-findlib)
+    (name "ocaml5.0-findlib")
+    (native-inputs
+     (list m4 ocaml-5.0))))
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
