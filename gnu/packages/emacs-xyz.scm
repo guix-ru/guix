@@ -44379,7 +44379,7 @@ provides an easy way to bind keys under a configurable prefix key.")
 (define-public emacs-spacious-padding
   (package
     (name "emacs-spacious-padding")
-    (version "0.7.0")
+    (version "0.8.0")
     (source
      (origin
        (method git-fetch)
@@ -44388,7 +44388,7 @@ provides an easy way to bind keys under a configurable prefix key.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "00mwzbvhzlvnhsbc5rki5cx08fnx4s7cmnlz8lqh534wmsmh3wf0"))))
+        (base32 "1vb9nbzjz5bpfbmmsf2ab8dizqmn4bbk0nd95rfv207gyjrgy6hn"))))
     (build-system emacs-build-system)
     (arguments
      (list
@@ -44396,12 +44396,7 @@ provides an easy way to bind keys under a configurable prefix key.")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'build-info-manual
-            (lambda _
-              (invoke "emacs"
-                      "--batch"
-                      "--eval=(require 'ox-texinfo)"
-                      "--eval=(find-file \"README.org\")"
-                      "--eval=(org-texinfo-export-to-info)"))))))
+            (lambda _ (emacs-makeinfo))))))
     (native-inputs (list texinfo))
     (home-page "https://github.com/protesilaos/spacious-padding")
     (synopsis "Increase the padding or spacing of frames and windows")
