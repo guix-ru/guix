@@ -45856,6 +45856,8 @@ Fennel code within Emacs.")
         (base32 "0s5sh1hiwmnpyj5jvy93wi1aqf85dznz7rr9kbm77zcfsyqhnly2"))
        (file-name (git-file-name name version))))
     (build-system emacs-build-system)
+    (arguments
+     (list #:tests? #false))            ;no tests
     (propagated-inputs (list emacs-compat))
     (home-page "https://github.com/minad/org-modern")
     (synopsis "Modern Org style")
