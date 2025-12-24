@@ -8253,7 +8253,7 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
            json-glib
            libcanberra
            libgweather
-           libphonenumber
+           libphonenumber-8.11
            mit-krb5
            openldap
            webkitgtk-for-gtk3))
