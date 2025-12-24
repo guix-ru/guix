@@ -1628,7 +1628,7 @@ represented by a QPoint or a QSize.")
 (define-public kwidgetsaddons
   (package
     (name "kwidgetsaddons")
-    (version "6.19.0")
+    (version "6.21.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -1637,7 +1637,7 @@ represented by a QPoint or a QSize.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0yl6d5xbfs9prd3gpsyba00y3z4acjrp1s5bwbq8qfzqjzv9cak2"))))
+                "1g6ji535lcx3wlzfzgvdjfdkgfg0ns4jkjsp3815xhrid113ia8l"))))
     (build-system qt-build-system)
     (native-inputs
      (list extra-cmake-modules qttools))
@@ -1647,14 +1647,15 @@ represented by a QPoint or a QSize.")
       #:configure-flags
       ;; XXX: build python bindings.
       #~(list "-DBUILD_PYTHON_BINDINGS=OFF")
+      #:test-exclude "ktooltipwidgettest"
       #:phases
       #~(modify-phases %standard-phases
           (replace 'check
-            (lambda* (#:key tests? parallel-tests? #:allow-other-keys)
+            (lambda* (#:key tests? parallel-tests? test-exclude
+                      #:allow-other-keys)
               (when tests?
                 ;; hideLaterShouldHideAfterDelay function time: 300000ms, total time: 300009ms
-                (invoke "ctest" "-E"
-                        "(ktooltipwidgettest)"
+                (invoke "ctest" "-E" test-exclude
                         "-j"
                         (if parallel-tests?
                             (number->string (parallel-job-count))
