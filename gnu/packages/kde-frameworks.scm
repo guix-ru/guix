@@ -2919,7 +2919,7 @@ gallons).")
 (define-public syndication
   (package
     (name "syndication")
-    (version "6.19.0")
+    (version "6.21.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -2928,7 +2928,7 @@ gallons).")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0rkiq5sypg8qkaf7993sq342jqfs318dhs30z2qbkisv9ms1048n"))))
+                "1fqa1rdv4iib4q06f40zl0nb4h1279dkyjvnqc9fx9hhczagd8vy"))))
     (build-system cmake-build-system)
     (native-inputs
      (list extra-cmake-modules))
