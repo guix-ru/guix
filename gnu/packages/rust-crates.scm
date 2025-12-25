@@ -2599,6 +2599,10 @@
   (crate-source "cc" "1.2.46"
                 "0diynsnlmw8fr032dxci5a79il5br2ws1l2a730v3cac0vhn6x5r"))
 
+(define rust-cc-1.2.50
+  (crate-source "cc" "1.2.50"
+                "0g1q2k30bwnym5hlhk2y3k08hhrklgn68gr61b63f73s49ixal4z"))
+
 (define rust-cedarwood-0.4.6
   (crate-source "cedarwood" "0.4.6"
                 "142fw2aj0c34v56bsml95v9cjlq88r3x5gnhccr7691csvnhp4bd"))
@@ -9799,6 +9803,10 @@
   (crate-source "itoa" "1.0.15"
                 "0b4fj9kz54dr3wam0vprjwgygvycyw8r0qwg7vp19ly8b2w16psa"))
 
+(define rust-itoa-1.0.16
+  (crate-source "itoa" "1.0.16"
+                "040hqvfkxl7mpjs54y495ch2qkxx26kbfxyydmi42k7vk8rvbrby"))
+
 (define rust-itoa-1.0.9
   (crate-source "itoa" "1.0.9"
                 "0f6cpb4yqzhkrhhg6kqsw3wnmmhdnnffi6r2xzy248gzi2v0l5dg"))
@@ -10390,6 +10398,10 @@
 (define rust-libc-0.2.177
   (crate-source "libc" "0.2.177"
                 "0xjrn69cywaii1iq2lib201bhlvan7czmrm604h5qcm28yps4x18"))
+
+(define rust-libc-0.2.178
+  (crate-source "libc" "0.2.178"
+                "1490yks6mria93i3xdva1gm05cjz824g14mbv0ph32lxma6kvj9p"))
 
 (define rust-libc-stdhandle-0.1.0
   (crate-source "libc-stdhandle" "0.1.0"
@@ -14301,6 +14313,10 @@
   (crate-source "portable-atomic" "1.6.0"
                 "1h77x9qx7pns0d66vdrmdbmwpi7586h7ysnkdnhrn5mwi2cyyw3i"))
 
+(define rust-portable-atomic-1.12.0
+  (crate-source "portable-atomic" "1.12.0"
+                "1p9rrnq6fdk8byqf1q7x5jbzqwx9yaj99zg8qabmgrgimv2717pm"))
+
 (define rust-portable-atomic-1.7.0
   (crate-source "portable-atomic" "1.7.0"
                 "0rbjqv7lw120k6avb3fbsg58zg69m0wrmjg926lqglph33i4wm6s"))
@@ -16825,6 +16841,10 @@
   (crate-source "ryu" "1.0.20"
                 "07s855l8sb333h6bpn24pka5sp7hjk2w667xy6a0khkf6sqv5lr8"))
 
+(define rust-ryu-1.0.21
+  (crate-source "ryu" "1.0.21"
+                "1sja0gi4s0h3yjrx7hky72vivhzx73p5dllsiwg844mzfwl9n132"))
+
 (define rust-safe-arch-0.7.4
   (crate-source "safe_arch" "0.7.4"
                 "08sk47n1kcm5w2di6bpgi2hsw8r2caz2230pwqvbdqfv5pl2vc4n"))
@@ -19049,6 +19069,10 @@
   (crate-source "target-lexicon" "0.13.3"
                 "0355pbycq0cj29h1rp176l57qnfwmygv7hwzchs7iq15gibn4zyz"))
 
+(define rust-target-lexicon-0.13.4
+  (crate-source "target-lexicon" "0.13.4"
+                "1fnh3md1p3bsxviyydvg9qk5q9i9x5a5s5f7ygi6f84ahpmhgpdi"))
+
 (define rust-target-spec-3.4.2
   (crate-source "target-spec" "3.4.2"
                 "0lr5sp4hjiawwhdmv3hbg5ip566iqha31shwdpj0ci5svh7lshj9"))
@@ -20760,6 +20784,10 @@
 (define rust-unicode-normalization-0.1.24
   (crate-source "unicode-normalization" "0.1.24"
                 "0mnrk809z3ix1wspcqy97ld5wxdb31f3xz6nsvg5qcv289ycjcsh"))
+
+(define rust-unicode-normalization-0.1.25
+  (crate-source "unicode-normalization" "0.1.25"
+                "1s76dcrxw7vs32yhpi0p074apdc3s7lak7809f3qvclwij3zdm2z"))
 
 (define rust-unicode-normalization-alignments-0.1.12
   (crate-source "unicode-normalization-alignments" "0.1.12"
@@ -23563,6 +23591,10 @@
   (crate-source "zerocopy" "0.8.27"
                 "0b1870gf2zzlckca69v2k4mqwmf8yh2li37qldnzvvd3by58g508"))
 
+(define rust-zerocopy-0.8.31
+  (crate-source "zerocopy" "0.8.31"
+                "1hwqn8f0zd8h1a7qz2hxym4iaqyzk8kdxgalllydn2i5p6cfqx7x"))
+
 (define rust-zerocopy-derive-0.7.35
   (crate-source "zerocopy-derive" "0.7.35"
                 "0gnf2ap2y92nwdalzz3x7142f2b83sni66l39vxp2ijd6j080kzs"))
@@ -23582,6 +23614,10 @@
 (define rust-zerocopy-derive-0.8.27
   (crate-source "zerocopy-derive" "0.8.27"
                 "0c9qrylm2p55dvaplxsl24ma48add9qk4y0d6kjbkllaqvcvill8"))
+
+(define rust-zerocopy-derive-0.8.31
+  (crate-source "zerocopy-derive" "0.8.31"
+                "0sjw20qqxbax8z8k9ifcmwjjlljjddpm0nmvih9zap7lzl4x5a6q"))
 
 (define rust-zerofrom-0.1.4
   (crate-source "zerofrom" "0.1.4"
@@ -35165,6 +35201,52 @@
                                rust-yansi-1.0.1
                                rust-zerocopy-0.8.26
                                rust-zerocopy-derive-0.8.26))
+                     (jellyfish =>
+                                (list rust-ahash-0.8.12
+                                      rust-autocfg-1.5.0
+                                      rust-cc-1.2.50
+                                      rust-cfg-if-1.0.4
+                                      rust-csv-1.4.0
+                                      rust-csv-core-0.1.13
+                                      rust-find-msvc-tools-0.1.5
+                                      rust-getrandom-0.3.4
+                                      rust-heck-0.5.0
+                                      rust-indoc-2.0.7
+                                      rust-itoa-1.0.16
+                                      rust-libc-0.2.178
+                                      rust-memchr-2.7.6
+                                      rust-memoffset-0.9.1
+                                      rust-num-traits-0.2.19
+                                      rust-once-cell-1.21.3
+                                      rust-portable-atomic-1.12.0
+                                      rust-proc-macro2-1.0.103
+                                      rust-pyo3-0.26.0
+                                      rust-pyo3-build-config-0.26.0
+                                      rust-pyo3-ffi-0.26.0
+                                      rust-pyo3-macros-0.26.0
+                                      rust-pyo3-macros-backend-0.26.0
+                                      rust-python3-dll-a-0.2.14
+                                      rust-quote-1.0.42
+                                      rust-r-efi-5.3.0
+                                      rust-rustversion-1.0.22
+                                      rust-ryu-1.0.21
+                                      rust-serde-core-1.0.228
+                                      rust-serde-derive-1.0.228
+                                      rust-shlex-1.3.0
+                                      rust-smallvec-1.15.1
+                                      rust-syn-2.0.111
+                                      rust-target-lexicon-0.13.4
+                                      rust-tinyvec-1.10.0
+                                      rust-tinyvec-macros-0.1.1
+                                      rust-unicode-ident-1.0.22
+                                      rust-unicode-normalization-0.1.25
+                                      rust-unicode-segmentation-1.12.0
+                                      rust-unindent-0.2.4
+                                      rust-version-check-0.9.5
+                                      rust-wasip2-1.0.1+wasi-0.2.4
+                                      rust-wit-bindgen-0.46.0
+                                      rust-zerocopy-0.8.31
+                                      rust-zerocopy-derive-0.8.31))
                      (jless =>
                             (list rust-aho-corasick-1.1.3
                                   rust-anstream-0.6.18
