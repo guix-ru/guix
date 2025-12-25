@@ -915,6 +915,36 @@ configuration, and more.")
      (home-page "http://log4r.rubyforge.org/")
      (license license:bsd-3)))
 
+(define-public ruby-logger
+  (package
+    (name "ruby-logger")
+    (version "1.7.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (rubygems-uri "logger" version))
+       (sha256
+        (base32 "00q2zznygpbls8asz5knjvvj2brr3ghmqxgr83xnrdj4rk3xwvhr"))))
+    (build-system ruby-build-system)
+    (native-inputs (list bundler ruby-rake ruby-test-unit
+                         ruby-test-unit-ruby-core))
+    (synopsis "Simple logging utility")
+    (arguments (list #:tests? #f)) ; no tests
+    (description
+     "Logger is a simple but powerful logging utility to output
+messages in a Ruby program.
+
+Logger has the following features:
+
+@itemize @bullet
+@item Printing messages to different levels such as @code{info} and @code{error}
+@item Auto-rolling of log files
+@item Setting the format of log messages
+@item Specifying a program name in conjunction with the message
+@end itemize")
+    (home-page "https://github.com/ruby/logger")
+    (license (list license:ruby license:bsd-2))))
+
 (define-public ruby-atoulme-antwrap
   (package
     (name "ruby-atoulme-antwrap")
