@@ -498,7 +498,7 @@ topology functions.")
 (define-public gnome-maps
   (package
     (name "gnome-maps")
-    (version "48.4")
+    (version "49.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -506,7 +506,7 @@ topology functions.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1jj5xrybjc229p0021f54mnns3xq5q3fj5rcs8zbvzmkn2w1d1xf"))))
+                "1pxx50cig25dz0ab5xkbppnibb4zcv3r3vy31dkn6ncf24vykj5z"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -550,7 +550,6 @@ topology functions.")
            evolution-data-server
            geoclue
            geocode-glib
-           gfbgraph
            gjs
            glib
            glib-networking
