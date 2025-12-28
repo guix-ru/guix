@@ -39,6 +39,7 @@
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages backup)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages bison)
   #:use-module (gnu packages boost)
   #:use-module (gnu packages c)
@@ -188,7 +189,7 @@ bioinformatics, materials science, and related areas.")
 (define-public avogadro2
   (package
     (name "avogadro2")
-    (version "1.100.0")
+    (version "1.102.1")
     (source
      (origin
        (method git-fetch)
@@ -196,7 +197,7 @@ bioinformatics, materials science, and related areas.")
              (url "https://github.com/OpenChemistry/avogadroapp")
              (commit version)))
        (sha256
-        (base32 "19cd5aqvcw6xj0x1kmzmxl0vrnbhk5ymnl9p2p4d9504ma5k6aim"))
+        (base32 "08343y0gbnng1mk18s8ixbl3pzdpsc787zg6sh3gffw91s5hw6cw"))
        (file-name (git-file-name name version))))
     (build-system cmake-build-system)
     (native-inputs
@@ -204,41 +205,45 @@ bioinformatics, materials science, and related areas.")
         ("pkg-config" ,pkg-config)
         ("avogadro-i18n"
          ,(origin
-           (method git-fetch)
-           (uri
-             (git-reference
-               (url "https://github.com/openchemistry/avogadro-i18n")
-               (commit "07bee85")))
-           (file-name (git-file-name name
-                                     version))
-           (sha256
-             (base32
-               "1vhjh0gilmm90269isrkvyzwwh1cj3bwcxls394psadw1a89mk14"))))))
-    (inputs (list avogadrolibs hdf5 molequeue openbabel qtbase-5 qtsvg-5
-                  qtwayland-5))
+            (method git-fetch)
+            (uri
+              (git-reference
+                (url "https://github.com/openchemistry/avogadro-i18n")
+                (commit "f91da38")))
+            (file-name
+            (git-file-name name version))
+            (sha256
+              (base32 "1nymlznpz58a7gwk0g6c1f6ri068n54iq7yd8z6zacia1ihrj1qi"))))))
+    (inputs (list avogadrolibs
+                  hdf5
+                  jkqtplotter
+                  openbabel
+                  qtbase
+                  qtsvg
+                  qtwayland
+                  bash-minimal))
     ;; TODO: Enable tests with "-DENABLE_TESTING" configure flag.
     (arguments
      (list
       #:tests? #f
+      ;; RPC is turned off since molequeue doesn't build with Qt 6
+      #:configure-flags
+      #~(list "-DQT_VERSION=6" "-DAvogadro_ENABLE_RPC=OFF")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'symlink
             (lambda _
-              (begin
-                (symlink (assoc-ref %build-inputs "avogadro-i18n")
-                         "../avogadro-i18n"))))
+              (symlink (assoc-ref %build-inputs "avogadro-i18n")
+                       "../avogadro-i18n")))
           (add-after 'install 'wrap-program
             (lambda _
               (wrap-program (string-append #$output "/bin/avogadro2")
-                (list
-                  "PATH"
-                  'suffix
-                  (list (string-append #$openbabel "/bin")))
-                (list
-                  "QT_PLUGIN_PATH"
-                  'suffix
-                  (list (string-append #$qtsvg-5 "/lib/qt5/plugins")
-                        (string-append #$qtwayland-5 "/lib/qt5/plugins")))))))))
+                (list "PATH"
+                      'suffix
+                      (list (string-append #$openbabel "/bin")))
+                (list "QT_PLUGIN_PATH"
+                      'suffix
+                      (list (string-append #$qtsvg "/lib/qt6/plugins")))))))))
     (home-page "https://www.openchemistry.org/projects/avogadro2/")
     (synopsis "Advanced molecule editor")
     (description
