@@ -5731,6 +5731,45 @@ trade and diplomacy.")
                    license:cc-by3.0     ;Covers some media content
                    license:bsd-3))))    ; horizons/ext/speaklater.py
 
+(define-public zmusic
+  (package
+    (name "zmusic")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/UZDoom/ZMusic")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "065wrk88rnpjd0jayc4gw45ynviky7s6ncg9ixw31i3nk8vh639f"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            (with-directory-excursion "thirdparty"
+              (for-each delete-file-recursively
+                        '("game-music-emu"
+                          "fluidsynth"))
+              (substitute* "CMakeLists.txt"
+                (("add_subdirectory\\(game-music-emu\\)")
+                 "find_package(PkgConfig)
+pkg_search_module(game-music-emu REQUIRED libgme)")
+                (("add_subdirectory\\(fluidsynth/src\\)")
+                 "find_package(FluidSynth REQUIRED)")))
+            (substitute* (find-files "source" "\\.(h|cpp)")
+              (("include \".*fluidsynth.h\"")
+               "include <fluidsynth.h>"))))))
+    (build-system cmake-build-system)
+    (arguments (list #:tests? #f))      ;No tests.
+    (inputs (list fluidsynth glib libgme))
+    (native-inputs (list pkg-config))
+    (home-page "https://github.com/UZDoom/ZMusic")
+    (synopsis "UZDoom's music system")
+    (description "ZMusic is a standalone library implementing the music
+system for UZDoom and other Doom-related projects.")
+    (license license:gpl3)))
+
 (define-public gnujump
   (package
     (name "gnujump")
