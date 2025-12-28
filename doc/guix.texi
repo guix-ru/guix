@@ -4018,12 +4018,9 @@ them in the specified order.  You also need to explicitly authorize the
 public keys of substitute servers to instruct Guix to accept the
 substitutes they sign.
 
-On Guix System, this is achieved by modifying the configuration of the
-@code{guix} service.  Since the @code{guix} service is part of the
-default lists of services, @code{%base-services} and
-@code{%desktop-services}, you can use @code{modify-services} to change
-its configuration and add the URLs and substitute keys that you want
-(@pxref{Service Reference, @code{modify-services}}).
+On Guix System, this is achieved by extending the configuration of the
+@code{guix} service.  @pxref{Service Composition, Service extensions}
+allow users to easily add new configuration information.
 
 As an example, suppose you want to fetch substitutes from
 @code{guix.example.org} and to authorize the signing key of that server,
@@ -4035,18 +4032,13 @@ configuration will look something like:
 (operating-system
   ;; @dots{}
   (services
-    ;; Assume we're starting from '%desktop-services'.  Replace it
-    ;; with the list of services you're actually using.
-    (modify-services %desktop-services
-      (guix-service-type config =>
-                        (guix-configuration
-                          (inherit config)
-                          (substitute-urls
-                            (append (list "https://guix.example.org")
-                                    %default-substitute-urls))
-                          (authorized-keys
-                            (append (list (local-file "./key.pub"))
-                                    %default-authorized-guix-keys)))))))
+    (cons
+     (simple-service
+      'my-guix-configuration guix-service-type
+      (guix-extension
+        (substitute-urls (list "https://guix.example.org"))
+        (authorized-keys (list (local-file "./key.pub")))))
+     %desktop-services)))
 @end lisp
 
 This assumes that the file @file{key.pub} contains the signing key of
@@ -20702,6 +20694,9 @@ a guix service extension.
 @xref{Service Composition}, for more information.
 
 @table @asis
+@item @code{channels} (default: @code{'()})
+A list of objects where each element is a channel record.
+
 @item @code{authorized-keys} (default: @code{'()})
 A list of file-like objects where each element contains a public key.
 

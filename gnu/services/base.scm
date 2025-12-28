@@ -241,6 +241,7 @@
             guix-extension
             guix-extension?
             guix-extension-authorized-keys
+            guix-extension-channels
             guix-extension-substitute-urls
             guix-extension-chroot-directories
 
@@ -2428,6 +2429,8 @@ guix-daemon have the right ownership."))
 (define-record-type* <guix-extension>
   guix-extension make-guix-extension
   guix-extension?
+  (channels guix-extension-channels     ;list of channel
+            (default '()))
   (authorized-keys guix-extension-authorized-keys ;list of file-like
                     (default '()))
   (substitute-urls guix-extension-substitute-urls ;list of strings
@@ -2439,6 +2442,8 @@ guix-daemon have the right ownership."))
 
 (define (guix-extension-merge a b)
   (guix-extension
+   (channels (append (guix-extension-channels a)
+                     (guix-extension-channels b)))
    (authorized-keys (append (guix-extension-authorized-keys a)
                             (guix-extension-authorized-keys b)))
    (substitute-urls (append (guix-extension-substitute-urls a)
@@ -2464,6 +2469,8 @@ guix-daemon have the right ownership."))
    (extend (lambda (config extension)
              (guix-configuration
               (inherit config)
+              (channels (append (guix-extension-channels extension)
+                                (guix-configuration-channels config)))
               (authorized-keys (append (guix-extension-authorized-keys extension)
                                        (guix-configuration-authorized-keys config)))
               (substitute-urls (append (guix-extension-substitute-urls extension)
