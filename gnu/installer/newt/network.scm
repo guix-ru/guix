@@ -27,6 +27,7 @@
   #:use-module (guix i18n)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-11)
+  #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-35)
   #:use-module (ice-9 match)
@@ -112,20 +113,24 @@ network devices were found. Do you want to continue anyway?"))
              full-value
              (+ value 1)))))))
 
-(define (url-alive? url)
+(define* (url-alive? url #:optional (allow-non-success-codes #t))
   (false-if-exception
-   (begin
-     (http-request url)
-     #t)))
+   (let ((response (http-request url)))
+     (or allow-non-success-codes
+         (= (response-code response)
+            200)))))
 
-(define (common-urls-alive? urls)
+(define* (common-urls-alive? urls #:optional (allow-non-success-codes #t))
+  "Return #t if at least some of the given URLS are alive,
+meaning that they do respond to a HTTP request. If ALLOW-NON-SUCCESS-CODES is
+#t, return #t only if the code is 200."
   (dynamic-wind
     (lambda ()
       (sigaction SIGALRM
         (lambda _ #f))
       (alarm 3))
     (lambda ()
-      (any url-alive?
+      (any (cut url-alive? <> allow-non-success-codes)
            urls))
     (lambda ()
       (alarm 0))))
@@ -173,7 +178,8 @@ Do you want to continue anyway?"))
      (common-urls-alive?
       (list
        "https://bordeaux.guix.gnu.org/nix-cache-info"
-       "https://ci.guix.gnu.org/nix-cache-info"))))
+       "https://ci.guix.gnu.org/nix-cache-info")
+      #f)))
 
   (let* ((full-value 5))
     (run-scale-page
