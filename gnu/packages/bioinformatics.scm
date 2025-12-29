@@ -21909,6 +21909,7 @@ tree-based ensemble regressors.")
              python-ctxcore
              python-cytoolz
              python-dask
+             python-diptest
              python-distributed
              python-frozendict
              python-fsspec
