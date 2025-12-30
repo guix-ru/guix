@@ -2316,6 +2316,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/qemu-fix-agent-paths.patch 		\
   %D%/packages/patches/qemu-fix-test-virtio-version.patch       \
   %D%/packages/patches/qemu-disable-aarch64-migration-test.patch	\
+  %D%/packages/patches/qflipper-qt6.9-compat.patch		\
   %D%/packages/patches/qrcodegen-cpp-cmake.patch		\
   %D%/packages/patches/qtbase-absolute-runpath.patch		\
   %D%/packages/patches/qtbase-qmake-fix-includedir.patch 	\

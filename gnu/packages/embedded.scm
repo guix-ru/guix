@@ -70,11 +70,13 @@
   #:use-module (gnu packages ncurses)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages protobuf)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-crypto)
   #:use-module (gnu packages python-web)
   #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages qt)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages rust)
   #:use-module (gnu packages rust-apps)
@@ -2090,3 +2092,72 @@ TS-4900 family.  The included commands are:
 in order to program 8051-based System-On-Chip devices: CC254x CC253x CC243x
 CC251x CC111x.")
     (license license:gpl2)))
+
+(define-public qflipper
+  (package
+    (name "qflipper")
+    (version "1.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/flipperdevices/qFlipper")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0q68pkkak1ji0800hxbypshgj89vzwkql3j5x53sd32v96c8j7yp"))
+       (patches
+        (search-patches "qflipper-qt6.9-compat.patch"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              (invoke "qmake"
+                      (string-append "PREFIX=" #$output)
+                      (string-append
+                       "QT_TOOL.lrelease.binary="
+                       (search-input-file inputs "/bin/lrelease"))
+                      "DEFINES+=DISABLE_APPLICATION_UPDATES")))
+          (add-after 'unpack 'fix-version
+            (lambda _
+              (substitute* "qflipper_common.pri"
+                (("GIT_VERSION =.*") (string-append "GIT_VERSION = \"" #$version "\"\n")))))
+          (add-after 'unpack 'unbundle-nanopb
+            (lambda _
+              (substitute* "qFlipper.pro"
+                ((".*3rdparty.*") ""))
+              (substitute* "plugins/flipperproto0/flipperproto0.pro"
+                (("-l3rdparty") "-lprotobuf-nanopb")))))))
+    (native-inputs (list pkg-config))
+    (inputs
+     (list libusb
+           nanopb-malloc
+           qt5compat
+           qtbase
+           qtdeclarative
+           qtserialport
+           qtsvg
+           qttools
+           qtwayland
+           zlib))
+    (home-page "https://github.com/flipperdevices/qFlipper")
+    (synopsis "Desktop application for Flipper Zero")
+    (description
+     "qFlipper is a graphical application for Flipper Zero with the following features:
+
+@itemize @bullet
+@item Update Flipper's firmware and supplemental data
+@item Repair a broken firmware installation
+@item Stream Flipper's display and control it remotely
+@item Install firmware from a @code{.dfu} file
+@item Backup and restore settings, progress and pairing data
+@item Command line interface
+@end itemize
+
+Tip: to be able to use this application as a regular user, search for the
+@code{42-flipperzero.rules} file in the contents of the package, install it
+using udev-rules-service, then add your user to the dialout group.")
+    (license license:gpl3)))
