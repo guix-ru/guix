@@ -449,6 +449,15 @@ in ansi C.  It is especially suitable for use in microcontrollers, but fits
 any memory-restricted system.")
     (license license:zlib)))
 
+(define-public nanopb-malloc
+  (package
+    (inherit nanopb)
+    (name "nanopb-malloc")
+    (arguments
+     (substitute-keyword-arguments (package-arguments nanopb)
+       ((#:configure-flags flags #~'())
+        #~(cons* "-DCMAKE_C_FLAGS=-DPB_ENABLE_MALLOC=ON" #$flags))))))
+
 (define-public python-mypy-protobuf
   (package
     (name "python-mypy-protobuf")
