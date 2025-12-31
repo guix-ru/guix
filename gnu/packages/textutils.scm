@@ -194,7 +194,7 @@ libenca and several charset conversion libraries and tools.")
   (hidden-package
    (package
      (name "utf8proc-bootstrap")
-     (version "2.10.0")
+     (version "2.11.3")
      (source
       (origin
         (method git-fetch)
@@ -203,7 +203,7 @@ libenca and several charset conversion libraries and tools.")
               (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "1n1k67x39sk8xnza4w1xkbgbvgb1g7w2a7j2qrqzqaw1lyilqsy2"))))
+         (base32 "1ssix4zf3lac1afzlw2gbfg3n52gmggip8lv224gywqf3zyvyp8c"))))
      (build-system gnu-build-system)
      (arguments
       (list #:tests? #f                 ;To break dependency cycle.
@@ -226,7 +226,7 @@ case-folding, and other operations for data in the UTF-8 encoding.")
     (inherit utf8proc-bootstrap)
     (name "utf8proc")
     (native-inputs
-     (let ((UNICODE_VERSION "16.0.0"))  ; defined in data/Makefile
+     (let ((UNICODE_VERSION "17.0.0"))  ; defined in data/Makefile
        ;; Only if the tests will be run should these be added.
        (if (and (%current-system)
                 (supported-package? julia))
@@ -238,7 +238,7 @@ case-folding, and other operations for data in the UTF-8 encoding.")
                          UNICODE_VERSION "/ucd/NormalizationTest.txt"))
                    (sha256
                     (base32
-                     "1cffwlxgn6sawxb627xqaw3shnnfxq0v7cbgsld5w1z7aca9f4fq")))
+                     "1nw7i89q42r0plwlc8qj6qm18brk23hc0jf800cp86km63azy6ah")))
                  (origin
                    (method url-fetch)
                    (uri (string-append
@@ -246,7 +246,7 @@ case-folding, and other operations for data in the UTF-8 encoding.")
                          UNICODE_VERSION "/ucd/auxiliary/GraphemeBreakTest.txt"))
                    (sha256
                     (base32
-                     "1d9w6vdfxakjpp38qjvhgvbl2qx0zv5655ph54dhdb3hs9a96azf")))
+                     "1v4k2x52bzwgqxw89hdf3wdgwm8q3ianmfrya37bl699qp939lg2")))
                  (origin
                    (method url-fetch)
                    (uri (string-append
@@ -254,7 +254,7 @@ case-folding, and other operations for data in the UTF-8 encoding.")
                          UNICODE_VERSION "/ucd/DerivedCoreProperties.txt"))
                    (sha256
                     (base32
-                     "1gfsq4vdmzi803i2s8ih7mm4fgs907kvkg88kvv9fi4my9hm3lrr")))
+                     "021clafsjmjblsxcszp0dpxy2phwhbmyghfmxym2yj2w378zxir4")))
                  ;; For tests.
                  julia
                  perl
