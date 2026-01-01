@@ -260,6 +260,66 @@ globalisation support for software applications.  This package contains the
 Java part.")
     (license x11)))
 
+;; GraalVM Truffle 25.0.1 wants ICU4J 76.1, but ICU stopped publishing
+;; source tarballs with build.xml after 73.2. Version 74+ only provides
+;; Maven-based builds or pre-built JARs. Using 73.2 as a compromise.
+(define-public java-icu4j-for-graal-truffle
+  (package
+    (inherit java-icu4j)
+    (name "java-icu4j-for-graal-truffle")
+    (version "73.2")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://github.com/unicode-org/icu/releases/download/release-"
+                    (string-map (lambda (x) (if (char=? x #\.) #\- x)) version)
+                    "/icu4j-"
+                    (string-map (lambda (x) (if (char=? x #\.) #\_ x)) version)
+                    ".tgz"))
+              (sha256
+               (base32 "0g4sxanzm5s0axjk2lm1w15gr0gx8jasir6rdjn23yx039brchjb"))))
+    (arguments
+     (substitute-keyword-arguments (package-arguments java-icu4j)
+       ((#:phases phases)
+        `(modify-phases ,phases
+           (add-after 'build 'create-sources-jar
+             (lambda _
+               ;; Create a sources JAR from the core source files.
+               ;; mx shading needs .java source files, not .class files.
+               (invoke "jar" "cf" "icu4j-sources.jar"
+                       "-C" "main/classes/core/src" "com")))
+           (replace 'install
+             (lambda* (#:key outputs #:allow-other-keys)
+               (let ((share (string-append (assoc-ref outputs "out")
+                                           "/share/java/")))
+                 (mkdir-p share)
+                 (install-file "icu4j.jar" share)
+                 (install-file "icu4j-sources.jar" share))))))))))
+
+(define-public java-icu4j-charset-for-graal-truffle
+  (package
+    (inherit java-icu4j-for-graal-truffle)
+    (name "java-icu4j-charset-for-graal-truffle")
+    (arguments
+     (substitute-keyword-arguments (package-arguments java-icu4j-for-graal-truffle)
+       ((#:build-target _) "icu4j-charset.jar")
+       ((#:phases phases)
+        `(modify-phases ,phases
+           (replace 'create-sources-jar
+             (lambda _
+               ;; Create a sources JAR from the charset source files.
+               (invoke "jar" "cf" "icu4j-charset-sources.jar"
+                       "-C" "main/classes/charset/src" "com")))
+           (replace 'install
+             (lambda* (#:key outputs #:allow-other-keys)
+               (let ((share (string-append (assoc-ref outputs "out")
+                                           "/share/java/")))
+                 (mkdir-p share)
+                 (install-file "icu4j-charset.jar" share)
+                 (install-file "icu4j-charset-sources.jar" share))))))))
+    (inputs (list java-icu4j-for-graal-truffle))
+    (synopsis "ICU4J charset provider for GraalVM Truffle")))
+
 (define-public icu4c-for-skia
   ;; The current version of skia needs this exact commit
   ;; for its test dependencies.

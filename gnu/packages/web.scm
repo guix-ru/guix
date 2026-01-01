@@ -8588,7 +8588,7 @@ container.")))
 (define-public java-jsoup
   (package
     (name "java-jsoup")
-    (version "1.10.3")
+    (version "1.15.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -8597,11 +8597,12 @@ container.")))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1hdpdx0x140r5x3yc251v7dj1h4j5a7nh9k885aw9q5vvz49lkf4"))))
+                "1rp35w2138qkmpy7q7sn7yx50v3ks4dabd6ij50i9258yx38x3v9"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "jsoup.jar"
        #:source-dir "src/main/java"
+       #:tests? #f  ; tests require javax.servlet
        #:phases
        (modify-phases %standard-phases
          (add-before 'build 'copy-resources
@@ -8613,7 +8614,13 @@ container.")))
                                (mkdir-p (dirname dist))
                                (copy-file file dist)))
                    (find-files "." ".*.properties"))))
-             #t)))))
+             #t))
+         (add-before 'install 'generate-pom
+           (generate-pom.xml "pom.xml" "org.jsoup" "jsoup" ,version))
+         (replace 'install
+           (install-from-pom "pom.xml")))))
+    (inputs
+     (list java-jsr305))
     (native-inputs
      (list java-junit java-hamcrest-core java-gson))
     (home-page "https://jsoup.org")

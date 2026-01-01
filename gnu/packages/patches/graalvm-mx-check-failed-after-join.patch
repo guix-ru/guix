@@ -1,0 +1,16 @@
+Author: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Sun Dec 21 04:41:14 AM CET 2025
+Subject: Fail the entire build on error.
+
+--- a/src/mx/_impl/mx.py	2025-12-19 20:15:23.140244258 +0000
++++ b/src/mx/_impl/mx.py	2025-12-19 20:15:23.142739235 +0000
+@@ -15181,6 +15181,9 @@
+             joinTasks()
+         showProgress()
+ 
++        if len(failed) > 0:
++            abort(f'{len(failed)} build tasks failed')
++
+         def dump_task_stats(f):
+             """
+             Dump task statistics CSV. Use R with following commands for visualization:

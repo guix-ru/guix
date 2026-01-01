@@ -48,7 +48,8 @@
   #:use-module ((guix build-system python) #:select (pypi-uri
                                                      package-with-python2
                                                      python-build-system))
-  #:use-module (guix build-system ruby))
+  #:use-module (guix build-system ruby)
+  #:use-module (guix build-system trivial))
 
 (define-public libffi
   (package
@@ -87,6 +88,21 @@ conversions for values passed between the two languages.")
 
     ;; See <https://github.com/atgreen/libffi/blob/master/LICENSE>.
     (license expat)))
+
+(define-public libffi-for-graal-truffle
+  (package
+    (inherit libffi)
+    (name "libffi-for-graal-truffle")
+    (version "3.4.8")
+    (source (origin
+              (method url-fetch)
+              (uri
+               (string-append "https://github.com/libffi/libffi/releases"
+                              "/download/v" version "/libffi-" version ".tar.gz"))
+              (file-name "libffi-src.tar.gz")
+              (sha256
+               (base32
+                "16qias9rs3g3lg3zs9zx76hqzry7pkzc8lhjxnqargwqi2hl565w"))))))
 
 ;; Provide a variant without static trampolines as some packages
 ;; (particularly GHC < 9) cannot handle them.  See

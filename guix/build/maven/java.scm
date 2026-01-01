@@ -88,7 +88,35 @@
 
 (define-peg-pattern class-body all (and (* WS) (* (and class-statement (* WS)))))
 (define-peg-pattern class-statement body (or inline-comment comment param-pat
-                                             method-pat class-pat))
+                                             method-pat class-pat enum-pat))
+;; enum-pat: skip over enum declarations.  Enum contents are irrelevant for
+;; plugin.xml generation which only extracts @Mojo (class-level), @Parameter
+;; and @Component (field-level) annotations from Mojo classes.
+(define-peg-pattern enum-pat none (and (? (and (ignore (or "private" "public" "protected"))
+                                               (* WS)))
+                                       (? (and (ignore "static") (* WS)))
+                                       (ignore "enum") (* WS)
+                                       package-name (* WS)
+                                       (ignore "{") enum-body (ignore "}")))
+;; enum-body: consume everything inside enum braces
+;; Handles: nested braces, strings (which may contain }), and comments (which may contain })
+(define-peg-pattern enum-body none (* (or enum-body-chr
+                                          string-pat
+                                          enum-comment
+                                          enum-single-slash
+                                          (and "{" enum-body "}"))))
+;; enum-body-chr: any char except { } " and /
+;; Excludes: " (34), / (47), { (123), } (125)
+(define-peg-pattern enum-body-chr none (or "\t" "\n" "\r" " " "!"
+                                           (range #\# #\.)   ; 35-46
+                                           (range #\0 #\z)   ; 48-122
+                                           "|"               ; 124
+                                           (range #\~ #\xffff)))
+;; enum-comment: block or line comments that may contain } characters
+(define-peg-pattern enum-comment none (or (and "/*" (* (and (not-followed-by "*/") peg-any)) "*/")
+                                          (and "//" (* (and (not-followed-by "\n") peg-any)) "\n")))
+;; enum-single-slash: a / not followed by * or / (i.e., not starting a comment)
+(define-peg-pattern enum-single-slash none (and "/" (not-followed-by (or "*" "/"))))
 (define-peg-pattern param-pat all (and (* (and annotation-pat (* WS)
                                                (? (ignore inline-comment))
                                                (* WS)))
@@ -102,15 +130,20 @@
                                        (? (and (* WS) (ignore "=") (* WS) value))
                                        (ignore ";")))
 (define-peg-pattern value none (or string-pat (+ valuechr)))
-(define-peg-pattern valuechr none (or comment inline-comment "\n"
-                                      "\t" "\r"
-                                      (range #\  #\:) (range #\< #\xffff)))
+;; Note: Character ranges must come BEFORE comment patterns to avoid
+;; misinterpreting `/*` inside strings like {"**/**"} as comment starts.
+;; The `/` character (ASCII 47) is in range 32-58, so it matches as a
+;; regular character before the comment pattern is tried.
+(define-peg-pattern valuechr none (or "\n" "\t" "\r"
+                                      (range #\  #\:) (range #\< #\xffff)
+                                      comment inline-comment))
 (define-peg-pattern param-name all (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)
                                           "_")))
 (define-peg-pattern type-name all type-pat)
+;; type-pat: Match type names including fully qualified names (e.g., org.example.Foo)
 (define-peg-pattern type-pat body
   (or "?"
-      (and (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9) "_"))
+      (and (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9) "_" "."))
            (? "...")
            (? "[]")
            (? type-param))))

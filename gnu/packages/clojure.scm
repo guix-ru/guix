@@ -855,6 +855,7 @@ dependency graph expansion and the creation of classpaths.")
        #:doc-dirs '()
        ;; FIXME: Could not initialize class org.eclipse.aether.transport.http.SslSocketFactory
        #:tests? #f
+       #:jdk ,openjdk11
        #:phases
        (modify-phases %standard-phases
          ;; FIXME: Currently, the S3 transporter depends on ClojureScript,

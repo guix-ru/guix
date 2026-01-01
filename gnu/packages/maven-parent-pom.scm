@@ -100,6 +100,18 @@
   (make-apache-parent-pom
     "29" "0fj078bgzs0r24x66ph5bbwkkc5s9d1qh57hmlpisg4mdi0l48s9"))
 
+(define-public apache-parent-pom-31
+  (make-apache-parent-pom
+    "31" "1sdjh664gakz5bjawrw4p4bpvkjwsk4wbd1iapl1r38zsfcp5qal"))
+
+(define-public apache-parent-pom-33
+  (make-apache-parent-pom
+    "33" "06qpsnrqf8459aficmbdhad7ldv8k48dqwxivd7r7knlssmlqsww"))
+
+(define-public apache-parent-pom-34
+  (make-apache-parent-pom
+    "34" "0jia7fxl3abvz4d70y144vghy2dq4a258jdyzcpp339hx37lnjm2"))
+
 (define* (make-apache-commons-parent-pom version hash parent
                                          #:key (tag-prefix "commons-parent-"))
   (hidden-package
@@ -131,6 +143,16 @@
       (description "This package contains the Apache Commons parent POM.")
       (license license:asl2.0))))
 
+(define-public apache-commons-parent-pom-28
+  (make-apache-commons-parent-pom
+    "28" "13zsm6x2cpk9j92bg5v3mg9f4d8928hh6xdx16024bz122y5nb34"
+    apache-parent-pom-13))
+
+(define-public apache-commons-parent-pom-34
+  (make-apache-commons-parent-pom
+    "34" "0r0gim683nsib2x62s1av2hr6agirqjp57vjkd3xh0qlrx36kna1"
+    apache-parent-pom-13))
+
 (define-public apache-commons-parent-pom-39
   (make-apache-commons-parent-pom
     "39" "0mjx48a55ik1h4hsxhifkli1flvkp6d05ab14p4al0fc6rhdxi46"
@@ -161,6 +183,35 @@
     "52" "0fb6id9cs9944fjlirjc07bf234bwi96i642px09m9nrfj338n5d"
     apache-parent-pom-23
     #:tag-prefix "rel/commons-parent-"))
+
+(define-public apache-commons-parent-pom-73
+  (hidden-package
+   (package
+     (name "apache-commons-parent-pom")
+     (version "73")
+     (source (origin
+               (method git-fetch)
+               (uri (git-reference
+                     (url "https://github.com/apache/commons-parent")
+                     (commit "rel/commons-parent-73")))
+               (file-name (git-file-name name version))
+               (sha256
+                (base32 "0avlf1chqccd6f6y03l9i7p8z5a96c91nvv1rx482yjdr8ic28mf"))))
+     (build-system ant-build-system)
+     (arguments
+      `(#:tests? #f
+        #:phases
+        (modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'build)
+          (replace 'install
+            (install-pom-file "pom.xml")))))
+     (propagated-inputs
+      `(("parent" ,apache-parent-pom-33)))
+     (home-page "https://maven.apache.org/")
+     (synopsis "Apache Commons parent pom")
+     (description "This package contains the Apache Commons parent POM.")
+     (license license:asl2.0))))
 
 (define-public java-weld-parent-pom
   (hidden-package
@@ -412,6 +463,74 @@ other projects as their parent pom.")
   (make-plexus-parent-pom
     "8" "0ybwdzawa58qg9ag39rxyin24lk9sjcaih6n2yfldfzsbkq6gnww"))
 
+(define-public plexus-parent-pom-10
+  (hidden-package
+   (package
+     (name "plexus-parent-pom")
+     (version "10")
+     (source (origin
+               (method git-fetch)
+               (uri (git-reference
+                     (url "https://github.com/codehaus-plexus/plexus-pom")
+                     (commit "plexus-10")))
+               (file-name (git-file-name name "10"))
+               (sha256
+                (base32 "10hhmi50ns0cqjiv9xw3dlanil1psm9s1mj2wndfyvn85cz7ia9n"))))
+     (build-system ant-build-system)
+     (arguments
+      `(#:tests? #f
+        #:phases
+        (modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'build)
+          (replace 'install
+            (install-pom-file "pom.xml")))))
+     (home-page "https://codehaus-plexus.github.io/plexus-pom")
+     (synopsis "Plexus parent pom")
+     (description "This package contains the Plexus parent POM.")
+     (license license:asl2.0))))
+
+(define-public plexus-parent-pom-15
+  (hidden-package
+   (package
+     (inherit plexus-parent-pom-10)
+     (version "15")
+     (source (origin
+               (method git-fetch)
+               (uri (git-reference
+                     (url "https://github.com/codehaus-plexus/plexus-pom")
+                     (commit "plexus-15")))
+               (file-name (git-file-name "plexus-parent-pom" "15"))
+               (sha256
+                (base32 "0rjbfy7qpvxa75ak3cx6vgd0agpbgdkc95jsbk3qhm9n0nisylh1")))))))
+
+(define-public plexus-parent-pom-20
+  (hidden-package
+   (package
+     (name "plexus-parent-pom")
+     (version "20")
+     (source (origin
+               (method git-fetch)
+               (uri (git-reference
+                     (url "https://github.com/codehaus-plexus/plexus-pom")
+                     (commit "plexus-20")))
+               (file-name (git-file-name name "20"))
+               (sha256
+                (base32 "1j2n06p5ylijxk2j0iwynxag6dq4bb5jdli7dsnj8hsywrj4jrpg"))))
+     (build-system ant-build-system)
+     (arguments
+      `(#:tests? #f
+        #:phases
+        (modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'build)
+          (replace 'install
+            (install-pom-file "pom.xml")))))
+     (home-page "https://codehaus-plexus.github.io/plexus-pom")
+     (synopsis "Plexus parent pom")
+     (description "This package contains the Plexus parent POM.")
+     (license license:asl2.0))))
+
 (define* (make-maven-parent-pom version hash parent #:key replacements)
   (hidden-package
     (package
@@ -451,6 +570,86 @@ other projects as their parent pom.")
 tool.  This package contains the Maven parent POM.")
       (license license:asl2.0))))
 
+(define-public maven-parent-pom-44
+  (hidden-package
+    (package
+      (name "maven-parent-pom")
+      (version "44")
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://github.com/apache/maven-parent")
+                       (commit "v44")))
+                (file-name (git-file-name name version))
+                (sha256 (base32 "0l54kjgi5s8n5asaf9swj96bjm26s77z3wk4x9jiljxflf9vdqgf"))))
+      (build-system ant-build-system)
+      (arguments
+       `(#:tests? #f
+         #:phases
+         (modify-phases %standard-phases
+           (delete 'configure)
+           (delete 'build)
+           (add-after 'install 'install-plugins
+             (install-pom-file "maven-plugins/pom.xml"))
+           (add-after 'install 'install-shared
+             (install-pom-file "maven-shared-components/pom.xml"))
+           (replace 'install
+             (install-pom-file "pom.xml")))))
+      (propagated-inputs
+       `(("parent" ,apache-parent-pom-33)))
+      (home-page "https://maven.apache.org/")
+      (synopsis "Maven parent pom")
+      (description "Apache Maven is a software project management and comprehension
+tool.  This package contains the Maven parent POM.")
+      (license license:asl2.0))))
+
+(define-public maven-parent-pom-43
+  (let ((base (make-maven-parent-pom
+                "43" "1f2w7nlkd97gq8bbddl9n0dgm7v5hkpjxrrhzln8szhm4d9wxrfa"
+                apache-parent-pom-33
+                #:replacements
+                (delay
+                  `(("org.codehaus.plexus"
+                     ("plexus-component-annotations" .
+                      ,(package-version java-plexus-component-annotations))))))))
+    (package
+      (inherit base)
+      (arguments
+        (substitute-keyword-arguments (package-arguments base)
+          ((#:phases phases)
+           `(modify-phases ,phases
+              (add-before 'install 'fix-versions
+                (lambda _
+                  ;; Use the junit-bom version we have available
+                  (substitute* "pom.xml"
+                    (("5\\.11\\.3")
+                     ,(package-version junit-bom-5.11))))))))))))
+
+(define-public maven-parent-pom-41
+  (let ((base (make-maven-parent-pom
+                "41" "0glhr3s77g80yc20ajpwmpqgqn3i2ap7mj1wqs1vnk2fp2s0lvsj"
+                apache-parent-pom-31
+                #:replacements
+                (delay
+                  `(("org.codehaus.plexus"
+                     ("plexus-component-annotations" .
+                      ,(package-version java-plexus-component-annotations))))))))
+    (package
+      (inherit base)
+      (arguments
+        (substitute-keyword-arguments (package-arguments base)
+          ((#:phases phases)
+           ;; FIXME: Version downgrades; upgrade sisu and plexus-utils instead.
+           `(modify-phases ,phases
+              (add-before 'install 'fix-versions
+                (lambda _
+                  (substitute* "pom.xml"
+                    (("0\\.9\\.0\\.M2")
+                     ,(package-version java-eclipse-sisu-plexus))
+                    (("version\\.plexus-utils>4\\.0\\.0")
+                     ,(string-append "version.plexus-utils>"
+                        (package-version java-plexus-utils)))))))))))))
+
 (define-public maven-parent-pom-39
   (make-maven-parent-pom
     "39" "1123nmm63nrsfy9i35zn12glswc2sy9bsj4fir2z9yh93kraky1y"
@@ -459,7 +658,9 @@ tool.  This package contains the Maven parent POM.")
     (delay
       `(("org.codehaus.plexus"
          ("plexus-component-annotations" .
-          ,(package-version java-plexus-component-annotations)))))))
+          ,(package-version java-plexus-component-annotations))
+         ("plexus-utils" .
+          ,(package-version java-plexus-utils)))))))
 
 (define-public maven-parent-pom-37
   (make-maven-parent-pom

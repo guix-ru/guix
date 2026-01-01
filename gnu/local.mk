@@ -343,6 +343,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/gperf.scm			\
   %D%/packages/gpodder.scm			\
   %D%/packages/gps.scm				\
+  %D%/packages/graal.scm			\
   %D%/packages/graph.scm			\
   %D%/packages/graphics.scm			\
   %D%/packages/graphviz.scm			\
@@ -1523,6 +1524,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/gpaste-fix-paths.patch			\
   %D%/packages/patches/gpm-glibc-2.26.patch			\
   %D%/packages/patches/gpodder-disable-updater.patch		\
+  %D%/packages/patches/graalvm-mx-check-failed-after-join.patch	\
   %D%/packages/patches/grantlee-fix-i586-precision.patch	\
   %D%/packages/patches/grantlee-register-metaenumvariable.patch	\
   %D%/packages/patches/grep-timing-sensitive-test.patch		\

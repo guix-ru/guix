@@ -32,8 +32,10 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages java)
+  #:use-module (gnu packages java-compression)
   #:use-module (gnu packages java-xml)
   #:use-module (gnu packages maven-parent-pom)
+  #:use-module (gnu packages perl)
   #:use-module (gnu packages web)
   #:use-module (ice-9 match))
 
@@ -720,6 +722,7 @@ ease usage of the repository system.")))
     (name "java-eclipse-aether-impl")
     (arguments
      `(#:jar-name "aether-impl.jar"
+       #:jdk ,openjdk11
        #:source-dir "aether-impl/src/main/java"
        #:test-dir "aether-impl/src/test"
        #:phases
@@ -739,14 +742,14 @@ ease usage of the repository system.")))
 (define-public maven-shared-utils
   (package
     (name "maven-shared-utils")
-    (version "3.2.1")
+    (version "3.3.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://apache/maven/shared/"
                                   "maven-shared-utils-" version "-source-release.zip"))
               (sha256
                (base32
-                "1kzmj68wwdcznb36hm6kfz57wbavw7g1rp236pz10znkjljn6rf6"))))
+                "1h42ilhpgkn2cqc83lj3q9bcj6r2l4kkx7g69p55pssmwwxz3k2w"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-shared-utils.jar"
@@ -763,6 +766,9 @@ ease usage of the repository system.")))
              (delete-file
                "src/test/java/org/apache/maven/shared/utils/introspection/ReflectionValueExtractorTest.java")
              #t))
+         (add-before 'check 'set-test-env
+           (lambda _
+             (setenv "TEST_SHARED_ENV" "TestValue")))
          (replace 'install
            (install-from-pom "pom.xml")))))
     (propagated-inputs
@@ -772,7 +778,7 @@ ease usage of the repository system.")))
        ("java-plexus-container-default" ,java-plexus-container-default)
        ("maven-parent-pom-30" ,maven-parent-pom-30)))
     (native-inputs
-     (list unzip java-junit java-hamcrest-core java-commons-lang3))
+     (list unzip java-junit java-hamcrest-all java-commons-lang3 java-commons-text))
     (home-page "https://maven.apache.org/shared/maven-shared-utils/")
     (synopsis "Plexus-util replacement for maven")
     (description "This project aims to be a functional replacement for
@@ -783,13 +789,13 @@ replacement with improvements.")
 (define-public maven-plugin-annotations
   (package
     (name "maven-plugin-annotations")
-    (version "3.5")
+    (version "3.15.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://apache/maven/"
                                   "plugin-tools/maven-plugin-tools-" version
                                   "-source-release.zip"))
-              (sha256 (base32 "1ryqhs62j5pas93brhf5dsnvp99hxbvssf681yj5rk3r9h24hqm2"))))
+              (sha256 (base32 "0w7k7x3w9x269z219664swh57m7l330b0mxii0az5c21dkqs2awr"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-plugin-annotations.jar"
@@ -808,7 +814,7 @@ replacement with improvements.")
     (description "This package contains Java 5 annotations for use in Mojos.")
     (license license:asl2.0)))
 
-(define maven-plugin-tools-parent-pom
+(define-public maven-plugin-tools-parent-pom
   (package
     (inherit maven-plugin-annotations)
     (name "maven-plugin-tools-parent-pom")
@@ -818,9 +824,51 @@ replacement with improvements.")
        (modify-phases %standard-phases
          (delete 'configure)
          (delete 'build)
+         (add-before 'install 'fix-dependency-versions
+           (lambda _
+             ;; Update dependency versions to match what we have in Guix.
+             ;; Maven's plugin classloader resolves dependencies from
+             ;; the pom.xml, and will fail in offline mode if versions
+             ;; don't match the m2 repository.
+             (substitute* "pom.xml"
+               ;; junit-bom
+               (("5\\.11\\.3")
+                ,(package-version junit-bom-5.11))
+               ;; plexus-xml: 3.0.1 -> 3.0.2
+               (("<plexusXmlVersion>3\\.0\\.1</plexusXmlVersion>")
+                ,(string-append "<plexusXmlVersion>"
+                                (package-version java-plexus-xml)
+                                "</plexusXmlVersion>"))
+               ;; plexus-archiver: 4.10.0 -> 4.10.4
+               (("<version>4\\.10\\.0</version>")
+                ,(string-append "<version>"
+                                (package-version java-plexus-archiver)
+                                "</version>"))
+               ;; velocity-engine-core: 2.4 -> 2.4.1
+               (("<version>2\\.4</version>")
+                ,(string-append "<version>"
+                                (package-version java-velocity-engine-core)
+                                "</version>"))
+               ;; plexus-velocity: 2.2.0 -> 2.0
+               ;; NOTE: Must come before qdox substitution to avoid conflict
+               (("<version>2\\.2\\.0</version>")
+                ,(string-append "<version>"
+                                (package-version java-plexus-velocity)
+                                "</version>"))
+               ;; qdox: 2.1.0 -> 2.2.0 (java-qdox-2)
+               (("<version>2\\.1\\.0</version>")
+                ,(string-append "<version>"
+                                (package-version java-qdox-2)
+                                "</version>"))
+               ;; jsoup: 1.18.1 -> 1.15.3
+               (("<version>1\\.18\\.1</version>")
+                ,(string-append "<version>"
+                                (package-version java-jsoup)
+                                "</version>")))))
          (replace 'install
            (install-pom-file "pom.xml")))))
-    (propagated-inputs '())))
+    (propagated-inputs
+     (list maven-parent-pom-43))))
 
 (define-public maven-wagon-provider-api
   (package
@@ -1132,13 +1180,13 @@ gets and puts artifacts through HTTP(S) using Apache HttpClient-4.x.")))
 (define maven-pom
   (package
     (name "maven-pom")
-    (version "3.9.0")
+    (version "3.9.9")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://apache/maven/"
                                   "maven-3/" version "/source/"
                                   "apache-maven-" version "-src.tar.gz"))
-              (sha256 (base32 "0s8ds2bqkdi2yrcwbd3mkszh6l4hf56j9jz47hkpd7i3zh1hmr4n"))
+              (sha256 (base32 "0b4blz63q75pdfg2jlxmrp8h5306a1r4v6h11impwfdcsi4c894a"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -1406,6 +1454,8 @@ inheritance, interpolation, @dots{}")))
        #:source-dir "src/main/java"
        #:jdk ,icedtea-8
        #:test-dir "src/test"
+       ;; Tests require powermock - skip for now
+       #:tests? #f
        #:phases
        (modify-phases %standard-phases
          (add-before 'configure 'chdir
@@ -1766,7 +1816,8 @@ artifactId=maven-core" ,(package-version maven-core-bootstrap))))
                   (("maven-compiler-plugin:[0-9.]+")
                    (string-append "maven-compiler-plugin:"
                                   ,(package-version maven-compiler-plugin)))
-                  (("maven-surefire-plugin:[0-9.]+")
+                  ;; Surefire version includes milestone suffix like -M8
+                  (("maven-surefire-plugin:[^:]+")
                    (string-append "maven-surefire-plugin:"
                                   ,(package-version maven-surefire-plugin)))
                   (("maven-jar-plugin:[0-9.]+")
@@ -1783,7 +1834,13 @@ artifactId=maven-core" ,(package-version maven-core-bootstrap))))
        ("java-jdom2" ,java-jdom2)
        ("java-qdox" ,java-qdox)
        ("maven-core-boot" ,maven-core-bootstrap)
-       ,@(package-native-inputs maven-core-bootstrap)))))
+       ,@(package-native-inputs maven-core-bootstrap)))
+    ;; Add plexus-archiver to propagated-inputs so it ends up in plexus.core
+    ;; ClassRealm.  Without this, Sisu cannot discover DefaultArchiverManager
+    ;; (which uses @Named) because it only scans plexus.core, not plugin realms.
+    (propagated-inputs
+     (modify-inputs (package-propagated-inputs maven-core-bootstrap)
+       (append java-plexus-archiver)))))
 
 (define-public maven-slf4j-provider
   (package
@@ -2191,14 +2248,35 @@ layer for plugins that need to keep Maven2 compatibility.")))
                      "java-plexus-sec-dispatcher" "java-plexus-cipher" "java-guava"
                      "java-guava-futures-failureaccess" "java-jansi"
                      "java-jsr250" "java-cdi-api" "java-commons-cli"
-                     "java-commons-io" "java-commons-lang3" "java-slf4j-api"))))
+                     "java-commons-io" "java-commons-lang3" "java-slf4j-api"
+                     ;; plexus-archiver is needed for sisu to discover DefaultArchiverManager
+                     ;; which is required by maven-plugin-plugin for the descriptor goal.
+                     "java-plexus-archiver" "java-plexus-io" "java-commons-compress"))))
              (substitute* "apache-maven/src/bin/mvn"
                (("cygwin=false;")
                 (string-append
                   "CLASSPATH="
+                  ;; plexus-classworlds is the launcher
                   (car (find-files
                          (assoc-ref inputs "java-plexus-classworlds")
                          ".*.jar"))
+                  ;; plexus-archiver and dependencies must be on the Java classpath
+                  ;; (not just in m2.conf) because Sisu discovers @Named components
+                  ;; by scanning the classloader hierarchy.  Plugin realms have
+                  ;; AppClassLoader as parent (not plexus.core), so components in
+                  ;; plexus.core are invisible to Sisu unless also on the classpath.
+                  ":"
+                  (car (find-files
+                         (assoc-ref inputs "java-plexus-archiver")
+                         "plexus-archiver.*\\.jar$"))
+                  ":"
+                  (car (find-files
+                         (assoc-ref inputs "java-plexus-io")
+                         "plexus-io.*\\.jar$"))
+                  ":"
+                  (car (find-files
+                         (assoc-ref inputs "java-commons-compress")
+                         "commons-compress.*\\.jar$"))
                   "\ncygwin=false;"))
                (("-classpath.*") "-classpath ${CLASSPATH} \\\n"))
              #t))
@@ -2247,12 +2325,12 @@ layer for plugins that need to keep Maven2 compatibility.")))
            java-httpcomponents-httpcore
            maven-wagon-http-shared
            maven-wagon-tck-http
-           java-eclipse-sisu-plexus
-           java-guice
+           java-eclipse-sisu-plexus-0.9
+           java-guice-5
            java-aopalliance
            java-cglib
-           java-asm-8
-           java-eclipse-sisu-inject
+           java-asm-9
+           java-eclipse-sisu-inject-0.9
            java-javax-inject
            java-plexus-component-annotations
            java-plexus-utils
@@ -2267,7 +2345,12 @@ layer for plugins that need to keep Maven2 compatibility.")))
            java-commons-cli
            java-commons-io
            java-commons-lang3
-           java-slf4j-api))
+           java-slf4j-api
+           ;; plexus-archiver is needed for sisu to discover DefaultArchiverManager
+           ;; which is required by maven-plugin-plugin for the descriptor goal.
+           java-plexus-archiver
+           java-plexus-io
+           java-commons-compress))
     (propagated-inputs
      (list coreutils which))
     (description "Apache Maven is a software project management and comprehension
@@ -2728,19 +2811,21 @@ Maven project dependencies.")
 (define-public maven-file-management
   (package
     (name "maven-file-management")
-    (version "3.0.0")
+    (version "3.2.0")
     (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://apache/maven/shared/"
-                                  "file-management-" version
-                                  "-source-release.zip"))
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/apache/maven-file-management")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
               (sha256
                (base32
-                "0wisz6sm67axrwvx8a75mb9s03h7kzkzfw8j3aaa4sx4k9ph58da"))))
+                "1kq3dgyflfacymb7szfhz33jq34css81k3yiz5kciaxhpljzfl1x"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-file-management.jar"
        #:source-dir "src/main/java"
+       #:tests? #f
        #:phases
        (modify-phases %standard-phases
          (add-before 'build 'copy-resources
@@ -2762,56 +2847,56 @@ Maven project dependencies.")
          (replace 'install
            (install-from-pom "pom.xml")))))
     (propagated-inputs
-     (list maven-3.0-plugin-api maven-shared-io maven-shared-utils
-           java-plexus-utils maven-components-parent-pom-22))
+     (list java-commons-io
+           java-plexus-utils
+           java-slf4j-api))
     (native-inputs
      `(("java-modello-core" ,java-modello-core)
        ;; modello plugins:
        ("java-modellop-plugins-java" ,java-modello-plugins-java)
-       ("java-modellop-plugins-xpp3" ,java-modello-plugins-xpp3)
-       ("unzip" ,unzip)))
-    (home-page "https://maven.apache.org/shared/maven-dependency-tree")
-    (synopsis "Tree-based API for resolution of Maven project dependencies")
-    (description "This package provides a tree-based API for resolution of
-Maven project dependencies.")
+       ("java-modellop-plugins-xpp3" ,java-modello-plugins-xpp3)))
+    (home-page "https://maven.apache.org/shared/file-management")
+    (synopsis "API to collect files from a project")
+    (description "This package provides an API to collect files from a project
+for creating archives.")
     (license license:asl2.0)))
 
 (define-public maven-archiver
   (package
     (name "maven-archiver")
-    (version "3.5.0")
+    (version "3.6.6")
     (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://apache/maven/shared/"
-                                  "maven-archiver-" version
-                                  "-source-release.zip"))
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/apache/maven-archiver")
+                    (commit (string-append "maven-archiver-" version))))
+              (file-name (git-file-name name version))
               (sha256
                (base32
-                "1204xkqj259brpk3yscprml0lbfbyn1vn5nrgqjk44z5vx127lbw"))))
+                "0kbibjspmc31wdl2pajpq06xvr7f81lzgrzvn5dwxfb67yzg8c5s"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-archiver.jar"
        #:source-dir "src/main/java"
+       #:tests? #f
        #:phases
        (modify-phases %standard-phases
          (replace 'install
            (install-from-pom "pom.xml")))))
     (propagated-inputs
-     `(("java-commons-io" ,java-commons-io)
-       ("maven-artifact" ,maven-3.0-artifact)
-       ("maven-core" ,maven-3.0-core)
-       ("maven-model" ,maven-3.0-model)
-       ("maven-shared-utils" ,maven-shared-utils)
-       ("java-plexus-archiver" ,java-plexus-archiver)
-       ("java-plexus-interpolation" ,java-plexus-interpolation)
-       ("java-plexus-utils" ,java-plexus-utils)
-       ("maen-parent-pom" ,maven-parent-pom-33)))
-    (native-inputs
-     (list java-junit java-assertj unzip))
-    (home-page "https://maven.apache.org/shared/maven-dependency-tree")
-    (synopsis "Tree-based API for resolution of Maven project dependencies")
-    (description "This package provides a tree-based API for resolution of
-Maven project dependencies.")
+     (list java-commons-io
+           maven-artifact
+           maven-core
+           maven-model
+           maven-shared-utils
+           java-plexus-archiver
+           java-plexus-interpolation
+           java-plexus-utils
+           java-plexus-xml))
+    (home-page "https://maven.apache.org/shared/maven-archiver")
+    (synopsis "Handle manifest and archive creation in Maven plugins")
+    (description "This package provides classes for creating archives in
+Maven plugins.")
     (license license:asl2.0)))
 
 (define-public maven-dependency-tree
@@ -2852,7 +2937,7 @@ Maven project dependencies.")
 (define-public maven-common-artifact-filters
   (package
     (name "maven-common-artifact-filters")
-    (version "3.2.0")
+    (version "3.4.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://apache/maven/shared/"
@@ -2860,7 +2945,7 @@ Maven project dependencies.")
                                   "-source-release.zip"))
               (sha256
                (base32
-                "1mr92s4zz6gf028wiskjg8rd1znxzdnmskg42ac55ifg9v1p1884"))))
+                "0ab7c82pc1cyh575jfywn372zy8a8kfblm217rzqdmqjhswlf1mp"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-common-artifact-filters.jar"
@@ -2868,24 +2953,18 @@ Maven project dependencies.")
        #:tests? #f; require maven-plugin-testing-harness, which requires maven 3.2.
        #:phases
        (modify-phases %standard-phases
-         (add-before 'build 'fix-aether
-           (lambda _
-             (substitute* "pom.xml"
-               (("eclipse.aether") "sonatype.aether"))
-             (substitute* "src/main/java/org/apache/maven/shared/artifact/filter/collection/ArtifactTransitivityFilter.java"
-               (("eclipse") "sonatype"))))
          (replace 'install
            (install-from-pom "pom.xml")))))
     (propagated-inputs
-     (list maven-3.0-artifact
-           maven-3.0-model
-           maven-3.0-core
-           maven-3.0-plugin-api
+     (list maven-artifact
+           maven-model
+           maven-core
+           maven-plugin-api
            maven-shared-utils
-           maven-parent-pom-33
+           maven-parent-pom-41
            java-eclipse-sisu-plexus
-           java-sonatype-aether-api
-           java-sonatype-aether-util))
+           java-eclipse-aether-api
+           java-eclipse-aether-util))
     (inputs
      (list maven-resolver-api maven-resolver-util))
     (native-inputs
@@ -2912,12 +2991,22 @@ Maven project dependencies.")
       (substitute-keyword-arguments (package-arguments maven-common-artifact-filters)
        ((#:phases phases)
         `(modify-phases ,phases
-           (delete 'fix-aether)
            (add-before 'build 'remove-sisu
              (lambda _
                (substitute* "pom.xml"
                  (("sisu-inject-plexus") "maven-plugin-api")
-                 (("org.sonatype.sisu") "org.apache.maven"))))))))))
+                 (("org.sonatype.sisu") "org.apache.maven"))))))))
+    ;; 3.1.0 uses Sonatype aether, not Eclipse aether
+    ;; Use maven-3.0 components to avoid conflicts with packages using maven-3.0-core
+    (propagated-inputs
+     (list maven-3.0-artifact
+           maven-3.0-model
+           maven-3.0-core
+           maven-3.0-plugin-api
+           maven-shared-utils-3.0
+           maven-components-parent-pom-21
+           java-sonatype-aether-api
+           java-sonatype-aether-util))))
 
 (define-public maven-enforcer-api
   (package
@@ -3345,22 +3434,13 @@ unit tests.")
              (substitute* "pom.xml"
                (("plexus-component-api") "plexus-component-annotations"))
              #t))
-         (add-after 'build 'generate-metadata
-           (lambda _
-             (invoke "java" "-cp" (string-append (getenv "CLASSPATH") ":build/classes")
-                     "org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli"
-                     "--source" "src/main/java"
-                     "--output" "build/classes/META-INF/plexus/components.xml"
-                     "--classes" "build/classes"
-                     "--descriptors" "build/classes/META-INF")
-             #t))
          (replace 'install
            (install-from-pom "pom.xml")))))
     (propagated-inputs
      (list maven-plugin-api maven-core maven-shared-utils
            java-plexus-component-annotations maven-parent-pom-30))
     (native-inputs
-     (list unzip java-plexus-component-metadata))
+     (list unzip))
     (home-page "https://maven.apache.org/shared/maven-shared-incremental")
     (synopsis "Maven Incremental Build support utilities")
     (description "This package contains various utility classes and plexus
@@ -3370,7 +3450,7 @@ components for supporting incremental build functionality in maven plugins.")
 (define-public maven-compiler-plugin
   (package
     (name "maven-compiler-plugin")
-    (version "3.8.1")
+    (version "3.9.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3379,12 +3459,13 @@ components for supporting incremental build functionality in maven plugins.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0jkbq02vykd09ws8k9bzqxv6fjrpmir8gcxydbmj05kkhl242bma"))))
+                "1fq4m1rihbj0r2fs68n0544mv23pp2snpf1vips22n30xhi891d7"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-compiler-plugin.jar"
        #:source-dir "src/main/java"
        #:test-dir "src/test"
+       #:jdk ,openjdk11
        #:tests? #f; test depends on maven-plugin-test-harness
        #:phases
        (modify-phases %standard-phases
@@ -3411,7 +3492,7 @@ components for supporting incremental build functionality in maven plugins.")
            maven-core
            maven-shared-utils
            maven-shared-incremental
-           java-plexus-java
+           java-plexus-java-1
            java-plexus-compiler-api
            java-plexus-compiler-manager
            java-plexus-compiler-javac
@@ -3438,14 +3519,14 @@ AspectJ, .NET, and C#.")
 (define-public java-surefire-logger-api
   (package
     (name "java-surefire-logger-api")
-    (version "3.0.0-M4")
+    (version "3.5.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://apache/maven/surefire/"
                                   "surefire-" version "-source-release.zip"))
               (sha256
                (base32
-                "1s6d4pzk3bjm9l38mj9sfgbgmk145rppdj1dmqwc4d5105mr9q9w"))))
+                "1ifw0ml0b1cycjpjsfyjy5420y4xgbssms72cvbpxny94dd7y8hs"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "java-surefire-logger-api.jar"
@@ -3465,6 +3546,49 @@ AspectJ, .NET, and C#.")
 internal to the SureFire Logger API.  It is designed to have no dependency.")
     (license license:asl2.0)))
 
+;; JUnit 5 BOM (Bill of Materials) - a pom-only package for dependency management.
+(define (make-junit-bom version hash)
+  (package
+    (name "junit-bom")
+    (version version)
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://repo1.maven.org/maven2/org/junit/junit-bom/"
+                    version "/junit-bom-" version ".pom"))
+              (sha256 (base32 hash))))
+    (build-system ant-build-system)
+    (arguments
+     `(#:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'build)
+         (replace 'install
+           (lambda* (#:key source outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (pom-dir (string-append out "/lib/m2/org/junit/junit-bom/"
+                                            ,version)))
+               (mkdir-p pom-dir)
+               (copy-file source (string-append pom-dir "/junit-bom-" ,version ".pom"))))))))
+    (home-page "https://junit.org/junit5/")
+    (synopsis "JUnit 5 Bill of Materials")
+    (description "This package provides a Maven BOM (Bill of Materials) for
+JUnit 5, used for dependency version management.")
+    (license license:epl2.0)))
+
+(define-public junit-bom
+  (make-junit-bom "5.9.3" "1mrf6kf0y6bic98n30w8s9gnxykgzv5j8mx1bh745wkjkv6jj0sd"))
+
+(define-public junit-bom-5.10
+  (make-junit-bom "5.10.3" "1g5syqjzm1pigqzsr4ya85b198z1293x69cjffw4r615qi27v4qh"))
+
+(define-public junit-bom-5.10.2
+  (make-junit-bom "5.10.2" "0s4r7bjcs9072a9gm2d92hy9zzib55icqn76zw655xmhlh2dk78n"))
+
+(define-public junit-bom-5.12
+  (make-junit-bom "5.12.1" "1w1b3i8a4ci9qj4xyf3x6xdgb80jj1zh4qwjmmyq3p7d5g3np0kw"))
+
 (define-public java-surefire-parent-pom
   (package
     (inherit java-surefire-logger-api)
@@ -3480,6 +3604,11 @@ internal to the SureFire Logger API.  It is designed to have no dependency.")
              (substitute* "pom.xml"
                (("1.11") ,(package-version java-commons-codec)))
              (substitute* "pom.xml"
+               (("mavenVersion>.*")
+                (string-append
+                  "mavenVersion>"
+                  ,(package-version maven-pom)
+                  "</mavenVersion>\n"))
                (("commonsLang3Version>.*")
                 (string-append
                   "commonsLang3Version>"
@@ -3496,14 +3625,15 @@ internal to the SureFire Logger API.  It is designed to have no dependency.")
                   ,(package-version java-commons-io)
                   "</commonsIoVersion>\n"))
                (("0.11.0") ,(package-version maven-artifact-transfer))
-               (("1.0.3") ,(package-version java-plexus-java)))
+               (("1.0.3") ,(package-version java-plexus-java))
+               (("3.1.1") ,(package-version maven-common-artifact-filters)))
              #t))
          (add-after 'install 'install-providers
            (install-pom-file "surefire-providers/pom.xml"))
          (replace 'install
            (install-pom-file "pom.xml")))))
     (propagated-inputs
-     (list maven-parent-pom-33))))
+     (list maven-parent-pom-41 junit-bom)))) ; FIXME: wtf does junit-bom do here???
 
 (define-public java-surefire-api
   (package
@@ -3523,15 +3653,43 @@ internal to the SureFire Logger API.  It is designed to have no dependency.")
          (add-before 'build 'prepare-shade
            (lambda* (#:key inputs #:allow-other-keys)
              (mkdir-p "build/classes")
+             (mkdir-p "build/shaded-deps")
+             (let ((jarjar (car (find-files (assoc-ref inputs "java-jarjar") ".*.jar$"))))
+               ;; Shade maven-shared-utils
+               (for-each
+                 (lambda (jar-file)
+                   (let ((out-jar "build/shaded-deps/shared-utils-shaded.jar"))
+                     (with-output-to-file "build/rules-utils"
+                       (lambda _
+                         (format #t "rule org.apache.maven.shared.utils.** org.apache.maven.surefire.shared.utils.@1~%")))
+                     (invoke "java" "-jar" jarjar "process" "build/rules-utils" jar-file out-jar)))
+                 (find-files (assoc-ref inputs "maven-shared-utils") ".*.jar$"))
+               ;; Shade commons-lang3
+               (for-each
+                 (lambda (jar-file)
+                   (let ((out-jar "build/shaded-deps/lang3-shaded.jar"))
+                     (with-output-to-file "build/rules-lang3"
+                       (lambda _
+                         (format #t "rule org.apache.commons.lang3.** org.apache.maven.surefire.shared.lang3.@1~%")))
+                     (invoke "java" "-jar" jarjar "process" "build/rules-lang3" jar-file out-jar)))
+                 (find-files (assoc-ref inputs "java-commons-lang3") ".*.jar$"))
+               ;; Shade commons-codec
+               (for-each
+                 (lambda (jar-file)
+                   (let ((out-jar "build/shaded-deps/codec-shaded.jar"))
+                     (with-output-to-file "build/rules-codec"
+                       (lambda _
+                         (format #t "rule org.apache.commons.codec.** org.apache.maven.surefire.shared.codec.@1~%")))
+                     (invoke "java" "-jar" jarjar "process" "build/rules-codec" jar-file out-jar)))
+                 (find-files (assoc-ref inputs "java-commons-codec") ".*.jar$")))
+             ;; Extract shaded jars
              (with-directory-excursion "build/classes"
                (for-each
-                 (lambda (input)
-                   (for-each
-                     (lambda (jar-file)
-                       (invoke "jar" "xf" jar-file)
-                       (delete-file-recursively "META-INF"))
-                     (find-files (assoc-ref inputs input) ".*.jar$")))
-                 '("maven-shared-utils" "java-commons-codec")))
+                 (lambda (jar-file)
+                   (invoke "jar" "xf" jar-file)
+                   (when (file-exists? "META-INF")
+                     (delete-file-recursively "META-INF")))
+                 (find-files "../shaded-deps" ".*.jar$")))
              #t))
          (add-after 'build 'shade
            (lambda* (#:key inputs #:allow-other-keys)
@@ -3545,22 +3703,56 @@ internal to the SureFire Logger API.  It is designed to have no dependency.")
                      (format #t (string-append
                                   "rule "
                                   "org.apache.maven.shared.utils.** "
-                                  "org.apache.maven.surefire.shade.api."
-                                  "org.apache.maven.shared.utils.@1~%"))
+                                  "org.apache.maven.surefire.shared.utils.@1~%"))
                      (format #t (string-append
                                   "rule "
                                   "org.apache.commons.codec.** "
-                                  "org.apache.maven.surefire.shade.api."
-                                  "org.apache.commons.codec.@1~%"))))
+                                  "org.apache.maven.surefire.shared.codec.@1~%"))
+                     (format #t (string-append
+                                  "rule "
+                                  "org.apache.commons.lang3.** "
+                                  "org.apache.maven.surefire.shared.lang3.@1~%"))))
                  (invoke "java" "-jar" jarjar "process" "rules" injar outjar)
                  (delete-file injar)
                  (rename-file outjar injar)))
              #t))
+         (add-before 'install 'remove-shared-utils-dep
+           (lambda _
+             (use-modules (guix build maven pom) (sxml simple) (srfi srfi-1))
+             (define fix-maven-xml (@@ (guix build maven pom) fix-maven-xml))
+             (define dep-tag (string->symbol "http://maven.apache.org/POM/4.0.0:dependency"))
+             (define deps-tag (string->symbol "http://maven.apache.org/POM/4.0.0:dependencies"))
+             (define artifactid-tag (string->symbol "http://maven.apache.org/POM/4.0.0:artifactId"))
+             (define (is-shared-utils? dep)
+               (and (pair? dep)
+                    (eq? (car dep) dep-tag)
+                    (any (lambda (part)
+                           (and (pair? part)
+                                (eq? (car part) artifactid-tag)
+                                (member "surefire-shared-utils" part)))
+                         (cdr dep))))
+             (define (filter-deps sxml)
+               (cond
+                ((not (pair? sxml)) sxml)
+                ((eq? (car sxml) deps-tag)
+                 (cons deps-tag
+                       (filter (lambda (d) (not (is-shared-utils? d)))
+                               (cdr sxml))))
+                (else
+                 (cons (filter-deps (car sxml))
+                       (filter-deps (cdr sxml))))))
+             (let* ((pom-file "surefire-api/pom.xml")
+                    (pom (get-pom pom-file))
+                    (fixed (filter-deps pom)))
+               (with-output-to-file pom-file
+                 (lambda ()
+                   (sxml->xml (fix-maven-xml fixed)))))
+             #t))
          (replace 'install
            (install-from-pom "surefire-api/pom.xml")))))
     (propagated-inputs
-     (list java-surefire-logger-api java-commons-codec
-           java-surefire-parent-pom maven-shared-utils-3.1))
+     (list java-surefire-logger-api java-commons-codec java-commons-lang3
+           java-surefire-parent-pom maven-shared-utils))
     (inputs
      (list java-jsr305))
     (native-inputs
@@ -3568,12 +3760,90 @@ internal to the SureFire Logger API.  It is designed to have no dependency.")
     (synopsis "Maven SureFire API")
     (description "This package contains the API to use Maven SureFire.")))
 
+;; Upstream uses maven-shade-plugin to do shading at build time, but Guix
+;; builds are offline so Maven plugins cannot run.  We simulate the shading
+;; using jarjar to relocate classes from the dependencies.
+(define-public java-surefire-shared-utils
+  (package
+    (inherit java-surefire-logger-api)
+    (name "java-surefire-shared-utils")
+    (arguments
+     `(#:jar-name "java-surefire-shared-utils.jar"
+       #:source-dir "surefire-shared-utils/src/main/java"
+       #:tests? #f ; no tests
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'build 'create-source-dir
+           (lambda _
+             ;; This module has no source - it's just shaded dependencies
+             (mkdir-p "surefire-shared-utils/src/main/java")
+             #t))
+         (add-before 'build 'prepare-shade
+           (lambda* (#:key inputs #:allow-other-keys)
+             (mkdir-p "build/classes")
+             ;; Extract all jars to shade into build/classes
+             (for-each
+               (lambda (input-name pattern)
+                 (let ((jar (car (find-files (assoc-ref inputs input-name) pattern))))
+                   (with-directory-excursion "build/classes"
+                     (invoke "jar" "xf" jar)
+                     (when (file-exists? "META-INF")
+                       (delete-file-recursively "META-INF")))))
+               '("maven-shared-utils" "java-commons-io" "java-commons-lang3" "java-commons-compress")
+               '("maven-shared-utils.*\\.jar$" "commons-io.*\\.jar$" "commons-lang3.*\\.jar$" "commons-compress.*\\.jar$"))
+             #t))
+         (add-after 'build 'shade
+           (lambda* (#:key inputs #:allow-other-keys)
+             (let ((jarjar (car (find-files (assoc-ref inputs "java-jarjar") ".*.jar$")))
+                   (injar "build/jar/java-surefire-shared-utils.jar")
+                   (outjar "build/jar/java-surefire-shared-utils-shaded.jar"))
+               (with-output-to-file "rules"
+                 (lambda _
+                   (format #t "rule org.apache.maven.shared.utils.** org.apache.maven.surefire.shared.utils.@1~%")
+                   (format #t "rule org.apache.commons.io.** org.apache.maven.surefire.shared.io.@1~%")
+                   (format #t "rule org.apache.commons.lang3.** org.apache.maven.surefire.shared.lang3.@1~%")
+                   (format #t "rule org.apache.commons.compress.** org.apache.maven.surefire.shared.compress.@1~%")))
+               (invoke "java" "-jar" jarjar "process" "rules" injar outjar)
+               (delete-file injar)
+               (rename-file outjar injar))
+             #t))
+         (replace 'install
+           (install-from-pom "surefire-shared-utils/pom.xml")))))
+    (propagated-inputs
+     (list maven-shared-utils java-commons-io java-commons-lang3
+           java-commons-compress java-surefire-parent-pom))
+    (native-inputs
+     (list unzip java-jarjar))
+    (synopsis "Shaded utilities for Maven SureFire")
+    (description "This package contains relocated Java packages of
+maven-shared-utils and several Apache Commons utilities used by SureFire.")))
+
+(define-public java-surefire-extensions-spi
+  (package
+    (inherit java-surefire-logger-api)
+    (name "java-surefire-extensions-spi")
+    (arguments
+     `(#:tests? #f
+       #:jar-name "java-surefire-extensions-spi.jar"
+       #:source-dir "surefire-extensions-spi/src/main/java"
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (install-from-pom "surefire-extensions-spi/pom.xml")))))
+    (propagated-inputs
+     (list java-surefire-api java-surefire-parent-pom))
+    (inputs
+     (list java-jsr305))
+    (synopsis "Maven SureFire Extensions SPI")
+    (description "This package contains the Service Provider Interface for
+Maven SureFire extensions.")))
+
 (define-public java-surefire-booter
   (package
     (inherit java-surefire-logger-api)
     (name "java-surefire-booter")
     (arguments
-     `(#:tests? #f; require mockito 2
+     `(#:tests? #f ; requires mockito 2
        #:jar-name "java-surefire-booter.jar"
        #:source-dir "surefire-booter/src/main/java"
        #:phases
@@ -3583,13 +3853,23 @@ internal to the SureFire Logger API.  It is designed to have no dependency.")
              (substitute* "surefire-booter/src/main/java/org/apache/maven/surefire/booter/PpidChecker.java"
                (("/bin/sh") (which "sh")))
              #t))
+         (add-before 'build 'add-service-provider-config
+           (lambda _
+             ;; The ServiceLoader config file must be included in the jar for
+             ;; ForkedBooter to find MasterProcessChannelProcessorFactory implementations.
+             (mkdir-p "build/classes/META-INF/services")
+             (copy-file "surefire-booter/src/main/resources/META-INF/services/org.apache.maven.surefire.spi.MasterProcessChannelProcessorFactory"
+                        "build/classes/META-INF/services/org.apache.maven.surefire.spi.MasterProcessChannelProcessorFactory")))
          (replace 'install
            (install-from-pom "surefire-booter/pom.xml")))))
     (propagated-inputs
-     (list java-surefire-api java-commons-lang3 java-commons-io
+     (list java-surefire-api java-surefire-extensions-api
+           java-surefire-extensions-spi java-surefire-shared-utils
            java-surefire-parent-pom))
     (inputs
      (list java-jsr305))
+    (native-inputs
+     (list unzip))
     (synopsis "API and Facilities used by forked tests running in JVM sub-process")
     (description "SureFire runs tests inside a forked JVM subprocess.  This
 package contains an API and facilities used inside that forked JVM.")))
@@ -3599,7 +3879,7 @@ package contains an API and facilities used inside that forked JVM.")))
     (inherit java-surefire-logger-api)
     (name "java-surefire-extensions-api")
     (arguments
-     `(#:tests? #f; requires mockito 2
+     `(#:tests? #f ; requires mockito 2
        #:jar-name "java-surefire-extensions-api.jar"
        #:source-dir "surefire-extensions-api/src/main/java"
        #:phases
@@ -3607,7 +3887,7 @@ package contains an API and facilities used inside that forked JVM.")))
          (replace 'install
            (install-from-pom "surefire-extensions-api/pom.xml")))))
     (propagated-inputs
-     (list java-surefire-api java-surefire-parent-pom))
+     (list java-surefire-api java-surefire-shared-utils java-surefire-parent-pom))
     (inputs
      (list java-plexus-component-annotations))
     (synopsis "Extension API for Maven SureFire")
@@ -3629,41 +3909,13 @@ POM in Apache Maven Surefire project.")))
                         "**/SmartStackTraceParserTest.java")
        #:phases
        (modify-phases %standard-phases
-         (add-before 'build 'prepare-shade
-           (lambda* (#:key inputs #:allow-other-keys)
-             (mkdir-p "build/classes")
-             (with-directory-excursion "build/classes"
-               (for-each
-                 (lambda (jar-file)
-                   (invoke "jar" "xf" jar-file)
-                   (delete-file-recursively "META-INF"))
-                 (find-files (assoc-ref inputs "maven-shared-utils") ".*.jar$")))
-             #t))
-         (add-after 'build 'shade
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let ((jarjar
-                   (car (find-files (assoc-ref inputs "java-jarjar") ".*.jar$")))
-                   (injar "java-surefire-common-java5.jar")
-                   (outjar "java-surefire-common-java5-shaded.jar"))
-               (with-directory-excursion "build/jar"
-                 (with-output-to-file "rules"
-                   (lambda _
-                     (format #t (string-append
-                                  "rule "
-                                  "org.apache.maven.shared.utils.** "
-                                  "org.apache.maven.surefire.shade.common."
-                                  "org.apache.maven.shared.utils.@1~%"))))
-                 (invoke "java" "-jar" jarjar "process" "rules" injar outjar)
-                 (delete-file injar)
-                 (rename-file outjar injar)))
-             #t))
          (replace 'install
            (install-from-pom "surefire-providers/common-java5/pom.xml")))))
     (propagated-inputs
-     (list maven-shared-utils-3.1 java-surefire-api
+     (list java-surefire-shared-utils java-surefire-api
            java-surefire-parent-pom))
     (native-inputs
-     (list unzip java-jarjar java-junit java-fest-assert))
+     (list unzip java-junit java-assertj))
     (synopsis "Common java5 facilities for Maven SureFire")
     (description "This package contains shared Java 5 code for all providers.")))
 
@@ -3797,51 +4049,122 @@ JVM, using JUnit 4.0 or later.")))
      `(#:tests? #f; require mockito 2
        #:jar-name "maven-surefire-common.jar"
        #:source-dir "maven-surefire-common/src/main/java"
+       #:jdk ,openjdk11
        #:phases
        (modify-phases %standard-phases
          (add-before 'build 'prepare-shade
            (lambda* (#:key inputs #:allow-other-keys)
+             ;; Shade dependencies BEFORE compilation so that the source code
+             ;; can import from org.apache.maven.surefire.shared.*
              (mkdir-p "build/classes")
+             (mkdir-p "build/shaded-deps")
+             (let ((jarjar (car (find-files (assoc-ref inputs "java-jarjar")
+                                            ".*.jar$"))))
+               ;; Shade maven-shared-utils
+               (for-each
+                (lambda (jar-file)
+                  (let ((out-jar "build/shaded-deps/shared-utils-shaded.jar"))
+                    (with-output-to-file "build/rules-utils"
+                      (lambda _
+                        (format #t "rule org.apache.maven.shared.utils.** org.apache.maven.surefire.shared.utils.@1~%")))
+                    (invoke "java" "-jar" jarjar "process" "build/rules-utils"
+                            jar-file out-jar)))
+                (find-files (assoc-ref inputs "maven-shared-utils") ".*.jar$"))
+               ;; Shade commons-io
+               (for-each
+                (lambda (jar-file)
+                  (let ((out-jar "build/shaded-deps/io-shaded.jar"))
+                    (with-output-to-file "build/rules-io"
+                      (lambda _
+                        (format #t "rule org.apache.commons.io.** org.apache.maven.surefire.shared.io.@1~%")))
+                    (invoke "java" "-jar" jarjar "process" "build/rules-io"
+                            jar-file out-jar)))
+                (find-files (assoc-ref inputs "java-commons-io") ".*.jar$"))
+               ;; Shade commons-lang3
+               (for-each
+                (lambda (jar-file)
+                  (let ((out-jar "build/shaded-deps/lang3-shaded.jar"))
+                    (with-output-to-file "build/rules-lang3"
+                      (lambda _
+                        (format #t "rule org.apache.commons.lang3.** org.apache.maven.surefire.shared.lang3.@1~%")))
+                    (invoke "java" "-jar" jarjar "process" "build/rules-lang3"
+                            jar-file out-jar)))
+                (find-files (assoc-ref inputs "java-commons-lang3") ".*.jar$"))
+               ;; Shade commons-compress
+               (for-each
+                (lambda (jar-file)
+                  (let ((out-jar "build/shaded-deps/compress-shaded.jar"))
+                    (with-output-to-file "build/rules-compress"
+                      (lambda _
+                        (format #t "rule org.apache.commons.compress.** org.apache.maven.surefire.shared.compress.@1~%")))
+                    (invoke "java" "-jar" jarjar "process" "build/rules-compress"
+                            jar-file out-jar)))
+                (find-files (assoc-ref inputs "java-commons-compress") ".*.jar$")))
+             ;; Extract shaded jars and non-shaded artifacts-filter
              (with-directory-excursion "build/classes"
                (for-each
-                 (lambda (input)
-                   (for-each
-                     (lambda (jar-file)
-                       (invoke "jar" "xf" jar-file)
-                       (delete-file-recursively "META-INF"))
-                     (find-files (assoc-ref inputs input) ".*.jar$")))
-                 '("maven-shared-utils" "java-commons-io" "java-commons-lang3"
-                   "java-commons-compress" "maven-common-artifact-filters")))
+                (lambda (jar-file)
+                  (invoke "jar" "xf" jar-file)
+                  (when (file-exists? "META-INF")
+                    (delete-file-recursively "META-INF")))
+                (find-files "../shaded-deps" ".*.jar$"))
+               ;; Also extract maven-common-artifact-filters (not shaded)
+               (for-each
+                (lambda (jar-file)
+                  (invoke "jar" "xf" jar-file)
+                  (when (file-exists? "META-INF")
+                    (delete-file-recursively "META-INF")))
+                (find-files (assoc-ref inputs "maven-common-artifact-filters")
+                            ".*.jar$")))
              #t))
-         (add-after 'build 'shade
+         (add-after 'build 'generate-plexus-components
+           (lambda _
+             ;; Create Plexus components.xml for @Component annotated classes.
+             ;; We do this manually because PlexusMetadataGeneratorCli has issues
+             ;; with our isolated classpath setup.
+             (mkdir-p "build/classes/META-INF/plexus")
+             (with-output-to-file "build/classes/META-INF/plexus/components.xml"
+               (lambda ()
+                 (display "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.surefire.providerapi.ProviderDetector</role>
+      <implementation>org.apache.maven.surefire.providerapi.ProviderDetector</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.surefire.providerapi.ServiceLoader</role>
+          <field-name>serviceLoader</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.apache.maven.surefire.providerapi.ServiceLoader</role>
+      <implementation>org.apache.maven.surefire.providerapi.ServiceLoader</implementation>
+    </component>
+  </components>
+</component-set>
+")))
+             ;; Create Sisu index for @Named components
+             (mkdir-p "build/classes/META-INF/sisu")
+             (with-output-to-file "build/classes/META-INF/sisu/javax.inject.Named"
+               (lambda ()
+                 (display "org.apache.maven.plugin.surefire.SurefireDependencyResolver\n")))
+             (invoke "ant" "jar")))
+         (add-after 'generate-plexus-components 'shade
            (lambda* (#:key inputs #:allow-other-keys)
-             (let ((jarjar
-                   (car (find-files (assoc-ref inputs "java-jarjar") ".*.jar$")))
+             ;; Shade the output jar as well for consistency
+             (let ((jarjar (car (find-files (assoc-ref inputs "java-jarjar")
+                                            ".*.jar$")))
                    (injar "maven-surefire-common.jar")
                    (outjar "maven-surefire-common-shaded.jar"))
                (with-directory-excursion "build/jar"
                  (with-output-to-file "rules"
                    (lambda _
-                     (format #t (string-append
-                                  "rule "
-                                  "org.apache.maven.shared.utils.** "
-                                  "org.apache.maven.surefire.shade.common."
-                                  "org.apache.maven.shared.utils.@1~%"))
-                     (format #t (string-append
-                                  "rule "
-                                  "org.apache.commons.io.** "
-                                  "org.apache.maven.surefire.shade.common."
-                                  "org.apache.commons.io.@1~%"))
-                     (format #t (string-append
-                                  "rule "
-                                  "org.apache.commons.lang3.** "
-                                  "org.apache.maven.surefire.shade.common."
-                                  "org.apache.commons.lang3.@1~%"))
-                     (format #t (string-append
-                                  "rule "
-                                  "org.apache.commons.compress.** "
-                                  "org.apache.maven.surefire.shade.common."
-                                  "org.apache.commons.compress.@1~%"))))
+                     (format #t "rule org.apache.maven.shared.utils.** org.apache.maven.surefire.shared.utils.@1~%")
+                     (format #t "rule org.apache.commons.io.** org.apache.maven.surefire.shared.io.@1~%")
+                     (format #t "rule org.apache.commons.lang3.** org.apache.maven.surefire.shared.lang3.@1~%")
+                     (format #t "rule org.apache.commons.compress.** org.apache.maven.surefire.shared.compress.@1~%")))
                  (invoke "java" "-jar" jarjar "process" "rules" injar outjar)
                  (delete-file injar)
                  (rename-file outjar injar)))
@@ -3850,6 +4173,41 @@ JVM, using JUnit 4.0 or later.")))
            (lambda _
              (substitute* "maven-surefire-common/pom.xml"
                (("maven-toolchain") "maven-core"))
+             #t))
+         (add-before 'install 'remove-shared-utils-dep
+           (lambda _
+             (use-modules (guix build maven pom) (sxml simple) (srfi srfi-1))
+             (define fix-maven-xml (@@ (guix build maven pom) fix-maven-xml))
+             (define dep-tag
+               (string->symbol "http://maven.apache.org/POM/4.0.0:dependency"))
+             (define deps-tag
+               (string->symbol "http://maven.apache.org/POM/4.0.0:dependencies"))
+             (define artifactid-tag
+               (string->symbol "http://maven.apache.org/POM/4.0.0:artifactId"))
+             (define (is-shared-utils? dep)
+               (and (pair? dep)
+                    (eq? (car dep) dep-tag)
+                    (any (lambda (part)
+                           (and (pair? part)
+                                (eq? (car part) artifactid-tag)
+                                (member "surefire-shared-utils" part)))
+                         (cdr dep))))
+             (define (filter-deps sxml)
+               (cond
+                ((not (pair? sxml)) sxml)
+                ((eq? (car sxml) deps-tag)
+                 (cons deps-tag
+                       (filter (lambda (d) (not (is-shared-utils? d)))
+                               (cdr sxml))))
+                (else
+                 (cons (filter-deps (car sxml))
+                       (filter-deps (cdr sxml))))))
+             (let* ((pom-file "maven-surefire-common/pom.xml")
+                    (pom (get-pom pom-file))
+                    (fixed (filter-deps pom)))
+               (with-output-to-file pom-file
+                 (lambda ()
+                   (sxml->xml (fix-maven-xml fixed)))))
              #t))
          (replace 'install
            (install-from-pom "maven-surefire-common/pom.xml")))))
@@ -3861,17 +4219,34 @@ JVM, using JUnit 4.0 or later.")))
            maven-plugin-annotations
            maven-common-artifact-filters
            maven-artifact-transfer
-           java-plexus-java
+           java-plexus-java-1
            java-jansi
            java-commons-io
            java-commons-lang3
            java-commons-compress
-           maven-shared-utils-3.1
+           maven-shared-utils
+           java-slf4j-simple
            java-surefire-parent-pom))
     (inputs
      (list java-jsr305))
     (native-inputs
-     (list unzip java-jarjar))
+     `(("unzip" ,unzip)
+       ("java-jarjar" ,java-jarjar)
+       ("java-plexus-component-metadata" ,java-plexus-component-metadata)
+       ("java-eclipse-sisu-inject" ,java-eclipse-sisu-inject)
+       ;; For isolated classpath in generate-plexus-components phase
+       ("java-plexus-utils" ,java-plexus-utils)
+       ("java-plexus-cli" ,java-plexus-cli)
+       ("java-plexus-classworlds" ,java-plexus-classworlds)
+       ("java-plexus-container-default" ,java-plexus-container-default)
+       ("java-qdox" ,java-qdox)
+       ("java-jdom" ,java-jdom)
+       ("java-jdom2" ,java-jdom2)
+       ("java-asm" ,java-asm-9)
+       ("java-commons-cli" ,java-commons-cli)
+       ("java-guava" ,java-guava)
+       ("java-geronimo-xbean-reflect" ,java-geronimo-xbean-reflect)
+       ("java-plexus-component-annotations" ,java-plexus-component-annotations)))
     (synopsis "API used in Surefire and Failsafe MOJO")
     (description "This package contains an API used in SureFire and Failsafe
 MOJO.")))
@@ -3883,9 +4258,19 @@ MOJO.")))
     (arguments
      `(#:jar-name "maven-surefire-plugin.jar"
        #:source-dir "maven-surefire-plugin/src/main/java"
+       #:jdk ,openjdk11
        #:tests? #f; test depends on maven-plugin-test-harness
        #:phases
        (modify-phases %standard-phases
+         (add-before 'build 'fix-line-endings
+           (lambda _
+             ;; Source files have CRLF line endings which break the Guix Maven Java parser.
+             (for-each
+               (lambda (file)
+                 (substitute* file
+                  (("\r\n")
+                   "\n")))
+               (find-files "." "\\.java$"))))
          (add-before 'build 'generate-plugin.xml
            (generate-plugin.xml "maven-surefire-plugin/pom.xml"
              "surefire"
@@ -3893,7 +4278,15 @@ MOJO.")))
              (list
                (list
                  "maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/AbstractSurefireMojo.java"
-                 "maven-surefire-plugin/src/main/java/org/apache/maven/plugin/surefire/SurefirePlugin.java"))))
+                 "maven-surefire-plugin/src/main/java/org/apache/maven/plugin/surefire/SurefireMojo.java"))))
+         (add-after 'generate-plugin.xml 'fix-plugin.xml
+           (lambda _
+             ;; The generate-plugin.xml phase doesn't fully qualify class names
+             ;; for classes in the same package (no import statement).
+             ;; Fix the role references to use fully qualified names.
+             (substitute* "build/classes/META-INF/maven/plugin.xml"
+               (("<role>SurefireDependencyResolver</role>")
+                "<role>org.apache.maven.plugin.surefire.SurefireDependencyResolver</role>"))))
          (replace 'install
            (install-from-pom "maven-surefire-plugin/pom.xml")))))
     (propagated-inputs
@@ -3908,7 +4301,11 @@ reports in two different file formats, plain text and xml.")))
 (define-public maven-jar-plugin
   (package
     (name "maven-jar-plugin")
-    (version "3.2.0")
+    ;; Note: 3.5.0 uses javax.inject.* annotations (JSR-330) for Sisu
+    ;; injection, which works correctly with Maven's plugin classloader.
+    ;; Earlier 3.4.x versions used org.apache.maven.api.di.* annotations
+    ;; which required Maven 4's api realm and failed to load.
+    (version "3.5.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3917,7 +4314,7 @@ reports in two different file formats, plain text and xml.")))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "04y2rlmcabmc55ljqlkgbb5xx94a59cz1dvrnpfj1vzz024pqkyg"))))
+                "02bhpsb7mr81z2q1dvc9dl653mji60p7zqkcj3wg1ylhxxmdifc1"))))
     (build-system ant-build-system)
     (arguments
      `(#:jar-name "maven-jar-plugin.jar"
@@ -3932,17 +4329,61 @@ reports in two different file formats, plain text and xml.")))
              (list
                (list "AbstractJarMojo.java" "JarMojo.java")
                (list "AbstractJarMojo.java" "TestJarMojo.java"))))
+         (add-before 'build 'generate-sisu-index
+           ;; Generate META-INF/sisu/javax.inject.Named for ToolchainsJdkSpecification
+           (lambda _
+             (mkdir-p "build/classes/META-INF/sisu")
+             (call-with-output-file "build/classes/META-INF/sisu/javax.inject.Named"
+               (lambda (port)
+                 (display "org.apache.maven.plugins.jar.ToolchainsJdkSpecification\n"
+                          port)))))
+         (add-before 'install 'add-transitive-dependencies
+           ;; maven-archiver requires plexus-interpolation at runtime, and
+           ;; plexus-archiver requires plexus-io at runtime.  Maven's plugin
+           ;; classloader only loads direct dependencies, so we need to add
+           ;; these transitive dependencies explicitly.
+           (lambda _
+             (substitute* "pom.xml"
+               (("</dependencies>")
+                "<dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
+      <version>1.27</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-io</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.28.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+  </dependencies>"))))
          (replace 'install
            (install-from-pom "pom.xml")))))
     (propagated-inputs
      (list maven-archiver
-           maven-3.0-artifact
-           maven-3.0-core
-           maven-3.0-plugin-api
+           maven-artifact
+           maven-core
+           maven-plugin-api
            maven-file-management
            maven-shared-utils
            java-plexus-archiver
-           java-plexus-utils))
+           java-plexus-io  ; Required by plexus-archiver at runtime
+           java-commons-compress  ; Required by plexus-archiver at runtime
+           java-plexus-xml  ; Required by plexus-utils at runtime
+           java-plexus-interpolation  ; Required by maven-archiver at runtime
+           java-plexus-utils
+           java-javax-inject
+           java-slf4j-api
+           java-commons-io))
     (inputs
      (list maven-plugin-annotations))
     (home-page "https://maven.apache.org/plugins/maven-jar-plugin")
@@ -4027,3 +4468,413 @@ techniques for generating static and dynamic content, supporting a variety of
 markup languages.
 
 This package contains Doxia core classes and interfaces.")))
+
+(define-public maven-reporting-api
+  (package
+    (name "maven-reporting-api")
+    (version "4.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://gitbox.apache.org/repos/asf/maven-reporting-api.git")
+                    (commit (string-append "maven-reporting-api-" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "0477sx16p6grspdfbcgjizf6cm1vs3lnr36m4jkygjm416h0b3yz"))))
+    (build-system ant-build-system)
+    (arguments
+     `(#:jar-name "maven-reporting-api.jar"
+       #:source-dir "src/main/java"
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (install-from-pom "pom.xml")))))
+    (propagated-inputs
+     (list maven-doxia-sink-api))
+    (home-page "https://maven.apache.org/shared/maven-reporting-api/")
+    (synopsis "Maven Reporting API")
+    (description "API for Maven report generation.")
+    (license license:asl2.0)))
+
+(define-public wagon-provider-api
+  (package
+    (name "wagon-provider-api")
+    (version "3.5.3")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://gitbox.apache.org/repos/asf/maven-wagon.git")
+                    (commit (string-append "wagon-" version))))
+              (file-name (git-file-name "maven-wagon" version))
+              (sha256
+               (base32 "134wqkyvjv3h7n052ghd1yy1c3zlp0fv0xlvblxbi352fcqnzx9b"))))
+    (build-system ant-build-system)
+    (arguments
+     `(#:jar-name "wagon-provider-api.jar"
+       #:source-dir "wagon-provider-api/src/main/java"
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (install-from-pom "wagon-provider-api/pom.xml")))))
+    (propagated-inputs
+     (list java-plexus-utils))
+    (home-page "https://maven.apache.org/wagon/")
+    (synopsis "Maven Wagon Provider API")
+    (description "Transport abstraction for Maven artifact and repository handling.")
+    (license license:asl2.0)))
+
+;;; Velocity packages - needed for maven-plugin-tools
+
+;; TODO: This package manually invokes jjtree and javacc because I was too lazy
+;; to do it right by packaging java-javacc-maven-plugin and using maven-build-system.
+(define velocity-engine-parent-pom
+  (package
+    (name "velocity-engine-parent-pom")
+    (version "2.4.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/apache/velocity-engine")
+                    (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "1b6vk9wlny7qkspgapqd8x38ipm04lsi1i1bnkzikmi3zp5pl42n"))))
+    (build-system ant-build-system)
+    (arguments
+     `(#:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'build)
+         (add-before 'install 'remove-parent-reference
+           (lambda _
+             ;; Remove the parent pom reference to avoid needing
+             ;; velocity-master:7 -> apache:33 parent chain.
+             ;; Use sed to remove the multiline <parent>...</parent> block,
+             ;; then add the missing groupId (which was inherited from parent).
+             (invoke "sed" "-i" "/<parent>/,/<\\/parent>/d" "pom.xml")
+             ;; Add groupId after modelVersion since it was inherited from parent
+             (substitute* "pom.xml"
+               (("<modelVersion>4.0.0</modelVersion>")
+                "<modelVersion>4.0.0</modelVersion>\n    <groupId>org.apache.velocity</groupId>"))))
+         (replace 'install
+           (install-pom-file "pom.xml")))))
+    (native-inputs
+     (list sed))
+    (home-page "https://velocity.apache.org/")
+    (synopsis "Apache Velocity Engine parent POM")
+    (description "Parent POM for Apache Velocity Engine modules.")
+    (license license:asl2.0)))
+
+(define-public java-velocity-engine-core
+  (package
+    (name "java-velocity-engine-core")
+    (version "2.4.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/apache/velocity-engine")
+                    (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "1b6vk9wlny7qkspgapqd8x38ipm04lsi1i1bnkzikmi3zp5pl42n"))))
+    (build-system ant-build-system)
+    (arguments
+     `(#:jar-name "velocity-engine-core.jar"
+       #:source-dir "velocity-engine-core/src/main/java"
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'build 'generate-parser
+           (lambda* (#:key inputs #:allow-other-keys)
+             (let ((javacc (search-input-file inputs "/bin/javacc"))
+                   (jjtree (search-input-file inputs "/bin/jjtree"))
+                   (parser-dir "velocity-engine-core/src/main/parser")
+                   (gen-dir "velocity-engine-core/src/main/java/org/apache/velocity/runtime/parser"))
+               ;; Substitute Maven template variables in Parser.jjt
+               (substitute* (string-append parser-dir "/Parser.jjt")
+                 (("\\$\\{parser\\.package\\}")
+                  "org.apache.velocity.runtime.parser")
+                 (("\\$\\{parser\\.basename\\}")
+                  "Standard")
+                 (("\\$\\{parser\\.char\\.asterisk\\}")
+                  "*")
+                 (("\\$\\{parser\\.char\\.at\\}")
+                  "@")
+                 (("\\$\\{parser\\.char\\.dollar\\}")
+                  "$")
+                 (("\\$\\{parser\\.char\\.hash\\}")
+                  "#"))
+               ;; Create output directory
+               (mkdir-p gen-dir)
+               (mkdir-p (string-append gen-dir "/node"))
+               ;; Run jjtree to generate Parser.jj (javacc 7.x uses -OPT=val syntax)
+               (invoke jjtree
+                       (string-append "-OUTPUT_DIRECTORY=" gen-dir)
+                       "-NODE_PACKAGE=org.apache.velocity.runtime.parser.node"
+                       "-NODE_USES_PARSER=true"
+                       "-MULTI=true"
+                       "-BUILD_NODE_FILES=false"
+                       (string-append parser-dir "/Parser.jjt"))
+               ;; Run javacc on the generated Parser.jj
+               (invoke javacc
+                       (string-append "-OUTPUT_DIRECTORY=" gen-dir)
+                       "-STATIC=false"
+                       "-TOKEN_MANAGER_USES_PARSER=true"
+                       (string-append gen-dir "/Parser.jj"))
+               ;; Delete generated Node.java - we have a handwritten one
+               (delete-file (string-append gen-dir "/Node.java"))
+               ;; Move files that have node package to node directory
+               (let ((node-dir (string-append gen-dir "/node")))
+                 (for-each (lambda (f)
+                             (rename-file (string-append gen-dir "/" f)
+                                          (string-append node-dir "/" f)))
+                           '("StandardParserTreeConstants.java"
+                             "JJTStandardParserState.java"
+                             "StandardParserDefaultVisitor.java"))))))
+         (add-before 'build 'generate-version-file
+           (lambda _
+             (let ((template "velocity-engine-core/src/main/java-templates/org/apache/velocity/runtime/VelocityEngineVersion.java")
+                   (target "velocity-engine-core/src/main/java/org/apache/velocity/runtime/VelocityEngineVersion.java"))
+               (copy-file template target)
+               (substitute* target
+                 (("\\$\\{project\\.version\\}") ,version)))))
+         (replace 'install
+           (install-from-pom "velocity-engine-core/pom.xml")))))
+    (propagated-inputs
+     (list velocity-engine-parent-pom
+           java-commons-lang3
+           java-slf4j-api))
+    (native-inputs
+     (list javacc))
+    (home-page "https://velocity.apache.org/")
+    (synopsis "Apache Velocity template engine core")
+    (description "Apache Velocity is a Java-based template engine.")
+    (license license:asl2.0)))
+
+(define-public java-plexus-velocity
+  (package
+    (name "java-plexus-velocity")
+    (version "2.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/codehaus-plexus/plexus-velocity")
+                    (commit (string-append "plexus-velocity-" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "1vw9k6z7d503x6gscc6px7nwcpl9r6sqy25fiaam9pm4qs4bmrv0"))))
+    (build-system ant-build-system)
+    (arguments
+     `(#:jar-name "plexus-velocity.jar"
+       #:source-dir "src/main/java"
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (install-from-pom "pom.xml")))))
+    (propagated-inputs
+     (list java-velocity-engine-core
+           java-plexus-container-default
+           java-plexus-utils
+           plexus-components-pom-6.6))
+    (home-page "https://codehaus-plexus.github.io/plexus-velocity/")
+    (synopsis "Plexus Velocity component")
+    (description "Plexus component for Apache Velocity template engine.")
+    (license license:asl2.0)))
+
+;;; Maven Plugin Tools 3.15.1 - needed for building Maven plugins
+
+(define-public maven-plugin-tools-api
+  (package
+    (inherit maven-plugin-annotations)
+    (name "maven-plugin-tools-api")
+    (arguments
+     `(#:jar-name "maven-plugin-tools-api.jar"
+       #:source-dir "maven-plugin-tools-api/src/main/java"
+       #:jdk ,openjdk11
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'build 'generate-sisu-index
+           (lambda _
+             ;; Generate Sisu index for @Named components
+             (mkdir-p "build/classes/META-INF/sisu")
+             (with-output-to-file "build/classes/META-INF/sisu/javax.inject.Named"
+               (lambda ()
+                 (display "org.apache.maven.tools.plugin.scanner.DefaultMojoScanner\n")))
+             (invoke "ant" "jar")))
+         (replace 'install
+           (install-from-pom "maven-plugin-tools-api/pom.xml")))))
+    (propagated-inputs
+     (list maven-plugin-tools-parent-pom
+           maven-core
+           maven-model
+           maven-plugin-api
+           maven-artifact
+           maven-reporting-api
+           maven-wagon-provider-api
+           java-httpcomponents-httpclient
+           java-httpcomponents-httpcore
+           java-javax-inject
+           java-plexus-classworlds
+           java-plexus-java
+           java-plexus-utils
+           java-plexus-xml
+           java-slf4j-api))
+    (synopsis "Maven Plugin Tools API")
+    (description "API for extracting plugin descriptors from Maven plugins.")))
+
+(define-public maven-plugin-tools-generators
+  (package
+    (inherit maven-plugin-annotations)
+    (name "maven-plugin-tools-generators")
+    (arguments
+     `(#:jar-name "maven-plugin-tools-generators.jar"
+       #:source-dir "maven-plugin-tools-generators/src/main/java"
+       #:jdk ,openjdk11
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (install-from-pom "maven-plugin-tools-generators/pom.xml")))))
+    (propagated-inputs
+     (list maven-plugin-tools-parent-pom
+           maven-plugin-tools-api
+           maven-plugin-api
+           java-jsoup
+           java-jtidy
+           java-plexus-utils
+           java-plexus-xml
+           java-plexus-velocity
+           java-velocity-engine-core))
+    (synopsis "Maven Plugin Tools Generators")
+    (description "Generators for Maven plugin descriptors.")))
+
+(define-public maven-plugin-tools-java
+  (package
+    (inherit maven-plugin-annotations)
+    (name "maven-plugin-tools-java")
+    (arguments
+     `(#:jar-name "maven-plugin-tools-java.jar"
+       #:source-dir "maven-plugin-tools-java/src/main/java"
+       #:jdk ,openjdk11
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (install-from-pom "maven-plugin-tools-java/pom.xml")))))
+    (propagated-inputs
+     (list maven-plugin-tools-parent-pom
+           maven-plugin-tools-api
+           java-qdox-2))
+    (synopsis "Maven Plugin Tools Java Extractor")
+    (description "Extracts plugin descriptors from Java source.")))
+
+(define-public maven-plugin-tools-annotations
+  (package
+    (inherit maven-plugin-annotations)
+    (name "maven-plugin-tools-annotations")
+    (arguments
+     `(#:jar-name "maven-plugin-tools-annotations.jar"
+       #:source-dir "maven-plugin-tools-annotations/src/main/java"
+       #:jdk ,openjdk11
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'build 'generate-sisu-index
+           (lambda _
+             ;; Generate Sisu index for @Named components
+             (mkdir-p "build/classes/META-INF/sisu")
+             (with-output-to-file "build/classes/META-INF/sisu/javax.inject.Named"
+               (lambda ()
+                 (display "org.apache.maven.tools.plugin.extractor.annotations.JavaAnnotationsMojoDescriptorExtractor
+org.apache.maven.tools.plugin.extractor.annotations.converter.JavadocBlockTagsToXhtmlConverter
+org.apache.maven.tools.plugin.extractor.annotations.scanner.DefaultMojoAnnotationsScanner
+org.apache.maven.tools.plugin.extractor.annotations.converter.JavadocInlineTagsToXhtmlConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.block.SeeTagConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.inline.CodeTagConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.inline.LinkTagToHtmlConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.inline.DocRootTagConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.inline.LinkPlainTagToHtmlConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.inline.ValueTagConverter
+org.apache.maven.tools.plugin.extractor.annotations.converter.tag.inline.LiteralTagToHtmlConverter
+")))
+             (invoke "ant" "jar")))
+         (replace 'install
+           (install-from-pom "maven-plugin-tools-annotations/pom.xml")))))
+    (propagated-inputs
+     (list maven-plugin-tools-parent-pom
+           maven-plugin-tools-api
+           maven-plugin-annotations
+           java-asm-9
+           java-asm-util-9
+           java-plexus-archiver
+           java-jsoup))
+    (synopsis "Maven Plugin Tools Annotations Extractor")
+    (description "Extracts plugin descriptors from Java annotations.")))
+
+(define-public maven-plugin-plugin
+  (package
+    (inherit maven-plugin-annotations)
+    (name "maven-plugin-plugin")
+    (arguments
+     `(#:jar-name "maven-plugin-plugin.jar"
+       #:source-dir "maven-plugin-plugin/src/main/java"
+       #:jdk ,openjdk11
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'remove-deprecated-dependencies
+           (lambda _
+             ;; Remove deprecated optional dependencies that don't exist
+             ;; in maven-plugin-tools 3.15.1 (they are now in maven-script/).
+             ;; These are marked optional but Maven still tries to resolve them.
+             ;; Use perl for multiline matching since sed doesn't handle it well.
+             (invoke "perl" "-i" "-0pe"
+                     "s|<dependency>\\s*<groupId>org.apache.maven.plugin-tools</groupId>\\s*<artifactId>maven-plugin-tools-ant</artifactId>.*?</dependency>||gs"
+                     "maven-plugin-plugin/pom.xml")
+             (invoke "perl" "-i" "-0pe"
+                     "s|<dependency>\\s*<groupId>org.apache.maven.plugin-tools</groupId>\\s*<artifactId>maven-plugin-tools-beanshell</artifactId>.*?</dependency>||gs"
+                     "maven-plugin-plugin/pom.xml")
+             ;; Change sisu-plexus scope from provided to compile so it gets
+             ;; included in the plugin's runtime classpath.  Without this,
+             ;; PlexusBindingModule can't discover components like ArchiverManager
+             ;; from plexus-archiver because it only scans jars in plexus.core.
+             (invoke "perl" "-i" "-0pe"
+                     "s|(<artifactId>org.eclipse.sisu.plexus</artifactId>\\s*)<scope>provided</scope>|\\1<scope>compile</scope>|gs"
+                     "maven-plugin-plugin/pom.xml")))
+         (add-before 'build 'generate-plugin.xml
+           (generate-plugin.xml "maven-plugin-plugin/pom.xml"
+             "plugin"
+             "maven-plugin-plugin/src/main/java/org/apache/maven/plugin/plugin"
+             (list
+               (list "AbstractGeneratorMojo.java" "DescriptorGeneratorMojo.java")
+               (list "AbstractGeneratorMojo.java" "HelpGeneratorMojo.java")
+               (list "metadata/AddPluginArtifactMetadataMojo.java"))))
+         (replace 'install
+           (install-from-pom "maven-plugin-plugin/pom.xml")))))
+    (native-inputs
+     (list perl unzip))
+    (propagated-inputs
+     (list maven-plugin-tools-parent-pom
+           maven-core
+           maven-plugin-api
+           maven-plugin-tools-api
+           maven-plugin-tools-generators
+           maven-plugin-tools-java
+           maven-plugin-tools-annotations
+           maven-plugin-annotations
+           java-plexus-build-api
+           java-plexus-archiver
+           ;; Use sisu 0.9 and guice 5.1 for compatibility with maven-parent-43
+           ;; which declares sisu 0.9.0.M3.  The older sisu 0.3.5 (from maven-core)
+           ;; uses Guice 4.1 which is incompatible with the newer Sisu.
+           java-eclipse-sisu-inject-0.9
+           java-eclipse-sisu-plexus-0.9
+           java-guice-5
+           java-plexus-io))  ; needed by plexus-archiver at runtime
+    (synopsis "Maven Plugin Plugin")
+    (description "Plugin for generating Maven plugin descriptors.")))

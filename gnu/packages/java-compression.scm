@@ -323,6 +323,35 @@ It can be used as a replacement for the Apache @code{CBZip2InputStream} /
 algorithms in Java.")
     (license license:public-domain)))
 
+(define-public java-xz-for-graal-truffle
+  (package
+    (inherit java-xz)
+    (name "java-xz-for-graal-truffle")
+    (version "1.10")
+    (source (origin
+              (method url-fetch/zipbomb)
+              (uri (string-append "https://tukaani.org/xz/xz-java-" version ".zip"))
+              (sha256
+               (base32 "1rbzbzab8iizic4yqh2ps9hmjxxym7hghc4gkiggscpl8bd54an0"))))
+    (arguments
+     `(#:tests? #f
+       #:jdk ,openjdk
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'build 'create-sources-jar
+           (lambda _
+             ;; Create a sources JAR from the source files.
+             ;; Only include org/tukaani/xz - exclude demo files in root.
+             (invoke "jar" "cf" "build/jar/xz-sources.jar"
+                     "-C" "src" "org")))
+         (replace 'install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (share (string-append out "/share/java")))
+               (mkdir-p share)
+               (install-file "build/jar/xz.jar" share)
+               (install-file "build/jar/xz-sources.jar" share)))))))))
+
 (define-public java-zstd
   (package
     (name "java-zstd")
@@ -338,9 +367,9 @@ algorithms in Java.")
                 "0z26z04sc4j6k0g4gvq4xc86mc4wiyp1j7z5hh6wpqgmy9b6h2zb"))))
     (build-system ant-build-system)
     (arguments
-     `(#:jar-name "java-zstd.jar"
+     `(#:jar-name "zstd-jni.jar"
        #:source-dir "src/main/java"
-       #:tests? #f; Require scala
+       #:tests? #f
        #:phases
        (modify-phases %standard-phases
          (add-before 'build 'generate-version
@@ -352,7 +381,21 @@ algorithms in Java.")
 
 public class ZstdVersion {
   public static final String VERSION = \"~a\";
-}" ,version))))))))
+}" ,version)))))
+         (add-before 'install 'generate-pom
+           (lambda _
+             (with-output-to-file "pom.xml"
+               (lambda _
+                 (format #t "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.luben</groupId>
+  <artifactId>zstd-jni</artifactId>
+  <version>~a</version>
+  <packaging>jar</packaging>
+  <name>zstd-jni</name>
+</project>" ,version)))))
+         (replace 'install (install-from-pom "pom.xml")))))
     (inputs
      `(("zstd" ,zstd)))
     (home-page "https://github.com/luben/zstd-jni")
@@ -363,3 +406,47 @@ compression needs.  This package provides JNI bindings for Zstd native
 library that provides fast and high compression lossless algorithm for
 Android, Java and all JVM languages.")
     (license license:bsd-2)))
+
+(define-public java-zstd-1.5.7
+  (package
+    (inherit java-zstd)
+    (version "1.5.7")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/luben/zstd-jni")
+                     (commit (string-append "v" version "-6"))))
+              (file-name (git-file-name "java-zstd" version))
+              (sha256
+               (base32
+                "014pmfix7rd1p1kmalvxyigqyiii5q3l7qahfnp32pz886pjd41i"))))
+    (arguments
+     `(#:jar-name "zstd-jni.jar"
+       #:source-dir "src/main/java"
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'build 'generate-version
+           (lambda _
+             (with-output-to-file
+               "src/main/java/com/github/luben/zstd/util/ZstdVersion.java"
+               (lambda _
+                 (format #t "package com.github.luben.zstd.util;
+
+public class ZstdVersion {
+  public static final String VERSION = \"~a\";
+}" ,version)))))
+         (add-before 'install 'generate-pom
+           (lambda _
+             (with-output-to-file "pom.xml"
+               (lambda _
+                 (format #t "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.luben</groupId>
+  <artifactId>zstd-jni</artifactId>
+  <version>~a</version>
+  <packaging>jar</packaging>
+  <name>zstd-jni</name>
+</project>" ,version)))))
+         (replace 'install (install-from-pom "pom.xml")))))))

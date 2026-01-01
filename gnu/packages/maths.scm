@@ -2099,13 +2099,13 @@ extremely large and complex data collections.")
             (lambda* (#:key inputs #:allow-other-keys)
               (let ((simple
                      (search-input-file
-                      inputs "/lib/m2/org/slf4j/slf4j-simple/1.7.25/slf4j-simple-1.7.25.jar"))
+                      inputs "/lib/m2/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar"))
                     (api
                      (search-input-file
-                      inputs "/lib/m2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"))
+                      inputs "/lib/m2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar"))
                     (nop
                      (search-input-file
-                      inputs "/lib/m2/org/slf4j/slf4j-nop/1.7.25/slf4j-nop-1.7.25.jar"))
+                      inputs "/lib/m2/org/slf4j/slf4j-nop/1.7.36/slf4j-nop-1.7.36.jar"))
                     (junit
                      (search-input-file
                       inputs "/lib/m2/junit/junit/4.12/junit-4.12.jar"))

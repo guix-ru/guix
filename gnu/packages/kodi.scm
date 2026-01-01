@@ -336,7 +336,7 @@ secondary errors.")
                 (dirname
                  (search-input-file
                   inputs
-                  "/lib/m2/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar")))
+                  "/lib/m2/org/apache/commons/commons-lang3/3.17.0/commons-lang3-3.17.0.jar")))
                (("\\$\\{apache-commons-text_SOURCE_DIR\\}")
                 (dirname
                  (search-input-file
@@ -347,7 +347,7 @@ secondary errors.")
                (("FetchContent_MakeAvailable\\(apache-commons-lang\\)")
                 (string-append "set(apache-commons-lang_SOURCE_DIR "
                                (assoc-ref inputs "java-commons-lang3")
-                               "/lib/m2/org/apache/commons/commons-lang3/3.12.0)"))
+                               "/lib/m2/org/apache/commons/commons-lang3/3.17.0)"))
                (("FetchContent_MakeAvailable\\(apache-commons-text\\)")
                 (string-append "set(apache-commons-text_SOURCE_DIR "
                                (assoc-ref inputs "java-commons-text")

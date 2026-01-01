@@ -599,6 +599,21 @@ than gzip and 15 % smaller output than bzip2.")
    (license (list license:gpl2+ license:lgpl2.1+)) ; bits of both
    (home-page "https://tukaani.org/xz/")))
 
+(define-public xz-for-graal-truffle
+  (package
+   (inherit xz)
+   (name "xz-for-graal-truffle")
+   (version "5.6.2")
+   (source (origin
+            (method url-fetch)
+            (uri (list (string-append "http://tukaani.org/xz/xz-" version
+                                      ".tar.gz")
+                       (string-append "http://multiprecision.org/guix/xz-"
+                                      version ".tar.gz")))
+            (sha256
+             (base32
+              "06a585qzn2qlwdv44w7x6p6x8qmbqrqzlz29y8108vyqw7021zcb"))))))
+
 (define-public heatshrink
   (package
     (name "heatshrink")

@@ -213,35 +213,23 @@ or '= when they denote equal versions."
 use namespaces in tag names.  This procedure takes an @var{sxml} representation
 of a pom file and removes the namespace uses.  It also adds the required bits
 to re-declare the namespaces in the top-level element."
+  (define (strip-ns tag)
+    "Strip the Maven namespace prefix from TAG if present."
+    (let ((tag-str (symbol->string tag))
+          (prefix "http://maven.apache.org/POM/4.0.0:"))
+      (if (string-prefix? prefix tag-str)
+          (string->symbol (substring tag-str (string-length prefix)))
+          tag)))
+
   (define (fix-xml sxml)
     (match sxml
-      ((tag ('@ opts ...) rest ...)
-       (if (> (string-length (symbol->string tag))
-              (string-length "http://maven.apache.org/POM/4.0.0:"))
-         (let* ((tag (symbol->string tag))
-                (tag (substring tag (string-length
-                                      "http://maven.apache.org/POM/4.0.0:")))
-                (tag (string->symbol tag)))
-           `(,tag (@ ,@opts) ,@(map fix-xml rest)))
-         `(,tag (@ ,@opts) ,@(map fix-xml rest))))
-      ((tag (rest ...))
-       (if (> (string-length (symbol->string tag))
-              (string-length "http://maven.apache.org/POM/4.0.0:"))
-         (let* ((tag (symbol->string tag))
-                (tag (substring tag (string-length
-                                      "http://maven.apache.org/POM/4.0.0:")))
-                (tag (string->symbol tag)))
-           `(,tag ,@(map fix-xml rest)))
-         `(,tag ,@(map fix-xml rest))))
-      ((tag rest ...)
-       (if (> (string-length (symbol->string tag))
-              (string-length "http://maven.apache.org/POM/4.0.0:"))
-         (let* ((tag (symbol->string tag))
-                (tag (substring tag (string-length
-                                      "http://maven.apache.org/POM/4.0.0:")))
-                (tag (string->symbol tag)))
-           `(,tag ,@(map fix-xml rest)))
-         `(,tag ,@(map fix-xml rest))))
+      ;; Element with attributes
+      (((? symbol? tag) ('@ opts ...) rest ...)
+       `(,(strip-ns tag) (@ ,@opts) ,@(map fix-xml rest)))
+      ;; Element without attributes
+      (((? symbol? tag) rest ...)
+       `(,(strip-ns tag) ,@(map fix-xml rest)))
+      ;; Anything else (strings, whitespace, etc.)
       (_ sxml)))
 
   `((*TOP* (*PI* xml "version=\"1.0\" encoding=\"UTF-8\"")
@@ -323,26 +311,48 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
               res
               (loop (cons entry res)))))))
 
+  (define (fix-parent parent-content)
+    ;; Update parent POM version to match what's available in inputs
+    (let* ((artifact (pom-artifactid parent-content))
+           (group (pom-groupid parent-content))
+           (version (or (assoc-ref (assoc-ref local-packages group) artifact)
+                        (find-version inputs group artifact #t)
+                        (pom-version parent-content))))
+      (format (current-error-port) "maven parent: ~a:~a -> ~a~%"
+              group artifact version)
+      (map
+        (lambda (tag)
+          (match tag
+            (('http://maven.apache.org/POM/4.0.0:version _)
+             `(http://maven.apache.org/POM/4.0.0:version ,version))
+            (('version _)
+             `(http://maven.apache.org/POM/4.0.0:version ,version))
+            (tag tag)))
+        parent-content)))
+
   (define fix-pom
     (match-lambda
       ('() '())
       ((tag rest ...)
        (match tag
+         (('http://maven.apache.org/POM/4.0.0:parent parent ...)
+          `((http://maven.apache.org/POM/4.0.0:parent ,@(fix-parent parent))
+            ,@(fix-pom rest)))
          (('http://maven.apache.org/POM/4.0.0:dependencies deps ...)
-          `((http://maven.apache.org/POM/4.0.0:dependencies ,(fix-deps deps))
+          `((http://maven.apache.org/POM/4.0.0:dependencies ,@(fix-deps deps))
             ,@(fix-pom rest)))
          (('http://maven.apache.org/POM/4.0.0:dependencyManagement deps ...)
           `((http://maven.apache.org/POM/4.0.0:dependencyManagement
-              ,(fix-dep-management deps))
+              ,@(fix-dep-management deps))
             ,@(fix-pom rest)))
          (('http://maven.apache.org/POM/4.0.0:build build ...)
           (if with-plugins?
-              `((http://maven.apache.org/POM/4.0.0:build ,(fix-build build))
+              `((http://maven.apache.org/POM/4.0.0:build ,@(fix-build build))
                 ,@(fix-pom rest))
               (cons tag (fix-pom rest))))
          (('http://maven.apache.org/POM/4.0.0:modules modules ...)
           (if with-modules?
-              `((http://maven.apache.org/POM/4.0.0:modules ,(fix-modules modules))
+              `((http://maven.apache.org/POM/4.0.0:modules ,@(fix-modules modules))
                 ,@(fix-pom rest))
               (cons tag (fix-pom rest))))
          (tag (cons tag (fix-pom rest)))))))
@@ -364,7 +374,7 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
       ((tag rest ...)
        (match tag
          (('http://maven.apache.org/POM/4.0.0:dependencies deps ...)
-          `((http://maven.apache.org/POM/4.0.0:dependencies ,(fix-deps deps #t))
+          `((http://maven.apache.org/POM/4.0.0:dependencies ,@(fix-deps deps #t))
             ,@(fix-dep-management rest)))
          (tag (cons tag (fix-dep-management rest)))))))
 
@@ -374,7 +384,7 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
       ((tag rest ...)
        (match tag
          (('http://maven.apache.org/POM/4.0.0:dependency dep ...)
-          `((http://maven.apache.org/POM/4.0.0:dependency ,(fix-dep dep optional?))
+          `((http://maven.apache.org/POM/4.0.0:dependency ,@(fix-dep dep optional?))
             ,@(fix-deps rest optional?)))
          (tag (cons tag (fix-deps rest optional?)))))))
 
@@ -385,15 +395,15 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
        (match tag
          (('http://maven.apache.org/POM/4.0.0:pluginManagement management ...)
           `((http://maven.apache.org/POM/4.0.0:pluginManagement
-              ,(fix-management management))
+              ,@(fix-management management))
             ,@(fix-build rest)))
          (('http://maven.apache.org/POM/4.0.0:plugins plugins ...)
           `((http://maven.apache.org/POM/4.0.0:plugins
-              ,(fix-plugins plugins))
+              ,@(fix-plugins plugins))
             ,@(fix-build rest)))
          (('http://maven.apache.org/POM/4.0.0:extensions extensions ...)
           `((http://maven.apache.org/POM/4.0.0:extensions
-              ,(fix-extensions extensions))
+              ,@(fix-extensions extensions))
             ,@(fix-build rest)))
          (tag (cons tag (fix-build rest)))))))
 
@@ -408,7 +418,7 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
             (if (member artifact (or (assoc-ref excludes group) '()))
               (fix-extensions rest optional?)
               `((http://maven.apache.org/POM/4.0.0:extension
-                  ,(fix-plugin extension optional?)); extensions are similar to plugins
+                  ,@(fix-plugin extension optional?)); extensions are similar to plugins
                 ,@(fix-extensions rest optional?)))))
          (tag (cons tag (fix-extensions rest optional?)))))))
 
@@ -419,7 +429,7 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
        (match tag
          (('http://maven.apache.org/POM/4.0.0:plugins plugins ...)
           `((http://maven.apache.org/POM/4.0.0:plugins
-              ,(fix-plugins plugins #t))
+              ,@(fix-plugins plugins #t))
             ,@(fix-management rest)))
          (tag (cons tag (fix-management rest)))))))
 
@@ -434,7 +444,7 @@ Returns nothing, but overrides the @var{pom-file} as a side-effect."
             (if (member artifact (or (assoc-ref excludes group) '()))
               (fix-plugins rest optional?)
               `((http://maven.apache.org/POM/4.0.0:plugin
-                  ,(fix-plugin plugin optional?))
+                  ,@(fix-plugin plugin optional?))
                 ,@(fix-plugins rest optional?)))))
          (tag (cons tag (fix-plugins rest optional?)))))))
 
