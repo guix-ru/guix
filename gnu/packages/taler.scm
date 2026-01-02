@@ -42,18 +42,9 @@
                 (sha256
                  (base32
                   "1lhcvqlazsqbj391d7dlp6rzblld4jij8z2vym2cbgz4mzb2vqj1"))
-                (modules '((guix build utils)
-                           (ice-9 ftw)
-                           (srfi srfi-26)))
+                (modules '((guix build utils)))
                 (snippet
                  #~(begin
-                     ;; XXX: 'delete-all-but' is copied from the turbovnc package.
-                     (define (delete-all-but directory . preserve)
-                       (with-directory-excursion directory
-                         (let* ((pred (negate (cut member <>
-                                                   (cons* "." ".." preserve))))
-                                (items (scandir "." pred)))
-                           (for-each (cut delete-file-recursively <>) items))))
                      ;; Delete 3rd party bundled Sphinx extensions.
                      (delete-all-but "_exts"
                                      ;; These are custom extensions.
