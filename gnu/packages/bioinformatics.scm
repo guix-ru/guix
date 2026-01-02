@@ -29,8 +29,8 @@
 ;;; Copyright © 2024 Spencer King <spencer.king@geneoscopy.com>
 ;;; Copyright © 2025 nomike Postmann <nomike@nomike.com>
 ;;; Copyright © 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
-;;; Copyright © 2026 Hartmut Goebel <h.goebel@crazy-compilers.com>
 ;;; Copyright © 2025-2026 Sharlatan Hellseher <sharlatanus@gmail.com>
+;;; Copyright © 2026 Hartmut Goebel <h.goebel@crazy-compilers.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
