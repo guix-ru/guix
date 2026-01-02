@@ -490,25 +490,8 @@ The binary is called @command{gvproxy}.")
        (file-name (git-file-name name version))
        (sha256
         (base32 "0jg1wfbr6rva24cz6q6d73wgaridzkh9sclzm2dwxpiwmbkcas38"))
-         (modules '((guix build utils)
-                    (ice-9 ftw)
-                    (srfi srfi-26)))
-         (snippet
-          #~(begin
-              (define (delete-all-but directory . preserve)
-                (define (directory? x)
-                  (and=> (stat x #f)
-                         (compose (cut eq? 'directory <>) stat:type)))
-                (with-directory-excursion directory
-                  (let* ((pred
-                          (negate (cut member <> (append '("." "..") preserve))))
-                         (items (scandir "." pred)))
-                    (for-each (lambda (item)
-                                (if (directory? item)
-                                    (delete-file-recursively item)
-                                    (delete-file item)))
-                              items))))
-              (delete-all-but "." "schema")))))
+       (modules '((guix build utils)))
+       (snippet #~(delete-all-but "." "schema"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -620,24 +603,9 @@ unprivileged user, known as \"Rootless mode\".")
        (file-name (git-file-name name version))
        (sha256
         (base32 "1sh1ljd0gmbncanfr3jz9vlsbp6szdgikspzp6a5lghpgjl5jiy8"))
-       (modules '((guix build utils)
-                  (ice-9 ftw)
-                  (srfi srfi-26)))
+       (modules '((guix build utils)))
        (snippet
         #~(begin
-            (define (delete-all-but directory . preserve)
-              (define (directory? x)
-                (and=> (stat x #f)
-                       (compose (cut eq? 'directory <>) stat:type)))
-              (with-directory-excursion directory
-                (let* ((pred
-                        (negate (cut member <> (append '("." "..") preserve))))
-                       (items (scandir "." pred)))
-                  (for-each (lambda (item)
-                              (if (directory? item)
-                                  (delete-file-recursively item)
-                                  (delete-file item)))
-                            items))))
             (delete-all-but "." "common")
             ;; Module name has been changed upstream.
             (substitute* (find-files "." "\\.go$")
@@ -729,24 +697,9 @@ those files in github.com/containers repos.")
        (file-name (git-file-name name version))
        (sha256
         (base32 "1p115gm6xj71pd00npdz5x3507iq57xmcb7pwmsrbi6fs6khq3f5"))
-       (modules '((guix build utils)
-                  (ice-9 ftw)
-                  (srfi srfi-26)))
+       (modules '((guix build utils)))
        (snippet
         #~(begin
-            (define (delete-all-but directory . preserve)
-              (define (directory? x)
-                (and=> (stat x #f)
-                       (compose (cut eq? 'directory <>) stat:type)))
-              (with-directory-excursion directory
-                (let* ((pred
-                        (negate (cut member <> (append '("." "..") preserve))))
-                       (items (scandir "." pred)))
-                  (for-each (lambda (item)
-                              (if (directory? item)
-                                  (delete-file-recursively item)
-                                  (delete-file item)))
-                            items))))
             (delete-all-but "." "image")
             ;; This is a workaround to provide a correct import-path.
             (rename-file "image" "tmp")
@@ -863,25 +816,8 @@ also implements \"simple image signing\".  It's a successor of
        (file-name (git-file-name name version))
        (sha256
         (base32 "00i4j4975mc9bhcm72zcy2xi3xr2x5prps1qas3gmjsvzk89wny6"))
-       (modules '((guix build utils)
-                  (ice-9 ftw)
-                  (srfi srfi-26)))
-       (snippet
-        #~(begin
-            (define (delete-all-but directory . preserve)
-              (define (directory? x)
-                (and=> (stat x #f)
-                       (compose (cut eq? 'directory <>) stat:type)))
-              (with-directory-excursion directory
-                (let* ((pred
-                        (negate (cut member <> (append '("." "..") preserve))))
-                       (items (scandir "." pred)))
-                  (for-each (lambda (item)
-                              (if (directory? item)
-                                  (delete-file-recursively item)
-                                  (delete-file item)))
-                            items))))
-            (delete-all-but "." "storage")))))
+       (modules '((guix build utils)))
+       (snippet #~(delete-all-but "." "storage"))))
     (build-system go-build-system)
     (arguments
      (list
