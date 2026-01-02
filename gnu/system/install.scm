@@ -530,10 +530,40 @@ Access documentation at any time by pressing Alt-F2.\x1b[0m
             "usb_common" "usbcore"
             ;; USB 3.0
             "xhci_pci" "xhci_hcd"
-            ;; embedded USB 3.0
             "xhci_plat_hcd"
+            ;; More USB controllers
+            "dwc3" "dwc3_pci"
+            ;; Allwinner
+            "phy_sun4i_usb" "phy_sun50i_usb3"
+            ;; Qualcomm
+            "dwc3_qcom"
+            "phy_qcom_qmp_usb" "phy_qcom_qusb2"
+            "phy_qcom_snps_femto_v2" "phy_qcom_usb_hs"
+            "phy_qcom_usb_ss"
+            ;; Texas Instruments
+            "phy_tusb1210"
+            ;; Rockchip
+            "phy_rockchip_usb"
+            "phy_rockchip_inno_usb2" "phy_rockchip_typec"
+            ;; NXP i.MX
+            "phy_fsl_imx8mq_usb"
+            ;; Generic
+            "phy_generic"
+            ;; "thunderbolt" "typec_thunderbolt"
             ;; USB 2.0
-            "ehci_pci" "ehci_hcd")
+            "dwc2"
+            "ehci_pci" "ehci_hcd"
+            "ehci_platform"
+            ;; USB 1.1
+            "ohci_pci" "ohci_hcd"
+            ;; SD cards
+            "mmc_core" "mmc_block"
+            "sdhci" "sdhci_pci"
+            "sdhci_acpi"
+            ;; Platform specific SD card
+            "sdhci_pltfm" "sdhci_msm"
+            "sdhci_of_arasan" "sdhci_of_esdhc"
+            "sdhci_brcmstb" "sdhci_tegra")
           '())
     ,@%base-initrd-modules))
 
