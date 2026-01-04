@@ -3689,6 +3689,32 @@ such as readers and writers that fail after N consecutive reads/writes.")
 execution when a test fails.")
     (license license:expat)))
 
+(define-public go-github-com-uudashr-gocognit
+  (package
+    (name "go-github-com-uudashr-gocognit")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/uudashr/gocognit")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1s4yj8sl8i3m6gm747h5lb76kbfn8lj43rb05vh1r1jws57jr08b"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/uudashr/gocognit"))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/uudashr/gocognit")
+    (synopsis "Calculate cognitive complexity of Go methods")
+    (description
+     "This package calculates cognitive complexities of functions (and
+methods) in Go source code.")
+    (license license:expat)))
+
 (define-public go-github-com-uudashr-iface
   (package
     (name "go-github-com-uudashr-iface")
