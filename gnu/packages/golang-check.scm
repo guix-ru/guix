@@ -3817,6 +3817,31 @@ gracefully enhance standard library testing package and behaviors of the
 @command{go test} command.")
     (license license:expat)))
 
+(define-public go-github-com-xen0n-gosmopolitan
+  (package
+    (name "go-github-com-xen0n-gosmopolitan")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/xen0n/gosmopolitan")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "12hpsczihbivy0jqs69h4zzy6askyq1lh410242cmk8av3i0n0sd"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/xen0n/gosmopolitan"))
+    (propagated-inputs (list go-golang-org-x-tools go-golang-org-x-text))
+    (home-page "https://github.com/xen0n/gosmopolitan")
+    (synopsis "Linter for internationalization anti-patterns")
+    (description
+     "This package checks your Go codebase for code smells that may prove to
+be a hindrance to internationalization and/or localization.")
+    (license license:gpl3)))
+
 (define-public go-github-com-yagipy-maintidx
   (package
     (name "go-github-com-yagipy-maintidx")
