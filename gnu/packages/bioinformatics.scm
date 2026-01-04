@@ -8128,6 +8128,9 @@ and random access tool.")
          (add-before 'build 'set-numba-cache-dir
            (lambda _
              (setenv "NUMBA_CACHE_DIR" "/tmp"))))))
+    (native-inputs
+     (list python-setuptools
+           python-setuptools-scm))
     (propagated-inputs
      (list python-anndata-0.11
            python-bamnostic
@@ -8140,7 +8143,7 @@ and random access tool.")
            python-natsort
            python-networkx
            python-numba
-           python-numpy
+           python-numpy-1
            python-packaging
            python-pandas
            python-scanpy
@@ -8152,7 +8155,6 @@ and random access tool.")
            python-pysam
            python-tbb
            python-umap-learn))
-    (native-inputs (list python-pytest python-setuptools-scm python-wheel))
     (home-page "https://github.com/colomemaria/epiScanpy")
     (synopsis "Tool for epigenomics single cell analysis")
     (description
