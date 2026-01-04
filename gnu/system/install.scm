@@ -673,13 +673,17 @@ or by starting the installer, using `guix-system-installer` command.
             ;; USB 1.1
             "ohci_pci" "ohci_hcd"
             ;; SD cards
+            "mmc_hsq" "mmc_spi"
             "mmc_core" "mmc_block"
             "sdhci" "sdhci_pci"
+            "mmc_spi"
             "sdhci_acpi"
             ;; Platform specific SD card
-            "sdhci_pltfm" "sdhci_msm"
-            "sdhci_of_arasan" "sdhci_of_esdhc"
-            "sdhci_brcmstb" "sdhci_tegra")
+            "dw_mmc" "dw_mmc-pltfm" "dw_mmc-rockchip"
+            "sunxi_mmc" "sdhci_pltfm" "sdhci_msm"
+            "sdhci_of_arasan" "sdhci_of_esdhc" "sdhci_brcmstb"
+            "sdhci_tegra" "phy_rockchip_emmc"
+            "sdhci_esdhc_imx")
           '())
     ,@%base-initrd-modules))
 
