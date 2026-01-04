@@ -925,7 +925,6 @@ history, and page outlines.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.23
       #:import-path "tildegit.org/sloum/bombadillo"
       #:install-source? #f
       #:phases
@@ -942,7 +941,8 @@ history, and page outlines.")
                 (with-directory-excursion builddir
                   (install-file "bombadillo.desktop" appdir)
                   (install-file "bombadillo.1" mandir)
-                  (install-file "bombadillo-icon.png" pixdir))))))))
+                  (install-file "bombadillo-icon.png" pixdir))))))
+      #:test-flags #~(list "-vet=off")))
     (home-page "https://bombadillo.colorfield.space")
     (synopsis "Terminal browser for the gopher, gemini, and finger protocols")
     (description "Bombadillo is a non-web browser for the terminal with
