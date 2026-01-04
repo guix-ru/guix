@@ -3689,6 +3689,32 @@ such as readers and writers that fail after N consecutive reads/writes.")
 execution when a test fails.")
     (license license:expat)))
 
+(define-public go-github-com-ultraware-whitespace
+  (package
+    (name "go-github-com-ultraware-whitespace")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ultraware/whitespace")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1117m5mwf0j3ksgqyjxyyvdk76nl206lvhn65bhc22klgqbrg7lv"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/ultraware/whitespace"))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/ultraware/whitespace")
+    (synopsis "Whitespace linter for Go")
+    (description
+     "This package is a linter that checks for unnecessary newlines at the
+start and end of functions, if, for, etc.")
+    (license license:expat)))
+
 (define-public go-github-com-uudashr-gocognit
   (package
     (name "go-github-com-uudashr-gocognit")
