@@ -3662,6 +3662,43 @@ such as readers and writers that fail after N consecutive reads/writes.")
     (description "This package provides text transformation utilities in Go.")
     (license license:expat)))
 
+(define-public go-github-com-timonwong-loggercheck
+  (package
+    (name "go-github-com-timonwong-loggercheck")
+    (version "0.11.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/timonwong/loggercheck")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "05m425zvdq2crgi47nzb9sjanm4dlv61zj89ap7y8ky6draydl89"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/timonwong/loggercheck"
+      #:test-flags
+      ;; 2 test group segfault.
+      #~(list "-skip" "TestLinter|TestOptions")))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/timonwong/loggercheck")
+    (synopsis "Go linter for common logger libraries")
+    (description
+     "This package provides a Go linter for common logger libraries:
+@itemize
+@item @code{kitlog}
+@item @code{klog}
+@item @code{logr}
+@item @code{log/slog}
+@item @code{zap}
+@end itemize")
+    (license license:expat)))
+
 (define-public go-github-com-tj-assert
   (package
     (name "go-github-com-tj-assert")
@@ -4994,6 +5031,21 @@ tool."))))
              (package-propagated-inputs go-github-com-daixiang0-gci)))
     (propagated-inputs '())
     (inputs '())))
+
+(define-public go-loggercheck
+  (package/inherit go-github-com-timonwong-loggercheck
+    (name "go-loggercheck")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/timonwong/loggercheck/cmd/loggercheck")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/timonwong/loggercheck")))
+    (native-inputs
+     (package-propagated-inputs go-github-com-timonwong-loggercheck))
+    (inputs '())
+    (propagated-inputs '())))
 
 (define-public go-pgmockproxy
   (package/inherit go-github-com-jackc-pgmock
