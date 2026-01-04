@@ -12934,6 +12934,7 @@ metrics.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 2023 passed, 7841 skipped, 200 deselected, 1626 xfailed, 4 warnings
       #:test-flags
       ;; Some of those tests are flaky.
       #~(list "-k" "not test_cms_identity_transforms")
@@ -12966,9 +12967,10 @@ def customize_build(EXTENSIONS, OPTIONS):
             (lambda _
               (setenv "HOME" (getcwd)))))))
     (inputs
-     (list c-blosc
+     (list brotli
+           c-blosc
+           c-blosc2
            giflib
-           brotli
            lcms
            libheif
            libjpeg-turbo
@@ -12977,7 +12979,6 @@ def customize_build(EXTENSIONS, OPTIONS):
            libwebp
            lz4
            lzfse
-           python-blosc2
            snappy
            xz
            zlib
