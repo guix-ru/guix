@@ -1793,6 +1793,33 @@ package.")
 the assertion failed.")
     (license license:expat)))
 
+(define-public go-github-com-gostaticanalysis-nilerr
+  (package
+    (name "go-github-com-gostaticanalysis-nilerr")
+    (version "0.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gostaticanalysis/nilerr")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1pqxh7zq0vy8g2i1ascalsswmlacsc5ilyg44r9l18h64lvbmyi1"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/gostaticanalysis/nilerr"))
+    (propagated-inputs
+     (list go-golang-org-x-tools
+           go-github-com-gostaticanalysis-comment))
+    (home-page "https://github.com/gostaticanalysis/nilerr")
+    (synopsis "Linter for bad err-nil checks")
+    (description
+     "This package finds code that returns nil in an @code{if err != nil}
+check.")
+    (license license:expat)))
+
 (define-public go-github-com-gostaticanalysis-testutil
   (package
     (name "go-github-com-gostaticanalysis-testutil")
