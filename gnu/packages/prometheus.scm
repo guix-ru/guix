@@ -747,6 +747,37 @@ metrics to Prometheus metrics via configured mapping rules.  This package
 provides a Golang module and @code{statsd_exporter} executable command.")
     (license license:asl2.0)))
 
+(define-public go-github-com-yeya24-promlinter
+  (package
+    (name "go-github-com-yeya24-promlinter")
+    (version "0.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/yeya24/promlinter")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0flmi0adwqhr6cbq2l73sngwpri37gdmi74lymz0w382pwhfyri1"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/yeya24/promlinter"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-prometheus-client-golang
+           go-github-com-prometheus-client-model
+           go-gopkg-in-alecthomas-kingpin-v2
+           go-gopkg-in-yaml-v2))
+    (home-page "https://github.com/yeya24/promlinter")
+    (synopsis "Go linter for Prometheus metrics")
+    (description
+     "This package provides a linter for checking Prometheus metrics name via
+promlint.")
+    (license license:asl2.0)))
+
 ;;;
 ;;; Executables:
 ;;;
