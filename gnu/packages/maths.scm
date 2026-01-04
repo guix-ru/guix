@@ -4427,6 +4427,7 @@ primes and prime k-tuplets up to 264.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 30 passed, 10 warnings
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'set-eigen-include-dir
@@ -4442,11 +4443,11 @@ primes and prime k-tuplets up to 264.")
            python-matplotx
            python-perfplot
            python-pytest
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (propagated-inputs
      (list eigen
            python-mpmath
+           python-numpy-1
            python-pyfma))
     (home-page "https://github.com/diego-hayashi/accupy")
     (synopsis "Accurate calculation of sums and dot products")
