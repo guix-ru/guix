@@ -3662,6 +3662,34 @@ such as readers and writers that fail after N consecutive reads/writes.")
     (description "This package provides text transformation utilities in Go.")
     (license license:expat)))
 
+(define-public go-github-com-tetafro-godot
+  (package
+    (name "go-github-com-tetafro-godot")
+    (version "1.5.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/tetafro/godot")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "17pmszjxsawmqxmrkikziv63asd5v7mrnriikxq2ac00ssabyry8"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list "-skip" "TestReplace")    ;requires writing to source dir
+      #:import-path "github.com/tetafro/godot"))
+    (propagated-inputs
+     (list go-go-yaml-in-yaml-v3))
+    (home-page "https://github.com/tetafro/godot")
+    (synopsis "Linter that checks that comments end in a period")
+    (description
+     "This package checks if comments contain a period at the end of the last
+sentence if needed.")
+    (license license:expat)))
+
 (define-public go-github-com-timakin-bodyclose
   (package
     (name "go-github-com-timakin-bodyclose")
@@ -5213,6 +5241,21 @@ tool."))))
       (package-propagated-inputs go-github-com-tomarrell-wrapcheck-v2)))
     (inputs '())
     (propagated-inputs '())))
+
+(define-public godot
+  (package/inherit go-github-com-tetafro-godot
+    (name "godot")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/tetafro/godot/cmd/godot")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #f) #f)
+       ((#:unpack-path _ "") "github.com/tetafro/godot")))
+    (native-inputs
+     (package-propagated-inputs go-github-com-tetafro-godot))
+    (propagated-inputs '())
+    (inputs '())))
 
 (define-public protogetter
   (package/inherit go-github-com-ghostiam-protogetter
