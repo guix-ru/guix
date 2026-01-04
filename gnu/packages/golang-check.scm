@@ -3428,6 +3428,31 @@ functions for writing tests in an @code{xUnit} style.")
 test coverage and has a web user interface that will refresh automatically.")
     (license license:expat)))
 
+(define-public go-github-com-sourcegraph-go-diff
+  (package
+    (name "go-github-com-sourcegraph-go-diff")
+    (version "0.7.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sourcegraph/go-diff")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "18kypvvc751mz98s1wxxgvyrzg59wriwnqmvr3xd3pnp53gzpkz0"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/sourcegraph/go-diff"))
+    (native-inputs (list go-github-com-google-go-cmp))
+    (home-page "https://github.com/sourcegraph/go-diff")
+    (synopsis "Diff parser and printer for Go")
+    (description
+     "This package provides a unified diff parser and printer for Go.")
+    (license license:expat)))
+
 (define-public go-github-com-ssgreg-nlreturn-v2
   (package
     (name "go-github-com-ssgreg-nlreturn-v2")
@@ -5107,6 +5132,21 @@ similar to the Unix diff command line tool to compare files.")
      (package-propagated-inputs go-github-com-gkampitakis-ciinfo))
     (propagated-inputs '())
     (inputs '())))
+
+(define-public go-diff
+  (package/inherit go-github-com-sourcegraph-go-diff
+    (name "go-diff")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/sourcegraph/go-diff/cmd/go-diff")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/sourcegraph/go-diff")))
+    (native-inputs
+     (package-propagated-inputs go-github-com-gkampitakis-ciinfo))
+    (inputs '())
+    (propagated-inputs '())))
 
 (define-public go-ginkgo
   (package/inherit go-github-com-onsi-ginkgo-v2
