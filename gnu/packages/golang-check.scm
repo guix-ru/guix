@@ -3662,6 +3662,33 @@ such as readers and writers that fail after N consecutive reads/writes.")
     (description "This package provides text transformation utilities in Go.")
     (license license:expat)))
 
+(define-public go-github-com-timakin-bodyclose
+  (package
+    (name "go-github-com-timakin-bodyclose")
+    (version "0.0.0-20241222091800-1db5c5ca4d67")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/timakin/bodyclose")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0b5kygys5b5v17mnzwy3yxlq7v36fscmr3g8na27303sjnzdd5mk"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/timakin/bodyclose"))
+    (propagated-inputs
+     (list go-golang-org-x-tools
+           go-github-com-gostaticanalysis-analysisutil))
+    (home-page "https://github.com/timakin/bodyclose")
+    (synopsis "Static analysis tool for res.Body")
+    (description
+     "@code{bodyclose} is a static analysis tool which checks whether
+@code{res.Body} is correctly closed.")
+    (license license:expat)))
+
 (define-public go-github-com-timonwong-loggercheck
   (package
     (name "go-github-com-timonwong-loggercheck")
