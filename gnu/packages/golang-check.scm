@@ -3689,6 +3689,39 @@ such as readers and writers that fail after N consecutive reads/writes.")
 execution when a test fails.")
     (license license:expat)))
 
+(define-public go-github-com-tomarrell-wrapcheck-v2
+  (package
+    (name "go-github-com-tomarrell-wrapcheck-v2")
+    (version "2.12.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/tomarrell/wrapcheck")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0g4s58sawxig3anv5mjh98nw80zj2gjcylkfxihbaxz0n35ba6cx"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/tomarrell/wrapcheck/v2"))
+    (native-inputs
+     (list go-github-com-spf13-viper
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-gobwas-glob
+           go-golang-org-x-tools
+           go-gopkg-in-yaml-v3))
+    (home-page "https://github.com/tomarrell/wrapcheck")
+    (synopsis "Go linter to check errors are properly wrapped")
+    (description
+     "This package provides a simple Go linter to check that errors from
+external packages are wrapped during return to help identify the error source
+during debugging.")
+    (license license:expat)))
+
 (define-public go-github-com-tommy-muehle-go-mnd-v2
   (package
     (name "go-github-com-tommy-muehle-go-mnd-v2")
@@ -5084,6 +5117,23 @@ prints an ASCII fraphic representing the memory layout.")))
      (string-append (package-description go-github-com-bitfield-gotestdox)
                     "  This package provides an command line interface (CLI)
 tool."))))
+
+(define-public go-wrapcheck
+  (package/inherit go-github-com-tomarrell-wrapcheck-v2
+    (name "go-wrapcheck")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/tomarrell/wrapcheck/v2/cmd/wrapcheck")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/tomarrell/wrapcheck/v2")))
+    (native-inputs
+     (append
+      (package-native-inputs go-github-com-tomarrell-wrapcheck-v2)
+      (package-propagated-inputs go-github-com-tomarrell-wrapcheck-v2)))
+    (inputs '())
+    (propagated-inputs '())))
 
 (define-public protogetter
   (package/inherit go-github-com-ghostiam-protogetter
