@@ -3334,6 +3334,34 @@ Go 1.7+ @url{https://blog.golang.org/subtests, subtests}.")
 @code{go test -coverprofile} runs and merges them into one profile.")
     (license license:bsd-2)))
 
+(define-public go-github-com-sivchari-tenv
+  (package
+    (name "go-github-com-sivchari-tenv")
+    (version "1.12.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sivchari/tenv")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1p0zs96c5cscv22a3mx2clsi48mlcj0sws4x6qygcl3vvcdpwlhx"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;modules disabled by GO111MODULE=OFF
+      #:import-path "github.com/sivchari/tenv"))
+    (propagated-inputs
+     (list go-golang-org-x-tools
+           go-github-com-gostaticanalysis-testutil))
+    (home-page "https://github.com/sivchari/tenv")
+    (synopsis "Analyzer to detect use of Go @code{os.Setenv}")
+    (description
+     "This package provide a Go analyzer that detects using @code{os.Setenv}
+instead of @code{t.Setenv} since Go1.17.")
+    (license license:expat)))
+
 (define-public go-github-com-smarty-assertions
   (package
     (name "go-github-com-smarty-assertions")
@@ -5378,6 +5406,20 @@ into @code{go-structlayout-pretty}.")))
     (synopsis "Format the output of go-structlayout with ASCII art in Go")
     (description "This package takes @code{go-structlayout}-like JSON and
 prints an ASCII fraphic representing the memory layout.")))
+
+(define-public go-tenv
+  (package/inherit go-github-com-sivchari-tenv
+    (name "go-tenv")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/sivchari/tenv/cmd/tenv")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/sivchari/tenv")))
+    (native-inputs (package-propagated-inputs go-github-com-sivchari-tenv))
+    (inputs '())
+    (propagated-inputs '())))
 
 (define-public go-testdox
   (package
