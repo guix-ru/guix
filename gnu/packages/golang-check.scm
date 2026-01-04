@@ -3689,6 +3689,32 @@ such as readers and writers that fail after N consecutive reads/writes.")
 execution when a test fails.")
     (license license:expat)))
 
+(define-public go-github-com-uudashr-iface
+  (package
+    (name "go-github-com-uudashr-iface")
+    (version "1.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/uudashr/iface")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0qs7d4nhsw9rkvws5a4vh00ap8w5cfjcg635368p8hm534sc4q90"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/uudashr/iface"))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/uudashr/iface")
+    (synopsis "Detect overuse of interfaces in Go")
+    (description
+     "This package provides analyzers that designed to identify the incorrect
+use of interfaces, helping developers avoid interface pollution.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-viant-assertly
   (package
     (name "go-github-com-viant-assertly")
