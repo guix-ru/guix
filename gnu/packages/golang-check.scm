@@ -1767,6 +1767,32 @@ package.")
 @url{https://golang.org/pkg/go/ast/CommentMap, @code{ast.CommentMap}}.")
     (license license:expat)))
 
+(define-public go-github-com-gostaticanalysis-forcetypeassert
+  (package
+    (name "go-github-com-gostaticanalysis-forcetypeassert")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gostaticanalysis/forcetypeassert")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jk82yxfmv3mjqhdkml1qrhjh8c59k42azpsi5s61v9ivbqgrhyc"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/gostaticanalysis/forcetypeassert"))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/gostaticanalysis/forcetypeassert")
+    (synopsis "Linter for forcing type assertions")
+    (description
+     "This package finds type assertions which are forced with no check for if
+the assertion failed.")
+    (license license:expat)))
+
 (define-public go-github-com-gostaticanalysis-testutil
   (package
     (name "go-github-com-gostaticanalysis-testutil")
