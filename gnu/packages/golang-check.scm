@@ -3689,6 +3689,32 @@ such as readers and writers that fail after N consecutive reads/writes.")
 execution when a test fails.")
     (license license:expat)))
 
+(define-public go-github-com-ultraware-funlen
+  (package
+    (name "go-github-com-ultraware-funlen")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ultraware/funlen")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1z5l1xjq0ymad4x221lb8v3j5a4p1c8r7kajyj9b5hfc9y2mjqcg"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/ultraware/funlen"))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/ultraware/funlen")
+    (synopsis "Go linter for function length")
+    (description
+     "This package is a linter that checks for long functions.  It can check
+both on the number of lines and the number of statements.")
+    (license license:expat)))
+
 (define-public go-github-com-ultraware-whitespace
   (package
     (name "go-github-com-ultraware-whitespace")
