@@ -1701,6 +1701,35 @@ package).")
               license:isc    ; for d3-selection
               ))))
 
+(define-public go-github-com-gostaticanalysis-analysisutil
+  (package
+    (name "go-github-com-gostaticanalysis-analysisutil")
+    (version "0.7.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gostaticanalysis/analysisutil")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1sysaa03zh6glmy1rkym3n3zg78i9s39jgw0mgla30mzc05x8fj8"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;fail with "analyzer <> is undocumented"
+      #:import-path "github.com/gostaticanalysis/analysisutil"))
+    (propagated-inputs
+     (list go-golang-org-x-tools
+           go-golang-org-x-tools-go-packages-packagestest
+           go-github-com-gostaticanalysis-comment))
+    (home-page "https://github.com/gostaticanalysis/analysisutil")
+    (synopsis "Utilities for x/tools/go/analysis package")
+    (description
+     "This package provides utilities for the @code{x/tools/go/analysis}
+package.")
+    (license license:expat)))
+
 (define-public go-github-com-gostaticanalysis-comment
   (package
     (name "go-github-com-gostaticanalysis-comment")
