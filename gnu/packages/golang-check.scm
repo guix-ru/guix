@@ -1701,6 +1701,43 @@ package).")
               license:isc    ; for d3-selection
               ))))
 
+(define-public go-github-com-gostaticanalysis-comment
+  (package
+    (name "go-github-com-gostaticanalysis-comment")
+    (version "1.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gostaticanalysis/comment")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "01ffgmqkya8hkgjvj2isyd6i9gbvhihfdn87hkxd4g866x8q9al5"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list "-vet=off"
+              "-skip" (string-join
+                       ;; Analyze: invalid analyzer name ""
+                       (list "Test_Maps_Ignore/notignore"
+                             "Test_Maps_Ignore/ignore"
+                             "Test_Maps_Ignore/havecomment")
+                       "|"))
+      #:import-path "github.com/gostaticanalysis/comment"))
+    (native-inputs
+     (list go-github-com-gostaticanalysis-testutil
+           go-github-com-google-go-cmp))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/gostaticanalysis/comment")
+    (synopsis "Go static analysis utilities for CommentMap")
+    (description
+     "This package provides utilities for
+@url{https://golang.org/pkg/go/ast/CommentMap, @code{ast.CommentMap}}.")
+    (license license:expat)))
+
 (define-public go-github-com-gostaticanalysis-testutil
   (package
     (name "go-github-com-gostaticanalysis-testutil")
