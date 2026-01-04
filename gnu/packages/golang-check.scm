@@ -1701,6 +1701,44 @@ package).")
               license:isc    ; for d3-selection
               ))))
 
+(define-public go-github-com-gostaticanalysis-testutil
+  (package
+    (name "go-github-com-gostaticanalysis-testutil")
+    (version "0.6.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gostaticanalysis/testutil")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0d11p832jc252c92s5k9jrmmhlbsynrmn6nk1f4g1i2vdmwakgff"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:test-flags
+      ;; modules disabled by GO111MODULE=off
+      #~(list "-skip" "TestWithModules_LineComment|TestIssue00023")
+      #:import-path "github.com/gostaticanalysis/testutil"))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-newmo-oss-gotestingmock))
+    (propagated-inputs
+     (list go-github-com-josharian-txtarfs
+           go-github-com-otiai10-copy
+           go-github-com-tenntenn-golden
+           go-github-com-tenntenn-modver
+           go-github-com-tenntenn-text-transform
+           go-golang-org-x-mod
+           go-golang-org-x-text
+           go-golang-org-x-tools))
+    (home-page "https://github.com/gostaticanalysis/testutil")
+    (synopsis "Utilities for test of static analysis tools")
+    (description
+     "This package provides utilities for test of static analysis tools.")
+    (license license:expat)))
+
 (define-public go-github-com-h2non-gock
   (package
     (name "go-github-com-h2non-gock")
