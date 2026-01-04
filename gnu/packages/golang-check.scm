@@ -3817,6 +3817,38 @@ gracefully enhance standard library testing package and behaviors of the
 @command{go test} command.")
     (license license:expat)))
 
+(define-public go-github-com-ykadowak-zerologlint
+  (package
+    (name "go-github-com-ykadowak-zerologlint")
+    (version "0.1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ykadowak/zerologlint")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0l5qy8g9sz79z4vbf2f02b9mcfppyrd4h550x4vgh2vm7lnrvhy6"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;tests need GO111MODULE=on
+      #:import-path "github.com/ykadowak/zerologlint"))
+    (propagated-inputs
+     (list go-github-com-gostaticanalysis-comment
+           go-golang-org-x-tools))
+    (home-page "https://github.com/ykadowak/zerologlint")
+    (synopsis "Detect incorrect usage of zerolog")
+    (description
+     "@code{zerologlint} is a linter for @url{https://github.com/rs/zerolog,
+zerolog} that can be run with @code{go vet} or through
+@url{https://golangci-lint.run/, golangci-lint}.  It detects the wrong usage
+of @code{zerolog} that a user forgets to dispatch @code{zerolog.Event} with
+@code{Send} or @code{Msg} like functions, in which case nothing will be
+logged.")
+    (license license:expat)))
+
 (define-public go-github-com-ysmood-goob
   (package
     (name "go-github-com-ysmood-goob")
