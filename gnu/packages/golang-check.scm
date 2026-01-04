@@ -3817,6 +3817,32 @@ gracefully enhance standard library testing package and behaviors of the
 @command{go test} command.")
     (license license:expat)))
 
+(define-public go-github-com-yagipy-maintidx
+  (package
+    (name "go-github-com-yagipy-maintidx")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/yagipy/maintidx")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0y4372r9j5izwvq4gcc4sm9qrq8qv2l81ywibm1wm95avw62cj55"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;see: <https://github.com/yagipy/maintidx/issues/9>
+      #:import-path "github.com/yagipy/maintidx"))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/yagipy/maintidx")
+    (synopsis "Measure maintainibility indices")
+    (description
+     "This package measures the maintainability index of Go functions.")
+    (license license:expat)))
+
 (define-public go-github-com-ykadowak-zerologlint
   (package
     (name "go-github-com-ykadowak-zerologlint")
