@@ -3334,6 +3334,39 @@ Go 1.7+ @url{https://blog.golang.org/subtests, subtests}.")
 @code{go test -coverprofile} runs and merges them into one profile.")
     (license license:bsd-2)))
 
+(define-public go-github-com-sivchari-containedctx
+  (package
+    (name "go-github-com-sivchari-containedctx")
+    (version "1.0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sivchari/containedctx")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "06gd9sqvv9sm2vdf5bs15j5dh71hkid814c4i6xryx8cb07syzds"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;modules disabled by GO111MODULE=off
+      #:import-path "github.com/sivchari/containedctx"))
+    (native-inputs
+     (list go-github-com-gostaticanalysis-testutil))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/sivchari/containedctx")
+    (synopsis
+     "Linter for Go that detects struct contained @code{context.Context} field")
+    (description
+     "This package is a linter that detects struct contained
+@code{context.Context} field. This is discouraged technique in favour of
+passing context as first argument of method or function.  For rationale please
+read @url{https://go.dev/blog/context-and-structs, Contexts and structs} the
+Go blog post.")
+    (license license:expat)))
+
 (define-public go-github-com-sivchari-tenv
   (package
     (name "go-github-com-sivchari-tenv")
@@ -5187,6 +5220,20 @@ similar to the Unix diff command line tool to compare files.")
      (package-propagated-inputs go-github-com-gkampitakis-ciinfo))
     (propagated-inputs '())
     (inputs '())))
+
+(define-public go-containedctx
+  (package/inherit go-github-com-sivchari-containedctx
+    (name "go-containedctx")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/sivchari/containedctx/cmd/containedctx")
+       ((#:install-source? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/sivchari/containedctx")))
+    (native-inputs
+     (package-propagated-inputs go-github-com-sivchari-containedctx))
+    (inputs '())
+    (propagated-inputs '())))
 
 (define-public go-diff
   (package/inherit go-github-com-sourcegraph-go-diff
