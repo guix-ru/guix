@@ -250,7 +250,7 @@
            kdialog
            libappindicator
            libnotify
-           python-dbus
+           python-dbus-1.2
            python-ipython
            python-pygobject
            python-pyinotify
