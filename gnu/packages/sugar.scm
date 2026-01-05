@@ -288,7 +288,7 @@ activities and other Sugar components.")
            python
            sugar-toolkit-gtk3))
     (propagated-inputs
-     (list python-dbus
+     (list python-dbus-1.2
            python-pygobject
            python-xapian-bindings))
     (native-inputs
@@ -386,7 +386,7 @@ and metadata, and the journal with querying and full text search.")
            ;; be propagated.
            python-pycairo
            python-dateutil
-           python-dbus
+           python-dbus-1.2
            python-decorator
            python-pygobject
            python-six
@@ -1057,7 +1057,7 @@ life with forces (think gravity, Newton!), friction (scrrrrape), and inertia
              gtk+
              gstreamer
              gst-plugins-base
-             python-dbus
+             python-dbus-1.2
              python-pygobject
              sugar-datastore
              sugar-toolkit-gtk3

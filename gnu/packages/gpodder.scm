@@ -113,7 +113,7 @@
            python-pygobject
            python-pycairo
            python-requests
-           python-dbus
+           python-dbus-1.2
            python-html5lib
            python-mutagen
            python-mygpoclient

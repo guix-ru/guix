@@ -6711,7 +6711,7 @@ can also directly record to WebM or MP4 if you prefer.")
             (lambda _
               (setenv "HOME" (getcwd)))))))
     (native-inputs
-     (list python-dbus
+     (list python-dbus-1.2
            python-pygobject
            python-pytest
            python-setuptools))

@@ -3888,7 +3888,7 @@ ASCII text files using Gmsh's own scripting language.")
     (inputs
      (list bash-minimal
            ghostscript ;optional, for EPS/PS output
-           python-dbus
+           python-dbus-1.2
            python-h5py ;optional, for HDF5 data
            python-pyqt-6
            qtbase

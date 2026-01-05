@@ -2827,7 +2827,7 @@ and how they are displayed (View).")
            gtksourceview-4
            pango
            python
-           python-dbus
+           python-dbus-1.2
            python-liblarch
            python-lxml
            python-pycairo
@@ -2993,7 +2993,7 @@ guidelines.")
            python
            cups
            gtk+
-           python-dbus
+           python-dbus-1.2
            python-pygobject
            python-pycups
            python-requests
@@ -5237,7 +5237,7 @@ and the GLib main loop, to integrate well with GNOME applications.")
            libxslt
            pkg-config
            python
-           python-dbus
+           python-dbus-1.2
            python-pygobject-3.50
            vala))
     (propagated-inputs
@@ -5855,7 +5855,7 @@ faster results and to avoid unnecessary server load.")
            pkg-config
            python
            ;; For tests.
-           python-dbus
+           python-dbus-1.2
            python-dbusmock-minimal
            python-packaging
            python-pygobject
@@ -8005,7 +8005,7 @@ to display dialog boxes from the commandline and shell scripts.")
            libxcursor                   ;for XCURSOR_PATH
            pipewire
            python
-           python-dbus
+           python-dbus-1.2
            python-dbusmock
            wireplumber-minimal))
     (propagated-inputs
@@ -8394,7 +8394,7 @@ users.")
            libxslt
            perl
            pkg-config
-           python-dbus
+           python-dbus-1.2
            python-pygobject-3.50
            python-wrapper
            vala))
@@ -9147,7 +9147,7 @@ usage and information about running processes.")
            libxml2
            pkg-config
            python
-           python-dbus))
+           python-dbus-1.2))
     (propagated-inputs
      ;; These are all required by the gnome-bluetooth .pc file.
      (list glib
@@ -9157,7 +9157,7 @@ usage and information about running processes.")
      (list eudev
            gsound
            libnotify
-           python-dbus
+           python-dbus-1.2
            upower))
     (synopsis "GNOME Bluetooth subsystem")
     (home-page "https://wiki.gnome.org/Projects/GnomeBluetooth")
@@ -9450,7 +9450,7 @@ printf '~a is deprecated.  Use the \"gnome-extensions\" CLI or \
            perl
            pkg-config
            python
-           python-dbus
+           python-dbus-1.2
            python-dbusmock
            ruby-sass
            sassc
@@ -12146,7 +12146,7 @@ advanced image management tool")
        ("gsettings-desktop-schemas" ,gsettings-desktop-schemas)
        ("gtk+" ,gtk+)
        ("python" ,python-wrapper)
-       ("python-dbus" ,python-dbus)
+       ("python-dbus" ,python-dbus-1.2)
        ("python-notify2" ,python-notify2)
        ("python-pycairo" ,python-pycairo)
        ("python-pygobject" ,python-pygobject)
@@ -14017,7 +14017,7 @@ historical battery usage and related statistics.")
            mutter
            pkg-config
            python
-           python-dbus
+           python-dbus-1.2
            python-pygobject
            xdg-desktop-portal-gnome))
     (home-page "https://gitlab.gnome.org/GNOME/gnome-remote-desktop")
