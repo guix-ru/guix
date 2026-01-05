@@ -402,27 +402,29 @@ interface for the Music Player Daemon.")
               (sha256
                (base32
                 "0rl8w7s2asff626clzfvyz987l2k4ml5dg417mqp9v8a962q0v2x"))))
-    (build-system python-build-system)
+    (build-system pyproject-build-system)
     (arguments
-     `(#:modules ((guix build gnu-build-system)
-                  (guix build python-build-system)
+     (list
+      #:test-backend #~'unittest
+      #:modules `((guix build gnu-build-system)
+                  (guix build pyproject-build-system)
                   ((guix build glib-or-gtk-build-system) #:prefix glib-or-gtk:)
                   (guix build utils))
-       #:imported-modules (,@%default-gnu-imported-modules
-                           (guix build python-build-system)
-                           (guix build glib-or-gtk-build-system))
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'glib-or-gtk-wrap
-           (assoc-ref glib-or-gtk:%standard-phases 'glib-or-gtk-wrap))
-         (add-after 'install 'wrap-sonata
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out               (assoc-ref outputs "out"))
-                   (gi-typelib-path   (getenv "GI_TYPELIB_PATH")))
-               (wrap-program (string-append out "/bin/sonata")
-                 `("GI_TYPELIB_PATH" ":" prefix (,gi-typelib-path)))))))))
+      #:imported-modules
+      `(,@%default-gnu-imported-modules
+        ,@%pyproject-build-system-modules
+        (guix build glib-or-gtk-build-system))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'glib-or-gtk-wrap
+            (assoc-ref glib-or-gtk:%standard-phases 'glib-or-gtk-wrap))
+          (add-after 'wrap 'wrap-sonata
+            (lambda _
+              (wrap-program (string-append #$output "/bin/sonata")
+                `("GI_TYPELIB_PATH" ":" prefix
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
     (native-inputs
-     (list gettext-minimal))
+     (list gettext-minimal python-setuptools))
     (inputs
      (list bash-minimal
            python-mpd2
