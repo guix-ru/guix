@@ -29146,6 +29146,128 @@ Merkle tree} implementation in Golang.")
 stopped.")
     (license license:expat)))
 
+(define-public go-github-com-u-root-u-root
+  (package
+    (name "go-github-com-u-root-u-root")
+    (version "0.16.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/u-root/u-root")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1slvph11kcwyddlx11hfxn6xdaj8g04jxl5gyn0k90b40a8xawj0"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            (delete-file-recursively "vendor")
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "cmds/exp/cmd2pkg/test")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/u-root/u-root"
+      #:test-subdirs
+      ;; XXX: Remove when all inputs are packaged.
+      #~(list "cmds/core/basename"
+              "cmds/core/cat"
+              "cmds/core/chmod"
+              "cmds/core/comm"
+              "cmds/core/cp"
+              "cmds/core/cpio"
+              "cmds/core/date"
+              "cmds/core/df"
+              "cmds/core/dirname"
+              "cmds/core/echo"
+              "cmds/core/find"
+              "cmds/core/free"
+              "cmds/core/gpgv"
+              "cmds/core/grep"
+              "cmds/core/head"
+              "cmds/core/hexdump"
+              "cmds/core/hostname"
+              "cmds/core/id")))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-davecgh-go-spew))
+    (propagated-inputs
+     (list go-github-com-beevik-ntp
+           go-github-com-cenkalti-backoff-v4
+           go-github-com-creack-pty
+           go-github-com-dustin-go-humanize
+           go-github-com-gliderlabs-ssh
+           go-github-com-google-go-tpm
+           go-github-com-google-uuid
+           go-github-com-gopacket-gopacket
+           go-github-com-insomniacslk-dhcp
+           go-github-com-ishidawataru-sctp
+           go-github-com-kevinburke-ssh-config
+           go-github-com-klauspost-compress
+           go-github-com-klauspost-pgzip
+           go-github-com-mdlayher-vsock
+           go-github-com-netflix-go-expect
+           go-github-com-peterh-liner
+           go-github-com-pierrec-lz4-v4
+           go-github-com-pkg-sftp
+           go-github-com-protonmail-go-crypto
+           go-github-com-safchain-ethtool
+           go-github-com-sirupsen-logrus
+           go-github-com-spf13-pflag
+           go-github-com-tklauser-go-sysconf
+           go-github-com-u-root-uio
+           go-github-com-ulikunitz-xz
+           go-github-com-vishvananda-netlink
+           go-github-com-vishvananda-netns
+           go-go-bug-st-serial
+           go-golang-org-x-crypto
+           go-golang-org-x-exp
+           go-golang-org-x-net
+           go-golang-org-x-sync
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-golang-org-x-text
+           go-golang-org-x-tools
+           go-gopkg-in-yaml-v2
+           go-mvdan-cc-sh-v3
+
+           ;; TODO: Complete packaging.
+           ;; go-github-com-bobuhiro11-gokvm
+           ;; go-github-com-florianl-go-tc
+           ;; go-github-com-gojuno-minimock-v3
+           ;; go-github-com-hugelgupf-vmtest
+           ;; go-github-com-jaypipes-ghw
+           ;; go-github-com-knz-bubbline
+           ;; go-github-com-nanmu42-limitio
+           ;; go-github-com-orangecms-go-framebuffer
+           ;; go-github-com-packetcap-go-pcap
+           ;; go-github-com-rck-unit
+           ;; go-github-com-rekby-gpt
+           ;; go-github-com-therootcompany-xz
+           ;; go-github-com-u-root-cpu
+           ;; go-github-com-u-root-cpuid
+           ;; go-github-com-u-root-gobusybox-src
+           ;; go-github-com-u-root-iscsinl
+           ;; go-github-com-u-root-mkuimage
+           ;; go-github-com-vtolstov-go-ioctl
+           #;go-pack-ag-tftp))
+    (home-page "https://github.com/u-root/u-root")
+    (synopsis "Fully Go userland with Linux bootloaders")
+    (description
+     "This package embodies four different projects.
+
+@enumerate
+@item Go versions of many standard Linux tools, such as ls, cp, or shutdown.
+@item A way to compile many Go programs into a single binary with busybox mode.
+@item A way to create initramfs (an archive of files) to use with Linux kernels,
+embeddable into firmware.
+@item Go bootloaders that use kexec to boot Linux or multiboot kernels such as
+ESXi, Xen, or tboot.  They are meant to be used with LinuxBoot.
+@end enumerate")
+    (license license:bsd-3)))
+
 (define-public go-github-com-u-root-uio
   (package
     (name "go-github-com-u-root-uio")
