@@ -29145,9 +29145,9 @@ characters in NFC form.
 Its algorithms are based on the kakasi library, which is written in C.")
     (license license:gpl3+)))
 
-(define-public python-dbus-python
+(define-public python-dbus
   (package
-    (name "python-dbus-python")
+    (name "python-dbus")
     (version "1.3.2")
     (source
      (origin
@@ -29240,7 +29240,7 @@ implementation of the D-Bus protocol.")
     (inputs
      (list dbus))
     (propagated-inputs
-     (list python-dbus-python python-pygobject))
+     (list python-dbus python-pygobject))
     (home-page "https://github.com/martinpitt/python-dbusmock")
     (synopsis "Python library for mock D-Bus objects")
     (description "python-dbusmock allows for the easy creation of mock objects on
@@ -32390,7 +32390,7 @@ CMake.")
                   libx11
                   libxtst
                   python-babel
-                  python-dbus-python
+                  python-dbus
                   python-pycairo
                   python-pygobject
                   slop))

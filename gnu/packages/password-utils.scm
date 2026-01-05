@@ -2271,7 +2271,7 @@ Himitsu for credentials.")
                         `("GI_TYPELIB_PATH" prefix (,gi-typelib-path))
                         '("CRYPTO_BACKEND" = ("cryptodome"))))))
                 (delete 'sanity-check)))) ; we have a slightly too old pygobject
-    (inputs (cons* python-dbus-python
+    (inputs (cons* python-dbus
                    python-pycryptodome
                    python-pygobject
                    python-pyhimitsu

@@ -5223,7 +5223,7 @@ cache of unix and unix-like systems.")
     (propagated-inputs
      (list python-pygobject
            python-pyudev
-           python-dbus-python
+           python-dbus
            python-evdev
            ;; For GUI.
            python-pyyaml
