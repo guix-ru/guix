@@ -11159,7 +11159,7 @@ include_dirs = ~:*~a/include~%"
               (setenv "CC"
                       #$(cc-for-target))
               (invoke "make" "check"))))))
-    (propagated-inputs (list python-numpy))
+    (propagated-inputs (list python-numpy-1))
     (native-inputs (list perl pkg-config python-setuptools))
     (home-page "https://github.com/dkogan/numpysane")
     (synopsis "More-reasonable core functionality for numpy")
