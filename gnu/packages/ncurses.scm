@@ -42,23 +42,10 @@
   #:use-module ((guix memoization) #:select (mlambda))
   #:use-module (ice-9 match))
 
-(define ncurses-rollup-patch
-  (mlambda (version)
-    (origin
-      (method url-fetch)
-      (uri (match (string-split (version-major+minor+point version) #\.)
-             ((major minor point)
-              (string-append "https://invisible-mirror.net/archives"
-                             "/ncurses/" major "." minor "/ncurses-"
-                             major "." minor "-" point "-patch.sh.bz2"))))
-      (sha256
-       (base32
-        "1b6522cvi4066bgh9lp93q8lk93zcjjssvnw1512z447xvazy2y6")))))
-
 (define-public ncurses
   (package
     (name "ncurses")
-    (version "6.2.20210619")
+    (version "6.6.20260103")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/ncurses/ncurses-"
@@ -66,7 +53,7 @@
                                   ".tar.gz"))
               (sha256
                (base32
-                "17bcm2z1rdx5gmzj5fb8cp7f28aw5b4g2z4qvvqg3yg0fq66wc1h"))))
+                "04gz96vhj83yls2czsajbmc65qsnfrxn2ijcl20h62w8xnxlqnrm"))))
     (build-system gnu-build-system)
     (outputs '("out"
                "doc"))                ;1 MiB of man pages
@@ -91,18 +78,6 @@
                              (cons (string-append "--host=" target)
                                    configure-flags)
                              configure-flags)))))
-           (apply-rollup-patch-phase
-            ;; Ncurses distributes "stable" patchsets to be applied on top
-            ;; of the release tarball.  These are only available as shell
-            ;; scripts(!) so we decompress and apply them in a phase.
-            ;; See <https://invisible-mirror.net/archives/ncurses/6.1/README>.
-            #~(lambda* (#:key inputs native-inputs #:allow-other-keys)
-                (let ((rollup-patch #$(ncurses-rollup-patch
-                                       (package-version this-package))))
-                  (copy-file rollup-patch
-                             (string-append (getcwd) "/rollup-patch.sh.bz2"))
-                  (invoke "bzip2" "-d" "rollup-patch.sh.bz2")
-                  (invoke "sh" "rollup-patch.sh"))))
            (remove-shebang-phase
             #~(lambda _
                 ;; To avoid retaining a reference to the bootstrap Bash via the
@@ -205,8 +180,6 @@
                  #$@(if (target-mingw?) #~("--enable-term-driver") #~()))
              #:tests? #f                          ; no "check" target
              #:phases #~(modify-phases %standard-phases
-                          (add-after 'unpack 'apply-rollup-patch
-                            #$apply-rollup-patch-phase)
                           (replace 'configure #$configure-phase)
                           (add-after 'install 'post-install
                             #$post-install-phase)
