@@ -4701,6 +4701,7 @@ recurrence relations.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 219 passed, 13 deselected
       #:test-flags
       ;; These tests fails with unexpected keyword arguments
       ;; in calls to cplot.
@@ -4720,12 +4721,11 @@ recurrence relations.")
            python-meshzoo
            python-pytest
            python-scipy
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (propagated-inputs
      (list python-importlib-metadata
            python-ndim
-           python-numpy
+           python-numpy-1
            python-sympy))
     (home-page "https://github.com/diego-hayashi/orthopy")
     (synopsis "Tools for orthogonal polynomials, Gaussian quadrature")
