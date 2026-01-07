@@ -9104,13 +9104,13 @@ building up, manipulating and serialising @code{Pandoc} structures.")
 (define-public ghc-parsec
   (package
     (name "ghc-parsec")
-    (version "3.1.15.0")
+    (version "3.1.18.0")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "parsec" version))
               (sha256
                (base32
-                "1v8zs8zv1rk16lag2yqaxfwanjpgnh4gxw1vd70py0n04d20z0lq"))))
+                "1byha0j1i0h5wwzafm0csx0y8maga17r6my2z5w2ciki789rybs0"))))
     (build-system haskell-build-system)
     (native-inputs (list ghc-tasty ghc-tasty-hunit))
     (home-page "https://github.com/haskell/parsec")
