@@ -9112,6 +9112,7 @@ building up, manipulating and serialising @code{Pandoc} structures.")
                (base32
                 "1byha0j1i0h5wwzafm0csx0y8maga17r6my2z5w2ciki789rybs0"))))
     (build-system haskell-build-system)
+    (properties '((upstream-name . "parsec")))
     (native-inputs (list ghc-tasty ghc-tasty-hunit))
     (home-page "https://github.com/haskell/parsec")
     (synopsis "Monadic parser combinators")
