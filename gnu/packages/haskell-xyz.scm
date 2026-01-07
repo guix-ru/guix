@@ -15292,7 +15292,11 @@ library targets typst 0.13 and currently offers only partial support.")
        (method url-fetch)
        (uri (hackage-uri "selective" version))
        (sha256
-        (base32 "1qxfnqidlqw5hbsqs80i77nrkanz73jzyd4w157gamkr3kklpyyv"))))
+        (base32 "1qxfnqidlqw5hbsqs80i77nrkanz73jzyd4w157gamkr3kklpyyv"))
+       (snippet
+         #~(substitute* "selective.cabal"
+             (("QuickCheck [<>=0-9. &|]*") "QuickCheck < 2.16")))
+       (modules '((guix build utils)))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "selective")))
     (native-inputs (list ghc-quickcheck))
