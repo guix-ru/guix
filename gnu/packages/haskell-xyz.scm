@@ -14652,10 +14652,17 @@ file.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "wave")))
     (inputs (list ghc-cereal))
-    (native-inputs (list ghc-quickcheck ghc-hspec ghc-temporary))
+    (native-inputs (list ghc-quickcheck ghc-hspec ghc-hspec-discover ghc-temporary))
     (arguments
-     `(#:cabal-revision ("1"
-                         "1j6ycd1v6c5khkmybzss2vbfm93n28dh1ah8sipqqpd94yqwvdiz")))
+     (list
+      #:cabal-revision '("1"
+                         "1j6ycd1v6c5khkmybzss2vbfm93n28dh1ah8sipqqpd94yqwvdiz")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'relax-dependencies
+            (lambda _
+              (substitute* "wave.cabal"
+                (("bytestring [<=>.0-9 &|]*") "bytestring < 0.13")))))))
     (home-page "https://github.com/mrkkrp/wave")
     (synopsis "Work with WAVE and RF64 files in Haskell")
     (description "This package allows you to work with WAVE and RF64
