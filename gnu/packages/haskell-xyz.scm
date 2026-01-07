@@ -3610,8 +3610,15 @@ MinTTY and other consoles.")
     (native-inputs (list ghc-test-framework ghc-quickcheck
                          ghc-test-framework-quickcheck2))
     (arguments
-     `(#:cabal-revision ("1"
-                         "1vjn4ryzdilz7l1ad7czh11nw48h5mj8if7ij3q0mmc3sffa8csd")))
+     (list
+      #:cabal-revision '("1"
+                         "1vjn4ryzdilz7l1ad7czh11nw48h5mj8if7ij3q0mmc3sffa8csd")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'relax-dependencies
+            (lambda _
+              (substitute* "edit-distance.cabal"
+                (("QuickCheck [ <>=^*&|0-9.]*") "QuickCheck < 2.16")))))))
     (home-page "http://github.com/phadej/edit-distance")
     (synopsis "Levenshtein and restricted Damerau-Levenshtein edit distances")
     (description
