@@ -299,13 +299,13 @@ generators, and more.")
 (define-public ghc-curve25519
   (package
   (name "ghc-curve25519")
-  (version "0.2.7")
+  (version "0.2.8.1")
   (source
    (origin
      (method url-fetch)
      (uri (hackage-uri "curve25519" version))
      (sha256
-      (base32 "1p8b1lppkvc19974hr43lcqdi4nj55j2nf7gsnp8dn7gyf23aayq"))))
+      (base32 "0p2rxad477cxbpxryvp78v8nrrf5gm35106jbqrj5cjgksappkdj"))))
   (build-system haskell-build-system)
   (native-inputs
    (list ghc-hunit
