@@ -1218,13 +1218,13 @@ result of golden tests.")
 (define-public ghc-proctest
   (package
     (name "ghc-proctest")
-    (version "0.1.3.0")
+    (version "0.1.3.1")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "proctest" version))
               (sha256
                (base32
-                "02iz323arx9zwclvspgaaqz81bp6jdnj89pjm08n2gamg39zsbdn"))))
+                "0yvhc0l5aj170ymhjx4ig0im0yd7wfa150m5lqhabr8j7cf16l7y"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "proctest")))
     (inputs (list ghc-hunit ghc-hspec ghc-quickcheck))
