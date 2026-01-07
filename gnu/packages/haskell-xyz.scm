@@ -5215,19 +5215,23 @@ a set of wrappers to use the hash tables in the IO monad.")
 (define-public ghc-haskeline
   (package
     (name "ghc-haskeline")
-    (version "0.8.2.1")
+    (version "0.8.4.1")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "haskeline" version))
        (sha256
-        (base32 "1zs0rlhd7lzp5g4kp7v5ca7cdwan7w4bx3jh5q2ri950svr2k1x0"))))
+        (base32 "0kxdgy3s6pakb7yqk9jy747xv6n3plzwxnnzabqnyk83cs0d8n22"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "haskeline")))
-    (native-inputs (list ghc-hunit))
+    (native-inputs (list ghc-hunit which))
     (arguments
-     `(#:cabal-revision ("3"
-                         "15kzy0bpm15x8b378b2x9vdrdzaisvq9s9hxs1wk7sj180ivin9i")))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'fix-path
+            (lambda _
+              (setenv "PATH" (string-append "dist/build/haskeline-examples-Test:" (getenv "PATH"))))))))
     (home-page "https://github.com/judah/haskeline")
     (synopsis "Command-line interface for user input, written in Haskell")
     (description
