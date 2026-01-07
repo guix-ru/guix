@@ -12,6 +12,7 @@
 ;;; Copyright © 2025 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2026 Zheng Junjie <z572@z572.online>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
+;;; Copyright © 2025 Isidor Zeuner <guix@quidecco.pl>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -34,6 +35,7 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
@@ -56,6 +58,59 @@
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module (guix packages))
+
+(define-public matrix-commander
+  (package
+    (name "matrix-commander")
+    (version "8.0.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/8go/matrix-commander")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0150l6qzy55qlm7639p82vdhsapq6x48ixhgr2yrm2yg9a62gn3q"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            ;; XXX: Provided by Python standard library, report upstream.
+            (lambda _
+              (substitute* "setup.cfg"
+                (("argparse") "")
+                (("async-timeout") "")
+                (("asyncio") "")
+                (("datetime") "")
+                (("uuid") ""))))
+          (replace 'check
+	    (lambda* (#:key tests? #:allow-other-keys)
+	      (when tests?
+	        ;; The other tests expect a Matrix server to connect
+	        ;; to, see <.github/workflows/run-tests.yml>.
+	        (invoke "./tests/test-version.sh")))))))
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (inputs
+     (list python-aiofiles
+           python-aiohttp
+           python-emoji
+           python-magic
+           python-markdown
+           python-matrix-nio
+           python-notify2
+           python-pillow
+           python-pyxdg))
+    (home-page "https://github.com/8go/matrix-commander")
+    (synopsis "Simple command-line Matrix client")
+    (description
+     "This package provides a simple but convenient @acronym{Command Line
+Interface, CLI}-based Matrix client app for sending and receiving.")
+    (license license:gpl3)))
 
 (define-public mautrix-whatsapp
   (package
