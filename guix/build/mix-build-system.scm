@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2023 Pierre-Henry Fröhring <contact@phfrohring.com>
-;;; Copyright © 2024, 2026 Igorj Gorjaĉev <igor@goryachev.org>
+;;; Copyright © 2024-2026 Igorj Gorjaĉev <igor@goryachev.org>
 ;;; Copyright © 2024, 2025 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -48,7 +48,13 @@
 VERSION are installed."
   (string-append path "/lib/elixir/" version))
 
-(define* (strip-prefix name #:optional (prefix "elixir-"))
+(define %elixir-prefix "elixir-")
+
+(define %beam-prefix "beam-")
+
+(define %vendorize-env-var "GUIX_MIX_VENDOR_DIR")
+
+(define* (strip-prefix name #:optional (prefix %elixir-prefix))
   "Return NAME without the prefix PREFIX."
   (if (string-prefix? prefix name)
       (string-drop name (string-length prefix))
@@ -83,9 +89,73 @@ working directory."
 (define (list-directories dir)
   "List absolute paths of directories directly under the directory DIR."
   (map (cute string-append dir "/" <>)
-       (scandir dir (lambda (filename)
-                      (and (not (member filename '("." "..")))
-                           (directory-exists? (string-append dir "/" filename)))))))
+       (scandir
+        dir (lambda (filename)
+              (and (not (member filename '("." "..")))
+                   (directory-exists? (string-append dir "/" filename)))))))
+
+(define* (unpack-vendorize #:key vendorize? vendor-dir inputs
+                           #:allow-other-keys)
+  "Unpack vendored packages."
+  (define (inputs->beam-inputs inputs)
+    "Filter using the label part from INPUTS."
+    (filter-map (lambda (input)
+                  (match input
+                    ((name . file)
+                     (and (beam-package? name) file))))
+                inputs))
+  (define (beam-input->upstream-name beam-input)
+    "Convert BEAM-INPUT into upstream package name."
+    ((compose
+      (cute package-name->elixir-name <> %beam-prefix)
+      (cute substring <> 33)
+      basename)
+     beam-input))
+  (define (copy-or-unpack-beam-package beam-input dep-dir)
+    "Copy contents, if BEAM-INPUT is a checkout package, otherwise unpack it."
+    (or (directory-exists? dep-dir)
+        (if (file-is-directory? beam-input)
+            (copy-recursively beam-input dep-dir)
+            (begin
+              (mkdir-p dep-dir)
+              (invoke "sh" "-c"
+                      (string-append "tar -xOf " beam-input
+                                     " contents.tar.gz"
+                                     " | tar -xz -C " dep-dir))))))
+  (and
+   vendorize?
+   (begin
+     (mkdir-p vendor-dir)
+     (setenv %vendorize-env-var (canonicalize-path vendor-dir))
+     (let ((beam-inputs (delete-duplicates (inputs->beam-inputs inputs))))
+       (unless (null? beam-inputs)
+         (for-each
+          (lambda (beam-input)
+            (let* ((upstream-name (beam-input->upstream-name beam-input))
+                   (dep-dir (string-append vendor-dir "/" upstream-name)))
+              (copy-or-unpack-beam-package beam-input dep-dir)))
+          beam-inputs))))))
+
+(define* (symlink-vendorize #:key vendorize? vendor-symlinks?
+                            #:allow-other-keys)
+  (and
+   vendorize?
+   vendor-symlinks?
+   (let* ((vendor-dir (getenv %vendorize-env-var))
+          (deps-dir (list-directories vendor-dir)))
+     (for-each
+      (lambda (dep-dir)
+        (let ((snapshot (string-contains dep-dir "_snapshot")))
+          (and
+           snapshot
+           (let ((canonical
+                  (string-drop-right
+                   dep-dir (- (string-length dep-dir) snapshot))))
+             (symlink dep-dir canonical)))))
+      deps-dir))))
+
+(define (beam-package? name)
+  (string-prefix? %beam-prefix name))
 
 (define* (set-mix-env #:key inputs mix-path mix-exs #:allow-other-keys)
   "Set environment variables.
@@ -113,22 +183,32 @@ See: https://hexdocs.pm/mix/1.15.7/Mix.html#module-environment-variables"
   (%elixir-version (elixir-version inputs))
   (format #t "Elixir version: ~a~%" (%elixir-version)))
 
-(define* (build #:key mix-environments #:allow-other-keys)
+
+(define* (build #:key mix-environments vendorize?
+                #:allow-other-keys)
   "Builds the Mix project."
   (for-each (lambda (mix-env)
               (setenv "MIX_ENV" mix-env)
-              (invoke "mix" "compile" "--no-deps-check"
-                      "--no-prune-code-paths"))
+              (if vendorize?
+                  (invoke "mix" "release")
+                  (invoke "mix" "compile" "--no-prune-code-paths"
+                          "--no-deps-check")))
             mix-environments))
 
-(define* (check #:key (tests? #t) (test-flags '()) #:allow-other-keys)
+(define* (check #:key (tests? #t) (test-flags '())
+                vendorize?
+                #:allow-other-keys)
   "Test the Mix project."
   (if tests?
-      (begin
+      (let ((maybe-no-deps-check-flag
+             (if vendorize? '() '("--no-deps-check"))))
         (setenv "MIX_ENV" "test")
-        (apply invoke "mix" "do" "compile" "--no-deps-check"
-                       "--no-prune-code-paths" "+" "test"
-                       "--no-deps-check" test-flags))
+        (apply invoke
+               (append '("mix" "do" "compile")
+                       maybe-no-deps-check-flag
+                       '("--no-prune-code-paths" "+" "test")
+                       maybe-no-deps-check-flag
+                       test-flags)))
       (format #t "tests? = ~a~%" tests?)))
 
 (define* (remove-mix-dirs . _)
@@ -137,7 +217,7 @@ We do not want to copy them to the installation directory."
   (for-each delete-file-recursively
             (find-files "." (file-name-predicate "\\.mix$") #:directories? #t)))
 
-(define (package-name->elixir-name name+ver)
+(define* (package-name->elixir-name name+ver #:optional (prefix %elixir-prefix))
   "Convert the Guix package NAME-VER to the corresponding Elixir name-version
 format.  Example: elixir-a-pkg-1.2.3 -> a_pkg or elixir-a-pkg-0.0.0-0.e51e36e
 -> a_pkg"
@@ -146,7 +226,7 @@ format.  Example: elixir-a-pkg-1.2.3 -> a_pkg or elixir-a-pkg-0.0.0-0.e51e36e
     (cute string-join <> "_")
     (cute drop-right <> (if git-version? 2 1))
     (cute string-split <> #\-))
-   (strip-prefix name+ver)))
+   (strip-prefix name+ver prefix)))
 
 (define* (install #:key
                   inputs
@@ -155,13 +235,24 @@ format.  Example: elixir-a-pkg-1.2.3 -> a_pkg or elixir-a-pkg-0.0.0-0.e51e36e
                   build-per-environment
                   #:allow-other-keys)
   "Install build artifacts in the store."
-  (let* ((lib-name (package-name->elixir-name name))
-         (lib-dir (string-append (elixir-libdir (assoc-ref outputs "out")) "/" lib-name))
-         (root (getenv "MIX_BUILD_ROOT"))
-         (env (if build-per-environment "prod" "shared")))
-    (mkdir-p lib-dir)
-    (copy-recursively (string-append (mix-build-dir root env) "/" lib-name) lib-dir
-                      #:follow-symlinks? #t)))
+  (if (beam-package? name)
+      (let* ((out (assoc-ref outputs "out"))
+             (excluded '("CHECKSUM" "contents.tar.gz" "environment-variables"
+                         "metadata.config" "VERSION"))
+             (files
+              (filter
+               (lambda (f)
+                 (not (member f (cons* "." ".." excluded))))
+               (scandir "."))))
+        (mkdir-p out)
+        (apply invoke "cp" "-r" (append files (list out))))
+      (let* ((lib-name (package-name->elixir-name name))
+             (lib-dir (string-append (elixir-libdir (assoc-ref outputs "out")) "/" lib-name))
+             (root (getenv "MIX_BUILD_ROOT"))
+             (env (if build-per-environment "prod" "shared")))
+        (mkdir-p lib-dir)
+        (copy-recursively (string-append (mix-build-dir root env) "/" lib-name) lib-dir
+                          #:follow-symlinks? #t))))
 
 (define %standard-phases
   (modify-phases gnu:%standard-phases
@@ -170,6 +261,8 @@ format.  Example: elixir-a-pkg-1.2.3 -> a_pkg or elixir-a-pkg-0.0.0-0.e51e36e
     (add-after 'install-locale 'set-mix-env set-mix-env)
     (add-after 'set-mix-env 'set-elixir-version set-elixir-version)
     (replace 'unpack unpack)
+    (add-after 'unpack 'unpack-vendorize unpack-vendorize)
+    (add-after 'unpack-vendorize 'symlink-vendorize symlink-vendorize)
     (replace 'build build)
     (replace 'check check)
     (add-before 'install 'remove-mix-dirs remove-mix-dirs)
