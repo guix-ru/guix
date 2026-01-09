@@ -47,6 +47,8 @@ Import and convert the hex.pm package for PACKAGE-NAME.\n"))
   (newline)
   (display (G_ "
   -r, --recursive        import packages recursively"))
+  (display (G_ "
+  -m, --mix-inputs       use mix-inputs for input field"))
   (newline)
   (show-bug-report-information))
 
@@ -62,6 +64,9 @@ Import and convert the hex.pm package for PACKAGE-NAME.\n"))
          (option '(#\r "recursive") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'recursive #t result)))
+         (option '("mix-inputs") #f #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'mix-inputs #t result)))
          %standard-import-options))
 
 
@@ -94,7 +99,9 @@ Import and convert the hex.pm package for PACKAGE-NAME.\n"))
                      (_ #f))
                     (hexpm-recursive-import name version))
                ;; Single import
-               (let ((sexp (hexpm->guix-package name #:version version)))
+               (let* ((mix-inputs (assoc-ref opts 'mix-inputs))
+                      (sexp (hexpm->guix-package name #:version version
+                                                 #:mix-inputs? mix-inputs)))
                  (unless sexp
                    (leave (G_ "failed to download meta-data for package '~a'~%")
                           spec))

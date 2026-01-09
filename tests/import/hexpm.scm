@@ -250,4 +250,48 @@
           (x
            (pk 'fail x #f))))))
 
+(test-assert "hexpm-with-mix-inputs"
+  ;; Replace network resources with sample data.
+  (mock ((guix http-client) http-fetch
+         (lambda (url . rest)
+           (match url
+             ("https://hex.pm/api/packages/bla"
+              (values (open-input-string test-bla-package)
+                      (string-length test-bla-package)))
+             ("https://hex.pm/api/packages/bla/releases/1.5.0"
+              (values (open-input-string test-bla-release)
+                      (string-length test-bla-release)))
+             (_ (error "http-fetch got unexpected URL: " url)))))
+  (mock ((guix build download) url-fetch
+         (lambda* (url file-name
+                       #:key
+                       (mirrors '()) verify-certificate?)
+           (with-output-to-file file-name
+             (lambda ()
+               (display
+                (match url
+                  ("https://repo.hex.pm/tarballs/bla-1.5.0.tar"
+                   "source")
+                  (_ (error "url-fetch got unexpected URL: " url))))))))
+    (match (hexpm->guix-package "bla" #:mix-inputs? #t)
+      (`(package
+          (name "erlang-bla")
+          (version "1.5.0")
+          (source
+           (origin
+             (method url-fetch)
+             (uri (hexpm-uri "bla" version))
+             (sha256
+              (base32
+               "0zcl4dgcmqwl1g5xb901pd6dz61r1xgmac9mqlwvh022paa6gks1"))))
+          (build-system rebar-build-system)
+          (inputs (mix-inputs 'erlang-bla))
+          (synopsis "A cool package")
+          (description "This package provides a cool package.")
+          (home-page "https://hex.pm/packages/bla")
+          (license (list license:expat license:asl2.0)))
+       #t)
+      (x
+       (pk 'fail x #f))))))
+
 (test-end "hexpm")

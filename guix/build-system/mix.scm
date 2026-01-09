@@ -1,6 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2023 Pierre-Henry Fröhring <contact@phfrohring.com>
 ;;; Copyright © 2025 Giacomo Leidi <therewasa@fishinthecalculator.me>
+;;; Copyright © 2025 Igorj Gorjaĉev <igor@goryachev.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -28,7 +29,10 @@
   #:use-module (guix build mix-build-system)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system)
+  #:use-module (guix diagnostics)
+  #:use-module (guix download)
   #:use-module (guix gexp)
+  #:use-module (guix i18n)
   #:use-module (guix monads)
   #:use-module (guix packages)
   #:use-module (guix search-paths)
@@ -37,7 +41,12 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:export (mix-build-system hexpm-uri))
+  #:export (mix-build-system
+            hexpm-uri
+            beam-name->package-name
+            hexpm-source
+            define-mix-inputs
+            mix-inputs))
 
 (define (default-elixir-hex)
   (@* (gnu packages elixir) elixir-hex))
@@ -64,6 +73,48 @@ See: https://github.com/hexpm/specifications/blob/main/endpoints.md"
     strip-prefix)
    name))
 
+(define (beam-name->package-name name)
+  (downstream-package-name "beam-" name))
+
+;; NOTE: Only use this procedure in (gnu packages beam-packages).
+(define* (hexpm-source package-name hexpm-name hexpm-version hexpm-hash
+                       #:key (patches '()) (snippet #f))
+  (origin
+    (method url-fetch)
+    (uri (hexpm-uri hexpm-name hexpm-version))
+    (file-name
+     (string-append "beam-" package-name "-" hexpm-version ".tar"))
+    (sha256 (base32 hexpm-hash))
+    (modules '((guix build utils)))
+    (patches patches)
+    (snippet snippet)))
+
+(define-syntax define-mix-inputs
+  (syntax-rules (=>)
+    ((_ lookup inputs ...)
+     (define lookup
+       (let ((table (make-hash-table)))
+         (letrec-syntax ((record
+                          (syntax-rules (=>)
+                            ((_) #t)
+                            ((_ (name => lst) rest (... ...))
+                             (begin
+                               (hashq-set! table 'name (filter identity lst))
+                               (record rest (... ...)))))))
+           (record inputs ...)
+           (lambda (name)
+             "Return the inputs for NAME."
+             (hashq-ref table name))))))))
+
+(define* (mix-inputs name #:key (module '(gnu packages beam-packages)))
+  "Lookup Mix inputs for NAME defined in MODULE, return an empty list if
+unavailable."
+  (let ((lookup (module-ref (resolve-interface module) 'lookup-mix-inputs)))
+    (or (lookup name)
+        (begin
+          (warning (G_ "no Mix inputs available for '~a'~%") name)
+          '()))))
+
 ;; A number of environment variables specific to the Mix build system are
 ;; reflected here.  They are documented at
 ;; https://hexdocs.pm/mix/Mix.html#module-environment-variables.  Other
@@ -75,6 +126,9 @@ See: https://github.com/hexpm/specifications/blob/main/endpoints.md"
                     source
                     (tests? #t)
                     (test-flags ''())
+                    (vendorize? #f)
+                    (vendor-symlinks? #t)
+                    (vendor-dir "guix-vendor")
                     (mix-path #f) ;See MIX_PATH.
                     (mix-exs "mix.exs") ;See MIX_EXS.
                     (build-per-environment #t) ;See :build_per_environment.
@@ -110,6 +164,9 @@ See: https://github.com/hexpm/specifications/blob/main/endpoints.md"
                            #:system #$system
                            #:tests? #$tests?
                            #:test-flags #$test-flags
+                           #:vendorize? #$vendorize?
+                           #:vendor-symlinks? #$vendor-symlinks?
+                           #:vendor-dir #$vendor-dir
                            #:mix-path #$mix-path
                            #:mix-exs #$mix-exs
                            #:mix-environments '#$mix-environments

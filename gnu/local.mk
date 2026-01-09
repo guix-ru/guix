@@ -76,6 +76,7 @@
 # Copyright © 2025 Nigko Yerden <nigko.yerden@gmail.com>
 # Copyright © 2025 Cayetano Santos <csantosb@disroot.org>
 # Copyright © 2025 bdunahu <bdunahu@operationnull.com>
+# Copyright © 2025 Igorj Gorjaĉev <igor@goryachev.org>
 # Copyright © 2026 Simen Endsjø <contact@simendsjo.me>
 # Copyright © 2026 Goran Vukoman <g@odyss3us.net>
 # Copyright © 2026 Stampede <stampde@tutamail.com>
@@ -181,6 +182,9 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/bash.scm				\
   %D%/packages/batik.scm			\
   %D%/packages/bdw-gc.scm			\
+  %D%/packages/beam-apps.scm			\
+  %D%/packages/beam-packages.scm		\
+  %D%/packages/beam-sources.scm			\
   %D%/packages/benchmark.scm			\
   %D%/packages/bioconductor.scm			\
   %D%/packages/bioinformatics.scm		\
