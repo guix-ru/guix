@@ -177,33 +177,37 @@ as symbols."
 (define* (make-hexpm-sexp #:key name version tarball-url
                           home-page synopsis description license
                           language build-system dependencies
+                          mix-inputs?
                           #:allow-other-keys)
   "Return the `package' s-expression for a hexpm package with the given NAME,
 VERSION, TARBALL-URL, HOME-PAGE, SYNOPSIS, DESCRIPTION, and LICENSE. The
 created package's name will stem from LANGUAGE. BUILD-SYSTEM defined the
-build-system, and DEPENDENCIES the inputs for the package."
-  (call-with-temporary-output-file
-   (lambda (temp port)
-     (and (url-fetch tarball-url temp)
-          (values
-       `(package
-         (name ,(hexpm-name->package-name name language))
-         (version ,version)
-         (source (origin
-                   (method url-fetch)
-                   (uri (hexpm-uri ,name version))
-                   (sha256 (base32 ,(guix-hash-url temp)))))
-         (build-system ,build-system)
-         ,@(maybe-inputs (dependencies->package-names dependencies) 'inputs)
-         (synopsis ,synopsis)
-         (description ,(beautify-description description))
-         (home-page ,(match home-page
-                            (() "")
-                            (_ home-page)))
-         (license ,(match license
-                          (() #f)
-                          ((license) license)
-                          (_ `(list ,@license))))))))))
+build-system, and DEPENDENCIES or MIX-INPUTS? the inputs for the package."
+  (let ((package-name (hexpm-name->package-name name language)))
+    (call-with-temporary-output-file
+     (lambda (temp port)
+       (and (url-fetch tarball-url temp)
+            (values
+             `(package
+                (name ,package-name)
+                (version ,version)
+                (source (origin
+                          (method url-fetch)
+                          (uri (hexpm-uri ,name version))
+                          (sha256 (base32 ,(guix-hash-url temp)))))
+                (build-system ,build-system)
+                ,@(if mix-inputs?
+                      `((inputs (mix-inputs ',(string->symbol package-name))))
+                      (maybe-inputs (dependencies->package-names dependencies) 'inputs))
+                (synopsis ,synopsis)
+                (description ,(beautify-description description))
+                (home-page ,(match home-page
+                              (() "")
+                              (_ home-page)))
+                (license ,(match license
+                            (() #f)
+                            ((license) license)
+                            (_ `(list ,@license)))))))))))
 
 (define (strings->licenses strings)
   "Convert the list of STRINGS into a list of license objects."
@@ -221,11 +225,13 @@ object, ordered from newest to oldest."
   (sort (map hexpm-version-number (hexpm-versions package))
         version>?))
 
-(define* (hexpm->guix-package package-name #:key version #:allow-other-keys)
-  "Fetch the metadata for PACKAGE-NAME from hexpms.io, and return the
+(define* (hexpm->guix-package package-name #:key version
+                              mix-inputs? #:allow-other-keys)
+  "Fetch the metadata for PACKAGE-NAME from hex.pm, and return the
 `package' s-expression corresponding to that package, or #f on failure.
 When VERSION is specified, attempt to fetch that version; otherwise fetch the
-latest version of PACKAGE-NAME."
+latest version of PACKAGE-NAME.  It can use `inputs` with `mix-inputs` when
+MIX-INPUTS? is specified."
 
   (define package
     (lookup-hexpm package-name))
@@ -277,6 +283,7 @@ latest version of PACKAGE-NAME."
            #:name package-name
            #:version version-number
            #:dependencies dependencies
+           #:mix-inputs? mix-inputs?
            #:home-page (or (and (not (eq? docs-html-url 'null))
                                 docs-html-url)
                            ;; TODO: Homepage?

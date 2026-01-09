@@ -149,6 +149,7 @@ Copyright @copyright{} 2025 Rodion Goritskov@*
 Copyright @copyright{} 2025 dan@*
 Copyright @copyright{} 2025 Noé Lopez@*
 Copyright @copyright{} 2026 David Elsing@*
+Copyright @copyright{} 2026 Igorj Gorjaĉev@*
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -15349,6 +15350,31 @@ Additional options include:
 Traverse the dependency graph of the given upstream package recursively
 and generate package expressions for all those packages that are not yet
 in Guix.
+@item --mix-inputs
+@itemx -m
+Use vendored @code{mix-inputs} for @code{input} field instead of common
+dependencies.
+@end table
+
+@item mix
+@cindex mix
+Import metadata from the @file{mix.lock}, Elixir's
+@uref{https://hexdocs.pm/elixir/introduction-to-mix.html, mix} lock file,
+as in this example:
+
+@example
+guix import mix -f mix.lock yourapp
+@end example
+
+Mandatory options are:
+
+@table @code
+@item --lockfile=@var{file}
+@itemx -f @var{file}
+@option{--lockfile} must be a @file{mix.lock} file.
+
+@xref{Packaging Elixir Applications,,, guix-cookbook, GNU Guix Cookbook}, for
+packaging workflow utilizing it.
 @end table
 @end table
 

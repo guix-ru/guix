@@ -29,6 +29,7 @@ Copyright @copyright{} 2025 45mg@*
 Copyright @copyright{} 2023 Marek Felšöci@*
 Copyright @copyright{} 2023 Konrad Hinsen@*
 Copyright @copyright{} 2023 Philippe Swartvagher@*
+Copyright @copyright{} 2026 Igorj Gorjaĉev@*
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -140,6 +141,7 @@ Programmable and automated package definition
 Packaging Workflows
 
 * Packaging Rust Crates::
+* Packaging Elixir Applications::
 
 Packaging Rust Crates
 
@@ -1629,6 +1631,7 @@ systems, serving as extensions to the concise packaging guidelines
 
 @menu
 * Packaging Rust Crates::
+* Packaging Elixir Applications::
 @end menu
 
 @node Packaging Rust Crates
@@ -1983,6 +1986,108 @@ method, one of the most popular choices for Traditional Chinese users.")
     (home-page "https://chewing.im/")
     (license license:lgpl2.1+)))
 @end lisp
+
+@node Packaging Elixir Applications
+@subsection Packaging Elixir Applications
+
+In preparation, add the following packages to your environment:
+
+@example
+$ guix shell elixir elixir-depscheck elixir-mix-audit
+@end example
+
+In this example, we package @uref{https://livebook.dev, livebook},
+which is an interactive, web-based notebook environment for writing,
+running, and sharing Elixir code with rich documentation and
+visualizations.
+
+@enumerate
+@item
+We retrieve the @code{livebook} source code with the latest version
+from the corresponding @code{git} repository:
+
+@example
+$ git clone --branch v0.18.2 --depth 1 \
+      https://github.com/livebook-dev/livebook
+@end example
+
+We should prepare the following definiton for this package (the suggested
+location for this definition should be @code{gnu/packages/beam-packages.scm}
+or up to your mind):
+
+@lisp
+(define-public livebook
+  (package
+    (name "livebook")
+    (version "0.18.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/livebook-dev/livebook")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1pq227nabslr7gh4qvg24wj4320djc0vrh6x6l23g3468x6znxjm"))))
+    (build-system mix-build-system)
+    (arguments
+     (list
+      #:tests? #f ; TODO: make them work a little bit later
+      #:vendorize? #t
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'install
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let ((out (assoc-ref outputs "out")))
+                (copy-recursively "_build/prod/rel/livebook/"
+                                  out)))))))
+    (inputs (mix-inputs 'livebook))
+    (synopsis "Web application for writing code notebooks")
+    (description "This package provides @code{Livebook}, a web application
+for writing interactive and collaborative code notebooks.")
+    (home-page "https://livebook.dev/")
+    (license license:asl2.0)))
+@end lisp
+
+The identifier used to invoke @code{mix-inputs}, in this case the scheme
+symbol @code{'livebook}, must be unique, usually matching the variable name
+of the package.
+
+@item
+Navigate to the unpacked directory, then run the following commands:
+
+@example
+$ mix deps.get
+$ mix deps.audit
+$ mix depscheck --verbose
+@end example
+
+@command{mix deps.audit} checks known vulnerabilities and @command{mix
+depscheck --verbose} checks licenses, for all the dependencies.  We must
+have an acceptable output (i.e. message ``No vulnerabilities found.'') of
+@command{mix deps.audit} and ensure all dependencies are licensed with our
+supported licenses (@pxref{Defining Packages,,, guix, GNU Guix Reference Manual}).
+
+@item
+Import dependencies from the lockfile:
+
+@example
+$ guix import --insert=gnu/packages/beam-packages.scm \
+      mix --lockfile=/path/to/mix.lock livebook
+
+# or:
+$ guix import -i gnu/packages/beam-packages.scm \
+      mix -f /path/to/mix.lock livebook
+@end example
+
+After that the package could be build by using the following command:
+
+@example
+$ guix build livebook
+@end example
+
+@end enumerate
 
 
 @c *********************************************************************

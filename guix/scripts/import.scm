@@ -7,6 +7,7 @@
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;; Copyright © 2022 Philip McGrath <philip@philipmcgrath.com>
 ;;; Copyright © 2024 Herman Rimm <herman@rimm.ee>
+;;; Copyright © 2025 Igorj Gorjaĉev <igor@goryachev.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -63,6 +64,7 @@
 (define importers '("composer" "cpan" "cran" "crate" "egg" "elm" "elpa"
                     "gem" "gnu" "go" "hackage" "hexpm" "json" "luanti"
                     "minetest"          ; deprecated
+                    "mix"
                     "npm-binary" "nuget" "opam" "pypi" "stackage" "texlive"))
 
 (define (resolve-importer name)
@@ -143,10 +145,10 @@ PROC callback."
     ((or ("-i" file importer args ...)
          ("--insert" file importer args ...))
      (let* ((define-prefixes
-             `(,@(if (member importer '("crate"))
-                     '(define)
-                     '())
-               define-public))
+              `(,@(if (member importer '("crate" "mix"))
+                      '(define)
+                      '())
+                define-public))
             (define-prefix? (cut member <> define-prefixes))
             (find-and-insert
              (lambda (expr)
@@ -172,9 +174,9 @@ PROC callback."
     ((importer args ...)
      (let ((print (lambda (expr)
                     (leave-on-EPIPE
-                      (pretty-print-with-comments
-                        (current-output-port) expr)
-                      ;; Two newlines: one after the closing paren, and
-                      ;; one to leave a blank line.
-                      (newline) (newline)))))
+                     (pretty-print-with-comments
+                      (current-output-port) expr)
+                     ;; Two newlines: one after the closing paren, and
+                     ;; one to leave a blank line.
+                     (newline) (newline)))))
        (import-as-definitions importer args print)))))

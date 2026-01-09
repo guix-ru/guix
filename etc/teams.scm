@@ -481,15 +481,21 @@ already exists.  Lookup team IDs among CURRENT-TEAMS."
         #:name "Erlang/Elixir/BEAM team"
         #:description "The virtual machine at the core of the Erlang Open
 Telecom Platform (OTP), Erlang and Elxir languages and packages, development
-of Rebar and Mix build systems and Hex.pm importer."
-        #:scope (list (make-regexp* "^gnu/packages/elixir(-.+|)\\.scm$")
+of Rebar and Mix build systems, Hex.pm and Mix importers."
+        #:scope (list (make-regexp* "^gnu/packages/beam-.+\\.scm$")
+                      (make-regexp* "^gnu/packages/elixir(-.+|)\\.scm$")
                       "guix/build/mix-build-system.scm"
                       "guix/build-system/mix.scm"
                       (make-regexp* "^gnu/packages/erlang(-.+|)\\.scm$")
                       "guix/build/rebar-build-system.scm"
                       "guix/build-system/rebar.scm"
                       "guix/import/hexpm.scm"
-                      "guix/scripts/import/hexpm.scm")))
+                      "guix/import/mix.scm"
+                      "guix/import/mix/mix-lock.scm"
+                      "guix/scripts/import/hexpm.scm"
+                      "guix/scripts/import/mix.scm"
+                      "tests/import/hexpm.scm"
+                      "tests/import/mix.scm")))
 
 (define-team bioinformatics
   (team 'bioinformatics

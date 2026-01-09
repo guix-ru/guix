@@ -22,6 +22,7 @@
 # Copyright © 2024 gemmaro <gemmaro.dev@gmail.com>
 # Copyright © 2025 Brice Waegeneire <brice@waegenei.re>
 # Copyright © 2025 Florian Pelz <pelzflorian@pelzflorian.de>
+# Copyright © 2025 Igorj Gorjaĉev <igor@goryachev.org>
 #
 # This file is part of GNU Guix.
 #
@@ -319,6 +320,8 @@ MODULES =					\
   guix/import/launchpad.scm   			\
   guix/import/luanti.scm   			\
   guix/import/minetest.scm   			\
+  guix/import/mix.scm				\
+  guix/import/mix/mix-lock.scm			\
   guix/import/nuget.scm   			\
   guix/import/npm-binary.scm			\
   guix/import/opam.scm				\
@@ -376,6 +379,7 @@ MODULES =					\
   guix/scripts/import/json.scm  		\
   guix/scripts/import/luanti.scm  		\
   guix/scripts/import/minetest.scm  		\
+  guix/scripts/import/mix.scm	  		\
   guix/scripts/import/npm-binary.scm		\
   guix/scripts/import/nuget.scm  		\
   guix/scripts/import/opam.scm			\
@@ -580,6 +584,7 @@ SCM_TESTS =					\
   tests/import/hackage.scm			\
   tests/import/hexpm.scm			\
   tests/import/luanti.scm			\
+  tests/import/mix.scm				\
   tests/import/npm-binary.scm			\
   tests/import/nuget.scm			\
   tests/import/opam.scm				\
