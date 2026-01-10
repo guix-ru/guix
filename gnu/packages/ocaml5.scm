@@ -487,6 +487,32 @@ adds a few missing functions and fully exploits OCaml's newfound string
 immutability.")
     (license license:isc)))
 
+(define-public ocaml-uuidm
+  (package
+    (name "ocaml5-uuidm")
+    (version "0.9.8")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/uuidm/"
+                           "releases/uuidm-" version ".tbz"))
+       (sha256
+        (base32 "1cr6xlzla9fmd587lfhzac0icifspjnqi9f4cdafshj3jn85nrpw"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:build-flags (list "build" "--tests" "true" "--with-cmdliner" "true")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-cmdliner ocaml-topkg))
+    (home-page "https://erratique.ch/software/uuidm")
+    (synopsis "Universally unique identifiers for OCaml")
+    (description
+     "Uuidm is an OCaml module implementing 128 bits universally
+unique identifiers (UUIDs) version 3, 5 (named based with MD5, SHA-1 hashing)
+and 4 (random based) according to RFC 4122.")
+    (license license:isc)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
