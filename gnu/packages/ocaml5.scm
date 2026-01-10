@@ -261,6 +261,10 @@ staying compatible with older version of OCaml should use the Result module
 defined in this library.")
     (license license:bsd-3)))
 
+;; Use this version of `ocaml-result` for packages built with the default
+;; ocaml 5.x compiler.
+(define-public ocaml-result ocaml5.3-result)
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
