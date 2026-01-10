@@ -667,6 +667,35 @@ to JUnit and other XUnit testing frameworks.")
 other XUnit testing frameworks.")
     (license license:expat)))
 
+(define-public ocaml-re
+  (package
+    (name "ocaml5-re")
+    (version "1.10.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/ocaml-re")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1g0vmpx6ylv8m0w77zarn215pgb4czc6gcpb2fi5da1s307zwr0w"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-seq))
+    (native-inputs (list ocaml-ounit))
+    (home-page "https://github.com/ocaml/ocaml-re/")
+    (synopsis "Regular expression library for OCaml")
+    (description
+     "Pure OCaml regular expressions with:
+@enumerate
+@item Perl-style regular expressions (module Re_perl)
+@item Posix extended regular expressions (module Re_posix)
+@item Emacs-style regular expressions (module Re_emacs)
+@item Shell-style file globbing (module Re_glob)
+@item Compatibility layer for OCaml's built-in Str module (module Re_str)
+@end enumerate")
+    (license license:expat)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
