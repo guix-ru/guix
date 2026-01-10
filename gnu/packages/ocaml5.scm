@@ -433,6 +433,29 @@ programs.  It allows the definition of simple macros and file inclusion.  Cppo i
 @code{Stdlib.Bigarray} in OCaml.")
     (license license:isc)))
 
+(define-public ocaml-mmap
+  (package
+    (name "ocaml5-mmap")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mmap")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1a7w7l682cbksn2zlmz24gb519x7wb65ivr5vndm9x5pi9fw5pfb"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-bigarray-compat))
+    (home-page "https://github.com/mirage/mmap")
+    (synopsis "File mapping for OCaml")
+    (description
+     "This project provides a @command{Mmap.map_file} function
+for mapping files in memory.  This function is the same as the
+@command{Unix.map_file} function added in OCaml >= 4.06.")
+    (license (list license:qpl license:lgpl2.0))))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
