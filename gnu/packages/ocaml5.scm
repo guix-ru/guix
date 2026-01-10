@@ -333,6 +333,28 @@ requires=\"\"")))
 standard iterator type starting from 4.07.")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-stdlib-shims
+  (package
+    (name "ocaml5-stdlib-shims")
+    (version "0.3.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/ocaml/stdlib-shims")
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0gmg8w67j3ww17llk7hl4dx0vq7p50rn5s4ib9sy984k543rz59h"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/ocaml/stdlib-shims")
+    (synopsis "OCaml stdlib features backport to older OCaml compilers")
+    (description "This package backports some of the new stdlib features to
+older compilers, such as the Stdlib module.  This allows projects that require
+compatibility with older compiler to use these new features in their code.")
+    ;; with ocaml-linking exception
+    (license license:lgpl2.1+)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
