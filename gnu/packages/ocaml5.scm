@@ -147,6 +147,39 @@ functional, imperative and object-oriented styles of programming.")
                (base32
                 "05jhy9zn53v12rn3sg3vllqf5blv1gp7f06803npimc58crxy6rv"))))))
 
+(define-public ocamlbuild
+  (package
+    (name "ocaml5-ocamlbuild")
+    (version "0.16.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/ocamlbuild")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "148r0imzsalr7c3zqncrl4ji29wpb5ls5zkqxy6xnh9q99gxb4a6"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:make-flags ,#~(list (string-append "OCAMLBUILD_PREFIX="
+                                            #$output)
+                             (string-append "OCAMLBUILD_BINDIR="
+                                            #$output "/bin")
+                             (string-append "OCAMLBUILD_LIBDIR="
+                                            #$output "/lib/ocaml/site-lib")
+                             (string-append "OCAMLBUILD_MANDIR="
+                                            #$output "/share/man"))
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))
+       ;; some failures because of changes in OCaml's error message formatting
+       #:tests? #f))
+    (home-page "https://github.com/ocaml/ocamlbuild")
+    (synopsis "OCaml build tool")
+    (description "OCamlbuild is a generic build tool, that has built-in rules
+for building OCaml library and programs.")
+    (license license:lgpl2.1+)))
+
 (define-public ocaml5.3-result
   (package
     (name "ocaml5.3-result")
