@@ -456,6 +456,37 @@ for mapping files in memory.  This function is the same as the
 @command{Unix.map_file} function added in OCaml >= 4.06.")
     (license (list license:qpl license:lgpl2.0))))
 
+(define-public ocaml-astring
+  (package
+    (name "ocaml5-astring")
+    (version "0.8.5")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "http://erratique.ch/software/astring/releases/astring-" version
+             ".tbz"))
+       (sha256
+        (base32 "1ykhg9gd3iy7zsgyiy2p9b1wkpqg9irw5pvcqs3sphq71iir4ml6"))))
+    (build-system ocaml-build-system)
+    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (home-page "https://erratique.ch/software/astring")
+    (synopsis "Alternative String module for OCaml")
+    (description
+     "Astring exposes an alternative String module for OCaml.  This
+module balances minimality and expressiveness for basic, index-free, string
+processing and provides types and functions for substrings, string sets and
+string maps.  The String module exposed by Astring has exception safe functions,
+removes deprecated and rarely used functions, alters some signatures and names,
+adds a few missing functions and fully exploits OCaml's newfound string
+immutability.")
+    (license license:isc)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
