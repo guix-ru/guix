@@ -89,13 +89,25 @@
                   #:allow-other-keys)
   "Install the given package."
   (let ((out (assoc-ref outputs "out")))
-    (if (and (file-exists? "setup.ml") (not use-make?))
+    (cond
+     ((and (file-exists? "setup.ml") (not use-make?))
       (apply invoke "ocaml" "setup.ml"
-             (string-append "-" install-target) build-flags)
-      (if (file-exists? "Makefile")
-        (apply invoke "make" install-target make-flags)
-        (invoke "opam-installer" "-i" (string-append "--prefix=" out)
-                (string-append "--libdir=" out "/lib/ocaml/site-lib")))))
+             (string-append "-" install-target) build-flags))
+     ((file-exists? "Makefile")
+      (apply invoke "make" install-target make-flags))
+     ;; Use either opam-installer or opaline, which both understand
+     ;; opam's `.install` file format.  opam-installer is the standard
+     ;; platform tool, while opaline is a fallback for packages with
+     ;; circular dependencies involving opam.
+     ;; (https://codeberg.org/guix/guix/issues/3588)
+     ((which "opam-installer")
+      (invoke "opam-installer" "-i" (string-append "--prefix=" out)
+              (string-append "--libdir=" out "/lib/ocaml/site-lib")))
+     ((which "opaline")
+      (invoke "opaline" "-prefix" out
+              "-libdir" (string-append out "/lib/ocaml/site-lib")))
+     (else (error (string-append "Either 'opam-installer' or 'opaline' "
+                                 "must exist in $PATH at build time.")))))
   #t)
 
 (define* (prepare-install #:key outputs #:allow-other-keys)
