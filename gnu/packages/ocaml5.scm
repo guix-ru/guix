@@ -52,6 +52,8 @@
 (define-module (gnu packages ocaml5)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages gcc)
+  #:use-module (gnu packages glib)
+  #:use-module (gnu packages libevent)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
@@ -593,6 +595,35 @@ and bigarrays")
 and bigarrays, based on new primitives added in version 4.01.  It works on
 strings, bytes and bigstring (Bigarrys of chars), and provides submodules for
 big- and little-endian, with their unsafe counter-parts.")
+    (license license:lgpl2.1)))
+
+(define-public ocaml-lwt
+  (package
+    (name "ocaml5-lwt")
+    (version "5.6.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocsigen/lwt")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0cfmhw4nsnwba49p06l9fbnbcq75w9fd3kvrr615ihjc9frlmjsy"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "lwt"))
+    (native-inputs (list ocaml-cppo pkg-config))
+    (inputs (list glib))
+    (propagated-inputs (list ocaml-mmap ocaml-ocplib-endian ocaml-result
+                             ocaml-seq libev))
+    (home-page "https://github.com/ocsigen/lwt")
+    (synopsis "Cooperative threads and I/O in monadic style")
+    (description
+     "Lwt provides typed, composable cooperative threads.  These
+make it easy to run normally-blocking I/O operations concurrently in a single
+process.  Also, in many cases, Lwt threads can interact without the need for
+locks or other synchronization primitives.")
     (license license:lgpl2.1)))
 
 (define-public ocaml5.3-dune-bootstrap
