@@ -647,6 +647,26 @@ locks or other synchronization primitives.")
 to JUnit and other XUnit testing frameworks.")
     (license license:expat)))
 
+(define-public ocaml-ounit
+  (package
+    (inherit ocaml-ounit2)
+    (name "ocaml5-ounit")
+    (arguments
+     `(#:tests? #f ;tests have been observed to hang.
+       #:phases (modify-phases %standard-phases
+                  (replace 'install
+                    (lambda _
+                      (invoke "make" "install-ounit"
+                              ,(string-append "version="
+                                              (package-version ocaml-ounit2))))))))
+    (propagated-inputs (list ocaml-ounit2))
+    (home-page "http://ounit.forge.ocamlcore.org")
+    (synopsis "Unit testing framework for OCaml")
+    (description
+     "Unit testing framework for OCaml.  It is similar to JUnit and
+other XUnit testing frameworks.")
+    (license license:expat)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
