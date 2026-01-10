@@ -295,6 +295,44 @@ configuration and to specify information about the package's distribution,
 creation and publication procedures.")
     (license license:isc)))
 
+(define-public ocaml-seq
+  (package
+    (name "ocaml5-seq")
+    (version "0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/c-cube/seq")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1cjpsc7q76yfgq9iyvswxgic4kfq2vcqdlmxjdjgd4lx87zvcwrv"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'build)
+         (replace 'install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let ((install-dir (string-append (assoc-ref outputs "out")
+                                               "/lib/ocaml/site-lib/seq")))
+               (mkdir-p install-dir)
+               (with-output-to-file (string-append install-dir "/META")
+                 (lambda _
+                   (display "name=\"seq\"
+version=\"[distributed with ocaml]\"
+description=\"dummy package for compatibility\"
+requires=\"\"")))
+               #t))))))
+    (home-page "https://github.com/c-cube/seq")
+    (synopsis "OCaml's standard iterator type")
+    (description "This package is a compatibility package for OCaml's
+standard iterator type starting from 4.07.")
+    (license license:lgpl2.1+)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
