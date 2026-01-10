@@ -513,6 +513,37 @@ unique identifiers (UUIDs) version 3, 5 (named based with MD5, SHA-1 hashing)
 and 4 (random based) according to RFC 4122.")
     (license license:isc)))
 
+(define-public ocaml-uutf
+  (package
+    (name "ocaml5-uutf")
+    (version "1.0.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/uutf/releases/"
+                           "uutf-" version ".tbz"))
+       (sha256
+        (base32 "0s05r8ggp1g97zq4rnvbxzj22pv8ld0k5wsdw662jw0y7mhsawl7"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (propagated-inputs (list ocaml-cmdliner))
+    (home-page "https://erratique.ch/software/uutf")
+    (synopsis "Non-blocking streaming Unicode codec for OCaml")
+    (description
+     "Uutf is a non-blocking streaming codec to decode and encode
+the UTF-8, UTF-16, UTF-16LE and UTF-16BE encoding schemes.  It can efficiently
+work character by character without blocking on IO.  Decoders perform character
+position tracking and support newline normalization.
+
+Functions are also provided to fold over the characters of UTF encoded OCaml
+string values and to directly encode characters in OCaml Buffer.t values.")
+    (license license:isc)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
