@@ -355,6 +355,32 @@ compatibility with older compiler to use these new features in their code.")
     ;; with ocaml-linking exception
     (license license:lgpl2.1+)))
 
+(define-public ocaml-cmdliner
+  (package
+    (name "ocaml5-cmdliner")
+    (version "1.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://erratique.ch/software/cmdliner/releases/"
+                           "cmdliner-" version ".tbz"))
+       (sha256
+        (base32 "1fwc2rj6xfyihhkx4cn7zs227a74rardl262m2kzch5lfgsq10cf"))))
+    (build-system dune-build-system)
+    (inputs (list ocaml-result))
+    (arguments
+     `(#:tests? #f))
+    (home-page "https://erratique.ch/software/cmdliner")
+    (synopsis "Declarative definition of command line interfaces for OCaml")
+    (description
+     "Cmdliner is a module for the declarative definition of command
+line interfaces.  It provides a simple and compositional mechanism to convert
+command line arguments to OCaml values and pass them to your functions.  The
+module automatically handles syntax errors, help messages and UNIX man page
+generation.  It supports programs with single or multiple commands and respects
+most of the POSIX and GNU conventions.")
+    (license license:bsd-3)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
