@@ -570,6 +570,31 @@ string values and to directly encode characters in OCaml Buffer.t values.")
 functions.")
     (license license:isc)))
 
+(define-public ocaml-ocplib-endian
+  (package
+    (name "ocaml5-ocplib-endian")
+    (version "1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/OCamlPro/ocplib-endian/")
+             (commit version)))
+       (sha256
+        (base32 "1klj4g451s7m5r8bxmwc1rpvngpqdm40csnx9smgc06pwy2fax2c"))
+       (file-name (git-file-name name version))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-cppo))
+    (home-page "https://github.com/OCamlPro/ocplib-endian")
+    (synopsis "Optimised functions to read and write int16/32/64 from strings
+and bigarrays")
+    (description
+     "Optimised functions to read and write int16/32/64 from strings
+and bigarrays, based on new primitives added in version 4.01.  It works on
+strings, bytes and bigstring (Bigarrys of chars), and provides submodules for
+big- and little-endian, with their unsafe counter-parts.")
+    (license license:lgpl2.1)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
