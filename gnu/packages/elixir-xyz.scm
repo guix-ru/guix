@@ -751,6 +751,28 @@ Elixir.")
     (home-page "https://hexdocs.pm/mimic/")
     (license license:asl2.0)))
 
+(define-public elixir-mix-audit
+  (package
+    (name "elixir-mix-audit")
+    (version "2.1.5")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hexpm-uri "mix_audit" version))
+       (sha256
+        (base32 "0s9dnk42n5665s6l22qf05x63ly11n37am2kmybzccns4672kyc7"))))
+    (build-system mix-build-system)
+    (propagated-inputs
+     (list elixir-jason
+           elixir-yaml-elixir))
+    (synopsis "Scanning Mix dependencies for security vulnerabilities")
+    (description "This package provides @code{elixir-mix-audit}, a
+@code{mix deps.audit} task to scan @code{Mix} dependencies for security
+vulnerabilities.  It draw its inspiration from tools like npm audit and
+bundler-audit.")
+    (home-page "https://hexdocs.pm/mix_audit/")
+    (license license:bsd-3)))
+
 (define-public elixir-mox
   (package
     (name "elixir-mox")
