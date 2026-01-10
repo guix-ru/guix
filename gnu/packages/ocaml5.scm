@@ -381,6 +381,36 @@ generation.  It supports programs with single or multiple commands and respects
 most of the POSIX and GNU conventions.")
     (license license:bsd-3)))
 
+(define-public ocaml-cppo
+  (package
+    (name "ocaml5-cppo")
+    (version "1.6.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mjambon/cppo")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1c8jlr2s0allw1h6czz5q24vn5jsnrrh44j7hjyilzaifm17dlrm"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:tests? #f))
+    (native-inputs (list ocamlbuild))
+    (home-page "https://github.com/mjambon/cppo")
+    (synopsis "Equivalent of the C preprocessor for OCaml programs")
+    (description
+     "Cppo is an equivalent of the C preprocessor for OCaml
+programs.  It allows the definition of simple macros and file inclusion.  Cppo is:
+@enumerate
+@item more OCaml-friendly than @command{cpp}
+@item easy to learn without consulting a manual
+@item reasonably fast
+@item simple to install and to maintain.
+@end enumerate")
+    (license license:bsd-3)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
