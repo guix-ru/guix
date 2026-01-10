@@ -544,6 +544,32 @@ Functions are also provided to fold over the characters of UTF encoded OCaml
 string values and to directly encode characters in OCaml Buffer.t values.")
     (license license:isc)))
 
+(define-public ocaml-fmt
+  (package
+    (name "ocaml5-fmt")
+    (version "0.9.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/fmt/releases/fmt-"
+                           version ".tbz"))
+       (sha256
+        (base32 "0q8j2in2473xh7k4hfgnppv9qy77f2ih89yp6yhpbp92ba021yzi"))))
+    (build-system ocaml-build-system)
+    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (propagated-inputs (list ocaml-cmdliner ocaml-stdlib-shims))
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build" "--with-base-unix" "true" "--with-cmdliner"
+                           "true")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (home-page "https://erratique.ch/software/fmt")
+    (synopsis "OCaml Format pretty-printer combinators")
+    (description "Fmt exposes combinators to devise Format pretty-printing
+functions.")
+    (license license:isc)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
