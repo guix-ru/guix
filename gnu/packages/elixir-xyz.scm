@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2023 Pierre-Henry Fröhring <phfrohring@deeplinks.com>
-;;; Copyright © 2024 Igor Goryachev <igor@goryachev.org>
+;;; Copyright © 2024, 2026 Igorj Gorjaĉev <igor@goryachev.org>
 ;;; Copyright © 2025 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -421,6 +421,25 @@ places can be represented exactly.")
     (description "This package provides @code{elixir-decorator}, a library
 implementing function decorators for Elixir.")
     (home-page "https://hexdocs.pm/decorator/")
+    (license license:expat)))
+
+(define-public elixir-depscheck
+  (package
+    (name "elixir-depscheck")
+    (version "1.0.11")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hexpm-uri "depscheck" version))
+       (sha256
+        (base32 "1v33ml2i19s59518j9031bsvipbf4xxr4xk49qx6xs3qby0018aw"))))
+    (build-system mix-build-system)
+    (synopsis "Checking dependency license compatibility in Elixir projects")
+    (description "This package provides @code{elixir-depscheck}, a @code{CI/CD}
+tool for checking dependency license compatibility in Elixir projects.  Reads
+license information from local hex metadata files and validates compatibility
+with your project's license using industry-standard rules.")
+    (home-page "https://hexdocs.pm/depscheck/")
     (license license:expat)))
 
 (define-public elixir-erlex
