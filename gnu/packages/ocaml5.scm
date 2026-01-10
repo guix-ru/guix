@@ -411,6 +411,28 @@ programs.  It allows the definition of simple macros and file inclusion.  Cppo i
 @end enumerate")
     (license license:bsd-3)))
 
+(define-public ocaml-bigarray-compat
+  (package
+    (name "ocaml5-bigarray-compat")
+    (version "1.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/bigarray-compat")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0hif5baiwswdblymyfbxh9066pfqynlz5vj3b2brpn0a12k6i5fq"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:tests? #f)) ;no tests
+    (home-page "https://github.com/mirage/bigarray-compat")
+    (synopsis "OCaml compatibility library")
+    (description "This package contains a compatibility library for
+@code{Stdlib.Bigarray} in OCaml.")
+    (license license:isc)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
