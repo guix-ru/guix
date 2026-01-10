@@ -180,6 +180,33 @@ functional, imperative and object-oriented styles of programming.")
 for building OCaml library and programs.")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-opam-file-format
+  (package
+    (name "ocaml5-opam-file-format")
+    (version "2.1.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/opam-file-format")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0dmnb1mqdy4913f9ma446hi5m99q7hfibj6j0m8x2wsfnfy2fw62"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f ;No tests
+       #:make-flags ,#~(list (string-append "LIBDIR="
+                                            #$output "/lib/ocaml/site-lib"))
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (home-page "https://opam.ocaml.org")
+    (synopsis "Parser and printer for the opam file syntax")
+    (description "This package contains a parser and a pretty-printer for
+the opam file format.")
+    ;; With static-linking exception
+    (license license:lgpl2.1+)))
+
 (define-public ocaml5.3-result
   (package
     (name "ocaml5.3-result")
