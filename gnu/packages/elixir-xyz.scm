@@ -24,6 +24,7 @@
   #:use-module (gnu packages linux)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages erlang)
   #:use-module (gnu packages erlang-xyz)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages)
@@ -1244,6 +1245,34 @@ provides a polyfill for @code{dbg} which was introduced in Elixir 1.14.")
     (synopsis "Conjugates English verbs")
     (description "This package provides a library to conjugate English verbs.")
     (home-page "https://hexdocs.pm/verbs/")
+    (license license:expat)))
+
+(define-public elixir-yaml-elixir
+  (package
+    (name "elixir-yaml-elixir")
+    (version "2.12.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hexpm-uri "yaml_elixir" version))
+       (sha256
+        (base32 "1ihknd9qy8y533zd150ch2yag2h895hsp86wamqpm4dcgfpaqsya"))))
+    (build-system mix-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-yamerl-hrl-path
+            (lambda _
+              (substitute* "lib/yaml_elixir/records.ex"
+                (("internal\\/yamerl_constr\\.hrl")
+                 "yamerl_constr.hrl")))))))
+    (propagated-inputs
+     (list erlang-yamerl))
+    (synopsis "YAML parser for Elixir based on native Erlang implementation")
+    (description "This package provides @code{elixir-yaml-elixir}, a @code{YAML}
+parser for @code{Elixir} based on native @code{Erlang} implementation.")
+    (home-page "https://hexdocs.pm/yaml_elixir/")
     (license license:expat)))
 
 (define-public elixir-zest
