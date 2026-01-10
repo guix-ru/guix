@@ -62,6 +62,7 @@
   #:use-module ((guix build-system ocaml)
                 #:select ((ocaml5-build-system . ocaml-build-system)))
   #:use-module (guix build-system gnu)
+  #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module ((guix licenses) #:prefix license:)
@@ -264,6 +265,35 @@ defined in this library.")
 ;; Use this version of `ocaml-result` for packages built with the default
 ;; ocaml 5.x compiler.
 (define-public ocaml-result ocaml5.3-result)
+
+(define-public ocaml-topkg
+  (package
+    (name "ocaml5-topkg")
+    (version "1.0.6")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "http://erratique.ch/software/topkg/releases/"
+                                  "topkg-" version ".tbz"))
+              (sha256
+               (base32
+                "11ycfk0prqvifm9jca2308gw8a6cjb1hqlgfslbji2cqpan09kpq"))))
+    (build-system ocaml-build-system)
+    (native-inputs
+     (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-result))
+    (arguments
+     `(#:tests? #f
+       #:build-flags '("build")
+       #:phases
+       ,#~(modify-phases %standard-phases
+            (delete 'configure))))
+    (home-page "https://erratique.ch/software/topkg")
+    (synopsis "Transitory OCaml software packager")
+    (description "Topkg is a packager for distributing OCaml software.  It
+provides an API to describe the files a package installs in a given build
+configuration and to specify information about the package's distribution,
+creation and publication procedures.")
+    (license license:isc)))
 
 (define-public ocaml5.3-dune-bootstrap
   (package
