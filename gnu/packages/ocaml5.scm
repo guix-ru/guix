@@ -696,6 +696,50 @@ other XUnit testing frameworks.")
 @end enumerate")
     (license license:expat)))
 
+(define-public ocaml-alcotest
+  (package
+    (name "ocaml5-alcotest")
+    (version "1.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/alcotest")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1a8ljwmbm7yp9kvfpfg1153amg7f54gh8jnmv485bhs8am1m0w7c"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "alcotest"
+       #:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-test-format
+                    (lambda _
+                      ;; cmdliner changed the format and the tests fail
+                      (substitute* "test/e2e/alcotest/failing/unknown_option.expected"
+                        (("`")
+                         "'")
+                        (("\\.\\.\\.")
+                         "…")))))))
+    (native-inputs (list ocamlbuild))
+    (propagated-inputs (list ocaml-astring
+                             ocaml-cmdliner
+                             ocaml-fmt
+                             ocaml-re
+                             ocaml-stdlib-shims
+                             ocaml-uuidm
+                             ocaml-uutf))
+    (home-page "https://github.com/mirage/alcotest")
+    (synopsis "Lightweight OCaml test framework")
+    (description
+     "Alcotest exposes simple interface to perform unit tests.  It
+exposes a simple TESTABLE module type, a check function to assert test
+predicates and a run function to perform a list of unit -> unit test callbacks.
+Alcotest provides a quiet and colorful output where only faulty runs are fully
+displayed at the end of the run (with the full logs ready to inspect), with a
+simple (yet expressive) query language to select the tests to run.")
+    (license license:isc)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
     (name "ocaml5.3-dune")
