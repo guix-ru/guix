@@ -207,6 +207,36 @@ the opam file format.")
     ;; With static-linking exception
     (license license:lgpl2.1+)))
 
+(define-public opaline
+  (package
+    (name "opaline")
+    (version "0.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jaapb/opaline")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0gilxynfxfbahzfg64h371lq6b3wrlsfy53xb8ccai0waa45l6za"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f ;No tests
+       #:make-flags ,#~(list (string-append "PREFIX="
+                                            #$output))
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (propagated-inputs (list ocaml-opam-file-format))
+    (native-inputs (list ocamlbuild))
+    (home-page "https://opam.ocaml.org")
+    (synopsis "Tool for installing OCaml packages")
+    (description
+     "@var{opaline} is a tool for installing OCaml packages
+based on @code{.install} files defined by the OPAM package manager.  It serves
+the same purpose as @var{opam-installer} but has fewer library dependencies.")
+    (license license:expat)))
+
 (define-public ocaml5.3-result
   (package
     (name "ocaml5.3-result")
