@@ -792,7 +792,7 @@ fingerprinting library and the Acoustid API.")
            python-pytest
            python-setuptools))
     (inputs
-     (list taglib-next))
+     (list taglib))
     (home-page "https://github.com/supermihi/pytaglib")
     (synopsis "Python bindings for taglib")
     (description
