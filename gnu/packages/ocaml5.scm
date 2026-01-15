@@ -1765,6 +1765,26 @@ flexibility by allowing you to override them for a specific type and more safety
 by making sure that you only compare comparable values.")
     (license license:expat)))
 
+
+(define-public ocaml-ppx-enumerate
+  (package
+    (name "ocaml5-ppx-enumerate")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin
+      "ppx_enumerate" version
+      "1vkn3ii16974p68n97187wz062ksp9al3nmxy1jdsywzkp36p832"))
+    (build-system dune-build-system)
+    (propagated-inputs
+     (list ocaml-base ocaml-ppxlib ocaml-ppxlib-jane))
+    (properties `((upstream-name . "ppx_enumerate")))
+    (home-page "https://github.com/janestreet/ppx_enumerate")
+    (synopsis "Generate a list containing all values of a finite type")
+    (description "Ppx_enumerate is a ppx rewriter which generates a definition
+for the list of all values of a type (for a type which only has finitely
+many values).")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
