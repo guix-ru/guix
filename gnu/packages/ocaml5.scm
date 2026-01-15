@@ -975,6 +975,24 @@ compilers that can directly deal with packages.")
     (name "ocaml5.0-findlib")
     (native-inputs
      (list m4 ocaml-5.0))))
+
+(define-public ocaml-compiler-libs
+  (package
+    (name "ocaml5-compiler-libs")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ocaml-compiler-libs")
+    (source
+     (janestreet-git-origin "ocaml-compiler-libs" version
+      "0cs3waqdnf5xv5cv5g2bkjypgqibwlxgkxd5ddmvj5g9d82vm821"))
+    (build-system dune-build-system)
+    (properties `((upstream-name . "ocaml-compiler-libs")))
+    (synopsis "Compiler libraries repackaged")
+    (description
+     "This package simply repackages the OCaml compiler libraries
+so they don't expose everything at toplevel.  For instance, @code{Ast_helper}
+is now @code{Ocaml_common.Ast_helper}.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
