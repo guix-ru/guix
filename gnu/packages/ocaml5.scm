@@ -2037,6 +2037,31 @@ output-generating code, interleaved with @code{%expect} extension expressions
 to denote the expected output.")
     (license license:expat)))
 
+(define %ocaml-odoc-base
+  (package
+    (name "ocaml5-odoc-base")
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/odoc")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0azxv64jfgncq11ys9li9mn2vc3s5a5k48pbnrj3qmaj2xzkslbw"))))
+    (build-system dune-build-system)
+  (home-page "https://github.com/ocaml/odoc")
+    (synopsis "OCaml documentation generator")
+    (description "Odoc is a documentation generator for OCaml.  It reads
+@emph{doc comments}, delimited with @code{(** ... *)}, and outputs
+@acronym{HTML}.
+
+Text inside doc comments is marked up in ocamldoc syntax.  Odoc's main
+advantage over ocamldoc is an accurate cross-referencer, which handles the
+complexity of the OCaml module system.")
+  (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
