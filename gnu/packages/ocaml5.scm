@@ -1408,6 +1408,30 @@ re-exports the input/output functions of the OCaml standard libraries using
 a more consistent API.")
     (license license:expat)))
 
+(define-public ocaml-crunch
+  (package
+    (name "ocaml5-crunch")
+    (version "4.0.0")
+    (home-page "https://github.com/mirage/ocaml-crunch")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append home-page
+                           "/releases/download/v4.0.0/crunch-4.0.0.tbz"))
+       (sha256
+        (base32 "16xq8hlid8725qghkrjws0y718aaskvcdk7rn1666v7d548qv6wk"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:tests? #f))
+    (propagated-inputs (list ocaml-cmdliner ocaml-ptime))
+    (synopsis "Convert a filesystem into a static OCaml module")
+    (description
+     "`ocaml-crunch` takes a directory of files and compiles them into a standalone
+OCaml module which serves the contents directly from memory.  This can be
+convenient for libraries that need a few embedded files (such as a web server)
+and do not want to deal with all the trouble of file configuration.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
