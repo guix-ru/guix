@@ -1819,6 +1819,22 @@ many values).")
 packages.")
     (license license:expat)))
 
+(define-public ocaml-ppx-sexp-conv
+  (package
+    (name "ocaml5-ppx-sexp-conv")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ppx_sexp_conv")
+    (source
+     (janestreet-git-origin "ppx_sexp_conv" version
+      "1gdgwxcwrzdkw3pm3azqqygk5kvqphffpz4j6ask4f0jkliv8j45"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib ocaml-ppxlib-jane))
+    (properties `((upstream-name . "ppx_sexp_conv")))
+    (synopsis
+     "@code{[@@deriving]} plugin to generate S-expression conversion functions")
+    (description "Part of the Jane Street's PPX rewriters collection.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
