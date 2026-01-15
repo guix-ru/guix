@@ -639,6 +639,33 @@ functions.")
 spans without being subject to operating system calendar time adjustments.")
     (license license:isc)))
 
+(define-public ocaml-ptime
+  (package
+    (name "ocaml5-ptime")
+    (version "1.2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri "https://erratique.ch/software/ptime/releases/ptime-1.2.0.tbz")
+       (sha256
+        (base32 "1c1swx6h794gcck358nqfzshlfhyw1zb5ji4h1pc63j9vxzp85ln"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:build-flags (list "build" "--tests" "true")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (propagated-inputs (list ocaml-result))
+    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (home-page "https://erratique.ch/software/ptime")
+    (synopsis "POSIX time for OCaml")
+    (description
+     "Ptime offers platform independent POSIX time support in pure OCaml.  It
+provides a type to represent a well-defined range of POSIX timestamps with
+picosecond precision, conversion with date-time values, conversion with RFC
+3339 timestamps and pretty printing to a human-readable, locale-independent
+representation.")
+    (license license:isc)))
+
 (define-public ocaml-rresult
   (package
     (name "ocaml5-rresult")
