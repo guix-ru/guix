@@ -1432,6 +1432,34 @@ convenient for libraries that need a few embedded files (such as a web server)
 and do not want to deal with all the trouble of file configuration.")
     (license license:isc)))
 
+(define-public ocaml-cinaps
+  ;; This commit removes an unused dependency on ocaml-ppx-jane. It avoids a
+  ;; dependency cycle between ocaml-ppx-jane and ocaml-ppxlib.
+  (let ((commit "d974bb2db3ab1ab14e81f989b5bdb609462bff47")
+        (revision "0"))
+    (package
+      (name "ocaml5-cinaps")
+      (version (git-version "0.15.1" revision commit))
+      (home-page "https://github.com/ocaml-ppx/cinaps")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url home-page)
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "00kb04vqlnk1pynqjhna5qhn8790ab17baxf4na5py1l1h1js8qx"))))
+      (build-system dune-build-system)
+      (propagated-inputs (list ocaml-re))
+      (synopsis "Trivial metaprogramming tool for OCaml")
+      (description
+       "Cinaps is a trivial Metaprogramming tool using the OCaml toplevel.  It is based
+on the same idea as expectation tests.  The user writes some OCaml code inside
+special comments and cinaps makes sure that what follows is what is printed by
+the OCaml code.")
+      (license license:expat))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
