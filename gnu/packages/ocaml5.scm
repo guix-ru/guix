@@ -613,6 +613,32 @@ functions.")
 `Uchar` module introduced in OCaml 4.03.")
     (license license:lgpl2.1)))
 
+(define-public ocaml-mtime
+  (package
+    (name "ocaml5-mtime")
+    (version "2.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://erratique.ch/software/mtime/releases/"
+                           "mtime-" version ".tbz"))
+       (sha256
+        (base32 "1ss4w3qxsfp51d88r0j7dzqs05dbb1xdx11hn1jl9cvd03ma0g9z"))))
+    (build-system ocaml-build-system)
+    (native-inputs (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-topkg))
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (home-page "https://erratique.ch/software/mtime")
+    (synopsis "Monotonic wall-clock time for OCaml")
+    (description
+     "Access monotonic wall-clock time.  It measures time
+spans without being subject to operating system calendar time adjustments.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
