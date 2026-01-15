@@ -1920,6 +1920,26 @@ a single pass.  They automatically detect the character encoding of the input
 stream, and convert everything to UTF-8.")
     (license license:bsd-3)))
 
+(define-public ocaml-jst-config
+  (package
+    (name "ocaml5-jst-config")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "jst-config" version
+      "1dy345p6825wyhpv6drlrl9gqwcgx341a5k3pnvfnxpcc6mkw167"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-assert ocaml-stdio
+                             dune-configurator))
+    (home-page "https://github.com/janestreet/jst-config")
+    (synopsis "Compile-time configuration for Jane Street libraries")
+    (description
+     "Defines compile-time constants used in Jane Street libraries
+such as Base, Core, and Async.  This package has an unstable interface; it is
+intended only to share configuration between different packages from Jane
+Street.  Future updates may not be backward-compatible, and we do not
+recommend using this package directly.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
