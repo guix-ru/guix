@@ -1242,6 +1242,23 @@ s-expressions from files or other external sources, you should use
 parsexp_io.")
     (license license:expat)))
 
+(define-public ocaml-stdio
+  (package
+    (name "ocaml5-stdio")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/stdio")
+    (source
+     (janestreet-git-origin "stdio" version
+      "1l3da9qri8d04440ps51j9ffh6bpk8j11mda4lidcndkmr94r19p"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-sexplib0))
+    (synopsis "Standard IO library for OCaml")
+    (description
+     "Stdio implements simple input/output functionalities for OCaml.  It
+re-exports the input/output functions of the OCaml standard libraries using
+a more consistent API.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
