@@ -1111,6 +1111,10 @@ config.h files for instance.  Among other things, dune-configurator allows one t
 @item generate config.h file
 @end itemize")))
 
+;; Use this version of `dune-configurator` for packages built with the default
+;; ocaml 5.x compiler.
+(define-public dune-configurator ocaml5.3-dune-bootstrap)
+
 (define-public ocaml5.3-dune
   (package
     (inherit ocaml5.3-dune-bootstrap)
