@@ -1744,6 +1744,27 @@ yojson package.  The program @code{atdgen} can be used to derive OCaml-JSON
 serializers and deserializers from type definitions.")
     (license license:bsd-3)))
 
+(define-public ocaml-ppx-compare
+  (package
+    (name "ocaml5-ppx-compare")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_compare" version
+      "13g1g0f8z40yjiipwp07rsi6wp2mhq5hhdn0z5jq1l6sqvsw21dq"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib ocaml-ppxlib-jane))
+    (properties `((upstream-name . "ppx_compare")))
+    (home-page "https://github.com/janestreet/ppx_compare")
+    (synopsis "Generation of comparison functions from types")
+    (description
+     "Generation of fast comparison functions from type expressions
+and definitions.  Ppx_compare is a ppx rewriter that derives comparison functions
+from type representations.  The scaffolded functions are usually much faster
+than ocaml's Pervasives.compare.  Scaffolding functions also gives you more
+flexibility by allowing you to override them for a specific type and more safety
+by making sure that you only compare comparable values.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
