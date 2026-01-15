@@ -667,6 +667,33 @@ to operate on the result type available from OCaml 4.03 in the standard
 library.")
     (license license:isc)))
 
+(define-public ocaml-fpath
+  (package
+    (name "ocaml5-fpath")
+    (version "0.7.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/fpath/releases/"
+                           "fpath-" version ".tbz"))
+       (sha256
+        (base32 "03z7mj0sqdz465rc4drj1gr88l9q3nfs374yssvdjdyhjbqqzc0j"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-topkg ocaml-astring))
+    (home-page "https://erratique.ch/software/fpath")
+    (synopsis "File system paths for OCaml")
+    (description
+     "Fpath is an OCaml module for handling file system paths with
+POSIX or Windows conventions.  Fpath processes paths without accessing the
+file system and is independent from any system library.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
