@@ -1853,6 +1853,28 @@ packages.")
 hash functions from type exrpessions and definitions.")
     (license license:expat)))
 
+(define-public ocaml-ppx-assert
+  (package
+    (name "ocaml5-ppx-assert")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_assert" version
+      "1h0gynscd3d9vdx1rf6cf281cn8sw3gxp6z5vl4smypsa5sb1p53"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base
+                             ocaml-ppx-cold
+                             ocaml-ppx-compare
+                             ocaml-ppx-here
+                             ocaml-ppx-sexp-conv
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_assert")))
+    (home-page "https://github.com/janestreet/ppx_assert")
+    (synopsis
+     "Assert-like extension nodes that raise useful errors on failure")
+    (description "This package contains assert-like extension nodes that raise
+useful errors on failure.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
