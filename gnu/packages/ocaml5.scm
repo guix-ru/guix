@@ -1670,6 +1670,21 @@ used to handle optional compilations of pieces of code depending of the word
 size, the version of the compiler, ...")
     (license license:expat)))
 
+(define-public ocaml-ppxlib-jane
+  (package
+    (name "ocaml5-ppxlib-jane")
+    (version "0.17.2")
+    (source
+     (janestreet-git-origin "ppxlib_jane" version
+      "0abnhxpvb0sykaifi9qygyq25sqhsm8z3wcj3gd9zsj5mds540h1"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_jane")))
+    (home-page "https://github.com/janestreet/ppxlib_jane")
+    (synopsis "Utilities for working with Jane Street AST constructs")
+    (description "Part of the Jane Street's PPX rewriters collection.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
