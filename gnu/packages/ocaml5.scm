@@ -1715,6 +1715,35 @@ also create your own representation and use it to instantiate a new set of
 combinators.")
     (license license:lgpl2.1)))
 
+(define-public ocaml-yojson
+  (package
+    (name "ocaml5-yojson")
+    (version "2.0.2")
+    (home-page "https://github.com/ocaml-community/yojson")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url (string-append home-page ".git"))
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1habsh00ihjhk1g1csxqg3hj8izk5zvgc7wm579wyjw35vzcmwr1"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "yojson"))
+    (propagated-inputs (list ocaml-seq))
+    (native-inputs (list ocaml-alcotest ocaml-cppo))
+    (synopsis "Low-level JSON library for OCaml")
+    (description
+     "Yojson is an optimized parsing and printing library for the
+JSON format.  It addresses a few shortcomings of json-wheel including 2x
+speedup, polymorphic variants and optional syntax for tuples and variants.
+@code{ydump} is a pretty printing command-line program provided with the
+yojson package.  The program @code{atdgen} can be used to derive OCaml-JSON
+serializers and deserializers from type definitions.")
+    (license license:bsd-3)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
