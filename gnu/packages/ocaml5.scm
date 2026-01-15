@@ -993,6 +993,23 @@ so they don't expose everything at toplevel.  For instance, @code{Ast_helper}
 is now @code{Ocaml_common.Ast_helper}.")
     (license license:expat)))
 
+(define-public ocaml-intrinsics-kernel
+  (package
+    (name "ocaml5-intrinsics-kernel")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ocaml_intrinsics_kernel" version
+      "1a85l2cns5g8vnxri1pxrx1zhs2r04bjl2sj2vfpcv9vs8k6pw6r"))
+    (home-page "https://github.com/janestreet/ocaml_intrinsics_kernel")
+    (build-system dune-build-system)
+    (properties `((upstream-name . "ocaml_intrinsics_kernel")))
+    (synopsis "Architecture-specific intrinsic operations")
+    (description
+     "Provides functions to invoke amd64 instructions (such as cmov, min/maxsd, popcnt)
+when available, or compatible software implementation on other targets.
+See also ocaml_intrinsics library.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
