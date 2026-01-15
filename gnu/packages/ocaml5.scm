@@ -1010,6 +1010,20 @@ when available, or compatible software implementation on other targets.
 See also ocaml_intrinsics library.")
     (license license:expat)))
 
+(define-public ocaml-jane-street-headers
+  (package
+    (name "ocaml5-jane-street-headers")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/jane-street-headers")
+    (source
+     (janestreet-git-origin "jane-street-headers" version
+      "0hq29ip8k7vyjrjm5hq9bq6b5cmssqlzcsaqi350sp39xg9bhilw"))
+    (build-system dune-build-system)
+    (synopsis "Jane Street C header files")
+    (description "C header files shared between the various Jane Street
+packages.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
