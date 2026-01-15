@@ -1110,6 +1110,22 @@ ppx_deriving and ppx_type_conv to inter-operate gracefully when linked
 as part of the same ocaml-migrate-parsetree driver.")
     (license license:bsd-3)))
 
+(define-public ocaml-sexplib0
+  (package
+    (name "ocaml5-sexplib0")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/sexplib0")
+    (source
+     (janestreet-git-origin "sexplib0" version
+      "1s6bc7hj7zwrrz7m5c994h0zjx69af9lvx5ayjpg7dsy2h9g17a3"))
+    (build-system dune-build-system)
+    (synopsis "Base definition of S-expressions and some converters")
+    (description
+     "Part of Jane Street's Core library.  The Core suite of
+libraries is an alternative to OCaml's standard library that was developed by
+Jane Street.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
