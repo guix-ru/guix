@@ -1984,6 +1984,31 @@ verification tool.")
 since the start of the Unix epoch.")
     (license license:expat)))
 
+(define-public ocaml-ppx-inline-test
+  (package
+    (name "ocaml5-ppx-inline-test")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ppx_inline_test")
+    (source
+     (janestreet-git-origin "ppx_inline_test" version
+      "0azhkx19srpjl748zznrhyzifhkij5h3477mp0dwbp2k16c6pmx4"))
+    (build-system dune-build-system)
+    (arguments
+     `(#:tests? #f)) ;see home page README for further information
+    (propagated-inputs (list ocaml-base
+                             ocaml-compiler-libs
+                             ocaml-sexplib0
+                             ocaml-stdio
+                             ocaml-ppxlib
+                             ocaml-time-now))
+    (properties `((upstream-name . "ppx_inline_test")))
+    (synopsis "Syntax extension for writing in-line tests in ocaml code")
+    (description
+     "This package contains a syntax extension for writing
+in-line tests in ocaml code.  It is part of Jane Street's PPX rewriters
+collection.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
