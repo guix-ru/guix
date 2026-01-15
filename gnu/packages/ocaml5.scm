@@ -1525,6 +1525,65 @@ special comments and cinaps makes sure that what follows is what is printed by
 the OCaml code.")
       (license license:expat))))
 
+(define-public ocaml-ppxlib
+  (package
+    (name "ocaml5-ppxlib")
+    (version "0.35.0")
+    (home-page "https://github.com/ocaml-ppx/ppxlib")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1q0vsik0mqk5f6gin7a8c1m1zk5172jy2sfz8mkl6hf13nlcc3s3"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-test-format
+                    (lambda _
+                      ;; Since sexplib >= 0.15, error formatting has changed
+                      (substitute* "test/driver/exception_handling/run.t"
+                        (("\\(Failure ")
+                         "Failure("))
+                      (substitute* "test/base/test.ml"
+                        (("Invalid_argument \\((.*)\\)." _ m)
+                         (string-append "Invalid_argument " m "."))
+                        (("\\(Invalid_argument (.*)\\)" _ m)
+                         (string-append "Invalid_argument " m ".")))
+                      (substitute* "test/ppx_import_support/test.ml"
+                        (("\\(Failure")
+                         "Failure")
+                        (("  \"(Some ppx-es.*)\")" _ m)
+                         (string-append " \"" m "\".")))))
+                  (add-after 'fix-test-format 'fix-egrep
+                    (lambda _
+                      ;; egrep is obsolescent; using grep -E
+                      (substitute* "test/expansion_context/run.t"
+                        (("egrep")
+                         "grep -E")))))))
+    (propagated-inputs (list ocaml-compiler-libs ocaml-cmdliner
+                             ocaml-ppx-derivers ocaml-sexplib0
+                             ocaml-stdlib-shims))
+    (native-inputs (list ocaml-stdio ocaml-cinaps ocaml-base))
+    (synopsis "Base library and tools for ppx rewriters")
+    (description
+     "A comprehensive toolbox for ppx development.  It features:
+@itemize
+@item an OCaml AST / parser / pretty-printer snapshot, to create a full frontend
+independent of the version of OCaml;
+@item a library for library for ppx rewriters in general, and type-driven code
+generators in particular;
+@item
+a feature-full driver for OCaml AST transformers;
+@item a quotation mechanism allowing to write values representing the
+OCaml AST in the OCaml syntax;
+@item a generator of open recursion classes from type definitions.
+@end itemize")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
