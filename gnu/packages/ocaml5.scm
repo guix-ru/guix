@@ -1087,6 +1087,29 @@ the OCaml core distribution.")
      "Octavius is a library to parse the `ocamldoc` comment syntax.")
     (license license:isc)))
 
+(define-public ocaml-ppx-derivers
+  (package
+    (name "ocaml5-ppx-derivers")
+    (version "1.2.1")
+    (home-page "https://github.com/ocaml-ppx/ppx_derivers")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url (string-append home-page ".git"))
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0yqvqw58hbx1a61wcpbnl9j30n495k23qmyy2xwczqs63mn2nkpn"))))
+    (build-system dune-build-system)
+    (properties `((upstream-name . "ppx_derivers")))
+    (synopsis "Shared @code{@@deriving} plugin registry")
+    (description
+     "Ppx_derivers is a tiny package whose sole purpose is to allow
+ppx_deriving and ppx_type_conv to inter-operate gracefully when linked
+as part of the same ocaml-migrate-parsetree driver.")
+    (license license:bsd-3)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
