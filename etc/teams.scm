@@ -1308,7 +1308,7 @@ the \"texlive\" importer."
 (define-member (person "Cayetano Santos"
                        "csantosb@inventati.org"
                        "csantosb")
-  ai emacs electronics hpc crypto)
+  ai emacs electronics hpc crypto reproduciblebuilds)
 
 (define-member (person "Greg Hogan"
                        "code@greghogan.com"
