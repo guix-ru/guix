@@ -1801,6 +1801,24 @@ many values).")
    (description "Part of the Jane Street's PPX rewriters collection.")
    (license license:expat)))
 
+(define-public ocaml-ppx-js-style
+  (package
+    (name "ocaml5-ppx-js-style")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_js_style" version
+      "0iciy8d1dh97q0fls0jlacx2y9clidlakpkiprv2cbqvxv2p6d7f"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-octavius ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_js_style")))
+    (home-page "https://github.com/janestreet/ppx_js_style")
+    (synopsis "Code style checker for Jane Street Packages")
+    (description
+     "This package is a no-op ppx rewriter.  It is used as a
+@code{lint} tool to enforce some coding conventions across all Jane Street
+packages.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
