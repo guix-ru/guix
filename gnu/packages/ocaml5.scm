@@ -1835,6 +1835,24 @@ packages.")
     (description "Part of the Jane Street's PPX rewriters collection.")
     (license license:expat)))
 
+(define-public ocaml-ppx-hash
+  (package
+    (name "ocaml5-ppx-hash")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_hash" version
+      "0zxb1n9zx4k44hilibdgasrq45y965ywx7h8pij3c6knh4pc400q"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-compare ocaml-ppx-sexp-conv
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_hash")))
+    (home-page "https://github.com/janestreet/ppx_hash")
+    (synopsis
+     "Generation of hash functions from type expressions and definitions")
+    (description "This package is a collection of ppx rewriters that generate
+hash functions from type exrpessions and definitions.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
