@@ -1615,6 +1615,25 @@ Usage is simple - add package bisect_ppx when building tests, run your tests,
 then run the Bisect_ppx report tool on the generated visitation files.")
     (license license:mpl2.0)))
 
+(define-public ocaml-ppx-cold
+  (package
+    (name "ocaml5-ppx-cold")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ppx_cold")
+    (source
+     (janestreet-git-origin "ppx_cold" version
+      "1l0gg8dyjawb71nz6w4r3svi0jbjk0qlmw9r3bzb0jylqsanlmkw"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_cold")))
+    (synopsis "Syntax extension for indicating cold path")
+    (description
+     "This package contains an syntax extension to indicate that the code is
+on the cold path and should be kept out of the way to avoid polluting the
+instruction cache on the hot path.  See also
+https://github.com/ocaml/ocaml/issues/8563.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
