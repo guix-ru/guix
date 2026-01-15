@@ -1940,6 +1940,32 @@ Street.  Future updates may not be backward-compatible, and we do not
 recommend using this package directly.")
     (license license:expat)))
 
+(define-public ocaml-ppx-base
+  (package
+    (name "ocaml5-ppx-base")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_base" version
+      "14lvhy842fjjm2qwqhxkqig4mc5s439rbkd87mlys86byzrdrkpy"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ppx-compare
+                             ocaml-ppx-cold
+                             ocaml-ppx-enumerate
+                             ocaml-ppx-globalize
+                             ocaml-ppx-hash
+                             ocaml-ppx-js-style
+                             ocaml-ppx-sexp-conv
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_base")))
+    (home-page "https://github.com/janestreet/ppx_base")
+    (synopsis "Base set of ppx rewriters")
+    (description
+     "Ppx_base is the set of ppx rewriters used for Base.
+
+Note that Base doesn't need ppx to build, it is only used as a
+verification tool.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
