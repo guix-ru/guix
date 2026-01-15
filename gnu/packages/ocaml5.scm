@@ -1154,6 +1154,33 @@ compiler, and enumerates the various official OCaml releases and configuration
 variants.")
     (license license:isc)))
 
+(define-public ocaml-menhir
+  (package
+    (name "ocaml5-menhir")
+    (version "20240715")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.inria.fr/fpottier/menhir.git")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0clg9w9a49wixdrk6y5r9kgwd8kfpz5qz6jzq3j4as5li40b297l"))))
+    (build-system dune-build-system)
+    (inputs (list ocaml))
+    (home-page "https://gallium.inria.fr/~fpottier/menhir/")
+    (synopsis "Parser generator")
+    (description
+     "Menhir is a parser generator.  It turns high-level grammar
+specifications, decorated with semantic actions expressed in the OCaml
+programming language into parsers, again expressed in OCaml.  It is based on
+Knuth’s LR(1) parser construction technique.")
+    ;; The file src/standard.mly and all files listed in src/mnehirLib.mlpack
+    ;; that have an *.ml or *.mli extension are GPL licensed. All other files
+    ;; are QPL licensed.
+    (license (list license:gpl2+ license:qpl))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
