@@ -58,6 +58,7 @@
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages web)
   #:use-module (gnu packages xorg)
   #:use-module ((guix build-system dune)
                 #:select ((ocaml5-dune-build-system . dune-build-system)))
@@ -2077,6 +2078,43 @@ complexity of the OCaml module system.")
      "This package provides a library for parsing the contents of OCaml
 documentation comments, formatted using Odoc syntax, an extension of the
 language understood by ocamldoc.")))
+
+(define-public ocaml-odoc
+  (package
+    (inherit %ocaml-odoc-base)
+    (name "ocaml5-odoc")
+    (arguments
+     `(#:package "odoc"
+       #:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-test
+                    (lambda _
+                      ;; test results expects #!/bin/sh but gets a store path instead
+                      (substitute* "test/xref2/with.t/run.t"
+                        (("#!/bin/sh")
+                         (string-append "#!"
+                                        (which "sh")))))))))
+    (inputs (list ocaml-astring
+                  ocaml-bisect-ppx
+                  ocaml-cmdliner
+                  ocaml-crunch
+                  ocaml-fmt
+                  ocaml-fpath
+                  ocaml-logs
+                  ocaml-odoc-parser
+                  ocaml-re
+                  ocaml-result
+                  ocaml-sexplib
+                  ocaml-tyxml))
+    (native-inputs (list ocaml-alcotest
+                         ocaml-bos
+                         ocaml-cppo
+                         ocaml-lwt
+                         ocaml-markup
+                         ocaml-menhir
+                         ocaml-ppx-expect
+                         ocaml-version
+                         ocaml-yojson
+                         jq))))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
