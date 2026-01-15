@@ -1875,6 +1875,47 @@ hash functions from type exrpessions and definitions.")
 useful errors on failure.")
     (license license:expat)))
 
+(define-public ocaml-markup
+  (package
+    (name "ocaml5-markup")
+    (version "1.0.3")
+    (home-page "https://github.com/aantron/markup.ml")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url (string-append home-page ".git"))
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1acgcbhx4rxx92rf65lsns588d6zzfrin2pnpkx24jw5vbgz7idn"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "markup"))
+    (propagated-inputs (list ocaml-bisect-ppx ocaml-uchar ocaml-uutf ocaml-lwt))
+    (native-inputs (list ocaml-ounit2 pkg-config))
+    (synopsis "Error-recovering functional HTML5 and XML parsers and writers")
+    (description
+     "Markup.ml provides an HTML parser and an XML parser.  The
+parsers are wrapped in a simple interface: they are functions that transform
+byte streams to parsing signal streams.  Streams can be manipulated in various
+ways, such as processing by fold, filter, and map, assembly into DOM tree
+structures, or serialization back to HTML or XML.
+
+Both parsers are based on their respective standards.  The HTML parser, in
+particular, is based on the state machines defined in HTML5.
+
+The parsers are error-recovering by default, and accept fragments.  This makes
+it very easy to get a best-effort parse of some input.  The parsers can,
+however, be easily configured to be strict, and to accept only full documents.
+
+Apart from this, the parsers are streaming (do not build up a document in
+memory), non-blocking (can be used with threading libraries), lazy (do not
+consume input unless the signal stream is being read), and process the input in
+a single pass.  They automatically detect the character encoding of the input
+stream, and convert everything to UTF-8.")
+    (license license:bsd-3)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
