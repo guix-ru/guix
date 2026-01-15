@@ -1584,6 +1584,37 @@ OCaml AST in the OCaml syntax;
 @end itemize")
     (license license:expat)))
 
+(define-public ocaml-bisect-ppx
+  (package
+    (name "ocaml5-bisect-ppx")
+    (version "2.8.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/aantron/bisect_ppx")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1albx01qvr4fax4wkdmy0dd21q0fd9ixsgsvnr1z32ngj9nyi9fy"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ppxlib ocaml-cmdliner))
+    (arguments
+     ;; Tests require ocamlformat which would lead to circular dependencies
+     '(#:tests? #f))
+    (properties `((upstream-name . "bisect_ppx")))
+    (home-page "https://github.com/aantron/bisect_ppx")
+    (synopsis "Code coverage for OCaml")
+    (description
+     "Bisect_ppx helps you test thoroughly.  It is a small
+preprocessor that inserts instrumentation at places in your code, such as
+if-then-else and match expressions.  After you run tests, Bisect_ppx gives a
+nice HTML report showing which places were visited and which were missed.
+
+Usage is simple - add package bisect_ppx when building tests, run your tests,
+then run the Bisect_ppx report tool on the generated visitation files.")
+    (license license:mpl2.0)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
