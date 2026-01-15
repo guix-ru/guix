@@ -1126,6 +1126,30 @@ libraries is an alternative to OCaml's standard library that was developed by
 Jane Street.")
     (license license:expat)))
 
+(define-public ocaml-version
+  (package
+    (name "ocaml5-version")
+    (version "3.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocurrent/ocaml-version")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1pnw2ym021j48zknhbi1kdiyfv9si8p2l04rdzbv4g51fclsqs92"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-alcotest))
+    (properties '((upstream-name . "ocaml-version")))
+    (home-page "https://github.com/ocurrent/ocaml-version")
+    (synopsis "Manipulate, parse and generate OCaml compiler version strings")
+    (description
+     "This library provides facilities to parse version numbers of the OCaml
+compiler, and enumerates the various official OCaml releases and configuration
+variants.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
