@@ -721,6 +721,38 @@ POSIX or Windows conventions.  Fpath processes paths without accessing the
 file system and is independent from any system library.")
     (license license:isc)))
 
+(define-public ocaml-logs
+  (package
+    (name "ocaml5-logs")
+    (version "0.7.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/logs/releases/"
+                           "logs-" version ".tbz"))
+       (sha256
+        (base32 "1jnmd675wmsmdwyb5mx5b0ac66g4c6gpv5s4mrx2j6pb0wla1x46"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build" "--with-js_of_ocaml" "false")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-fmt
+                             ocaml-lwt
+                             ocaml-mtime
+                             ocaml-result
+                             ocaml-cmdliner
+                             ocaml-topkg))
+    (home-page "https://erratique.ch/software/logs")
+    (synopsis "Logging infrastructure for OCaml")
+    (description
+     "Logs provides a logging infrastructure for OCaml.  Logging is
+performed on sources whose reporting level can be set independently.  Log
+message report is decoupled from logging and is handled by a reporter.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
