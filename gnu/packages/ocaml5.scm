@@ -588,6 +588,31 @@ string values and to directly encode characters in OCaml Buffer.t values.")
 functions.")
     (license license:isc)))
 
+(define-public ocaml-uchar
+  (package
+    (name "ocaml5-uchar")
+    (version "0.0.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/ocaml/uchar/releases/download/v" version
+             "/uchar-" version ".tbz"))
+       (sha256
+        (base32 "1w2saw7zanf9m9ffvz2lvcxvlm118pws2x1wym526xmydhqpyfa7"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "native=true" "native-dynlink=true")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild opaline))
+    (home-page "https://github.com/ocaml/uchar")
+    (synopsis "Compatibility library for OCaml's Uchar module")
+    (description "The uchar package provides a compatibility library for the
+`Uchar` module introduced in OCaml 4.03.")
+    (license license:lgpl2.1)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
