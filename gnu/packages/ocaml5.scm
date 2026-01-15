@@ -639,6 +639,34 @@ functions.")
 spans without being subject to operating system calendar time adjustments.")
     (license license:isc)))
 
+(define-public ocaml-rresult
+  (package
+    (name "ocaml5-rresult")
+    (version "0.7.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/rresult/releases/"
+                           "rresult-" version ".tbz"))
+       (sha256
+        (base32 "0h2mjyzhay1p4k7n0mzaa7hlc7875kiy6m1i3r1n03j6hddpzahi"))))
+    (build-system ocaml-build-system)
+    (native-inputs (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-topkg))
+    (arguments
+     `(#:tests? #f
+       #:build-flags '("build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (home-page "https://erratique.ch/software/rresult")
+    (synopsis "Result value combinators for OCaml")
+    (description
+     "Handle computation results and errors in an explicit and
+declarative manner, without resorting to exceptions.  It defines combinators
+to operate on the result type available from OCaml 4.03 in the standard
+library.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
