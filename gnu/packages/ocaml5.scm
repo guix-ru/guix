@@ -1024,6 +1024,41 @@ See also ocaml_intrinsics library.")
 packages.")
     (license license:expat)))
 
+(define-public ocaml-num
+  (package
+    (name "ocaml5-num")
+    (version "1.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/num")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vzdnvpj5dbj3ifx03v25pj2jj1ccav072v4d29pk1czdba2lzfc"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-race
+                    (lambda _
+                      ;; There's a race between bng.o and bng_generic.c.  Both depend on
+                      ;; the architecture specific bng.c, but only the latter declares
+                      ;; the dependency.
+                      (mkdir-p "_build/default/src")
+                      (for-each (lambda (f)
+                                  (copy-file f
+                                             (string-append "_build/default/"
+                                                            f)))
+                                (find-files "src" "bng_.*\\.c")))))))
+    (home-page "https://github.com/ocaml/num")
+    (synopsis "Arbitrary-precision integer and rational arithmetic")
+    (description
+     "OCaml-Num contains the legacy Num library for
+arbitrary-precision integer and rational arithmetic that used to be part of
+the OCaml core distribution.")
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
