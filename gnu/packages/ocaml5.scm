@@ -1685,6 +1685,36 @@ size, the version of the compiler, ...")
     (description "Part of the Jane Street's PPX rewriters collection.")
     (license license:expat)))
 
+(define-public ocaml-tyxml
+  (package
+    (name "ocaml5-tyxml")
+    (version "4.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocsigen/tyxml")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0bh66wknc7sx2r63kscp0hg6h73dkv6qpkx0cdz2qp7p28pg2ixz"))))
+    (build-system dune-build-system)
+    (inputs (list ocaml-re ocaml-seq ocaml-uutf))
+    (native-inputs (list ocaml-alcotest))
+    (arguments
+     `(#:package "tyxml"))
+    (home-page "https://github.com/ocsigen/tyxml/")
+    (synopsis "TyXML is a library for building correct HTML and SVG documents")
+    (description
+     "TyXML provides a set of convenient combinators that uses the
+OCaml type system to ensure the validity of the generated documents.  TyXML can
+be used with any representation of HTML and SVG: the textual one, provided
+directly by this package, or DOM trees (@code{js_of_ocaml-tyxml}) virtual DOM
+(@code{virtual-dom}) and reactive or replicated trees (@code{eliom}).  You can
+also create your own representation and use it to instantiate a new set of
+combinators.")
+    (license license:lgpl2.1)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
