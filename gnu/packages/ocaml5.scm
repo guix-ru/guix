@@ -189,6 +189,10 @@ functional, imperative and object-oriented styles of programming.")
                (base32
                 "0bpfwdfc7j53hb57arb6nxdj0ahkcxzkbj2ax90nvkjcyr96xcr3"))))))
 
+;; The default ocaml 5.x compiler, for those packages that depend on a
+;; compiler explicitly.
+(define-public ocaml ocaml-5.3)
+
 (define-public ocamlbuild
   (package
     (name "ocaml5-ocamlbuild")
