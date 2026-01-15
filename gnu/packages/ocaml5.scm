@@ -1652,6 +1652,24 @@ https://github.com/ocaml/ocaml/issues/8563.")
     (description "Part of the Jane Street's PPX rewriters collection.")
     (license license:expat)))
 
+(define-public ocaml-ppx-optcomp
+  (package
+    (name "ocaml5-ppx-optcomp")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ppx_optcomp")
+    (source
+     (janestreet-git-origin "ppx_optcomp" version
+      "0287r4sqv752wsyx6k04kxw61wvj5y0xj66cj68q3x3i2b717nhz"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-stdio ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_optcomp")))
+    (synopsis "Optional compilation for OCaml")
+    (description
+     "Ppx_optcomp stands for Optional Compilation.  It is a tool
+used to handle optional compilations of pieces of code depending of the word
+size, the version of the compiler, ...")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
