@@ -753,6 +753,39 @@ performed on sources whose reporting level can be set independently.  Log
 message report is decoupled from logging and is handled by a reporter.")
     (license license:isc)))
 
+(define-public ocaml-bos
+  (package
+    (name "ocaml5-bos")
+    (version "0.2.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/bos/releases/" "bos-"
+                           version ".tbz"))
+       (sha256
+        (base32 "0dwg7lpaq30rvwc5z1gij36fn9xavvpah1bj8ph9gmhhddw2xmnq"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild opaline))
+    (propagated-inputs (list ocaml-topkg
+                             ocaml-astring
+                             ocaml-fmt
+                             ocaml-fpath
+                             ocaml-logs
+                             ocaml-rresult))
+    (home-page "https://erratique.ch/software/bos")
+    (synopsis "Basic OS interaction for OCaml")
+    (description
+     "Bos provides support for basic and robust interaction with
+the operating system in OCaml.  It has functions to access the process
+environment, parse command line arguments, interact with the file system and
+run command line programs.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
