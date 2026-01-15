@@ -1059,6 +1059,34 @@ arbitrary-precision integer and rational arithmetic that used to be part of
 the OCaml core distribution.")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-octavius
+  (package
+    (name "ocaml5-octavius")
+    (version "1.2.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml-doc/octavius")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1c5m51xcn2jv42kjjpklr6g63sgx1k885wfdp1yr4wrmiaj9cbpx"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (add-before 'build 'make-writable
+                    (lambda _
+                      (for-each (lambda (file)
+                                  (chmod file #o644))
+                                (find-files "." ".")) #t)))))
+    (properties `((upstream-name . "octavius")))
+    (home-page "https://github.com/ocaml-doc/octavius")
+    (synopsis "Ocamldoc comment syntax parser")
+    (description
+     "Octavius is a library to parse the `ocamldoc` comment syntax.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
