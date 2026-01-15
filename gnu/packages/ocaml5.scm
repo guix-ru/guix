@@ -1181,6 +1181,29 @@ Knuth’s LR(1) parser construction technique.")
     ;; are QPL licensed.
     (license (list license:gpl2+ license:qpl))))
 
+(define-public ocaml-base
+  (package
+    (name "ocaml5-base")
+    (version "0.17.3")
+    (home-page "https://github.com/janestreet/base")
+    (source
+     (janestreet-git-origin "base" version
+      "0yyd9cs6qf8bzk4cpga6hh0iiarhyl2kn15ar3jgqgfmg3p6bcyb"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-intrinsics-kernel ocaml-sexplib0))
+    (synopsis "Full standard library replacement for OCaml")
+    (description
+     "Base is a complete and portable alternative to the OCaml standard
+library.  It provides all standard functionalities one would expect
+from a language standard library.  It uses consistent conventions
+across all of its module.
+
+Base aims to be usable in any context.  As a result system dependent
+features such as I/O are not offered by Base.  They are instead
+provided by companion libraries such as
+@url{https://github.com/janestreet/stdio, ocaml-stdio}.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
