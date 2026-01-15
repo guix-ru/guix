@@ -1209,6 +1209,22 @@ libraries is an alternative to OCaml's standard library that was developed by
 Jane Street.")
     (license license:expat)))
 
+(define-public ocaml-sexplib
+  (package
+    (name "ocaml5-sexplib")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/sexplib")
+    (source
+     (janestreet-git-origin "sexplib" version
+      "0q2cgpvayczvcn1a2l765hc4d2ny3hb9yl65lhxrz4gc0q0wq50g"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-num ocaml-parsexp ocaml-sexplib0))
+    (synopsis "Library for serializing OCaml values to and from S-expressions")
+    (description
+     "This package is part of Jane Street's Core library.  Sexplib contains
+functionality for parsing and pretty-printing s-expressions.")
+    (license license:expat)))
+
 (define-public ocaml-version
   (package
     (name "ocaml5-version")
