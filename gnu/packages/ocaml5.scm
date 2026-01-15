@@ -70,6 +70,18 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages))
 
+;; An origin for a Jane Street project hosted on Github.
+(define (janestreet-git-origin name version hash-string)
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+           (url (string-append
+                 "https://github.com/janestreet/" name))
+           (commit (string-append "v" version))))
+    (file-name (git-file-name name version))
+    (sha256
+     (base32 hash-string))))
+
 (define-public ocaml-5.0
   (package
     (name "ocaml")
