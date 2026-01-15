@@ -1634,6 +1634,24 @@ instruction cache on the hot path.  See also
 https://github.com/ocaml/ocaml/issues/8563.")
     (license license:expat)))
 
+(define-public ocaml-ppx-here
+  (package
+    (name "ocaml5-ppx-here")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_here" version
+      "1hr6ymfkz5xhsciia8bi23mnlx94h4345njp9r7k9f1nzxr0xg69"))
+    (build-system dune-build-system)
+    (arguments
+     ;; broken tests
+     `(#:tests? #f))
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_here")))
+    (home-page "https://github.com/janestreet/ppx_here")
+    (synopsis "Expands [%here] into its location")
+    (description "Part of the Jane Street's PPX rewriters collection.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
