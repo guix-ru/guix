@@ -2062,6 +2062,22 @@ advantage over ocamldoc is an accurate cross-referencer, which handles the
 complexity of the OCaml module system.")
   (license license:isc)))
 
+(define-public ocaml-odoc-parser
+  (package
+    (inherit %ocaml-odoc-base)
+    (name "ocaml5-odoc-parser")
+    (arguments
+     `(#:package "odoc-parser"))
+    (propagated-inputs (list ocaml-astring ocaml-camlp-streams ocaml-fpath
+                             ocaml-result ocaml-uutf))
+    (native-inputs (list ocaml-ppx-expect ocaml-cppo ocaml-tyxml))
+    (home-page "https://github.com/ocaml/odoc")
+    (synopsis "Parser for ocaml documentation comments")
+    (description
+     "This package provides a library for parsing the contents of OCaml
+documentation comments, formatted using Odoc syntax, an extension of the
+language understood by ocamldoc.")))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
