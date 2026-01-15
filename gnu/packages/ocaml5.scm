@@ -1204,6 +1204,44 @@ provided by companion libraries such as
 @url{https://github.com/janestreet/stdio, ocaml-stdio}.")
     (license license:expat)))
 
+(define-public ocaml-parsexp
+  (package
+    (name "ocaml5-parsexp")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/parsexp")
+    (source
+     (janestreet-git-origin "parsexp" version
+      "1mfw44f41kiy3jxbrina3vqrgbi8hdw6l6xsjy8sfcybf3lxkal8"))
+    (build-system dune-build-system)
+    (inputs (list ocaml-sexplib0 ocaml-base))
+    (synopsis "S-expression parsing library")
+    (description
+     "This library provides generic parsers for parsing S-expressions from
+strings or other medium.
+
+The library is focused on performances but still provide full generic
+parsers that can be used with strings, bigstrings, lexing buffers,
+character streams or any other sources effortlessly.
+
+It provides three different class of parsers:
+@itemize
+@item
+the normal parsers, producing [Sexp.t] or [Sexp.t list] values
+@item
+the parsers with positions, building compact position sequences so
+that one can recover original positions in order to report properly
+located errors at little cost
+@item
+the Concrete Syntax Tree parsers, produce values of type
+@code{Parsexp.Cst.t} which record the concrete layout of the s-expression
+syntax, including comments
+@end itemize
+
+This library is portable and doesn't provide IO functions.  To read
+s-expressions from files or other external sources, you should use
+parsexp_io.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
