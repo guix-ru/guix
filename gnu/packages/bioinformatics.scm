@@ -2192,7 +2192,6 @@ Format (GFF) with Biopython integration.")
         (ice-9 match)
         (ice-9 rdelim))
       #:phases
-      (with-extensions (list (pyproject-guile-json))
       #~(modify-phases %standard-phases
           (add-after 'configure 'set-data-path
             (lambda _
@@ -2287,7 +2286,7 @@ version = ~s
                   (delete-file-recursively
                    (string-append site "/bed_reader/tests"))
                   (delete-file-recursively
-                   (string-append #$output "/.pytest_cache"))))))))))
+                   (string-append #$output "/.pytest_cache")))))))))
     (native-inputs (list python-pytest
                          python-pytest-cov
                          python-pytest-datadir
@@ -25510,7 +25509,6 @@ CSIv1, CSIv2 and FAI files.")
         ((guix build pyproject-build-system) #:prefix py:)
         (guix build utils))
       #:phases
-      (with-extensions (list (pyproject-guile-json))
       #~(modify-phases %standard-phases
           (add-after 'install 'prepare-python-module
             (lambda _
@@ -25566,7 +25564,7 @@ exclude =
               (when tests?
                 (invoke "pytest" "-vv" "tests"
                         ;; These tests need access to the internet
-                        "-k" "not test_enrichr and not test_prerank"))))))))
+                        "-k" "not test_enrichr and not test_prerank")))))))
     (inputs
      (cons python-wrapper (cargo-inputs 'python-gseapy)))
     (native-inputs
