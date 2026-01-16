@@ -1060,7 +1060,6 @@ integrals for Gaussian type functions.")
               (string-append "-DPYTHON_INSTALL_DIR="
                              (site-packages %build-inputs %outputs)))
       #:phases
-      (with-extensions (list (pyproject-guile-json))
         #~(modify-phases %standard-phases
             (add-after 'unpack 'patch-includes
               (lambda _
@@ -1099,7 +1098,7 @@ integrals for Gaussian type functions.")
                   (with-directory-excursion "../source"
                     (setenv "PYTHONPATH" "../build/py")
                     (invoke "python3" "-m" "unittest" "discover" "-v"
-                            "-s" "tests")))))))))
+                          "-s" "tests"))))))))
     (inputs (list python zlib))
     (native-inputs
      (list fast-float
@@ -1469,7 +1468,6 @@ and rendering molecules.")
                   (guix build utils)
                   ((guix build pyproject-build-system) #:prefix py:))
       #:phases
-      (with-extensions (list (pyproject-guile-json))
         #~(modify-phases %standard-phases
             (add-before 'configure 'patch-cmake
               (lambda _
@@ -1512,7 +1510,7 @@ and rendering molecules.")
             (add-after 'install 'check
               (assoc-ref %standard-phases 'check))
             (add-before 'check 'add-install-to-pythonpath
-              (assoc-ref py:%standard-phases 'add-install-to-pythonpath))))))
+            (assoc-ref py:%standard-phases 'add-install-to-pythonpath)))))
     (inputs (list python))
     (native-inputs (list doxygen python python-cython-0 python-sphinx))
     (home-page "https://github.com/rareylab/RingDecomposerLib")
@@ -1630,7 +1628,6 @@ Tanimoto scoring.")
                "-DCMAKE_INCLUDE_PATH="
                (search-input-directory %build-inputs "/include/avalontoolkit")))
       #:phases
-      (with-extensions (list (pyproject-guile-json))
         #~(modify-phases %standard-phases
             (add-after 'unpack 'copy-external-dependencies
               (lambda _
@@ -1690,7 +1687,7 @@ Tanimoto scoring.")
                               ;; Circular import
                               "pythonSourceTests"
                               ) "|")
-                           ")"))))))))))
+                         ")")))))))))
     (inputs
      (list avalon-toolkit
            cairo
