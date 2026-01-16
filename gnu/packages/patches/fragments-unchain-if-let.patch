@@ -1,0 +1,45 @@
+This syntax requires Rust >= 1.88.0,
+see <https://github.com/rust-lang/rust/issues/53667>.
+
+diff --git a/src/app.rs b/src/app.rs
+index 04aa571..3169994 100644
+--- a/src/app.rs
++++ b/src/app.rs
+@@ -399,11 +399,13 @@ mod imp {
+             debug!("Add torrent by file: {file:?}");
+ 
+             if let Some(ext) = file.extension()
+-                && ext != "torrent"
+             {
+-                warn!("Unsupported file extension: {ext:?}");
+-                utils::inapp_notification(&i18n("Unsupported file format"), gtk::Widget::NONE);
+-                return;
++                if (ext != "torrent")
++                {
++                    warn!("Unsupported file extension: {ext:?}");
++                    utils::inapp_notification(&i18n("Unsupported file format"), gtk::Widget::NONE);
++                    return;
++                }
+             }
+ 
+             let fut = clone!(
+diff --git a/src/ui/window.rs b/src/ui/window.rs
+index 063d276..8c6c2ff 100644
+--- a/src/ui/window.rs
++++ b/src/ui/window.rs
+@@ -377,9 +377,11 @@ mod imp {
+ 
+             // Try finding the exact torrent file name
+             if let Some(mut segments) = torrent_link.path_segments()
+-                && let Some(last) = segments.next_back()
+             {
+-                msg = i18n_f("Add “{}” from clipboard?", &[last])
++                if let Some(last) = segments.next_back()
++                {
++                  msg = i18n_f("Add “{}” from clipboard?", &[last])
++                }
+             }
+             let toast = adw::Toast::new(&msg);
+             toast.set_timeout(0);
+-- 
+2.52.0

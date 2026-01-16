@@ -1321,6 +1321,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/fp16-system-libraries.patch		\
   %D%/packages/patches/fpc-reproducibility.patch		\
   %D%/packages/patches/fpc-glibc-2.34-compat.patch		\
+  %D%/packages/patches/fragments-unchain-if-let.patch		\
   %D%/packages/patches/fritzing-0.9.6-fix-types.patch		\
   %D%/packages/patches/freedink-engine-fix-const-char.patch	\
   %D%/packages/patches/freedict-tools-fix-determinism.patch	\
