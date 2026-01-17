@@ -2686,9 +2686,6 @@ specify a list of hooks you want and pre-commit manages the installation and
 execution of any hook written in any language before every commit.")
     (license license:expat)))
 
-(define-deprecated-package python-pre-commit
-  pre-commit)
-
 (define-public mercurial
   (package
     (name "mercurial")
