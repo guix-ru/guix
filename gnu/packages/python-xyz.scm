@@ -21692,7 +21692,6 @@ interfaces.")
     (propagated-inputs
      (list python-attrs
            python-cbor2
-           python-exceptiongroup
            python-orjson
            python-pyyaml
            python-tomlkit
