@@ -858,7 +858,8 @@ in SOURCE."
               (define version-links
                 (list (menu-item #$latest-version
                                  (string-append
-                                  "/manual/" language
+                                  "/manual/" #$latest-version
+                                  "/" language
                                   (if split-node? "/html_node" "")))
                       (menu-item "development"
                                  (string-append
@@ -1023,7 +1024,8 @@ makeinfo OPTIONS."
                       (let* ((texi (language->texi-file-name language))
                              (opts `("--html"
                                      "-c" ,(string-append "TOP_NODE_UP_URL=/manual/"
-                                                         language)
+                                                          #$%latest-guix-version
+                                                          "/" language)
                                      #$@options
                                      ,texi)))
                         (format #t "building HTML manual for language '~a'...~%"
