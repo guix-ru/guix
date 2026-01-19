@@ -3988,7 +3988,6 @@ and custom quantization matrices.")
            python-setuptools))
     (propagated-inputs
      (list python-certifi
-           python-exceptiongroup
            python-isodate
            python-lxml
            python-pycountry
