@@ -2676,6 +2676,7 @@ astronomical images, especially when there is no WCS information available.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 108 passed, 1 skipped, 26 deselected, 1 xfailed, 297 warnings
       #:test-flags
       #~(list "-k" (string-join
                     ;; Tests requiring network access.
@@ -2719,14 +2720,13 @@ astronomical images, especially when there is no WCS information available.")
            python-astroquery
            python-pytest-astropy
            python-setuptools
-           python-setuptools-scm
-           python-wheel))
+           python-setuptools-scm))
     (propagated-inputs
      (list python-asdf
            python-astropy
            python-cachetools
            python-fsspec
-           python-gwcs
+           python-gwcs-0.26
            python-pillow
            python-requests
            python-roman-datamodels
