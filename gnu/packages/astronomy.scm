@@ -9792,6 +9792,7 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 307 passed, 4 skipped, 2 xfailed, 175 warnings
       #:test-flags
       #~(list "--pyargs" "stcal"
               "--numprocesses" (number->string (parallel-job-count))
@@ -9828,7 +9829,7 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
            python-asdf
            python-astropy
            python-drizzle
-           python-gwcs
+           python-gwcs-0.26
            python-numpy
            python-requests
            python-scikit-image
