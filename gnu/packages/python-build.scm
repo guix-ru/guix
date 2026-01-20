@@ -417,7 +417,24 @@ facilitate packaging Python projects, where packaging includes:
               (invoke "python" "./setup.py" "install"
                       (string-append "--prefix=" #$output) "--no-compile")
               (invoke "python" "-m" "compileall"
-                      "--invalidation-mode=unchecked-hash" #$output))))))
+                      "--invalidation-mode=unchecked-hash" #$output)))
+          ;; XXX: Despite using the same setup.py, it seems that the
+          ;; bootstrap version is not able to install the distutils hack.
+          (add-after 'install 'fix-installation
+            (lambda* (#:key outputs #:allow-other-keys)
+              (with-directory-excursion
+                  (car (find-files #$output "site-packages"
+                                   #:directories? #t))
+                (call-with-output-file "distutils-precedence.pth"
+                  (lambda (port)
+                    (display
+                     (string-join
+                      '("import os"
+                        "var = 'SETUPTOOLS_USE_DISTUTILS'"
+                        "enabled = os.environ.get(var, 'local') == 'local'"
+                        "enabled and __import__('_distutils_hack').add_shim();")
+                      "; ")
+                     port)))))))))
     (native-inputs (list))
     ;; Avoid introducing an additional module-dependency.
     (inputs (list (module-ref (resolve-interface '(gnu packages python))
