@@ -28862,17 +28862,18 @@ register custom encoders and decoders.")
 (define-public python-anyio
   (package
     (name "python-anyio")
-    (version "4.6.2")
+    (version "4.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "anyio" version))
        (sha256
         (base32
-         "0ir3n40gdcm1kd7qyn4c46pgdyyp36h49a0pifyv6lh7vnrpnapp"))))
+         "19ivjwk60cyxc5cm7699f3007rp8wxqq6nxahx2p8fb0r4sswgrz"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 1462 passed, 47 skipped, 665 deselected, 6 xfailed
       #:test-flags
       #~(list "-p" "no:asyncio"
               "-m" "not network"
@@ -28880,7 +28881,8 @@ register custom encoders and decoders.")
               (string-join
                (list
                 "not test_is_block_device"
-
+                ;; AssertionError
+                "test_anyio_fixture_adoption_does_not_persist"
                 #$@(cond
                     ((or (target-aarch64?)
                          (target-riscv64?))
@@ -28919,7 +28921,8 @@ register custom encoders and decoders.")
                " and not "))))
     (propagated-inputs
      (list python-idna
-           python-sniffio))
+           python-sniffio
+           python-typing-extensions))
     (native-inputs
      (list python-psutil
            python-pytest
@@ -28928,6 +28931,7 @@ register custom encoders and decoders.")
            python-setuptools-scm
            python-trio
            python-trustme
+           python-truststore
            python-uvloop))
     (home-page "https://github.com/agronholm/anyio")
     (synopsis "Compatibility layer for multiple asynchronous event loops")
