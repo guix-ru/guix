@@ -5623,6 +5623,18 @@ default) to world coordinates.")
        (replace "python-astropy" python-astropy-6)
        (replace "python-asdf" python-asdf-3)))))
 
+;; The last 0.X.X version, providing breaking changes with 1.X.X.
+(define-public python-gwcs-0.26
+  (package
+    (inherit python-gwcs)
+    (version "0.26.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "gwcs" version))
+       (sha256
+        (base32 "0gkxgwzlazg0xihhgg9vlss6jj7lg6i6r2z6igpxcnyc5s147d0p"))))))
+
 (define-public python-halo-analysis
   (package
     (name "python-halo-analysis")
