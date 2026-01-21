@@ -10597,9 +10597,6 @@ This tool is used in text editing environments to provide a complete
 and integrated feature-set for programming Python effectively.")
     (license license:expat)))
 
-(define-deprecated-package python-language-server
-  python-lsp-server)
-
 (define-public python-black
   (package
     (name "python-black")
