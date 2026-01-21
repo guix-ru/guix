@@ -4416,9 +4416,6 @@ files.")
                 "and not test_matrix"))
         #:phases
         #~(modify-phases %standard-phases
-            (add-after 'unpack 'pretend-version
-              (lambda _
-                (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$base-version)))
             (replace 'check
               (lambda* (#:key tests? test-flags #:allow-other-keys)
                 (when tests?
@@ -6059,13 +6056,6 @@ with MOFA+ in Python.")
                (base32
                 "17s1w3746d35pcwr97ynhr7s5hfk76vsfcinwyqynx9k3xxi9br4"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'pretend-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
     (propagated-inputs
      (list python-anndata python-h5py python-pandas))
     (native-inputs
@@ -6958,9 +6948,6 @@ accessing bigWig files.")
          "--deselect=schema_salad/tests/test_makedoc.py::test_detect_changes_in_html")
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-after 'unpack 'relax-requirements
             (lambda _
               ;; Mistune dependency is too strict mistune>=3,<3.1 .
@@ -7226,10 +7213,6 @@ documents.")
             (lambda _
               (substitute* "setup.py"
                 (("== 1.5.1") "> 1.5.1")))) ; prov
-          (add-after 'unpack 'set-version
-            (lambda _
-              ;; Set exact version.
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-after 'unpack 'patch-tests
             (lambda _
               (substitute* '("tests/subgraph/env-tool2.cwl"
@@ -19862,9 +19845,6 @@ implementation differs in these ways:
                             "test_qc_metrics_no_log1p[dask_array_sparse]")))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-before 'check 'pre-check
             (lambda _
               ;; Numba needs a writable dir to cache functions.
@@ -20323,12 +20303,7 @@ bgzipped text file that contains a pair of genomic coordinates per line.")
     (arguments
      (list
       ;; tests: 107 failed, 54 passed, 8 skipped, 7 xfailed, 14 errors  
-      #:tests? #f ;most of them need remote data
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
+      #:tests? #f)) ;most of them need remote data
     (native-inputs
      (list python-biopython
            python-fsspec
@@ -22036,15 +22011,6 @@ updated much more frequently.")
         (base32
          "0nv4lc46cnzpg5gcdxrsv7b4srmkq55zl3rcadw5pn3yyz5fzd2k"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'pretend-version
-            ;; The version string is usually derived via setuptools-scm, but
-            ;; it doesn't work without the .git directory.
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
     (propagated-inputs
      (list python-cytoolz
            python-frozendict
@@ -24382,9 +24348,6 @@ aligner.")
       #~(list "tests/core")
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           ;; Numba needs a writable dir to cache functions.
           (add-before 'check 'set-numba-cache-dir
             (lambda _

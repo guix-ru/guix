@@ -2296,13 +2296,6 @@ Astropy objects.")
        (sha256
         (base32 "0fd2d5raglp1nwjy0hr3kckk518xrph451zymlw58jgwg5l1vq3m"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
     (native-inputs
      (list python-numpy
            python-pytest
@@ -2377,12 +2370,7 @@ implementation package such as asdf-astropy.")
        (build-system pyproject-build-system)
        (arguments
         (list
-         #:tests? #f ; cycle with python-asdf
-         #:phases
-         #~(modify-phases %standard-phases
-             (add-before 'build 'set-version
-               (lambda _
-                 (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" "0.0.1"))))))
+         #:tests? #f)) ; cycle with python-asdf
        (native-inputs
         (list python-setuptools
               python-setuptools-scm
@@ -3727,9 +3715,6 @@ bad pixel tracking throughout the reduction process.")
             (lambda _
               (substitute* "pyproject.toml"
                 ((" --cov=cdflib --cov-report=xml") ""))))
-          (add-before 'build 'set-env-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-before 'check 'set-home-env
             (lambda _
               (setenv "HOME" (getcwd)))))))
@@ -4039,14 +4024,7 @@ lens models possibly obtained from different modeling codes.")
        (sha256
         (base32 "0rnp1myhilkcr7mnv6x3cmxqjn0adgmb89crszn536qphsisyc35"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      ;; tests: 51 passed
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'set-env-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
+    ;; tests: 51 passed
     (native-inputs
      (list python-pytest
            python-scipy
@@ -4396,9 +4374,6 @@ help you search, obtain and use DKIST data as part of your Python software.")
      (list
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'build 'set-env-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-before 'check 'build-extensions
             (lambda _
               ;; Cython extensions have to be built before running the tests.
@@ -4689,14 +4664,7 @@ tools for astronomers.")
        (sha256
         (base32 "0g548pca43iwpq1641w3jzrb3rk2kqjf5gcjbcymfpdif1982zv2"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      ;; tests: 163 passed, 3 skipped, 4 xfailed
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-env-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
+    ;; tests: 163 passed, 3 skipped, 4 xfailed
     (native-inputs
      (list python-cython
            python-numpy
@@ -4764,14 +4732,6 @@ exitinction laws found in the literature.")
        (sha256
         (base32 "0lj8vb3b2s7m56bs4am6856w8vdlyi4p86gj7hlkncfngsgx1f8v"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'set-env-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION"
-                      #$(version-major+minor+point version)))))))
     (native-inputs
      (list python-pytest
            python-setuptools
@@ -5202,9 +5162,6 @@ across many files.")
              (substitute* "pyproject.toml"
                ;; ipython>=4.0,<9.0
                ((">=4.0,<9\\.0") ">=4.0"))))
-          (add-before 'build 'set-env-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-before 'check 'prepare-x
             (lambda _
               (system "Xvfb &")
@@ -6236,9 +6193,6 @@ supports only the basic features of the original.")
       #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
          (add-after 'unpack 'relax-requirements
            (lambda _
              (substitute* "pyproject.toml"
@@ -6599,10 +6553,7 @@ Astronomy.")
              (substitute* "pyproject.toml"
                (("'ipywidgets',") "")
                (("'jupyter',") "")
-               (("'notebook',") ""))))
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
+               (("'notebook',") "")))))))
     (native-inputs
      (list python-cython
            python-hatch-vcs
@@ -7459,9 +7410,6 @@ N-Chilada and RAMSES AMR outputs.")
               (substitute* "setup.cfg"
                 ((".*pypeit_install_ql_calibs.*") "")
                 ((".*pypeit_ql_multislit.*") ""))))
-          (add-after 'unpack 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-after 'install 'include-package-data
             ;; XXX: PyPI archive provides pypeit/data but during build from
             ;; Git it's ignored for some reason, add it manually.
@@ -7800,10 +7748,7 @@ natively in Siril.")
             (lambda _
               (substitute* "pyproject.toml"
                 (("scipy < 1.15") "scipy")
-                (("numpy < 2") "numpy")))) ; no constain on master branch
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
+                (("numpy < 2") "numpy"))))))) ; no constain on master branch
     (native-inputs
      (list nss-certs-for-test
            python-hatch-vcs
@@ -7858,9 +7803,6 @@ memory usage, improving performance and run in parallel with MPI.")
         ;; tests: 189 passed, 213 skipped, 3 xfailed
         #:phases
         #~(modify-phases %standard-phases
-            (add-before 'build 'set-version
-              (lambda _
-                (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" "2.0.0")))
             (add-before 'check 'set-env-data-path
               (lambda _
                 (setenv "PYSYN_CDBS" (string-append #$output "/crds")))))))
@@ -7907,9 +7849,6 @@ spectra, and data.")
       #~(list "--pyargs" "pyvo")
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-after 'install 'include-package-data
             ;; FIXME: Check why pyproject-build-system ignores coping some
             ;; package data files during build/install phases.
@@ -8395,13 +8334,7 @@ pipelines.")
                             "romancal/source_catalog/tests/test_source_catalog.py"
                             "romancal/stpipe/tests/test_core.py"))
               ;;  SystemExit: -1
-              "-k" "not test_inject_sources and not test_grid_injection")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION"
-                      #$(version-major+minor+point version)))))))
+              "-k" "not test_inject_sources and not test_grid_injection")))
     (native-inputs
      (list nss-certs-for-test
            python-ci-watson
@@ -8598,13 +8531,7 @@ well as ephemerides services
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:test-flags #~(list "test.py")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION"
-                      #$(package-version this-package)))))))
+      #:test-flags #~(list "test.py")))
     (native-inputs
      (list python-cython
            python-pytest
@@ -9091,9 +9018,6 @@ owners/operators, academia and other entities.")
               "-k" "not test_init_line_list")
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)))
           (add-before 'check 'set-home
             (lambda _
               ;; Relax matplotlib warning: ... because the default path
@@ -9285,7 +9209,6 @@ about the underlying principles, see
       #~(modify-phases %standard-phases
           (add-after 'unpack 'preparations
             (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version)
               ;; Use our own libraries in place of bundles.
               (setenv "USE_SYSTEM_QD" "1"))))))
     (native-inputs
@@ -9344,8 +9267,7 @@ spherical polygons that represent arbitrary regions of the sky.")
                   (display
                    (string-append "__version__ = \""
                                   #$(package-version this-package)
-                                  "\""))))
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" #$version))))))
+                                  "\"")))))))))
     (native-inputs
      (list python-cython
            python-extension-helpers
@@ -9715,13 +9637,7 @@ Telescope Science Institute} image array manipulation functions.")
     (arguments
      (list
       #:test-flags
-      #~(list "--pyargs" "stsci.imagestats")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION"
-                      #$(version-major+minor+point version)))))))
+      #~(list "--pyargs" "stsci.imagestats")))
     (native-inputs
      (list python-pytest
            python-setuptools
@@ -10074,13 +9990,7 @@ and @code{astropy}.")
      (list
       ;; TODO: tests require some remove data, findout how to run bare minmal
       ;; unit tests withou it.
-      #:tests? #f
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'set-version
-            (lambda _
-              (setenv "SETUPTOOLS_SCM_PRETEND_VERSION"
-                      #$(version-major+minor+point version)))))))
+      #:tests? #f))
     (native-inputs
      (list python-setuptools
            python-setuptools-scm))
