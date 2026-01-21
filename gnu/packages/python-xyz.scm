@@ -33667,9 +33667,6 @@ all the niceties of modern GUI-based debuggers in a more lightweight and
 keyboard-friendly package.")
     (license license:expat)))
 
-(define-deprecated-package pudb
-  python-pudb)
-
 (define-public python-iwlib
   (package
     (name "python-iwlib")
