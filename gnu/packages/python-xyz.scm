@@ -22993,8 +22993,6 @@ natural language processing libraries.")
 discovery, monitoring and configuration.")
     (license license:expat)))
 
-(define-deprecated-package python-consul python-py-consul)
-
 (define-public python-schematics
   (package
     (name "python-schematics")
