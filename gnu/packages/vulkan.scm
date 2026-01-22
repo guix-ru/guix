@@ -43,11 +43,13 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages cpp)
+  #:use-module (gnu packages flex)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages llvm)
+  #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages wine)
@@ -570,54 +572,52 @@ shader compilation.")
     (license license:asl2.0)))
 
 (define-public vkd3d
-  (let ((commit "56cd4a94d541707959ce7677af6d1a34739e5579")) ; Release 1.2.
-    (package
-      (name "vkd3d")
-      (version "1.2")
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://source.winehq.org/git/vkd3d.git")
-               (commit commit)))
-         (sha256
-          (base32
-           "1n4a622drgnprvz5hjxzyzcsg2lp5rlf1sajki2vzf5gsx6fdpk8"))
-         (file-name (string-append name "-" version "-checkout"))))
-      (build-system gnu-build-system)
-      (arguments
-       (list
-        #:configure-flags #~(list "--with-spirv-tools")
-        #:phases
-        #~(modify-phases %standard-phases
-            (add-after 'unpack 'patch-for-new-vulkan
-              (lambda _
-                ;; Mimic upstream commit 8e7bf8a5c3e0047 for
-                ;; compatibility with newer vulkan-headers.
-                (substitute* "libs/vkd3d/vkd3d_private.h"
-                  (("VK_PIPELINE_BIND_POINT_RANGE_SIZE")
-                   "2u")))))))
-      (native-inputs
-       (list autoconf
-             automake
-             gettext-minimal
-             libtool
-             pkg-config))
-      (inputs
-       (list libx11
-             libxcb
-             spirv-headers
-             spirv-tools
-             vulkan-headers
-             vulkan-loader
-             wine-minimal ; Needed for 'widl'.
-             xcb-util
-             xcb-util-keysyms
-             xcb-util-wm))
-      (home-page "https://source.winehq.org/git/vkd3d.git/")
-      (synopsis "Direct3D 12 to Vulkan translation library")
-      (description "vkd3d is a library for translating Direct3D 12 to Vulkan.")
-      (license license:lgpl2.1))))
+  (package
+    (name "vkd3d")
+    (version "1.18")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitlab.winehq.org/wine/vkd3d")
+              (commit (string-append "vkd3d-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "001v4yyis6gzgyw0994ln7fz8254cmflna2dqnkh6sl56lmxdj98"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:configure-flags #~(list "--with-spirv-tools")
+      #:make-flags
+      #~(list (string-append "CC=" #$(cc-for-target))
+              (string-append "PREFIX=" #$output))))
+    (native-inputs
+     (list autoconf
+           automake
+           bison
+           flex
+           gettext-minimal
+           libtool
+           perl
+           perl-json
+           pkg-config))
+    (inputs
+     (list libx11
+           libxcb
+           spirv-headers
+           spirv-tools
+           vulkan-headers
+           vulkan-loader
+           wine-minimal ; Needed for 'widl'.
+           xcb-util
+           xcb-util-keysyms
+           xcb-util-wm))
+    (home-page "https://gitlab.winehq.org/wine/vkd3d/")
+    (synopsis "Direct3D 12 to Vulkan translation library")
+    (description "vkd3d is a 3D graphics library built on top of Vulkan,
+intended for translating Direct3D 12 to Vulkan.")
+    (license license:lgpl2.1)))
 
 (define-public vulkan-validationlayers
   (package
