@@ -4609,8 +4609,7 @@ recurrence relations.")
            python-scipy
            python-setuptools))
     (propagated-inputs
-     (list python-importlib-metadata
-           python-ndim
+     (list python-ndim
            python-numpy-1
            python-sympy))
     (home-page "https://github.com/diego-hayashi/orthopy")
@@ -4789,8 +4788,7 @@ Mathematics (GLM) library to Python.")
      ;; [optional]
      (list python-matplotlib))
     (propagated-inputs
-      (list python-importlib-metadata
-            python-numpy-1
+      (list python-numpy-1
             python-orthopy
             python-scipy
             python-sympy))
