@@ -8857,7 +8857,7 @@ templates.  A format string can be provided to control the output.")
                          python-mako
                          python-poetry-core
                          python-pytest
-                         python-tornado-6))
+                         python-tornado))
     (propagated-inputs (list python-charset-normalizer python-six))
     (home-page "https://github.com/kakulukia/pypugjs")
     (synopsis "Convert Pug source files into different template languages")
@@ -14446,7 +14446,7 @@ away.")
             python-jupyter-client-bootstrap
             python-psutil
             python-pyzmq
-            python-tornado-6
+            python-tornado
             python-tqdm
             python-traitlets))
      (home-page "https://ipython.org/")
@@ -18290,7 +18290,7 @@ time.")
            python-tinycss2
            python-traitlets
            ;; Required, even if [serve] is not used.
-           python-tornado-6
+           python-tornado
            ;; Required at runtime for `jupyter nbconvert --to=pdf`.
            texlive-adjustbox
            texlive-amsmath
@@ -19813,7 +19813,7 @@ enhancements to optimization and data fitting problems.")
            python-pandas
            python-pillow
            python-pyyaml
-           python-tornado-6
+           python-tornado
            python-xyzservices))
     (native-inputs
      (list python-beautifulsoup4
@@ -36644,7 +36644,7 @@ well as an event scheduler.")
      (list python-pytest
            python-setuptools
            python-setuptools-scm
-           python-tornado-6
+           python-tornado
            python-typeguard
            python-wheel))
     (home-page "https://github.com/jd/tenacity")
