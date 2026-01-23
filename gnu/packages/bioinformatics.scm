@@ -2841,7 +2841,6 @@ biological activities from omics data within a unified framework.")
     (arguments (list #:tests? #false))
     (propagated-inputs
      (list python-docopt
-           python-importlib-metadata
            python-numpy
            python-pandas
            python-pegasusio
@@ -2991,7 +2990,6 @@ to produce high quality figures that can be used in publications.")
                 ;; Fix syntax error
                 (("sphinx>") "sphinx")))))))
     (propagated-inputs (list python-anndata
-                             python-importlib-metadata
                              python-ipython
                              python-matplotlib
                              python-nbsphinx
@@ -3190,7 +3188,6 @@ multi-panel figures.")
                              python-pluggy
                              python-scipy))
     (native-inputs (list ghostscript
-                         python-importlib-metadata
                          python-importlib-resources
                          python-pytest
                          python-setuptools
@@ -3303,7 +3300,6 @@ and gene expression visualization.")
                              python-cvxpy
                              python-fastcluster
                              python-igraph
-                             python-importlib-metadata
                              python-numpy
                              python-pandas
                              python-psutil
