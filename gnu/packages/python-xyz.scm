@@ -10727,7 +10727,7 @@ and integrated feature-set for programming Python effectively.")
            python-pathspec
            python-platformdirs))
     (native-inputs
-     (list python-pytest
+     (list python-pytest-8
            python-pytest-xdist
            python-hatch-fancy-pypi-readme
            python-hatch-vcs
