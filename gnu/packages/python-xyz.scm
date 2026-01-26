@@ -185,6 +185,7 @@
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 John Dawson <dawson.john.andrew@gmail.com>
 ;;; Copyright © 2026 Kevin Deldycke <kevin@deldycke.com>
+;;; Copyright © 2026 Ryan Desfosses <rdesfo@sdf.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -20276,30 +20277,37 @@ following uses:
 (define-public python-icalendar
   (package
     (name "python-icalendar")
-    (version "5.0.13")
-    (source (origin
-             (method url-fetch)
-             (uri (pypi-uri "icalendar" version))
-             (sha256
-              (base32
-               "01lp0advx60z8wgng8aga1p1668ydn1r6d9qm3d622yfikg9yycj"))))
+    (version "6.3.2")
+    (source
+     (origin
+       (method url-fetch)       ;XXX: hatch-vcs fails with git-fetch
+       (uri (pypi-uri "icalendar" version))
+       (sha256
+        (base32 "188hj57l5l1jjnrfxwkmsh8hsn5pwvv93m7p7b9misgbzk5hxhg0"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (replace 'check
-            (lambda* (#:key tests? #:allow-other-keys)
-              (when tests?
-                (invoke "pytest" "-vv" "src/icalendar/tests")))))))
-    (propagated-inputs
-     (list python-dateutil python-pytz python-tzdata))
+      ;; tests: 8995 passed, 21 skipped, 2 deselected
+      #:test-flags
+      #~(list
+         "-k"
+         (string-append
+          ;; See: <https://github.com/collective/icalendar/issues/812>.
+          "not test_dateutil_timezone_is_matched_with_tzname[Arctic/Longyearbyen]"
+          " and not test_docstring_of_python_file[icalendar.timezone.tzid]"))))
     (native-inputs
-     (list python-pytest python-pytz python-setuptools python-wheel))
+     (list python-hatch-vcs
+           python-hatchling
+           python-pytest
+           python-pytz))
+    (propagated-inputs
+     (list python-dateutil
+           python-tzdata))
+    (home-page "https://github.com/collective/icalendar")
     (synopsis "Python library for parsing and generating iCalendar files")
     (description
-     "@code{icalendar} is a Python library for parsing and generating iCalendar files.")
-    (home-page "https://github.com/collective/icalendar")
+     "@code{icalendar} is a Python library for parsing and generating
+iCalendar files.")
     (license license:bsd-2)))
 
 (define-public python-args
