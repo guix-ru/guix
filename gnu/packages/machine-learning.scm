@@ -2384,7 +2384,7 @@ performance computing environments.")
      (list openblas))
     (native-inputs
      (list gfortran
-           python-meson-python
+           python-meson
            python-pandas
            python-pytest
            python-pytest-xdist))
