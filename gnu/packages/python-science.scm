@@ -2967,7 +2967,7 @@ logic, also known as grey logic.")
            ;; python-scikit-learn
            #;python-simpleitk))
     (native-inputs
-     (list python-meson-python
+     (list python-meson
            python-pytest
            python-pytest-localserver
            python-pythran))
@@ -3013,7 +3013,7 @@ logic, also known as grey logic.")
                  (string-append "version = \"" #$version "\""))))))))
     (native-inputs
      (list gfortran
-           python-meson-python
+           python-meson
            python-spin
            python-pytest
            python-setuptools))
@@ -3301,7 +3301,7 @@ cross-validation.")
            python-click
            python-doit
            python-hypothesis
-           python-meson-python
+           python-meson
            python-mpmath
            python-numpydoc
            python-pooch
@@ -3926,7 +3926,7 @@ tissue-specificity metrics for gene expression.")
     (inputs
      (list xclip xsel))
     (native-inputs
-     (list python-meson-python
+     (list python-meson
            python-lxml
            python-pytest
            python-pytest-asyncio
@@ -5085,7 +5085,7 @@ arrays.  It is a fork of the Aesara library.")
                        "scs/pythoncapi-compat"))))))
     (native-inputs
      (list pkg-config
-           python-meson-python
+           python-meson
            python-pytest
            pythoncapi-compat
            scs))

@@ -2466,7 +2466,7 @@ three consecutive points in a polyline or polygon
                  "license = {text = \"Apache-2.0 OR LGPL-2.1-or-later\"}\n")))))))
     (native-inputs
      (list pkg-config
-           python-meson-python
+           python-meson
            python-pytest))
     (inputs
      (list c-siphash))
@@ -3321,7 +3321,7 @@ into dataclasses.")
               "-k" "not test_filled_random_big and not test_lines_random_big")))
     (native-inputs
      (list pybind11
-           python-meson-python
+           python-meson
            python-pytest
            python-wurlitzer))
     (propagated-inputs
@@ -10885,7 +10885,7 @@ include_dirs = ~:*~a/include~%" #$(this-package-input "openblas"))))))
     (native-inputs
      (list gfortran
            python-hypothesis
-           python-meson-python
+           python-meson
            python-pytest
            python-pytest-xdist
            python-setuptools
@@ -11075,7 +11075,7 @@ include_dirs = ~:*~a/include~%"
                        (find-files (in-vicinity #$output "/bin"))))))))
     (native-inputs
      (list python-hypothesis
-           python-meson-python
+           python-meson
            python-pytest
            python-pytest-xdist
            python-setuptools
@@ -11998,7 +11998,7 @@ comparison.
            tk))
     (native-inputs
      (list pkg-config
-           python-meson-python
+           python-meson
            pybind11
            python-pytest
            python-pytest-timeout
@@ -13442,7 +13442,7 @@ a front-end for C compilers or analysis tools.")
            ninja
            pkg-config
            python-cython
-           python-meson-python
+           python-meson
            python-numpy
            python-pytest))
     (propagated-inputs
@@ -15826,9 +15826,9 @@ validate this input and generate a PEP 643-compliant metadata
 file (e.g. @file{PKG-INFO}).")
     (license license:expat)))
 
-(define-public python-meson-python
+(define-public python-meson
   (package
-    (name "python-meson-python")
+    (name "python-meson")
     (version "0.19.0")
     (source
      (origin
@@ -15857,6 +15857,9 @@ file (e.g. @file{PKG-INFO}).")
     (description "This package provides a PEP 517 build backend that makes
 use of the Meson build system.")
     (license license:expat)))
+
+;; XXX: Deprecated on <2026-01-26>.
+(define-deprecated/public-alias python-meson-python python-meson)
 
 (define-public python-mccabe
   (package
@@ -20792,7 +20795,7 @@ codebase to support both Python 2 and Python 3 with minimal overhead.")
        (sha256
         (base32 "1syixz6xlmy1pjcr03ij7hcvaklgjy4mmwggssrmmnr9pxnn5xw9"))))
     (build-system pyproject-build-system)
-    (native-inputs (list python-meson-python
+    (native-inputs (list python-meson
                          python-cython
                          python-pytest))
     (home-page "https://github.com/sagemath/cysignals")
@@ -28351,7 +28354,7 @@ Its algorithms are based on the kakasi library, which is written in C.")
            meson
            ninja/pinned
            patchelf
-           python-meson-python
+           python-meson
            python-setuptools
            python-tappy))
     (inputs
