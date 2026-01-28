@@ -81,26 +81,26 @@
 (define-public parallel
   (package
     (name "parallel")
-    (version "20251222")
+    (version "20260122")
     (outputs '("out" "doc"))
     (source
      (origin
-      (method url-fetch)
-      (uri (string-append "mirror://gnu/parallel/parallel-"
-                          version ".tar.bz2"))
-      (sha256
-       (base32 "0xf2j9jmjba7scjdlnk6n9p53ycakzkfkikhdzzssb0gva456sxm"))
-      (snippet
-       '(begin
-          (use-modules (guix build utils))
-          ;; Delete pre-generated manpages and documents.
-          ;; TODO: generate rst files.
-          ;; parallel_cheat_bw.pdf uses libreoffice to be generated.
-          (rename-file "src/parallel_cheat_bw.pdf"
-                       "src/parallel_cheat_bw.pdf-keep")
-          (for-each delete-file (find-files "src" "\\.(1|7|html|pdf)$"))
-          (rename-file "src/parallel_cheat_bw.pdf-keep"
-                       "src/parallel_cheat_bw.pdf")))))
+       (method url-fetch)
+       (uri (string-append "mirror://gnu/parallel/parallel-"
+                           version ".tar.bz2"))
+       (sha256
+        (base32 "0fvcknxpmvv2glgdv5z0f9mm475azpqlzmc1fwgb9214miwwyqis"))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils))
+            ;; Delete pre-generated manpages and documents.
+            ;; TODO: generate rst files.
+            ;; parallel_cheat_bw.pdf uses libreoffice to be generated.
+            (rename-file "src/parallel_cheat_bw.pdf"
+                         "src/parallel_cheat_bw.pdf-keep")
+            (for-each delete-file (find-files "src" "\\.(1|7|html|pdf)$"))
+            (rename-file "src/parallel_cheat_bw.pdf-keep"
+                         "src/parallel_cheat_bw.pdf")))))
     (build-system gnu-build-system)
     (arguments
      (list
