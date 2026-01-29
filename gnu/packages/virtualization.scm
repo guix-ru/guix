@@ -180,6 +180,7 @@
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system go)
+  #:use-module (guix build-system haskell)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system python)
@@ -816,12 +817,11 @@ firmware blobs.  You can
     (build-system gnu-build-system)
     (arguments
      (list
-      #:imported-modules `(,@%default-gnu-imported-modules
-                           (guix build haskell-build-system)
-                           (guix build python-build-system))
+      #:imported-modules (append %haskell-build-system-modules
+                                 %pyproject-build-system-modules)
       #:modules `(,@%default-gnu-modules
                   ((guix build haskell-build-system) #:prefix haskell:)
-                  ((guix build python-build-system) #:select (site-packages))
+                  ((guix build pyproject-build-system) #:select (site-packages))
                   (srfi srfi-1)
                   (srfi srfi-26)
                   (ice-9 match)
