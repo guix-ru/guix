@@ -66,6 +66,7 @@
 ;;; Copyright © 2025 Dariqq <dariqq@posteo.net>
 ;;; Copyright © 2025 Tomas Volf <~@wolfsden.cz>
 ;;; Copyright © 2025 Matthew Elwin <elwin@northwestern.edu>
+;;; Copyright © 2026 Robin Templeton <robin@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -426,6 +427,16 @@ Python 3.3 and later, rather than on Python 2.")
                      "MINGW"
                      "GNU")))           ;matched against '*'
 
+              ;; Patch git-sh-i18n.sh to source gettext.sh from
+              ;; gettext-minimal.  By default, it uses gettext.sh from $PATH
+              ;; if available, and falls back to English if not.
+              (let ((gettext-sh (search-input-file inputs "bin/gettext.sh")))
+                (substitute* "git-sh-i18n.sh"
+                  (("type gettext.sh")
+                   (format #f "type ~a" gettext-sh))
+                  (("\\. gettext.sh")
+                   (format #f ". ~a" gettext-sh))))
+
               ;; git-submodule sources 'git-sh-setup.sh', but not before
               ;; invoking the basename and sed commands... patch them to their
               ;; absolute location.
@@ -566,6 +577,7 @@ Python 3.3 and later, rather than on Python 2.")
            coreutils-minimal
            curl                         ;for HTTP(S) access
            expat                        ;for 'git push' over HTTP(S)
+           gettext-minimal              ;for gettext.sh
            openssl
            perl
            sed
