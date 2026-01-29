@@ -70,6 +70,7 @@
 ;;; Copyright © 2026 Ingar <ingar@onionmail.info>
 ;;; Copyright © 2026 Nguyễn Gia Phong <cnx@loang.net>
 ;;; Copyright © 2026 Luca Kredel <luca.kredel@web.de>
+;;; Copyright © 2026 Robin Templeton <robin@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -505,6 +506,16 @@ optimized for version control systems.")
                      "MINGW"
                      "GNU")))           ;matched against '*'
 
+              ;; Patch git-sh-i18n.sh to source gettext.sh from
+              ;; gettext-minimal.  By default, it uses gettext.sh from $PATH
+              ;; if available, and falls back to English if not.
+              (let ((gettext-sh (search-input-file inputs "bin/gettext.sh")))
+                (substitute* "git-sh-i18n.sh"
+                  (("type gettext.sh")
+                   (format #f "type ~a" gettext-sh))
+                  (("\\. gettext.sh")
+                   (format #f ". ~a" gettext-sh))))
+
               ;; git-submodule sources 'git-sh-setup.sh', but not before
               ;; invoking the basename and sed commands... patch them to their
               ;; absolute location.
@@ -647,6 +658,7 @@ optimized for version control systems.")
            coreutils-minimal
            curl                         ;for HTTP(S) access
            expat                        ;for 'git push' over HTTP(S)
+           gettext-minimal              ;for gettext.sh
            openssl
            perl
            sed
