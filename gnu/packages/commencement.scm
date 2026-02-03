@@ -3159,7 +3159,16 @@ exec " gcc "/bin/" program
   (package
     (inherit findutils)
     (name "findutils-boot0")
-    (source (bootstrap-origin (package-source findutils)))
+    (version "4.9.0")
+    (source
+     (bootstrap-origin (origin
+                        (method url-fetch)
+                        (uri (string-append "mirror://gnu/findutils/findutils-"
+                                            version ".tar.xz"))
+                        (sha256
+                         (base32
+                          "1zk2sighc26bfdsm97bv7cd1cnvq7r4gll4zqpnp0rs3kp0bigx2"))
+                        (patches (search-patches "findutils-localstatedir.patch")))))
     (inputs
      `(("make" ,gnu-make-boot0)
        ("diffutils" ,diffutils-boot0) ; for tests
@@ -3167,7 +3176,7 @@ exec " gcc "/bin/" program
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
-       ;; The build system assumes we have done a mistake when time_t is 32-bit
+       ;; The build system assumes we have made a mistake when time_t is 32-bit
        ;; on a 64-bit system.  Ignore that for our bootstrap toolchain.
        ,@(substitute-keyword-arguments (package-arguments findutils)
            ((#:configure-flags flags ''())
@@ -3184,18 +3193,13 @@ exec " gcc "/bin/" program
                (add-before 'check 'skip-problematic-tests
                  (lambda _
                    ,(match (%current-system)
-                     ;; 'test-fnmatch' fails when using glibc-mesboot@2.16, due
-                     ;; to incorrect handling of the [:alpha:] regexp character
-                     ;; class.  Ignore it.
-                     ((or "x86_64-linux" "i686-linux")
+                     ;; 'test-fnmatch' fails when using a glibc version earlier
+                     ;; than 2.25 (or so), due to incorrect handling of the
+                     ;; [:alpha:] regexp character class.  Ignore it.
+                     ((or "x86_64-linux" "i686-linux" "armhf-linux")
                       '(substitute* "gnulib-tests/Makefile"
                          (("^XFAIL_TESTS =")
                           "XFAIL_TESTS = test-fnmatch ")))
-                     ("armhf-linux"
-                      '(substitute* "gnulib-tests/Makefile"
-                         (("^XFAIL_TESTS =")
-                          "XFAIL_TESTS = test-fnmatch ")
-                         (("test-pthread-thread\\$\\(EXEEXT\\)") "")))
                      ("riscv64-linux"
                       '(substitute* "gnulib-tests/Makefile"
                          ;; These tests fails non-deterministically.
@@ -3203,14 +3207,7 @@ exec " gcc "/bin/" program
                          (("test-sigprocmask\\$\\(EXEEXT\\)") "")
                          (("test-setlocale_null-mt-all\\$\\(EXEEXT\\)") "")
                          (("test-pthread_sigmask1\\$\\(EXEEXT\\)") "")))
-                     (_
-                      ;; XXX: The pthread tests are known to fail at least on
-                      ;; ARM; skip them.
-                      '(substitute* "gnulib-tests/Makefile"
-                         (("test-pthread\\$\\(EXEEXT\\)") "")
-                         (("test-pthread-thread\\$\\(EXEEXT\\)") "")
-                         (("test-pthread_sigmask1\\$\\(EXEEXT\\)") "")
-                         (("test-pthread_sigmask2\\$\\(EXEEXT\\)") "")))))))))))))
+                     (_ #t)))))))))))
 
 (define file
   (package
