@@ -52,7 +52,7 @@
 (define-public aspell
   (package
     (name "aspell")
-    (version "0.60.8.1")
+    (version "0.60.8.2")
     (source
      (origin
       (method url-fetch)
@@ -60,7 +60,7 @@
                           version ".tar.gz"))
       (sha256
        (base32
-        "06yjhwlgpcvbrl5g83qjrpzjwjx7hka5lhsfc3x5gm229nri5nnn"))
+        "06b9szgm9cj1zh58r7sbl5fbi3vi9fs7b1as4ir8y176x9ilizjp"))
       (patches (search-patches "aspell-default-dict-dir.patch"))))
     (build-system gnu-build-system)
     (arguments
