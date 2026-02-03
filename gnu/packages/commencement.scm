@@ -3920,14 +3920,48 @@ exec " gcc "/bin/" program
   (package
     (inherit m4)
     (name "m4-boot0")
-    (source (bootstrap-origin (package-source m4)))
+    (version "1.4.20")
+    (source (origin
+             (method url-fetch)
+             (uri (string-append "mirror://gnu/m4/m4-"
+                                 version ".tar.xz"))
+             (sha256
+              (base32
+               "0axgilr6n88br7msm3ls8m4zlwgk4q3vcjqw1cknqpyg3hxfldp2"))))
     (inputs (%boot0-inputs))
     (arguments
      `(#:guile ,%bootstrap-guile
        #:implicit-inputs? #f
-       ,@(package-arguments m4)
-       ;; Ignore test failure in gnulib for armhf/aarch64 and Hurd
-       #:tests? ,(and (not (target-arm?))
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'disable-test
+           (lambda _
+             ;; Test 5 raises SIGINT from a child and immediately returns
+             ;; code 71, and tests whether the child was killed by a signal.
+             ;; Since there is no signal handler for SIGINT in the build
+             ;; container, the parent sees the return code, and fails.
+             ;; XXX: For some reason adding signal handlers in Guile before
+             ;; running tests has no effect.
+             (substitute* "tests/test-execute.sh"
+               (("4 5 6")
+                "4 6"))))
+         ,@(if (target-hurd64?)
+               '((add-after 'unpack 'patch-sigsegv
+                   (lambda _
+                     ;; Stack overflow recovery does not compile
+                     (substitute* "lib/sigsegv.in.h"
+                       (("__GNU__") "__XGNU__")))))
+               '())
+         (add-after 'unpack 'configure-shell
+           (lambda* (#:key native-inputs inputs #:allow-other-keys)
+             (let ((/bin/sh (search-input-file (or native-inputs inputs)
+                                               "/bin/sh")))
+               ;; Adjust hard-coded /bin/sh for tests.
+               (substitute* "lib/config.hin"
+                 (("\"/bin/sh\"")
+                  (format #f "\"~a\"" /bin/sh)))))))
+       ;; Ignore test failure in gnulib for riscv64 and Hurd
+       #:tests? ,(and (not (target-riscv64?))
                       (not (target-hurd?)))))))
 
 (define bison-boot0
