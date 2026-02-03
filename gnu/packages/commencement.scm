@@ -3178,33 +3178,47 @@ exec " gcc "/bin/" program
        #:guile ,%bootstrap-guile
        ;; The build system assumes we have made a mistake when time_t is 32-bit
        ;; on a 64-bit system.  Ignore that for our bootstrap toolchain.
-       ,@(substitute-keyword-arguments (package-arguments findutils)
-           ((#:configure-flags flags ''())
-            `(append
-              ,(if (target-x86-64?)
-                   ''("TIME_T_32_BIT_OK=yes")
-                   ''())
-              ,flags))
-           ((#:phases phases '%standard-phases)
-            `(modify-phases ,phases
-               (add-before 'check 'skip-problematic-tests
-                 (lambda _
-                   ,(match (%current-system)
-                     ;; 'test-fnmatch' fails when using a glibc version earlier
-                     ;; than 2.25 (or so), due to incorrect handling of the
-                     ;; [:alpha:] regexp character class.  Ignore it.
-                     ((or "x86_64-linux" "i686-linux" "armhf-linux")
-                      '(substitute* "gnulib-tests/Makefile"
-                         (("^XFAIL_TESTS =")
-                          "XFAIL_TESTS = test-fnmatch ")))
-                     ("riscv64-linux"
-                      '(substitute* "gnulib-tests/Makefile"
-                         ;; These tests fails non-deterministically.
-                         (("test-hard-locale\\$\\(EXEEXT\\)") "")
-                         (("test-sigprocmask\\$\\(EXEEXT\\)") "")
-                         (("test-setlocale_null-mt-all\\$\\(EXEEXT\\)") "")
-                         (("test-pthread_sigmask1\\$\\(EXEEXT\\)") "")))
-                     (_ #t)))))))))))
+       #:configure-flags
+       (list ,@(if (target-x86-64?)
+                   '("TIME_T_32_BIT_OK=yes")
+                   '())
+             ;; XXX: 32-bit Hurd platforms don't support 64bit time_t
+             ,@(if (target-hurd32?)
+                   '("--disable-year2038")
+                   '())
+             ;; Tell 'updatedb' to write to /var.
+             "--localstatedir=/var")
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'check 'adjust-test-shebangs
+           (lambda _
+             (substitute* '("tests/xargs/verbose-quote.sh"
+                            "tests/find/exec-plus-last-file.sh")
+               (("#!/bin/sh")
+                (string-append "#!" (which "sh"))))))
+         (add-before 'check 'skip-problematic-tests
+           (lambda _
+             ,(match (%current-system)
+               ;; 'test-fnmatch' fails when using a glibc version earlier
+               ;; than 2.25 (or so), due to incorrect handling of the
+               ;; [:alpha:] regexp character class.  Ignore it.
+               ((or "x86_64-linux" "i686-linux" "armhf-linux")
+                '(substitute* "gnulib-tests/Makefile"
+                   (("^XFAIL_TESTS =")
+                    "XFAIL_TESTS = test-fnmatch ")))
+               ("riscv64-linux"
+                '(substitute* "gnulib-tests/Makefile"
+                   ;; These tests fails non-deterministically.
+                   (("test-hard-locale\\$\\(EXEEXT\\)") "")
+                   (("test-sigprocmask\\$\\(EXEEXT\\)") "")
+                   (("test-setlocale_null-mt-all\\$\\(EXEEXT\\)") "")
+                   (("test-pthread_sigmask1\\$\\(EXEEXT\\)") "")))
+               ((or "i586-gnu" "x86_64-gnu")
+                '(substitute* "gnulib-tests/test-strerror_r.c"
+                   ;; This test fails non-deterministically.
+                   (("(^| )main *\\(.*" all)
+                    (string-append all "{\n  exit (77);//"))))
+               (_ #t)))))))))
 
 (define file
   (package
