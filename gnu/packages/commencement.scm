@@ -3181,12 +3181,9 @@ exec " gcc "/bin/" program
        ,@(substitute-keyword-arguments (package-arguments findutils)
            ((#:configure-flags flags ''())
             `(append
-               ;; TODO: Figure out exactly with architectures need this.
-              ,(if (target-64bit?)
+              ,(if (target-x86-64?)
                    ''("TIME_T_32_BIT_OK=yes")
                    ''())
-              '("--disable-year2038")
-              '()       ; XXX: List only added to prevent rebuilds!
               ,flags))
            ((#:phases phases '%standard-phases)
             `(modify-phases ,phases
