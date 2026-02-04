@@ -2617,6 +2617,30 @@ OPAM.")))
        #:tests? #f
        #:phases %standard-phases))))
 
+(define ocaml-opam-client
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam-client")
+    (arguments
+     `(#:package "opam-client"
+       ;; tests are run with the opam package
+       #:tests? #f
+       #:phases (modify-phases %standard-phases
+                  (add-before 'build 'pre-build
+                    (lambda* (#:key inputs make-flags #:allow-other-keys)
+                      (let ((bwrap (search-input-file inputs "/bin/bwrap")))
+                        (substitute* "src/client/opamInitDefaults.ml"
+                          (("\"bwrap\"")
+                           (string-append "\"" bwrap "\"")))))))))
+    (inputs (list bubblewrap))
+    (propagated-inputs (list ocaml-base64
+                             ocaml-cmdliner
+                             ocaml-opam-repository
+                             ocaml-opam-solver
+                             ocaml-opam-state
+                             ocaml-re
+                             ocaml-spdx-licenses))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
