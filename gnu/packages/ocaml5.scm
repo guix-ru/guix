@@ -2247,6 +2247,30 @@ management is based on OPIUM (Optimal Package Install/Uninstall Manager).
 quickly (even for a SAT-based solver).")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-cudf
+  (package
+    (name "ocaml5-cudf")
+    (version "0.10")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.com/irill/cudf")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1lvrmpscbk1kjv5ag5bzlzv520xk5zw2haf6q7chvz98gcm9g0hk"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-extlib))
+    (native-inputs (list ocaml-ounit2))
+    (home-page "https://www.mancoosi.org/cudf/")
+    (synopsis "CUDF library (part of the Mancoosi tools)")
+    (description
+     "@acronym{CUDF, Common Upgradeability Description Format} is a format for
+describing upgrade scenarios in package-based software distributions.")
+    ;; With static-linking exception
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
