@@ -2520,6 +2520,24 @@ Git-friendly development workflow.")
        #:tests? #f
        #:phases %standard-phases))))
 
+(define-public opam-installer
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam-installer")
+    (native-inputs (list ocaml-opam-format ocaml-cmdliner))
+    (inputs '())
+    (propagated-inputs '())
+    (arguments
+     `(#:package "opam-installer"
+       ;; requires all of opam
+       #:tests? #f))
+    (synopsis "Tool for installing OCaml packages")
+    (description
+     "@var{opam-installer} is a tool for installing OCaml packages
+based on @code{.install} files defined by the OPAM package manager.  It is
+useful for installing OCaml packages without requiring the entirety of
+OPAM.")))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
