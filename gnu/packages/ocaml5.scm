@@ -2140,6 +2140,31 @@ Graphics.open_graph is called.  This library used to be distributed with OCaml
 up to OCaml 4.08.")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-graph
+  (package
+    (name "ocaml5-graph")
+    (version "2.2.0")
+    (home-page "https://github.com/backtracking/ocamlgraph/")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url home-page)
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02f4iyrnnhi7kam7qrnny76vbdh1q68748bcrq02cy8wa79chp3r"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "ocamlgraph"))
+    (native-inputs (list ocaml-graphics))
+    (properties `((upstream-name . "ocamlgraph")))
+    (synopsis "Generic graph data structures for OCaml")
+    (description
+     "This library defines a set of graph data structures and algorithms
+to operate on them.")
+    (license license:lgpl2.1)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
