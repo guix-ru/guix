@@ -2386,6 +2386,30 @@ repository-wide uninstallability checks.")
     ;; with static-linking exception
     (license license:lgpl2.1+)))
 
+(define-public ocaml-sha
+  (package
+    (name "ocaml5-sha")
+    (version "1.15.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/djs55/ocaml-sha")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0fpvfa522zx0rb5n7y3agklp4acpwbr430zg4qmfx1vwsxyx44mc"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-stdlib-shims ocaml-odoc))
+    (native-inputs (list ocaml-ounit2))
+    (home-page "https://github.com/djs55/ocaml-sha")
+    (synopsis "OCaml binding to the SHA cryptographic functions")
+    (description
+     "This is the binding for SHA interface code in OCaml, offering the same
+interface as the MD5 digest included in the OCaml standard library.  It
+currently provides SHA1, SHA256 and SHA512 hash functions.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
