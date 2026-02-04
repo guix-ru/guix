@@ -2218,6 +2218,35 @@ for day to day programming.")
     ;; With static-linking exception
     (license license:lgpl2.1+)))
 
+(define-public ocaml-0install-solver
+  (package
+    (name "ocaml5-0install-solver")
+    (version "2.18")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/0install/0install")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1hm72k355qwgh16hngmnd77bgawf20ipnqxfncdzl10rqrc0640b"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "0install-solver"))
+    (native-inputs (list ocaml-ounit2))
+    (home-page "https://docs.0install.net/developers/solver/")
+    (synopsis "Package dependency solver")
+    (description
+     "This package provides a package dependency resolver based on a SAT solver.  This
+was originally written for the 0install package manager, but is now generic and
+is also used as a solver backend for opam.  The SAT solver is based on
+@code{MiniSat} (http://minisat.se/Papers.html) and the application to package
+management is based on OPIUM (Optimal Package Install/Uninstall Manager).
+0install-solver uses a (novel?) strategy to find the optimal solution extremely
+quickly (even for a SAT-based solver).")
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
