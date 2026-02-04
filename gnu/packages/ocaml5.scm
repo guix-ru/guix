@@ -2328,6 +2328,29 @@ order to interface with opam as it is the format common used to talk to all the
 supported solvers.")
     (license license:isc)))
 
+(define-public ocaml-base64
+  (package
+    (name "ocaml5-base64")
+    (version "3.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/ocaml-base64")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1jq349jp663hq51a941afr2y4yyh34r19zsxla73ks9bywj4mm2q"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-alcotest ocaml-bos ocaml-rresult))
+    (home-page "https://github.com/mirage/ocaml-base64")
+    (synopsis "Base64 encoding for OCaml")
+    (description
+     "Base64 is a group of similar binary-to-text encoding schemes
+that represent binary data in an ASCII string format by translating it into a
+radix-64 representation.  It is specified in RFC 4648.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
