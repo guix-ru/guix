@@ -787,6 +787,33 @@ environment, parse command line arguments, interact with the file system and
 run command line programs.")
     (license license:isc)))
 
+(define-public ocaml-jsonm
+  (package
+    (name "ocaml5-jsonm")
+    (version "1.0.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/jsonm/releases/"
+                           "jsonm-" version ".tbz"))
+       (sha256
+        (base32 "1mkvi88vwn4rxa5ir3k5qhm8h8z15iyd5rp1ycfj0ls0xfgj6aga"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases ,#~(modify-phases %standard-phases
+                     (delete 'configure))))
+    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (propagated-inputs (list ocaml-uutf ocaml-cmdliner))
+    (home-page "https://erratique.ch/software/jsonm")
+    (synopsis "Non-blocking streaming JSON codec for OCaml")
+    (description
+     "Jsonm is a non-blocking streaming codec to decode and encode
+the JSON data format.  It can process JSON text without blocking on IO and
+without a complete in-memory representation of the data.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
