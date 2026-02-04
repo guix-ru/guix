@@ -2575,6 +2575,35 @@ OPAM.")))
        #:tests? #f
        #:phases %standard-phases))))
 
+(define ocaml-opam-state
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam-state")
+    (arguments
+     `(#:package "opam-state"
+       ;; tests are run with the opam package
+       #:tests? #f
+       #:phases (modify-phases %standard-phases
+                  (add-before 'build 'pre-build
+                    (lambda* (#:key inputs make-flags #:allow-other-keys)
+                      (let ((bwrap (search-input-file inputs "/bin/bwrap")))
+                        ;; Use bwrap from the store directly.
+                        (substitute* "src/state/shellscripts/bwrap.sh"
+                          (("-v bwrap")
+                           (string-append "-v " bwrap))
+                          (("exec bwrap")
+                           (string-append "exec " bwrap))
+                          ;; Mount /gnu and /run/current-system in the
+                          ;; isolated environment when building with opam.
+                          ;; This is necessary for packages to find external
+                          ;; dependencies, such as a C compiler, make, etc...
+                          (("^add_sys_mounts /usr")
+                           (string-append "add_sys_mounts "
+                                          (%store-directory)
+                                          " /run/current-system /usr")))))))))
+    (inputs (list bubblewrap ocaml-spdx-licenses))
+    (propagated-inputs (list ocaml-opam-repository))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
