@@ -2271,6 +2271,33 @@ describing upgrade scenarios in package-based software distributions.")
     ;; With static-linking exception
     (license license:lgpl2.1+)))
 
+(define-public ocaml-mccs
+  (package
+    (name "ocaml5-mccs")
+    (version "1.1+19")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/AltGr/ocaml-mccs")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1x1y5rhj4f0xakbgfn9f90a9xy09v99p8mc42pbnam5kghyjmxy6"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-cudf))
+    (home-page "https://www.i3s.unice.fr/~cpjm/misc/")
+    (synopsis "Upgrade path problem solver")
+    (description
+     "Mccs (Multi Criteria CUDF Solver) is a CUDF problem solver.
+Mccs take as input a CUDF problem and computes the best solution according to
+a set of criteria.  It relies on a Integer Programming solver or a
+Pseudo Boolean solver to achieve its task.  Mccs can use a wide set of
+underlying solvers like Cplex, Gurobi, Lpsolver, Glpk, CbC, SCIP or WBO.")
+    (license (list license:bsd-3 license:gpl3+
+                   ;; With static-linking exception
+                   license:lgpl2.1+))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
