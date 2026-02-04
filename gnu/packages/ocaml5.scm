@@ -2508,6 +2508,18 @@ Git-friendly development workflow.")
     ;; The 'LICENSE' file waives some requirements compared to LGPLv3.
     (license license:lgpl3)))
 
+(define ocaml-opam-format
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam-format")
+    (inputs '())
+    (propagated-inputs (list ocaml-opam-core ocaml-opam-file-format ocaml-re))
+    (arguments
+     `(#:package "opam-format"
+       ;; tests are run with the opam package
+       #:tests? #f
+       #:phases %standard-phases))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
