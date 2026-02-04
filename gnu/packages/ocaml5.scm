@@ -2165,6 +2165,32 @@ up to OCaml 4.08.")
 to operate on them.")
     (license license:lgpl2.1)))
 
+(define-public ocaml-extlib
+  (package
+    (name "ocaml5-extlib")
+    (version "1.8.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://ygrek.org/p/release/ocaml-extlib/"
+                           "extlib-" version ".tar.gz"))
+       (sha256
+        (base32 "0w2xskv8hl0fwjri68q5bpf6n36ab4fp1q08zkfqw2i807q7fhln"))))
+    (build-system dune-build-system)
+    (arguments
+     (list
+      #:package "extlib"))
+    (native-inputs (list ocaml-cppo))
+    (home-page "https://github.com/ygrek/ocaml-extlib")
+    (synopsis "Complete and small extension for OCaml standard library")
+    (description
+     "This library adds new functions to OCaml standard library
+modules, modifies some functions in order to get better performances or
+safety (tail-recursive) and also provides new modules which should be useful
+for day to day programming.")
+    ;; With static-linking exception
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
