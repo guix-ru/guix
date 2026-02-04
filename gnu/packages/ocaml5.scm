@@ -2538,6 +2538,18 @@ based on @code{.install} files defined by the OPAM package manager.  It is
 useful for installing OCaml packages without requiring the entirety of
 OPAM.")))
 
+(define ocaml-opam-repository
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam-repository")
+    (inputs '())
+    (propagated-inputs (list ocaml-opam-format))
+    (arguments
+     `(#:package "opam-repository"
+       ;; tests are run with the opam package
+       #:tests? #f
+       #:phases %standard-phases))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
