@@ -2351,6 +2351,41 @@ that represent binary data in an ASCII string format by translating it into a
 radix-64 representation.  It is specified in RFC 4648.")
     (license license:isc)))
 
+(define-public ocaml-dose3
+  (package
+    (name "ocaml5-dose3")
+    (version "7.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://gitlab.com/irill/dose3")
+                    (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0hcjh68svicap7j9bghgkp49xa12qhxa1pygmrgc9qwm0m4dhirb"))))
+    (build-system dune-build-system)
+    (arguments `(#:package "dose3"))
+    (propagated-inputs (list ocaml-extlib
+                             ocaml-base64
+                             ocaml-cudf
+                             ocaml-graph
+                             ocaml-re
+                             ocaml-stdlib-shims))
+    (native-inputs (list ocaml-ounit))
+    (home-page "https://www.mancoosi.org/software/")
+    (synopsis "Package distribution management framework")
+    (description "Dose3 is a framework made of several OCaml libraries for
+managing distribution packages and their dependencies.  Though not tied to
+any particular distribution, dose3 constitutes a pool of libraries which
+enable analyzing packages coming from various distributions.  Besides basic
+functionalities for querying and setting package properties, dose3 also
+implements algorithms for solving more complex problems such as monitoring
+package evolutions, correct and complete dependency resolution and
+repository-wide uninstallability checks.")
+    ;; with static-linking exception
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
