@@ -2116,6 +2116,30 @@ language understood by ocamldoc.")))
                          ocaml-yojson
                          jq))))
 
+(define-public ocaml-graphics
+  (package
+    (name "ocaml5-graphics")
+    (version "5.1.2")
+    (home-page "https://github.com/ocaml/graphics")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1q20f8y6ijxbvzik2ns4yl3w54q5z8kd0pby8i8c64a04hvly08m"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list libx11))
+    (synopsis "Portable drawing primatives")
+    (description
+     "The graphics library provides a set of portable drawing primitives.
+Drawing takes place in a separate window that is created when
+Graphics.open_graph is called.  This library used to be distributed with OCaml
+up to OCaml 4.08.")
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
