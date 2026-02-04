@@ -2604,6 +2604,19 @@ OPAM.")))
     (inputs (list bubblewrap ocaml-spdx-licenses))
     (propagated-inputs (list ocaml-opam-repository))))
 
+(define ocaml-opam-solver
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam-solver")
+    (inputs '())
+    (propagated-inputs (list ocaml-opam-format ocaml-mccs
+                             ocaml-opam-0install-cudf ocaml-dose3))
+    (arguments
+     `(#:package "opam-solver"
+       ;; tests are run with the opam package
+       #:tests? #f
+       #:phases %standard-phases))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
