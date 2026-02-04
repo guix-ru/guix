@@ -58,6 +58,7 @@
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages virtualization)
   #:use-module (gnu packages web)
   #:use-module (gnu packages xorg)
   #:use-module ((guix build-system dune)
@@ -2459,6 +2460,53 @@ providing a unified diff.")
 identifiers (swhids).  This is the core library, for most use cases you should
 use the swhid library instead.")
     (license license:isc)))
+
+(define ocaml-opam-core
+  (package
+    (name "ocaml5-opam-core")
+    (version "2.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/opam")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0php0b31cwyabhds477abk8qyz4whl3kncpbka4dynzpaf9xnqsm"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "opam-core"
+       ;; tests are run with the opam package
+       #:tests? #f
+       #:phases (modify-phases %standard-phases
+                  (add-before 'build 'pre-build
+                    (lambda* (#:key inputs make-flags #:allow-other-keys)
+                      (let ((bash (assoc-ref inputs "bash"))
+                            (bwrap (search-input-file inputs "/bin/bwrap")))
+                        (substitute* "src/core/opamSystem.ml"
+                          (("\"/bin/sh\"")
+                           (string-append "\"" bash "/bin/sh\""))
+                          (("getconf")
+                           (which "getconf")))))))))
+    (propagated-inputs (list ocaml-graph
+                             ocaml-re
+                             ocaml-patch
+                             ocaml-uutf
+                             ocaml-cppo
+                             ocaml-swhid-core
+                             ocaml-jsonm
+                             ocaml-cmdliner
+                             ocaml-sha))
+    (inputs (list bubblewrap ocaml-patch ocaml-uutf))
+    (home-page "https://opam.ocamlpro.com/")
+    (synopsis "Package manager for OCaml")
+    (description
+     "OPAM is a tool to manage OCaml packages.  It supports multiple
+simultaneous compiler installations, flexible package constraints, and a
+Git-friendly development workflow.")
+    ;; The 'LICENSE' file waives some requirements compared to LGPLv3.
+    (license license:lgpl3)))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
