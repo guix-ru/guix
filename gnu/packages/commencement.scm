@@ -1011,9 +1011,10 @@ MesCC-Tools), and finally M2-Planet.")
                              ;; Instead of checking if the header already exists
                              ;; install them in a 'backwards' order, so the
                              ;; preferred one never ends up overridden.
-                             (find-files "obj/include/bits")
-                             (find-files "arch/generic/bits")
-                             (find-files (string-append "arch/" arch "/bits"))))
+                             (find-files "obj/include/bits" "\\.h$")
+                             (find-files "arch/generic/bits" "\\.h$")
+                             (find-files
+                               (string-append "arch/" arch "/bits") "\\.h$")))
                  (when (file-exists? (string-append lib "/libc.so"))
                    (symlink "libc.so"
                             (string-append lib "/ld-musl-" arch ".so.1")))))))))))
