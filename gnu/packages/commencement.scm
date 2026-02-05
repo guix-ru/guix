@@ -351,8 +351,8 @@ pure Scheme to Tar and decompression in one easy step.")
     (native-inputs `(("bootar" ,bootar)))))
 
 (define (%boot-gash-inputs)
-  `(("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
+  `(("bash" ,gash-boot)                 ;gnu-build-system used to expect "bash"
+    ("coreutils" ,gash-utils-boot)
     ("bootar" ,bootar)
     ("guile" ,%bootstrap-guile)))
 
