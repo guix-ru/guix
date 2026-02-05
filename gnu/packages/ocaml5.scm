@@ -1059,6 +1059,9 @@ Descriptions of projects, libraries and executables are provided in
     (properties '((hidden? . #t)))
     (license license:expat)))
 
+;; Use this alias for packages built with the default ocaml 5.x compiler.
+(define-public dune ocaml5.3-dune-bootstrap)
+
 (define-public ocaml5.0-dune-bootstrap
   (package
     (inherit ocaml5.3-dune-bootstrap)
