@@ -39,6 +39,7 @@
   #:use-module (guix modules)
   #:export (%test-cgit
             %test-git-http
+            %test-git-http-root-path
             %test-gitolite
             %test-gitile
             %test-fossil))
@@ -217,7 +218,7 @@ HTTP-PORT."
 ;;; Git server.
 ;;;
 
-(define %git-nginx-configuration
+(define (git-nginx-configuration uri-path)
   (nginx-configuration
    (server-blocks
     (list
@@ -228,19 +229,20 @@ HTTP-PORT."
       (locations
        (list (git-http-nginx-location-configuration
               (git-http-configuration (export-all? #t)
-                                      (uri-path "/git"))))))))))
+                                      (uri-path uri-path))))))))))
 
-(define %git-http-os
+(define (git-http-os uri-path)
   (simple-operating-system
    (service dhcpcd-service-type)
    (service fcgiwrap-service-type)
-   (service nginx-service-type %git-nginx-configuration)
+   (service nginx-service-type (git-nginx-configuration uri-path))
    %test-repository-service))
 
-(define* (run-git-http-test #:optional (http-port 19418))
+(define* (git-http-test name description uri-path
+          #:optional (http-port 19418))
   (define os
     (marionette-operating-system
-     %git-http-os
+     (git-http-os uri-path)
      #:imported-modules '((gnu services herd)
                           (guix combinators))))
 
@@ -262,7 +264,7 @@ HTTP-PORT."
             (make-marionette (list #$vm)))
 
           (test-runner-current (system-test-runner #$output))
-          (test-begin "git-http")
+          (test-begin #$name)
 
           ;; Wait for nginx to be up and running.
           (test-assert "nginx running"
@@ -283,19 +285,29 @@ HTTP-PORT."
             '#$README-contents
             (begin
               (invoke #$(file-append git "/bin/git") "clone" "-v"
-                      "http://localhost:8080/git/test" "/tmp/clone")
+                      #$(simple-format #f "http://localhost:8080~a/test"
+                          (if (string=? uri-path "/")
+                              ""
+                              (string-append "/" (string-trim-both
+                                                  uri-path #\/))))
+                      "/tmp/clone")
               (call-with-input-file "/tmp/clone/README"
                 get-string-all)))
 
           (test-end))))
 
-  (gexp->derivation "git-http" test))
+  (system-test
+   (name name)
+   (description description)
+   (value (gexp->derivation name test))))
 
 (define %test-git-http
-  (system-test
-   (name "git-http")
-   (description "Connect to a running Git HTTP server.")
-   (value (run-git-http-test))))
+  (git-http-test "git-http" "Connect to a running Git HTTP server." "/git/"))
+
+(define %test-git-http-root-path
+  (git-http-test "git-http-root-path"
+                 "Connect to a running Git HTTP server with root URI path."
+                 "/"))
 
 
 ;;;
