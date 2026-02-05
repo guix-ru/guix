@@ -50,6 +50,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages ocaml5)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
@@ -58,6 +59,11 @@
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages python)
+  #:use-module (gnu packages rsync)
+  #:use-module (gnu packages tls)
+  #:use-module (gnu packages version-control)
+  #:use-module (gnu packages vim)
   #:use-module (gnu packages virtualization)
   #:use-module (gnu packages web)
   #:use-module (gnu packages xorg)
@@ -2643,6 +2649,177 @@ OPAM.")))
                              ocaml-opam-state
                              ocaml-re
                              ocaml-spdx-licenses))))
+
+(define-public opam
+  (package
+    (inherit ocaml-opam-core)
+    (name "ocaml5-opam")
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "opam"
+       #:phases (modify-phases %standard-phases
+                  (add-before 'check 'prepare-checks
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      ;; Opam tests need to run an isolated environment from a writable
+                      ;; home directory.
+                      (mkdir-p "test-home")
+                      (setenv "HOME"
+                              (string-append (getcwd) "/test-home"))
+                      (with-output-to-file (string-append (getcwd)
+                                            "/test-home/.gitconfig")
+                        (lambda _
+                          (display "[user]
+email = guix@localhost.none
+name = Guix Builder
+
+[protocol \"file\"]
+allow = always")
+                          (newline)))
+
+                      ;; Opam tests require data from opam-repository. Instead
+                      ;; of downloading them with wget from the guix
+                      ;; environment, copy the content to the expected
+                      ;; directory.
+                      (substitute* "tests/reftests/dune.inc"
+                        (("tar -C.*opam-archive-([0-9a-f]*)[^)]*" _ commit)
+                         (string-append "rmdir %{targets}) (run cp -r "
+                          (begin
+                            ;; When updating opam, uncomment the following
+                            ;; call.  It will list "opam-repo" commit-ish
+                            ;; required to run tests (see native-inputs
+                            ;; below).  Remove versions that are no longer
+                            ;; required, and add new ones if necessary.
+                            ;;
+                            ;; (pk commit)
+                            (assoc-ref inputs
+                                       (string-append "opam-repo-" commit)))
+                          "/ %{targets}) (run chmod +w -R %{targets}"))
+                        (("wget[^)]*")
+                         "touch %{targets}")
+
+                        ;; Selectively disable a fraction of opam's "reftests"
+                        ;; (CRAM-style regression tests). Most of these tests
+                        ;; make assumptions about the build environment that
+                        ;; don't hold for Guix.
+
+                        ;; Test tries to clone a git repository from inside
+                        ;; bwrap
+                        (("diff upgrade-format.test upgrade-format.out")
+                         "run true")
+                        ;; Test tries to figure out which distro this is, and
+                        ;; it doesn't know Guix
+                        (("diff pin.unix.test pin.unix.out")
+                         "run true")
+                        ;; A variable expansion fails.
+                        (("diff opamroot-versions.test opamroot-versions.out")
+                         "run true")
+                        ;; The repository we replaced is probably not as
+                        ;; expected
+                        (("diff opamrt-big-upgrade.test opamrt-big-upgrade.out")
+                         "run true")
+                        ;; Disable a failing test because of missing sandboxing
+                        ;; functionality
+                        (("diff init.test init.out")
+                         "run true")
+                        ;; Opam commit c4d912e normalizes test output to
+                        ;; exclude version strings, but this seems to break
+                        ;; some output assertions if $BASEDIR happens to
+                        ;; include the version.
+                        (("diff cli-versioning.test cli-versioning.out")
+                         "run true")
+                        ;; Fails on noisy git output.
+                        (("diff action-disk.test action-disk.out")
+                         "run true")
+                        ;; Requires network access.
+                        (("diff download.test download.out")
+                         "run true")
+                        (("diff swhid.unix.test swhid.unix.out")
+                         "run true")
+                        ;; Depends on 3rd-party git repos.
+                        (("diff lock.test lock.out")
+                         "run true"))
+
+                      (substitute* "tests/reftests/dune"
+                        ;; Because of our changes to the previous file, we
+                        ;; cannot check it can be regenerated
+                        (("diff dune.inc dune.inc.gen")
+                         "run true"))
+                      ;; Ensure we can run the generated build.sh (no /bin/sh)
+                      (substitute* '("tests/reftests/legacy-local.test"
+                                     "tests/reftests/legacy-git.test")
+                        (("#! ?/bin/sh")
+                         (string-append "#!"
+                                        (search-input-file inputs "/bin/sh"))))
+                      (substitute* "tests/reftests/testing-env"
+                        (("OPAMSTRICT=1")
+                         (string-append "OPAMSTRICT=1\nLIBRARY_PATH="
+                                        (assoc-ref inputs "libc") "/lib"))))))))
+
+    (native-inputs (let ((opam-repo (lambda (commit hash)
+                                      (origin
+                                        (method git-fetch)
+                                        (uri (git-reference (url
+                                                             "https://github.com/ocaml/opam-repository")
+                                                            (commit commit)))
+                                        (file-name (git-file-name "opam-repo"
+                                                                  commit))
+                                        (sha256 (base32 hash))))))
+                     `(("dune" ,dune)
+                       ("ocaml-cppo" ,ocaml-cppo)
+
+                       ;; For tests.
+                       ("git" ,git-minimal/pinned)
+                       ("openssl" ,openssl)
+                       ("python" ,python-wrapper)
+                       ("rsync" ,rsync)
+                       ("unzip" ,unzip)
+                       ("which" ,which)
+                       ("xxd" ,xxd)
+
+                       ;; Data for tests
+                       ("opam-repo-0070613707" ,(opam-repo
+                                                 "00706137074d536d2019d2d222fbe1bea929deda"
+                                                 "1gv1vvmfscj7wirfv6qncp8pf81wygnpzjwd0lyqcxm7g8r8lb4w"))
+                       ("opam-repo-009e00fa" ,(opam-repo
+                                               "009e00fa86300d11c311309a2544e5c6c3eb8de2"
+                                               "1wwy0rwrsjf4q10j1rh1dazk32fbzhzy6f7zl6qmndidx9b1bq7w"))
+                       ("opam-repo-11ea1cb" ,(opam-repo
+                                              "11ea1cb6f2418b1f8a6679e4422771a04c9c3655"
+                                              "1s4p0wfn3bx97yvm8xvj3yhzv2pz0jwml68g2ybv37hj9mpbrsq0"))
+                       ("opam-repo-143dd2a2f59f5befbf3cb90bb2667f911737fbf8" ,
+                        (opam-repo "143dd2a2f59f5befbf3cb90bb2667f911737fbf8"
+                         "1kliiy9n2j8myxhbz1brq6yingfy0si1bmv15j1hbnbpyi3bavr9"))
+                       ("opam-repo-297366c" ,(opam-repo
+                                              "297366cd01c3aaf29b967bf0b34ccc7989d4d5b3"
+                                              "1ysg69gys37nc2cxivs2ikh6xp0gj85if4rcrr874mqb9z12dm0j"))
+                       ("opam-repo-3235916" ,(opam-repo
+                                              "3235916a162a59d7c82dac3fe24214975d48f1aa"
+                                              "1yf73rv2n740a4s9g7a9k4j91b4k7al88nwnw9cdw0k2ncbmr486"))
+                       ("opam-repo-7090735c" ,(opam-repo
+                                               "7090735c9d1dd2dc481c4128c5ef4d3667238f15"
+                                               "1bccsgjhlp64lmvfjfn6viywf3x73ji75myg9ssf1ij1fkmabn0z"))
+                       ("opam-repo-7371c1d9" ,(opam-repo
+                                               "7371c1d9c53000840fb9a6d8ec13d87ffaa98401"
+                                               "0lmy3rmp5liyp2dsx4s90rjdwc012947ig2fz6y97s3pmwsbf9g8"))
+                       ("opam-repo-a5d7cdc0" ,(opam-repo
+                                               "a5d7cdc0c91452b0aef4fa71c331ee5237f6dddd"
+                                               "0z7kawqisy07088p5xjxwpvmvzlbj1d9cgdipsj90yx7nc5qh369"))
+                       ("opam-repo-ad4dd344" ,(opam-repo
+                                               "ad4dd344fe5cd1cab49ced49d6758a9844549fb4"
+                                               "1a1qj47kj8xjdnc4zc50ijrix1kym1n7k20n3viki80a7518baw8"))
+                       ("opam-repo-c1842d168d" ,(opam-repo
+                                                 "c1842d168de956caf06d7ac8588e65020d7594d8"
+                                                 "142y1ac7sprygyh91shcp0zcyfxjjkshi9g44qgg4rx60rbsbhai"))
+                       ("opam-repo-c1ba97dafe95c865d37ad4d88f6e57c9ffbe7f0a" ,
+                        (opam-repo "c1ba97dafe95c865d37ad4d88f6e57c9ffbe7f0a"
+                         "0sllm110dvs3w1k7qhias5y8v6ikkk2knw97v1fk9lnw4lq45gv6"))
+                       ("opam-repo-de897adf36c4230dfea812f40c98223b31c4521a" ,
+                        (opam-repo "de897adf36c4230dfea812f40c98223b31c4521a"
+                         "1m18x9gcwnbar8yv9sbfz8a3qpw412fp9cf4d6fb7syn0p0h96jw"))
+                       ("opam-repo-f372039d" ,(opam-repo
+                                               "f372039db86a970ef3e662adbfe0d4f5cd980701"
+                                               "0ld7fcry6ss6fmrpswvr6bikgx299w97h0gwrjjh7kd7rydsjdws")))))
+    (inputs (list ocaml-opam-client))))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
