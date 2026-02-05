@@ -1122,10 +1122,20 @@ MesCC-Tools), and finally M2-Planet.")
 (define oksh-muslboot0
   (package
     (inherit oksh)
-    (source (bootstrap-origin (package-source oksh)))
+    (version "7.8")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/ibara/oksh/releases/download/oksh-"
+             version "/oksh-" version ".tar.gz"))
+       (sha256
+        (base32
+         "0l59x9mm6nbixcpz3zf3iplqili2gyw8l382rj89b0iv32hxac1v"))))
     (arguments
      (list
        #:implicit-inputs? #f
+       #:license-file-regexp "LEGAL"
        #:guile %bootstrap-guile
        #:tests? #f                  ; No tests.
        #:strip-binaries? #f         ; No strip yet.
