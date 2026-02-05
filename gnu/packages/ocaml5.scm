@@ -2821,6 +2821,35 @@ allow = always")
                                                "0ld7fcry6ss6fmrpswvr6bikgx299w97h0gwrjjh7kd7rydsjdws")))))
     (inputs (list ocaml-opam-client))))
 
+(define-public ocaml-opam-monorepo
+  (package
+    (name "ocaml5-opam-monorepo")
+    (version "0.4.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/tarides/opam-monorepo/")
+             (commit version)))
+       (file-name name)
+       (sha256
+        (base32 "0nani7qhp54i6mhz8gxk9nzl15bz237qbqb0mc9jhb1016xwbvj3"))))
+    (build-system dune-build-system)
+    (arguments
+     ;; TODO: Too many tests require a fully initialized opam, disabling them
+     ;; would be a huge pain.  "Mocking" opam init is difficult because it
+     ;; requires networking access.
+     '(#:tests? #f))
+    ;; TODO: not entirely clear if these should be native, test cross-building
+    (native-inputs (list ocaml-odoc pkg-config))
+    (home-page "https://github.com/tarides/opam-monorepo")
+    (synopsis "Assemble and manage fully vendored Dune repositories")
+    (description
+     "The opam monorepo plugin provides a convenient interface to bridge the
+opam package manager with having a local copy of all the source code required
+to build a project using the dune build tool.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
