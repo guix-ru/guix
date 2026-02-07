@@ -2826,11 +2826,11 @@ void DerivationGoal::startBuilder()
             }
             for (auto & file : files) {
                 if (pathExists(file)) {
-		    /* On Guix System, /etc/services is a symlink; likewise,
-		       on systemd-based system, /etc/resolv.conf is a symlink.
-		       Dereference them.  */
-                    ctx.filesInChroot[file] = canonPath(file, true);
-                    ctx.readOnlyFilesInChroot.insert(file);
+                    /* Copy files into chroot instead of bind-mounting in case
+                       they are symbolic links that won't resolve on the
+                       inside. */
+                    string contents = readFile(file);
+                    writeFile(chrootRootDir + file, contents);
                 }
             }
         }
