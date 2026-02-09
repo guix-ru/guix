@@ -5459,7 +5459,7 @@ standalone JACK client and an LV2 plugin is also available.")
 (define-public sfizz
   (package
     (name "sfizz")
-    (version "1.2.0")
+    (version "1.2.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://github.com/sfztools/sfizz"
@@ -5467,7 +5467,7 @@ standalone JACK client and an LV2 plugin is also available.")
                                   "/sfizz-" version ".tar.gz"))
               (sha256
                (base32
-                "1wsr3dpn7a7whqn480m02kp6n4raamnfi3imhf2q8k58md1yn9jw"))
+                "08k88gcqs691bgqvbm7sdvk77aqgd1hfipsbnkvg1mr0fsn9wcx9"))
               (modules '((guix build utils)))
               (snippet
                '(for-each delete-file-recursively
