@@ -731,7 +731,7 @@ single-instruction multiple-data (SIMD) intrinsics.")
                 (("#define PMIX_CONFIGURE_CLI .*")
                  "#define PMIX_CONFIGURE_CLI \"[scrubbed]\"\n")))))))
     (inputs (list libevent `(,hwloc "lib") zlib))
-    (native-inputs (list perl python python-cython-0))
+    (native-inputs (list perl python python-cython-0 python-setuptools))
     (synopsis "PMIx library")
     (description
      "PMIx is an application programming interface standard that provides
