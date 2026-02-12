@@ -821,6 +821,32 @@ the JSON data format.  It can process JSON text without blocking on IO and
 without a complete in-memory representation of the data.")
     (license license:isc)))
 
+(define-public ocaml-xmlm
+  (package
+    (name "ocaml5-xmlm")
+    (version "1.4.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "http://erratique.ch/software/xmlm/releases/"
+                           "xmlm-" version ".tbz"))
+       (sha256
+        (base32 "1ynrjba3wm3axscvggrfijfgsznmphhxnkffqch67l9xiqjm44h9"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
+    (home-page "https://erratique.ch/software/xmlm")
+    (synopsis "Streaming XML codec for OCaml")
+    (description
+     "Xmlm is a streaming codec to decode and encode the XML data
+format.  It can process XML documents without a complete in-memory
+representation of the data.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
