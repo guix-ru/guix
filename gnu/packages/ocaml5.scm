@@ -3033,6 +3033,17 @@ etc.")
      "This package integrates with the build system to index a codebase and allow
 tools such as Merlin to perform project-wide occurrences queries.")))
 
+(define-public ocaml-dot-merlin-reader
+  (package
+    (inherit %ocaml-merlin-base)
+    (name "ocaml5-dot-merlin-reader")
+    (arguments
+     '(#:package "dot-merlin-reader"))
+    (propagated-inputs (list ocaml-merlin-lib))
+    (synopsis "Reads config files for @code{ocaml-merlin}")
+    (description "@code{ocaml-dot-merlin-reader} is an external reader for
+@code{ocaml-merlin} configurations.")))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
