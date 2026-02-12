@@ -2972,6 +2972,22 @@ writing to these structures, and they are accessed via the Bigarray module.")
 length of domain names are preserved throughout the module.")
     (license license:isc)))
 
+(define-public ocaml-ppx-let
+  (package
+    (name "ocaml5-ppx-let")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_let" version
+      "0ijdpgikzx89m6srm3xdl657zim5c8pmzf6rwzx32m67nf0m0hr6"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib ocaml-ppx-here))
+    (properties `((upstream-name . "ppx_let")))
+    (home-page "https://github.com/janestreet/ppx_let")
+    (synopsis "Monadic let-bindings")
+    (description "A ppx rewriter for monadic and applicative let bindings,
+match expressions, and if expressions.")
+    (license license:asl2.0)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
