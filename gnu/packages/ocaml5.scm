@@ -847,6 +847,34 @@ format.  It can process XML documents without a complete in-memory
 representation of the data.")
     (license license:isc)))
 
+(define-public ocaml-react
+  (package
+    (name "ocaml5-react")
+    (version "1.2.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "http://erratique.ch/software/react/releases/react-" version
+             ".tbz"))
+       (sha256
+        (base32 "16cg4byj8lfbbw96dhh8sks5y9n1c3fshz7f2p8m7wgisqax7bf4"))))
+    (build-system ocaml-build-system)
+    (native-inputs (list ocamlbuild opam-installer ocaml-topkg))
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (home-page "https://erratique.ch/software/react")
+    (synopsis "Declarative events and signals for OCaml")
+    (description
+     "React is an OCaml module for functional reactive programming
+(FRP).  It provides support to program with time varying values: declarative
+events and signals.  React doesn't define any primitive event or signal, it
+lets the client choose the concrete timeline.")
+    (license license:bsd-3)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
