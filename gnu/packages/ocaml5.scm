@@ -3013,6 +3013,14 @@ available in modern IDEs: error reporting, auto completion, source browsing,
 etc.")
     (license license:expat)))
 
+(define-public ocaml-merlin-lib
+  (package
+    (inherit %ocaml-merlin-base)
+    (name "ocaml5-merlin-lib")
+    (arguments
+     '(#:package "merlin-lib"))
+    (propagated-inputs (list ocaml-alcotest ocaml-csexp ocaml-menhir))))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
