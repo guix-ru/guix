@@ -2950,6 +2950,28 @@ to access C-like structures directly from OCaml.  It supports both reading and
 writing to these structures, and they are accessed via the Bigarray module.")
     (license license:isc)))
 
+(define-public ocaml-domain-name
+  (package
+    (name "ocaml5-domain-name")
+    (version "0.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/hannesm/domain-name/")
+             (commit (string-append "v" version))))
+       (file-name name)
+       (sha256
+        (base32 "1a669zz1pc7sqbi1c13jsnp8algcph2b8gr5fjrjhyh3p232770k"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-alcotest))
+    (home-page "https://github.com/hannesm/domain-name")
+    (synopsis "RFC 1035 Internet domain name data structure and parser")
+    (description
+     "Parses and constructs RFC compliant domain names.  The invariants on the
+length of domain names are preserved throughout the module.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
