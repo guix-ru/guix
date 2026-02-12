@@ -2924,6 +2924,32 @@ between Bigstrings and other string-like types.  @code{bigstringaf} provides
 these missing pieces.")
     (license license:bsd-3)))
 
+(define-public ocaml-cstruct
+  (package
+    (name "ocaml5-cstruct")
+    (version "6.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/ocaml-cstruct")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0dpbirs6lzp0bclr3wcw407jjspll7iy66z18zks3mjccvlxd21w"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "cstruct"))
+    (propagated-inputs (list ocaml-bigarray-compat))
+    (native-inputs (list ocaml-alcotest))
+    (home-page "https://github.com/mirage/ocaml-cstruct")
+    (synopsis "Accesses C structures via a camlp4 extension")
+    (description
+     "Cstruct is a library and syntax extension to make it easier
+to access C-like structures directly from OCaml.  It supports both reading and
+writing to these structures, and they are accessed via the Bigarray module.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
