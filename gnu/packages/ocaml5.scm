@@ -3261,6 +3261,36 @@ their application, with the unbuffered interface enabling zero-copy IO.
 Parsers are backtracking by default and support unbounded lookahead.")
     (license license:bsd-3)))
 
+(define-public ocaml-macaddr
+  (package
+    (name "ocaml5-macaddr")
+    (version "5.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/ocaml-ipaddr/")
+             (commit (string-append "v" version))))
+       (file-name name)
+       (sha256
+        (base32 "1zgwx0ms3l4k4dzwnkrwq4zzqjrddjsvqn66mbd0rm6aq1ib019d"))))
+    (build-system dune-build-system)
+    (arguments
+     '(#:package "macaddr"))
+    (propagated-inputs (list ocaml-cstruct ocaml-domain-name))
+    (native-inputs (list ocaml-ounit2 ocaml-ppx-sexp-conv))
+    (home-page "https://github.com/mirage/ocaml-ipaddr")
+    (synopsis "OCaml library for manipulation of MAC address representations")
+    (description
+     "This library is for parsing and manipulating MAC addresses. Features include:
+@itemize
+@item MAC-48 (Ethernet) address support
+@item @code{Macaddr} is a @code{Map.OrderedType}
+@item All types have sexplib serializers/deserializers optionally via the
+@code{Macaddr_sexp} library
+@end itemize")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
