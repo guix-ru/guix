@@ -2850,6 +2850,31 @@ opam package manager with having a local copy of all the source code required
 to build a project using the dune build tool.")
     (license license:isc)))
 
+(define-public ocaml-pprint
+  (package
+    (name "ocaml5-pprint")
+    (version "20220103")
+    (home-page "https://github.com/fpottier/pprint")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09y6nwnjldifm47406q1r9987njlk77g4ifqg6qs54dckhr64vax"))))
+    (build-system dune-build-system)
+    (synopsis "OCaml pretty-printing combinator library and rendering
+engine")
+    (description
+     "This OCaml library offers a set of combinators for building
+so-called documents as well as an efficient engine for converting documents to
+a textual, fixed-width format.  The engine takes care of indentation and line
+breaks, while respecting the constraints imposed by the structure of the
+document and by the text width.")
+    (license license:lgpl2.0)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
