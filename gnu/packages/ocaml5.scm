@@ -2875,6 +2875,28 @@ breaks, while respecting the constraints imposed by the structure of the
 document and by the text width.")
     (license license:lgpl2.0)))
 
+(define-public ocaml-syntax-shims
+  (package
+    (name "ocaml5-syntax-shims")
+    (version "1.0.0")
+    (home-page "https://github.com/ocaml-ppx/ocaml-syntax-shims")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0l1i8z95qgb0lxlrv3yb5nkp391hqsiyi4r91p12k3xmggqixagf"))))
+    (build-system dune-build-system)
+    (properties `((upstream-name . "ocaml-syntax-shims")))
+    (synopsis "Backport of new OCaml syntax to older compilers")
+    (description
+     "This package backports new language features such as @code{let+} to older
+OCaml compilers.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
