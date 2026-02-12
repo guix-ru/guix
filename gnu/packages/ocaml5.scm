@@ -3068,6 +3068,30 @@ generated instances of the type.  It provides combinators for generating
 instances and printing them.")
     (license license:lgpl3+)))
 
+(define-public ocaml-qtest
+  (package
+    (name "ocaml5-qtest")
+    (version "2.11.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/vincent-hugot/qtest/")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "04ghjshh6104xyglm0db9kv90m62qla5f4bfrlndv6dsvgw3rdjl"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ounit ocaml-qcheck))
+    (home-page "https://github.com/vincent-hugot/qtest")
+    (synopsis "Inline (Unit) Tests for OCaml")
+    (description
+     "Qtest extracts inline unit tests written using a special
+syntax in comments.  Those tests are then run using the oUnit framework and the
+qcheck library.  The possibilities range from trivial tests -- extremely simple
+to use -- to sophisticated random generation of test cases.")
+    (license license:lgpl3+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
