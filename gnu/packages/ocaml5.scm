@@ -3207,6 +3207,29 @@ provides support to program with time varying values: declarative events and
 client chooses the concrete timeline.")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-stringext
+  (package
+    (name "ocaml5-stringext")
+    (version "1.6.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/rgrinberg/stringext")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1m09cmn3vrk3gdm60fb730qsygcfyxsyv7gl9xfzck08q1x2x9qx"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocamlbuild ocaml-qtest))
+    (home-page "https://github.com/rgrinberg/stringext")
+    (synopsis "Extra string functions for OCaml")
+    (description
+     "Provides a single module named Stringext that provides a grab
+bag of often used but missing string functions from the stdlib.  E.g, split,
+full_split, cut, rcut, etc..")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
