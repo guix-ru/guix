@@ -2897,6 +2897,33 @@ document and by the text width.")
 OCaml compilers.")
     (license license:expat)))
 
+(define-public ocaml-bigstringaf
+  (package
+    (name "ocaml5-bigstringaf")
+    (version "0.9.0")
+    (home-page "https://github.com/inhabitedtype/bigstringaf")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "188j9awxg99vrp2l3rqfmdxdazq5xrjmg1wf62vfqsks9sff6wqx"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-bigarray-compat))
+    (native-inputs (list ocaml-alcotest pkg-config))
+    (synopsis "Bigstring intrinsics and fast blits based on memcpy/memmove")
+    (description
+     "The OCaml compiler has a bunch of intrinsics for Bigstrings, but they're
+not widely-known, sometimes misused, and so programs that use Bigstrings are
+slower than they have to be.  And even if a library got that part right and
+exposed the intrinsics properly, the compiler doesn't have any fast blits
+between Bigstrings and other string-like types.  @code{bigstringaf} provides
+these missing pieces.")
+    (license license:bsd-3)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
