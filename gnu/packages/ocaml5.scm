@@ -3021,6 +3021,18 @@ etc.")
      '(#:package "merlin-lib"))
     (propagated-inputs (list ocaml-alcotest ocaml-csexp ocaml-menhir))))
 
+(define-public ocaml-index
+  (package
+    (inherit %ocaml-merlin-base)
+    (name "ocaml5-index")
+    (arguments
+     '(#:package "ocaml-index"))
+    (propagated-inputs (list ocaml-merlin-lib))
+    (synopsis "Produces indicies for value occurrences in cmt files")
+    (description
+     "This package integrates with the build system to index a codebase and allow
+tools such as Merlin to perform project-wide occurrences queries.")))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
