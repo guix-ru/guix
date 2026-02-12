@@ -3044,6 +3044,30 @@ tools such as Merlin to perform project-wide occurrences queries.")))
     (description "@code{ocaml-dot-merlin-reader} is an external reader for
 @code{ocaml-merlin} configurations.")))
 
+(define-public ocaml-qcheck
+  (package
+    (name "ocaml5-qcheck")
+    (version "0.20")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/c-cube/qcheck")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1r0m5p1dd06lbgfxqdpl1ya4vb8252z7hqkvdi9k444g4rx2ay3p"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-alcotest ocaml-ounit ocaml-ppxlib))
+    (native-inputs (list ocamlbuild))
+    (home-page "https://github.com/c-cube/qcheck")
+    (synopsis "QuickCheck-inspired property-based testing for OCaml")
+    (description
+     "This module checks invariants (properties of some types) over randomly
+generated instances of the type.  It provides combinators for generating
+instances and printing them.")
+    (license license:lgpl3+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
