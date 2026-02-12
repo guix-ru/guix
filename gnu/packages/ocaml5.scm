@@ -3092,6 +3092,37 @@ qcheck library.  The possibilities range from trivial tests -- extremely simple
 to use -- to sophisticated random generation of test cases.")
     (license license:lgpl3+)))
 
+(define-public ocaml-afl-persistent
+  (package
+    (name "ocaml5-afl-persistent")
+    (version "1.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/stedolan/ocaml-afl-persistent")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "06yyds2vcwlfr2nd3gvyrazlijjcrd1abnvkfpkaadgwdw3qam1i"))))
+    (build-system ocaml-build-system)
+    (arguments
+     '(#:phases (modify-phases %standard-phases
+                  (delete 'configure)
+                  (replace 'build
+                    (lambda _
+                      (invoke "./build.sh")))
+                  ;; The tests are already run in the build.sh script.
+                  (delete 'check))))
+    (native-inputs (list opam-installer))
+    (home-page "https://github.com/stedolan/ocaml-afl-persistent")
+    (synopsis "Allows use of afl-fuzz in 'persistent mode' for performance")
+    (description
+     "The afl-fuzz tool normally works by repeatedly forking the program being
+tested.  Using this package, you can run afl-fuzz in 'persistent mode', which
+avoids repeated forking and is much faster.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
