@@ -1118,6 +1118,9 @@ To avoid a dependency on a particular S-expression library, the only
 module of this library is parameterised by the type of S-expressions.")
     (license license:expat)))
 
+;; Use this alias for packages built with the default ocaml 5.x compiler.
+(define-public ocaml-csexp ocaml5.3-csexp)
+
 (define-public ocaml5.3-dune-configurator
   (package
     (inherit ocaml5.3-dune-bootstrap)
