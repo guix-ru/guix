@@ -3316,6 +3316,31 @@ Parsers are backtracking by default and support unbounded lookahead.")
 range of RFCs.")
     (license license:isc)))
 
+(define-public ocaml-uri
+  (package
+    (name "ocaml5-uri")
+    (version "4.2.0")
+    (home-page "https://github.com/mirage/ocaml-uri")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1bgkc66cq00mgnkz3i535srwzwc4cpdsv0mly5dzvvq33451xwf0"))))
+    (build-system dune-build-system)
+    (arguments
+     '(#:package "uri"))
+    (propagated-inputs (list ocaml-stringext ocaml-angstrom))
+    (native-inputs (list ocaml-ounit ocaml-ppx-sexp-conv))
+    (properties `((upstream-name . "uri")))
+    (synopsis "RFC3986 URI/URL parsing library")
+    (description
+     "OCaml-uri is a library for parsing and unparsing RFC3986 URI strings.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
