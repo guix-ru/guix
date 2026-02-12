@@ -3177,6 +3177,36 @@ tested.  Using this package, you can run afl-fuzz in 'persistent mode', which
 avoids repeated forking and is much faster.")
     (license license:expat)))
 
+(define-public ocaml-reactivedata
+  (package
+    (name "ocaml5-reactivedata")
+    (version "0.3")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/ocsigen/reactiveData")
+                    (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0gmpfnw08c7hx4bsgrgvp6w7pq2ghqxq3qd1cbdyscbg9n22jrca"))))
+    (arguments
+     `(#:tests? #f)) ;no tests
+    (build-system dune-build-system)
+    (properties `((upstream-name . "reactiveData")))
+    (propagated-inputs
+     (list ocaml-react))
+    (home-page "https://github.com/ocsigen/reactiveData")
+    ;; The upstream package cribs the exact synopsis and description of
+    ;; ocaml-react but appears to be otherwise distinct.
+    (synopsis "Declarative events and signals for OCaml")
+    (description
+     "reactiveData is an OCaml module for functional reactive programming (FRP).  It
+provides support to program with time varying values: declarative events and
+ signals.  React doesn't define any primitive event or signal, it lets the
+client chooses the concrete timeline.")
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
