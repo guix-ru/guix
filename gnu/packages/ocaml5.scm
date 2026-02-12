@@ -3230,6 +3230,37 @@ bag of often used but missing string functions from the stdlib.  E.g, split,
 full_split, cut, rcut, etc..")
     (license license:expat)))
 
+(define-public ocaml-angstrom
+  (package
+    (name "ocaml5-angstrom")
+    (version "0.15.0")
+    (home-page "https://github.com/inhabitedtype/angstrom")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1hmrkdcdlkwy7rxhngf3cv3sa61cznnd9p5lmqhx20664gx2ibrh"))))
+    (build-system dune-build-system)
+    (arguments
+     ;; Only build the base angstrom package.
+     '(#:package "angstrom"))
+    (propagated-inputs (list ocaml-bigstringaf))
+    (native-inputs (list ocaml-alcotest ocaml-ppx-let ocaml-syntax-shims))
+    (synopsis "Parser combinators built for speed and memory-efficiency")
+    (description
+     "Angstrom is a parser-combinator library that makes it easy to write
+efficient, expressive, and reusable parsers suitable for high-performance
+applications.  It exposes monadic and applicative interfaces for composition,
+and supports incremental input through buffered and unbuffered interfaces.
+Both interfaces give the user total control over the blocking behavior of
+their application, with the unbuffered interface enabling zero-copy IO.
+Parsers are backtracking by default and support unbounded lookahead.")
+    (license license:bsd-3)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
