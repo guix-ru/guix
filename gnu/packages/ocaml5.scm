@@ -2991,6 +2991,28 @@ length of domain names are preserved throughout the module.")
 match expressions, and if expressions.")
     (license license:asl2.0)))
 
+(define %ocaml-merlin-base
+  (package
+    (name "ocaml5-merlin-base")
+    (version "5.5-503")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/merlin")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1qzj4aqx5x76ldwhpxzz2ynjdh43l8nk6lmj93hr53c6ykrgn9nw"))))
+    (build-system dune-build-system)
+    (home-page "https://ocaml.github.io/merlin/")
+    (synopsis "Code completion, typing, and navigation in Vim and Emacs")
+    (description
+     "Merlin is an assistant for editing OCaml code.  It aims to provide the features
+available in modern IDEs: error reporting, auto completion, source browsing,
+etc.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
