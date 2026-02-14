@@ -1964,7 +1964,6 @@ OpenJDK.")
     (home-page "https://www.jetbrains.com/")
     (license license:gpl2+)))
 
-
 (define-public ant/java8
   (package
     (name "ant")
@@ -2027,9 +2026,26 @@ OpenJDK.")
               (setenv "JAVA_HOME" (assoc-ref inputs "jdk"))
               (invoke "bash" "bootstrap.sh"
                       (string-append "-Ddist.dir=" #$output))))
+          (add-after 'build 'fix-executables-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (wrap-script (string-append #$output "/bin/ant")
+                `("PATH" suffix
+                  (,(dirname (search-input-file inputs "/bin/sed"))
+                   ,(dirname (search-input-file inputs "/bin/uname"))
+                   ,(dirname (search-input-file inputs "/bin/which")))))
+              (patch-shebang
+               (string-append #$output "/bin/complete-ant-cmd.pl")
+               (list (dirname (search-input-file inputs "/bin/perl"))))))
           (delete 'install))))
     (inputs
-     (list java-junit java-hamcrest-core java-hamcrest-library))
+     (list coreutils-minimal
+           guile-3.0/pinned
+           java-hamcrest-core
+           java-hamcrest-library
+           java-junit
+           perl
+           sed
+           which))
     (home-page "https://ant.apache.org")
     (synopsis "Build tool for Java")
     (description
