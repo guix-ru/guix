@@ -56,6 +56,7 @@
   #:use-module (gnu packages glib)
   #:use-module (gnu packages libevent)
   #:use-module (gnu packages m4)
+  #:use-module (gnu packages node)
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
@@ -3628,6 +3629,29 @@ syntax extension.")
 It makes it possible to run pure OCaml programs in JavaScript environment like
 browsers and Node.js.")
     ;; With static-linking exception
+    (license license:lgpl2.1+)))
+
+(define-public js-of-ocaml-compiler
+  (package
+    (inherit %js-of-ocaml-base)
+    (name "ocaml5-js-of-ocaml-compiler")
+    (arguments
+     `(#:package "js_of_ocaml-compiler"
+       #:tests? #f))
+    (propagated-inputs (list ocaml-ppxlib
+                             ocaml-menhir
+                             ocaml-reactivedata
+                             ocaml-cmdliner
+                             ocaml-lwt
+                             ocaml-sedlex
+                             ocaml-re
+                             ocaml-yojson))
+    (native-inputs
+     ;; for tests
+     (list node-lts ocaml-ppx-expect ocaml-num))
+    (properties `((upstream-name . "js_of_ocaml")))
+    (home-page "https://ocsigen.org/js_of_ocaml/")
+    (synopsis "Compiler from OCaml bytecode to Javascript (compiler core)")
     (license license:lgpl2.1+)))
 
 ;;;
