@@ -3363,6 +3363,71 @@ dates and times.")
     ;; With linking exception.
     (license license:lgpl2.1+)))
 
+(define-public ocaml-mdx
+  (package
+    (name "ocaml5-mdx")
+    (version "2.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/realworldocaml/mdx")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1rhj00gsj1zz8yd99wkcpsgf0ym1fg940zk2jq29fysk4zd1g7m3"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-test-assertions
+                    (lambda _
+                      (let ((path-prefix "test/bin/mdx-test/misc/"))
+                        ;; cmdliner changed the format and the tests fail
+                        (substitute* (list (string-append path-prefix
+                                            "no-such-file/test.expected")
+                                           (string-append path-prefix
+                                            "no-such-prelude/test.expected"))
+                          (("`")
+                           "'")
+                          (("COMMAND")
+                           "[COMMAND]")
+                          (("\\.\\.\\.")
+                           "…")))))
+                  (add-after 'fix-test-assertions 'fix-egrep
+                    (lambda _
+                      ;; egrep is obsolescent; using grep -E
+                      (substitute* "test/bin/mdx-test/expect/padding/test-case.md"
+                        (("egrep")
+                         "grep -E")))))))
+    (propagated-inputs (list ocaml-fmt
+                             ocaml-astring
+                             ocaml-logs
+                             ocaml-cmdliner
+                             ocaml-re
+                             ocaml-result
+                             ocaml-odoc
+                             ocaml-odoc-parser
+                             ocaml-version))
+    (native-inputs (list ocaml-cppo ocaml-lwt ocaml-alcotest))
+    (home-page "https://github.com/realworldocaml/mdx")
+    (synopsis "Executable code blocks inside markdown files")
+    (description
+     "@code{ocaml-mdx} executes code blocks inside markdown files.
+There are (currently) two sub-commands, corresponding
+to two modes of operations: pre-processing (@code{ocaml-mdx pp})
+and tests (@code{ocaml-mdx test}]).
+
+The pre-processor mode allows mixing documentation and code,
+and to practice @dfn{literate programming} using markdown and OCaml.
+
+The test mode ensures that shell scripts and OCaml fragments
+in the documentation always stays up-to-date.
+
+@code{ocaml-mdx} is released as two binaries called @code{ocaml-mdx} and
+@code{mdx} which are the same, mdx being the deprecated name, kept for now for
+compatibility.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
