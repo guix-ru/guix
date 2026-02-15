@@ -62,6 +62,7 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages rsync)
   #:use-module (gnu packages tls)
+  #:use-module (gnu packages unicode)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages vim)
   #:use-module (gnu packages virtualization)
@@ -3451,6 +3452,57 @@ compatibility.")
     (description
      "This package implements restartable and consumable iterators for OCaml.")
     (license license:bsd-2)))
+
+(define-public ocaml-sedlex
+  (package
+    (name "ocaml5-sedlex")
+    (version "3.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml-community/sedlex")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "104h0v5qkgy847vyy43zhdrvbq38mhgm8b97qsfywwgcpsx6l8rn"))))
+    (build-system dune-build-system)
+    (arguments
+     (list
+      #:package "sedlex"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'copy-resources
+            ;; These three files are needed by src/generator/data/dune,
+            ;; but would be downloaded using curl at build time.
+            (lambda* (#:key inputs #:allow-other-keys)
+              (with-directory-excursion "src/generator/data"
+                ;; Newer versions of dune emit an error if files it wants to
+                ;; build already exist. Delete the dune file so dune doesn't
+                ;; complain.
+                (delete-file "dune")
+                (for-each (lambda (file)
+                            (copy-file (search-input-file inputs file)
+                                       (basename file)))
+                          '("share/ucd/extracted/DerivedGeneralCategory.txt"
+                            "share/ucd/DerivedCoreProperties.txt"
+                            "share/ucd/PropList.txt")))))
+          (add-before 'build 'chmod
+            (lambda _
+              (for-each (lambda (file)
+                          (chmod file #o644))
+                        (find-files "." ".*")))))))
+    (native-inputs (list ocaml-ppx-expect))
+    (propagated-inputs (list ocaml-gen ocaml-ppxlib ocaml-uchar))
+    (inputs (list ucd))
+    (home-page "https://www.cduce.org/download.html#side")
+    (synopsis "Lexer generator for Unicode")
+    (description
+     "sedlex is a lexer generator for OCaml.  It is similar to ocamllex, but
+supports Unicode.  Unlike ocamllex, sedlex allows lexer specifications within
+regular OCaml source files.  Lexing specific constructs are provided via a ppx
+syntax extension.")
+    (license license:expat)))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
