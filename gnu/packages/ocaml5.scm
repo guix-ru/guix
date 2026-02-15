@@ -3607,6 +3607,29 @@ regular OCaml source files.  Lexing specific constructs are provided via a ppx
 syntax extension.")
     (license license:expat)))
 
+(define %js-of-ocaml-base
+  (package
+    (name "ocaml5-js-of-ocaml-base")
+    (version "6.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocsigen/js_of_ocaml")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "04y0bn7jmk30aq1q56rpb09n89zy71fv7qfn0b8fzrv6w9z8asnh"))))
+    (build-system dune-build-system)
+    (home-page "https://ocsigen.org/js_of_ocaml/")
+    (synopsis "Compiler from OCaml bytecode to Javascript")
+    (description
+     "Js_of_ocaml is a compiler from OCaml bytecode to JavaScript.
+It makes it possible to run pure OCaml programs in JavaScript environment like
+browsers and Node.js.")
+    ;; With static-linking exception
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
