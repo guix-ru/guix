@@ -3428,6 +3428,30 @@ in the documentation always stays up-to-date.
 compatibility.")
     (license license:isc)))
 
+(define-public ocaml-gen
+  (package
+    (name "ocaml5-gen")
+    (version "1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/c-cube/gen")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1z5nw5wljvcqp8q07h336bbvf9paynia0jsdh4486hlkbmr1ask1"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "gen"))
+    (propagated-inputs (list ocaml-odoc ocaml-seq))
+    (native-inputs (list ocaml-qtest ocaml-qcheck))
+    (home-page "https://github.com/c-cube/gen/")
+    (synopsis "Iterators for OCaml, both restartable and consumable")
+    (description
+     "This package implements restartable and consumable iterators for OCaml.")
+    (license license:bsd-2)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
