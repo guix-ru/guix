@@ -876,6 +876,34 @@ events and signals.  React doesn't define any primitive event or signal, it
 lets the client choose the concrete timeline.")
     (license license:bsd-3)))
 
+(define-public ocaml-uunf
+  (package
+    (name "ocaml5-uunf")
+    (version "17.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://erratique.ch/software/uunf/releases/uunf-"
+             version ".tbz"))
+       (sha256
+        (base32 "0q6l33146kymq7nqvx8ck6zpw4y2w8rcff1d1fi6dcv8qi9ijxp5"))))
+    (build-system ocaml-build-system)
+    (arguments
+     `(#:tests? #f
+       #:build-flags (list "build")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (native-inputs (list ocamlbuild opam-installer ocaml-topkg))
+    (propagated-inputs (list ocaml-uutf))
+    (home-page "https://erratique.ch/software/uunf")
+    (synopsis "Unicode text normalization for OCaml")
+    (description
+     "Uunf is an OCaml library for normalizing Unicode text.  It supports all
+Unicode normalization forms.  The library is independent from any
+IO mechanism or Unicode text data structure and it can process text
+without a complete in-memory representation.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
