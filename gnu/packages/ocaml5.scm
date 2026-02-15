@@ -904,6 +904,33 @@ IO mechanism or Unicode text data structure and it can process text
 without a complete in-memory representation.")
     (license license:isc)))
 
+(define-public ocaml-uucd
+  (package
+    (name "ocaml5-uucd")
+    (version "17.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://erratique.ch/software/uucd/releases/"
+                           "uucd-" version ".tbz"))
+       (sha256
+        (base32 "0b98phs4i4p6fyj9pmsbqb2yf62wz1js0pnibcwaqbky8c2w9y49"))))
+    (build-system ocaml-build-system)
+    (arguments
+     '(#:build-flags '("build" "--tests" "true")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (propagated-inputs (list ocaml-xmlm))
+    (native-inputs (list opam-installer ocamlbuild ocaml-topkg))
+    (home-page "https://erratique.ch/software/uucd")
+    (synopsis "Unicode character database decoder for OCaml")
+    (description
+     "Uucd is an OCaml module to decode the data of the Unicode
+character database from its XML representation.  It provides high-level (but
+not necessarily efficient) access to the data so that efficient
+representations can be extracted.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
