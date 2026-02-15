@@ -3654,6 +3654,33 @@ browsers and Node.js.")
     (synopsis "Compiler from OCaml bytecode to Javascript (compiler core)")
     (license license:lgpl2.1+)))
 
+(define-public js-of-ocaml
+  (package
+    (inherit %js-of-ocaml-base)
+    (name "ocaml5-js-of-ocaml")
+    (arguments
+     `(#:package "js_of_ocaml"
+       #:tests? #f))
+    (propagated-inputs (list js-of-ocaml-compiler
+                             ocaml-ppxlib
+                             ocaml-uchar
+                             ocaml-menhir
+                             ocaml-reactivedata
+                             ocaml-cmdliner
+                             ocaml-lwt
+                             ocaml-sedlex
+                             ocaml-tyxml
+                             ocaml-re
+                             ocaml-uutf
+                             ocaml-graphics
+                             ocaml-yojson))
+    (native-inputs
+     ;; for tests
+     (list node-lts ocaml-ppx-expect ocaml-num))
+    (properties `((upstream-name . "js_of_ocaml")))
+    (home-page "https://ocsigen.org/js_of_ocaml/")
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
