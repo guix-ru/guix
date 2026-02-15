@@ -3099,6 +3099,25 @@ tools such as Merlin to perform project-wide occurrences queries.")))
     (description "@code{ocaml-dot-merlin-reader} is an external reader for
 @code{ocaml-merlin} configurations.")))
 
+(define-public ocaml-merlin
+  (package
+    (inherit %ocaml-merlin-base)
+    (name "ocaml5-merlin")
+    (arguments
+     `(#:package "merlin"
+       #:phases (modify-phases %standard-phases
+                  (replace 'check
+                    (lambda* (#:key tests? #:allow-other-keys)
+                      ;; Tests require a writable cache directory
+                      (setenv "HOME" "/tmp")
+                      (when tests?
+                        (invoke "dune" "runtest" "-p"
+                                "merlin,dot-merlin-reader")))))))
+    (propagated-inputs (list ocaml-merlin-lib ocaml-yojson ocaml-index))
+    (native-inputs (list ocaml-dot-merlin-reader ;required for tests
+                         ocaml-ppxlib ocaml-mdx jq))
+    (license license:expat)))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
