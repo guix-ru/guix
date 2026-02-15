@@ -931,6 +931,35 @@ not necessarily efficient) access to the data so that efficient
 representations can be extracted.")
     (license license:isc)))
 
+(define-public ocaml-uucp
+  (package
+    (name "ocaml5-uucp")
+    (version "17.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://erratique.ch/software/uucp/releases/"
+                           "uucp-" version ".tbz"))
+       (sha256
+        (base32 "06xs0ig337vq5a4apyws2qjjj4gwgr1bg1c5lmwssq83gr72s94r"))))
+    (build-system ocaml-build-system)
+    (arguments
+     '(#:build-flags '("build" "--tests" "true")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (native-inputs (list opam-installer
+                         ocamlbuild
+                         ocaml-topkg
+                         ocaml-uucd
+                         ocaml-uunf
+                         ocaml-uutf))
+    (home-page "https://erratique.ch/software/uucp")
+    (synopsis "Unicode character properties for OCaml")
+    (description
+     "Uucp is an OCaml library providing efficient access to a
+selection of character properties of the Unicode character database.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
