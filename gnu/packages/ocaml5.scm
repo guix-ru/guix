@@ -3341,6 +3341,28 @@ range of RFCs.")
      "OCaml-uri is a library for parsing and unparsing RFC3986 URI strings.")
     (license license:isc)))
 
+(define-public ocaml-calendar
+  (package
+    (name "ocaml5-calendar")
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml-community/calendar")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jw8sdz1kl53fzdyxixd8ljfr25vvn4f2z4lspasqcj4ma5k6m7r"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-re ocaml-odoc ocaml-alcotest))
+    (home-page "https://github.com/ocaml-community/calendar")
+    (synopsis "OCaml library for handling dates and times")
+    (description "This package provides types and operations over
+dates and times.")
+    ;; With linking exception.
+    (license license:lgpl2.1+)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
