@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013-2015, 2020-2022 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2015, 2020-2022, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2013 Cyril Roelandt <tipecaml@gmail.com>
 ;;; Copyright © 2017 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2020 Efraim Flashner <efraim@flashner.co.il>
@@ -123,7 +123,6 @@
   "Return a bag for NAME."
   (define private-keywords
     `(#:cmake #:inputs #:native-inputs
-      #:implicit-inputs? #:implicit-cross-inputs?
       ,@(if target '() '(#:target))))
 
   (bag
@@ -162,7 +161,10 @@
 
 (define* (cmake-build name inputs
                       #:key guile source
-                      (outputs '("out")) (configure-flags ''())
+                      (outputs '("out"))
+                      (implicit-inputs? #t)
+                      (implicit-cross-inputs? #t)
+                      (configure-flags ''())
                       (search-paths '())
                       (make-flags ''())
                       (out-of-source? #t)
@@ -231,7 +233,11 @@ provides a 'CMakeLists.txt' file as its build system."
                       #:graft? #f
                       #:substitutable? substitutable?
                       #:allowed-references allowed-references
-                      #:disallowed-references disallowed-references
+                      #:disallowed-references
+                      (or disallowed-references
+                          (and implicit-inputs?
+                               (not allowed-references)
+                               (default-disallowed-references system)))
                       #:guile-for-build guile)))
 
 
@@ -244,6 +250,8 @@ provides a 'CMakeLists.txt' file as its build system."
                             target
                             build-inputs target-inputs host-inputs
                             source guile
+                            (implicit-inputs? #t)
+                            (implicit-cross-inputs? #t)
                             (outputs '("out"))
                             (configure-flags ''())
                             (search-paths '())
