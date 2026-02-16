@@ -37,6 +37,7 @@
             gnu-build-system
             standard-packages
             standard-cross-packages
+            default-disallowed-references
             package-with-explicit-inputs
             package-with-extra-configure-variable
             static-libgcc-package
@@ -275,6 +276,20 @@ standard packages used as implicit inputs of the GNU build system."
   (let ((distro (resolve-module '(gnu packages commencement))))
     ((module-ref distro '%final-inputs) system)))
 
+(define default-disallowed-references
+  (mlambda (system)
+    "Return the set of disallowed references for SYSTEM--i.e., build-time
+dependencies that build outputs should not refer to by default."
+    ;; XXX: Ideally we would mark all of them but this is too ambitious at
+    ;; this stage: many packages keep a reference to coreutils, grep, etc.
+    (filter-map (match-lambda
+                  (("gcc" gcc) gcc)
+                  (("binutils" binutils) binutils)
+                  (("ld-wrapper" ld-wrapper) ld-wrapper)
+                  (("libc:static" libc "static") (gexp-input libc "static"))
+                  (_ #f))
+                (standard-packages system))))
+
 (define* (lower name
                 #:key source inputs native-inputs outputs target
                 (implicit-inputs? #t) (implicit-cross-inputs? #t)
@@ -284,7 +299,6 @@ standard packages used as implicit inputs of the GNU build system."
   "Return a bag for NAME from the given arguments."
   (define private-keywords
     `(#:inputs #:native-inputs #:outputs
-      #:implicit-inputs? #:implicit-cross-inputs?
       ,@(if target '() '(#:target))))
 
   (bag
@@ -341,6 +355,8 @@ standard packages used as implicit inputs of the GNU build system."
                     guile source
                     (outputs '("out"))
                     (search-paths '())
+                    (implicit-inputs? #t)
+                    (implicit-cross-inputs? #t)
                     (bootstrap-scripts %bootstrap-scripts)
                     (configure-flags ''())
                     (make-flags ''())
@@ -433,7 +449,11 @@ are allowed to refer to."
                       #:graft? #f
                       #:substitutable? substitutable?
                       #:allowed-references allowed-references
-                      #:disallowed-references disallowed-references
+                      #:disallowed-references
+                      (or disallowed-references
+                          (and implicit-inputs?
+                               (not allowed-references)
+                               (default-disallowed-references system)))
                       #:guile-for-build guile)))
 
 
@@ -478,6 +498,8 @@ is one of `host' or `target'."
                           target
                           build-inputs target-inputs host-inputs
                           guile source
+                          (implicit-inputs? #t)
+                          (implicit-cross-inputs? #t)
                           (outputs '("out"))
                           (search-paths '())
                           (native-search-paths '())
