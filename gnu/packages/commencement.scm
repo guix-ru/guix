@@ -1648,9 +1648,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (uri (string-append "mirror://gnu/m4/m4-" version ".tar.gz"))
               (sha256
                (base32 "1arz972zxmwhnyik9007g6ww9gars8d55xbvg548xlsw3a9369mb"))))
-    (native-inputs (if (target-x86?)
+    (native-inputs #;(if (target-x86?)
                        (%boot-mesboot1-inputs)
-                       (%boot-tcc-musl-inputs)))
+                       (%boot-tcc-musl-inputs))
+                       (%boot-tcc-musl-inputs))
     (inputs '())
     (propagated-inputs '())
     (arguments
@@ -1658,11 +1659,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:tests? #f
        #:guile %bootstrap-guile
        #:implicit-inputs? #f
-       #:parallel-build? (target-x86?)
+       #:parallel-build? #f#;(target-x86?)
        #:configure-flags
-       #~(list #$@(if (target-x86?)
-                      #~()
-                      #~("CC=tcc"))
+       #~(list ;#$@(if (target-x86?)
+               ;       #~()
+               ;       #~("CC=tcc"))
+               "CC=tcc"
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target)))))))
 
@@ -1677,9 +1679,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (uri (string-append "mirror://gnu/gmp/gmp-" version ".tar.gz"))
               (sha256
                (base32 "09w5yzlvdll19fa9zhh0f4y97hv8483cbly0003zvbvyighpzwvi"))))
-    (native-inputs (if (target-x86?)
+    (native-inputs #;(if (target-x86?)
                        (%boot-mesboot1-inputs)
-                       (%boot-tcc-musl-inputs)))
+                       (%boot-tcc-musl-inputs))
+                       (%boot-tcc-musl-inputs))
     (inputs (list m4-boot))
     (propagated-inputs '())
     (arguments
@@ -1689,9 +1692,11 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:implicit-inputs? #f
        #:parallel-build? #f
        #:configure-flags
-       #~(list #$@(if (target-x86?)
-                      #~()
-                      #~("CC=tcc"))
+       #~(list ;#$@(if (target-x86?)
+               ;       #~()
+               ;       #~("CC=tcc"))
+               "CC=tcc"
+               "CFLAGS=-D HAVE_ALLOCA_H"
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
@@ -1711,9 +1716,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (uri (string-append "mirror://gnu/mpfr/mpfr-" version ".tar.gz"))
               (sha256
                (base32 "1mm2zxjqxxqlacd87cxlyi63pwrxwafqks7lmpqa3wqq6a0zw9ri"))))
-    (native-inputs (if (target-x86?)
+    (native-inputs #;(if (target-x86?)
                        (%boot-mesboot1-inputs)
-                       (%boot-tcc-musl-inputs)))
+                       (%boot-tcc-musl-inputs))
+                       (%boot-tcc-musl-inputs))
     (inputs '())
     (propagated-inputs (list gmp-boot))
     (arguments
@@ -1721,11 +1727,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:guile %bootstrap-guile
        #:tests? #f
        #:implicit-inputs? #f
-       #:parallel-build? (target-x86?)
+       #:parallel-build? #f#;(target-x86?)
        #:configure-flags
-       #~(list #$@(if (target-x86?)
-                      #~()
-                      #~("CC=tcc"))
+       #~(list ;#$@(if (target-x86?)
+               ;       #~()
+               ;       #~("CC=tcc"))
+               "CC=tcc"
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
@@ -1742,9 +1749,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (uri (string-append "mirror://gnu/mpc/mpc-" version ".tar.gz"))
               (sha256
                (base32 "0n846hqfqvmsmim7qdlms0qr86f1hck19p12nq3g3z2x74n3sl0p"))))
-    (native-inputs (if (target-x86?)
+    (native-inputs #;(if (target-x86?)
                        (%boot-mesboot1-inputs)
-                       (%boot-tcc-musl-inputs)))
+                       (%boot-tcc-musl-inputs))
+                       (%boot-tcc-musl-inputs))
     (inputs '())
     (propagated-inputs (list gmp-boot mpfr-boot))
     (arguments
@@ -1752,11 +1760,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
        #:guile %bootstrap-guile
        #:tests? #f
        #:implicit-inputs? #f
-       #:parallel-build? (target-x86?)
+       #:parallel-build? #f#;(target-x86?)
        #:configure-flags
-       #~(list #$@(if (target-x86?)
-                      #~()
-                      #~("CC=tcc"))
+       #~(list ;#$@(if (target-x86?)
+               ;       #~()
+               ;       #~("CC=tcc"))
+               "CC=tcc"
                (string-append "--build=" #$(commencement-build-target))
                (string-append "--host=" #$(commencement-build-target))
                "--enable-static"
@@ -1863,11 +1872,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
            #:parallel-build? #f             ; for debugging
            #:configure-flags
            #~(let ((out  (assoc-ref %outputs "out"))
-                   (libc (assoc-ref %build-inputs "libc"))
-                   (bash (assoc-ref %build-inputs "bash")))
+                   (libc (assoc-ref %build-inputs "libc")))
                (list (string-append "--prefix=" out)
                      (string-append "--with-build-sysroot=" libc "/include")
-                     (string-append "--with-native-system-header-dir=" libc "/include")
+                     ;(string-append "--with-native-system-header-dir=" libc "/include")
                      (string-append "--build="
                                     #$(string-replace-substring
                                         (commencement-build-target)
@@ -1916,6 +1924,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                    (let ((libc (assoc-ref inputs "libc")))
                      ;; Fix the dynamic linker's file name.
                      ;; This should work on gcc-13 for all architectures except loongarch.
+                     #;
                      (substitute* (find-files "gcc/config"
                                               "^(aarch64-)?(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
                        (("(#define MUSL_DYNAMIC_LINKER*).*$" _ dynamic-linker)
@@ -1929,7 +1938,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                          _ gnu-user suffix)
                         (format #f "#define ~a_DYNAMIC_LINKER~a \"~a\"~%"
                                 gnu-user suffix
-                                (string-append libc "/lib/libc.so")))))))
+                                (string-append libc "/lib/libc.a")))))))
                (add-after 'apply-riscv64-patch 'patch-for-modern-libc
                  (lambda _
                    (for-each
@@ -1941,6 +1950,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (add-before 'configure 'setenv
                  (lambda _
                    (setenv "CC" "tcc")
+                   (setenv "CPP" "tcc -E")  ; probably
                    (setenv "CFLAGS" "-D HAVE_ALLOCA_H")
                    ;; We don't have an existing C++ compiler so we need to set
                    ;; the search path manually.
@@ -2140,9 +2150,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs (if (target-x86?)
+    (native-inputs #;(if (target-x86?)
                        (%boot-mesboot2-inputs)
-                       (%boot-muslboot2-inputs)))
+                       (%boot-muslboot2-inputs))
+                       (%boot-muslboot2-inputs))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
