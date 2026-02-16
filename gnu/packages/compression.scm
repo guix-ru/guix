@@ -578,7 +578,7 @@ formats, including zstd, xz, gzip, and bgzf.")
               (substitute* (string-append out "/lib/liblzma.la")
                 (("^old_library='liblzma.a'") "old_library=''"))
               #t))))))
-   (outputs '("out" "static"))
+   (outputs '("out" "static" "doc"))
    (inputs
     `(,@(if (%current-target-system)
             `(("bash" ,bash-minimal))
@@ -595,6 +595,8 @@ compression algorithm is currently LZMA2, which is used inside the .xz
 container format.  With typical files, XZ Utils create 30 % smaller output
 than gzip and 15 % smaller output than bzip2.")
    (license (list license:gpl2+ license:lgpl2.1+)) ; bits of both
+   (properties
+    `((output-synopsis "doc" "API documentation and example code")))
    (home-page "https://tukaani.org/xz/")))
 
 (define-public heatshrink
