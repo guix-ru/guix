@@ -3291,6 +3291,31 @@ Parsers are backtracking by default and support unbounded lookahead.")
 @end itemize")
     (license license:isc)))
 
+(define-public ocaml-ipaddr
+  (package
+    (name "ocaml5-ipaddr")
+    (version "5.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/ocaml-ipaddr/")
+             (commit (string-append "v" version))))
+       (file-name name)
+       (sha256
+        (base32 "1zgwx0ms3l4k4dzwnkrwq4zzqjrddjsvqn66mbd0rm6aq1ib019d"))))
+    (build-system dune-build-system)
+    (arguments
+     '(#:package "ipaddr"))
+    (propagated-inputs (list ocaml-macaddr ocaml-domain-name))
+    (native-inputs (list ocaml-ounit2 ocaml-ppx-sexp-conv))
+    (home-page "https://github.com/mirage/ocaml-ipaddr")
+    (synopsis "Manipulates IP address representations")
+    (description
+     "This library provides IP address types with serialization, supporting a wide
+range of RFCs.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
