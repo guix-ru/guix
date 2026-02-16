@@ -361,7 +361,7 @@ pure Scheme to Tar and decompression in one easy step.")
   ;; `bootstrap-seeds, for x86 a 190 byte binary seed: `x86/hex0-seed'.
     (package
       (name "stage0-posix")
-      (version "1.9.1")
+      (version "1.7.0")
       (source (origin
                 (method url-fetch)
                 (uri (string-append "https://github.com/oriansj/stage0-posix/"
@@ -369,7 +369,7 @@ pure Scheme to Tar and decompression in one easy step.")
                                     "/stage0-posix-" version ".tar.gz"))
                 (sha256
                  (base32
-                  "0vr24kr4bl955mf0x3ig6wyipxnzrm1yyrrlzlsb02p9bmkxmzgl"))))
+                  "10c79z2c62gvrvpshvj94zz2hczdq1p4g1v0dakx1jiz2fx32vvn"))))
       (supported-systems '("i686-linux" "x86_64-linux"
                            "aarch64-linux"
                            "riscv64-linux"))
@@ -393,9 +393,6 @@ pure Scheme to Tar and decompression in one easy step.")
                                #$(%current-system)))
                    (stage0-cpu
                     (cond
-                     ;; Not enough of the other packages support x86_64.
-                     #;(#$(target-x86-64?)
-                      "AMD64")
                      ((or #$(target-x86-64?) #$(target-x86-32?))
                       "x86")
                      (#$(target-aarch64?)
@@ -412,7 +409,9 @@ pure Scheme to Tar and decompression in one easy step.")
               (invoke "tar" "xvf" source)
               (chdir (string-append "stage0-posix-" #$version))
               (mkdir-p bindir)
-              (invoke kaem (string-append "kaem." (string-downcase stage0-cpu)))
+              ;; Keep the same capitalization between the file name and the folder.
+              (rename-file "kaem.aarch64" "kaem.AArch64")
+              (invoke kaem (string-append "kaem." stage0-cpu))
               (with-directory-excursion (string-append stage0-cpu "/bin")
                 (install-file "hex2" bindir)
                 (install-file "M1" bindir)
