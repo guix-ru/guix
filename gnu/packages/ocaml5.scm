@@ -3827,6 +3827,33 @@ that constructs unikernels.")))
 applications built with MirageOS.")
     (license license:isc)))
 
+(define-public ocaml-functoria
+  (package
+    (inherit %ocaml-mirage-base)
+    (name "ocaml5-functoria")
+    (arguments
+     '(#:package "functoria"
+       ;; some tests require opam, which needs network access.
+       #:tests? #f))
+    (propagated-inputs (list ocaml-cmdliner
+                             ocaml-rresult
+                             ocaml-result
+                             ocaml-astring
+                             ocaml-fmt
+                             ocaml-logs
+                             ocaml-bos
+                             ocaml-fpath
+                             ocaml-emile
+                             ocaml-uri))
+    (native-inputs (list ocaml-alcotest ocaml-functoria-runtime))
+    (home-page "https://github.com/mirage/mirage")
+    (synopsis "DSL to organize functor applications")
+    (description
+     "DSL to describe a set of modules and functors, their types and
+how to apply them in order to produce a complete application.  The main use
+case is Mirage.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
