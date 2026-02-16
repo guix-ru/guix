@@ -1175,9 +1175,15 @@ MesCC-Tools), and finally M2-Planet.")
     (inputs '())
     (propagated-inputs '())
     (native-inputs
-     (modify-inputs (package-native-inputs tcc-musl)
-                    (replace "tcc" tcc-musl)
-                    (replace "bash" oksh-muslboot0)))
+     ;; It seems we need ranlib on some architectures.
+     (if (target-x86?)
+         (modify-inputs (package-native-inputs tcc-musl)
+                        (replace "tcc" tcc-musl)
+                        (replace "bash" oksh-muslboot0)
+                        (prepend binutils-mesboot0))
+         (modify-inputs (package-native-inputs tcc-musl)
+                        (replace "tcc" tcc-musl)
+                        (replace "bash" oksh-muslboot0))))
     (arguments
      (list #:implicit-inputs? #f
            #:guile %bootstrap-guile
@@ -1208,9 +1214,11 @@ MesCC-Tools), and finally M2-Planet.")
                "CFLAGS=-g"
                "CC=tcc"
                "LD=tcc"
-               "AR=tcc -ar"
+               #$@(if (target-x86?)
+                      #~("AR=ar")
+                      #~("AR=tcc -ar"
+                         "RANLIB=true"))
                "MAKEINFO=true"
-               "RANLIB=true"
                "--enable-64-bit-bfd"
                "--disable-nls"
                "--disable-shared"
