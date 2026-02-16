@@ -294,46 +294,44 @@ more.")
     (properties `((release-date . "2013-03-10")))
     (build-system gnu-build-system)
     (arguments
-     '(#:tests? #f
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'configure
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((out  (assoc-ref outputs "out"))
-                   (libc (assoc-ref inputs "libc")))
-               ;; Use the right path for `pwd'.
-               (substitute* "dist/Cwd/Cwd.pm"
-                 (("/bin/pwd")
-                  (which "pwd")))
+     (list
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((libc (assoc-ref inputs "libc")))
+                ;; Use the right path for `pwd'.
+                (substitute* "dist/Cwd/Cwd.pm"
+                  (("/bin/pwd")
+                   (which "pwd")))
 
-               (invoke "./Configure"
-                       (string-append "-Dprefix=" out)
-                       (string-append "-Dman1dir=" out "/share/man/man1")
-                       (string-append "-Dman3dir=" out "/share/man/man3")
-                       "-de" "-Dcc=gcc"
-                       "-Uinstallusrbinperl"
-                       "-Dinstallstyle=lib/perl5"
-                       "-Duseshrplib"
-                       (string-append "-Dlocincpth=" libc "/include")
-                       (string-append "-Dloclibpth=" libc "/lib")
+                (invoke "./Configure"
+                        (string-append "-Dprefix=" #$output)
+                        (string-append "-Dman1dir=" #$output "/share/man/man1")
+                        (string-append "-Dman3dir=" #$output "/share/man/man3")
+                        "-de" "-Dcc=gcc"
+                        "-Uinstallusrbinperl"
+                        "-Dinstallstyle=lib/perl5"
+                        "-Duseshrplib"
+                        (string-append "-Dlocincpth=" libc "/include")
+                        (string-append "-Dloclibpth=" libc "/lib")
 
-                       ;; Force the library search path to contain only libc
-                       ;; because it is recorded in Config.pm and
-                       ;; Config_heavy.pl; we don't want to keep a reference
-                       ;; to everything that's in $LIBRARY_PATH at build
-                       ;; time (Binutils, bzip2, file, etc.)
-                       (string-append "-Dlibpth=" libc "/lib")
-                       (string-append "-Dplibpth=" libc "/lib")))))
+                        ;; Force the library search path to contain only libc
+                        ;; because it is recorded in Config.pm and
+                        ;; Config_heavy.pl; we don't want to keep a reference
+                        ;; to everything that's in $LIBRARY_PATH at build
+                        ;; time (Binutils, bzip2, file, etc.)
+                        (string-append "-Dlibpth=" libc "/lib")
+                        (string-append "-Dplibpth=" libc "/lib")))))
 
-         (add-before 'strip 'make-shared-objects-writable
-           (lambda* (#:key outputs #:allow-other-keys)
-             ;; The 'lib/perl5' directory contains ~50 MiB of .so.  Make them
-             ;; writable so that 'strip' actually strips them.
-             (let* ((out (assoc-ref outputs "out"))
-                    (lib (string-append out "/lib")))
-               (for-each (lambda (dso)
-                           (chmod dso #o755))
-                         (find-files lib "\\.so$"))))))))
+          (add-before 'strip 'make-shared-objects-writable
+            (lambda _
+              ;; The 'lib/perl5' directory contains ~50 MiB of .so.  Make them
+              ;; writable so that 'strip' actually strips them.
+              (for-each
+               (lambda (dso) (chmod dso #o755))
+               (find-files (string-append #$output "/lib") "\\.so$")))))))
     (native-inputs
      (list gcc-7))
     (native-search-paths (list (search-path-specification
