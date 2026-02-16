@@ -3711,6 +3711,29 @@ browsers and Node.js.")
     (home-page "https://ocsigen.org/js_of_ocaml/")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-pecu
+  (package
+    (name "ocaml5-pecu")
+    (version "0.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/pecu/")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0k2l94q7yms2b1cs2727df9xwmydbi4jg0myiyx47ph372i5xdi8"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-fmt ocaml-alcotest ocaml-crowbar ocaml-astring))
+    (home-page "https://github.com/mirage/pecu")
+    (synopsis "Encoder/Decoder of Quoted-Printable (RFC2045 & RFC2047)")
+    (description
+     "This package provides a non-blocking encoder/decoder of Quoted-Printable
+according to RFC2045 and RFC2047 (about encoded-word).  Useful to translate
+contents of emails.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
