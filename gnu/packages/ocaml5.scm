@@ -3763,6 +3763,29 @@ RFC2822, RFC5321 and RFC6532.  It handles UTF-8 email addresses and
 encoded-word according to RFC2047.")
     (license license:expat)))
 
+(define %ocaml-mirage-base
+  (package
+    (name "ocaml5-mirage-base")
+    (version "4.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage/")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name "mirage" version))
+       (sha256
+        (base32 "09mqbffrhnklbc50gaflkwb3h1xysqqiwb84a9q1phjl038pic6r"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/mirage/mirage")
+    (synopsis "MirageOS library operating system")
+    (description
+     "Library operating system that constructs unikernels for secure,
+high-performance network applications across a variety of cloud computing and
+mobile platforms.  Code can be developed on a normal OS and then compiled into
+a fully-standalone, specialised unikernel.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
