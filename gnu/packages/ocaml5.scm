@@ -3734,6 +3734,35 @@ according to RFC2045 and RFC2047 (about encoded-word).  Useful to translate
 contents of emails.")
     (license license:expat)))
 
+(define-public ocaml-emile
+  (package
+    (name "ocaml5-emile")
+    (version "1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/emile/")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gc442gncngwai2y0y5bb018mp5450rg0x0g1cgi384kp07mmn0z"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-angstrom
+                             ocaml-ipaddr
+                             ocaml-base64
+                             ocaml-pecu
+                             ocaml-bigstringaf
+                             ocaml-uutf))
+    (native-inputs (list ocaml-alcotest))
+    (home-page "https://github.com/mirage/emile")
+    (synopsis "RFC822 emaila address parser")
+    (description
+     "This package provides a parser of email addresses according to RFC822,
+RFC2822, RFC5321 and RFC6532.  It handles UTF-8 email addresses and
+encoded-word according to RFC2047.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
