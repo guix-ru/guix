@@ -3808,6 +3808,25 @@ a fully-standalone, specialised unikernel.")
      "This is a runtime support library for MirageOS, a library operating system
 that constructs unikernels.")))
 
+(define-public ocaml-mirage-runtime
+  (package
+    (inherit %ocaml-mirage-base)
+    (name "ocaml5-mirage-runtime")
+    (build-system dune-build-system)
+    (arguments
+     '(#:package "mirage-runtime"
+       ;; some tests require opam, which needs network access.
+       #:tests? #f))
+    (propagated-inputs (list ocaml-ipaddr ocaml-functoria-runtime ocaml-fmt
+                             ocaml-logs ocaml-lwt))
+    (native-inputs (list ocaml-alcotest))
+    (home-page "https://github.com/mirage/mirage")
+    (synopsis "Core runtime library used by all MirageOS unikernels")
+    (description
+     "This package provides a bundle of useful runtime functions for
+applications built with MirageOS.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
