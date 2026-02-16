@@ -127,126 +127,125 @@
                        "perl-reproducible-build-date.patch"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:tests? #f
-       #:configure-flags
-       (let ((out  (assoc-ref %outputs "out"))
-             (libc (assoc-ref %build-inputs "libc")))
-         (list
-          (string-append "-Dprefix=" out)
-          (string-append "-Dman1dir=" out "/share/man/man1")
-          (string-append "-Dman3dir=" out "/share/man/man3")
-          "-de" "-Dcc=gcc"
-          "-Uinstallusrbinperl"
-          "-Dinstallstyle=lib/perl5"
-          "-Duseshrplib"
-          (string-append "-Dlocincpth=" libc "/include")
-          (string-append "-Dloclibpth=" libc "/lib")
-          "-Dusethreads"))
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'setup-configure
-           (lambda* (#:key inputs #:allow-other-keys)
-             ;; Use the right path for `pwd'.
-             (substitute* "dist/PathTools/Cwd.pm"
-               (("'/bin/pwd'")
-                (string-append "'" (search-input-file inputs "bin/pwd") "'")))
+     (list
+      #:tests? #f
+      #:configure-flags
+      #~(let* ((libc.so (search-input-file %build-inputs "/lib/libc.so"))
+               (libc (dirname (dirname libc.so))))
+          (list (string-append "-Dprefix=" #$output)
+                (string-append "-Dman1dir=" #$output "/share/man/man1")
+                (string-append "-Dman3dir=" #$output "/share/man/man3")
+                "-de" "-Dcc=gcc"
+                "-Uinstallusrbinperl"
+                "-Dinstallstyle=lib/perl5"
+                "-Duseshrplib"
+                (string-append "-Dlocincpth=" libc "/include")
+                (string-append "-Dloclibpth=" libc "/lib")
+                "-Dusethreads"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'setup-configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Use the right path for `pwd'.
+              (substitute* "dist/PathTools/Cwd.pm"
+                (("'/bin/pwd'")
+                 (string-append "'" (search-input-file inputs "bin/pwd") "'")))
 
-             ;; Build in GNU89 mode to tolerate C++-style comment in libc's
-             ;; <bits/string3.h>.
-             (substitute* "cflags.SH"
-               (("-std=c89")
-                "-std=gnu89"))))
-         ,@(if (%current-target-system)
-               `((add-after 'unpack 'unpack-cross
-                   (lambda* (#:key native-inputs inputs #:allow-other-keys)
-                     (let ((cross-checkout
-                            (assoc-ref native-inputs "perl-cross")))
-                       (rename-file "Artistic" "Artistic.perl")
-                       (rename-file "Copying" "Copying.perl")
-                       (copy-recursively cross-checkout "."))
-                     (let ((bash (search-input-file inputs "bin/bash")))
-                       (substitute* '("Makefile.config.SH"
-                                      "cnf/config.guess"
-                                      "cnf/config.sub"
-                                      "cnf/configure"
-                                      "cnf/configure_misc.sh"
-                                      "miniperl_top")
-                         (("! */bin/sh") (string-append "! " bash))
-                         ((" /bin/sh") bash))
-                       (substitute* '("ext/Errno/Errno_pm.PL")
-                         (("\\$cpp < errno.c") "$Config{cc} -E errno.c")))))
-                 (replace 'configure
-                   (lambda* (#:key configure-flags outputs inputs #:allow-other-keys)
-                     (let* ((out (assoc-ref outputs "out"))
-                            (store-directory (%store-directory))
-                            (configure-flags
-                             (cons*
-                              ;; `perl-cross' confuses target and host
-                              (string-append "--target=" ,(%current-target-system))
-                              (string-append "--prefix=" out)
-                              (string-append "-Dcc=" ,(%current-target-system) "-gcc")
-                              "-Dbyteorder=1234"
-                              (filter (negate
-                                       (lambda (x) (or (string-prefix? "-d" x)
-                                                       (string-prefix? "-Dcc=" x))))
-                                      configure-flags)))
-                            (bash (assoc-ref inputs "bash-minimal")))
-                       (format (current-error-port)
-                               "running ./configure ~a\n"
-                               (string-join configure-flags))
-                       (apply invoke (cons "./configure" configure-flags))
-                       (substitute* "config.sh"
-                         (((string-append store-directory "/[^/]*-bash-[^/]*"))
-                          bash))
-                       (substitute* '("config.h")
-                         (("^#define SH_PATH .*")
-                          (string-append  "#define SH_PATH \""
-                                          bash "/bin/bash\"\n"))))))
-                 (add-after 'build 'touch-non-built-files-for-install
-                   (lambda _
-                     ;; `make install' wants to install these although they do
-                     ;; not get built...
-                     (with-directory-excursion "cpan"
-                       (mkdir-p "Pod-Usage/blib/script")
-                       (mkdir-p "Pod-Parser/blib/script")
-                       (for-each (lambda (file)
-                                   (call-with-output-file file
-                                     (lambda (port) (display "" port))))
-                                 '("Pod-Usage/blib/script/pod2text"
-                                   "Pod-Usage/blib/script/pod2usage"
-                                   "Pod-Checker/blib/script/podchecker"
-                                   "Pod-Parser/blib/script/podselect"))))))
-               `((replace 'configure
-                   (lambda* (#:key configure-flags #:allow-other-keys)
-                     (format #t "Perl configure flags: ~s~%" configure-flags)
-                     (apply invoke "./Configure" configure-flags)))))
-         (add-after 'install 'remove-extra-references
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((out     (assoc-ref outputs "out"))
-                    (libc    (assoc-ref inputs
-                                        ,(if (%current-target-system)
-                                             "cross-libc" "libc")))
-                    (config1 (car (find-files (string-append out "/lib/perl5")
-                                              "^Config_heavy\\.pl$")))
-                    (config2 (find-files (string-append out "/lib/perl5")
-                                         "^Config\\.pm$")))
-               ;; Force the library search path to contain only libc because
-               ;; it is recorded in Config.pm and Config_heavy.pl; we don't
-               ;; want to keep a reference to everything that's in
-               ;; $LIBRARY_PATH at build time (GCC, Binutils, bzip2, file,
-               ;; etc.)
-               (substitute* config1
-                 (("^incpth=.*$")
-                  (string-append "incpth='" libc "/include'\n"))
-                 (("^(libpth|plibpth|libspath)=.*$" _ variable)
-                  (string-append variable "='" libc "/lib'\n")))
+              ;; Build in GNU89 mode to tolerate C++-style comment in libc's
+              ;; <bits/string3.h>.
+              (substitute* "cflags.SH"
+                (("-std=c89")
+                 "-std=gnu89"))))
+          #$@(if (%current-target-system)
+                 #~((add-after 'unpack 'unpack-cross
+                      (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                        (let ((cross-checkout
+                               (assoc-ref native-inputs "perl-cross")))
+                          (rename-file "Artistic" "Artistic.perl")
+                          (rename-file "Copying" "Copying.perl")
+                          (copy-recursively cross-checkout "."))
+                        (let ((bash (search-input-file inputs "bin/bash")))
+                          (substitute* '("Makefile.config.SH"
+                                         "cnf/config.guess"
+                                         "cnf/config.sub"
+                                         "cnf/configure"
+                                         "cnf/configure_misc.sh"
+                                         "miniperl_top")
+                            (("! */bin/sh")
+                             (string-append "! " bash))
+                            ((" /bin/sh")
+                             bash))
+                          (substitute* '("ext/Errno/Errno_pm.PL")
+                            (("\\$cpp < errno.c")
+                             "$Config{cc} -E errno.c")))))
+                    (replace 'configure
+                      (lambda* (#:key configure-flags inputs #:allow-other-keys)
+                        (let* ((store-directory (%store-directory))
+                               (configure-flags
+                                (cons*
+                                 ;; `perl-cross' confuses target and host
+                                 (string-append "--target=" #$(%current-target-system))
+                                 (string-append "--prefix=" #$output)
+                                 (string-append "-Dcc=" #$(%current-target-system) "-gcc")
+                                 "-Dbyteorder=1234"
+                                 (remove (lambda (x) (or (string-prefix? "-d" x)
+                                                         (string-prefix? "-Dcc=" x)))
+                                         configure-flags)))
+                               (bash (assoc-ref inputs "bash-minimal")))
+                          (format (current-error-port)
+                                  "running ./configure ~a\n"
+                                  (string-join configure-flags))
+                          (apply invoke (cons "./configure" configure-flags))
+                          (substitute* "config.sh"
+                            (((string-append store-directory "/[^/]*-bash-[^/]*"))
+                             bash))
+                          (substitute* '("config.h")
+                            (("^#define SH_PATH .*")
+                             (string-append "#define SH_PATH \""
+                                            bash "/bin/bash\"\n"))))))
+                    (add-after 'build 'touch-non-built-files-for-install
+                      (lambda _
+                        ;; `make install' wants to install these although they do
+                        ;; not get built...
+                        (with-directory-excursion "cpan"
+                          (mkdir-p "Pod-Usage/blib/script")
+                          (mkdir-p "Pod-Parser/blib/script")
+                          (for-each (lambda (file)
+                                      (call-with-output-file file
+                                        (lambda (port) (display "" port))))
+                                    '("Pod-Usage/blib/script/pod2text"
+                                      "Pod-Usage/blib/script/pod2usage"
+                                      "Pod-Checker/blib/script/podchecker"
+                                      "Pod-Parser/blib/script/podselect"))))))
+                 #~((replace 'configure
+                      (lambda* (#:key configure-flags #:allow-other-keys)
+                        (format #t "Perl configure flags: ~s~%" configure-flags)
+                        (apply invoke "./Configure" configure-flags)))))
+          (add-after 'install 'remove-extra-references
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((lib-perl5 (string-append #$output "/lib/perl5"))
+                     (libc.so   (search-input-file
+                                 #$(if (%current-target-system)
+                                       #~%build-target-inputs
+                                       #~%build-inputs)
+                                 "/lib/libc.so"))
+                     (libc    (dirname (dirname libc.so)))
+                     (config1 (find-files lib-perl5 "^Config_heavy\\.pl$"))
+                     (config2 (find-files lib-perl5 "^Config\\.pm$")))
+                ;; Force the library search path to contain only libc because
+                ;; it is recorded in Config.pm and Config_heavy.pl; we don't
+                ;; want to keep a reference to everything that's in
+                ;; $LIBRARY_PATH at build time (GCC, Binutils, bzip2, file,
+                ;; etc.)
+                (substitute* (car config1)
+                  (("^incpth=.*$")
+                   (string-append "incpth='" libc "/include'\n"))
+                  (("^(libpth|plibpth|libspath)=.*$" _ variable)
+                   (string-append variable "='" libc "/lib'\n")))
 
-               (for-each (lambda (file)
-                           (substitute* config2
-                             (("libpth => .*$")
-                              (string-append "libpth => '" libc
-                                             "/lib',\n"))))
-                         config2)))))))
+                (substitute* config2
+                  (("libpth => .*$")
+                   (string-append "libpth => '" libc "/lib',\n")))))))))
     (inputs
      (if (%current-target-system)
        (list bash-minimal coreutils-minimal)
