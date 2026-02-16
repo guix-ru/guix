@@ -1830,7 +1830,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
 
 (define gcc-muslboot0
   (package
-    (inherit gcc-4.7)
+    (inherit gcc-base)
     (name "gcc-muslboot0")
     (version "4.6.4")
     (source (origin
