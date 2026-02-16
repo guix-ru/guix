@@ -930,7 +930,9 @@ MesCC-Tools), and finally M2-Planet.")
            "CC=tcc"
            "AR=tcc -ar"
            "RANLIB=true"
-           "CFLAGS=-DSYSCALL_NO_TLS -D__riscv_float_abi_soft -U__riscv_flen")
+           #$@(if (target-riscv64?)
+                  #~("CFLAGS=-DSYSCALL_NO_TLS -D__riscv_float_abi_soft -U__riscv_flen")
+                  #~("CFLAGS=-DSYSCALL_NO_TLS")))
        #:configure-flags
        #~(let ((bash #$(this-package-native-input "bash")))
            (list "CC=tcc"
