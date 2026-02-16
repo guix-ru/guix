@@ -3854,6 +3854,31 @@ how to apply them in order to produce a complete application.  The main use
 case is Mirage.")
     (license license:isc)))
 
+(define-public ocaml-mirage
+  (package
+    (inherit %ocaml-mirage-base)
+    (name "ocaml5-mirage")
+    (arguments
+     '(#:package "mirage"
+       ;; some tests require opam, which needs network access.
+       #:tests? #f))
+    (propagated-inputs (list ocaml-astring
+                             ocaml-bos
+                             ocaml-functoria
+                             ocaml-ipaddr
+                             ocaml-logs
+                             ocaml-mirage-runtime
+                             ocaml-opam-monorepo))
+    (native-inputs (list ocaml-alcotest ocaml-fmt))
+    (home-page "https://github.com/mirage/mirage")
+    (synopsis "MirageOS library operating system")
+    (description
+     "Library operating system that constructs unikernels for secure,
+high-performance network applications across a variety of cloud computing and
+mobile platforms.  Code can be developed on a normal OS and then compiled into
+a fully-standalone, specialised unikernel.")
+    (license license:isc)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
