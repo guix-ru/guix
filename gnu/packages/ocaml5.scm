@@ -3786,6 +3786,28 @@ mobile platforms.  Code can be developed on a normal OS and then compiled into
 a fully-standalone, specialised unikernel.")
     (license license:isc)))
 
+(define-public ocaml-functoria-runtime
+  (package
+    (inherit %ocaml-mirage-base)
+    (name "ocaml5-functoria-runtime")
+    (arguments
+     '(#:package "functoria-runtime"
+       ;; some tests require opam, which needs network access.
+       #:tests? #f))
+    (propagated-inputs (list ocaml-cmdliner
+                             ocaml-fmt
+                             ocaml-logs
+                             ocaml-bos
+                             ocaml-ipaddr
+                             ocaml-emile
+                             ocaml-uri))
+    (native-inputs (list ocaml-alcotest))
+    (home-page "https://github.com/mirage/mirage")
+    (synopsis "Runtime support library for functoria-generated code")
+    (description
+     "This is a runtime support library for MirageOS, a library operating system
+that constructs unikernels.")))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
