@@ -1550,22 +1550,22 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (inputs '())
     (propagated-inputs '())
     (arguments
-     `(#:implicit-inputs? #f
-       #:parallel-build? #f
-       #:guile ,%bootstrap-guile
-       #:configure-flags '("ac_cv_func_connect=no")
-       #:make-flags '("gawk")
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'check
-           (lambda _
-             (invoke "./gawk" "--version")))
-         (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (bin (string-append out "/bin")))
-               (install-file "gawk" bin)
-               (symlink "gawk" (string-append bin "/awk"))))))))))
+     (list
+      #:implicit-inputs? #f
+      #:parallel-build? #f
+      #:guile %bootstrap-guile
+      #:configure-flags #~(list "ac_cv_func_connect=no")
+      #:make-flags #~(list "gawk")
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda _
+              (invoke "./gawk" "--version")))
+          (replace 'install
+            (lambda _
+              (let ((bin (string-append #$output "/bin")))
+                (install-file "gawk" bin)
+                (symlink "gawk" (string-append bin "/awk"))))))))))
 
 (define (%boot-mesboot3-inputs)
   `(("binutils" ,binutils-mesboot)
