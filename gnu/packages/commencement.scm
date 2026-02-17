@@ -691,40 +691,42 @@ MesCC-Tools), and finally M2-Planet.")
     (propagated-inputs '())
     (native-inputs (cons* tcc-boot0 (%boot-gash-inputs)))
     (arguments
-     `(#:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-       #:configure-flags '("CC=tcc"
-                           "CPP=tcc -E"
-                           "LD=tcc"
-                           "--build=i686-unknown-linux-gnu"
-                           "--host=i686-unknown-linux-gnu"
-                           "--disable-nls")
-       #:modules ((guix build gnu-build-system)
+     (list
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:configure-flags
+      #~(list "CC=tcc"
+              "CPP=tcc -E"
+              "LD=tcc"
+              "--build=i686-unknown-linux-gnu"
+              "--host=i686-unknown-linux-gnu"
+              "--disable-nls")
+      #:modules '((guix build gnu-build-system)
                   (guix build utils)
                   (srfi srfi-1))
-       #:strip-binaries? #f             ; no strip yet
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'scripted-patch
-           (lambda _
-             (substitute* "build.sh.in"
-               (("@LIBOBJS@") "getloadavg.o")
-               (("@REMOTE@") "stub"))))
-         (add-after 'configure 'configure-fixup
-           (lambda _
-             (substitute* "make.h"
-               (("^extern long int lseek.*" all) (string-append "// " all)))))
-         (replace 'build
-           (lambda _
-             (invoke "sh" "./build.sh")))
-         (replace 'check                ; proper check needs awk
-           (lambda _
-             (invoke "./make" "--version")))
-         (replace 'install
-           (lambda _
-             (let* ((out (assoc-ref %outputs "out"))
-                    (bin (string-append out "/bin")))
-               (install-file "make" bin)))))))))
+      #:strip-binaries? #f             ; no strip yet
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'scripted-patch
+            (lambda _
+              (substitute* "build.sh.in"
+                (("@LIBOBJS@") "getloadavg.o")
+                (("@REMOTE@") "stub"))))
+          (add-after 'configure 'configure-fixup
+            (lambda _
+              (substitute* "make.h"
+                (("^extern long int lseek.*" all)
+                 (string-append "// " all)))))
+          (replace 'build
+            (lambda _
+              (invoke "sh" "./build.sh")))
+          (replace 'check                ; proper check needs awk
+            (lambda _
+              (invoke "./make" "--version")))
+          (replace 'install
+            (lambda _
+              (install-file "make"
+                            (string-append #$output "/bin")))))))))
 
 (define (%boot-tcc0-inputs)
   `(("make" ,gnu-make-mesboot0)
