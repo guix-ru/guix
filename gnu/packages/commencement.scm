@@ -886,14 +886,10 @@ MesCC-Tools), and finally M2-Planet.")
          (delete 'compress-documentation))))))
 
 (define (%boot-tcc-inputs)
-  `(("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("tcc" ,tcc-boot)
-    ("make" ,gnu-make-mesboot0)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* gzip-mesboot
+         patch-mesboot
+         tcc-boot
+         (delete tcc-boot0 (%boot-tcc0-inputs))))
 
 (define binutils-mesboot0
   ;; The initial Binutils
@@ -962,8 +958,7 @@ MesCC-Tools), and finally M2-Planet.")
     (supported-systems '("i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("binutils" ,binutils-mesboot0)
-                     ,@(%boot-tcc-inputs)))
+    (native-inputs (cons* binutils-mesboot0 (%boot-tcc-inputs)))
     (outputs '("out"))
     (arguments
      (list #:implicit-inputs? #f
@@ -1062,7 +1057,13 @@ ac_cv_c_float_format='IEEE (little-endian)'
 (define (%boot-mesboot-core-inputs)
   `(("binutils" ,binutils-mesboot0)
     ("gcc" ,gcc-core-mesboot0)
-    ,@(alist-delete "tcc" (%boot-tcc-inputs))))
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("make" ,gnu-make-mesboot0)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define mesboot-headers
   (package
@@ -1071,8 +1072,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (supported-systems '("i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("kernel-headers" ,%bootstrap-linux-libre-headers)
-                     ,@(%boot-tcc-inputs)))
+    (native-inputs (cons* %bootstrap-linux-libre-headers
+                          (%boot-tcc-inputs)))
     (arguments
      (list
       #:implicit-inputs? #f
@@ -1086,7 +1087,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
           (replace 'install
             (lambda* (#:key inputs #:allow-other-keys)
               (let* ((include (string-append #$output "/include"))
-                     (headers (assoc-ref inputs "kernel-headers")))
+                     (headers (assoc-ref inputs
+                                         "linux-libre-headers-bootstrap")))
                 (copy-recursively "include" #$output)
                 (copy-recursively headers #$output)))))))))
 
