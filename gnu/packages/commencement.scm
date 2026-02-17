@@ -1201,27 +1201,28 @@ ac_cv_c_float_format='IEEE (little-endian)'
 ac_cv_c_float_format='IEEE (little-endian)'
 ")))))
             (replace 'install2
-              (lambda* (#:key outputs #:allow-other-keys)
-                (let* ((out (assoc-ref outputs "out"))
-                       (gcc-dir (string-append
-                                 out "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3")))
+              (lambda _
+                (let ((gcc-dir (string-append #$output "/lib/gcc-lib"
+                                              "/i686-unknown-linux-gnu/2.95.3")))
                   (and
                    (mkdir-p "tmp")
-                   (zero? (system (string-append "set -x; cd tmp && ar x ../gcc/libgcc2.a")))
-                   (zero? (system (string-append "set -x; cd tmp && ar r " gcc-dir "/libgcc.a *.o")))
-                   (copy-file "gcc/libgcc2.a" (string-append out "/lib/libgcc2.a"))))))))
+                   (zero? (system "set -x; cd tmp && ar x ../gcc/libgcc2.a"))
+                   (zero? (system (string-append "set -x; cd tmp && ar r "
+                                                 gcc-dir "/libgcc.a *.o")))
+                   (copy-file "gcc/libgcc2.a"
+                              (string-append #$output "/lib/libgcc2.a"))))))))
        ((#:configure-flags configure-flags)
-        #~(let ((out (assoc-ref %outputs "out")))
-            `("--disable-shared"
-              "--disable-werror"
-              "--build=i686-unknown-linux-gnu"
-              "--host=i686-unknown-linux-gnu"
-              ,(string-append "--prefix=" out))))
+        #~(list "--disable-shared"
+                "--disable-werror"
+                "--build=i686-unknown-linux-gnu"
+                "--host=i686-unknown-linux-gnu"
+                (string-append "--prefix=" #$output)))
        ((#:make-flags make-flags)
-        #~(let ((gcc (assoc-ref %build-inputs "gcc")))
-            `("RANLIB=true"
-              ,(string-append "LIBGCC2_INCLUDES=-I " gcc "/include")
-              "LANGUAGES=c")))))))
+        #~(let ((gcc (search-input-file %build-inputs "/bin/gcc")))
+            (list "RANLIB=true"
+                  (string-append "LIBGCC2_INCLUDES=-I "
+                                 (dirname (dirname gcc)) "/include")
+                  "LANGUAGES=c")))))))
 
 (define (%boot-mesboot0-inputs)
   `(("gcc" ,gcc-mesboot0)
