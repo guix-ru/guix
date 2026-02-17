@@ -730,12 +730,7 @@ MesCC-Tools), and finally M2-Planet.")
                             (string-append #$output "/bin")))))))))
 
 (define (%boot-tcc0-inputs)
-  `(("make" ,gnu-make-mesboot0)
-    ("tcc" ,tcc-boot0)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* gnu-make-mesboot0 tcc-boot0 (%boot-gash-inputs)))
 
 (define tcc-boot
   ;; The final tcc.
@@ -753,8 +748,7 @@ MesCC-Tools), and finally M2-Planet.")
     (build-system gnu-build-system)
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("mes" ,mes-boot)
-                     ,@(%boot-tcc0-inputs)))
+    (native-inputs (cons* mes-boot (%boot-tcc0-inputs)))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
@@ -771,7 +765,7 @@ MesCC-Tools), and finally M2-Planet.")
          (replace 'configure
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref %outputs "out"))
-                    (tcc (assoc-ref %build-inputs "tcc"))
+                    (tcc (assoc-ref %build-inputs "tcc-boot0"))
                     (libc (assoc-ref %build-inputs "libc"))
                     (interpreter "/mes/loader"))
                (invoke "sh" "configure"
@@ -785,7 +779,7 @@ MesCC-Tools), and finally M2-Planet.")
          (replace 'build
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref %outputs "out"))
-                    (tcc (assoc-ref %build-inputs "tcc"))
+                    (tcc (assoc-ref %build-inputs "tcc-boot0"))
                     (libc (assoc-ref %build-inputs "libc"))
                     (interpreter "/mes/loader"))
                (invoke
@@ -814,8 +808,8 @@ MesCC-Tools), and finally M2-Planet.")
          (replace 'install
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref %outputs "out"))
-                    (mes (assoc-ref %build-inputs "mes"))
-                    (tcc (assoc-ref %build-inputs "tcc"))
+                    (mes (assoc-ref %build-inputs "mes-boot"))
+                    (tcc (assoc-ref %build-inputs "tcc-boot0"))
                     (interpreter "/mes/loader")
                     (cppflags
                      (list
@@ -896,7 +890,11 @@ MesCC-Tools), and finally M2-Planet.")
   `(("gzip" ,gzip-mesboot)
     ("patch" ,patch-mesboot)
     ("tcc" ,tcc-boot)
-    ,@(alist-delete "tcc" (%boot-tcc0-inputs))))
+    ("make" ,gnu-make-mesboot0)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define binutils-mesboot0
   ;; The initial Binutils
