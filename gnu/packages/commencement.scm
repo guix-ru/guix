@@ -1239,13 +1239,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (arguments
      (substitute-keyword-arguments (package-arguments binutils-mesboot0)
        ((#:configure-flags configure-flags)
-        #~(let ((out (assoc-ref %outputs "out")))
-            `("--disable-nls" "--disable-shared"
-              "--disable-werror"
-              "--build=i686-unknown-linux-gnu"
-              "--host=i686-unknown-linux-gnu"
-              "--with-sysroot=/"
-              ,(string-append "--prefix=" out))))))))
+        #~(list "--disable-nls" "--disable-shared"
+                "--disable-werror"
+                "--build=i686-unknown-linux-gnu"
+                "--host=i686-unknown-linux-gnu"
+                "--with-sysroot=/"
+                (string-append "--prefix=" #$output)))))))
 
 (define gnu-make-mesboot
   (package
