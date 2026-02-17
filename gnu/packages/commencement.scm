@@ -1055,15 +1055,9 @@ ac_cv_c_float_format='IEEE (little-endian)'
             (files '("lib")))))))
 
 (define (%boot-mesboot-core-inputs)
-  `(("binutils" ,binutils-mesboot0)
-    ("gcc" ,gcc-core-mesboot0)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("make" ,gnu-make-mesboot0)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* binutils-mesboot0
+         gcc-core-mesboot0
+         (delete tcc-boot (%boot-tcc-inputs))))
 
 (define mesboot-headers
   (package
@@ -1113,8 +1107,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (supported-systems '("i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("headers" ,mesboot-headers)
-                     ,@(%boot-mesboot-core-inputs)))
+    (native-inputs (cons* mesboot-headers (%boot-mesboot-core-inputs)))
     (outputs '("out"))
     (arguments
      (list
@@ -1183,11 +1176,12 @@ ac_cv_c_float_format='IEEE (little-endian)'
   (package
     (inherit gcc-core-mesboot0)
     (name "gcc-mesboot0")
-    (native-inputs `(;; Packages are given in an order that's relevant for
-                     ;; #include_next purposes.
-                     ("libc" ,glibc-mesboot0)
-                     ("kernel-headers" ,%bootstrap-linux-libre-headers)
-                     ,@(%boot-mesboot-core-inputs)))
+    (native-inputs
+     ;; Packages are given in an order that's relevant for
+     ;; #include_next purposes.
+     (cons* glibc-mesboot0
+            %bootstrap-linux-libre-headers
+            (%boot-mesboot-core-inputs)))
     (arguments
      (substitute-keyword-arguments (package-arguments gcc-core-mesboot0)
        ((#:phases phases)
@@ -1228,7 +1222,14 @@ ac_cv_c_float_format='IEEE (little-endian)'
   `(("gcc" ,gcc-mesboot0)
     ("kernel-headers" ,%bootstrap-linux-libre-headers)
     ("libc" ,glibc-mesboot0)
-    ,@(alist-delete "gcc" (%boot-mesboot-core-inputs))))
+    ("binutils" ,binutils-mesboot0)
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("make" ,gnu-make-mesboot0)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define binutils-mesboot1
   (package
