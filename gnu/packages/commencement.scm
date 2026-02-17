@@ -1077,22 +1077,21 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (native-inputs `(("kernel-headers" ,%bootstrap-linux-libre-headers)
                      ,@(%boot-tcc-inputs)))
     (arguments
-     `(#:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-       #:tests? #f
-       #:strip-binaries? #f
-       #:phases
-       (modify-phases %standard-phases
-         (delete 'configure)
-         (delete 'build)
-         (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (include (string-append out "/include"))
-                    (headers (assoc-ref %build-inputs "kernel-headers")))
-               (mkdir-p include)
-               (copy-recursively "include" out)
-               (copy-recursively headers out)))))))))
+     (list
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:tests? #f
+      #:strip-binaries? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'build)
+          (replace 'install
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((include (string-append #$output "/include"))
+                     (headers (assoc-ref inputs "kernel-headers")))
+                (copy-recursively "include" #$output)
+                (copy-recursively headers #$output)))))))))
 
 (define glibc-mesboot0
   ;; GNU C Library 2.2.5 is the most recent glibc that we managed to build
