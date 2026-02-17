@@ -1307,6 +1307,35 @@ ac_cv_c_float_format='IEEE (little-endian)'
       (sha256
        (base32 "1hzci2zrrd7v3g1jk35qindq05hbl0bhjcyyisq9z209xb3fqzb1")))))
 
+;; This G-expression, when ungexped, returns a phase that unpacks and
+;; symlink result directories from all input .tar.(gz|xz) input files.
+;; It is used in multiple GCCs to reduce the set of pre-built bootstrap
+;; inputs.
+(define unpack-and-symlink-other-tarballs-phase
+  #~(lambda* (#:key inputs #:allow-other-keys)
+      (for-each
+       (match-lambda
+         ((filename . source)
+          (let ((gz (string-suffix? ".tar.gz" filename))
+                (xz (string-suffix? ".tar.xz" filename)))
+            ;; Only select archives other than "source"
+            (and (or gz xz)
+                 ;; Unpack them
+                 (or (invoke "tar" "xvf" source)
+                     (error "failed to unpack tarball" source))
+                 ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
+                 (let* ((suffix (if gz ".tar.gz" ".tar.xz"))
+                        (name-version (string-trim-right
+                                       (basename filename suffix)
+                                       char-set:letter))
+                        (index (string-rindex name-version #\-)))
+                   (when index
+                     (symlink name-version
+                              ;; Drop trailing letters, as
+                              ;; gmp-6.0.0a unpacks into gmp-6.0.0.
+                              (string-take name-version index))))))))
+       inputs)))
+
 (define gcc-core-mesboot1
   ;; GCC 4.6.4 is the latest modular distribution.  This package is not
   ;; stricly needed, but very helpful for development because it builds
@@ -1323,111 +1352,89 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (sha256
                (base32
                 "173kdb188qg79pcz073cj9967rs2vzanyjdjyxy9v0xb0p5sad75"))))
-    (inputs `(("gmp-source" ,gmp-boot)
-              ("mpfr-source" ,mpfr-boot)
-              ("mpc-source" ,mpc-boot)))
+    (inputs (list gmp-boot mpfr-boot mpc-boot))
     (native-inputs (%boot-mesboot1-inputs))
     (arguments
-     (list #:implicit-inputs? #f
-           #:guile %bootstrap-guile
-           #:tests? #f
-           #:modules '((guix build gnu-build-system)
-                       (guix build utils)
-                       (srfi srfi-1))
-           #:parallel-build? #f             ; for debugging
-           #:make-flags
-           #~(let* ((libc (assoc-ref %build-inputs "libc"))
-                    (ldflags (string-append
-                              "-B" libc "/lib "
-                              "-Wl,-dynamic-linker "
-                              "-Wl," libc
-                              #$(glibc-dynamic-linker "i686-linux"))))
-               (list (string-append "LDFLAGS=" ldflags)
-                     (string-append "LDFLAGS_FOR_TARGET=" ldflags)))
-           #:configure-flags
-           #~(let ((out (assoc-ref %outputs "out"))
-                   (glibc (assoc-ref %build-inputs "libc")))
-               (list (string-append "--prefix=" out)
-                     "--build=i686-unknown-linux-gnu"
-                     "--host=i686-unknown-linux-gnu"
-                     (string-append "--with-native-system-header-dir=" glibc "/include")
-                     (string-append "--with-build-sysroot=" glibc "/include")
-                     "--disable-bootstrap"
-                     "--disable-decimal-float"
-                     "--disable-libatomic"
-                     "--disable-libcilkrts"
-                     "--disable-libgomp"
-                     "--disable-libitm"
-                     "--disable-libmudflap"
-                     "--disable-libquadmath"
-                     "--disable-libsanitizer"
-                     "--disable-libssp"
-                     "--disable-libvtv"
-                     "--disable-lto"
-                     "--disable-lto-plugin"
-                     "--disable-multilib"
-                     "--disable-plugin"
-                     "--disable-threads"
-                     "--enable-languages=c"
-                     "--enable-static"
-                     "--disable-shared"
-                     "--enable-threads=single"
-                     "--disable-libstdcxx-pch"
-                     "--disable-build-with-cxx"))
-           #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'unpack 'apply-boot-patch
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (let ((patch-file
-                          #$(local-file
-                             (search-patch "gcc-boot-4.6.4.patch"))))
-                     (invoke "patch" "--force" "-p1" "-i" patch-file))))
-               ;; c&p from commencement.scm:gcc-boot0
-               (add-after 'unpack 'unpack-gmp&co
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
-                         (mpfr (assoc-ref %build-inputs "mpfr-source"))
-                         (mpc  (assoc-ref %build-inputs "mpc-source")))
-
-                     ;; To reduce the set of pre-built bootstrap inputs, build
-                     ;; GMP & co. from GCC.
-                     (for-each (lambda (source)
-                                 (or (invoke "tar" "xvf" source)
-                                     (error "failed to unpack tarball"
-                                            source)))
-                               (list gmp mpfr mpc))
-
-                     ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
-                     #$@(map (lambda (lib package)
-                               ;; Drop trailing letters, as gmp-6.0.0a unpacks
-                               ;; into gmp-6.0.0.
-                               #~(symlink #$(string-trim-right
-                                             (basename
-                                              (origin-actual-file-name lib)
-                                              ".tar.gz")
-                                             char-set:letter)
-                                          #$package))
-                             (list gmp-boot mpfr-boot mpc-boot)
-                             '("gmp" "mpfr" "mpc")))))
-               (add-before 'configure 'setenv
-                 (lambda* (#:key outputs #:allow-other-keys)
-                   (let* ((out (assoc-ref outputs "out"))
-                          (binutils (assoc-ref %build-inputs "binutils"))
-                          (bash (assoc-ref %build-inputs "bash"))
-                          (gcc (assoc-ref %build-inputs "gcc"))
-                          (glibc (assoc-ref %build-inputs "libc"))
-                          (kernel-headers (assoc-ref %build-inputs "kernel-headers")))
-                     (setenv "CONFIG_SHELL" (string-append bash "/bin/sh"))
-                     (setenv "C_INCLUDE_PATH" (string-append
-                                               gcc "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3/include"
-                                               ":" kernel-headers "/include"
-                                               ":" glibc "/include"
-                                               ":" (getcwd) "/mpfr/src"))
-                     (setenv "LIBRARY_PATH" (string-append glibc "/lib"
-                                                           ":" gcc "/lib"))
-                     (format (current-error-port) "C_INCLUDE_PATH=~a\n" (getenv "C_INCLUDE_PATH"))
-                     (format (current-error-port) "LIBRARY_PATH=~a\n"
-                             (getenv "LIBRARY_PATH"))))))))))
+     (list
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:tests? #f
+      #:modules '((guix build gnu-build-system)
+                  (guix build utils)
+                  (ice-9 match)
+                  (srfi srfi-1))
+      #:parallel-build? #f             ; for debugging
+      #:make-flags
+      #~(let* ((libc.a (search-input-file %build-inputs "/lib/libc.a"))
+               (libc (dirname (dirname libc.a)))
+               (ldflags (string-append
+                         "-B" libc "/lib "
+                         "-Wl,-dynamic-linker "
+                         "-Wl," libc
+                         #$(glibc-dynamic-linker "i686-linux"))))
+          (list (string-append "LDFLAGS=" ldflags)
+                (string-append "LDFLAGS_FOR_TARGET=" ldflags)))
+      #:configure-flags
+      #~(let* ((libc.a (search-input-file %build-inputs "/lib/libc.a"))
+               (glibc (dirname (dirname libc.a))))
+          (list (string-append "--prefix=" #$output)
+                "--build=i686-unknown-linux-gnu"
+                "--host=i686-unknown-linux-gnu"
+                (string-append "--with-native-system-header-dir=" glibc "/include")
+                (string-append "--with-build-sysroot=" glibc "/include")
+                "--disable-bootstrap"
+                "--disable-decimal-float"
+                "--disable-libatomic"
+                "--disable-libcilkrts"
+                "--disable-libgomp"
+                "--disable-libitm"
+                "--disable-libmudflap"
+                "--disable-libquadmath"
+                "--disable-libsanitizer"
+                "--disable-libssp"
+                "--disable-libvtv"
+                "--disable-lto"
+                "--disable-lto-plugin"
+                "--disable-multilib"
+                "--disable-plugin"
+                "--disable-threads"
+                "--enable-languages=c"
+                "--enable-static"
+                "--disable-shared"
+                "--enable-threads=single"
+                "--disable-libstdcxx-pch"
+                "--disable-build-with-cxx"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'apply-boot-patch
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((patch-file
+                     #$(local-file
+                        (search-patch "gcc-boot-4.6.4.patch"))))
+                (invoke "patch" "--force" "-p1" "-i" patch-file))))
+          (add-after 'unpack 'unpack-other-tarballs
+            #$unpack-and-symlink-other-tarballs-phase)
+          (add-before 'configure 'setenv
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((shell (search-input-file inputs "/bin/sh"))
+                     (gcc-lib (search-input-directory inputs "/lib/gcc-lib"))
+                     (gcc (dirname (dirname gcc-lib)))
+                     (libc.a (search-input-file inputs "/lib/libc.a"))
+                     (glibc (dirname (dirname libc.a)))
+                     (ioctl.h (search-input-file %build-inputs
+                                                 "/include/asm/ioctl.h"))
+                     (kernel-headers-include (dirname (dirname ioctl.h))))
+                (setenv "CONFIG_SHELL" shell)
+                (setenv "C_INCLUDE_PATH" (string-append
+                                          gcc "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3/include"
+                                          ":" kernel-headers-include
+                                          ":" glibc "/include"
+                                          ":" (getcwd) "/mpfr/src"))
+                (setenv "LIBRARY_PATH" (string-append glibc "/lib"
+                                                      ":" gcc "/lib"))
+                (format (current-error-port) "C_INCLUDE_PATH=~a\n" (getenv "C_INCLUDE_PATH"))
+                (format (current-error-port) "LIBRARY_PATH=~a\n"
+                        (getenv "LIBRARY_PATH"))))))))))
 
 (define gcc-mesboot1
   (package
@@ -1435,29 +1442,33 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (name "gcc-mesboot1")
     (version "4.6.4")
     (native-inputs
-     `(("gcc-g++"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append "mirror://gnu/gcc/gcc-"
-                               version "/gcc-g++-" version ".tar.gz"))
-           (sha256
-            (base32
-             "1fqqk5zkmdg4vmqzdmip9i42q6b82i3f6yc0n86n9021cr7ms2k9"))))
-       ,@(package-native-inputs gcc-core-mesboot1)))
+     (modify-inputs (package-native-inputs gcc-core-mesboot1)
+       (prepend
+        (origin
+          (method url-fetch)
+          (uri (string-append "mirror://gnu/gcc/gcc-"
+                              version "/gcc-g++-" version ".tar.gz"))
+          (sha256
+           (base32
+            "1fqqk5zkmdg4vmqzdmip9i42q6b82i3f6yc0n86n9021cr7ms2k9"))))))
     (arguments
      (substitute-keyword-arguments (package-arguments gcc-core-mesboot1)
        ((#:configure-flags configure-flags)
-        #~(let ((out (assoc-ref %outputs "out")))
-            `("--enable-languages=c,c++"
-              ,@(filter
-                 (negate (lambda (x) (string-prefix? "--enable-languages=" x)))
-                 #$configure-flags))))
+        #~(cons* "--enable-languages=c,c++"
+                 (remove (lambda (x) (string-prefix? "--enable-languages=" x))
+                         #$configure-flags)))
+       ((#:modules modules)
+        (cons* '(ice-9 ftw) modules))
        ((#:phases phases)
         #~(modify-phases #$phases
-            (add-before 'unpack 'unpack-g++
+            (add-after 'unpack-other-tarballs 'relocate-gcc-g++
               (lambda _
-                (let ((source-g++ (assoc-ref %build-inputs "gcc-g++")))
-                  (invoke "tar" "xvf" source-g++))))
+                (let ((directory (find (lambda (dir)
+                                         (string-prefix? "gcc-" dir))
+                                       (scandir "."))))
+                  (copy-recursively directory ".")
+                  (delete-file-recursively directory)
+                  (delete-file "gcc-g++"))))
             (replace 'setenv
               (lambda _
                 (setenv "CONFIG_SHELL" (which "sh"))
@@ -1815,8 +1826,8 @@ exec " gcc "/bin/" program
            ((#:phases phases)
             #~(modify-phases #$phases
                 (delete 'apply-boot-patch)
-                (delete 'unpack-g++)     ; sadly, gcc-4.9.4 does not provide
-                                                  ; modular core/language downloads
+                (delete 'relocate-gcc-g++) ; sadly, gcc-4.9.4 does not provide
+                                           ; modular core/language downloads
                 (replace 'setenv
                   (lambda* (#:key outputs #:allow-other-keys)
                     (let* ((out (assoc-ref outputs "out"))
