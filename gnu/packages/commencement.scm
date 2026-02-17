@@ -340,10 +340,7 @@ pure Scheme to Tar and decompression in one easy step.")
     (native-inputs (list bootar))))
 
 (define (%boot-gash-inputs)
-  `(("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (list gash-boot gash-utils-boot bootar %bootstrap-guile))
 
 (define stage0-posix
   ;; The initial bootstrap package: no binary inputs except those from
@@ -362,7 +359,7 @@ pure Scheme to Tar and decompression in one easy step.")
       (supported-systems '("i686-linux" "x86_64-linux"
                            "aarch64-linux"
                            "riscv64-linux"))
-      (native-inputs (map cadr (%boot-gash-inputs)))
+      (native-inputs (%boot-gash-inputs))
       (build-system trivial-build-system)
       (arguments
        (list
@@ -439,7 +436,7 @@ MesCC-Tools), and finally M2-Planet.")
             (bootstrap-origin
              (origin (inherit (package-source nyacc-1.00.2))
                      (snippet #f)))
-            (map cadr (%boot-gash-inputs))))
+            (%boot-gash-inputs)))
     (arguments
      (list
       #:implicit-inputs? #f
@@ -549,7 +546,7 @@ MesCC-Tools), and finally M2-Planet.")
             (bootstrap-origin
              (origin (inherit (package-source nyacc-1.00.2))
                      (snippet #f)))
-            (map cadr (%boot-gash-inputs))))
+            (%boot-gash-inputs)))
     (arguments
      (list
       #:implicit-inputs? #f
@@ -640,8 +637,7 @@ MesCC-Tools), and finally M2-Planet.")
     (supported-systems '("i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("tcc" ,tcc-boot0)
-                     ,@(%boot-gash-inputs)))
+    (native-inputs (cons* tcc-boot0 (%boot-gash-inputs)))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
@@ -693,8 +689,7 @@ MesCC-Tools), and finally M2-Planet.")
     (supported-systems '("i686-linux" "x86_64-linux"))
     (inputs '())
     (propagated-inputs '())
-    (native-inputs `(("tcc" ,tcc-boot0)
-                     ,@(%boot-gash-inputs)))
+    (native-inputs (cons* tcc-boot0 (%boot-gash-inputs)))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
@@ -734,7 +729,10 @@ MesCC-Tools), and finally M2-Planet.")
 (define (%boot-tcc0-inputs)
   `(("make" ,gnu-make-mesboot0)
     ("tcc" ,tcc-boot0)
-    ,@(%boot-gash-inputs)))
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define tcc-boot
   ;; The final tcc.
