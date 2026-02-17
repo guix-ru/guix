@@ -435,33 +435,41 @@ MesCC-Tools), and finally M2-Planet.")
     (propagated-inputs '())
     (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
     (native-inputs
-     `(("m2-planet" ,stage0-posix)
-       ("nyacc-source" ,(bootstrap-origin
-                         (origin (inherit (package-source nyacc-1.00.2))
-                                 (snippet #f))))
-       ,@(%boot-gash-inputs)))
+     (cons* stage0-posix
+            (bootstrap-origin
+             (origin (inherit (package-source nyacc-1.00.2))
+                     (snippet #f)))
+            (map cadr (%boot-gash-inputs))))
     (arguments
      (list
       #:implicit-inputs? #f
       #:tests? #f
       #:guile %bootstrap-guile
       #:strip-binaries? #f              ;no strip yet
+      #:modules '((guix build gnu-build-system)
+                  (guix build utils)
+                  (ice-9 match))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'unpack-seeds
-            (lambda _
-              (let ((nyacc-source #$(this-package-native-input "nyacc-source")))
-                (with-directory-excursion ".."
-                  (invoke "tar" "-xvf" nyacc-source)))))
+            (lambda* (#:key inputs #:allow-other-keys)
+              (for-each
+               (match-lambda
+                 ((filename . source)
+                  ;; Conveniently select archives other than "source", here nyacc
+                  (when (string-suffix? ".tar.gz" filename)
+                    ;; Unpack it
+                    (with-directory-excursion ".."
+                      (or (invoke "tar" "xvf" source)
+                          (error "failed to unpack tarball" source))))))
+               inputs)))
           (replace 'configure
-            (lambda* (#:key inputs outputs #:allow-other-keys)
-              (let ((out #$output)
-                    (gash #$(this-package-native-input "bash"))
-                    (dir (with-directory-excursion ".." (getcwd))))
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((dir (with-directory-excursion ".." (getcwd))))
                 (setenv "GUILE_LOAD_PATH" (string-append
                                            dir "/nyacc-1.00.2/module"))
                 (invoke "gash" "configure.sh"
-                        (string-append "--prefix=" out)
+                        (string-append "--prefix=" #$output)
                         (string-append "--host="
                           #$(cond
                               ((target-x86-64?) "i686-linux-gnu")
@@ -476,7 +484,7 @@ MesCC-Tools), and finally M2-Planet.")
               (invoke "gash" "bootstrap.sh")))
           (delete 'check)
           (replace 'install
-            (lambda* (#:key outputs #:allow-other-keys)
+            (lambda _
               (substitute* "install.sh" ; show some progress
                 ((" -xf") " -xvf")
                 (("^( *)((cp|mkdir|tar) [^']*[^\\])\n" all space cmd)
@@ -484,8 +492,7 @@ MesCC-Tools), and finally M2-Planet.")
                                 space cmd "\n")))
               (invoke "gash" "install.sh")
               ;; Keep ASCII output, for friendlier comparison and bisection
-              (let* ((out #$output)
-                     (cache (string-append out "/lib/cache")))
+              (let ((cache (string-append #$output "/lib/cache")))
                 (define (objects-in-dir dir)
                   (find-files dir
                               (lambda (name stat)
