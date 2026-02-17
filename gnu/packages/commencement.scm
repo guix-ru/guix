@@ -1271,17 +1271,11 @@ ac_cv_c_float_format='IEEE (little-endian)'
               (install-file "make" (string-append #$output "/bin")))))))))
 
 (define (%boot-mesboot1-inputs)
-  `(("binutils" ,binutils-mesboot1)
-    ("make" ,gnu-make-mesboot)
-    ("gcc" ,gcc-mesboot0)
-    ("kernel-headers" ,%bootstrap-linux-libre-headers)
-    ("libc" ,glibc-mesboot0)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* binutils-mesboot1
+         gnu-make-mesboot
+         (fold delete
+               (%boot-mesboot0-inputs)
+               (list binutils-mesboot0 gnu-make-mesboot0))))
 
 (define gmp-boot
   (let ((version "4.3.2"))
@@ -1484,7 +1478,16 @@ ac_cv_c_float_format='IEEE (little-endian)'
 
 (define (%boot-mesboot2-inputs)
   `(("gcc" ,gcc-mesboot1)
-    ,@(alist-delete "gcc" (%boot-mesboot1-inputs))))
+    ("binutils" ,binutils-mesboot1)
+    ("make" ,gnu-make-mesboot)
+    ("kernel-headers" ,%bootstrap-linux-libre-headers)
+    ("libc" ,glibc-mesboot0)
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define hello-mesboot
   ;; Check for Scheme-only bootstrap.  Note that newer versions of Hello
