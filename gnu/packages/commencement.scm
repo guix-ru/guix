@@ -544,31 +544,41 @@ MesCC-Tools), and finally M2-Planet.")
     (inputs '())
     (propagated-inputs '())
     (native-inputs
-     `(("mes" ,mes-boot)
-       ("mescc-tools" ,stage0-posix)
-       ("nyacc-source" ,(bootstrap-origin
-                         (origin (inherit (package-source nyacc-1.00.2))
-                                 (snippet #f))))
-       ,@(%boot-gash-inputs)))
+     (cons* mes-boot
+            stage0-posix
+            (bootstrap-origin
+             (origin (inherit (package-source nyacc-1.00.2))
+                     (snippet #f)))
+            (map cadr (%boot-gash-inputs))))
     (arguments
      (list
       #:implicit-inputs? #f
       #:guile %bootstrap-guile
       #:validate-runpath? #f            ; no dynamic executables
       #:strip-binaries? #f              ; no strip yet
+      #:modules '((guix build gnu-build-system)
+                  (guix build utils)
+                  (ice-9 match))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'unpack-extra-sources
-            (lambda* (#:key outputs #:allow-other-keys)
-              (let ((nyacc-source #$(this-package-native-input "nyacc-source")))
-                (with-directory-excursion ".."
-                  (invoke "tar" "-xvf" nyacc-source)))))
+          (add-after 'unpack 'unpack-seeds
+            (lambda* (#:key inputs #:allow-other-keys)
+              (for-each
+               (match-lambda
+                 ((filename . source)
+                  ;; Conveniently select archives other than "source", here nyacc
+                  (when (string-suffix? ".tar.gz" filename)
+                    ;; Unpack it
+                    (with-directory-excursion ".."
+                      (or (invoke "tar" "xvf" source)
+                          (error "failed to unpack tarball" source))))))
+               inputs)))
           (replace 'configure
             (lambda* (#:key inputs outputs #:allow-other-keys)
               (let* ((out #$output)
                      (dir (with-directory-excursion ".." (getcwd)))
                      (interpreter "/lib/mes-loader")
-                     (mes #$(this-package-native-input "mes"))
+                     (mes #$(this-package-native-input "mes-boot"))
                      (mescc (string-append mes "/bin/mescc")))
                 (substitute* "conftest.c"
                   (("volatile") ""))
