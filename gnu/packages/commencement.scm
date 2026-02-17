@@ -1219,17 +1219,10 @@ ac_cv_c_float_format='IEEE (little-endian)'
                   "LANGUAGES=c")))))))
 
 (define (%boot-mesboot0-inputs)
-  `(("gcc" ,gcc-mesboot0)
-    ("kernel-headers" ,%bootstrap-linux-libre-headers)
-    ("libc" ,glibc-mesboot0)
-    ("binutils" ,binutils-mesboot0)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("make" ,gnu-make-mesboot0)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* gcc-mesboot0
+         %bootstrap-linux-libre-headers
+         glibc-mesboot0
+         (delete gcc-core-mesboot0 (%boot-mesboot-core-inputs))))
 
 (define binutils-mesboot1
   (package
@@ -1280,8 +1273,15 @@ ac_cv_c_float_format='IEEE (little-endian)'
 (define (%boot-mesboot1-inputs)
   `(("binutils" ,binutils-mesboot1)
     ("make" ,gnu-make-mesboot)
-    ,@(fold alist-delete (%boot-mesboot0-inputs)
-            '("binutils" "make"))))
+    ("gcc" ,gcc-mesboot0)
+    ("kernel-headers" ,%bootstrap-linux-libre-headers)
+    ("libc" ,glibc-mesboot0)
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define gmp-boot
   (let ((version "4.3.2"))
