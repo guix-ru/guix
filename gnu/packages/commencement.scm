@@ -972,26 +972,24 @@ MesCC-Tools), and finally M2-Planet.")
            #:parallel-build? #f
            #:strip-binaries? #f
            #:configure-flags
-           #~(let ((out (assoc-ref %outputs "out")))
-               `("--enable-static"
-                 "--disable-shared"
-                 "--disable-werror"
-                 "--build=i686-unknown-linux-gnu"
-                 "--host=i686-unknown-linux-gnu"
-                 ,(string-append "--prefix=" out)))
+           #~(list "--enable-static"
+                   "--disable-shared"
+                   "--disable-werror"
+                   "--build=i686-unknown-linux-gnu"
+                   "--host=i686-unknown-linux-gnu"
+                   (string-append "--prefix=" #$output))
            #:make-flags
-           #~`("CC=tcc -static -D __GLIBC_MINOR__=6"
-               "OLDCC=tcc -static -D __GLIBC_MINOR__=6"
-               "CC_FOR_BUILD=tcc -static -D __GLIBC_MINOR__=6"
-               "AR=ar"
-               "RANLIB=ranlib"
-               ,(string-append "LIBGCC2_INCLUDES=-I "
-                               (assoc-ref %build-inputs "tcc")
-                               "/include")
-               "LANGUAGES=c"
-               ,(string-append "BOOT_LDFLAGS="
-                               " -B" (assoc-ref %build-inputs "tcc")
-                               "/lib/"))
+           #~(let* ((libtcc1.a (search-input-file %build-inputs
+                                                  "/lib/libtcc1.a"))
+                    (tcc (dirname (dirname libtcc1.a))))
+               (list "CC=tcc -static -D __GLIBC_MINOR__=6"
+                     "OLDCC=tcc -static -D __GLIBC_MINOR__=6"
+                     "CC_FOR_BUILD=tcc -static -D __GLIBC_MINOR__=6"
+                     "AR=ar"
+                     "RANLIB=ranlib"
+                     "LANGUAGES=c"
+                     (string-append "LIBGCC2_INCLUDES=-I " tcc "/include")
+                     (string-append "BOOT_LDFLAGS=" " -B" tcc "/lib/")))
            #:modules '((guix build gnu-build-system)
                        (guix build utils)
                        (srfi srfi-1))
@@ -1004,12 +1002,9 @@ MesCC-Tools), and finally M2-Planet.")
                              (search-patch "gcc-boot-2.95.3.patch"))))
                      (invoke "patch" "--force" "-p1" "-i" patch-file))))
                (add-before 'configure 'setenv
-                 (lambda* (#:key outputs #:allow-other-keys)
-                   (let* ((out (assoc-ref outputs "out"))
-                          (bash (assoc-ref %build-inputs "bash"))
-                          (shell (string-append bash "/bin/bash"))
-                          (tcc (assoc-ref %build-inputs "tcc"))
-                          (cppflags " -D __GLIBC_MINOR__=6"))
+                 (lambda _
+                   (let ((shell (search-input-file %build-inputs "/bin/bash"))
+                         (cppflags " -D __GLIBC_MINOR__=6"))
                      (setenv "CONFIG_SHELL" shell)
                      (setenv "CPPFLAGS" cppflags)
                      (setenv "CC" (string-append "tcc" cppflags))
@@ -1033,7 +1028,9 @@ ac_cv_c_float_format='IEEE (little-endian)'
                    (invoke "touch" "gcc/cpp.info" "gcc/gcc.info")))
                (add-after 'install 'install2
                  (lambda* (#:key outputs #:allow-other-keys)
-                   (let* ((tcc (assoc-ref %build-inputs "tcc"))
+                   (let* ((libtcc1.a (search-input-file %build-inputs
+                                                       "/lib/libtcc1.a"))
+                          (tcc (dirname (dirname libtcc1.a)))
                           (tcc-lib (string-append tcc "/lib/x86-mes-gcc"))
                           (out (assoc-ref outputs "out"))
                           (gcc-dir (string-append
