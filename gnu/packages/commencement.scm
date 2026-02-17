@@ -362,7 +362,7 @@ pure Scheme to Tar and decompression in one easy step.")
       (supported-systems '("i686-linux" "x86_64-linux"
                            "aarch64-linux"
                            "riscv64-linux"))
-      (native-inputs (%boot-gash-inputs))
+      (native-inputs (map cadr (%boot-gash-inputs)))
       (build-system trivial-build-system)
       (arguments
        (list
@@ -373,8 +373,8 @@ pure Scheme to Tar and decompression in one easy step.")
             (use-modules (guix build utils))
             (let* ((source #$(package-source this-package))
                    (tar #$(this-package-native-input "bootar"))
-                   (bash #$(this-package-native-input "bash"))
-                   (coreutils #$(this-package-native-input "coreutils"))
+                   (bash #$(this-package-native-input "gash-boot"))
+                   (coreutils #$(this-package-native-input "gash-utils-boot"))
                    (guile #$(this-package-input "guile"))
                    (out #$output)
                    (bindir (string-append out "/bin"))
