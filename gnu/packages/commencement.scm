@@ -925,19 +925,19 @@ MesCC-Tools), and finally M2-Planet.")
            #~(let ((cppflags (string-append
                               " -D __GLIBC_MINOR__=6"
                               " -D MES_BOOTSTRAP=1"))
-                   (bash (assoc-ref %build-inputs "bash")))
-               `(,(string-append "CONFIG_SHELL=" bash "/bin/sh")
-                 ,(string-append "CPPFLAGS=" cppflags)
-                 "AR=tcc -ar"
-                 "CXX=false"
-                 "RANLIB=true"
-                 ,(string-append "CC=tcc" cppflags)
-                 "--disable-nls"
-                 "--disable-shared"
-                 "--disable-werror"
-                 "--build=i686-unknown-linux-gnu"
-                 "--host=i686-unknown-linux-gnu"
-                 "--with-sysroot=/"))))))
+                   (bash (search-input-file %build-inputs "/bin/sh")))
+               (list (string-append "CONFIG_SHELL=" bash)
+                     (string-append "CPPFLAGS=" cppflags)
+                     "AR=tcc -ar"
+                     "CXX=false"
+                     "RANLIB=true"
+                     (string-append "CC=tcc" cppflags)
+                     "--disable-nls"
+                     "--disable-shared"
+                     "--disable-werror"
+                     "--build=i686-unknown-linux-gnu"
+                     "--host=i686-unknown-linux-gnu"
+                     "--with-sysroot=/"))))))
 
 (define gcc-core-mesboot0
   ;; Gcc-2.95.3 is the most recent GCC that is supported by what the Mes C
