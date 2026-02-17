@@ -1510,17 +1510,18 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (propagated-inputs '())
     (native-inputs (%boot-mesboot2-inputs))
     (arguments
-     `(#:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-       #:parallel-build? #f
-       ;; checking for grep that handles long lines and -e...
-       ;; configure: error: no acceptable grep could be found
-       #:configure-flags '("ac_cv_path_GREP=grep")
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'check
-           (lambda _
-             (invoke "./hello"))))))))
+     (list
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:parallel-build? #f
+      ;; checking for grep that handles long lines and -e...
+      ;; configure: error: no acceptable grep could be found
+      #:configure-flags #~(list "ac_cv_path_GREP=grep")
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda _
+              (invoke "./hello"))))))))
 
 (define binutils-mesboot
   (package
