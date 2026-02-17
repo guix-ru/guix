@@ -245,7 +245,7 @@ pure Scheme to Tar and decompression in one easy step.")
            #~(modify-phases %standard-phases
                (add-after 'unpack 'set-load-path
                  (lambda* (#:key inputs #:allow-other-keys)
-                   (let ((gash (assoc-ref inputs "gash")))
+                   (let ((gash (assoc-ref inputs "gash-boot")))
                      (add-to-load-path (string-append gash
                                                       "/share/guile/site/"
                                                       (effective-version))))))
@@ -300,7 +300,7 @@ pure Scheme to Tar and decompression in one easy step.")
                           (godir (string-append out "/lib/guile/"
                                                 (effective-version)
                                                 "/site-ccache"))
-                          (gash (assoc-ref inputs "gash"))
+                          (gash (assoc-ref inputs "gash-boot"))
                           (gash-moddir (string-append gash
                                                       "/share/guile/site/"
                                                       (effective-version)))
@@ -336,9 +336,8 @@ pure Scheme to Tar and decompression in one easy step.")
                          (display "echo \"$@\"")
                          (newline)))
                      (chmod (string-append out "/bin/echo") #o755)))))))
-    (inputs `(("gash" ,gash-boot)
-              ("guile" ,%bootstrap-guile)))
-    (native-inputs `(("bootar" ,bootar)))))
+    (inputs (list gash-boot %bootstrap-guile))
+    (native-inputs (list bootar))))
 
 (define (%boot-gash-inputs)
   `(("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
