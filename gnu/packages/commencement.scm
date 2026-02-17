@@ -1263,20 +1263,19 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (inputs '())
     (propagated-inputs '())
     (arguments
-     `(#:implicit-inputs? #f
-       #:parallel-build? #f
-       #:guile ,%bootstrap-guile
-       #:configure-flags '("LIBS=-lc -lnss_files -lnss_dns -lresolv")
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'check
-           (lambda _
-             (invoke "./make" "--version")))
-         (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (bin (string-append out "/bin")))
-               (install-file "make" bin)))))))))
+     (list
+      #:implicit-inputs? #f
+      #:parallel-build? #f
+      #:guile %bootstrap-guile
+      #:configure-flags #~(list "LIBS=-lc -lnss_files -lnss_dns -lresolv")
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda _
+              (invoke "./make" "--version")))
+          (replace 'install
+            (lambda _
+              (install-file "make" (string-append #$output "/bin")))))))))
 
 (define (%boot-mesboot1-inputs)
   `(("binutils" ,binutils-mesboot1)
