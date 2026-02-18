@@ -4110,6 +4110,23 @@ else expression.")
 string conversion.")
     (license license:asl2.0)))
 
+(define-public ocaml-ppx-sexp-value
+  (package
+    (name "ocaml5-ppx-sexp-value")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_sexp_value" version
+      "1cpp6wmkdadpdlbh0imapzs0qjn5p9cd78y35b9wvyj8s4n87pkz"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-here ocaml-ppx-sexp-conv
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_sexp_value")))
+    (home-page "https://github.com/janestreet/ppx_sexp_value")
+    (synopsis "Simplify building s-expressions from ocaml values")
+    (description "@samp{ppx-sexp-value} is a ppx rewriter that simplifies
+building s-expressions from ocaml values.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
