@@ -1558,18 +1558,9 @@ ac_cv_c_float_format='IEEE (little-endian)'
                 (symlink "gawk" (string-append bin "/awk"))))))))))
 
 (define (%boot-mesboot3-inputs)
-  `(("binutils" ,binutils-mesboot)
-    ("gawk" ,gawk-mesboot)
-    ("gcc" ,gcc-mesboot1)
-    ("make" ,gnu-make-mesboot)
-    ("kernel-headers" ,%bootstrap-linux-libre-headers)
-    ("libc" ,glibc-mesboot0)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* binutils-mesboot
+         gawk-mesboot
+         (delete binutils-mesboot1 (%boot-mesboot2-inputs))))
 
 (define glibc-headers-mesboot
   (package
@@ -1588,7 +1579,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                 (base32
                  "0vlz4x6cgz7h54qq4528q526qlhnsjzbsvgc4iizn76cb0bfanx7")))))
     (native-inputs (cons* mesboot-headers
-                          (map cadr (%boot-mesboot3-inputs))))
+                          (%boot-mesboot3-inputs)))
     (arguments
      (substitute-keyword-arguments (package-arguments glibc-mesboot0)
        ((#:configure-flags configure-flags)
@@ -1681,7 +1672,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (inherit glibc-headers-mesboot)
     (name "glibc-mesboot")
     (native-inputs (cons* glibc-headers-mesboot
-                          (map cadr (%boot-mesboot3-inputs))))
+                          (%boot-mesboot3-inputs)))
     (arguments
      (cons*
       #:validate-runpath? #f ; fails when using --enable-shared
@@ -1713,7 +1704,17 @@ ac_cv_c_float_format='IEEE (little-endian)'
 
 (define (%boot-mesboot4-inputs)
   `(("libc" ,glibc-mesboot)
-    ,@(alist-delete "libc" (%boot-mesboot3-inputs))))
+    ("binutils" ,binutils-mesboot)
+    ("gawk" ,gawk-mesboot)
+    ("gcc" ,gcc-mesboot1)
+    ("make" ,gnu-make-mesboot)
+    ("kernel-headers" ,%bootstrap-linux-libre-headers)
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define gcc-mesboot1-wrapper
   ;; We need this so gcc-mesboot1 can be used to create shared binaries that
