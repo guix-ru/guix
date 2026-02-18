@@ -3934,6 +3934,27 @@ conversion functions between almost identical types.")
 operators @code{|>} and @code{|!}.")
     (license license:expat)))
 
+(define-public ocaml-fieldslib
+  (package
+    (name "ocaml5-fieldslib")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "fieldslib" version
+      "09ba8z37ipyhb3mmhgf1pq4icviyi677dljr9rc3d1m0ckgxryb5"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "fieldslib")))
+    (home-page "https://github.com/janestreet/fieldslib")
+    (synopsis "Syntax extension for operations on record fields")
+    (description
+     "Syntax extension to define first class values representing
+record fields, to get and set record fields, iterate and fold over all fields
+of a record and create new record values.  In recent releases the
+functionality has moved into ocaml-base, leaving this package as a
+compatibility shim.")
+    (license license:expat)))
+
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
