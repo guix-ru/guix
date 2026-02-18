@@ -1948,8 +1948,8 @@ exec " gcc-bin "/" program
            '(#:configure-flags)
            (package-arguments pkg))))
       (native-inputs
-       `(("sed" ,sed-mesboot)
-         ,@(package-native-inputs pkg))))))
+       (modify-inputs (package-native-inputs pkg)
+         (prepend sed-mesboot))))))
 
 ;; The XZ implementation in Bootar cannot decompress 'tar'.
 (define xz-mesboot
