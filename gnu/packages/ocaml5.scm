@@ -4175,6 +4175,26 @@ protocol is also heavily optimized for size, making it ideal for long-term
 storage of large amounts of data.")
     (license license:expat)))
 
+(define-public ocaml-ppx-bin-prot
+  (package
+    (name "ocaml5-ppx-bin-prot")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_bin_prot" version
+      "03pf85zs4mabcs56gf3ib70ldz9rxlz4bfygcr6348cy113nsczm"))
+    (build-system dune-build-system)
+    (arguments
+     ;; Cyclic dependency with ocaml-ppx-jane
+     `(#:tests? #f))
+    (propagated-inputs (list ocaml-base ocaml-bin-prot ocaml-ppx-here
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_bin_prot")))
+    (home-page "https://github.com/janestreet/ppx_bin_prot")
+    (synopsis "Generation of bin_prot readers and writers from types")
+    (description "This PPX generates binary serialization and deserialization
+functions from type definitions.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
