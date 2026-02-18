@@ -1935,8 +1935,8 @@ exec " gcc-bin "/" program
     (package
       (inherit pkg)
       (native-inputs
-       `(("sed" ,sed-mesboot)
-         ,@(package-native-inputs pkg))))))
+       (modify-inputs (package-native-inputs pkg)
+         (prepend sed-mesboot))))))
 
 (define grep-mesboot
   (let ((pkg (mesboot-package "grep-mesboot" grep)))
