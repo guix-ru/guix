@@ -4043,6 +4043,24 @@ and set record fields, iterate and fold over all fields of a record and create
 new record values.")
     (license license:expat)))
 
+(define-public ocaml-ppx-variants-conv
+  (package
+    (name "ocaml5-ppx-variants-conv")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_variants_conv" version
+      "1xbml7df11n0fswlp1n12v6irqyd49d3wqbsbcz37b5vvdg6rzz2"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-variantslib ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_variants_conv")))
+    (home-page "https://github.com/janestreet/ppx_variants_conv")
+    (synopsis
+     "Generation of accessor and iteration functions for OCaml variant types")
+    (description
+     "This package generates accessors and iteration functions for OCaml
+variant types.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
