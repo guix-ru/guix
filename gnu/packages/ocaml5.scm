@@ -4147,6 +4147,34 @@ debugging messages, where one needs to construct an S-expression based on
 various element of the context such as function arguments.")
     (license license:expat)))
 
+(define-public ocaml-bin-prot
+  (package
+    (name "ocaml5-bin-prot")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "bin_prot" version
+      "1f3a2a3fwiy2c8cydza9nkjry979dh58j2zk2g6qiybf4zq8l1z5"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base
+                             ocaml-ppx-compare
+                             ocaml-ppx-custom-printf
+                             ocaml-ppx-fields-conv
+                             ocaml-ppx-optcomp
+                             ocaml-ppx-sexp-conv
+                             ocaml-ppx-stable-witness
+                             ocaml-ppx-variants-conv))
+    (properties `((upstream-name . "bin_prot")))
+    (home-page "https://github.com/janestreet/bin_prot")
+    (synopsis "Binary protocol generator")
+    (description
+     "This library contains functionality for reading and writing
+OCaml-values in a type-safe binary protocol.  It is extremely efficient,
+typically supporting type-safe marshalling and unmarshalling of even highly
+structured values at speeds sufficient to saturate a gigabit connection.  The
+protocol is also heavily optimized for size, making it ideal for long-term
+storage of large amounts of data.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
