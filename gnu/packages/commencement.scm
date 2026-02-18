@@ -1703,18 +1703,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                    (copy-recursively kernel-headers #$output)))))))))))
 
 (define (%boot-mesboot4-inputs)
-  `(("libc" ,glibc-mesboot)
-    ("binutils" ,binutils-mesboot)
-    ("gawk" ,gawk-mesboot)
-    ("gcc" ,gcc-mesboot1)
-    ("make" ,gnu-make-mesboot)
-    ("kernel-headers" ,%bootstrap-linux-libre-headers)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* glibc-mesboot (delete glibc-mesboot0 (%boot-mesboot3-inputs))))
 
 (define gcc-mesboot1-wrapper
   ;; We need this so gcc-mesboot1 can be used to create shared binaries that
@@ -1781,7 +1770,7 @@ exec " gcc-bin "/" program
     (native-inputs
      (cons* gcc-mesboot1-wrapper
             glibc-headers-mesboot
-            (map cadr (%boot-mesboot4-inputs))))
+            (%boot-mesboot4-inputs)))
     (arguments
      (cons*
       #:validate-runpath? #f
@@ -1878,7 +1867,17 @@ exec " gcc-bin "/" program
 (define (%boot-mesboot5-inputs)
   `(("gcc-wrapper" ,gcc-mesboot-wrapper)
     ("gcc" ,gcc-mesboot)
-    ,@(fold alist-delete (%boot-mesboot4-inputs) '("gcc" "gcc-wrapper"))))
+    ("libc" ,glibc-mesboot)
+    ("binutils" ,binutils-mesboot)
+    ("gawk" ,gawk-mesboot)
+    ("make" ,gnu-make-mesboot)
+    ("kernel-headers" ,%bootstrap-linux-libre-headers)
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
+    ("coreutils" , gash-utils-boot)
+    ("bootar" ,bootar)
+    ("guile" ,%bootstrap-guile)))
 
 (define (mesboot-package name pkg)
   (package
