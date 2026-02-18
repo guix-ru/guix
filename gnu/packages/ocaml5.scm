@@ -3901,6 +3901,22 @@ fields are not in scope.")
      "Typerep is a library for representing OCaml types at runtime.")
     (license license:expat)))
 
+(define-public ocaml-ppx-stable
+  (package
+    (name "ocaml5-ppx-stable")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_stable" version
+      "1q9j217dfpshyb9r1is851w8rj30zs6g24z5ivdbqx4fai2j0l49"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_stable")))
+    (home-page "https://github.com/janestreet/ppx_stable")
+    (synopsis "Stable types conversions generator")
+    (description "This package is a ppx extension for easier implementation of
+conversion functions between almost identical types.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
