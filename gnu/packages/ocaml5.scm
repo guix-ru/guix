@@ -4061,6 +4061,22 @@ new record values.")
 variant types.")
     (license license:expat)))
 
+(define-public ocaml-ppx-typerep-conv
+  (package
+    (name "ocaml5-ppx-typerep-conv")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_typerep_conv" version
+      "05vqvpjzx34427qsnqmrcgs6d2688i14m50268xkgakgzvd8n6mg"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-typerep ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_typerep_conv")))
+    (home-page "https://github.com/janestreet/ppx_typerep_conv")
+    (synopsis "Generation of runtime types from type definitions")
+    (description "This package can automatically generate runtime types
+from type definitions.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
