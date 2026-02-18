@@ -4127,6 +4127,26 @@ string conversion.")
 building s-expressions from ocaml values.")
     (license license:expat)))
 
+(define-public ocaml-ppx-sexp-message
+  (package
+    (name "ocaml5-ppx-sexp-message")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_sexp_message" version
+      "1q2di8vb0145xnxxf0qvjdrkiq32724j2wksm3imr06lqjz17n28"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-here ocaml-ppx-sexp-conv
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_sexp_message")))
+    (home-page "https://github.com/janestreet/ppx_sexp_message")
+    (synopsis "PPX rewriter for easy construction of s-expressions")
+    (description
+     "Ppx_sexp_message aims to ease the creation of canonical
+S-expressions in OCaml.  This is mainly motivated by writing error and
+debugging messages, where one needs to construct an S-expression based on
+various element of the context such as function arguments.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
