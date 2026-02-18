@@ -3917,6 +3917,23 @@ fields are not in scope.")
 conversion functions between almost identical types.")
     (license license:expat)))
 
+(define-public ocaml-ppx-pipebang
+  (package
+    (name "ocaml5-ppx-pipebang")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_pipebang" version
+      "14yz95fzw8l4lkzmiphksnw73h8hhd3wk1slgn8971a26g7va5hq"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_pipebang")))
+    (home-page "https://github.com/janestreet/ppx_pipebang")
+    (synopsis "Inline reverse application operators `|>` and `|!`")
+    (description
+     "This package provides a ppx rewriter that inlines reverse application
+operators @code{|>} and @code{|!}.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
