@@ -3972,6 +3972,23 @@ the functionality has moved into ocaml-base, leaving this package as a
 compatibility shim.")
     (license license:expat)))
 
+(define-public ocaml-ppx-fixed-literal
+  (package
+    (name "ocaml5-ppx-fixed-literal")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_fixed_literal" version
+      "1iffidvi815nkyfyf5999h5gj45f5cvz81vsf2dyxzshysv9pbsy"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_fixed_literal")))
+    (home-page "https://github.com/janestreet/ppx_fixed_literal")
+    (synopsis "Simpler notation for fixed point literals")
+    (description
+     "@samp{ppx-fixed-literal} is a ppx rewriter that rewrites fixed point
+literal of the  form 1.0v to conversion functions currently in scope.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
