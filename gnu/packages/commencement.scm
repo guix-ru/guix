@@ -1972,9 +1972,8 @@ exec " gcc-bin "/" program
     (package
       (inherit pkg)
       (native-inputs
-       `(("xz" ,xz-mesboot)
-         ("sed" ,sed-mesboot)
-         ,@(package-native-inputs pkg)))
+       (modify-inputs (package-native-inputs pkg)
+         (prepend xz-mesboot sed-mesboot)))
       (arguments (substitute-keyword-arguments (package-arguments pkg)
                    ((#:configure-flags flags #~(list))
                     #~(cons "--disable-year2038" #$flags)))))))
