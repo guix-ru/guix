@@ -4006,6 +4006,23 @@ literal of the  form 1.0v to conversion functions currently in scope.")
 @code{@@warning \"-20-26-32-33-34-35-36-37-38-39-60-66-67\"}.")
     (license license:expat)))
 
+(define-public ocaml-ppx-ignore-instrumentation
+  (package
+    (name "ocaml5-ppx-ignore-instrumentation")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_ignore_instrumentation" version
+      "1v2prvv8s20xfc91jc0gwn0z2n7cragsfdd0cysb7c4zfbqnjxzg"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_ignore_instrumentation")))
+    (home-page "https://github.com/janestreet/ppx_ignore_instrumentation")
+    (synopsis "Ignore Jane Street specific instrumentation extensions")
+    (description
+     "Ignore Jane Street specific instrumentation extensions from internal
+PPXs or compiler features not yet upstreamed.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
