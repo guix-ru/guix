@@ -3954,6 +3954,23 @@ functionality has moved into ocaml-base, leaving this package as a
 compatibility shim.")
     (license license:expat)))
 
+(define-public ocaml-variantslib
+  (package
+    (name "ocaml5-variantslib")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "variantslib" version
+      "1prfwpmj544lvsx5sgxc3l690y8f09imlyxk0xn52hnfqgbppymz"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "variantslib")))
+    (home-page "https://github.com/janestreet/variantslib")
+    (synopsis "Represents OCaml variants as first class values")
+    (description
+     "This library represents variants as first class values.  In recent releases
+the functionality has moved into ocaml-base, leaving this package as a
+compatibility shim.")
+    (license license:expat)))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
