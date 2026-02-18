@@ -4077,6 +4077,23 @@ variant types.")
 from type definitions.")
     (license license:expat)))
 
+(define-public ocaml-ppx-optional
+  (package
+    (name "ocaml5-ppx-optional")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_optional" version
+      "00gprmppf1w875r4r3bq9hfx333rarsnyxk1rmym66x53v73cz28"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib ocaml-ppxlib-jane))
+    (properties `((upstream-name . "ppx_optional")))
+    (home-page "https://github.com/janestreet/ppx_optional")
+    (synopsis "Pattern matching on flat options")
+    (description
+     "A ppx rewriter that rewrites simple match statements with an if then
+else expression.")
+    (license license:asl2.0)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
