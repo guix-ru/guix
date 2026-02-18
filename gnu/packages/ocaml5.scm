@@ -3867,6 +3867,25 @@ serialization format will never change.  This allows programs running at
 different versions of the code to safely communicate.")
     (license license:expat)))
 
+(define-public ocaml-ppx-tydi
+  (package
+    (name "ocaml5-ppx-tydi")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_tydi" version
+      "00q8yq74dgkw0wyljjnqday5vzkrzykyza4ady5b33r3hnxp0ikn"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_tydi")))
+    (home-page "https://github.com/janestreet/ppx_tydi")
+    (synopsis "PPX syntax for inferring a pattern type from an expression")
+    (description
+     "Provides a PPX for [let%tydi]: type-directed [let] bindings.  In
+[let%tydi a = b in ...], [a]'s type is inferred from [b] rather than
+the other way around.  This is convenient for record patterns whose
+fields are not in scope.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
