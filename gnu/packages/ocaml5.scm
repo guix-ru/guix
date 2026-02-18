@@ -4094,6 +4094,22 @@ from type definitions.")
 else expression.")
     (license license:asl2.0)))
 
+(define-public ocaml-ppx-custom-printf
+  (package
+    (name "ocaml5-ppx-custom-printf")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ppx_custom_printf")
+    (source
+     (janestreet-git-origin "ppx_custom_printf" version
+      "17kaghmdfsmwh0br0m7v9b31lcfk1psq034ajnh2l508sdph6n0c"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-sexp-conv ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_custom_printf")))
+    (synopsis "Printf-style format-strings for user-defined string conversion")
+    (description "Extensions to printf-style format-strings for user-defined
+string conversion.")
+    (license license:asl2.0)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
