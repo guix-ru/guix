@@ -3848,6 +3848,25 @@ mobile platforms.  Code can be developed on a normal OS and then compiled into
 a fully-standalone, specialised unikernel.")
     (license license:isc)))
 
+(define-public ocaml-ppx-stable-witness
+  (package
+    (name "ocaml5-ppx-stable-witness")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_stable_witness" version
+      "07af14w3xh9vy57gh31nrxaq9pg753jhlx4fwwi1ngccyd3nx3lk"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_stable_witness")))
+    (home-page "https://github.com/janestreet/ppx_stable_witness")
+    (synopsis "Marks a type as stable across versions")
+    (description
+     "This ppx extension is used for deriving a witness that a
+type is intended to be stable.  In this context, stable means that the
+serialization format will never change.  This allows programs running at
+different versions of the code to safely communicate.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
