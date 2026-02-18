@@ -3989,6 +3989,23 @@ compatibility shim.")
 literal of the  form 1.0v to conversion functions currently in scope.")
     (license license:expat)))
 
+(define-public ocaml-ppx-disable-unused-warnings
+  (package
+    (name "ocaml5-ppx-disable-unused-warnings")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_disable_unused_warnings" version
+      "0rcnknb6547n9z5akb05diklkzd71yfrgz5p12qlxynlynwqhx98"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_disable_unused_warnings")))
+    (home-page "https://github.com/janestreet/ppx_disable_unused_warnings")
+    (synopsis "Simple ppx extension for commonly unused warnings")
+    (description
+     "This package expands @code{@@disable_unused_warnings} into
+@code{@@warning \"-20-26-32-33-34-35-36-37-38-39-60-66-67\"}.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
