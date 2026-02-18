@@ -1778,81 +1778,88 @@ exec " gcc-bin "/" program
     (name "gcc-mesboot")
     (version (package-version gcc-4.9))
     (source (bootstrap-origin (package-source gcc-4.9)))
-    (native-inputs `(("gcc-wrapper" ,gcc-mesboot1-wrapper)
-                     ("headers" ,glibc-headers-mesboot)
-                     ,@(%boot-mesboot4-inputs)))
+    (native-inputs
+     (cons* gcc-mesboot1-wrapper
+            glibc-headers-mesboot
+            (map cadr (%boot-mesboot4-inputs))))
     (arguments
-     `(#:validate-runpath? #f
-       ,@(substitute-keyword-arguments (package-arguments gcc-mesboot1)
-           ((#:configure-flags configure-flags)
-            #~(let ((out (assoc-ref %outputs "out"))
-                    (glibc (assoc-ref %build-inputs "libc")))
-                (list (string-append "--prefix=" out)
-                      "--build=i686-unknown-linux-gnu"
-                      "--host=i686-unknown-linux-gnu"
+     (cons*
+      #:validate-runpath? #f
+      (substitute-keyword-arguments (package-arguments gcc-mesboot1)
+        ((#:configure-flags configure-flags)
+         #~(let* ((libc.a   (search-input-file %build-inputs "/lib/libc.a"))
+                  (glibc     (dirname (dirname libc.a))))
+             (list (string-append "--prefix=" #$output)
+                   "--build=i686-unknown-linux-gnu"
+                   "--host=i686-unknown-linux-gnu"
 
-                      "--with-host-libstdcxx=-lsupc++"
+                   "--with-host-libstdcxx=-lsupc++"
 
-                      (string-append "--with-native-system-header-dir=" glibc "/include")
-                      (string-append "--with-build-sysroot=" glibc "/include")
+                   (string-append "--with-native-system-header-dir=" glibc "/include")
+                   (string-append "--with-build-sysroot=" glibc "/include")
 
-                      "--disable-bootstrap"
-                      "--disable-decimal-float"
-                      "--disable-libatomic"
-                      "--disable-libcilkrts"
-                      "--disable-libgomp"
-                      "--disable-libitm"
-                      "--disable-libmudflap"
-                      "--disable-libquadmath"
-                      "--disable-libsanitizer"
-                      "--disable-libssp"
-                      "--disable-libvtv"
-                      "--disable-lto"
-                      "--disable-lto-plugin"
-                      "--disable-multilib"
-                      "--disable-plugin"
-                      "--disable-threads"
-                      "--enable-languages=c,c++"
+                   "--disable-bootstrap"
+                   "--disable-decimal-float"
+                   "--disable-libatomic"
+                   "--disable-libcilkrts"
+                   "--disable-libgomp"
+                   "--disable-libitm"
+                   "--disable-libmudflap"
+                   "--disable-libquadmath"
+                   "--disable-libsanitizer"
+                   "--disable-libssp"
+                   "--disable-libvtv"
+                   "--disable-lto"
+                   "--disable-lto-plugin"
+                   "--disable-multilib"
+                   "--disable-plugin"
+                   "--disable-threads"
+                   "--enable-languages=c,c++"
 
-                      "--enable-static"
-                      "--enable-shared"
-                      "--enable-threads=single"
+                   "--enable-static"
+                   "--enable-shared"
+                   "--enable-threads=single"
 
-                      ;; No pre-compiled libstdc++ headers, to save space.
-                      "--disable-libstdcxx-pch"
+                   ;; No pre-compiled libstdc++ headers, to save space.
+                   "--disable-libstdcxx-pch"
 
-                      ;; for libcpp ...
-                      "--disable-build-with-cxx")))
-           ((#:phases phases)
-            #~(modify-phases #$phases
-                (delete 'apply-boot-patch)
-                (delete 'relocate-gcc-g++) ; sadly, gcc-4.9.4 does not provide
-                                           ; modular core/language downloads
-                (replace 'setenv
-                  (lambda* (#:key outputs #:allow-other-keys)
-                    (let* ((out (assoc-ref outputs "out"))
-                           (binutils (assoc-ref %build-inputs "binutils"))
-                           (bash (assoc-ref %build-inputs "bash"))
-                           (gcc (assoc-ref %build-inputs "gcc"))
-                           (glibc (assoc-ref %build-inputs "libc"))
-                           (kernel-headers (assoc-ref %build-inputs "kernel-headers")))
-                      (setenv "CONFIG_SHELL" (string-append bash "/bin/sh"))
-                      (setenv "C_INCLUDE_PATH" (string-append
-                                                gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
-                                                ":" kernel-headers "/include"
-                                                ":" glibc "/include"
-                                                ":" (getcwd) "/mpfr/src"))
-                      (setenv "CPLUS_INCLUDE_PATH" (string-append
-                                                    gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
-                                                    ":" kernel-headers "/include"
-                                                    ":" glibc "/include"
-                                                    ":" (getcwd) "/mpfr/src"))
-                      (setenv "LIBRARY_PATH" (string-append glibc "/lib"
-                                                            ":" gcc "/lib"))
-                      (format (current-error-port) "C_INCLUDE_PATH=~a\n" (getenv "C_INCLUDE_PATH"))
-                      (format (current-error-port) "CPLUS_INCLUDE_PATH=~a\n" (getenv "CPLUS_INCLUDE_PATH"))
-                      (format (current-error-port) "LIBRARY_PATH=~a\n"
-                              (getenv "LIBRARY_PATH"))))))))))))
+                   ;; for libcpp ...
+                   "--disable-build-with-cxx")))
+        ((#:phases phases)
+         #~(modify-phases #$phases
+             (delete 'apply-boot-patch)
+             (delete 'relocate-gcc-g++) ; sadly, gcc-4.9.4 does not provide
+                                        ; modular core/language downloads
+             (replace 'setenv
+               (lambda* (#:key inputs #:allow-other-keys)
+                 (let* ((bin-gcc  (search-input-file inputs "bin/gcc"))
+                        (gcc      (dirname (dirname bin-gcc)))
+                        (libc.a   (search-input-file inputs "/lib/libc.a"))
+                        (glibc    (dirname (dirname libc.a)))
+                        (ioctl.h (search-input-file %build-inputs
+                                                    "/include/asm/ioctl.h"))
+                        (kernel-headers (dirname (dirname (dirname ioctl.h)))))
+                   (setenv "CONFIG_SHELL" (search-input-file inputs "bin/sh"))
+                   (setenv "C_INCLUDE_PATH"
+                           (string-append
+                            gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
+                            ":" kernel-headers "/include"
+                            ":" glibc "/include"
+                            ":" (getcwd) "/mpfr/src"))
+                   (setenv "CPLUS_INCLUDE_PATH"
+                           (string-append
+                            gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
+                            ":" kernel-headers "/include"
+                            ":" glibc "/include"
+                            ":" (getcwd) "/mpfr/src"))
+                   (setenv "LIBRARY_PATH"
+                           (string-append glibc "/lib" ":" gcc "/lib"))
+                   (format (current-error-port) "C_INCLUDE_PATH=~a\n"
+                           (getenv "C_INCLUDE_PATH"))
+                   (format (current-error-port) "CPLUS_INCLUDE_PATH=~a\n"
+                           (getenv "CPLUS_INCLUDE_PATH"))
+                   (format (current-error-port) "LIBRARY_PATH=~a\n"
+                           (getenv "LIBRARY_PATH"))))))))))))
 
 (define gcc-mesboot-wrapper
   ;; We need this so gcc-mesboot can be used to create shared binaries that
