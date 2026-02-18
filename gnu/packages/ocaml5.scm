@@ -4195,6 +4195,22 @@ storage of large amounts of data.")
 functions from type definitions.")
     (license license:expat)))
 
+(define-public ocaml-capitalization
+  (package
+    (name "ocaml5-capitalization")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "capitalization" version
+      "0af3smzisx4prk96vq5rqikspmxzb1ai5gibhl8fa5wpwhxi5by2"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-base))
+    (home-page "https://github.com/janestreet/capitalization")
+    (synopsis "Defines case conventions and functions to rename identifiers")
+    (description
+     "This package defines case conventions and functions to rename identifiers
+according to them.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
