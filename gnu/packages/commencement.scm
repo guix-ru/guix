@@ -1859,10 +1859,10 @@ exec " gcc-bin "/" program
     (version (package-version gcc-mesboot))
     (source #f)
     (inputs '())
-    (native-inputs `(("bash" ,gash-boot)
-                     ("coreutils" ,gash-utils-boot)
-                     ("libc" ,glibc-mesboot)
-                     ("gcc" ,gcc-mesboot)))))
+    (native-inputs (list gash-boot
+                         gash-utils-boot
+                         glibc-mesboot
+                         gcc-mesboot))))
 
 (define (%boot-mesboot5-inputs)
   `(("gcc-wrapper" ,gcc-mesboot-wrapper)
