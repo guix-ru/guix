@@ -1680,34 +1680,36 @@ ac_cv_c_float_format='IEEE (little-endian)'
   (package
     (inherit glibc-headers-mesboot)
     (name "glibc-mesboot")
-    (native-inputs `(("headers" ,glibc-headers-mesboot)
-                     ,@(%boot-mesboot3-inputs)))
+    (native-inputs (cons* glibc-headers-mesboot
+                          (map cadr (%boot-mesboot3-inputs))))
     (arguments
-     `(#:validate-runpath? #f ; fails when using --enable-shared
-       ,@(substitute-keyword-arguments (package-arguments glibc-headers-mesboot)
-           ((#:make-flags make-flags)
-            #~(let ((bash (assoc-ref %build-inputs "bash")))
-                (list (string-append "SHELL=" bash "/bin/sh"))))
-           ((#:phases phases)
-            #~(modify-phases #$phases
-                (add-after 'unpack 'simplify-intl-tests
-                  (lambda _
-                    ;; The bootstrap Guile (2.0.9) crashes trying to
-                    ;; perform a regex on non-ASCII text.  This gets
-                    ;; triggered by 'intl/po2test.sed' running over
-                    ;; 'po/de.po'.  If we ever remove the bootstrap
-                    ;; Guile or add pure-Scheme regex to Gash, this can
-                    ;; be removed.
-                    (substitute* '("catgets/Makefile"
-                                   "intl/Makefile")
-                      (("de\\.po") "en_GB.po"))))
-                (replace 'install
-                  (lambda* (#:key outputs make-flags #:allow-other-keys)
-                    (let* ((kernel-headers (assoc-ref %build-inputs "kernel-headers"))
-                           (out (assoc-ref outputs "out"))
-                           (install-flags (cons "install" make-flags)))
-                      (apply invoke "make" install-flags)
-                      (copy-recursively kernel-headers out)))))))))))
+     (cons*
+      #:validate-runpath? #f ; fails when using --enable-shared
+      (substitute-keyword-arguments (package-arguments glibc-headers-mesboot)
+        ((#:make-flags make-flags)
+         #~(let ((bash (search-input-file %build-inputs "/bin/sh")))
+             (list (string-append "SHELL=" bash))))
+        ((#:phases phases)
+         #~(modify-phases #$phases
+             (add-after 'unpack 'simplify-intl-tests
+               (lambda _
+                 ;; The bootstrap Guile (2.0.9) crashes trying to
+                 ;; perform a regex on non-ASCII text.  This gets
+                 ;; triggered by 'intl/po2test.sed' running over
+                 ;; 'po/de.po'.  If we ever remove the bootstrap
+                 ;; Guile or add pure-Scheme regex to Gash, this can
+                 ;; be removed.
+                 (substitute* '("catgets/Makefile"
+                                "intl/Makefile")
+                   (("de\\.po") "en_GB.po"))))
+             (replace 'install
+               (lambda* (#:key make-flags #:allow-other-keys)
+                 (let* ((ioctl.h (search-input-file %build-inputs
+                                                    "/include/asm/ioctl.h"))
+                        (kernel-headers (dirname (dirname (dirname ioctl.h))))
+                        (install-flags (cons "install" make-flags)))
+                   (apply invoke "make" install-flags)
+                   (copy-recursively kernel-headers #$output)))))))))))
 
 (define (%boot-mesboot4-inputs)
   `(("libc" ,glibc-mesboot)
