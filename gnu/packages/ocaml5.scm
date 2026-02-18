@@ -3886,6 +3886,21 @@ the other way around.  This is convenient for record patterns whose
 fields are not in scope.")
     (license license:expat)))
 
+(define-public ocaml-typerep
+  (package
+    (name "ocaml5-typerep")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ocaml-typerep" version
+      "0a9d55b13kg14k2nmmr26bkc11y6b4l6yqj0dq0d5iqbpix3f3c7"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base))
+    (home-page "https://github.com/janestreet/typerep")
+    (synopsis "Runtime representations of types")
+    (description
+     "Typerep is a library for representing OCaml types at runtime.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
