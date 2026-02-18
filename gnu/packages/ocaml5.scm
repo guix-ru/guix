@@ -4211,6 +4211,22 @@ functions from type definitions.")
 according to them.")
     (license license:expat)))
 
+(define-public ocaml-ppx-string
+  (package
+    (name "ocaml5-ppx-string")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_string" version
+      "001f92jh2jf3fp46j9hhkln6mlri11zpz1c811wz83ixmcjjz85m"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-base ocaml-stdio
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_string")))
+    (home-page "https://github.com/janestreet/ppx_string")
+    (synopsis "PPX extension for string interpolation")
+    (description "This extension provides a syntax for string interpolation.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
