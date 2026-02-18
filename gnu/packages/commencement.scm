@@ -1725,53 +1725,52 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (name "gcc-mesboot1-wrapper")
     (source #f)
     (inputs '())
-    (native-inputs `(("bash" ,gash-boot)
-                     ("coreutils" ,gash-utils-boot)
-                     ("libc" ,glibc-mesboot)
-                     ("gcc" ,gcc-mesboot1)))
+    (native-inputs
+     (list gash-boot
+           gash-utils-boot
+           glibc-mesboot
+           gcc-mesboot1))
     (arguments
-     `(#:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-       #:phases
-       (modify-phases %standard-phases
-         (delete 'unpack)
-         (delete 'configure)
-         (delete 'install)
-         (replace 'build
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (bash (assoc-ref %build-inputs "bash"))
-                    (libc (assoc-ref %build-inputs "libc"))
-                    (gcc (assoc-ref %build-inputs "gcc"))
-                    (bin (string-append out "/bin")))
-               (mkdir-p bin)
-               (for-each
-                (lambda (program)
-                  (let ((wrapper (string-append bin "/" program)))
-                    (with-output-to-file wrapper
-                      (lambda _
-                        (display (string-append "#! " bash "/bin/bash
-exec " gcc "/bin/" program
+     (list
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'unpack)
+          (delete 'configure)
+          (delete 'install)
+          (replace 'build
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((bash    (search-input-file inputs "bin/bash"))
+                     (libc.a  (search-input-file inputs "/lib/libc.a"))
+                     (libc    (dirname (dirname libc.a)))
+                     (gcc-bin (dirname (search-input-file inputs "bin/gcc")))
+                     (bin     (string-append #$output "/bin")))
+                (mkdir-p bin)
+                (for-each
+                 (lambda (program)
+                   (let ((wrapper (string-append bin "/" program)))
+                     (with-output-to-file wrapper
+                       (lambda _
+                         (display (string-append "#! " bash "
+exec " gcc-bin "/" program
 " -Wl,--dynamic-linker"
 ;; also for x86_64-linux, we are still on i686-linux
-" -Wl," libc ,(glibc-dynamic-linker "i686-linux")
+" -Wl," libc #$(glibc-dynamic-linker "i686-linux")
 " -Wl,--rpath"
 " -Wl," libc "/lib"
 " \"$@\"
 "))
-                        (chmod wrapper #o555)))))
-                '("cpp"
-                  "gcc"
-                  "g++"
-                  "i686-unknown-linux-gnu-cpp"
-                  "i686-unknown-linux-gnu-gcc"
-                  "i686-unknown-linux-gnu-g++")))))
-         (replace 'check
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (bin (string-append out "/bin"))
-                    (program (string-append bin "/gcc")))
-               (invoke program "--help")))))))))
+                         (chmod wrapper #o555)))))
+                 '("cpp"
+                   "gcc"
+                   "g++"
+                   "i686-unknown-linux-gnu-cpp"
+                   "i686-unknown-linux-gnu-gcc"
+                   "i686-unknown-linux-gnu-g++")))))
+          (replace 'check
+            (lambda* (#:key outputs #:allow-other-keys)
+              (invoke (search-input-file outputs "bin/gcc") "--help"))))))))
 
 (define gcc-mesboot
   (package
