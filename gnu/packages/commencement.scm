@@ -1587,18 +1587,18 @@ ac_cv_c_float_format='IEEE (little-endian)'
                (sha256
                 (base32
                  "0vlz4x6cgz7h54qq4528q526qlhnsjzbsvgc4iizn76cb0bfanx7")))))
-    (native-inputs `(("headers" ,mesboot-headers)
-                     ,@(%boot-mesboot3-inputs)))
+    (native-inputs (cons* mesboot-headers
+                          (map cadr (%boot-mesboot3-inputs))))
     (arguments
      (substitute-keyword-arguments (package-arguments glibc-mesboot0)
        ((#:configure-flags configure-flags)
-        #~(let ((out (assoc-ref %outputs "out"))
-                (headers (assoc-ref %build-inputs "headers")))
+        #~(let ((ioctl.h (search-input-file %build-inputs
+                                            "/include/asm/ioctl.h")))
             (list
-             (string-append "--prefix=" out)
+             (string-append "--prefix=" #$output)
              "--disable-obsolete-rpc"
              "--host=i686-unknown-linux-gnu"
-             (string-append "--with-headers=" headers "/include")
+             (string-append "--with-headers=" (dirname (dirname ioctl.h)))
              "--enable-static-nss"
              "--with-pthread"
              "--without-cvs"
@@ -1619,9 +1619,9 @@ ac_cv_c_float_format='IEEE (little-endian)'
                 (chdir (string-append "glibc-" #$version))))
             (replace 'setenv
               (lambda* (#:key inputs #:allow-other-keys)
-                (let* ((headers  (assoc-ref inputs "headers"))
-                       (libc     (assoc-ref inputs "libc"))
-                       (gcc      (assoc-ref inputs "gcc"))
+                (let* ((libc.a   (search-input-file inputs "/lib/libc.a"))
+                       (libc     (dirname (dirname libc.a)))
+                       (gcc      (search-input-file inputs "/bin/gcc"))
                        (cppflags (string-append
                                   " -I " (getcwd) "/nptl/sysdeps/pthread/bits"
                                   " -D BOOTSTRAP_GLIBC=1"))
@@ -1631,8 +1631,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
                   (setenv "CONFIG_SHELL" (which "sh"))
                   (setenv "SHELL" (which "sh"))
 
-                  (setenv "CPP" (string-append gcc "/bin/gcc -E " cppflags))
-                  (setenv "CC" (string-append gcc "/bin/gcc " cppflags cflags))
+                  (setenv "CPP" (string-append gcc " -E " cppflags))
+                  (setenv "CC" (string-append gcc " " cppflags cflags))
                   (setenv "LD" "gcc")
 
                   ;; avoid -fstack-protector
@@ -1641,10 +1641,11 @@ ac_cv_c_float_format='IEEE (little-endian)'
                     (("/bin/pwd") "pwd")))))
             (replace 'install
               (lambda* (#:key outputs make-flags #:allow-other-keys)
-                (let ((kernel-headers (assoc-ref %build-inputs "kernel-headers"))
-                      (out (assoc-ref outputs "out")))
+                (let* ((ioctl.h (search-input-file %build-inputs
+                                                   "/include/asm/ioctl.h"))
+                       (kernel-headers (dirname (dirname (dirname ioctl.h)))))
                   (apply invoke "make" make-flags)
-                  (copy-recursively kernel-headers out))))
+                  (copy-recursively kernel-headers #$output))))
             (add-before 'configure 'remove-bashism
               (lambda _
                 (substitute* "sysdeps/unix/make-syscalls.sh"
@@ -1658,24 +1659,18 @@ ac_cv_c_float_format='IEEE (little-endian)'
                 (chdir "build")
                 (apply invoke "../configure" configure-flags)))
             (add-after 'configure 'remove-sunrpc
-              (lambda _
-                (let* ((out (assoc-ref %outputs "out"))
-                       (bash (assoc-ref %build-inputs "bash"))
-                       (shell (string-append bash "/bin/bash")))
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((shell (search-input-file inputs "/bin/bash"))
+                      (Makefile (open-file "Makefile" "a")))
+                  (display (string-append "\n\nSHELL := " shell "\n")
+                           Makefile)
+                  (close Makefile)
 
-                  (let ((Makefile (open-file "Makefile" "a")))
-                    (display (string-append "
-
-SHELL := " shell "
-")
-                             Makefile)
-                    (close Makefile))
-                  (substitute* "../Makefile"
-                    (("^SHELL := /bin/sh") (string-append "SHELL := " shell)))
-                  (substitute* "../Makeconfig"
-                    (("^SHELL := /bin/sh") (string-append "SHELL := " shell)))
-                  (substitute* "../elf/Makefile"
-                    (("^SHELL := /bin/sh") (string-append "SHELL := " shell)))
+                  (substitute* (list "../Makefile"
+                                     "../Makeconfig"
+                                     "../elf/Makefile")
+                    (("^SHELL := /bin/sh")
+                     (string-append "SHELL := " shell)))
                   (invoke "make" (string-append (getcwd) "/sysd-sorted" ))
                   (substitute* "sysd-sorted"
                     ((" sunrpc") " ")
