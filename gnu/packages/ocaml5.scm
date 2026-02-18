@@ -4023,6 +4023,26 @@ literal of the  form 1.0v to conversion functions currently in scope.")
 PPXs or compiler features not yet upstreamed.")
     (license license:expat)))
 
+(define-public ocaml-ppx-fields-conv
+  (package
+    (name "ocaml5-ppx-fields-conv")
+    (version "0.17.0")
+    (home-page "https://github.com/janestreet/ppx_fields_conv")
+    (source
+     (janestreet-git-origin "ppx_fields_conv" version
+      "0d1lxqwxyqf3fgg48jpl6fzczllwhq3cyw65dsl9sc49187f23hl"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-fieldslib ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_fields_conv")))
+    (synopsis
+     "Generation of accessor and iteration functions for ocaml records")
+    (description
+     "Ppx_fields_conv is a ppx rewriter that can be used to define
+first class values representing record fields, and additional routines, to get
+and set record fields, iterate and fold over all fields of a record and create
+new record values.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
