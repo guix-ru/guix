@@ -2100,9 +2100,9 @@ exec " gcc-bin "/" program
     (name "findutils-boot0")
     (source (bootstrap-origin (package-source findutils)))
     (inputs
-     `(("make" ,gnu-make-boot0)
-       ("diffutils" ,diffutils-boot0) ; for tests
-       ,@(%bootstrap-inputs+toolchain)))
+     (cons* diffutils-boot0         ; for tests.
+            gnu-make-boot0
+            (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
