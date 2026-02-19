@@ -437,25 +437,22 @@ default values, and with EXTRA-FIELDS set as specified."
      (inherit gnu-make)
      (name "make-test-boot0")
      (arguments
-      `(#:guile ,%bootstrap-guile
-        #:implicit-inputs? #f
-        #:tests? #f                               ;cannot run "make check"
-        ,@(substitute-keyword-arguments (package-arguments gnu-make)
-            ((#:configure-flags flags ''())
-             ;; As in 'gnu-make-boot0', work around a 'config.status' defect.
-             `(cons "--disable-dependency-tracking" ,flags))
-            ((#:phases phases)
-             `(modify-phases ,phases
-                (replace 'build
-                  (lambda _
-                    (invoke "./build.sh")
-                    #t))
-                (replace 'install
-                  (lambda* (#:key outputs #:allow-other-keys)
-                    (let* ((out (assoc-ref outputs "out"))
-                           (bin (string-append out "/bin")))
-                      (install-file "make" bin)
-                      #t))))))))
+      (cons*
+       #:guile %bootstrap-guile
+       #:implicit-inputs? #f
+       #:tests? #f                               ;cannot run "make check"
+       (substitute-keyword-arguments (package-arguments gnu-make)
+         ((#:configure-flags flags ''())
+          ;; As in 'gnu-make-boot0', work around a 'config.status' defect.
+          #~(cons "--disable-dependency-tracking" #$flags))
+         ((#:phases phases)
+          #~(modify-phases #$phases
+              (replace 'build
+                (lambda _
+                  (invoke "./build.sh")))
+              (replace 'install
+                (lambda _
+                  (install-file "make" (string-append #$output "/bin")))))))))
      (native-inputs '())                          ;no need for 'pkg-config'
      (inputs %bootstrap-inputs-for-tests))))
 
