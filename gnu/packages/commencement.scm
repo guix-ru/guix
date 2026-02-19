@@ -2086,8 +2086,8 @@ exec " gcc-bin "/" program
               (patches '())))                 ;patches for tests unneeded here
     (native-inputs `())
     (inputs
-     `(("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+     (cons* gnu-make-boot0
+            (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      `(#:tests? #f                            ; the test suite needs diffutils
        #:guile ,%bootstrap-guile
