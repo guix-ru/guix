@@ -2191,8 +2191,7 @@ exec " gcc-bin "/" program
     (name "patch-boot0")
     (native-inputs '())
     (inputs
-     `(("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+     (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      (list
       #:tests? #f                       ; merge test fails
