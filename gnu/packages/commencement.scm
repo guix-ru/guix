@@ -2845,8 +2845,8 @@ memoized as a function of '%current-system'."
     (inherit texinfo)
     (source (bootstrap-origin (package-source texinfo)))
     (native-inputs '())
-    (inputs `(,@(%boot0-inputs)
-              ("perl" ,perl-boot0)))
+    (inputs (append (map cadr (%boot0-inputs))
+                    (list perl-boot0)))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
