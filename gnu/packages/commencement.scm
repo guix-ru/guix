@@ -2220,15 +2220,14 @@ exec " gcc-bin "/" program
     (name "tar-boot0")
     (source (bootstrap-origin (package-source tar)))
     (native-inputs '())
-    (inputs
-     `(("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+    (inputs (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
-     `(#:implicit-inputs? #f
-       #:tests? #f
-       #:guile ,%bootstrap-guile
-       #:configure-flags (list "--disable-year2038")
-       ,@(package-arguments tar)))))
+     (append
+      (list #:implicit-inputs? #f
+            #:tests? #f
+            #:guile %bootstrap-guile
+            #:configure-flags #~(list "--disable-year2038"))
+      (package-arguments tar)))))
 
 (define (%boot0-inputs)
   `(,@(match (%current-system)
