@@ -2690,12 +2690,11 @@ memoized as a function of '%current-system'."
                      (("echo 2\\.25\\.0") ;binutils
                       "echo 2.20.1")))))))))
     (native-inputs
-     `(("perl" ,perl-boot0)
-
-       ;; Flex and Bison are required since version 4.16.
-       ("flex" ,flex-boot0)
-       ("bison" ,bison-boot0)
-       ,@(%boot0-inputs)))))
+     (cons* perl-boot0
+            ;; Flex and Bison are required since version 4.16.
+            flex-boot0
+            bison-boot0
+            (%boot0-inputs)))))
 
 (define with-boot0
   (package-with-explicit-inputs %boot0-inputs
