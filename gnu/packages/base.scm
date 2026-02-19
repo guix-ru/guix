@@ -616,20 +616,21 @@ standard.")
    (inputs (list guile-3.0))
    (outputs '("out" "debug"))
    (arguments
-    `(,@(if (target-hurd?)
-            '(#:configure-flags '("CFLAGS=-D__alloca=alloca"
-                                  "ac_cv_func_posix_spawn=no"))
-            '())
+    (append
+     (if (target-hurd?)
+         (list #:configure-flags '("CFLAGS=-D__alloca=alloca"
+                                   "ac_cv_func_posix_spawn=no"))
+         (list))
+     (list
       #:phases
-      (modify-phases %standard-phases
-        (add-before 'build 'set-default-shell
-          (lambda* (#:key inputs #:allow-other-keys)
-            ;; Change the default shell from /bin/sh.
-            (let ((bash (assoc-ref inputs "bash")))
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-default-shell
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Change the default shell from /bin/sh.
               (substitute* "src/job.c"
                 (("default_shell =.*$")
-                 (format #f "default_shell = \"~a/bin/sh\";\n"
-                         bash)))))))))
+                 (format #f "default_shell = \"~a\";\n"
+                         (search-input-file inputs "/bin/sh"))))))))))
    (synopsis "Remake files automatically")
    (description
     "Make is a program that is used to control the production of
@@ -653,17 +654,17 @@ change.  GNU make offers many powerful extensions over the standard utility.")
                (base32
                 "12f5zzyq2w56g95nni65hc0g5p7154033y2f3qmjvd016szn5qnn"))))
     (arguments
-     `(#:configure-flags '("CFLAGS=-D__alloca=alloca -D__stat=stat")
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'set-default-shell
-           (lambda* (#:key inputs #:allow-other-keys)
-             ;; Change the default shell from /bin/sh.
-             (let ((bash (assoc-ref inputs "bash")))
-               (substitute* "job.c"
-                 (("default_shell =.*$")
-                  (format #f "default_shell = \"~a/bin/sh\";\n"
-                          bash)))))))))))
+     (list
+      #:configure-flags #~(list "CFLAGS=-D__alloca=alloca -D__stat=stat")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-default-shell
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Change the default shell from /bin/sh.
+              (substitute* "job.c"
+                (("default_shell =.*$")
+                 (format #f "default_shell = \"~a\";\n"
+                         (search-input-file inputs "/bin/sh")))))))))))
 
 (define-public binutils
   (package
