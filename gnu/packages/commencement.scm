@@ -2207,9 +2207,7 @@ exec " gcc-bin "/" program
     (name "sed-boot0")
     (source (bootstrap-origin (package-source sed)))
     (native-inputs '())
-    (inputs
-     `(("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+    (inputs (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      `(#:implicit-inputs? #f
        #:tests? #f
