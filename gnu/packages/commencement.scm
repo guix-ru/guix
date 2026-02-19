@@ -2894,8 +2894,8 @@ memoized as a function of '%current-system'."
                    (for-each delete-file
                              (find-files "Lib/ensurepip" ".*.whl$")))))))
     (inputs
-     `(,@(%boot0-inputs)
-       ("expat" ,expat-sans-tests)))              ;remove OpenSSL, zlib, etc.
+     (append (map cadr (%boot0-inputs))
+             (list expat-sans-tests)))   ;remove OpenSSL, zlib, etc.
     (native-inputs                                ;and pkg-config
      `())
     (arguments
