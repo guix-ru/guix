@@ -2971,7 +2971,7 @@ memoized as a function of '%current-system'."
                    #:target boot-triplet
                    #:binutils binutils-boot0
                    #:guile %bootstrap-guile
-                   #:bash (car (assoc-ref (%boot0-inputs) "bash"))
+                   #:bash bash-mesboot
                    #:guile-for-build %bootstrap-guile))
 
 (define (%boot1-inputs)
