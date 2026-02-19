@@ -1865,19 +1865,11 @@ exec " gcc-bin "/" program
                          gcc-mesboot))))
 
 (define (%boot-mesboot5-inputs)
-  `(("gcc-wrapper" ,gcc-mesboot-wrapper)
-    ("gcc" ,gcc-mesboot)
-    ("libc" ,glibc-mesboot)
-    ("binutils" ,binutils-mesboot)
-    ("gawk" ,gawk-mesboot)
-    ("make" ,gnu-make-mesboot)
-    ("kernel-headers" ,%bootstrap-linux-libre-headers)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("bash" , gash-boot)               ;gnu-build-system used to expect "bash"
-    ("coreutils" , gash-utils-boot)
-    ("bootar" ,bootar)
-    ("guile" ,%bootstrap-guile)))
+  (cons* gcc-mesboot-wrapper
+         gcc-mesboot
+         (fold delete
+               (%boot-mesboot4-inputs)
+               (list gcc-mesboot1-wrapper gcc-mesboot1))))
 
 (define (mesboot-package name pkg)
   (package
@@ -1985,8 +1977,15 @@ exec " gcc-bin "/" program
     ("sed" ,sed-mesboot)
     ("tar" ,tar-mesboot)
     ("xz" ,xz-mesboot)
-    ,@(fold alist-delete (%boot-mesboot5-inputs)
-            '("bash" "coreutils" "bootar" "kernel-headers"))))
+    ("gcc-wrapper" ,gcc-mesboot-wrapper)
+    ("gcc" ,gcc-mesboot)
+    ("libc" ,glibc-mesboot)
+    ("binutils" ,binutils-mesboot)
+    ("gawk" ,gawk-mesboot)
+    ("make" ,gnu-make-mesboot)
+    ("gzip" ,gzip-mesboot)
+    ("patch" ,patch-mesboot)
+    ("guile" ,%bootstrap-guile)))
 
 (define (%bootstrap-inputs+toolchain)
   ;; The traditional bootstrap-inputs.  For the i686-linux, x86_64-linux
