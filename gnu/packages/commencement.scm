@@ -2367,33 +2367,16 @@ exec " gcc-bin "/" program
                            "--disable-libstdcxx-pch"
                            #$flags)
                   flags))
+             ((#:modules modules)
+              (append '((ice-9 ftw) (ice-9 match)) modules))
              ((#:phases phases)
               #~(modify-phases #$phases
-                  (add-after 'unpack 'unpack-gmp&co
-                    (lambda* (#:key inputs #:allow-other-keys)
-                      (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
-                            (mpfr (assoc-ref %build-inputs "mpfr-source"))
-                            (mpc  (assoc-ref %build-inputs "mpc-source")))
-
-                        ;; To reduce the set of pre-built bootstrap inputs, build
-                        ;; GMP & co. from GCC.
-                        (for-each (lambda (source)
-                                    (invoke "tar" "xvf" source))
-                                  (list gmp mpfr mpc))
-
-                        ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
-                        #$@(map (lambda (lib)
-                                  ;; Drop trailing letters, as gmp-6.0.0a unpacks
-                                  ;; into gmp-6.0.0.
-                                  #~(symlink #$(string-trim-right
-                                                (package-full-name lib "-")
-                                                char-set:letter)
-                                             #$(package-name lib)))
-                                (list gmp-6.0 mpfr mpc))))))))))
-      (inputs `(("gmp-source" ,(bootstrap-origin (package-source gmp-6.0)))
-                ("mpfr-source" ,(bootstrap-origin (package-source mpfr)))
-                ("mpc-source" ,(bootstrap-origin (package-source mpc)))
-                ,@(%boot0-inputs)))
+                  (add-after 'unpack 'unpack-other-tarballs
+                    #$unpack-and-symlink-other-tarballs-phase))))))
+      (inputs (cons* (bootstrap-origin (package-source gmp-6.0))
+                     (bootstrap-origin (package-source mpfr))
+                     (bootstrap-origin (package-source mpc))
+                     (%boot0-inputs)))
       (native-inputs '()))))
 
 (define gcc-boot0
