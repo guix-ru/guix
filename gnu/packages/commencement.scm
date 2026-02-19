@@ -2826,10 +2826,10 @@ memoized as a function of '%current-system'."
            (arguments `(#:guile ,%bootstrap-guile
                         ,@(package-arguments hurd-core-headers)))
            (inputs
-            `(("gnumach-headers" ,gnumach-headers-boot0)
-              ("hurd-headers" ,hurd-headers-boot0)
-              ("hurd-minimal" ,hurd-minimal-boot0)
-              ,@(%boot0-inputs)))))
+            (cons* gnumach-headers-boot0
+                   hurd-headers-boot0
+                   hurd-minimal-boot0
+                   (%boot0-inputs)))))
 
 (define* (kernel-headers-boot0 #:optional (system (%current-system)))
   (match system
