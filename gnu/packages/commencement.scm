@@ -2158,8 +2158,7 @@ exec " gcc-bin "/" program
     (source (bootstrap-origin (package-source file)))
     (name "file-boot0")
     (inputs
-     `(("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+     (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      `(#:tests? #f                      ; merge test fails
        #:implicit-inputs? #f
