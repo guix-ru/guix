@@ -2255,6 +2255,14 @@ exec " gcc-bin "/" program
     ("findutils" ,findutils-boot0)
     ("file" ,file-boot0)))
 
+(define (%boot0-bash)
+  "Return the system-dependent bash package in %BOOT0-INPUTS."
+  (match (%current-system)
+    ((or "i686-linux" "x86_64-linux")
+     bash-mesboot)
+    (_
+     %bootstrap-coreutils&co)))
+
 (define* (boot-triplet #:optional (system (%current-system)))
   ;; Return the triplet used to create the cross toolchain needed in the
   ;; first bootstrapping stage.
@@ -2964,7 +2972,7 @@ memoized as a function of '%current-system'."
                    #:target boot-triplet
                    #:binutils binutils-boot0
                    #:guile %bootstrap-guile
-                   #:bash (car (assoc-ref (%boot0-inputs) "bash"))
+                   #:bash (%boot0-bash)
                    #:guile-for-build %bootstrap-guile))
 
 (define (%boot1-inputs)
