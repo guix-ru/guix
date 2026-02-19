@@ -2040,9 +2040,8 @@ exec " gcc-bin "/" program
     (name "bzip2-boot0")
     (native-inputs `())
     (inputs
-     `(("diffutils" ,diffutils-boot0)
-       ("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+     (cons* diffutils-boot0 gnu-make-boot0
+            (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      `(#:guile ,%bootstrap-guile
        #:implicit-inputs? #f
