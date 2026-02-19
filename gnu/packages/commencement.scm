@@ -2176,8 +2176,7 @@ exec " gcc-bin "/" program
     (name "gawk-boot0")
     (native-inputs '())
     (inputs
-     `(("make" ,gnu-make-boot0)
-       ,@(%bootstrap-inputs+toolchain)))
+     (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
      `(#:tests? #f
        #:implicit-inputs? #f
