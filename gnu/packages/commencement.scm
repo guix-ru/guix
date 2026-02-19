@@ -1971,21 +1971,18 @@ exec " gcc-bin "/" program
                     #~(cons "--disable-year2038" #$flags)))))))
 
 (define (%boot-mesboot6-inputs)
-  `(("bash" ,bash-mesboot)
-    ("coreutils" ,coreutils-mesboot)
-    ("grep" ,grep-mesboot)
-    ("sed" ,sed-mesboot)
-    ("tar" ,tar-mesboot)
-    ("xz" ,xz-mesboot)
-    ("gcc-wrapper" ,gcc-mesboot-wrapper)
-    ("gcc" ,gcc-mesboot)
-    ("libc" ,glibc-mesboot)
-    ("binutils" ,binutils-mesboot)
-    ("gawk" ,gawk-mesboot)
-    ("make" ,gnu-make-mesboot)
-    ("gzip" ,gzip-mesboot)
-    ("patch" ,patch-mesboot)
-    ("guile" ,%bootstrap-guile)))
+  (cons* bash-mesboot
+         coreutils-mesboot
+         grep-mesboot
+         sed-mesboot
+         tar-mesboot
+         xz-mesboot
+         (fold delete
+               (%boot-mesboot5-inputs)
+               (list bootar
+                     gash-boot
+                     gash-utils-boot
+                     %bootstrap-linux-libre-headers))))
 
 (define (%bootstrap-inputs+toolchain)
   ;; The traditional bootstrap-inputs.  For the i686-linux, x86_64-linux
@@ -2032,7 +2029,7 @@ exec " gcc-bin "/" program
                  (install-file "make"
                                (string-append #$output "/bin")))))))))
     (native-inputs '())                           ; no need for 'pkg-config'
-    (inputs (map cadr (%bootstrap-inputs+toolchain)))))
+    (inputs (%bootstrap-inputs+toolchain))))
 
 (define bzip2-boot0
   (package
@@ -2041,7 +2038,7 @@ exec " gcc-bin "/" program
     (native-inputs `())
     (inputs
      (cons* diffutils-boot0 gnu-make-boot0
-            (map cadr (%bootstrap-inputs+toolchain))))
+            (%bootstrap-inputs+toolchain)))
     (arguments
      `(#:guile ,%bootstrap-guile
        #:implicit-inputs? #f
@@ -2056,7 +2053,7 @@ exec " gcc-bin "/" program
     (native-inputs `())
     (inputs
      (cons* gnu-make-boot0
-            (map cadr (%bootstrap-inputs+toolchain))))
+            (%bootstrap-inputs+toolchain)))
     (arguments
      `(#:tests? #f
        #:implicit-inputs? #f
@@ -2087,7 +2084,7 @@ exec " gcc-bin "/" program
     (native-inputs `())
     (inputs
      (cons* gnu-make-boot0
-            (map cadr (%bootstrap-inputs+toolchain))))
+            (%bootstrap-inputs+toolchain)))
     (arguments
      `(#:tests? #f                            ; the test suite needs diffutils
        #:guile ,%bootstrap-guile
@@ -2102,7 +2099,7 @@ exec " gcc-bin "/" program
     (inputs
      (cons* diffutils-boot0         ; for tests.
             gnu-make-boot0
-            (map cadr (%bootstrap-inputs+toolchain))))
+            (%bootstrap-inputs+toolchain)))
     (arguments
      `(#:implicit-inputs? #f
        #:guile ,%bootstrap-guile
@@ -2156,7 +2153,7 @@ exec " gcc-bin "/" program
     (source (bootstrap-origin (package-source file)))
     (name "file-boot0")
     (inputs
-     (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
+     (cons* gnu-make-boot0 (%bootstrap-inputs+toolchain)))
     (arguments
      (list
       #:tests? #f                      ; merge test fails
@@ -2174,7 +2171,7 @@ exec " gcc-bin "/" program
     (name "gawk-boot0")
     (native-inputs '())
     (inputs
-     (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
+     (cons* gnu-make-boot0 (%bootstrap-inputs+toolchain)))
     (arguments
      `(#:tests? #f
        #:implicit-inputs? #f
@@ -2189,7 +2186,7 @@ exec " gcc-bin "/" program
     (name "patch-boot0")
     (native-inputs '())
     (inputs
-     (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
+     (cons* gnu-make-boot0 (%bootstrap-inputs+toolchain)))
     (arguments
      (list
       #:tests? #f                       ; merge test fails
@@ -2205,7 +2202,7 @@ exec " gcc-bin "/" program
     (name "sed-boot0")
     (source (bootstrap-origin (package-source sed)))
     (native-inputs '())
-    (inputs (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
+    (inputs (cons* gnu-make-boot0 (%bootstrap-inputs+toolchain)))
     (arguments
      (list
       #:implicit-inputs? #f
@@ -2218,7 +2215,7 @@ exec " gcc-bin "/" program
     (name "tar-boot0")
     (source (bootstrap-origin (package-source tar)))
     (native-inputs '())
-    (inputs (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
+    (inputs (cons* gnu-make-boot0 (%bootstrap-inputs+toolchain)))
     (arguments
      (append
       (list #:implicit-inputs? #f
@@ -2235,13 +2232,33 @@ exec " gcc-bin "/" program
            ("gawk" ,gawk-boot0)
            ("patch" ,patch-boot0)
            ("sed" ,sed-boot0)
-           ("tar" ,tar-boot0)))
-        (_ '()))
+           ("tar" ,tar-boot0)
+           ("coreutils" ,coreutils-mesboot)
+           ("grep" ,grep-mesboot)
+           ("sed" ,sed-mesboot)
+           ("tar" ,tar-mesboot)
+           ("xz" ,xz-mesboot)
+           ("gcc-wrapper" ,gcc-mesboot-wrapper)
+           ("gcc" ,gcc-mesboot)
+           ("libc" ,glibc-mesboot)
+           ("binutils" ,binutils-mesboot)
+           ("gawk" ,gawk-mesboot)
+           ("make" ,gnu-make-mesboot)
+           ("gzip" ,gzip-mesboot)
+           ("patch" ,patch-mesboot)
+           ("guile" ,%bootstrap-guile)))
+        (_
+         `(("libc" ,%bootstrap-glibc)
+           ("gcc" ,%bootstrap-gcc)
+           ("binutils" ,%bootstrap-binutils)
+           ("coreutils&co" ,%bootstrap-coreutils&co)
+           ;; In gnu-build-system.scm, we rely on the availability of Bash.
+           ("bash" ,%bootstrap-coreutils&co))))
     ("make" ,gnu-make-boot0)
     ("diffutils" ,diffutils-boot0)
     ("findutils" ,findutils-boot0)
     ("file" ,file-boot0)
-    ,@(%bootstrap-inputs+toolchain)))
+    ("bash" ,bash-mesboot)))
 
 (define* (boot-triplet #:optional (system (%current-system)))
   ;; Return the triplet used to create the cross toolchain needed in the
