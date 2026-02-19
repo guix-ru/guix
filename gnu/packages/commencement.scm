@@ -145,6 +145,11 @@ the checkout from TARBALL, a tarball containing said checkout.
              #:graft? #f
              #:local-build? #t))))))
 
+(define packages->input-alist
+  (match-lambda
+    ((or (package . _) package)
+     (list (package-name package) package))))
+
 (define bootar
   (package
     (name "bootar")
@@ -2225,35 +2230,29 @@ exec " gcc-bin "/" program
       (package-arguments tar)))))
 
 (define (%boot0-inputs)
-  `(,@(match (%current-system)
-        ((or "i686-linux" "x86_64-linux")
-         `(("bzip2" ,bzip2-boot0)
-           ("coreutils" ,coreutils-boot0)
-           ("gawk" ,gawk-boot0)
-           ("patch" ,patch-boot0)
-           ("sed" ,sed-boot0)
-           ("tar" ,tar-boot0)
-           ("bash" ,bash-mesboot)
-           ("grep" ,grep-mesboot)
-           ("tar" ,tar-mesboot)
-           ("xz" ,xz-mesboot)
-           ("gcc-wrapper" ,gcc-mesboot-wrapper)
-           ("gcc" ,gcc-mesboot)
-           ("libc" ,glibc-mesboot)
-           ("binutils" ,binutils-mesboot)
-           ("gzip" ,gzip-mesboot)
-           ("guile" ,%bootstrap-guile)))
-        (_
-         `(("libc" ,%bootstrap-glibc)
-           ("gcc" ,%bootstrap-gcc)
-           ("binutils" ,%bootstrap-binutils)
-           ("coreutils&co" ,%bootstrap-coreutils&co)
-           ;; In gnu-build-system.scm, we rely on the availability of Bash.
-           ("bash" ,%bootstrap-coreutils&co))))
-    ("make" ,gnu-make-boot0)
-    ("diffutils" ,diffutils-boot0)
-    ("findutils" ,findutils-boot0)
-    ("file" ,file-boot0)))
+  (append
+   (match (%current-system)
+     ((or "i686-linux" "x86_64-linux")
+      (cons* bzip2-boot0
+             coreutils-boot0
+             gawk-boot0
+             patch-boot0
+             sed-boot0
+             tar-boot0
+             (fold delete
+                   (%boot-mesboot6-inputs)
+                   (list gnu-make-mesboot
+                         coreutils-mesboot
+                         gawk-mesboot
+                         patch-mesboot
+                         sed-mesboot
+                         tar-mesboot))))
+     (_
+      (%bootstrap-inputs)))
+   (list gnu-make-boot0
+         diffutils-boot0
+         findutils-boot0
+         file-boot0)))
 
 (define (%boot0-bash)
   "Return the system-dependent bash package in %BOOT0-INPUTS."
@@ -2383,7 +2382,7 @@ exec " gcc-bin "/" program
       (inputs (cons* (bootstrap-origin (package-source gmp-6.0))
                      (bootstrap-origin (package-source mpfr))
                      (bootstrap-origin (package-source mpc))
-                     (map cadr (%boot0-inputs))))
+                     (%boot0-inputs)))
       (native-inputs '()))))
 
 (define gcc-boot0
@@ -2531,8 +2530,14 @@ exec " gcc-bin "/" program
 
            ;; Call it differently so that the builder can check whether
            ;; the "libc" input is #f.
-           ("libc-native" ,@(assoc-ref (%boot0-inputs) "libc"))
-           ,@(alist-delete "libc" (%boot0-inputs)))
+           ("libc-native" ,(match (%current-system)
+                             ((or "i686-linux" "x86_64-linux")
+                              glibc-mesboot)
+                             (_
+                              %bootstrap-glibc)))
+           ,@(map packages->input-alist
+                  (fold delete (%boot0-inputs)
+                        (list glibc-mesboot %bootstrap-glibc))))
        (prepend (bootstrap-origin (package-source gmp-6.0))
                 (bootstrap-origin (package-source mpfr))
                 (bootstrap-origin (package-source mpc)))))
@@ -2684,11 +2689,13 @@ memoized as a function of '%current-system'."
             ;; Flex and Bison are required since version 4.16.
             flex-boot0
             bison-boot0
-            (map cadr (%boot0-inputs))))))
+            (%boot0-inputs)))))
 
 (define with-boot0
-  (package-with-explicit-inputs %boot0-inputs
-                                %bootstrap-guile))
+  (package-with-explicit-inputs
+   (lambda ()
+     (map packages->input-alist (%boot0-inputs)))
+   %bootstrap-guile))
 
 (define autoconf-boot0
   (with-boot0
@@ -2821,7 +2828,7 @@ memoized as a function of '%current-system'."
     (inherit texinfo)
     (source (bootstrap-origin (package-source texinfo)))
     (native-inputs '())
-    (inputs (append (map cadr (%boot0-inputs))
+    (inputs (append (%boot0-inputs)
                     (list perl-boot0)))
     (arguments
      `(#:implicit-inputs? #f
@@ -2885,7 +2892,7 @@ memoized as a function of '%current-system'."
                    (for-each delete-file
                              (find-files "Lib/ensurepip" ".*.whl$")))))))
     (inputs
-     (append (map cadr (%boot0-inputs))
+     (append (%boot0-inputs)
              (list expat-sans-tests)))   ;remove OpenSSL, zlib, etc.
     (native-inputs                                ;and pkg-config
      `())
@@ -2963,7 +2970,33 @@ memoized as a function of '%current-system'."
   `(("gcc" ,gcc-boot0)
     ("ld-wrapper-cross" ,ld-wrapper-boot0)
     ("binutils-cross" ,binutils-boot0)
-    ,@(alist-delete "binutils" (%boot0-inputs))))
+    ,@(match (%current-system)
+        ((or "i686-linux" "x86_64-linux")
+         `(("bzip2" ,bzip2-boot0)
+           ("coreutils" ,coreutils-boot0)
+           ("gawk" ,gawk-boot0)
+           ("patch" ,patch-boot0)
+           ("sed" ,sed-boot0)
+           ("tar" ,tar-boot0)
+           ("bash" ,bash-mesboot)
+           ("grep" ,grep-mesboot)
+           ("tar" ,tar-mesboot)
+           ("xz" ,xz-mesboot)
+           ("gcc-wrapper" ,gcc-mesboot-wrapper)
+           ("gcc" ,gcc-mesboot)
+           ("libc" ,glibc-mesboot)
+           ("gzip" ,gzip-mesboot)
+           ("guile" ,%bootstrap-guile)))
+        (_
+         `(("libc" ,%bootstrap-glibc)
+           ("gcc" ,%bootstrap-gcc)
+           ("coreutils&co" ,%bootstrap-coreutils&co)
+           ;; In gnu-build-system.scm, we rely on the availability of Bash.
+           ("bash" ,%bootstrap-coreutils&co))))
+    ("make" ,gnu-make-boot0)
+    ("diffutils" ,diffutils-boot0)
+    ("findutils" ,findutils-boot0)
+    ("file" ,file-boot0)))
 
 (define/system-dependent glibc-final-with-bootstrap-bash
   ;; The final libc, "cross-built".  If everything went well, the resulting
@@ -3023,7 +3056,7 @@ memoized as a function of '%current-system'."
 
          ;; Here, we use the bootstrap Bash, which is not satisfactory
          ;; because we don't want to depend on bootstrap tools.
-         ("static-bash" ,@(assoc-ref (%boot0-inputs) "bash")))))))
+         ("static-bash" ,(%boot0-bash)))))))
 
 (define (cross-gcc-wrapper gcc binutils glibc bash)
   "Return a wrapper for the pseudo-cross toolchain GCC/BINUTILS/GLIBC
