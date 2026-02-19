@@ -248,47 +248,49 @@ implementation offers several extensions over the standard utility.")
    (build-system gnu-build-system)
    ;; Note: test suite requires ~1GiB of disk space.
    (arguments
-    `(,@(cond
-          ((target-hurd?)
-           '(#:make-flags
-             (list (string-append
-                     "TESTSUITEFLAGS= -k '"
-                     "!sparse"
-                     ",!renamed dirs in incrementals"
-                     ",!--exclude-tag option in incremental pass"
-                     ",!incremental dumps with -C"
-                     ",!incremental dumps of nested directories"
-                     ",!incremental restores with -C"
-                     ",!concatenated incremental archives (renames)"
-                     ",!renamed directory containing subdirectories"
-                     ",!renamed subdirectories"
-                     ",!chained renames"
-                     ",!Directory"
-                     "'"))))
-          ;; 'storing sparse files > 8G' fails on powerpc-linux, likely
-          ;; due to the small HDD and RAM present on these devices.
-          ((target-ppc32?)
-           '(#:make-flags (list (string-append "TESTSUITEFLAGS= -k "
-                                               "'!tricky time stamps"
-                                               ",!storing sparse files > 8G'"))))
-          ;; https://lists.gnu.org/archive/html/bug-tar/2021-10/msg00007.html
-          ;; tar-1.34 isn't aware of 64-bit time_t and upstream suggests
-          ;; skipping the test for this release on 32-bit systems.
-          ((not (target-64bit?))
-           '(#:make-flags (list "TESTSUITEFLAGS= -k '!tricky time stamps'")))
-          (else '()))
-      ;; XXX: 32-bit Hurd platforms don't support 64bit time_t
-      ,@(if (target-hurd32?)
-            (list #:configure-flags ''("--disable-year2038"))
-            '())
-      #:phases (modify-phases %standard-phases
-                 (add-before 'build 'set-shell-file-name
-                   (lambda* (#:key inputs #:allow-other-keys)
-                     ;; Do not use "/bin/sh" to run programs.
-                     (let ((bash (assoc-ref inputs "bash")))
-                       (substitute* "src/system.c"
-                         (("/bin/sh")
-                          (string-append bash "/bin/sh")))))))))
+    (append
+     (cond
+      ((target-hurd?)
+       '(#:make-flags
+         (list (string-append
+                "TESTSUITEFLAGS= -k '"
+                "!sparse"
+                ",!renamed dirs in incrementals"
+                ",!--exclude-tag option in incremental pass"
+                ",!incremental dumps with -C"
+                ",!incremental dumps of nested directories"
+                ",!incremental restores with -C"
+                ",!concatenated incremental archives (renames)"
+                ",!renamed directory containing subdirectories"
+                ",!renamed subdirectories"
+                ",!chained renames"
+                ",!Directory"
+                "'"))))
+      ;; 'storing sparse files > 8G' fails on powerpc-linux, likely
+      ;; due to the small HDD and RAM present on these devices.
+      ((target-ppc32?)
+       '(#:make-flags (list (string-append "TESTSUITEFLAGS= -k "
+                                           "'!tricky time stamps"
+                                           ",!storing sparse files > 8G'"))))
+      ;; https://lists.gnu.org/archive/html/bug-tar/2021-10/msg00007.html
+      ;; tar-1.34 isn't aware of 64-bit time_t and upstream suggests
+      ;; skipping the test for this release on 32-bit systems.
+      ((not (target-64bit?))
+       '(#:make-flags (list "TESTSUITEFLAGS= -k '!tricky time stamps'")))
+      (else '()))
+     ;; XXX: 32-bit Hurd platforms don't support 64bit time_t
+     (if (target-hurd32?)
+         (list #:configure-flags #~(list "--disable-year2038"))
+         '())
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-shell-file-name
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Do not use "/bin/sh" to run programs.
+              (substitute* "src/system.c"
+                (("/bin/sh")
+                 (search-input-file inputs "bin/sh")))))))))
 
    ;; When cross-compiling, the 'set-shell-file-name' phase needs to be able
    ;; to refer to the target Bash.

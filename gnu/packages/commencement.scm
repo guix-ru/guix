@@ -1976,8 +1976,8 @@ exec " gcc-bin "/" program
          ("sed" ,sed-mesboot)
          ,@(package-native-inputs pkg)))
       (arguments (substitute-keyword-arguments (package-arguments pkg)
-                   ((#:configure-flags flags ''())
-                    `(cons "--disable-year2038" ,flags)))))))
+                   ((#:configure-flags flags #~(list))
+                    #~(cons "--disable-year2038" #$flags)))))))
 
 (define (%boot-mesboot6-inputs)
   `(("bash" ,bash-mesboot)
