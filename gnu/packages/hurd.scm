@@ -246,23 +246,28 @@ Library, Parted and netdde for GNU/Hurd.")
     (source #f)
     (build-system trivial-build-system)
     (arguments
-     '(#:modules ((guix build union))
-       #:builder (begin
-                   (use-modules (srfi srfi-1)
-                                (srfi srfi-26)
-                                (ice-9 match)
-                                (guix build union))
-                   (let ((inputs (filter
-                                  (compose (cute member <> '("gnumach-headers"
-                                                             "hurd-headers"
-                                                             "hurd-minimal"))
-                                           car)
-                                  %build-inputs)))
-                     (match inputs
-                       (((names . directories) ...)
-                        (union-build (assoc-ref %outputs "out")
-                                     directories)
-                        #t))))))
+     '(#:modules ((guix build union)
+                  (guix build utils))
+       #:builder
+       (begin
+         (use-modules (srfi srfi-1)
+                      (ice-9 match)
+                      (guix build union)
+                      (guix build utils))
+
+         (union-build (assoc-ref %outputs "out")
+                      (filter-map
+                       (match-lambda
+                         ((label . input)
+                          (and (or (directory-exists?
+                                    (string-append input "/include/mach"))
+                                   (directory-exists?
+                                    (string-append input "/include/hurd")))
+                               ;; Avoid libc libraries.
+                               (not (file-exists?
+                                     (string-append input "/include/locale.h")))
+                               input)))
+                       %build-inputs)))))
     (inputs (list gnumach-headers hurd-headers hurd-minimal))
     (supported-systems %hurd-systems)
     (synopsis "Union of the Hurd headers and libraries")
