@@ -27,14 +27,14 @@
 (define-public libsigsegv
   (package
    (name "libsigsegv")
-   (version "2.14")
+   (version "2.15")
    (source (origin
             (method url-fetch)
             (uri (string-append
                   "mirror://gnu/libsigsegv/libsigsegv-"
                   version ".tar.gz"))
             (sha256
-             (base32 "15d2r831xz94s7540nvb1gbfl062g7mrnj88m60wyr1kh10kkb6d"))))
+             (base32 "1n992y64ni16bv9lijxsa5h87rscfvk01z4hl4bkijr509k5as03"))))
    (build-system gnu-build-system)
    (home-page "https://www.gnu.org/software/libsigsegv/")
    (synopsis "Library for handling page faults")
