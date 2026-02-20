@@ -403,10 +403,9 @@ file; as a result, it is often used in conjunction with \"tar\", resulting in
 
            ;; Don't attempt to run the tests when cross-compiling.
            #:tests? (not (%current-target-system))))
-    (inputs
-     `(,@(if (%current-target-system)
-             `(("bash" ,bash-minimal))
-             '())))
+    (inputs (if (%current-target-system)
+                (list bash-minimal)
+                (list)))
     (outputs '("out" "static"))
     (synopsis "High-quality data compression program")
     (description
