@@ -1030,8 +1030,8 @@ the store.")
                            (bin  (string-append out "/bin"))
                            ;; FIXME: Normally we would look it up only in INPUTS
                            ;; but cross-base uses it as a native input.
-                           (bash (or (assoc-ref inputs "static-bash")
-                                     (assoc-ref native-inputs "static-bash"))))
+                           (bash (or (assoc-ref inputs "bash-static")
+                                     (assoc-ref native-inputs "bash-static"))))
                       ;; Install the rpc data base file under `$out/etc/rpc'.
                       (substitute* "inet/Makefile"
                         (("^\\$\\(inst_sysconfdir\\)/rpc(.*)$" _ suffix)
@@ -1184,7 +1184,7 @@ the store.")
                                  (symlink cpu machine))))))
                        '()))))
 
-   (inputs `(("static-bash" ,static-bash)))
+   (inputs (list static-bash))
 
    ;; To build the manual, we need Texinfo and Perl.  Gettext is needed to
    ;; install the message catalogs, with 'msgfmt'.
