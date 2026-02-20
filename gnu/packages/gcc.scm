@@ -77,16 +77,16 @@ where the OS part is overloaded to denote a specific ABI---into GCC
   (cond ((string-match "^mips64el.*gnuabin?64$" target)
          ;; Triplets recognized by glibc as denoting the N64 ABI; see
          ;; ports/sysdeps/mips/preconfigure.
-         '("--with-abi=64"))
+         #~(list "--with-abi=64"))
 
         ((string-match "^arm.*-gnueabihf$" target)
-         '("--with-arch=armv7-a"
-           "--with-float=hard"
-           "--with-mode=thumb"
-           "--with-fpu=neon"))
+         #~(list "--with-arch=armv7-a"
+                 "--with-float=hard"
+                 "--with-mode=thumb"
+                 "--with-fpu=neon"))
 
         ((string-match "x86_64-linux-gnux32" target)
-         '("--with-abi=mx32"))
+         #~(list "--with-abi=mx32"))
 
         ((and (string-suffix? "-gnu" target)
               (not (string-contains target "-linux")))
@@ -94,36 +94,24 @@ where the OS part is overloaded to denote a specific ABI---into GCC
          ;; with:
          ;;   libcilkrts/runtime/os-unix.c:388:2: error: #error "Unknown architecture"
          ;; Cilk has been removed from GCC 8 anyway.
-         '("--disable-libcilkrts"))
+         #~(list "--disable-libcilkrts"))
 
         ;; glibc needs the 128-bit long double type on these architectures.
         ((or (string-prefix? "powerpc64le-" target)
              (string-prefix? "powerpc-" target))
-         '("--with-long-double-128"))
+         #~(list "--with-long-double-128"))
 
         ;; GCC 11.3.0's <libgcov.h> includes <sys/mman.h>, which MinGW lacks:
         ;; <https://bugs.gentoo.org/show_bug.cgi?id=843989>.
         ((target-mingw? target)
-         '("--disable-gcov"))
+         #~(list "--disable-gcov"))
 
         (else
          ;; TODO: Add `arm.*-gnueabi', etc.
-         '())))
+         #~(list))))
 
 (define-public gcc-base
   (let* ((stripped? #t)      ;whether to strip the compiler, not the libraries
-         (maybe-target-tools
-          (lambda ()
-            ;; Return the `_FOR_TARGET' variables that are needed when
-            ;; cross-compiling GCC.
-            (let ((target (%current-target-system)))
-              (if target
-                  (map (lambda (var tool)
-                         (string-append (string-append var "_FOR_TARGET")
-                                        "=" target "-" tool))
-                       '("CC"  "CXX" "LD" "AR" "NM" "OBJDUMP" "RANLIB" "STRIP")
-                       '("gcc" "g++" "ld" "ar" "nm" "objdump" "ranlib" "strip"))
-                  '()))))
          (libdir
           (let ((base '(or (assoc-ref outputs "lib")
                            (assoc-ref outputs "out"))))
@@ -131,45 +119,7 @@ where the OS part is overloaded to denote a specific ABI---into GCC
               ;; Return the directory that contains lib/libgcc_s.so et al.
               (if (%current-target-system)
                   `(string-append ,base "/" ,(%current-target-system))
-                  base))))
-         (configure-flags
-          (lambda ()
-            ;; This is terrible.  Since we have two levels of quasiquotation,
-            ;; we have to do this convoluted thing just so we can insert the
-            ;; contents of (maybe-target-tools).
-            (list 'quasiquote
-                  (append
-                   '("--enable-plugin"
-                     "--enable-languages=c,c++,objc,obj-c++"
-                     "--disable-multilib"
-                     "--with-system-zlib"
-
-                     ;; No pre-compiled libstdc++ headers, to save space.
-                     "--disable-libstdcxx-pch"
-
-                     "--with-local-prefix=/no-gcc-local-prefix"
-
-                     ;; With a separate "lib" output, the build system
-                     ;; incorrectly guesses GPLUSPLUS_INCLUDE_DIR, so force
-                     ;; it.  (Don't use a versioned sub-directory, that's
-                     ;; unnecessary.)
-                     ,(string-append "--with-gxx-include-dir="
-                                     (assoc-ref %outputs "out")
-                                     "/include/c++")
-
-                     ,(let ((libc (assoc-ref %build-inputs "libc")))
-                        (if libc
-                            (string-append "--with-native-system-header-dir=" libc
-                                           "/include")
-                            "--without-headers")))
-
-                   ;; Pass the right options for the target triplet.
-                   (let ((triplet
-                          (or (%current-target-system)
-                              (nix-system->gnu-triplet (%current-system)))))
-                     (gcc-configure-flags-for-triplet triplet))
-
-                   (maybe-target-tools))))))
+                  base)))))
     (hidden-package
      (package
        (name "gcc")
@@ -199,201 +149,241 @@ where the OS part is overloaded to denote a specific ABI---into GCC
                             texinfo-5))
 
        (arguments
-        `(#:out-of-source? #t
-          #:configure-flags ,(configure-flags)
+        (list
+         #:out-of-source? #t
+         #:configure-flags
+         #~(append
+            (list "--enable-plugin"
+                  "--enable-languages=c,c++,objc,obj-c++"
+                  "--disable-multilib"
+                  "--with-system-zlib"
 
-          #:make-flags
-          ;; None of the flags below are needed when doing a Canadian cross.
-          ;; TODO: Simplify this.
-          ,(if (%current-target-system)
-               (if stripped?
-                   ''("CFLAGS=-g0 -O2")
-                   ''())
-               `(let* ((libc        (assoc-ref %build-inputs "libc"))
-                       (libc-native (or (assoc-ref %build-inputs "libc-native")
-                                        libc)))
-                  `(,@(if libc
-                          (list (string-append "LDFLAGS_FOR_TARGET="
-                                               "-B" libc "/lib "
-                                               "-Wl,-dynamic-linker "
-                                               "-Wl," libc
-                                               ,(glibc-dynamic-linker)))
-                          '())
+                  ;; No pre-compiled libstdc++ headers, to save space.
+                  "--disable-libstdcxx-pch"
 
-                    ;; Native programs like 'genhooks' also need that right.
-                    ,(string-append "LDFLAGS="
-                                    "-Wl,-rpath=" libc-native "/lib "
-                                    "-Wl,-dynamic-linker "
-                                    "-Wl," libc-native ,(glibc-dynamic-linker))
-                    ,(string-append "BOOT_CFLAGS=-O2 "
-                                    ,(if stripped? "-g0" "-g")))))
+                  "--with-local-prefix=/no-gcc-local-prefix"
 
-          #:tests? #f
+                  ;; With a separate "lib" output, the build system
+                  ;; incorrectly guesses GPLUSPLUS_INCLUDE_DIR, so force
+                  ;; it.  (Don't use a versioned sub-directory, that's
+                  ;; unnecessary.)
+                  (string-append "--with-gxx-include-dir="
+                                 #$output "/include/c++")
 
-          #:phases
-          (modify-phases %standard-phases
-            (add-before 'configure 'relax-gcc-14s-strictness
-              (lambda* (#:key inputs #:allow-other-keys)
-                (let ((bash (assoc-ref inputs "bash"))
-                      (wrapper (string-append (getcwd) "/gcc.sh"))
-                      (stage-wrapper (string-append (getcwd) "/stage-gcc.sh")))
-                  (with-output-to-file wrapper
-                    (lambda _
-                      (format #t "#! ~a/bin/bash
+                  (let ((libc (assoc-ref %build-inputs "libc")))
+                    (if libc
+                        (string-append "--with-native-system-header-dir=" libc
+                                       "/include")
+                        "--without-headers")))
+
+            ;; Pass the right options for the target triplet.
+            #$(gcc-configure-flags-for-triplet
+               (or (%current-target-system)
+                   (nix-system->gnu-triplet (%current-system))))
+
+            ;; Return the `_FOR_TARGET' variables that are needed when
+            ;; cross-compiling GCC.
+            (let ((target #$(%current-target-system)))
+              (if target
+                  (map (lambda (var tool)
+                         (string-append (string-append var "_FOR_TARGET")
+                                        "=" target "-" tool))
+                       '("CC"  "CXX" "LD" "AR" "NM" "OBJDUMP" "RANLIB" "STRIP")
+                       '("gcc" "g++" "ld" "ar" "nm" "objdump" "ranlib" "strip"))
+                  (list))))
+         #:make-flags
+         ;; None of the flags below are needed when doing a Canadian cross.
+         ;; TODO: Simplify this.
+         (cond
+          ((and (%current-target-system) stripped?)
+           #~(list "CFLAGS=-g0 -O2"))
+          ((%current-target-system)
+           #~(list))
+          (else
+           #~(let* ((libc (assoc-ref %build-inputs "libc"))
+                    (libc-native (or (assoc-ref %build-inputs "libc-native")
+                                     libc))
+                    (loader #$(glibc-dynamic-linker)))
+               (cons*
+                ;; Native programs like 'genhooks' need that right.
+                (string-append "LDFLAGS="
+                               "-Wl,-rpath=" libc-native "/lib "
+                               "-Wl,-dynamic-linker "
+                               "-Wl," libc-native loader)
+                (string-append "BOOT_CFLAGS=-O2 "
+                               (if #$stripped? "-g0" "-g"))
+                (if libc
+                    (list (string-append "LDFLAGS_FOR_TARGET="
+                                         "-B" libc "/lib "
+                                         "-Wl,-dynamic-linker "
+                                         "-Wl," libc loader))
+                    (list))))))
+         #:tests? #f
+
+         #:phases
+         #~(modify-phases %standard-phases
+             (add-before 'configure 'relax-gcc-14s-strictness
+               (lambda* (#:key inputs #:allow-other-keys)
+                 (let ((bash (search-input-file inputs "/bin/bash"))
+                       (wrapper (string-append (getcwd) "/gcc.sh"))
+                       (stage-wrapper (string-append (getcwd) "/stage-gcc.sh")))
+                   (with-output-to-file wrapper
+                     (lambda _
+                       (format #t "#! ~a
 exec gcc \"$@\" \
     -Wno-error=implicit-function-declaration"
-                              bash)))
-                  (chmod wrapper #o555)
-                  (with-output-to-file stage-wrapper
-                    (lambda _
-                      (format #t "#! ~a/bin/bash
+                               bash)))
+                   (chmod wrapper #o555)
+                   (with-output-to-file stage-wrapper
+                     (lambda _
+                       (format #t "#! ~a
 exec \"$@\" \
     -Wno-error=implicit-function-declaration"
-                              bash)))
-                  (chmod stage-wrapper #o555)
-                  ;; Rather than adding CC to #:configure-flags and
-                  ;; STAGE_CC_WRAPPER to #:make-flags, we add them to the
-                  ;; environment in this easily removable stage.
-                  (cond (,(%current-target-system) ;cross-build?
-                         (setenv "CC_FOR_BUILD" wrapper))
-                        (else
-                         (setenv "CC" wrapper)
-                         (setenv "STAGE_CC_WRAPPER" stage-wrapper))))))
-            (add-before 'configure 'pre-configure
-              (lambda* (#:key inputs outputs #:allow-other-keys)
-                (let ((libdir ,(libdir))
-                      (libc   (assoc-ref inputs "libc")))
-                  (when libc
-                    ;; The following is not performed for `--without-headers'
-                    ;; cross-compiler builds.
+                               bash)))
+                   (chmod stage-wrapper #o555)
+                   ;; Rather than adding CC to #:configure-flags and
+                   ;; STAGE_CC_WRAPPER to #:make-flags, we add them to the
+                   ;; environment in this easily removable stage.
+                   (cond (#$(%current-target-system) ;cross-build?
+                          (setenv "CC_FOR_BUILD" wrapper))
+                         (else
+                          (setenv "CC" wrapper)
+                          (setenv "STAGE_CC_WRAPPER" stage-wrapper))))))
+             (add-before 'configure 'pre-configure
+               (lambda* (#:key inputs outputs #:allow-other-keys)
+                 (let ((libdir #$(libdir))
+                       (libc   (assoc-ref inputs "libc")))
+                   (when libc
+                     ;; The following is not performed for `--without-headers'
+                     ;; cross-compiler builds.
 
-                    ;; Join multi-line definitions of GLIBC_DYNAMIC_LINKER* into a
-                    ;; single line, to allow the next step to work properly.
-                    (for-each
-                     (lambda (x)
-                       (substitute* (find-files "gcc/config"
-                                                "^(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
-                         (("(#define (GLIBC|GNU_USER)_DYNAMIC_LINKER.*)\\\\\n$" _ line)
-                          line)))
-                     '(1 2 3))
+                     ;; Join multi-line definitions of GLIBC_DYNAMIC_LINKER* into a
+                     ;; single line, to allow the next step to work properly.
+                     (for-each
+                      (lambda (x)
+                        (substitute* (find-files "gcc/config"
+                                                 "^(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
+                          (("(#define (GLIBC|GNU_USER)_DYNAMIC_LINKER.*)\\\\\n$" _ line)
+                           line)))
+                      '(1 2 3))
 
-                    ;; Fix the dynamic linker's file name.
-                    (substitute* (find-files "gcc/config"
-                                             "^(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
-                      (("#define (GLIBC|GNU_USER)_DYNAMIC_LINKER([^ \t]*).*$"
-                        _ gnu-user suffix)
-                       (format #f "#define ~a_DYNAMIC_LINKER~a \"~a\"~%"
-                               gnu-user suffix
-                               (string-append libc ,(glibc-dynamic-linker)))))
+                     ;; Fix the dynamic linker's file name.
+                     (substitute* (find-files "gcc/config"
+                                              "^(linux|gnu|sysv4)(64|-elf|-eabi)?\\.h$")
+                       (("#define (GLIBC|GNU_USER)_DYNAMIC_LINKER([^ \t]*).*$"
+                         _ gnu-user suffix)
+                        (format #f "#define ~a_DYNAMIC_LINKER~a \"~a\"~%"
+                                gnu-user suffix
+                                (string-append libc #$(glibc-dynamic-linker)))))
 
-                    ;; Tell where to find libstdc++, libc, and `?crt*.o', except
-                    ;; `crt{begin,end}.o', which come with GCC.
-                    (substitute* (find-files "gcc/config"
-                                             "^gnu-user.*\\.h$")
-                      (("#define GNU_USER_TARGET_LIB_SPEC (.*)$" _ suffix)
-                       ;; Help libgcc_s.so be found (see also below.)  Always use
-                       ;; '-lgcc_s' so that libgcc_s.so is always found by those
-                       ;; programs that use 'pthread_cancel' (glibc dlopens
-                       ;; libgcc_s.so when pthread_cancel support is needed, but
-                       ;; having it in the application's RUNPATH isn't enough; see
-                       ;; <http://sourceware.org/ml/libc-help/2013-11/msg00023.html>.)
-                       ;;
-                       ;; NOTE: The '-lgcc_s' added below needs to be removed in a
-                       ;; later phase of %gcc-static.  If you change the string
-                       ;; below, make sure to update the relevant code in
-                       ;; %gcc-static package as needed.
-                       (format #f "#define GNU_USER_TARGET_LIB_SPEC \
+                     ;; Tell where to find libstdc++, libc, and `?crt*.o', except
+                     ;; `crt{begin,end}.o', which come with GCC.
+                     (substitute* (find-files "gcc/config"
+                                              "^gnu-user.*\\.h$")
+                       (("#define GNU_USER_TARGET_LIB_SPEC (.*)$" _ suffix)
+                        ;; Help libgcc_s.so be found (see also below.)  Always use
+                        ;; '-lgcc_s' so that libgcc_s.so is always found by those
+                        ;; programs that use 'pthread_cancel' (glibc dlopens
+                        ;; libgcc_s.so when pthread_cancel support is needed, but
+                        ;; having it in the application's RUNPATH isn't enough; see
+                        ;; <http://sourceware.org/ml/libc-help/2013-11/msg00023.html>.)
+                        ;;
+                        ;; NOTE: The '-lgcc_s' added below needs to be removed in a
+                        ;; later phase of %gcc-static.  If you change the string
+                        ;; below, make sure to update the relevant code in
+                        ;; %gcc-static package as needed.
+                        (format #f "#define GNU_USER_TARGET_LIB_SPEC \
 \"-L~a/lib %{!static:-rpath=~a/lib %{!static-libgcc:-rpath=~a/lib -lgcc_s}} \" ~a"
-                               libc libc libdir suffix))
-                      (("#define GNU_USER_TARGET_STARTFILE_SPEC.*$" line)
-                       (format #f "#define STANDARD_STARTFILE_PREFIX_1 \"~a/lib/\"
+                                libc libc libdir suffix))
+                       (("#define GNU_USER_TARGET_STARTFILE_SPEC.*$" line)
+                        (format #f "#define STANDARD_STARTFILE_PREFIX_1 \"~a/lib/\"
 #define STANDARD_STARTFILE_PREFIX_2 \"\"
 ~a"
-                               libc line)))
+                                libc line)))
 
-                    ;; The rs6000 (a.k.a. powerpc) config in GCC does not use
-                    ;; GNU_USER_* defines.  Do the above for this case.
-                    (substitute*
-                        "gcc/config/rs6000/sysv4.h"
-                      (("#define LIB_LINUX_SPEC (.*)$" _ suffix)
-                       (format #f "#define LIB_LINUX_SPEC \
+                     ;; The rs6000 (a.k.a. powerpc) config in GCC does not use
+                     ;; GNU_USER_* defines.  Do the above for this case.
+                     (substitute*
+                         "gcc/config/rs6000/sysv4.h"
+                       (("#define LIB_LINUX_SPEC (.*)$" _ suffix)
+                        (format #f "#define LIB_LINUX_SPEC \
 \"-L~a/lib %{!static:-rpath=~a/lib %{!static-libgcc:-rpath=~a/lib -lgcc_s}} \" ~a"
-                               libc libc libdir suffix))
-                      (("#define	STARTFILE_LINUX_SPEC.*$" line)
-                       (format #f "#define STANDARD_STARTFILE_PREFIX_1 \"~a/lib/\"
+                                libc libc libdir suffix))
+                       (("#define	STARTFILE_LINUX_SPEC.*$" line)
+                        (format #f "#define STANDARD_STARTFILE_PREFIX_1 \"~a/lib/\"
 #define STANDARD_STARTFILE_PREFIX_2 \"\"
 ~a"
-                               libc line))))
+                                libc line))))
 
-                  (when (file-exists? "gcc/config/rs6000")
-                    ;; Force powerpc libdir to be /lib and not /lib64
-                    (substitute* (find-files "gcc/config/rs6000")
-                      (("/lib64") "/lib")))
+                   (when (file-exists? "gcc/config/rs6000")
+                     ;; Force powerpc libdir to be /lib and not /lib64
+                     (substitute* (find-files "gcc/config/rs6000")
+                       (("/lib64") "/lib")))
 
-                  ;; Don't retain a dependency on the build-time sed.
-                  (substitute* "fixincludes/fixincl.x"
-                    (("static char const sed_cmd_z\\[\\] =.*;")
-                     "static char const sed_cmd_z[] = \"sed\";"))
+                   ;; Don't retain a dependency on the build-time sed.
+                   (substitute* "fixincludes/fixincl.x"
+                     (("static char const sed_cmd_z\\[\\] =.*;")
+                      "static char const sed_cmd_z[] = \"sed\";"))
 
-                  ;; Aarch64 support didn't land in GCC until the 4.8 series.
-                  (when (file-exists? "gcc/config/aarch64")
-                    ;; Force Aarch64 libdir to be /lib and not /lib64
-                    (substitute* "gcc/config/aarch64/t-aarch64-linux"
-                      (("lib64") "lib")))
+                   ;; Aarch64 support didn't land in GCC until the 4.8 series.
+                   (when (file-exists? "gcc/config/aarch64")
+                     ;; Force Aarch64 libdir to be /lib and not /lib64
+                     (substitute* "gcc/config/aarch64/t-aarch64-linux"
+                       (("lib64") "lib")))
 
-                  ;; The STARTFILE_PREFIX_SPEC prevents gcc from finding the
-                  ;; gcc:lib output, which causes ld to not find -lgcc_s.
-                  (when (file-exists? "gcc/config/riscv")
-                    (substitute* '("gcc/config/riscv/linux.h"
-                                   "gcc/config/riscv/riscv.h")  ; GCC < 10
-                      (("define STARTFILE_PREFIX_SPEC")
-                      "define __STARTFILE_PREFIX_SPEC")))
+                   ;; The STARTFILE_PREFIX_SPEC prevents gcc from finding the
+                   ;; gcc:lib output, which causes ld to not find -lgcc_s.
+                   (when (file-exists? "gcc/config/riscv")
+                     (substitute* '("gcc/config/riscv/linux.h"
+                                    "gcc/config/riscv/riscv.h")  ; GCC < 10
+                       (("define STARTFILE_PREFIX_SPEC")
+                        "define __STARTFILE_PREFIX_SPEC")))
 
-                  (when (file-exists? "libbacktrace")
-                    ;; GCC 4.8+ comes with libbacktrace.  By default it builds
-                    ;; with -Werror, which fails with a -Wcast-qual error in glibc
-                    ;; 2.21's stdlib-bsearch.h.  Remove -Werror.
-                    (substitute* "libbacktrace/configure"
-                      (("WARN_FLAGS=(.*)-Werror" _ flags)
-                       (string-append "WARN_FLAGS=" flags)))
+                   (when (file-exists? "libbacktrace")
+                     ;; GCC 4.8+ comes with libbacktrace.  By default it builds
+                     ;; with -Werror, which fails with a -Wcast-qual error in glibc
+                     ;; 2.21's stdlib-bsearch.h.  Remove -Werror.
+                     (substitute* "libbacktrace/configure"
+                       (("WARN_FLAGS=(.*)-Werror" _ flags)
+                        (string-append "WARN_FLAGS=" flags)))
 
-                    (when (file-exists? "libsanitizer/libbacktrace")
-                      ;; Same in libsanitizer's bundled copy (!) found in 4.9+.
-                      (substitute* "libsanitizer/libbacktrace/Makefile.in"
-                        (("-Werror")
-                         ""))))
+                     (when (file-exists? "libsanitizer/libbacktrace")
+                       ;; Same in libsanitizer's bundled copy (!) found in 4.9+.
+                       (substitute* "libsanitizer/libbacktrace/Makefile.in"
+                         (("-Werror")
+                          ""))))
 
-                  ;; Add a RUNPATH to libstdc++.so so that it finds libgcc_s.
-                  ;; See <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=32354>
-                  ;; and <http://bugs.gnu.org/20358>.
-                  (substitute* "libstdc++-v3/src/Makefile.in"
-                    (("^OPT_LDFLAGS = ")
-                     "OPT_LDFLAGS = -Wl,-rpath=$(libdir) "))
+                   ;; Add a RUNPATH to libstdc++.so so that it finds libgcc_s.
+                   ;; See <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=32354>
+                   ;; and <http://bugs.gnu.org/20358>.
+                   (substitute* "libstdc++-v3/src/Makefile.in"
+                     (("^OPT_LDFLAGS = ")
+                      "OPT_LDFLAGS = -Wl,-rpath=$(libdir) "))
 
-                  ;; Move libstdc++*-gdb.py to the "lib" output to avoid a
-                  ;; circularity between "out" and "lib".  (Note:
-                  ;; --with-python-dir is useless because it imposes $(prefix) as
-                  ;; the parent directory.)
-                  (substitute* "libstdc++-v3/python/Makefile.in"
-                    (("pythondir = .*$")
-                     (string-append "pythondir = " libdir "/share"
-                                    "/gcc-$(gcc_version)/python\n")))
+                   ;; Move libstdc++*-gdb.py to the "lib" output to avoid a
+                   ;; circularity between "out" and "lib".  (Note:
+                   ;; --with-python-dir is useless because it imposes $(prefix) as
+                   ;; the parent directory.)
+                   (substitute* "libstdc++-v3/python/Makefile.in"
+                     (("pythondir = .*$")
+                      (string-append "pythondir = " libdir "/share"
+                                     "/gcc-$(gcc_version)/python\n")))
 
-                  ;; Avoid another circularity between the outputs: this #define
-                  ;; ends up in auto-host.h in the "lib" output, referring to
-                  ;; "out".  (This variable is used to augment cpp's search path,
-                  ;; but there's nothing useful to look for here.)
-                  (substitute* "gcc/config.in"
-                    (("PREFIX_INCLUDE_DIR")
-                     "PREFIX_INCLUDE_DIR_isnt_necessary_here")))))
+                   ;; Avoid another circularity between the outputs: this #define
+                   ;; ends up in auto-host.h in the "lib" output, referring to
+                   ;; "out".  (This variable is used to augment cpp's search path,
+                   ;; but there's nothing useful to look for here.)
+                   (substitute* "gcc/config.in"
+                     (("PREFIX_INCLUDE_DIR")
+                      "PREFIX_INCLUDE_DIR_isnt_necessary_here")))))
 
-            (add-after 'configure 'post-configure
-              (lambda _
-                ;; Don't store configure flags, to avoid retaining references to
-                ;; build-time dependencies---e.g., `--with-ppl=/gnu/store/xxx'.
-                (substitute* "Makefile"
-                  (("^TOPLEVEL_CONFIGURE_ARGUMENTS=(.*)$" _ rest)
-                   "TOPLEVEL_CONFIGURE_ARGUMENTS=\n")))))))
+             (add-after 'configure 'post-configure
+               (lambda _
+                 ;; Don't store configure flags, to avoid retaining references to
+                 ;; build-time dependencies---e.g., `--with-ppl=/gnu/store/xxx'.
+                 (substitute* "Makefile"
+                   (("^TOPLEVEL_CONFIGURE_ARGUMENTS=(.*)$" _ rest)
+                    "TOPLEVEL_CONFIGURE_ARGUMENTS=\n")))))))
        (native-search-paths %gcc-search-paths)
        (properties `((gcc-libc . ,(assoc-ref inputs "libc"))))
        (synopsis "GNU Compiler Collection")
@@ -443,21 +433,21 @@ Go.  It also includes runtime support libraries for these languages.")
               `((srfi srfi-1)
                 ,@modules))
              ((#:phases phases)
-              `(modify-phases ,phases
-                 (add-after 'set-paths 'adjust-CPLUS_INCLUDE_PATH
-                   (lambda* (#:key inputs #:allow-other-keys)
-                     (let ((libc (assoc-ref inputs "libc"))
-                           (gcc (assoc-ref inputs  "gcc")))
-                       (setenv "CPLUS_INCLUDE_PATH"
-                               (string-join (fold delete
-                                                  (string-split (getenv "CPLUS_INCLUDE_PATH")
-                                                                #\:)
-                                                  (list (string-append libc "/include")
-                                                        (string-append gcc "/include/c++")))
-                                            ":"))
-                       (format #t
-                               "environment variable `CPLUS_INCLUDE_PATH' changed to ~a~%"
-                               (getenv "CPLUS_INCLUDE_PATH")))))))))))
+              #~(modify-phases #$phases
+                  (add-after 'set-paths 'adjust-CPLUS_INCLUDE_PATH
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let ((libc (assoc-ref inputs "libc"))
+                            (gcc (assoc-ref inputs  "gcc")))
+                        (setenv "CPLUS_INCLUDE_PATH"
+                                (string-join (fold delete
+                                                   (string-split (getenv "CPLUS_INCLUDE_PATH")
+                                                                 #\:)
+                                                   (list (string-append libc "/include")
+                                                         (string-append gcc "/include/c++")))
+                                             ":"))
+                        (format #t
+                                "environment variable `CPLUS_INCLUDE_PATH' changed to ~a~%"
+                                (getenv "CPLUS_INCLUDE_PATH")))))))))))
     (supported-systems (fold delete %supported-systems
                              '("aarch64-linux" "riscv64-linux"
                                "powerpc64le-linux" "x86_64-gnu")))))
@@ -507,21 +497,21 @@ Go.  It also includes runtime support libraries for these languages.")
              ;; For native builds of some GCC versions the C++ include path needs to
              ;; be adjusted so it does not interfere with GCC's own build processes.
              ((#:phases phases)
-              `(modify-phases ,phases
-                 (add-after 'set-paths 'adjust-CPLUS_INCLUDE_PATH
-                   (lambda* (#:key inputs #:allow-other-keys)
-                     (let ((libc (assoc-ref inputs "libc"))
-                           (gcc (assoc-ref inputs  "gcc")))
-                       (setenv "CPLUS_INCLUDE_PATH"
-                               (string-join (fold delete
-                                                  (string-split (getenv "CPLUS_INCLUDE_PATH")
-                                                                #\:)
-                                                  (list (string-append libc "/include")
-                                                        (string-append gcc "/include/c++")))
-                                            ":"))
-                       (format #t
-                               "environment variable `CPLUS_INCLUDE_PATH' changed to ~a~%"
-                               (getenv "CPLUS_INCLUDE_PATH")))))))))))
+              #~(modify-phases #$phases
+                  (add-after 'set-paths 'adjust-CPLUS_INCLUDE_PATH
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let ((libc (assoc-ref inputs "libc"))
+                            (gcc (assoc-ref inputs  "gcc")))
+                        (setenv "CPLUS_INCLUDE_PATH"
+                                (string-join (fold delete
+                                                   (string-split (getenv "CPLUS_INCLUDE_PATH")
+                                                                 #\:)
+                                                   (list (string-append libc "/include")
+                                                         (string-append gcc "/include/c++")))
+                                             ":"))
+                        (format #t
+                                "environment variable `CPLUS_INCLUDE_PATH' changed to ~a~%"
+                                (getenv "CPLUS_INCLUDE_PATH")))))))))))
     (supported-systems (fold delete %supported-systems
                              '("riscv64-linux" "x86_64-gnu")))
     (inputs
