@@ -3074,7 +3074,7 @@ memoized as a function of '%current-system'."
 
          ;; Here, we use the bootstrap Bash, which is not satisfactory
          ;; because we don't want to depend on bootstrap tools.
-         ("static-bash" ,(%boot0-bash)))))))
+         ("bash-static" ,(%boot0-bash)))))))
 
 (define (cross-gcc-wrapper gcc binutils glibc bash)
   "Return a wrapper for the pseudo-cross toolchain GCC/BINUTILS/GLIBC
@@ -3199,9 +3199,9 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     (package/inherit libc
       (name "glibc")
       (source (bootstrap-origin (package-source libc)))
-      (inputs `(("static-bash" ,static-bash-for-glibc)
+      (inputs `(("bash-static" ,static-bash-for-glibc)
                 ,@(alist-delete
-                   "static-bash"
+                   "bash-static"
                    (package-inputs glibc-final-with-bootstrap-bash))))
 
       ;; This time we need 'msgfmt' to install all the libc.mo files.
@@ -3422,7 +3422,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     ;; scripts?).
     (native-inputs `(("texinfo" ,texinfo-boot0)
                      ("perl" ,perl-boot0) ;for manpages
-                     ("static-bash" ,static-bash-for-glibc)
+                     ("bash-static" ,static-bash-for-glibc)
                      ,@(package-native-inputs gcc-boot0)))
 
     (inputs `(("gmp-source" ,(bootstrap-origin (package-source gmp-6.0)))
