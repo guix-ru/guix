@@ -2424,6 +2424,8 @@ exec " gcc-bin "/" program
       #:implicit-inputs? #f
       #:modules '((guix build gnu-build-system)
                   (guix build utils)
+                  (ice-9 ftw)
+                  (ice-9 match)
                   (ice-9 regex)
                   (srfi srfi-1)
                   (srfi srfi-26))
@@ -2459,41 +2461,21 @@ exec " gcc-bin "/" program
                                 "--(with-system-zlib|enable-languages.*)" <>)
                            #$flags)))
         ((#:make-flags flags)
-         `(let* ((libc        (assoc-ref %build-inputs "libc"))
-                 (libc-native (or (assoc-ref %build-inputs "libc-native")
-                                  libc)))
-            `(,,@(append
-                  `((string-append "LDFLAGS="
-                                   "-Wl,-rpath=" libc-native "/lib "
-                                   "-Wl,-dynamic-linker "
-                                   "-Wl," libc-native
-                                   ,(glibc-dynamic-linker
+         #~(let* ((libc (assoc-ref %build-inputs "libc"))
+                  (libc-native (or (assoc-ref %build-inputs "libc-native")
+                                   libc)))
+             (list (string-append "LDFLAGS="
+                                  "-Wl,-rpath=" libc-native "/lib "
+                                  "-Wl,-dynamic-linker "
+                                  "-Wl," libc-native
+                                  #$(glibc-dynamic-linker
                                      (match (%current-system)
                                        ("x86_64-linux" "i686-linux")
-                                       (_ (%current-system))))))))))
+                                       (_ (%current-system))))))))
         ((#:phases phases)
          #~(modify-phases #$phases
-             (add-after 'unpack 'unpack-gmp&co
-               (lambda* (#:key inputs #:allow-other-keys)
-                 (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
-                       (mpfr (assoc-ref %build-inputs "mpfr-source"))
-                       (mpc  (assoc-ref %build-inputs "mpc-source")))
-
-                   ;; To reduce the set of pre-built bootstrap inputs, build
-                   ;; GMP & co. from GCC.
-                   (for-each (lambda (source)
-                               (invoke "tar" "xvf" source))
-                             (list gmp mpfr mpc))
-
-                   ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
-                   #$@(map (lambda (lib)
-                             ;; Drop trailing letters, as gmp-6.0.0a unpacks
-                             ;; into gmp-6.0.0.
-                             #~(symlink #$(string-trim-right
-                                           (package-full-name lib "-")
-                                           char-set:letter)
-                                        #$(package-name lib)))
-                           (list gmp-6.0 mpfr mpc)))))
+             (add-after 'unpack 'unpack-other-tarballs
+               #$unpack-and-symlink-other-tarballs-phase)
              #$@(if (and (target-linux?) (target-x86?))
                     #~((add-after 'unpack 'patch-system.h
                          (lambda _
@@ -2523,46 +2505,47 @@ exec " gcc-bin "/" program
                       (lambda* (#:key inputs #:allow-other-keys)
                         ;; libcc1.so NEEDs libgcc_s.so, so provide one here
                         ;; to placate the 'validate-runpath' phase.
-                        (substitute* "libcc1/Makefile.in"
-                          (("la_LDFLAGS =")
-                           (string-append "la_LDFLAGS = -Wl,-rpath="
-                                          (assoc-ref inputs "gcc") "/lib")))
+                        (let ((libgcc (search-input-file inputs
+                                                         "lib/libgcc_s.so")))
+                          (substitute* "libcc1/Makefile.in"
+                            (("la_LDFLAGS =")
+                             (string-append "la_LDFLAGS = -Wl,-rpath="
+                                            (dirname libgcc)))))
                         ;; XXX: "g++ -v" is broken (see also libstdc++ above).
                         (substitute* "libcc1/configure"
                           (("g\\+\\+ -v") "true")))))
                  (_ #~(add-before 'configure 'return-true
                         (lambda _ #t))))
              (add-after 'install 'symlink-libgcc_eh
-               (lambda* (#:key outputs #:allow-other-keys)
-                 (let ((out (assoc-ref outputs "lib")))
-                   ;; Glibc wants to link against libgcc_eh, so provide
-                   ;; it.
-                   (with-directory-excursion
-                       (string-append out "/lib/gcc/"
-                                      #$(boot-triplet)
-                                      "/" #$(package-version gcc))
-                     (symlink "libgcc.a" "libgcc_eh.a"))))))))))
+               (lambda _
+                 ;; Glibc wants to link against libgcc_eh, so provide it.
+                 (with-directory-excursion
+                     (string-append #$output:lib "/lib/gcc/"
+                                    #$(boot-triplet)
+                                    "/" #$(package-version gcc))
+                   (symlink "libgcc.a" "libgcc_eh.a")))))))))
 
-    (inputs `(("gmp-source" ,(bootstrap-origin (package-source gmp-6.0)))
-              ("mpfr-source" ,(bootstrap-origin (package-source mpfr)))
-              ("mpc-source" ,(bootstrap-origin (package-source mpc)))
-              ("binutils-cross" ,binutils-boot0)
+    (inputs
+     (modify-inputs
+         `(("binutils-cross" ,binutils-boot0)
 
-              ;; The libstdc++ that libcc1 links against.
-              ("libstdc++" ,(match (%current-system)
-                                   ("aarch64-linux" (make-libstdc++-boot0 gcc-5))
-                                   ("powerpc-linux" (make-libstdc++-boot0 gcc-5))
-                                   ("powerpc64le-linux" (make-libstdc++-boot0 gcc-5))
-                                   ("riscv64-linux" (make-libstdc++-boot0 gcc-7))
-                                   ("i586-gnu" (make-libstdc++-boot0 gcc-5))
-                                   ("x86_64-gnu" (make-libstdc++-boot0 gcc-14))
-                                   (_ libstdc++-boot0)))
+           ;; The libstdc++ that libcc1 links against.
+           ("libstdc++" ,(match (%current-system)
+                           ("aarch64-linux" (make-libstdc++-boot0 gcc-5))
+                           ("powerpc-linux" (make-libstdc++-boot0 gcc-5))
+                           ("powerpc64le-linux" (make-libstdc++-boot0 gcc-5))
+                           ("riscv64-linux" (make-libstdc++-boot0 gcc-7))
+                           ("i586-gnu" (make-libstdc++-boot0 gcc-5))
+                           ("x86_64-gnu" (make-libstdc++-boot0 gcc-14))
+                           (_ libstdc++-boot0)))
 
-              ;; Call it differently so that the builder can check whether
-              ;; the "libc" input is #f.
-              ("libc-native" ,@(assoc-ref (%boot0-inputs) "libc"))
-              ,@(alist-delete "libc" (%boot0-inputs))))
-
+           ;; Call it differently so that the builder can check whether
+           ;; the "libc" input is #f.
+           ("libc-native" ,glibc-mesboot)
+           ,@(alist-delete "libc" (%boot0-inputs)))
+       (prepend (bootstrap-origin (package-source gmp-6.0))
+                (bootstrap-origin (package-source mpfr))
+                (bootstrap-origin (package-source mpc)))))
     ;; No need for the native-inputs to build the documentation at this stage.
     (native-inputs '())))
 
