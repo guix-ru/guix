@@ -2677,7 +2677,7 @@ memoized as a function of '%current-system'."
             ;; Flex and Bison are required since version 4.16.
             flex-boot0
             bison-boot0
-            (%boot0-inputs)))))
+            (map cadr (%boot0-inputs))))))
 
 (define with-boot0
   (package-with-explicit-inputs %boot0-inputs
