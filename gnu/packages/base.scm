@@ -446,14 +446,14 @@ used to apply commands with arbitrarily long arguments.")
 (define-public coreutils
   (package
    (name "coreutils")
-   (version "9.8")
+   (version "9.10")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnu/coreutils/coreutils-"
                                 version ".tar.xz"))
             (sha256
              (base32
-              "05fark34w12c9qx2jwjz352pxkd08v8i72m1qahl349chlnzvm76"))))
+              "098xsm5sybyifknrr524lfiyrx6rsfm15mp2cirh640bvyd5llqn"))))
    (build-system gnu-build-system)
    (inputs `(,acl                                 ;TODO: add SELinux
              ,attr                                ;for xattrs in ls, mv, etc
@@ -496,7 +496,10 @@ used to apply commands with arbitrarily long arguments.")
                      (setenv "SHELL" (which "sh"))
 
                      (substitute* (find-files "gnulib-tests" "\\.c$")
-                       (("/bin/sh") (which "sh")))
+                       (("/bin/sh") (which "sh"))
+                       ;; this has to happen later to prevent
+                       ;; substituting /bin/sh twice.
+                       (("BOURNE_SHELL") (format #f "~s" (which "sh"))))
                      (substitute* (find-files "tests" "\\.sh$")
                        (("#!/bin/sh") (string-append "#!" (which "sh"))))))
                  ,@(if (string=? "riscv64-linux" (%current-system))
