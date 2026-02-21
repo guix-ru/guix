@@ -2158,14 +2158,14 @@ exec " gcc-bin "/" program
     (inputs
      (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
-     `(#:tests? #f                      ; merge test fails
-       #:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-       #:configure-flags '("--disable-bzlib")
-       #:make-flags '("CFLAGS+=-std=c11")
-       #:strip-binaries? #f
-       #:validate-runpath? #f
-       ,@(package-arguments file)))))
+     (list
+      #:tests? #f                      ; merge test fails
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:configure-flags #~(list "--disable-bzlib")
+      #:make-flags #~(list "CFLAGS+=-std=c11")
+      #:strip-binaries? #f
+      #:validate-runpath? #f))))
 
 (define gawk-boot0
   (package
