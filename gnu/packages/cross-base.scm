@@ -558,16 +558,15 @@ the base compiler.  Use XBINUTILS as the associated cross-Binutils."
                         (srfi srfi-26))
              ,@(package-arguments glibc/hurd-headers))
          ((#:phases phases)
-          `(modify-phases ,phases
-             (add-after 'unpack 'set-cross-headers-path
-               (lambda* (#:key inputs #:allow-other-keys)
-                 (let* ((mach (assoc-ref inputs "gnumach-headers"))
-                        (hurd (assoc-ref inputs "hurd-headers"))
-                        (cpath (string-append mach "/include:"
-                                              hurd "/include")))
-                   (for-each (cut setenv <> cpath)
-                             ',%gcc-cross-include-paths)
-                   #t)))))
+          #~(modify-phases #$phases
+              (add-after 'unpack 'set-cross-headers-path
+                (lambda* (#:key inputs #:allow-other-keys)
+                  (let* ((mach (assoc-ref inputs "gnumach-headers"))
+                         (hurd (assoc-ref inputs "hurd-headers"))
+                         (cpath (string-append mach "/include:"
+                                               hurd "/include")))
+                    (for-each (cut setenv <> cpath)
+                              '#$%gcc-cross-include-paths))))))
          ((#:configure-flags flags)
           `(cons* ,(string-append "--build=" (%current-system))
                   ,(string-append "--host=" target)
@@ -706,24 +705,24 @@ returned."
 
                ,@(package-arguments libc))
            ((#:phases phases)
-            `(modify-phases ,phases
-               (add-before 'configure 'add-cross-binutils-to-PATH
-                 (lambda* (#:key native-inputs inputs #:allow-other-keys)
-                   ;; Add BINUTILS/TARGET/bin to $PATH so that 'gcc
-                   ;; -print-prog-name=objdump' returns the correct name.  See
-                   ;; <https://inbox.sourceware.org/libc-alpha/d72f5f6f-cc3a-bd89-0800-ffb068928e0f@linaro.org/t/>.
-                   (define cross-objdump
-                     (search-input-file
-                      (or native-inputs inputs)
-                      (string-append ,target "/bin/objdump")))
+            #~(modify-phases #$phases
+                (add-before 'configure 'add-cross-binutils-to-PATH
+                  (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                    ;; Add BINUTILS/TARGET/bin to $PATH so that 'gcc
+                    ;; -print-prog-name=objdump' returns the correct name.  See
+                    ;; <https://inbox.sourceware.org/libc-alpha/d72f5f6f-cc3a-bd89-0800-ffb068928e0f@linaro.org/t/>.
+                    (define cross-objdump
+                      (search-input-file
+                       (or native-inputs inputs)
+                       (string-append #$target "/bin/objdump")))
 
-                   (define cross-binutils
-                     (dirname cross-objdump))
+                    (define cross-binutils
+                      (dirname cross-objdump))
 
-                   (format #t "adding '~a' to the front of 'PATH'~%"
-                           cross-binutils)
-                   (setenv "PATH" (string-append cross-binutils ":"
-                                                 (getenv "PATH"))))))))))
+                    (format #t "adding '~a' to the front of 'PATH'~%"
+                            cross-binutils)
+                    (setenv "PATH" (string-append cross-binutils ":"
+                                                  (getenv "PATH"))))))))))
 
       ;; Shadow the native "kernel-headers" because glibc's recipe expects the
       ;; "kernel-headers" input to point to the right thing.
