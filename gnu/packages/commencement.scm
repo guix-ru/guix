@@ -2623,8 +2623,8 @@ exec " gcc-bin "/" program
   ;; This Flex is needed to build MiG as well as Linux-Libre headers.
   (package
     (inherit flex)
-    (native-inputs `(("bison" ,bison-boot0)))
-    (propagated-inputs `(("m4" ,m4-boot0)))
+    (native-inputs (list bison-boot0))
+    (propagated-inputs (list m4-boot0))
     (inputs (%boot0-inputs))
     (arguments
      `(#:implicit-inputs? #f
