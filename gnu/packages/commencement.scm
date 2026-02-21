@@ -3119,24 +3119,25 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
   (package
     (inherit static-bash)
     (source (bootstrap-origin (package-source static-bash)))
-    (inputs `(("gcc" ,gcc-boot0-intermediate-wrapped)
-              ("libc" ,glibc-final-with-bootstrap-bash)
-              ("libc:static" ,glibc-final-with-bootstrap-bash "static")
-              ,@(fold alist-delete (%boot1-inputs)
-                      '("gcc" "libc"))))
+    (inputs
+     (cons* gcc-boot0-intermediate-wrapped
+            glibc-final-with-bootstrap-bash
+            (list glibc-final-with-bootstrap-bash "static")
+            (fold delete
+                  (map cadr (%boot1-inputs))
+                  (list gcc-mesboot glibc-mesboot))))
     (arguments
-     `(#:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-
-       ,@(substitute-keyword-arguments (package-arguments static-bash)
-           ((#:configure-flags flags #~'())
-            ;; Add a '-L' flag so that the pseudo-cross-ld of
-            ;; BINUTILS-BOOT0 can find libc.a.
-            #~(append #$flags
-                      (list (string-append "LDFLAGS=-static -L"
-                                           (assoc-ref %build-inputs
-                                                      "libc:static")
-                                           "/lib")))))))))
+     (append
+      (list #:implicit-inputs? #f
+            #:guile %bootstrap-guile)
+      (substitute-keyword-arguments (package-arguments static-bash)
+        ((#:configure-flags flags #~'())
+         ;; Add a '-L' flag so that the pseudo-cross-ld of
+         ;; BINUTILS-BOOT0 can find libc.a.
+         #~(let ((libc.a (search-input-file %build-inputs "/lib/libc.a")))
+             (append #$flags
+                     (list (string-append "LDFLAGS=-static -L"
+                                          (dirname libc.a)))))))))))
 
 (define gettext-boot0
   ;; A minimal gettext used during bootstrap.
