@@ -223,10 +223,9 @@ pure Scheme to Tar and decompression in one easy step.")
                (replace 'install
                  (bootstrap-install '("gash") "scripts"))
                (add-after 'install 'install-symlinks
-                 (lambda* (#:key outputs #:allow-other-keys)
-                   (let ((out (assoc-ref outputs "out")))
-                     (symlink "gash" (string-append out "/bin/sh"))
-                     (symlink "gash" (string-append out "/bin/bash"))))))))
+                 (lambda _
+                   (symlink "gash" (string-append #$output "/bin/sh"))
+                   (symlink "gash" (string-append #$output "/bin/bash")))))))
     (inputs (list %bootstrap-guile))
     (native-inputs (list bootar))))
 
