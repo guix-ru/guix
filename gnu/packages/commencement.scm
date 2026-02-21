@@ -3004,40 +3004,42 @@ memoized as a function of '%current-system'."
       (outputs (delete "debug" (package-outputs libc)))
       (source (bootstrap-origin (package-source libc)))
       (arguments
-       `(#:guile ,%bootstrap-guile
-         #:implicit-inputs? #f
+       (append
+        (list #:guile %bootstrap-guile
+              #:implicit-inputs? #f)
+        (substitute-keyword-arguments (package-arguments libc)
+          ((#:configure-flags flags)
+           #~(cons* #$(string-append "--host=" (boot-triplet))
+                    #$(string-append "--build="
+                                     (nix-system->gnu-triplet))
+                    #$(if (system-hurd?)
+                          "--disable-werror"
+                          "")
+                    #$flags))
+          ((#:phases phases)
+           #~(modify-phases #$phases
+               (add-before 'configure 'pre-configure
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   ;; Don't clobber include paths with the bootstrap libc.
+                   (unsetenv "C_INCLUDE_PATH")
+                   (unsetenv "CPLUS_INCLUDE_PATH")
 
-         ,@(substitute-keyword-arguments (package-arguments libc)
-             ((#:configure-flags flags)
-              `(append (list ,(string-append "--host=" (boot-triplet))
-                             ,(string-append "--build="
-                                             (nix-system->gnu-triplet))
-                             ,(if (system-hurd?) "--disable-werror"
-                                  ""))
-                       ,flags))
-             ((#:phases phases)
-              `(modify-phases ,phases
-                 (add-before 'configure 'pre-configure
-                   (lambda* (#:key inputs #:allow-other-keys)
-                     ;; Don't clobber include paths with the bootstrap libc.
-                     (unsetenv "C_INCLUDE_PATH")
-                     (unsetenv "CPLUS_INCLUDE_PATH")
-
-                     ;; Tell 'libpthread' where to find 'libihash' on Hurd systems.
-                     ,@(if (system-hurd?)
-                           '((substitute* '("sysdeps/mach/Makefile"
+                   ;; Tell 'libpthread' where to find 'libihash' on Hurd systems.
+                   #$@(if (system-hurd?)
+                          #~((substitute* '("sysdeps/mach/Makefile"
                                             "sysdeps/mach/hurd/Makefile")
                                (("LDLIBS-pthread.so =.*")
                                 (string-append "LDLIBS-pthread.so = "
-                                               (assoc-ref %build-inputs "kernel-headers")
-                                               "/lib/libihash.a\n"))))
-                           '()))))))))
+                                               (search-input-file %build-inputs
+                                                                  "/lib/libihash.a")
+                                               "\n"))))
+                          #~()))))))))
       (propagated-inputs `(("kernel-headers" ,(kernel-headers-boot0))))
       (native-inputs
-       `(("bison" ,bison-boot0)
-         ("texinfo" ,texinfo-boot0)
-         ("perl" ,perl-boot0)
-         ("python" ,python-boot0)))
+       (list bison-boot0
+             perl-boot0
+             python-boot0
+             texinfo-boot0))
       (inputs
        `( ;; The boot inputs.  That includes the bootstrap libc.  We don't want
          ;; it in $CPATH, hence the 'pre-configure' phase above.

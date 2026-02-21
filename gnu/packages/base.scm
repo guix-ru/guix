@@ -958,247 +958,238 @@ the store.")
               "static"))                          ;9 MiB of .a files
 
    (arguments
-    `(#:out-of-source? #t
+    (list
+     #:out-of-source? #t
 
-      ;; The libraries have an empty RUNPATH, but some, such as the versioned
-      ;; libraries (libdl-2.24.so, etc.) have ld.so marked as NEEDED.  Since
-      ;; these libraries are always going to be found anyway, just skip
-      ;; RUNPATH checks.
-      #:validate-runpath? #f
+     ;; The libraries have an empty RUNPATH, but some, such as the versioned
+     ;; libraries (libdl-2.24.so, etc.) have ld.so marked as NEEDED.  Since
+     ;; these libraries are always going to be found anyway, just skip
+     ;; RUNPATH checks.
+     #:validate-runpath? #f
 
-      #:modules ((ice-9 ftw)
+     #:modules `((ice-9 ftw)
                  (srfi srfi-1)
                  (srfi srfi-26)
                  (guix build utils)
                  (guix build gnu-build-system))
 
-      ;; Strip binaries but preserve the symbol table needed by Valgrind:
-      ;; <https://lists.gnu.org/archive/html/help-guix/2022-03/msg00036.html>.
-      #:strip-flags '("--strip-debug")
+     ;; Strip binaries but preserve the symbol table needed by Valgrind:
+     ;; <https://lists.gnu.org/archive/html/help-guix/2022-03/msg00036.html>.
+     #:strip-flags #~'("--strip-debug")
 
-      #:configure-flags
-      (list "--sysconfdir=/etc"
+     #:configure-flags
+     #~(list "--sysconfdir=/etc"
 
-            ;; Installing a locale archive with all the locales is to
-            ;; expensive (~100 MiB), so we rely on users to install the
-            ;; locales they really want.
-            ;;
-            ;; Set the default locale path.  In practice, $LOCPATH may be
-            ;; defined to point whatever locales users want.  However, setuid
-            ;; binaries don't honor $LOCPATH, so they'll instead look into
-            ;; $libc_cv_complocaledir; we choose /run/current-system/locale/X.Y,
-            ;; with the idea that it is going to be populated by the sysadmin.
-            ;; The "X.Y" sub-directory is because locale data formats are
-            ;; incompatible across libc versions; see
-            ;; <https://lists.gnu.org/archive/html/guix-devel/2015-08/msg00737.html>.
-            ;;
-            ;; `--localedir' is not honored, so work around it.
-            ;; See <http://sourceware.org/ml/libc-alpha/2013-03/msg00093.html>.
-            (string-append "libc_cv_complocaledir=/run/current-system/locale/"
-                           ,(version-major+minor version))
+             ;; Installing a locale archive with all the locales is to
+             ;; expensive (~100 MiB), so we rely on users to install the
+             ;; locales they really want.
+             ;;
+             ;; Set the default locale path.  In practice, $LOCPATH may be
+             ;; defined to point whatever locales users want.  However, setuid
+             ;; binaries don't honor $LOCPATH, so they'll instead look into
+             ;; $libc_cv_complocaledir; we choose /run/current-system/locale/X.Y,
+             ;; with the idea that it is going to be populated by the sysadmin.
+             ;; The "X.Y" sub-directory is because locale data formats are
+             ;; incompatible across libc versions; see
+             ;; <https://lists.gnu.org/archive/html/guix-devel/2015-08/msg00737.html>.
+             ;;
+             ;; `--localedir' is not honored, so work around it.
+             ;; See <http://sourceware.org/ml/libc-alpha/2013-03/msg00093.html>.
+             (string-append "libc_cv_complocaledir=/run/current-system/locale/"
+                            #$(version-major+minor version))
 
-            (string-append "--with-headers="
-                           (assoc-ref ,(if (%current-target-system)
-                                           '%build-target-inputs
-                                           '%build-inputs)
-                                      "kernel-headers")
-                           "/include")
+             (string-append "--with-headers="
+                            (assoc-ref #$(if (%current-target-system)
+                                             #~%build-target-inputs
+                                             #~%build-inputs)
+                                       "kernel-headers")
+                            "/include")
 
-            ;; This is the default for most architectures as of GNU libc 2.26,
-            ;; but we specify it explicitly for clarity and consistency.  See
-            ;; "kernel-features.h" in the GNU libc for details.
-            "--enable-kernel=3.2.0"
+             ;; This is the default for most architectures as of GNU libc 2.26,
+             ;; but we specify it explicitly for clarity and consistency.  See
+             ;; "kernel-features.h" in the GNU libc for details.
+             "--enable-kernel=3.2.0"
 
-            ;; Use our Bash instead of /bin/sh.
-            (string-append "BASH_SHELL="
-                           (assoc-ref %build-inputs "bash")
-                           "/bin/bash")
+             ;; Use our Bash instead of /bin/sh.
+             (string-append "BASH_SHELL="
+                            (search-input-file %build-inputs "/bin/bash"))
 
-            ;; On GNU/Hurd we get discarded-qualifiers warnings for
-            ;; 'device_write_inband' among other things.  Ignore them.
-            ,@(if (target-hurd?)
-                  `("--disable-werror")
-                  '()))
+             ;; On GNU/Hurd we get discarded-qualifiers warnings for
+             ;; 'device_write_inband' among other things.  Ignore them.
+             #$@(if (target-hurd?)
+                    #~("--disable-werror")
+                    #~()))
 
-      #:tests? #f                                 ; XXX
-      #:phases (modify-phases %standard-phases
-                 (add-before
-                  'configure 'pre-configure
-                  (lambda* (#:key inputs native-inputs outputs
-                                  #:allow-other-keys)
-                    (let* ((out  (assoc-ref outputs "out"))
-                           (bin  (string-append out "/bin"))
-                           ;; FIXME: Normally we would look it up only in INPUTS
-                           ;; but cross-base uses it as a native input.
-                           (bash (or (assoc-ref inputs "bash-static")
-                                     (assoc-ref native-inputs "bash-static"))))
-                      ;; Install the rpc data base file under `$out/etc/rpc'.
-                      (substitute* "inet/Makefile"
-                        (("^\\$\\(inst_sysconfdir\\)/rpc(.*)$" _ suffix)
-                         (string-append out "/etc/rpc" suffix "\n"))
-                        (("^install-others =.*$")
-                         (string-append "install-others = " out "/etc/rpc\n")))
+     #:tests? #f ; XXX
+     #:phases
+     #~(modify-phases %standard-phases
+         (add-before 'configure 'pre-configure
+           (lambda* (#:key inputs native-inputs #:allow-other-keys)
+             (let* ((bin (string-append #$output "/bin"))
+                    ;; FIXME: Normally we would look it up only in INPUTS
+                    ;; but cross-base uses it as a native input.
+                    (bash (or (assoc-ref inputs "bash-static")
+                              (assoc-ref native-inputs "bash-static"))))
+               ;; Install the rpc data base file under `$out/etc/rpc'.
+               (substitute* "inet/Makefile"
+                 (("^\\$\\(inst_sysconfdir\\)/rpc(.*)$" _ suffix)
+                  (string-append #$output "/etc/rpc" suffix "\n"))
+                 (("^install-others =.*$")
+                  (string-append "install-others = " #$output "/etc/rpc\n")))
 
-                      (substitute* "Makeconfig"
-                        ;; According to
-                        ;; <http://www.linuxfromscratch.org/lfs/view/stable/chapter05/glibc.html>,
-                        ;; linking against libgcc_s is not needed with GCC
-                        ;; 4.7.1.
-                        ((" -lgcc_s") ""))
+               (substitute* "Makeconfig"
+                 ;; According to
+                 ;; <http://www.linuxfromscratch.org/lfs/view/stable/chapter05/glibc.html>,
+                 ;; linking against libgcc_s is not needed with GCC
+                 ;; 4.7.1.
+                 ((" -lgcc_s") ""))
 
-                      ;; Tell the ld.so cache code where the store is.
-                      (substitute* "elf/dl-cache.c"
-                        (("@STORE_DIRECTORY@")
-                         (string-append "\"" (%store-directory) "\"")))
+               ;; Tell the ld.so cache code where the store is.
+               (substitute* "elf/dl-cache.c"
+                 (("@STORE_DIRECTORY@")
+                  (string-append "\"" (%store-directory) "\"")))
 
-                      ;; Have `system' use that Bash.
-                      (substitute* "sysdeps/posix/system.c"
-                        (("#define[[:blank:]]+SHELL_PATH.*$")
-                         (format #f "#define SHELL_PATH \"~a/bin/bash\"\n"
-                                 bash)))
+               ;; Have `system' use that Bash.
+               (substitute* "sysdeps/posix/system.c"
+                 (("#define[[:blank:]]+SHELL_PATH.*$")
+                  (format #f "#define SHELL_PATH \"~a/bin/bash\"\n" bash)))
 
-                      ;; Same for `popen'.
-                      (substitute* "libio/iopopen.c"
-                        (("/bin/sh")
-                         (string-append bash "/bin/sh")))
+               ;; Same for `popen'.
+               (substitute* "libio/iopopen.c"
+                 (("/bin/sh")
+                  (string-append bash "/bin/sh")))
 
-                      ;; Same for the shell used by the 'exec' functions for
-                      ;; scripts that lack a shebang.
-                      (substitute* (find-files "." "^paths\\.h$")
-                        (("#define[[:blank:]]+_PATH_BSHELL[[:blank:]].*$")
-                         (string-append "#define _PATH_BSHELL \""
-                                        bash "/bin/sh\"\n")))
+               ;; Same for the shell used by the 'exec' functions for
+               ;; scripts that lack a shebang.
+               (substitute* (find-files "." "^paths\\.h$")
+                 (("#define[[:blank:]]+_PATH_BSHELL[[:blank:]].*$")
+                  (string-append "#define _PATH_BSHELL \""
+                                 bash "/bin/sh\"\n")))
 
-                      ;; Make sure we don't retain a reference to the
-                      ;; bootstrap Perl.
-                      (substitute* "malloc/mtrace.pl"
-                        (("^#!.*")
-                         ;; The shebang can be omitted, because there's the
-                         ;; "bilingual" eval/exec magic at the top of the file.
-                         "")
-                        (("exec @PERL@")
-                         "exec perl")))))
+               ;; Make sure we don't retain a reference to the
+               ;; bootstrap Perl.
+               (substitute* "malloc/mtrace.pl"
+                 (("^#!.*")
+                  ;; The shebang can be omitted, because there's the
+                  ;; "bilingual" eval/exec magic at the top of the file.
+                  "")
+                 (("exec @PERL@")
+                  "exec perl")))))
 
-                 (add-after 'install 'move-static-libs
-                   (lambda* (#:key outputs #:allow-other-keys)
-                     ;; Move static libraries to the "static" output.
-                     ;; Note: As of GNU libc 2.34, the contents of some ".a"
-                     ;; files have been moved into "libc.so", and *both* empty
-                     ;; ".so" and ".a" files have been introduced to avoid
-                     ;; breaking existing executables and existing builds
-                     ;; respectively.  The intent of the seemingly redundant
-                     ;; empty ".a" files is to avoid newly-compiled executables
-                     ;; from having dependencies on the empty shared libraries,
-                     ;; and as such, it is useful to have these ".a" files in
-                     ;; OUT in addition to STATIC.
+         (add-after 'install 'move-static-libs
+           (lambda _
+             ;; Move static libraries to the "static" output.
+             ;; Note: As of GNU libc 2.34, the contents of some ".a"
+             ;; files have been moved into "libc.so", and *both* empty
+             ;; ".so" and ".a" files have been introduced to avoid
+             ;; breaking existing executables and existing builds
+             ;; respectively.  The intent of the seemingly redundant
+             ;; empty ".a" files is to avoid newly-compiled executables
+             ;; from having dependencies on the empty shared libraries,
+             ;; and as such, it is useful to have these ".a" files in
+             ;; OUT in addition to STATIC.
 
-                     (define (empty-static-library? file)
-                       ;; Return true if FILE is an 'ar' archive with nothing
-                       ;; beyond the header.
-                       (let ((file (string-append (assoc-ref outputs "out")
-                                                  "/lib/" file)))
-                         (and (ar-file? file)
-                              (= (stat:size (stat file)) 8))))
+             (define (empty-static-library? file)
+               ;; Return true if FILE is an 'ar' archive with nothing
+               ;; beyond the header.
+               (let ((file (string-append #$output "/lib/" file)))
+                 (and (ar-file? file)
+                      (= (stat:size (stat file)) 8))))
 
-                     (define (static-library? file)
-                       ;; Return true if FILE is a static library.  The
-                       ;; "_nonshared.a" files are referred to by libc.so,
-                       ;; libpthread.so, etc., which are in fact linker
-                       ;; scripts.
-                       (and (string-suffix? ".a" file)
-                            (not (string-contains file "_nonshared"))
-                            (not (empty-static-library? file))))
+             (define (static-library? file)
+               ;; Return true if FILE is a static library.  The
+               ;; "_nonshared.a" files are referred to by libc.so,
+               ;; libpthread.so, etc., which are in fact linker
+               ;; scripts.
+               (and (string-suffix? ".a" file)
+                    (not (string-contains file "_nonshared"))
+                    (not (empty-static-library? file))))
 
-                     (define (linker-script? file)
-                       ;; Guess whether FILE, a ".a" file, is actually a
-                       ;; linker script.
-                       (and (not (ar-file? file))
-                            (not (elf-file? file))))
+             (define (linker-script? file)
+               ;; Guess whether FILE, a ".a" file, is actually a
+               ;; linker script.
+               (and (not (ar-file? file))
+                    (not (elf-file? file))))
 
-                     (let* ((out    (assoc-ref outputs "out"))
-                            (lib    (string-append out "/lib"))
-                            (files  (scandir lib static-library?))
-                            (empty  (scandir lib empty-static-library?))
-                            (static (assoc-ref outputs "static"))
-                            (slib   (string-append static "/lib")))
-                       (mkdir-p slib)
-                       (for-each (lambda (base)
-                                   (rename-file (string-append lib "/" base)
-                                                (string-append slib "/" base)))
-                                 files)
-                       (for-each (lambda (base)
-                                   (copy-file (string-append lib "/" base)
-                                              (string-append slib "/" base)))
-                                 empty)
+             (let* ((lib (string-append #$output "/lib"))
+                    (files (scandir lib static-library?))
+                    (empty (scandir lib empty-static-library?))
+                    (slib (string-append #$output:static "/lib")))
+               (mkdir-p slib)
+               (for-each (lambda (base)
+                           (rename-file (string-append lib "/" base)
+                                        (string-append slib "/" base)))
+                         files)
+               (for-each (lambda (base)
+                           (copy-file (string-append lib "/" base)
+                                      (string-append slib "/" base)))
+                         empty)
 
-                       ;; Usually libm.a is a linker script so we need to
-                       ;; change the file names in there to refer to STATIC
-                       ;; instead of OUT.
-                       (for-each (lambda (ld-script)
-                                   (substitute* ld-script
-                                     ((out) static)))
-                                 (filter linker-script?
-                                         (map (cut string-append slib "/" <>)
-                                              files))))))
+               ;; Usually libm.a is a linker script so we need to
+               ;; change the file names in there to refer to STATIC
+               ;; instead of OUT.
+               (for-each (lambda (ld-script)
+                           (substitute* ld-script
+                             ((#$output)
+                              #$output:static)))
+                         (filter linker-script?
+                                 (map (cut string-append slib "/" <>)
+                                      files))))))
 
-                 (add-after 'install 'install-utf8-c-locale
-                   (lambda* (#:key outputs #:allow-other-keys)
-                     ;; Install the C.UTF-8 locale so there's always a UTF-8
-                     ;; locale around.
-                     (let* ((out (assoc-ref outputs "out"))
-                            (bin (string-append out "/bin"))
-                            (locale (string-append out "/lib/locale/"
-                                                   ,(package-version
-                                                     this-package))))
-                       (mkdir-p locale)
+         (add-after 'install 'install-utf8-c-locale
+           (lambda _
+             ;; Install the C.UTF-8 locale so there's always a UTF-8
+             ;; locale around.
+             (let ((bin (string-append #$output "/bin"))
+                   (locale (string-append #$output "/lib/locale/"
+                                          #$(package-version
+                                             this-package))))
+               (mkdir-p locale)
 
-                       ;; FIXME: When cross-compiling, attempt to use
-                       ;; 'localedef' from the same libc version.
-                       (invoke ,(if (%current-target-system)
-                                    "true"
-                                    '(string-append bin "/localedef"))
-                               "--no-archive" "--prefix" locale
-                               "-i" "C" "-f" "UTF-8"
-                               (string-append locale "/C.UTF-8")))))
+               ;; FIXME: When cross-compiling, attempt to use
+               ;; 'localedef' from the same libc version.
+               (invoke #$(if (%current-target-system)
+                             "true"
+                             #~(string-append bin "/localedef"))
+                       "--no-archive" "--prefix" locale
+                       "-i" "C" "-f" "UTF-8"
+                       (string-append locale "/C.UTF-8")))))
 
-                 ,@(if (target-hurd?)
-                       `((add-after 'install 'augment-libc.so
-                           (lambda* (#:key outputs #:allow-other-keys)
-                             (let ((out (assoc-ref outputs "out")))
-                               (substitute* (string-append out "/lib/libc.so")
-                                 (("/[^ ]+/lib/libc.so.0.3")
-                                  (string-append out "/lib/libc.so.0.3"
-                                                 " libmachuser.so libhurduser.so"))))))
-                         (add-after 'install 'create-machine-symlink
-                           (lambda* (#:key outputs #:allow-other-keys)
-                             (let* ((out (assoc-ref outputs "out"))
-                                    (cpu ,(match (or (%current-target-system)
-                                                     (%current-system))
-                                            ((? target-x86-32?)
-                                             "i386")
-                                            ((? target-x86-64?)
-                                             "x86_64")))
-                                    (machine (string-append
-                                              out "/include/mach/machine")))
-                               (unless (file-exists? machine)
-                                 (symlink cpu machine))))))
-                       '()))))
+         #$@(if (target-hurd?)
+                `((add-after 'install 'augment-libc.so
+                    (lambda _
+                      (substitute* (string-append #$output "/lib/libc.so")
+                        (("/[^ ]+/lib/libc.so.0.3")
+                         (string-append #$output "/lib/libc.so.0.3"
+                                        " libmachuser.so libhurduser.so")))))
+                  (add-after 'install 'create-machine-symlink
+                    (lambda _
+                      (let* ((cpu #$(match (or (%current-target-system)
+                                               (%current-system))
+                                      ((? target-x86-32?)
+                                       "i386")
+                                      ((? target-x86-64?)
+                                       "x86_64")))
+                             (machine (string-append #$output
+                                                     "/include/mach/machine")))
+                        (unless (file-exists? machine)
+                          (symlink cpu machine))))))
+                '()))))
 
    (inputs (list static-bash))
 
    ;; To build the manual, we need Texinfo and Perl.  Gettext is needed to
    ;; install the message catalogs, with 'msgfmt'.
-   (native-inputs `(("texinfo" ,texinfo)
-                    ("perl" ,perl)
-                    ("bison" ,bison)
-                    ("gettext" ,gettext-minimal)
-                    ("python" ,python-minimal)
-
-                    ,@(if (target-hurd?)
-                          `(("mig" ,mig)
-                            ("perl" ,perl))
-                          '())))
-
+   (native-inputs
+    (append
+     (list bison
+           gettext-minimal
+           perl
+           python-minimal
+           texinfo)
+     (if (target-hurd?)
+         (list mig)
+         (list))))
    (native-search-paths
     ;; Search path for packages that provide locale data.  This is useful
     ;; primarily in build environments.  Use 'GUIX_LOCPATH' rather than
@@ -1301,8 +1292,8 @@ with the Linux kernel.")
         ;; The C.UTF-8 fails to build in glibc 2.35:
         ;; <https://sourceware.org/bugzilla/show_bug.cgi?id=28861>.
         ;; It is missing altogether in versions earlier than 2.35.
-        `(modify-phases ,phases
-           (delete 'install-utf8-c-locale)))))))
+        #~(modify-phases #$phases
+            (delete 'install-utf8-c-locale)))))))
 
 (define-public glibc-2.33
   (package
@@ -1343,9 +1334,9 @@ with the Linux kernel.")
                  "libc_cv_cxx_link_ok=no"
                  #$flags))
        ((#:phases phases)
-        `(modify-phases ,phases
-           ;; This phase fails trying to create /etc/ld.so.cache
-           (delete 'install-utf8-c-locale)))))))
+        #~(modify-phases #$phases
+            ;; This phase fails trying to create /etc/ld.so.cache
+            (delete 'install-utf8-c-locale)))))))
 
 (define-public (make-gcc-libc base-gcc libc)
   "Return a GCC that targets LIBC."
