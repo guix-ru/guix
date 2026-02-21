@@ -2148,9 +2148,7 @@ exec " gcc-bin "/" program
   (package
     (inherit (@ (gnu packages file) file))
     (arguments
-     `(#:configure-flags
-       ;; XXX: List only added to prevent rebuilds!
-       `("--disable-bzlib" ,,@'())))))
+     (list #:configure-flags #~(list "--disable-bzlib")))))
 
 (define file-boot0
   (package
