@@ -3414,12 +3414,10 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
       (source (bootstrap-origin (package-source bash)))
       (inputs (%boot3-inputs))
       (arguments
-       `(#:implicit-inputs? #f
-         #:guile ,%bootstrap-guile
-
-         #:disallowed-references ,(assoc-ref (%boot3-inputs) "coreutils&co")
-
-         ,@(package-arguments bash))))))
+       (cons* #:implicit-inputs? #f
+              #:guile %bootstrap-guile
+              #:disallowed-references (list %bootstrap-coreutils&co)
+              (package-arguments bash))))))
 
 (define (%boot4-inputs)
   ;; Now use the final Bash.
