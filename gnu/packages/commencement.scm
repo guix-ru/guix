@@ -2209,10 +2209,10 @@ exec " gcc-bin "/" program
     (native-inputs '())
     (inputs (cons* gnu-make-boot0 (map cadr (%bootstrap-inputs+toolchain))))
     (arguments
-     `(#:implicit-inputs? #f
-       #:tests? #f
-       #:guile ,%bootstrap-guile
-       ,@(package-arguments sed)))))
+     (list
+      #:implicit-inputs? #f
+      #:tests? #f
+      #:guile %bootstrap-guile))))
 
 (define tar-boot0
   (package
