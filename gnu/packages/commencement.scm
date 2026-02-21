@@ -3066,44 +3066,45 @@ that makes it available under the native tool names."
      (list
       #:guile %bootstrap-guile
       #:modules '((guix build utils))
-      #:builder #~(begin
-                    (use-modules (guix build utils))
+      #:builder
+      #~(begin
+          (use-modules (guix build utils))
 
-                    (let* ((binutils (assoc-ref %build-inputs "binutils"))
-                           (gcc      (assoc-ref %build-inputs "gcc"))
-                           (libc     (assoc-ref %build-inputs "libc"))
-                           (bash     (assoc-ref %build-inputs "bash"))
-                           (out      (assoc-ref %outputs "out"))
-                           (bindir   (string-append out "/bin"))
-                           (triplet  #$(boot-triplet)))
-                      (define (wrap-program program)
-                        ;; GCC-BOOT0 is a libc-less cross-compiler, so it
-                        ;; needs to be told where to find the crt files and
-                        ;; the dynamic linker.
-                        (call-with-output-file program
-                          (lambda (p)
-                            (format p "#!~a/bin/bash
+          (let* ((binutils-bin (dirname
+                                (search-input-file %build-inputs "bin/ar")))
+                 (gcc-libexec  (search-input-directory %build-inputs
+                                                       "libexec/gcc"))
+                 (gcc          (dirname (dirname gcc-libexec)))
+                 (libc.so      (search-input-file %build-inputs
+                                                  "/lib/libc.so"))
+                 (libc         (dirname (dirname libc.so)))
+                 (bash         (search-input-file %build-inputs "bin/bash"))
+                 (bindir       (string-append #$output "/bin"))
+                 (triplet      #$(boot-triplet)))
+            (define (wrap-program program)
+              ;; GCC-BOOT0 is a libc-less cross-compiler, so it
+              ;; needs to be told where to find the crt files and
+              ;; the dynamic linker.
+              (call-with-output-file program
+                (lambda (p)
+                  (format p "#!~a
 exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
-                                    bash
-                                    gcc triplet program
-                                    libc libc
-                                    #$(glibc-dynamic-linker))))
+                          bash
+                          gcc triplet program
+                          libc libc
+                          #$(glibc-dynamic-linker))))
 
-                        (chmod program #o555))
+              (chmod program #o555))
 
-                      (mkdir-p bindir)
-                      (with-directory-excursion bindir
-                        (for-each (lambda (tool)
-                                    (symlink (string-append binutils "/bin/"
-                                                            triplet "-" tool)
-                                             tool))
-                                  '("ar" "ranlib"))
-                        (for-each wrap-program '("gcc" "g++")))))))
-    (native-inputs
-     `(("binutils" ,binutils)
-       ("gcc" ,gcc)
-       ("libc" ,glibc)
-       ("bash" ,bash)))
+            (mkdir-p bindir)
+            (with-directory-excursion bindir
+              (for-each (lambda (tool)
+                          (symlink (string-append binutils-bin "/"
+                                                  triplet "-" tool)
+                                   tool))
+                        '("ar" "ranlib"))
+              (for-each wrap-program '("gcc" "g++")))))))
+    (native-inputs (list bash binutils gcc glibc))
     (inputs '())))
 
 (define/system-dependent gcc-boot0-intermediate-wrapped
