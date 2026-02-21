@@ -3191,35 +3191,12 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 
 (define (%boot2-inputs)
   ;; 3rd stage inputs.
-  `(("libc" ,glibc-final)
-    ("libc:static" ,glibc-final "static")
-    ("gcc" ,gcc-boot0-wrapped)
-    ("ld-wrapper-cross" ,ld-wrapper-boot0)
-    ("binutils-cross" ,binutils-boot0)
-    ,@(match (%current-system)
-        ((or "i686-linux" "x86_64-linux")
-         `(("bzip2" ,bzip2-boot0)
-           ("coreutils" ,coreutils-boot0)
-           ("gawk" ,gawk-boot0)
-           ("patch" ,patch-boot0)
-           ("sed" ,sed-boot0)
-           ("tar" ,tar-boot0)
-           ("grep" ,grep-mesboot)
-           ("tar" ,tar-mesboot)
-           ("xz" ,xz-mesboot)
-           ("gcc-wrapper" ,gcc-mesboot-wrapper)
-           ("make" ,gnu-make-mesboot)
-           ("gzip" ,gzip-mesboot)
-           ("guile" ,%bootstrap-guile)))
-        (_
-         `(("coreutils&co" ,%bootstrap-coreutils&co)
-           ;; In gnu-build-system.scm, we rely on the availability of Bash.
-           ("bash" ,%bootstrap-coreutils&co))))
-    ("make" ,gnu-make-boot0)
-    ("diffutils" ,diffutils-boot0)
-    ("findutils" ,findutils-boot0)
-    ("file" ,file-boot0)
-    ("bash" ,bash-mesboot)))
+  (cons* glibc-final
+         (list glibc-final "static")
+         gcc-boot0-wrapped
+         (fold delete
+               (%boot1-inputs)
+               (list gcc-mesboot glibc-mesboot))))
 
 (define libstdc++
   ;; Intermediate libstdc++ that will allow us to build the final GCC
@@ -3246,7 +3223,18 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
                    (string-append "--with-gxx-include-dir="
                                   #$output "/include"))))))
       (outputs '("out"))
-      (inputs (%boot2-inputs))
+      (inputs `(("libc" ,glibc-final)
+                ("libc:static" ,glibc-final "static")
+                ("gcc" ,gcc-boot0-wrapped)
+                ("ld-wrapper-cross" ,ld-wrapper-boot0)
+                ("binutils-cross" ,binutils-boot0)
+                ,@(map packages->input-alist
+                       (fold delete (%boot2-inputs)
+                             (list glibc-final
+                                   (list glibc-final "static")
+                                   gcc-boot0-wrapped
+                                   ld-wrapper-boot0
+                                   binutils-boot0)))))
       (synopsis "GNU C++ standard library (intermediate)"))))
 
 (define binutils-final
@@ -3275,8 +3263,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     (inputs
      (match (%current-system)
        ((? target-powerpc?)
-        `(("bash" ,static-bash-for-glibc)
-          ,@(%boot2-inputs)))
+        (cons* static-bash-for-glibc (%boot2-inputs)))
        (_ (%boot2-inputs))))))
 
 (define zlib-final
@@ -3296,7 +3283,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
   (make-ld-wrapper "ld-wrapper-boot3"
                    #:binutils binutils-final
                    #:guile %bootstrap-guile
-                   #:bash (car (assoc-ref (%boot2-inputs) "bash"))
+                   #:bash bash-mesboot
                    #:guile-for-build %bootstrap-guile))
 
 (define gcc-final
@@ -3389,7 +3376,12 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
                 perl-boot0                  ;for manpages
                 static-bash-for-glibc)))
     (inputs
-     (modify-inputs (%boot2-inputs)
+     (modify-inputs
+         `(("libc" ,glibc-final)
+           ("libc:static" ,glibc-final "static")
+           ,@(map packages->input-alist
+                  (fold delete (%boot2-inputs)
+                        (list glibc-final (list glibc-final "static")))))
        (prepend (bootstrap-origin (package-source gmp-6.0))
                 (package-source mpfr)
                 (package-source mpc)
@@ -3402,7 +3394,34 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
   ;; 4th stage inputs.
   `(("gcc" ,gcc-final)
     ("ld-wrapper" ,ld-wrapper-boot3)
-    ,@(alist-delete "gcc" (%boot2-inputs))))
+    ("libc" ,glibc-final)
+    ("libc:static" ,glibc-final "static")
+    ("ld-wrapper-cross" ,ld-wrapper-boot0)
+    ("binutils-cross" ,binutils-boot0)
+    ,@(match (%current-system)
+        ((or "i686-linux" "x86_64-linux")
+         `(("bzip2" ,bzip2-boot0)
+           ("coreutils" ,coreutils-boot0)
+           ("gawk" ,gawk-boot0)
+           ("patch" ,patch-boot0)
+           ("sed" ,sed-boot0)
+           ("tar" ,tar-boot0)
+           ("grep" ,grep-mesboot)
+           ("tar" ,tar-mesboot)
+           ("xz" ,xz-mesboot)
+           ("gcc-wrapper" ,gcc-mesboot-wrapper)
+           ("make" ,gnu-make-mesboot)
+           ("gzip" ,gzip-mesboot)
+           ("guile" ,%bootstrap-guile)))
+        (_
+         `(("coreutils&co" ,%bootstrap-coreutils&co)
+           ;; In gnu-build-system.scm, we rely on the availability of Bash.
+           ("bash" ,%bootstrap-coreutils&co))))
+    ("make" ,gnu-make-boot0)
+    ("diffutils" ,diffutils-boot0)
+    ("findutils" ,findutils-boot0)
+    ("file" ,file-boot0)
+    ("bash" ,bash-mesboot)))
 
 (define bash-final
   ;; Link with `-static-libgcc' to make sure we don't retain a reference
