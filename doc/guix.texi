@@ -58168,7 +58168,8 @@ there is no offset applied.
 The partition file system as a string, defaulting to @code{"ext4"}.
 
 The supported values are @code{"btrfs"}, @code{"ext4"}, @code{"fat16"},
-@code{"f2fs"}, @code{"fat32"}, @code{"vfat"}, and @code{"swap"}.
+@code{"f2fs"}, @code{"fat32"}, @code{"vfat"}, @code{"squashfs"}, and
+@code{"swap"}.
 
 @code{"vfat"}, @code{"fat16"}, and @code{"fat32"} partitions without the
 @code{'esp} flag are by default LBA compatible.

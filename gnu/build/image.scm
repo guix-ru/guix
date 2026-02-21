@@ -157,6 +157,24 @@ turn doesn't take any constant overhead into account, force a 1-MiB minimum."
              ,target))
     (invoke "fakeroot" "sload.f2fs" "-P" "-f" root target)))
 
+(define* (make-squashfs-image partition target root
+                          #:key
+                          (owner-uid 0)
+                          (owner-gid 0))
+  "Handle the creation of SQUASHFS partition images.  See 'make-partition-image'."
+  (let ((size (partition-size partition))
+        (label (partition-label partition))
+        (uuid (partition-uuid partition))
+        (fs-options (partition-file-system-options partition)))
+    (apply invoke "fakeroot" "mksquashfs"
+           root
+           target
+           "-root-uid" (number->string owner-uid)
+           "-root-gid" (number->string owner-gid)
+           "-comp" "xz"
+           "-Xdict-size" "100%"
+           `(,@fs-options))))
+
 (define* (make-vfat-image partition target root fs-bits)
   "Handle the creation of VFAT partition images.  See 'make-partition-image'."
   (let ((size (partition-size partition))
@@ -224,6 +242,8 @@ ROOT directory to populate the image."
       (make-vfat-image partition target root 16))
      ((string=? type "fat32")
       (make-vfat-image partition target root 32))
+     ((string=? type "squashfs")
+      (make-squashfs-image partition target root))
      ((string=? "swap" type)
       (make-swap-image partition target))
      ((string=? type "unformatted")
