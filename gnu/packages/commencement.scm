@@ -3301,7 +3301,8 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 
 (define gcc-final
   ;; The final GCC.
-  (package (inherit gcc-boot0)
+  (package
+    (inherit gcc-boot0)
     (name "gcc")
 
     ;; XXX: Currently #:allowed-references applies to all the outputs but the
@@ -3323,14 +3324,16 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
       #:validate-runpath? #f
 
       ;; Additional modules for the libstdc++ phase below.
-      #:modules `((srfi srfi-1)
+      #:modules `((ice-9 match)
+                  (srfi srfi-1)
                   (srfi srfi-26)
                   ,@%default-gnu-modules)
 
       (substitute-keyword-arguments (package-arguments gcc)
         ((#:make-flags flags)
          ;; Since $LIBRARY_PATH is not honored, add the relevant flags.
-         #~(let ((zlib (assoc-ref %build-inputs "zlib")))
+         #~(let ((z-lib (dirname
+                         (search-input-file %build-inputs "lib/libz.so"))))
              (map (lambda (flag)
                     (if #$(if (target-hurd64?)
                               #~(and (string? flag)
@@ -3338,8 +3341,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
                               #~(string-prefix? "LDFLAGS=" flag))
                         (string-append flag " -L"
                                        (assoc-ref %build-inputs "libstdc++")
-                                       "/lib -L" zlib "/lib -Wl,-rpath="
-                                       zlib "/lib")
+                                       "/lib -L" z-lib " -Wl,-rpath=" z-lib)
                         flag))
                   #$flags)))
         ((#:configure-flags flags)
@@ -3355,27 +3357,8 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
         ;; doesn't honor $LIBRARY_PATH, which breaks `gnu-build-system'.)
         ((#:phases phases)
          #~(modify-phases #$phases
-             (add-after 'unpack 'unpack-gmp&co
-               (lambda* (#:key inputs #:allow-other-keys)
-                 (let ((gmp  (assoc-ref %build-inputs "gmp-source"))
-                       (mpfr (assoc-ref %build-inputs "mpfr-source"))
-                       (mpc  (assoc-ref %build-inputs "mpc-source")))
-
-                   ;; To reduce the set of pre-built bootstrap inputs, build
-                   ;; GMP & co. from GCC.
-                   (for-each (lambda (source)
-                               (invoke "tar" "xvf" source))
-                             (list gmp mpfr mpc))
-
-                   ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
-                   #$@(map (lambda (lib)
-                             ;; Drop trailing letters, as gmp-6.0.0a unpacks
-                             ;; into gmp-6.0.0.
-                             #~(symlink #$(string-trim-right
-                                           (package-full-name lib "-")
-                                           char-set:letter)
-                                        #$(package-name lib)))
-                           (list gmp-6.0 mpfr mpc)))))
+             (add-after 'unpack 'unpack-other-tarballs
+               #$unpack-and-symlink-other-tarballs-phase)
              (add-after 'unpack 'fix-build-with-external-libstdc++
                (lambda* (#:key inputs #:allow-other-keys)
                  (let ((libstdc++ (assoc-ref inputs "libstdc++")))
@@ -3400,19 +3383,20 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     ;; STATIC-BASH-FOR-GLIBC so that it's used in the final shebangs of
     ;; scripts such as 'mkheaders' and 'fixinc.sh' (XXX: who cares about these
     ;; scripts?).
-    (native-inputs `(("texinfo" ,texinfo-boot0)
-                     ("perl" ,perl-boot0) ;for manpages
-                     ("bash-static" ,static-bash-for-glibc)
-                     ,@(package-native-inputs gcc-boot0)))
-
-    (inputs `(("gmp-source" ,(bootstrap-origin (package-source gmp-6.0)))
-              ("mpfr-source" ,(package-source mpfr))
-              ("mpc-source" ,(package-source mpc))
-              ("ld-wrapper" ,ld-wrapper-boot3)
-              ("binutils" ,binutils-final)
-              ("libstdc++" ,libstdc++)
-              ("zlib" ,zlib-final)
-              ,@(%boot2-inputs)))))
+    (native-inputs
+     (modify-inputs (package-native-inputs gcc-boot0)
+       (prepend texinfo-boot0
+                perl-boot0                  ;for manpages
+                static-bash-for-glibc)))
+    (inputs
+     (modify-inputs (%boot2-inputs)
+       (prepend (bootstrap-origin (package-source gmp-6.0))
+                (package-source mpfr)
+                (package-source mpc)
+                ld-wrapper-boot3
+                binutils-final
+                libstdc++
+                zlib-final)))))
 
 (define (%boot3-inputs)
   ;; 4th stage inputs.
