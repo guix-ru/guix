@@ -2587,37 +2587,38 @@ exec " gcc-bin "/" program
   (package
     (inherit bison)
     (name "bison-boot0")
-    (propagated-inputs `(("m4" ,m4-boot0)))
-    (native-inputs `(("perl" ,perl-boot0)))
+    (propagated-inputs (list m4-boot0))
+    (native-inputs (list perl-boot0))
     (inputs (%boot0-inputs))                      ;remove Flex...
     (arguments
-     `(#:tests? #f                                ;... and thus disable tests
-       #:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
+     (cons*
+      #:tests? #f                                ;... and thus disable tests
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
 
-       ;; Zero timestamps in liby.a; this must be done
-       ;; explicitly here because the bootstrap Binutils don't
-       ;; do that (default is "cru".)
-       #:make-flags `("ARFLAGS=crD"
-                      ,,(match (%current-system)
-                          ;; ranlib: '-D': No such file
-                          ((or "i686-linux" "x86_64-linux")
-                           "RANLIB=ranlib")
-                          (_
-                           "RANLIB=ranlib -D"))
-                      "V=1")
+      ;; Zero timestamps in liby.a; this must be done
+      ;; explicitly here because the bootstrap Binutils don't
+      ;; do that (default is "cru".)
+      #:make-flags
+      #~(list "ARFLAGS=crD"
+              #$(match (%current-system)
+                  ;; ranlib: '-D': No such file
+                  ((or "i686-linux" "x86_64-linux")
+                   "RANLIB=ranlib")
+                  (_
+                   "RANLIB=ranlib -D"))
+              "V=1")
 
-       ;; 'glibc-bootstrap' on non-x86 platforms has a buggy 'posix_spawn'.
-       ;; Thus, use the Gnulib replacement instead.  See
-       ;; <https://bugs.gnu.org/49367>.
-       ,@(match (%current-system)
+      ;; 'glibc-bootstrap' on non-x86 platforms has a buggy 'posix_spawn'.
+      ;; Thus, use the Gnulib replacement instead.  See
+      ;; <https://bugs.gnu.org/49367>.
+      (substitute-keyword-arguments (package-arguments bison)
+        ((#:configure-flags flags)
+         (match (%current-system)
            ((or "i686-linux" "x86_64-linux")
-            '())
+            flags)
            (_
-            '(#:configure-flags '("gl_cv_func_posix_spawn_works=no"))))
-
-       ,@(strip-keyword-arguments '(#:configure-flags)
-				  (package-arguments bison))))))
+            #~(cons* "gl_cv_func_posix_spawn_works=no" #$flags)))))))))
 
 (define flex-boot0
   ;; This Flex is needed to build MiG as well as Linux-Libre headers.
