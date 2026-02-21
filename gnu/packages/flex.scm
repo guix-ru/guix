@@ -45,16 +45,6 @@
                (base32
                 "15g9bv236nzi665p9ggqjlfn4dwck5835vf0bbw2cz7h5c1swyp8"))))
     (build-system gnu-build-system)
-    (inputs
-     (let ((bison-for-tests
-            (package
-              (inherit bison)
-              (arguments
-               ;; Disable tests, since they require flex.
-               (substitute-keyword-arguments (package-arguments bison)
-                 ((#:tests? _ #f) #f)))
-              (inputs (alist-delete "flex" (package-inputs bison))))))
-       `(("bison" ,bison-for-tests))))
     (arguments
      (if (or (target-hurd64?) (%current-target-system))
          (list #:configure-flags
@@ -68,20 +58,28 @@
     ;; m4 is not present in PATH when cross-building
     (native-inputs
      (list help2man m4))
+    (inputs
+     (list (package
+             (inherit bison)
+             (arguments
+              ;; Disable tests, since they require flex.
+              (substitute-keyword-arguments (package-arguments bison)
+                ((#:tests? _ #f) #f)))
+             (inputs (modify-inputs (package-inputs bison)
+                       (delete "flex"))))))
     (propagated-inputs (list m4))
     (home-page "https://github.com/westes/flex")
     (synopsis "Fast lexical analyser generator")
     (description
-     "Flex is a tool for generating scanners.  A scanner, sometimes
-called a tokenizer, is a program which recognizes lexical patterns in
-text.  The flex program reads user-specified input files, or its standard
-input if no file names are given, for a description of a scanner to
-generate.  The description is in the form of pairs of regular expressions
-and C code, called rules.  Flex generates a C source file named,
-\"lex.yy.c\", which defines the function yylex().  The file \"lex.yy.c\"
-can be compiled and linked to produce an executable.  When the executable
-is run, it analyzes its input for occurrences of text matching the
-regular expressions for each rule.  Whenever it finds a match, it
-executes the corresponding C code.")
+     "Flex is a tool for generating scanners.  A scanner, sometimes called a
+tokenizer, is a program which recognizes lexical patterns in text.  The flex
+program reads user-specified input files, or its standard input if no file
+names are given, for a description of a scanner to generate.  The description
+is in the form of pairs of regular expressions and C code, called rules.  Flex
+generates a C source file named @file{lex.yy.c}, which defines the function
+@code{yylex()}.  The @file{lex.yy.c} can be compiled and linked to produce an
+executable.  When the executable is run, it analyzes its input for occurrences
+of text matching the regular expressions for each rule.  Whenever it finds a
+match, it executes the corresponding C code.")
     (license (non-copyleft "file://COPYING"
                            "See COPYING in the distribution."))))
