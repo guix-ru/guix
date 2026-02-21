@@ -2960,37 +2960,10 @@ memoized as a function of '%current-system'."
 
 (define (%boot1-inputs)
   ;; 2nd stage inputs.
-  `(("gcc" ,gcc-boot0)
-    ("ld-wrapper-cross" ,ld-wrapper-boot0)
-    ("binutils-cross" ,binutils-boot0)
-    ,@(match (%current-system)
-        ((or "i686-linux" "x86_64-linux")
-         `(("bzip2" ,bzip2-boot0)
-           ("coreutils" ,coreutils-boot0)
-           ("gawk" ,gawk-boot0)
-           ("patch" ,patch-boot0)
-           ("sed" ,sed-boot0)
-           ("tar" ,tar-boot0)
-           ("grep" ,grep-mesboot)
-           ("tar" ,tar-mesboot)
-           ("xz" ,xz-mesboot)
-           ("gcc-wrapper" ,gcc-mesboot-wrapper)
-           ("gcc" ,gcc-mesboot)
-           ("libc" ,glibc-mesboot)
-           ("make" ,gnu-make-mesboot)
-           ("gzip" ,gzip-mesboot)
-           ("guile" ,%bootstrap-guile)))
-        (_
-         `(("libc" ,%bootstrap-glibc)
-           ("gcc" ,%bootstrap-gcc)
-           ("coreutils&co" ,%bootstrap-coreutils&co)
-           ;; In gnu-build-system.scm, we rely on the availability of Bash.
-           ("bash" ,%bootstrap-coreutils&co))))
-    ("make" ,gnu-make-boot0)
-    ("diffutils" ,diffutils-boot0)
-    ("findutils" ,findutils-boot0)
-    ("file" ,file-boot0)
-    ("bash" ,bash-mesboot)))
+  (cons* gcc-boot0
+         ld-wrapper-boot0
+         binutils-boot0
+         (delete binutils-mesboot (%boot0-inputs))))
 
 (define/system-dependent glibc-final-with-bootstrap-bash
   ;; The final libc, "cross-built".  If everything went well, the resulting
@@ -3048,7 +3021,7 @@ memoized as a function of '%current-system'."
         (list kernel-headers)
         ;; The boot inputs, including the bootstrap libc.  We don't
         ;; want it in $CPATH, hence the 'pre-configure' phase above.
-        (map cadr (%boot1-inputs))
+        (%boot1-inputs)
         ;; A native MiG is needed to build Glibc on Hurd.
         (if (system-hurd?)
             (list mig-boot0)
@@ -3115,7 +3088,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
   ;; non-cross names.
   (cross-gcc-wrapper gcc-boot0 binutils-boot0
                      glibc-final-with-bootstrap-bash
-                     (car (assoc-ref (%boot1-inputs) "bash"))))
+                     bash-mesboot))
 
 (define static-bash-for-glibc
   ;; A statically-linked Bash to be used by GLIBC-FINAL in system(3) & co.
@@ -3127,7 +3100,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
             glibc-final-with-bootstrap-bash
             (list glibc-final-with-bootstrap-bash "static")
             (fold delete
-                  (map cadr (%boot1-inputs))
+                  (%boot1-inputs)
                   (list gcc-mesboot glibc-mesboot))))
     (arguments
      (append
@@ -3213,15 +3186,39 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 (define/system-dependent gcc-boot0-wrapped
   ;; Make the cross-tools GCC-BOOT0 and BINUTILS-BOOT0 available under the
   ;; non-cross names.
-  (cross-gcc-wrapper gcc-boot0 binutils-boot0 glibc-final
-                     (car (assoc-ref (%boot1-inputs) "bash"))))
+  (cross-gcc-wrapper gcc-boot0 binutils-boot0 glibc-final bash-mesboot))
 
 (define (%boot2-inputs)
   ;; 3rd stage inputs.
   `(("libc" ,glibc-final)
     ("libc:static" ,glibc-final "static")
     ("gcc" ,gcc-boot0-wrapped)
-    ,@(fold alist-delete (%boot1-inputs) '("libc" "gcc" "linux-libre-headers"))))
+    ("ld-wrapper-cross" ,ld-wrapper-boot0)
+    ("binutils-cross" ,binutils-boot0)
+    ,@(match (%current-system)
+        ((or "i686-linux" "x86_64-linux")
+         `(("bzip2" ,bzip2-boot0)
+           ("coreutils" ,coreutils-boot0)
+           ("gawk" ,gawk-boot0)
+           ("patch" ,patch-boot0)
+           ("sed" ,sed-boot0)
+           ("tar" ,tar-boot0)
+           ("grep" ,grep-mesboot)
+           ("tar" ,tar-mesboot)
+           ("xz" ,xz-mesboot)
+           ("gcc-wrapper" ,gcc-mesboot-wrapper)
+           ("make" ,gnu-make-mesboot)
+           ("gzip" ,gzip-mesboot)
+           ("guile" ,%bootstrap-guile)))
+        (_
+         `(("coreutils&co" ,%bootstrap-coreutils&co)
+           ;; In gnu-build-system.scm, we rely on the availability of Bash.
+           ("bash" ,%bootstrap-coreutils&co))))
+    ("make" ,gnu-make-boot0)
+    ("diffutils" ,diffutils-boot0)
+    ("findutils" ,findutils-boot0)
+    ("file" ,file-boot0)
+    ("bash" ,bash-mesboot)))
 
 (define libstdc++
   ;; Intermediate libstdc++ that will allow us to build the final GCC
