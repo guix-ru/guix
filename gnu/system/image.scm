@@ -455,6 +455,7 @@ used in the image."
          ((member 'esp flags) "0xEF")
          ((string=? file-system "swap") "0x82")
          ((or (string=? file-system "btrfs")
+              (string=? file-system "erofs")
               (string-prefix? "ext" file-system)
               (string=? file-system "f2fs")
               (string=? file-system "squashfs")) "0x83")
@@ -477,6 +478,7 @@ used in the image."
         (cond
          ((member 'esp flags) "U")
          ((or (string=? file-system "btrfs")
+              (string=? file-system "erofs")
               (string-prefix? "ext" file-system)
               (string=? file-system "f2fs")
               (string=? file-system "squashfs")) "L")
@@ -514,6 +516,8 @@ used in the image."
                      (inputs '#+(cond
                                   ((string=? type "btrfs")
                                    (list btrfs-progs util-linux))
+                                  ((string=? type "erofs")
+                                   (list erofs-utils fakeroot))
                                   ((string-prefix? "ext" type)
                                    (list e2fsprogs fakeroot))
                                   ((string=? type "f2fs")

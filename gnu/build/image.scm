@@ -93,6 +93,25 @@ turn doesn't take any constant overhead into account, force a 1-MiB minimum."
              ,@fs-options
              ,target))))
 
+(define* (make-erofs-image partition target root)
+  "Handle the creation of EROFS partition images.  See 'make-partition-image'."
+  (let ((uuid (partition-uuid partition))
+        (label (partition-label partition))
+        (fs-options (partition-file-system-options partition)))
+    (apply invoke
+           `("fakeroot" "mkfs.erofs"
+             ;; GRUB doesn't support compression yet
+             ;; "-zlzma,level=109,dictsize=8388608"
+             ,@(if uuid
+                   `("-U" ,(uuid->string uuid))
+                   '())
+             ,@(if label
+                   `("-L" ,label)
+                   '())
+             ,@fs-options
+             ,target
+             ,root))))
+
 (define* (make-ext-image partition target root
                          #:key
                          (owner-uid 0)
@@ -234,6 +253,8 @@ ROOT directory to populate the image."
     (cond
      ((string=? "btrfs" type)
       (make-btrfs-image partition target root))
+     ((string=? type "erofs")
+      (make-erofs-image partition target root))
      ((string-prefix? "ext" type)
       (make-ext-image partition target root))
      ((string=? "f2fs" type)
