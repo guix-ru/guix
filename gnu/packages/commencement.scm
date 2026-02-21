@@ -2997,7 +2997,8 @@ memoized as a function of '%current-system'."
   ;; store path has no dependencies.  Actually, the really-final libc is
   ;; built just below; the only difference is that this one uses the
   ;; bootstrap Bash.
-  (let ((libc (libc-for-target (%current-system))))
+  (let ((libc (libc-for-target (%current-system)))
+        (kernel-headers (kernel-headers-boot0)))
     (package
       (inherit libc)
       (name "glibc-intermediate")
@@ -3034,25 +3035,27 @@ memoized as a function of '%current-system'."
                                                                   "/lib/libihash.a")
                                                "\n"))))
                           #~()))))))))
-      (propagated-inputs `(("kernel-headers" ,(kernel-headers-boot0))))
+      (propagated-inputs (list kernel-headers))
       (native-inputs
        (list bison-boot0
              perl-boot0
              python-boot0
              texinfo-boot0))
       (inputs
-       `( ;; The boot inputs.  That includes the bootstrap libc.  We don't want
-         ;; it in $CPATH, hence the 'pre-configure' phase above.
-         ,@(%boot1-inputs)
-
-         ;; A native MiG is needed to build Glibc on Hurd.
-         ,@(if (system-hurd?)
-               `(("mig" ,mig-boot0))
-               '())
-
-         ;; Here, we use the bootstrap Bash, which is not satisfactory
-         ;; because we don't want to depend on bootstrap tools.
-         ("bash-static" ,bash-mesboot))))))
+       (append
+        ;; Order matters here, as glibc-mesboot also contains the same
+        ;; header files.
+        (list kernel-headers)
+        ;; The boot inputs, including the bootstrap libc.  We don't
+        ;; want it in $CPATH, hence the 'pre-configure' phase above.
+        (map cadr (%boot1-inputs))
+        ;; A native MiG is needed to build Glibc on Hurd.
+        (if (system-hurd?)
+            (list mig-boot0)
+            '())
+        ;; TODO Here, we use the bootstrap Bash, which is not satisfactory
+        ;; because we don't want to depend on bootstrap tools.
+        (list bash-mesboot))))))
 
 (define (cross-gcc-wrapper gcc binutils glibc bash)
   "Return a wrapper for the pseudo-cross toolchain GCC/BINUTILS/GLIBC
@@ -3179,14 +3182,15 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     (package/inherit libc
       (name "glibc")
       (source (bootstrap-origin (package-source libc)))
-      (inputs `(("bash-static" ,static-bash-for-glibc)
-                ,@(alist-delete
-                   "bash-static"
-                   (package-inputs glibc-final-with-bootstrap-bash))))
+      (inputs
+       (modify-inputs (package-inputs glibc-final-with-bootstrap-bash)
+         (delete "bash-mesboot")
+         (append static-bash-for-glibc)))
 
       ;; This time we need 'msgfmt' to install all the libc.mo files.
-      (native-inputs `(,@(package-native-inputs glibc-final-with-bootstrap-bash)
-                       ("gettext" ,gettext-boot0)))
+      (native-inputs
+       (modify-inputs (package-native-inputs glibc-final-with-bootstrap-bash)
+         (append gettext-boot0)))
 
       (propagated-inputs
        (package-propagated-inputs glibc-final-with-bootstrap-bash))

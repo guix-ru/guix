@@ -968,8 +968,10 @@ the store.")
      #:validate-runpath? #f
 
      #:modules `((ice-9 ftw)
+                 (ice-9 match)
                  (srfi srfi-1)
                  (srfi srfi-26)
+                 (guix build gremlin)
                  (guix build utils)
                  (guix build gnu-build-system))
 
@@ -998,12 +1000,22 @@ the store.")
              (string-append "libc_cv_complocaledir=/run/current-system/locale/"
                             #$(version-major+minor version))
 
-             (string-append "--with-headers="
-                            (assoc-ref #$(if (%current-target-system)
-                                             #~%build-target-inputs
-                                             #~%build-inputs)
-                                       "kernel-headers")
-                            "/include")
+             ;; Here we need to refer to kernel headers and not glibc-mesboot
+             (string-append
+              "--with-headers="
+              (and=>
+               (find
+                (match-lambda
+                  ((label . input)
+                   (and (file-exists?
+                         (string-append input "/include/asm/ioctl.h"))
+                        ;; Ensure we're not refering to another libc.
+                        (not (file-exists?
+                              (string-append input "/include/locale.h"))))))
+                #$(if (%current-target-system)
+                      #~%build-target-inputs
+                      #~%build-inputs))
+               cdr) "/include")
 
              ;; This is the default for most architectures as of GNU libc 2.26,
              ;; but we specify it explicitly for clarity and consistency.  See
@@ -1026,10 +1038,17 @@ the store.")
          (add-before 'configure 'pre-configure
            (lambda* (#:key inputs native-inputs #:allow-other-keys)
              (let* ((bin (string-append #$output "/bin"))
-                    ;; FIXME: Normally we would look it up only in INPUTS
-                    ;; but cross-base uses it as a native input.
-                    (bash (or (assoc-ref inputs "bash-static")
-                              (assoc-ref native-inputs "bash-static"))))
+                    (bash (find
+                           (match-lambda
+                             ((label . input)
+                              (let ((sh (string-append input "/bin/sh")))
+                                (and (file-exists? sh)
+                                     ;; Is it bash-static specifically? The
+                                     ;; label can't be used because of
+                                     ;; bash-mesboot during the bootstrap.
+                                     (not (file-dynamic-info sh))))))
+                           inputs))
+                    (bash (and=> bash cdr)))
                ;; Install the rpc data base file under `$out/etc/rpc'.
                (substitute* "inet/Makefile"
                  (("^\\$\\(inst_sysconfdir\\)/rpc(.*)$" _ suffix)
