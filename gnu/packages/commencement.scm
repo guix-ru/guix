@@ -3228,23 +3228,22 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
       (inherit lib)
       (source (bootstrap-origin (package-source lib)))
       (arguments
-       `(#:guile ,%bootstrap-guile
-         #:implicit-inputs? #f
-         #:allowed-references ("out")
+       (cons*
+        #:guile %bootstrap-guile
+        #:implicit-inputs? #f
+        #:allowed-references '("out")
 
-         ;; XXX: libstdc++.so NEEDs ld.so for some reason.
-         #:validate-runpath? #f
+        ;; XXX: libstdc++.so NEEDs ld.so for some reason.
+        #:validate-runpath? #f
 
-         ;; All of the package arguments from 'make-libstdc++
-         ;; except for the configure-flags.
-         ,@(package-arguments lib)
-         #:configure-flags `("--disable-shared"
-                             "--disable-libstdcxx-dual-abi"
-                             "--disable-libstdcxx-threads"
-                             "--disable-libstdcxx-pch"
-                             ,(string-append "--with-gxx-include-dir="
-                                             (assoc-ref %outputs "out")
-                                             "/include"))))
+        (substitute-keyword-arguments (package-arguments lib)
+          ((#:configure-flags _)
+           #~(list "--disable-shared"
+                   "--disable-libstdcxx-dual-abi"
+                   "--disable-libstdcxx-threads"
+                   "--disable-libstdcxx-pch"
+                   (string-append "--with-gxx-include-dir="
+                                  #$output "/include"))))))
       (outputs '("out"))
       (inputs (%boot2-inputs))
       (synopsis "GNU C++ standard library (intermediate)"))))
