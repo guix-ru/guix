@@ -307,41 +307,8 @@ standard utility.")
    (license gpl3+)
    (home-page "https://www.gnu.org/software/tar/")))
 
-;;; TODO: Replace/merge with 'patch' on core-updates.
-(define-public patch/pinned
-  (hidden-package
-   (package
-     (name "patch")
-     (version "2.7.6")
-     (source (origin
-               (method url-fetch)
-               (uri (string-append "mirror://gnu/patch/patch-"
-                                   version ".tar.xz"))
-               (sha256
-                (base32
-                 "1zfqy4rdcy279vwn2z1kbv19dcfw25d2aqy9nzvdkq5bjzd0nqdc"))
-               (patches (search-patches "patch-hurd-path-max.patch"))))
-     (build-system gnu-build-system)
-     (arguments
-      ;; Work around a cross-compilation bug whereby libpatch.a would provide
-      ;; '__mktime_internal', which conflicts with the one in libc.a.
-      (if (%current-target-system)
-          `(#:configure-flags '("gl_cv_func_working_mktime=yes"))
-          '()))
-     (native-inputs (list ed))
-     (synopsis "Apply differences to originals, with optional backups")
-     (description
-      "Patch is a program that applies changes to files based on differences
-laid out as by the program \"diff\".  The changes may be applied to one or more
-files depending on the contents of the diff file.  It accepts several
-different diff formats.  It may also be used to revert previously applied
-differences.")
-     (license gpl3+)
-     (home-page "https://savannah.gnu.org/projects/patch/"))))
-
 (define-public patch
   (package
-    (inherit patch/pinned)
     (name "patch")
     (version "2.8")
     (source (origin
@@ -351,13 +318,27 @@ differences.")
               (sha256
                (base32
                 "1qssgwgy3mfahkpgg99a35gl38vamlqb15m3c2zzrd62xrlywz7q"))))
+    (build-system gnu-build-system)
     (arguments
-     (substitute-keyword-arguments (package-arguments patch/pinned)
-       ((#:configure-flags flags #~'())
-        (if (target-hurd32?)
-            #~(cons* "--disable-year2038"
-                     #$flags)
-            flags))))
+     (list
+      #:configure-flags
+      #~(append
+         (if #$(%current-target-system)
+             (list "gl_cv_func_working_mktime=yes")
+             '())
+         (if #$(target-hurd32?)
+             (list "--disable-year2038")
+             '()))))
+    (native-inputs (list ed))
+    (synopsis "Apply differences to originals, with optional backups")
+    (description
+     "Patch is a program that applies changes to files based on differences
+laid out as by the program \"diff\".  The changes may be applied to one or more
+files depending on the contents of the diff file.  It accepts several
+different diff formats.  It may also be used to revert previously applied
+differences.")
+    (license gpl3+)
+    (home-page "https://savannah.gnu.org/projects/patch/")
     (properties '())))
 
 (define-public diffutils
