@@ -37,7 +37,6 @@
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
-  #:use-module (gnu packages c)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages gawk)
@@ -528,7 +527,13 @@ MesCC-Tools), and finally M2-Planet.")
   ;; ported to 0.9.27, alas the resulting tcc is buggy.  Once MesCC is more
   ;; mature, this package should use the 0.9.27 sources (or later).
   (package
-    (inherit tcc)
+    ;; (inherit tcc)
+    ;; Avoids (gnu packages c) module load.
+    ;; The package is not visible, so those don't matter.
+    (synopsis "")
+    (description "")
+    (home-page "http://www.tinycc.org/")
+    (license license:lgpl2.1+)
     (name "tcc-boot0")
     (version "0.9.26-1149-g46a75d0c")
     (source (origin
