@@ -2107,7 +2107,7 @@ useful errors on failure.")
     (build-system dune-build-system)
     (arguments
      `(#:package "markup"))
-    (propagated-inputs (list ocaml-bisect-ppx ocaml-uchar ocaml-uutf ocaml-lwt))
+    (propagated-inputs (list ocaml-uchar ocaml-uutf ocaml-lwt))
     (native-inputs (list ocaml-ounit2 pkg-config))
     (synopsis "Error-recovering functional HTML5 and XML parsers and writers")
     (description
