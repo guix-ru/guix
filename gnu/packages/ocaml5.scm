@@ -2304,7 +2304,6 @@ language understood by ocamldoc.")))
                          (string-append "#!"
                                         (which "sh")))))))))
     (inputs (list ocaml-astring
-                  ocaml-bisect-ppx
                   ocaml-cmdliner
                   ocaml-crunch
                   ocaml-fmt
