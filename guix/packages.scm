@@ -964,7 +964,7 @@ identifiers.  The result is inferred from the file names of patches."
       ("gzip"  ,(ref '(gnu packages compression) 'gzip))
       ("lzip"  ,(ref '(gnu packages compression) 'lzip))
       ("unzip" ,(ref '(gnu packages compression) 'unzip))
-      ("patch" ,(ref '(gnu packages base) 'patch/pinned)))))
+      ("patch" ,(ref '(gnu packages base) 'patch)))))
 
 (define (default-guile)
   "Return the default Guile package used to run the build code of

@@ -844,7 +844,7 @@ MesCC-Tools), and finally M2-Planet.")
 (define patch-mesboot
   ;; The initial patch.
   (package
-    (inherit patch/pinned)
+    (inherit patch)
     (name "patch-mesboot")
     (version "2.5.9")
     (source (origin
@@ -2170,19 +2170,21 @@ exec " gcc "/bin/" program
 
 (define patch-boot0
   (package
-    (inherit patch/pinned)
-    (source (bootstrap-origin (package-source patch/pinned)))
+    (inherit patch)
+    (source (bootstrap-origin (package-source patch)))
     (name "patch-boot0")
     (native-inputs '())
     (inputs
      `(("make" ,gnu-make-boot0)
        ,@(%bootstrap-inputs+toolchain)))
     (arguments
-     `(#:tests? #f                      ; merge test fails
-       #:implicit-inputs? #f
-       #:guile ,%bootstrap-guile
-       #:strip-binaries? #f
-       #:validate-runpath? #f))))
+     (list
+      #:tests? #f                       ; merge test fails
+      #:implicit-inputs? #f
+      #:guile %bootstrap-guile
+      #:strip-binaries? #f
+      #:validate-runpath? #f
+      #:configure-flags #~(list "--disable-year2038")))))
 
 (define sed-boot0
   (package
@@ -3568,7 +3570,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
                    ("bzip2" ,bzip2)
                    ("file" ,file)
                    ("diffutils" ,diffutils)
-                   ("patch" ,patch/pinned)
+                   ("patch" ,patch)
                    ("findutils" ,findutils)
                    ("gawk" ,(package/inherit gawk
                               (native-inputs
