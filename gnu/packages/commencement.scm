@@ -3509,19 +3509,17 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
   "Compute the final GNU Make, which uses the final Guile."
   (let ((pkg-config (package
                       (inherit %pkg-config)       ;the native pkg-config
-                      (inputs `(("guile" ,guile-final)
-                                ,@(%boot5-inputs)))
+                      (inputs (cons* guile-final (%boot5-inputs)))
                       (arguments
-                       `(#:implicit-inputs? #f
-                         ,@(package-arguments %pkg-config))))))
+                       (cons* #:implicit-inputs? #f
+                              (package-arguments %pkg-config))))))
     (package
       (inherit (package-with-bootstrap-guile gnu-make))
-      (inputs `(("guile" ,guile-final)
-                ,@(%boot5-inputs)))
-      (native-inputs `(("pkg-config" ,pkg-config)))
+      (inputs (cons* guile-final (%boot5-inputs)))
+      (native-inputs (list pkg-config))
       (arguments
-       `(#:implicit-inputs? #f
-         ,@(package-arguments gnu-make))))))
+       (cons* #:implicit-inputs? #f
+              (package-arguments gnu-make))))))
 
 
 (define coreutils-final
