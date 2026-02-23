@@ -3542,8 +3542,9 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     (package/inherit grep
       (arguments (strip-keyword-arguments '(#:configure-flags)
                                           (package-arguments grep)))
-      (inputs (alist-delete "pcre2" (package-inputs grep)))
-      (native-inputs `(("perl" ,perl-boot0))))))
+      (inputs (modify-inputs (package-inputs grep)
+                (delete "pcre2")))
+      (native-inputs (list perl-boot0)))))
 
 (define xz-final
   ;; The final xz.  We need to replace the bootstrap xz with a newer one
