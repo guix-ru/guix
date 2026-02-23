@@ -69,10 +69,7 @@
     (inputs
      (list libunistring
            libxml2
-           ;; TODO: ncurses is only needed for the 'libtextstyle' library.
-           ;; The next version of gettext can use a separate libtextstyle,
-           ;; but for now we include it here in 'gettext-minimal'.
-           ncurses))
+           libtextstyle))
     (arguments
      (list #:configure-flags #~'("--with-included-libunistring=no"
                                  "--with-included-libxml=no")
@@ -91,11 +88,11 @@
                      (("/bin/pwd") "pwd"))))
                (add-before 'check 'patch-tests
                  (lambda* (#:key inputs #:allow-other-keys)
-                   ;;libgettextlib-0.23.so => not found
+                   ;;libgettextlib-1.0.so => not found
                    (substitute* "gettext-tools/gnulib-tests/test-execute.sh"
                      (("^#!.*" all)
                       (string-append all "exit 77;\n")))
-                   (let* ((bash (which "sh")))
+                   (let* ((bash (search-input-file inputs "bin/sh")))
                      ;; Some of the files we're patching are
                      ;; ISO-8859-1-encoded, so choose it as the default
                      ;; encoding so the byte encoding is preserved.
@@ -104,7 +101,7 @@
                            (find-files "gettext-tools/tests"
                                        "^(lang-sh|msg(exec|filter)-[0-9])")
                          (("#![[:blank:]]/bin/sh")
-                          (format #f "#!~a" bash)))
+                          (string-append "#!" bash)))
 
                        (substitute* (cons "gettext-tools/src/msginit.c"
                                           (find-files "gettext-tools/gnulib-tests"
@@ -202,22 +199,17 @@ translated messages from the catalogs.  Nearly all GNU packages use Gettext.")
 (define-public libtextstyle
   (package
     (name "libtextstyle")
-    (version "0.21")
-    (source (origin
-              (inherit (package-source gnu-gettext))
-              (uri (string-append "mirror://gnu/gettext/gettext-"
-                                  version ".tar.gz"))
-              (sha256
-               (base32
-                "04kbg1sx0ncfrsbr85ggjslqkzzb243fcw9nyh3rrv1a22ihszf7"))))
+    (version (package-version gnu-gettext))
+    (source (package-source gnu-gettext))
     (build-system gnu-build-system)
     (arguments
-     '(#:configure-flags '("--disable-static")
-       #:phases (modify-phases %standard-phases
-                  (add-after 'unpack 'chdir
-                    (lambda _
-                      (chdir "libtextstyle")
-                      #t)))))
+     (list
+      #:configure-flags #~(list "--disable-static")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir
+            (lambda _
+              (chdir "libtextstyle"))))))
     ;; libtextstyle bundles libxml2, glib (a small subset thereof), and
     ;; libcroco, but it purposefully prevents users from using an external
     ;; copy, to reduce the startup time of programs using libtextstyle.
