@@ -3418,32 +3418,16 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 
 (define (%boot4-inputs)
   ;; Now use the final Bash.
-  `(("bash" ,bash-final)
-    ("gcc" ,gcc-final)
-    ("ld-wrapper" ,ld-wrapper-boot3)
-    ("libc" ,glibc-final)
-    ("libc:static" ,glibc-final "static")
-    ("ld-wrapper-cross" ,ld-wrapper-boot0)
-    ("binutils-cross" ,binutils-boot0)
-    ,@(match (%current-system)
-        ((or "i686-linux" "x86_64-linux")
-         `(("bzip2" ,bzip2-boot0)
-           ("coreutils" ,coreutils-boot0)
-           ("gawk" ,gawk-boot0)
-           ("patch" ,patch-boot0)
-           ("sed" ,sed-boot0)
-           ("tar" ,tar-boot0)))
-        (_
-         `(("coreutils&co" ,%bootstrap-coreutils&co)
-           ;; In gnu-build-system.scm, we rely on the availability of Bash.
-           ("bash" ,%bootstrap-coreutils&co))))
-    ("make" ,gnu-make-boot0)
-    ("diffutils" ,diffutils-boot0)
-    ("findutils" ,findutils-boot0)
-    ("file" ,file-boot0)))
+  (cons* bash-final (delete bash-mesboot (%boot3-inputs))))
 
 (define with-boot4
-  (package-with-explicit-inputs %boot4-inputs %bootstrap-guile))
+  (package-with-explicit-inputs
+   (lambda ()
+     (map (match-lambda
+            ((or (package . _) package)
+             (list (package-name package) package)))
+          (%boot4-inputs)))
+   %bootstrap-guile))
 
 (define-public guile-final
   ;; This package must be public because other modules refer to it.  However,
@@ -3554,14 +3538,20 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 
 (define (%boot6-inputs)
   ;; Now use the final Coreutils.
-  `(("coreutils" ,coreutils-final)
-    ("grep" ,grep-final)
-    ("xz" ,xz-final)
-    ,@(fold alist-delete (%boot5-inputs)
-            '("coreutils" "xz"))))
+  (cons* coreutils-final
+         grep-final
+         xz-final
+         (fold delete
+               (%boot5-inputs)
+               (list coreutils-boot0 grep-mesboot xz-mesboot))))
 
 (define with-boot6
-  (package-with-explicit-inputs %boot6-inputs))
+  (package-with-explicit-inputs
+   (lambda ()
+     (map (match-lambda
+            ((or (package . _) package)
+             (list (package-name package) package)))
+          (%boot6-inputs)))))
 
 (define sed-final
   ;; The final sed.
