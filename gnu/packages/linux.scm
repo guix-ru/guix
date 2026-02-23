@@ -12024,6 +12024,16 @@ read-only file system optimized for resource-scarce devices.  This package
 provides user-space tools for creating EROFS file systems.")
     (license license:gpl2+)))
 
+(define-public erofs-utils/static
+  (static-package
+   (package
+     (inherit erofs-utils)
+     (name "erofs-utils-static")
+     (arguments
+      (substitute-keyword-arguments (package-arguments erofs-utils)
+       ((#:configure-flags flags #~'())
+        #~(append #$flags (list "--without-uuid" "--without-zlib"))))))))
+
 (define-public rasdaemon
   (package
     (name "rasdaemon")
