@@ -202,7 +202,46 @@ NUL terminator, return the size of the bytevector."
   (utf16->string (sub-bytevector bv 0 (bytevector-utf16-length bv))
                  endianness))
 
-
+;;;
+;;; EROFS file system.
+;;;
+;;; <https://erofs.docs.kernel.org/en/latest/core_ondisk.html>
+
+;; Little endian on-disk design according to
+;; Documentation/filesystems/erofs.rst in the Linux source code.
+(define-syntax %erofs-endianness
+  ;; Endianness of EROFS file systems.
+  (identifier-syntax (endianness little)))
+
+(define (erofs-superblock? sblock)
+  "Return #t when SBLOCK is an EROFS superblock."
+  (let ((magic (bytevector-u32-ref sblock 0 %erofs-endianness)))
+    (= magic #xE0F5E1E2)))
+
+(define (read-erofs-superblock device)
+  "Return the raw contents of DEVICE's EROFS superblock as a bytevector, or #f
+if DEVICE does not contain an ext2 file system."
+  (read-superblock device 1024 128 erofs-superblock?))
+
+(define (erofs-superblock-uuid sblock)
+  "Return the UUID of EROFS superblock SBLOCK as a 16-byte bytevector."
+  (sub-bytevector sblock 48 16))
+
+(define (erofs-superblock-volume-name sblock)
+  "Return the volume name of EROFS superblock SBLOCK as a string of at most 16
+characters, or #f if SBLOCK has no volume name."
+  (null-terminated-latin1->string (sub-bytevector sblock 64 16)))
+
+(define (check-erofs-file-system device force? repair)
+  "Return the health of an unmuounted F2FS file system on DEVICE.  If FORCE?
+is true, check the file system even if it's marked as clean.  Repair is not
+possible, it is only kept for compatibility reasons and it is ignored."
+  (match (status:exit-val
+          (apply system*/tty "fsck.erofs"
+                 `(,device)))
+    (0 'pass)
+    (_ 'fatal-error)))
+
 ;;;
 ;;; Ext2 file systems.
 ;;;
@@ -1087,6 +1126,8 @@ partition field reader that returned a value."
 (define %partition-label-readers
   (list (partition-field-reader read-iso9660-superblock
                                 iso9660-superblock-volume-name)
+        (partition-field-reader read-erofs-superblock
+                                erofs-superblock-volume-name)
         (partition-field-reader read-ext2-superblock
                                 ext2-superblock-volume-name)
         (partition-field-reader read-linux-swap-superblock
@@ -1113,6 +1154,8 @@ partition field reader that returned a value."
 (define %partition-uuid-readers
   (list (partition-field-reader read-iso9660-superblock
                                 iso9660-superblock-uuid)
+        (partition-field-reader read-erofs-superblock
+                                erofs-superblock-uuid)
         (partition-field-reader read-ext2-superblock
                                 ext2-superblock-uuid)
         (partition-field-reader read-linux-swap-superblock
@@ -1251,6 +1294,7 @@ all TYPEs support all values or combinations of FORCE? and REPAIR.  Don't throw
 an exception in such cases but perform the nearest sane action."
   (define check-procedure
     (cond
+     ((string-prefix? "erofs" type) check-erofs-file-system)
      ((string-prefix? "ext" type) check-ext2-file-system)
      ((string-prefix? "bcachefs" type) check-bcachefs-file-system)
      ((string-prefix? "btrfs" type) check-btrfs-file-system)
