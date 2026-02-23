@@ -3567,50 +3567,50 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
     ;; used for origins that have patches, thereby avoiding circular
     ;; dependencies.
     (parameterize ((%current-system system))
-      (let ((finalize (compose with-boot6
-                               package-with-bootstrap-guile)))
-        `(,@(map (match-lambda
-                   ((name package)
-                    (list name (finalize package))))
-                 `(("tar" ,tar)
-                   ("gzip" ,gzip)
-                   ("bzip2" ,bzip2)
-                   ("file" ,file)
-                   ("diffutils" ,diffutils)
-                   ("patch" ,patch)
-                   ("findutils" ,findutils)
-                   ("gawk" ,(package/inherit gawk
-                              (native-inputs
-                               (list (if (target-hurd?)
-                                         glibc-utf8-locales-final/hurd
-                                         glibc-utf8-locales-final)))))
-                   ("zstd" ,zstd)))
-          ("sed" ,sed-final)
-          ("grep" ,grep-final)
-          ("xz" ,xz-final)
-          ("coreutils" ,coreutils-final)
-          ("make" ,(make-gnu-make-final))
-          ("bash" ,bash-final)
-          ("ld-wrapper" ,ld-wrapper)
-          ("binutils" ,binutils-final)
-          ("gcc" ,gcc-final)
-          ("libc" ,glibc-final)
-          ("libc:static" ,glibc-final "static"))))))
+      (append
+       (map packages->input-alist
+            (append
+             (map (compose with-boot6 package-with-bootstrap-guile)
+                  (list tar
+                        gzip
+                        bzip2
+                        file
+                        diffutils
+                        patch
+                        findutils
+                        (package/inherit gawk
+                          (native-inputs
+                           (list (if (target-hurd?)
+                                     glibc-utf8-locales-final/hurd
+                                     glibc-utf8-locales-final))))
+                        zstd))
+             (list sed-final
+                   grep-final
+                   xz-final
+                   coreutils-final
+                   (make-gnu-make-final)
+                   bash-final
+                   ld-wrapper
+                   binutils-final)))
+       `(("gcc" ,gcc-final)
+         ("libc" ,glibc-final)
+         ("libc:static" ,glibc-final "static"))))))
 
 (define-public canonical-package
   (let ((name->package (mlambda (system)
                          (fold (lambda (input result)
                                  (match input
-                                   ((_ package . outputs)
+                                   ((or ((? package? package) . _)
+                                        (? package? package)
+                                        (_ (? package? package) . _))
                                     (vhash-cons (package-full-name package)
                                                 package result))))
                                vlist-null
-                               `(("guile" ,guile-final)
-                                 ("glibc-utf8-locales"
-                                  ,(if (target-hurd? system)
-                                       glibc-utf8-locales-final/hurd
-                                       glibc-utf8-locales-final))
-                                 ,@(%final-inputs system))))))
+                               (cons* guile-final
+                                      (if (target-hurd? system)
+                                          glibc-utf8-locales-final/hurd
+                                          glibc-utf8-locales-final)
+                                      (%final-inputs system))))))
     (lambda (package)
       "Return the 'canonical' variant of PACKAGE---i.e., if PACKAGE is one of
 the implicit inputs of 'gnu-build-system', return that one, otherwise return
