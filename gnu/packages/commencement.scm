@@ -3566,7 +3566,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 (define sed-final
   ;; The final sed.
   (let ((sed (with-boot6 (package-with-bootstrap-guile sed))))
-    (package/inherit sed (native-inputs `(("perl" ,perl-boot0))))))
+    (package/inherit sed (native-inputs (list perl-boot0)))))
 
 (define-public %final-inputs
   ;; The 'glibc-final' package is not the same depending on what system is
