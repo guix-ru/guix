@@ -1203,29 +1203,29 @@ interactive environment for the functional language Haskell.")
        (sha256
         (base32 "1ch4j2asg7pr52ai1hwzykxyj553wndg7wq93i47ql4fllspf48i"))))
     (native-inputs
-     `(("gcc" ,gcc-13)                     ; does not compile with gcc-14 and adding
-                                           ; -Wno-error=incompatible-pointer-types
-                                           ; at the appropriate stages is difficult
-       ("perl" ,perl)
-       ("python" ,python)               ; for tests
-       ("ghostscript" ,ghostscript)     ; for tests
-       ;; GHC 8.4.4 is built with GHC >= 8.0.
-       ("ghc-bootstrap" ,ghc-8.0)
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                 "https://www.haskell.org/ghc/dist/"
-                 version "/" name "-" version "-testsuite.tar.xz"))
-           (sha256
-            (base32
-             "0s8lf9sxj7n89pjagi58b3fahnp34qvmwhnn0j1fbg6955vbrfj6"))
-           (modules '((guix build utils)))
-           (snippet
-            ;; collections.Iterable was moved to collections.abc in Python 3.10.
-            '(substitute* "testsuite/driver/testlib.py"
-               (("collections\\.Iterable")
-                "collections.abc.Iterable")))))))
+     (list
+      ;; XXX: does not compile with gcc-14 and adding
+      ;; -Wno-error=incompatible-pointer-types at the appropriate stages
+      ;; is difficult
+      gcc-13
+      perl
+      python                            ; for tests
+      ghostscript                       ; for tests
+      ;; GHC 8.4.4 is built with GHC >= 8.0.
+      ghc-8.0
+      (origin
+        (method url-fetch)
+        (uri (string-append
+              "https://www.haskell.org/ghc/dist/"
+              version "/" name "-" version "-testsuite.tar.xz"))
+        (sha256
+         (base32 "0s8lf9sxj7n89pjagi58b3fahnp34qvmwhnn0j1fbg6955vbrfj6"))
+        (modules '((guix build utils)))
+        (snippet
+         ;; collections.Iterable was moved to collections.abc in Python 3.10.
+         '(substitute* "testsuite/driver/testlib.py"
+            (("collections\\.Iterable")
+             "collections.abc.Iterable"))))))
     (arguments
      (substitute-keyword-arguments (package-arguments ghc-8.0)
        ((#:phases phases)
@@ -1249,17 +1249,14 @@ interactive environment for the functional language Haskell.")
             ;; plain command names.
             (add-before 'configure 'set-target-programs
               (lambda* (#:key inputs #:allow-other-keys)
-                (let ((binutils (assoc-ref inputs "binutils"))
-                      (gcc (assoc-ref inputs "gcc"))
-                      (ld-wrapper (assoc-ref inputs "ld-wrapper")))
-                  (setenv "CC" (string-append gcc "/bin/gcc"))
-                  (setenv "CXX" (string-append gcc "/bin/g++"))
-                  (setenv "LD" (string-append ld-wrapper "/bin/ld"))
-                  (setenv "NM" (string-append binutils "/bin/nm"))
-                  (setenv "RANLIB" (string-append binutils "/bin/ranlib"))
-                  (setenv "STRIP" (string-append binutils "/bin/strip"))
-                  ;; The 'ar' command does not follow the same pattern.
-                  (setenv "fp_prog_ar" (string-append binutils "/bin/ar")))))))))
+                (setenv "CC" (search-input-file inputs "bin/gcc"))
+                (setenv "CXX" (search-input-file inputs "/bin/g++"))
+                (setenv "LD" (search-input-file inputs "/bin/ld"))
+                (setenv "NM" (search-input-file inputs "/bin/nm"))
+                (setenv "RANLIB" (search-input-file inputs "/bin/ranlib"))
+                (setenv "STRIP" (search-input-file inputs "/bin/strip"))
+                ;; The 'ar' command does not follow the same pattern.
+                (setenv "fp_prog_ar" (search-input-file inputs "/bin/ar"))))))))
     (native-search-paths (list (search-path-specification
                                 (variable "GHC_PACKAGE_PATH")
                                 (files (list
