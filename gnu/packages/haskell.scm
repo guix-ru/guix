@@ -868,6 +868,7 @@ interactive environment for the functional language Haskell.")
     (method url-fetch)
     (uri
      "https://www.haskell.org/ghc/dist/7.8.4/ghc-7.8.4-x86_64-unknown-linux-deb7.tar.xz")
+    (file-name "ghc-7.8.4-x86_64-binary.tar.xz")
     (sha256
      (base32
       "13azsl53xgj20mi1hj9x0xb32vvcvs6cpmvwx6znxhas7blh0bpn"))))
@@ -877,6 +878,7 @@ interactive environment for the functional language Haskell.")
     (method url-fetch)
     (uri
      "https://www.haskell.org/ghc/dist/7.8.4/ghc-7.8.4-i386-unknown-linux-deb7.tar.xz")
+    (file-name "ghc-7.8.4-i386-binary.tar.xz")
     (sha256
      (base32
       "0wj5s435j0zgww70bj1d3f6wvnnpzlxwvwcyh2qv4qjq5z8j64kg"))))
@@ -911,35 +913,33 @@ interactive environment for the functional language Haskell.")
     (supported-systems '("i686-linux" "x86_64-linux"))
     (outputs '("out" "doc"))
     (inputs
-     `(("gmp" ,gmp)
-       ("ncurses" ,ncurses)
-
-       ;; Use a LibFFI variant without static trampolines to work around
-       ;; <https://gitlab.haskell.org/ghc/ghc/-/issues/20051>.
-       ("libffi" ,libffi-sans-static-trampolines)
-
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                 "https://www.haskell.org/ghc/dist/"
-                 version "/" name "-" version "-testsuite.tar.xz"))
-           (sha256
-            (base32
-             "0fk4xjw1x5lk2ifvgqij06lrbf1vxq9qfix86h9r16c0bilm3hah"))))))
+     (list gmp
+           ncurses
+           ;; Use a LibFFI variant without static trampolines to work around
+           ;; <https://gitlab.haskell.org/ghc/ghc/-/issues/20051>.
+           libffi-sans-static-trampolines
+           (origin
+             (method url-fetch)
+             (uri (string-append
+                   "https://www.haskell.org/ghc/dist/"
+                   version "/" name "-" version "-testsuite.tar.xz"))
+             (sha256
+              (base32
+               "0fk4xjw1x5lk2ifvgqij06lrbf1vxq9qfix86h9r16c0bilm3hah")))))
     (native-inputs
-     `(("gcc" ,gcc-13)                     ; does not compile with gcc-14 and adding
-                                           ; -Wno-error=incompatible-pointer-types
-                                           ; at the appropriate stages is difficult
-       ("perl" ,perl)
-       ("python" ,python-2)                ; for tests (fails with python-3)
-       ("ghostscript" ,ghostscript)        ; for tests
-       ("patchelf" ,patchelf)
-       ;; GHC is built with GHC. Therefore we need bootstrap binaries.
-       ("ghc-binary"
-        ,(if (string-match "x86_64" (or (%current-target-system) (%current-system)))
-             ghc-bootstrap-x86_64-7.8.4
-             ghc-bootstrap-i686-7.8.4))))
+     (list
+      ;; XXX: does not compile with gcc-14 and adding
+      ;; -Wno-error=incompatible-pointer-types at the appropriate stages
+      ;; is difficult
+      gcc-13
+      perl
+      python-2                          ; for tests (fails with python-3)
+      ghostscript                       ; for tests
+      patchelf
+      ;; GHC is built with GHC. Therefore we need bootstrap binaries.
+      (if (string-match "x86_64" (or (%current-target-system) (%current-system)))
+          ghc-bootstrap-x86_64-7.8.4
+          ghc-bootstrap-i686-7.8.4)))
     (arguments
      (list
        #:test-target "test"
@@ -957,16 +957,17 @@ interactive environment for the functional language Haskell.")
                    (srfi srfi-26)
                    (srfi srfi-1))
        #:configure-flags
-       #~(list
-           (string-append "--with-gmp-libraries="
-                          (assoc-ref %build-inputs "gmp") "/lib")
-           (string-append "--with-gmp-includes="
-                          (assoc-ref %build-inputs "gmp") "/include")
-           "--with-system-libffi"
-           (string-append "--with-ffi-libraries="
-                          (assoc-ref %build-inputs "libffi") "/lib")
-           (string-append "--with-ffi-includes="
-                          (assoc-ref %build-inputs "libffi") "/include"))
+       #~(let* ((libgmp.so (search-input-file %build-inputs "lib/libgmp.so"))
+                (gmp       (dirname (dirname libgmp.so)))
+                (libffi.so (search-input-file %build-inputs "lib/libffi.so"))
+                (ffi       (dirname (dirname libffi.so))))
+           (list
+            (string-append "--with-gmp-libraries=" gmp "/lib")
+            (string-append "--with-gmp-includes=" gmp "/include")
+            "--with-system-libffi"
+            (string-append "--with-ffi-libraries=" ffi "/lib")
+            (string-append "--with-ffi-includes=" ffi "/include")))
+
        ;; FIXME: The user-guide needs dblatex, docbook-xsl and docbook-utils.
        ;; Currently we do not have the last one.
        ;; #:make-flags
@@ -978,14 +979,23 @@ interactive environment for the functional language Haskell.")
                   (string-append ghc-bootstrap-path "/usr" )))
            (modify-phases %standard-phases
              (add-after 'unpack 'unpack-bin
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                (mkdir-p ghc-bootstrap-prefix)
-                (with-directory-excursion ghc-bootstrap-path
-                  (invoke "tar" "xvf" (assoc-ref inputs "ghc-binary")))))
+               (lambda* (#:key inputs #:allow-other-keys)
+                 (let ((ghc-binary-pair (find (lambda (pair)
+                                                (string-suffix? "binary.tar.xz"
+                                                                (car pair)))
+                                              inputs)))
+                   (mkdir-p ghc-bootstrap-prefix)
+                   (with-directory-excursion ghc-bootstrap-path
+                     (invoke "tar" "xvf" (and=> ghc-binary-pair cdr))))))
              (add-after 'unpack-bin 'unpack-testsuite-and-fix-bins
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 (with-directory-excursion ".."
-                   (invoke "tar" "xvf" (assoc-ref inputs "ghc-testsuite")))
+               (lambda* (#:key inputs #:allow-other-keys)
+                 (let ((ghc-testsuite (find (lambda (pair)
+                                              (string-suffix?
+                                               "testsuite.tar.xz"
+                                               (car pair)))
+                                            inputs)))
+                   (with-directory-excursion ".."
+                     (invoke "tar" "xvf" (and=> ghc-testsuite cdr))))
                  (substitute*
                    (list "testsuite/timeout/Makefile"
                          "testsuite/timeout/timeout.py"
@@ -997,7 +1007,7 @@ interactive environment for the functional language Haskell.")
                    (("/bin/sh") (search-input-file inputs "/bin/sh"))
                    (("/bin/rm") "rm"))))
              (add-before 'configure 'install-bin
-               (lambda* (#:key inputs outputs #:allow-other-keys)
+               (lambda _
                  (with-directory-excursion
                    (string-append ghc-bootstrap-path "/ghc-7.8.4")
                    (invoke "make" "install"))))
