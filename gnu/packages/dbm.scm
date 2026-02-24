@@ -113,14 +113,7 @@
                      (for-each (lambda (x)
                                  (install-file x "aclocal"))
                                (find-files "aclocal_java"))
-                     (apply (assq-ref %standard-phases 'bootstrap) arguments)
-                     (let ((automake-files (search-input-directory
-                                            (or native-inputs inputs)
-                                            "share/automake-1.16")))
-                       (define (replace file)
-                         (symlink (string-append automake-files "/" file) file))
-                       (for-each replace '("config.sub" "config.guess"
-                                           "install-sh"))))))
+                     (apply (assq-ref %standard-phases 'bootstrap) arguments))))
                #$@(if (or (target-arm?)
                           (target-riscv64?))
                       #~((add-after 'unpack 'bdb-configure-patch
@@ -147,7 +140,7 @@
                      (("rm (.*) configure") "")
                      (("chmod (.*) config.guess(.*)$") ""))
                    (invoke "sh" "s_config"))))))
-    (native-inputs (list autoconf-2.69 automake-1.16.5 libtool))
+    (native-inputs (list autoconf automake-1.16.5 libtool))
     (synopsis "Berkeley database")
     (description
      "Berkeley DB is an embeddable database allowing developers the choice of
