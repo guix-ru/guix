@@ -149,30 +149,31 @@ translated messages from the catalogs.  Nearly all GNU packages use Gettext.")
                   (cpe-name . "gettext")))
     (license gpl3+)))                             ;some files are under GPLv2+
 
-(define-public gettext-minimal-0.21
+;; Starting with gettext 0.24 some gnulib files are no longer public.
+;; keep this here to easily fix autoreconf
+(define-public gettext-minimal-0.23
   (package/inherit gettext-minimal
-    (version "0.21")
+    (version "0.23.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/gettext/gettext-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "04kbg1sx0ncfrsbr85ggjslqkzzb243fcw9nyh3rrv1a22ihszf7"))
-              (patches (search-patches "gettext-libunicode-update.patch"))))
+                "0j8fijicvg8jkrisgsqbpnbmfb2mz3gx2p6pcwip82731yb7i9aj"))))
     (arguments
      (substitute-keyword-arguments (package-arguments gettext-minimal)
-       ((#:phases phases)
-        #~(modify-phases #$phases
-            (add-after 'unpack 'touch-test
-              (lambda _
-                (with-output-to-file "gettext-tools/gnulib-tests/test-execute.sh"
-                  (lambda _ (display "")))))
-            (add-before 'check 'patch-test
-              (lambda _
-                ;; This test fails with ggc-14.
-                (substitute* "gettext-tools/tests/xgettext-javascript-6"
-                  (("^#!.*" all) (string-append all "exit 77;\n")))))))))))
+       ((#:make-flags flags)
+        ;; these gnulib tests fail with newer libunistring
+        #~(cons (string-append "XFAIL_TESTS="
+                               "test-uc_tolower "
+                               "test-ctype_alnum "
+                               "test-ctype_alpha "
+                               "test-ctype_graph "
+                               "test-ctype_lower "
+                               "test-ctype_print "
+                               "test-ctype_punct "
+                               "test-ctype_upper") #$flags))))))
 
 ;; Use that name to avoid clashes with Guile's 'gettext' procedure.
 ;;
