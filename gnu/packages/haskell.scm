@@ -1098,22 +1098,23 @@ interactive environment for the functional language Haskell.")
      ;; <https://gitlab.haskell.org/ghc/ghc/-/issues/20051>.
      (list gmp ncurses libffi-sans-static-trampolines))
     (native-inputs
-     `(("gcc" ,gcc-13)                     ; does not compile with gcc-14 and adding
-                                           ; -Wno-error=incompatible-pointer-types
-                                           ; at the appropriate stages is difficult
-       ("perl" ,perl)
-       ("python" ,python-2)                ; for tests
-       ("ghostscript" ,ghostscript)        ; for tests
-       ;; GHC is built with GHC.
-       ("ghc-bootstrap" ,ghc-7)
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                  "https://www.haskell.org/ghc/dist/"
-                  version "/" name "-" version "-testsuite.tar.xz"))
-           (sha256
-            (base32 "1wjc3x68l305bl1h1ijd3yhqp2vqj83lkp3kqbr94qmmkqlms8sj")))) ))
+     (list
+      ;; XXX: does not compile with gcc-14 and adding
+      ;; -Wno-error=incompatible-pointer-types at the appropriate stages
+      ;; is difficult
+      gcc-13
+      perl
+      python-2                          ; for tests (fails with python-3)
+      ghostscript                       ; for tests
+      ;; GHC is built with GHC.
+      ghc-7
+      (origin
+        (method url-fetch)
+        (uri (string-append
+              "https://www.haskell.org/ghc/dist/"
+              version "/" name "-" version "-testsuite.tar.xz"))
+        (sha256
+         (base32 "1wjc3x68l305bl1h1ijd3yhqp2vqj83lkp3kqbr94qmmkqlms8sj")))))
     (arguments
      (list
        #:test-target "test"
@@ -1125,28 +1126,36 @@ interactive environment for the functional language Haskell.")
        ;; auto-detects slightly different triplets for --host and --target and
        ;; then complains that they don't match.
        #:build #f
+       #:modules '((guix build gnu-build-system)
+                   (guix build utils)
+                   (srfi srfi-1))
 
        #:configure-flags
-       #~(list
-           (string-append "--with-gmp-libraries="
-                          (assoc-ref %build-inputs "gmp") "/lib")
-           (string-append "--with-gmp-includes="
-                          (assoc-ref %build-inputs "gmp") "/include")
-           "--with-system-libffi"
-           (string-append "--with-ffi-libraries="
-                          (assoc-ref %build-inputs "libffi") "/lib")
-           (string-append "--with-ffi-includes="
-                          (assoc-ref %build-inputs "libffi") "/include")
-           (string-append "--with-curses-libraries="
-                          (assoc-ref %build-inputs "ncurses") "/lib")
-           (string-append "--with-curses-includes="
-                          (assoc-ref %build-inputs "ncurses") "/include"))
+       #~(let* ((libgmp.so (search-input-file %build-inputs "lib/libgmp.so"))
+                (gmp       (dirname (dirname libgmp.so)))
+                (libffi.so (search-input-file %build-inputs "lib/libffi.so"))
+                (ffi       (dirname (dirname libffi.so)))
+                (libncurses.so (search-input-file %build-inputs
+                                                  "lib/libncurses.so"))
+                (ncurses   (dirname (dirname libncurses.so))))
+           (list
+            (string-append "--with-gmp-libraries=" gmp "/lib")
+            (string-append "--with-gmp-includes=" gmp "/include")
+            "--with-system-libffi"
+            (string-append "--with-ffi-libraries=" ffi "/lib")
+            (string-append "--with-ffi-includes=" ffi "/include")
+            (string-append "--with-curses-libraries=" ncurses "/lib")
+            (string-append "--with-curses-includes=" ncurses "/include")))
        #:phases
        #~(modify-phases %standard-phases
            (add-after 'unpack 'unpack-testsuite
              (lambda* (#:key inputs #:allow-other-keys)
-               (with-directory-excursion ".."
-                 (invoke "tar" "xvf" (assoc-ref inputs "ghc-testsuite")))))
+               (let ((ghc-testsuite (find (lambda (pair)
+                                            (string-suffix? "testsuite.tar.xz"
+                                                            (car pair)))
+                                          inputs)))
+                 (with-directory-excursion ".."
+                   (invoke "tar" "xvf" (and=> ghc-testsuite cdr))))))
            (add-before 'build 'fix-lib-paths
              (lambda* (#:key inputs #:allow-other-keys)
                (substitute*
