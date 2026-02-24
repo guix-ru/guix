@@ -1265,88 +1265,100 @@ interactive environment for the functional language Haskell.")
                                 (file-type 'directory))))))
 
 (define-public ghc-8.6
-  (package (inherit ghc-8.4)
-    (name "ghc")
-    (version "8.6.5")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://www.haskell.org/ghc/dist/"
-                           version "/" name "-" version "-src.tar.xz"))
-       (sha256
-        (base32 "0qg3zsmbk4rkwkc3jpas3zs74qaxmw4sp4v1mhsbj0a0dzls2jjd"))))
-    (native-inputs
-     `(;; GHC 8.6.5 must be built with GHC >= 8.2.
-       ("ghc-bootstrap" ,ghc-8.4)
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                 "https://www.haskell.org/ghc/dist/"
-                 version "/" name "-" version "-testsuite.tar.xz"))
-           (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
-                                    "ghc-testsuite-grep-compat.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
-           (sha256
-            (base32
-             "0pw9r91g2np3i806g2f4f8z4jfdd7mx226cmdizk4swa7av1qf91"))
-           (modules '((guix build utils)))
-           (snippet
-            ;; collections.Iterable was moved to collections.abc in Python 3.10.
-            '(substitute* "testsuite/driver/testlib.py"
-               (("collections\\.Iterable")
-                "collections.abc.Iterable")))))
-       ,@(filter (match-lambda
-                   (("ghc-bootstrap" . _) #f)
-                   (("ghc-testsuite" . _) #f)
-                   (_ #t))
-                 (package-native-inputs ghc-8.4))))
-    (arguments
-     (substitute-keyword-arguments (package-arguments ghc-8.4)
-       ((#:make-flags make-flags ''())
-        #~(cons "EXTRA_RUNTEST_OPTS=--skip-perf-tests"
-                #$make-flags))
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-           (add-after 'install 'remove-unnecessary-references
-             (lambda* (#:key outputs #:allow-other-keys)
-               (substitute* (find-files (string-append (assoc-ref outputs "out") "/lib/")
-                                        "settings")
-                 (("/gnu/store/.*/bin/(.*)" m program) program))
+  (let ((ghc-bootstrap ghc-8.4))
+    (package
+      (inherit ghc-bootstrap)
+      (name "ghc")
+      (version "8.6.5")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append "https://www.haskell.org/ghc/dist/"
+                             version "/" name "-" version "-src.tar.xz"))
+         (sha256
+          (base32 "0qg3zsmbk4rkwkc3jpas3zs74qaxmw4sp4v1mhsbj0a0dzls2jjd"))))
+      (native-inputs
+       ;; It's not possible to set this using modify-inputs because it's
+       ;; necessary to also modify the label for further inheritance issues.
+       (cons* (list
+               (string-append name "-" version "-testsuite.tar.xz")
+               (origin
+                 (method url-fetch)
+                 (uri (string-append
+                       "https://www.haskell.org/ghc/dist/"
+                       version "/" name "-" version "-testsuite.tar.xz"))
+                 (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
+                                          "ghc-testsuite-grep-compat.patch"))
+                 (sha256
+                  (base32
+                   "0pw9r91g2np3i806g2f4f8z4jfdd7mx226cmdizk4swa7av1qf91"))
+                 (modules '((guix build utils)))
+                 (snippet
+                  ;; collections.Iterable was moved to collections.abc in Python 3.10.
+                  '(substitute* "testsuite/driver/testlib.py"
+                     (("collections\\.Iterable")
+                      "collections.abc.Iterable")))))
+              (modify-inputs (package-native-inputs ghc-bootstrap)
+                ;; GHC 8.6.5 must be built with GHC >= 8.2.
+                (replace "ghc" ghc-bootstrap)
+                (delete (string-append name "-" (package-version ghc-bootstrap)
+                                       "-testsuite.tar.xz")))))
+      (arguments
+       (substitute-keyword-arguments (package-arguments ghc-8.4)
+         ((#:make-flags make-flags ''())
+          #~(cons "EXTRA_RUNTEST_OPTS=--skip-perf-tests"
+                  #$make-flags))
+         ((#:phases phases '%standard-phases)
+          #~(modify-phases #$phases
+              (add-after 'install 'remove-unnecessary-references
+                (lambda* (#:key outputs #:allow-other-keys)
+                  (substitute* (find-files (string-append #$output "/lib/")
+                                           "settings")
+                    (("/gnu/store/.*/bin/(.*)" m program) program))
 
-               ;; Remove references to "doc" output from "out" by rewriting
-               ;; the "haddock-interfaces" fields and removing the optional
-               ;; "haddock-html" field in the generated .conf files.
-               (let ((doc (assoc-ref outputs "doc"))
-                     (out (assoc-ref outputs "out")))
-                 (with-fluids ((%default-port-encoding #f))
-                   (for-each (lambda (config-file)
-                               (substitute* config-file
-                                 (("^haddock-html: .*") "\n")
-                                 (((format #f "^haddock-interfaces: ~a" doc))
-                                  (string-append "haddock-interfaces: " out))))
-                             (find-files (string-append out "/lib") ".conf")))
-                 ;; Move the referenced files to the "out" output.
-                 (for-each (lambda (haddock-file)
-                             (let* ((subdir (string-drop haddock-file (string-length doc)))
-                                    (new    (string-append out subdir)))
-                               (mkdir-p (dirname new))
-                               (rename-file haddock-file new)))
-                           (find-files doc "\\.haddock$")))))
-           (add-after 'unpack-testsuite 'skip-tests
-             (lambda _
-               ;; These two tests refer to the root user, which doesn't exist
-               ;; (see <https://bugs.gnu.org/36692>).
-               (substitute* "libraries/unix/tests/all.T"
-                 (("^test\\('T8108'") "# guix skipped: test('T8108'"))
-               (substitute* "libraries/unix/tests/libposix/all.T"
-                 (("^test\\('posix010'") "# guix skipped: test('posix010'"))))))))
-    (native-search-paths (list (search-path-specification
-                                (variable "GHC_PACKAGE_PATH")
-                                (files (list
-                                        (string-append "lib/ghc-" version)))
-                                (file-pattern ".*\\.conf\\.d$")
-                                (file-type 'directory))))))
+                  ;; Remove references to "doc" output from "out" by rewriting
+                  ;; the "haddock-interfaces" fields and removing the optional
+                  ;; "haddock-html" field in the generated .conf files.
+                  (let ((doc (assoc-ref outputs "doc"))
+                        (out (assoc-ref outputs "out")))
+                    (with-fluids ((%default-port-encoding #f))
+                      (for-each
+                       (lambda (config-file)
+                         (substitute* config-file
+                           (("^haddock-html: .*") "\n")
+                           (((format #f "^haddock-interfaces: ~a" doc))
+                            (string-append "haddock-interfaces: " out))))
+                       (find-files (string-append out "/lib") ".conf")))
+                    ;; Move the referenced files to the "out" output.
+                    (for-each
+                     (lambda (haddock-file)
+                       (let* ((subdir (string-drop haddock-file
+                                                   (string-length doc)))
+                              (new    (string-append out subdir)))
+                         (mkdir-p (dirname new))
+                         (rename-file haddock-file new)))
+                     (find-files doc "\\.haddock$")))))
+              (add-after 'unpack-testsuite 'skip-tests
+                (lambda _
+                  ;; These two tests refer to the root user, which doesn't exist
+                  ;; (see <https://bugs.gnu.org/36692>).
+                  (substitute* "libraries/unix/tests/all.T"
+                    (("^test\\('T8108'") "# guix skipped: test('T8108'"))
+                  (substitute* "libraries/unix/tests/libposix/all.T"
+                    (("^test\\('posix010'") "# guix skipped: test('posix010'"))))
+              ;; binutils@2.39 warns for execstack deprecation by default, causing
+              ;; some tests to fail ; explicitely disable during linking instead.
+              (add-after 'unpack-testsuite 'fix-tests-with-binutils@2.39
+                (lambda _
+                  (substitute* "testsuite/mk/test.mk"
+                    (("^TEST_HC_OPTS = ")
+                     "TEST_HC_OPTS = -optl -Wl,-z,noexecstack "))))))))
+      (native-search-paths (list (search-path-specification
+                                   (variable "GHC_PACKAGE_PATH")
+                                   (files (list
+                                           (string-append "lib/ghc-" version)))
+                                   (file-pattern ".*\\.conf\\.d$")
+                                   (file-type 'directory)))))))
 
 (define-public ghc-8.8
   (package (inherit ghc-8.6)
