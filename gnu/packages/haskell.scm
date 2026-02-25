@@ -1707,28 +1707,27 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
          ;; Increase verbosity, so running the test suite does not time out on CI.
          ((#:make-flags make-flags ''())
           #~(cons "VERBOSE=4" #$make-flags))))
-      (properties '((max-silent-time . 36000))) ; 10 hours, for i686.
       (native-inputs
-       `(;; GHC 9.2 must be built with GHC >= 8.6.
-         ("ghc-bootstrap" ,(if (target-aarch64?)
-                               binary-ghc-8.10.7
-                               base))
-         ("ghc-testsuite"
-          ,(origin
-             (method url-fetch)
-             (uri (string-append
-                   "https://www.haskell.org/ghc/dist/"
-                   version "/ghc-" version "-testsuite.tar.xz"))
-             (sha256
-              (base32
-               "0cmmwhcwv9fjzvmgjj85d354858qqbmqfzaz5160xqj4yl9zk225"))
-             (patches (search-patches "ghc-9.2-grep-warnings.patch"
-                                      "ghc-testsuite-recomp015-execstack.patch"))))
-         ,@(filter (match-lambda
-                     (("ghc-bootstrap" . _) #f)
-                     (("ghc-testsuite" . _) #f)
-                     (_ #t))
-                   (package-native-inputs base))))
+       (cons* (list
+               (string-append name "-" version "-testsuite.tar.xz")
+               (origin
+                 (method url-fetch)
+                 (uri (string-append
+                       "https://www.haskell.org/ghc/dist/"
+                       version "/ghc-" version "-testsuite.tar.xz"))
+                 (sha256
+                  (base32
+                   "0cmmwhcwv9fjzvmgjj85d354858qqbmqfzaz5160xqj4yl9zk225"))
+                 (patches (search-patches "ghc-9.2-grep-warnings.patch"))))
+              (modify-inputs (package-native-inputs base)
+                ;; GHC 8.10.7 must be built with GHC >= 8.6.
+                (replace "ghc" (if (target-aarch64?)
+                                   binary-ghc-8.10.7
+                                   base))
+                (delete (string-append name "-"
+                                       (package-version base)
+                                       "-testsuite.tar.xz")))))
+      (properties '((max-silent-time . 36000))) ; 10 hours, for i686.
       (native-search-paths
        (list (search-path-specification
               (variable "GHC_PACKAGE_PATH")
