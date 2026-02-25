@@ -1419,97 +1419,96 @@ interactive environment for the functional language Haskell.")
                                    (file-type 'directory)))))))
 
 (define-public ghc-8.10
-  (package
-    (inherit ghc-8.8)
-    (name "ghc")
-    (version "8.10.7")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://www.haskell.org/ghc/dist/"
-                           version "/ghc-" version "-src.tar.xz"))
-       (sha256
-        (base32 "179ws2q0dinl1a39wm9j37xzwm84zfz3c5543vz8v479khigdvp3"))))
-    (native-inputs
-     `(;; GHC 8.10.7 must be built with GHC >= 8.6.
-       ("ghc-bootstrap" ,ghc-8.6)
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                 "https://www.haskell.org/ghc/dist/"
-                 version "/ghc-" version "-testsuite.tar.xz"))
-           (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
-                                    "ghc-testsuite-grep-compat.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
-           (sha256
-            (base32
-             "1zl25gg6bpx5601k8h3cqnns1xfc0nqgwnh8jvn2s65ra3f2g1nz"))
-           (modules '((guix build utils)))
-           (snippet
-            ;; collections.Iterable was moved to collections.abc in Python 3.10.
-            '(substitute* "testsuite/driver/testlib.py"
-               (("collections\\.Iterable")
-                "collections.abc.Iterable")))))
-       ("git" ,git-minimal/pinned)                 ; invoked during tests
-       ,@(filter (match-lambda
-                   (("ghc-bootstrap" . _) #f)
-                   (("ghc-testsuite" . _) #f)
-                   (_ #t))
-                 (package-native-inputs ghc-8.8))))
-    (arguments
-     (substitute-keyword-arguments (package-arguments ghc-8.8)
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-           (add-after 'unpack-testsuite 'patch-more-shebangs
-             (lambda* (#:key inputs #:allow-other-keys)
-               (let ((bash (assoc-ref inputs "bash")))
-                 (substitute* '("testsuite/tests/driver/T8602/T8602.script")
-                   (("/bin/sh")
-                    (string-append bash "/bin/sh"))))))
-           ;; Mark failing tests as broken. Reason for failure is unknown.
-           (add-after 'skip-more-tests 'skip-even-more-tests
-             (lambda _
-               (substitute* '("testsuite/tests/driver/T16521/all.T")
-                 (("extra_files" all) (string-append "[" all))
-                 (("\\]\\), " all)
-                  (string-append all "expect_broken(0)], ")))))
-           (add-after 'skip-more-tests 'skip-failing-tests-i686
-             (lambda _
-               (substitute* '("testsuite/tests/codeGen/should_compile/all.T")
-                 (("(test\\('T15155l', )when\\(unregisterised\\(\\), skip\\)" all before)
-                  (string-append before "when(arch('i386'), skip)")))
-               ;; Unexpected failures:
-               ;;    quasiquotation/T14028.run  T14028 [bad stderr] (dyn)
-               (substitute* '("testsuite/tests/quasiquotation/all.T")
-                 (("unless\\(config.have_ext_interp, skip\\),")
-                  "unless(config.have_ext_interp, skip), when(arch('i386'), skip),"))))
-           ;; i686 fails on CI, but (sometimes and with generous timeouts) completes
-           ;; locally. The issue seems to be that the testsuite tries to run some very
-           ;; broad regular expressions on output files of several megabytes in size,
-           ;; which takes a long time. Since the expressions never match anything on
-           ;; our builds anyways, remove them.
-           ;; TODO: Merge with 'skip-failing-tests-i686 or move into snippets on
-           ;; next rebuild. Note that they are required for GHC 8.10 and 9.2.
-           #$@(if (string-prefix? "i686" (or (%current-target-system)
-                                             (%current-system)))
-               #~((add-after 'skip-failing-tests-i686 'skip-more-failing-tests-i686
-                    (lambda _
-                      (substitute* '("testsuite/tests/profiling/should_run/all.T")
-                        (("test\\('T11627a', \\[ ")
-                         "test('T11627a', [ when(arch('i386'), skip), "))
-                      (substitute* '("testsuite/driver/testlib.py")
-                        ((".*changes being made to the file will invalidate the code signature.*")
-                         "")
-                        ((".*warning: argument unused during compilation:.*")
-                         "")))))
-               #~())))))
-    (native-search-paths (list (search-path-specification
-                                (variable "GHC_PACKAGE_PATH")
-                                (files (list
-                                        (string-append "lib/ghc-" version)))
-                                (file-pattern ".*\\.conf\\.d$")
-                                (file-type 'directory))))))
+  (let ((ghc-bootstrap ghc-8.6))
+    (package
+      (inherit ghc-8.8)
+      (name "ghc")
+      (version "8.10.7")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append "https://www.haskell.org/ghc/dist/"
+                             version "/ghc-" version "-src.tar.xz"))
+         (sha256
+          (base32 "179ws2q0dinl1a39wm9j37xzwm84zfz3c5543vz8v479khigdvp3"))))
+      (native-inputs
+       (cons* (list
+               (string-append name "-" version "-testsuite.tar.xz")
+               (origin
+                 (method url-fetch)
+                 (uri (string-append
+                       "https://www.haskell.org/ghc/dist/"
+                       version "/ghc-" version "-testsuite.tar.xz"))
+                 (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
+                                          "ghc-testsuite-grep-compat.patch"))
+                 (sha256
+                  (base32
+                   "1zl25gg6bpx5601k8h3cqnns1xfc0nqgwnh8jvn2s65ra3f2g1nz"))
+                 (modules '((guix build utils)))
+                 (snippet
+                  ;; collections.Iterable was moved to collections.abc in Python 3.10.
+                  '(substitute* "testsuite/driver/testlib.py"
+                     (("collections\\.Iterable")
+                      "collections.abc.Iterable")))))
+              (modify-inputs (package-native-inputs ghc-bootstrap)
+                ;; GHC 8.10.7 must be built with GHC >= 8.6.
+                (replace "ghc" ghc-bootstrap)
+                (delete (string-append name "-"
+                                       (package-version ghc-bootstrap)
+                                       "-testsuite.tar.xz"))
+                (append git-minimal/pinned)))) ; invoked during tests
+      (arguments
+       (substitute-keyword-arguments (package-arguments ghc-8.8)
+         ((#:phases phases '%standard-phases)
+          #~(modify-phases #$phases
+              (add-after 'unpack-testsuite 'patch-more-shebangs
+                (lambda* (#:key inputs #:allow-other-keys)
+                  (substitute* '("testsuite/tests/driver/T8602/T8602.script")
+                    (("/bin/sh")
+                     (search-input-file inputs "/bin/sh")))))
+              ;; Mark failing tests as broken. Reason for failure is unknown.
+              (add-after 'skip-more-tests 'skip-even-more-tests
+                (lambda _
+                  (substitute* '("testsuite/tests/driver/T16521/all.T")
+                    (("extra_files" all) (string-append "[" all))
+                    (("\\]\\), " all)
+                     (string-append all "expect_broken(0)], ")))))
+              (add-after 'skip-more-tests 'skip-failing-tests-i686
+                (lambda _
+                  (substitute* '("testsuite/tests/codeGen/should_compile/all.T")
+                    (("(test\\('T15155l', )when\\(unregisterised\\(\\), skip\\)" all before)
+                     (string-append before "when(arch('i386'), skip)")))
+                  ;; Unexpected failures:
+                  ;;    quasiquotation/T14028.run  T14028 [bad stderr] (dyn)
+                  (substitute* '("testsuite/tests/quasiquotation/all.T")
+                    (("unless\\(config.have_ext_interp, skip\\),")
+                     "unless(config.have_ext_interp, skip), when(arch('i386'), skip),"))))
+              ;; i686 fails on CI, but (sometimes and with generous timeouts) completes
+              ;; locally. The issue seems to be that the testsuite tries to run some very
+              ;; broad regular expressions on output files of several megabytes in size,
+              ;; which takes a long time. Since the expressions never match anything on
+              ;; our builds anyways, remove them.
+              ;; TODO: Merge with 'skip-failing-tests-i686 or move into snippets on
+              ;; next rebuild. Note that they are required for GHC 8.10 and 9.2.
+              #$@(if (string-prefix? "i686" (or (%current-target-system)
+                                                (%current-system)))
+                     #~((add-after 'skip-failing-tests-i686 'skip-more-failing-tests-i686
+                          (lambda _
+                            (substitute* '("testsuite/tests/profiling/should_run/all.T")
+                              (("test\\('T11627a', \\[ ")
+                               "test('T11627a', [ when(arch('i386'), skip), "))
+                            (substitute* '("testsuite/driver/testlib.py")
+                              ((".*changes being made to the file will invalidate the code signature.*")
+                               "")
+                              ((".*warning: argument unused during compilation:.*")
+                               "")))))
+                     #~())))))
+      (native-search-paths (list (search-path-specification
+                                   (variable "GHC_PACKAGE_PATH")
+                                   (files (list
+                                           (string-append "lib/ghc-" version)))
+                                   (file-pattern ".*\\.conf\\.d$")
+                                   (file-type 'directory)))))))
 
 (define-public ghc-8 ghc-8.10)
 
