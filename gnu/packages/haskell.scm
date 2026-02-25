@@ -1361,62 +1361,62 @@ interactive environment for the functional language Haskell.")
                                    (file-type 'directory)))))))
 
 (define-public ghc-8.8
-  (package (inherit ghc-8.6)
-    (name "ghc")
-    (version "8.8.4")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://www.haskell.org/ghc/dist/"
-                           version "/ghc-" version "-src.tar.xz"))
-       (sha256
-        (base32 "0bgwbxxvdn56l91bp9p5d083gzcfdi6z8l8b17qzjpr3n8w5wl7h"))))
-    (native-inputs
-     `(("ghc-bootstrap" ,ghc-8.6)
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                 "https://www.haskell.org/ghc/dist/"
-                 version "/ghc-" version "-testsuite.tar.xz"))
-           (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
-                                    "ghc-testsuite-grep-compat.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
-           (sha256
-            (base32
-             "0c55pj2820q26rikhpf636sn4mjgqsxjrl94vsywrh79dxp3k14z"))
-           (modules '((guix build utils)))
-           (snippet
-            ;; collections.Iterable was moved to collections.abc in Python 3.10.
-            '(substitute* "testsuite/driver/testlib.py"
-               (("collections\\.Iterable")
-                "collections.abc.Iterable")))))
-       ("git" ,git-minimal/pinned)                 ; invoked during tests
-       ,@(filter (match-lambda
-                   (("ghc-bootstrap" . _) #f)
-                   (("ghc-testsuite" . _) #f)
-                   (_ #t))
-                 (package-native-inputs ghc-8.6))))
-    (arguments
-     (substitute-keyword-arguments (package-arguments ghc-8.6)
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-           (add-before 'build 'fix-cc-reference
-             (lambda _
-               (substitute* "utils/hsc2hs/Common.hs"
-                 (("\"cc\"") "\"gcc\""))))
-           (add-after 'unpack-testsuite 'skip-more-tests
-             (lambda _
-               ;; XXX: This test fails because our ld-wrapper script
-               ;; mangles the response file passed to the linker.
-               (substitute* "testsuite/tests/hp2ps/all.T"
-                 (("^test\\('T15904'") "# guix skipped: test('T15904'"))))))))
-    (native-search-paths (list (search-path-specification
-                                (variable "GHC_PACKAGE_PATH")
-                                (files (list
-                                        (string-append "lib/ghc-" version)))
-                                (file-pattern ".*\\.conf\\.d$")
-                                (file-type 'directory))))))
+  (let ((ghc-bootstrap ghc-8.6))
+    (package
+      (inherit ghc-bootstrap)
+      (name "ghc")
+      (version "8.8.4")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append "https://www.haskell.org/ghc/dist/"
+                             version "/ghc-" version "-src.tar.xz"))
+         (sha256
+          (base32 "0bgwbxxvdn56l91bp9p5d083gzcfdi6z8l8b17qzjpr3n8w5wl7h"))))
+      (native-inputs
+       (modify-inputs (package-native-inputs ghc-bootstrap)
+         ;; GHC 8.6.5 must be built with GHC >= 8.2.
+         (replace "ghc" ghc-bootstrap)
+         (replace (string-append name "-"
+                                 (package-version ghc-bootstrap)
+                                 "-testsuite.tar.xz")
+           (origin
+             (method url-fetch)
+             (uri (string-append
+                   "https://www.haskell.org/ghc/dist/"
+                   version "/ghc-" version "-testsuite.tar.xz"))
+             (patches (search-patches "ghc-testsuite-dlopen-pie.patch"
+                                      "ghc-testsuite-grep-compat.patch"))
+             (sha256
+              (base32
+               "0c55pj2820q26rikhpf636sn4mjgqsxjrl94vsywrh79dxp3k14z"))
+             (modules '((guix build utils)))
+             (snippet
+              ;; collections.Iterable was moved to collections.abc in Python 3.10.
+              '(substitute* "testsuite/driver/testlib.py"
+                 (("collections\\.Iterable")
+                  "collections.abc.Iterable")))))
+         (append git-minimal/pinned)))  ; invoked during tests
+      (arguments
+       (substitute-keyword-arguments (package-arguments ghc-bootstrap)
+         ((#:phases phases '%standard-phases)
+          #~(modify-phases #$phases
+              (add-before 'build 'fix-cc-reference
+                (lambda _
+                  (substitute* "utils/hsc2hs/Common.hs"
+                    (("\"cc\"") "\"gcc\""))))
+              (add-after 'unpack-testsuite 'skip-more-tests
+                (lambda _
+                  ;; XXX: This test fails because our ld-wrapper script
+                  ;; mangles the response file passed to the linker.
+                  (substitute* "testsuite/tests/hp2ps/all.T"
+                    (("^test\\('T15904'") "# guix skipped: test('T15904'"))))))))
+      (native-search-paths (list (search-path-specification
+                                   (variable "GHC_PACKAGE_PATH")
+                                   (files (list
+                                           (string-append "lib/ghc-" version)))
+                                   (file-pattern ".*\\.conf\\.d$")
+                                   (file-type 'directory)))))))
 
 (define-public ghc-8.10
   (package
