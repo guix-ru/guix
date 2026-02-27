@@ -1587,7 +1587,7 @@ write native speed custom Git applications in any language with bindings.")
                         "ok \"ignored\"")
                        ;; Fix a test.
                        (("#!/bin/sh") (string-append "#!" (which "sh")))))))))
-      (native-inputs (list git-minimal util-linux))
+      (native-inputs (list git-minimal/pinned util-linux))
       (inputs (list jq curl))
       (synopsis "Git-based decentralized issue management")
       (description
