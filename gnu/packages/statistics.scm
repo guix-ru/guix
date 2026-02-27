@@ -1883,7 +1883,7 @@ main use is as the driver for radian, the R console.")
                          r-minimal
                          r-reticulate
                          ;; Needed for sh tests.
-                         git-minimal))
+                         git-minimal/pinned))
     (home-page "https://github.com/randy3k/radian")
     (synopsis "R console")
     (description
