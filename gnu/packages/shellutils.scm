@@ -570,7 +570,7 @@ POSIX Shell}, @url{https://www.gnu.org/software/bash/, Bash}, and
        (if (%current-target-system)
            (list this-package)
            '())
-       (list git-minimal)))
+       (list git-minimal/pinned)))
     (home-page "https://starship.rs")
     (synopsis "Fast and customizable shell prompt")
     (description
