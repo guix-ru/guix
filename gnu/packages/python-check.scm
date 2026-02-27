@@ -3342,7 +3342,7 @@ import them in their actual tests to use them.")
     (build-system pyproject-build-system)
     (propagated-inputs (list python-pytest))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            python-pytest
            python-setuptools
            python-setuptools-scm))
