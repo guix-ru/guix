@@ -4360,7 +4360,7 @@ matching.")
               (with-directory-excursion (string-append #$output "/bin")
                 (rename-file "v3" "git-lfs")))))))
     (native-inputs
-     (append (list git-minimal
+     (append (list git-minimal/pinned
                    go-github-com-avast-retry-go
                    go-github-com-dpotapov-go-spnego
                    go-github-com-git-lfs-gitobj-v2
