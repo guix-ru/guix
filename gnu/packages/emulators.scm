@@ -1921,7 +1921,7 @@ emulation community.  It provides highly accurate emulation.")
               (let ((nx-dir (string-append (getcwd) "/src/tzdb/nx")))
                 (copy-recursively nx-dir #$output)))))))
     (native-inputs
-     (list git-minimal tzdata))
+     (list git-minimal/pinned tzdata))
     (synopsis "Nintendo Switch timezone database")
     (description "This package provides timezone data in the format expected by
 Nintendo Switch emulators.  It converts standard IANA timezone data to the
