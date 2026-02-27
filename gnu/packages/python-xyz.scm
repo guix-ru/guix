@@ -24479,7 +24479,7 @@ protocols written in pure Python.")
     (propagated-inputs
      (list python-packaging))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            python-poetry-core
            python-pytest))
     (home-page "https://github.com/mtkennerly/dunamai")
