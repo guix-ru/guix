@@ -2381,7 +2381,7 @@ more.")
                      args))))))
     (native-inputs (list pkg-config
                          ;; for tests
-                         git-minimal))
+                         git-minimal/pinned))
     (inputs (cons* libgit2-1.9 zlib (cargo-inputs 'lsd)))
     (home-page "https://github.com/lsd-rs/lsd")
     (synopsis "Mostly ls compatible command with pretty colors")
