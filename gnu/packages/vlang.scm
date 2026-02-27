@@ -130,7 +130,7 @@
             (file-name (git-file-name "vc" vc-version))
             (sha256
              (base32 "1gxdkgc7aqw5f0fhch1n6nhzgzvgb49p77idx1zj7wcp53lpx5ng")))))
-      ("git" ,git-minimal)
+      ("git" ,git-minimal/pinned)
       ;; For the tests.
       ("libx11" ,libx11)
       ("node" ,node-lts)
