@@ -4824,7 +4824,7 @@ TkDiff is included for browsing and merging your changes.")
     (native-inputs
      (list asciidoc
            docbook-xsl
-           git-minimal
+           git-minimal/pinned
            libxml2                        ;for XML_CATALOG_FILES
            xmlto
            perl
