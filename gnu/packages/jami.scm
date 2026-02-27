@@ -278,7 +278,7 @@ QSortFilterProxyModel conveniently exposed for QML.")
                   ;;(apply invoke "ctest" "-R" "Qml_Tests" ctest-args)
                   )))))))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            googletest
            pkg-config
            python-minimal
