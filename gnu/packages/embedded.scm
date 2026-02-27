@@ -1722,7 +1722,7 @@ STC89, STC90, STC10, STC11, STC12, STC15, STC8 and STC32 series.")
            python-packaging
            python-pykwalify
            python-pyyaml))
-    (native-inputs (list git-minimal python-pytest python-setuptools))
+    (native-inputs (list git-minimal/pinned python-pytest python-setuptools))
     (home-page "https://github.com/zephyrproject-rtos/west")
     (synopsis "Zephyr RTOS Project meta-tool")
     (description
