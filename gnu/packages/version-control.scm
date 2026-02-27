@@ -4648,7 +4648,7 @@ If several repos are related, it helps to see their status together.")
                   (copy-file "misc/zsh/_ghq"
                              (string-append zsh-completion "/_ghq")))))))))
     (native-inputs
-     (list git-minimal))
+     (list git-minimal/pinned))
     (inputs
      (list go-github-com-mattn-go-isatty
            go-github-com-motemen-go-colorine
