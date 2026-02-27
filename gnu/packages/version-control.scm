@@ -1224,7 +1224,7 @@ the date of the most recent commit that modified them
                     (string-append zsh-completions-dir "/_gs")
                   (lambda _ (invoke gs "shell" "completion" "zsh")))))))))
     (native-inputs
-     (list git-minimal ; for tests in testdata/scripts
+     (list git-minimal/pinned ; for tests in testdata/scripts
            go-github-com-alecthomas-kong
            go-github-com-buildkite-shellwords
            go-github-com-charmbracelet-bubbles
