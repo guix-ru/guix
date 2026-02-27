@@ -20893,7 +20893,7 @@ templates into Python modules.")
                           (string-append #$(this-package-native-input
                                             "bash-minimal") "/bin/bash"))))))))
     (native-inputs (list bash-minimal
-                         git-minimal
+                         git-minimal/pinned
                          python-freezegun
                          python-pytest
                          python-pytest-mock
