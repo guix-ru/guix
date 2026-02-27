@@ -5656,7 +5656,7 @@ standalone JACK client and an LV2 plugin is also available.")
       ;; So we simply skip them.
       #:tests? #f))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            `(,gtk+ "bin")             ;for gtk-update-icon-cache
            pkg-config
            qttools))
