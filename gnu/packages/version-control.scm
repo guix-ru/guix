@@ -1809,7 +1809,7 @@ collaboration using typical untrusted file hosts or services.")
                 (invoke "make" "-C"
                         "src/github.com/Apteryks/git-repo-go/test")))))))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            go-github-com-go-git-go-git-v5
            go-github-com-h2non-gock
            go-github-com-jiangxin-goconfig
