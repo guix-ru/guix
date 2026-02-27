@@ -989,7 +989,7 @@ assembler, PEG) is less than 1MB.")
            coreutils-minimal
            curl
            gcc
-           git-minimal/pinned
+           git-minimal
            ;; Lazily resolve the gcc-toolchain to avoid a circular
            ;; dependency.
            (module-ref (resolve-interface '(gnu packages commencement))
