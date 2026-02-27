@@ -1524,7 +1524,7 @@ libraries designed for computer vision research and implementation.")
                     zlib-ng-compat))
       (native-inputs
        (list castxml
-             git-minimal
+             git-minimal/pinned
              pkg-config
              python-numpy               ;for phase 'python-sanity-check
              swig-4.4
