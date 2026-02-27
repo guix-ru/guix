@@ -4863,7 +4863,7 @@ It will then write @code{fixup!} commits for each of those changes.")
                        ("etc/completion/completion.zsh"
                         "share/zsh/site-functions/_delta"))
                      args))))))
-    (native-inputs (list git-minimal pkg-config))
+    (native-inputs (list git-minimal/pinned pkg-config))
     (inputs
      (cons* libgit2-1.9
             oniguruma
