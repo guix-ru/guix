@@ -3415,7 +3415,7 @@ exchanged form one Spatial DBMS and the other.")
         (base32 "0w57zcq1rpx3cfhcqjqw25wiz1pi6lx7xnif511vr4plvzqdx8yd"))))
     (build-system cmake-build-system)
     (native-inputs
-     (list gettext-minimal git-minimal googletest pkg-config))
+     (list gettext-minimal git-minimal/pinned googletest pkg-config))
     (inputs
      (list alsa-utils
            bzip2
