@@ -2067,7 +2067,7 @@ resolution compared to the classic solver.")
      (list autoconf-wrapper
            automake
            cmake-minimal
-           git-minimal
+           git-minimal/pinned
            libtool
            meson
            ninja
