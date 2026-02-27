@@ -694,7 +694,7 @@ ksh, and tcsh.")
                  (lambda _
                    (setenv "HOME" "/tmp"))))))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            python-pyte
            python-pytest
            python-pytest-mock
