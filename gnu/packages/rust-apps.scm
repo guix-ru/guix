@@ -2175,7 +2175,7 @@ JSON viewer and jq filter editor.")
            '())
        (list pkg-config
              ;; For tests.
-             git-minimal
+             git-minimal/pinned
              openssh-sans-x)))
     (inputs (cons* zlib openssl libssh2 libgit2-1.9 (cargo-inputs 'jujutsu)))
     (home-page "https://github.com/jj-vcs/jj")
