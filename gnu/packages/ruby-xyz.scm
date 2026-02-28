@@ -1593,13 +1593,13 @@ under the hood.")
                (("require 'bundler/setup'") "nil")
                (("Bundler::GemHelper\\.install_tasks") "nil")))))))
     (native-inputs
-     (list ruby-rack-test ruby-rspec-core ruby-sinatra))
+     (list ruby-pandoc-ruby ruby-rack-test ruby-rspec-core ruby-sinatra))
     (propagated-inputs
      (list ruby-temple ruby-tilt))
     (synopsis "Minimalist template language for Ruby")
     (description "Slim is a template language for Ruby that aims to reduce the
 syntax to the minimum while remaining clear.")
-    (home-page "http://slim-lang.com/")
+    (home-page "https://slim-lang.com/")
     (license license:expat)))
 
 (define-public ruby-asciidoctor
