@@ -1022,7 +1022,7 @@ structure.  Supports custom object formatting via plugins.")
 (define-public ruby-pandoc-ruby
   (package
     (name "ruby-pandoc-ruby")
-    (version "2.1.4")
+    (version "2.1.10")
     (source
      (origin
        (method git-fetch)               ;the gem lacks many test files
@@ -1032,7 +1032,7 @@ structure.  Supports custom object formatting via plugins.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "03a11clhycyn0jhc7g9davpqd83sn60jqwjy1y145ag9sq6sp935"))))
+         "0zi66884rkd06vifar6zv9927bjcfl7c357cvra2w539vniyydly"))))
     (build-system ruby-build-system)
     (arguments
      `(#:tests? #f ; Disable tests since they depend on pandoc behavior
@@ -1043,8 +1043,8 @@ structure.  Supports custom object formatting via plugins.")
            (lambda* (#:key inputs #:allow-other-keys)
              (let ((pandoc (search-input-file inputs "/bin/pandoc")))
                (substitute* "lib/pandoc-ruby.rb"
-                 (("@@pandoc_path = 'pandoc'")
-                  (format #f "@@pandoc_path = '~a'" pandoc)))
+                 (("@pandoc_path = 'pandoc'")
+                  (format #f "@pandoc_path = '~a'" pandoc)))
                (substitute* "test/test_pandoc_ruby.rb"
                  (("('|\")pandoc" _ quote)
                   (string-append quote pandoc))
