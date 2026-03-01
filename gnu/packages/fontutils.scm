@@ -1825,6 +1825,10 @@ definitions.")
            pango
            potrace
            python
+           ;; XXX: Python 3.12 lacks distutils:
+           ;; ModuleNotFoundError: No module named 'distutils'
+           ;; Remove when package is updated.
+           python-setuptools-bootstrap
            zlib))
     (arguments
      (append
