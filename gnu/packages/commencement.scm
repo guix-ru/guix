@@ -681,13 +681,13 @@ MesCC-Tools), and finally M2-Planet.")
   (package
     (inherit gnu-make)
     (name "make-mesboot0")
-    (version "3.82")
+    (version "3.80")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/make/make-" version ".tar.gz"))
               (sha256
                (base32
-                "1rs2f9hmvy3q6zkl15jnlmnpgffm0bhw5ax0h5c7q604wqrip69x"))))
+                "1pb7fb7fqf9wz9najm85qdma1xhxzf1rhj5gwrlzdsz2zm0hpcv4"))))
     (inputs '())
     (propagated-inputs '())
     (native-inputs `(("tcc" ,tcc-boot0)
