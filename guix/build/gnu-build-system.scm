@@ -62,6 +62,14 @@ that incorporate timestamps as a way to tell them to use a fixed timestamp.
 See https://reproducible-builds.org/specs/source-date-epoch/."
   (setenv "SOURCE_DATE_EPOCH" "1"))
 
+(define* (set-GUIX_GCC_MANGLE_PREFIX_MAP #:rest _)
+  "Set the 'GUIX_GCC_MANGLE_PREFIX_MAP' environment variable.
+Guix applies 'gcc-mangle-guix-store.patch' to ensure that there are no
+hardcoded references to inputs from the store in derivation outputs due to
+macro expansions of __FILE__.  Prefix mangling is enabled when this variable
+is set.  See https://codeberg.org/guix/guix/issues/2394."
+  (setenv "GUIX_GCC_MANGLE_PREFIX_MAP" "1"))
+
 (define (first-subdirectory directory)
   "Return the file name of the first sub-directory of DIRECTORY or false, when
 there are none."
@@ -936,7 +944,8 @@ that traversing all the RUNPATH entries entails."
   (let-syntax ((phases (syntax-rules ()
                          ((_ p ...) `((p . ,p) ...)))))
     (phases separate-from-pid1
-            set-SOURCE-DATE-EPOCH set-paths install-locale unpack
+            set-GUIX_GCC_MANGLE_PREFIX_MAP set-SOURCE-DATE-EPOCH
+            set-paths install-locale unpack
             bootstrap
             patch-usr-bin-file
             patch-source-shebangs configure patch-generated-file-shebangs
