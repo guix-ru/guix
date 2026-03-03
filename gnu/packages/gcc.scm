@@ -981,7 +981,8 @@ It also includes runtime support libraries for these languages.")
               (patches (search-patches "gcc-12-strmov-store-file-names.patch"
                                        "gcc-5.0-libvtv-runpath.patch"
                                        "gcc-13-libsanitizer-no-crypt.patch"
-                                       "gcc-libstdc++-newer-gcc.patch"))
+                                       "gcc-libstdc++-newer-gcc.patch"
+                                       "gcc-mangle-guix-store.patch"))
               (modules '((guix build utils)))
               (snippet gcc-canadian-cross-objdump-snippet)))
     (arguments
@@ -1012,7 +1013,8 @@ It also includes runtime support libraries for these languages.")
                (base32
                 "0fna78ly417g69fdm4i5f3ms96g8xzzjza8gwp41lqr5fqlpgp70"))
               (patches (search-patches "gcc-12-strmov-store-file-names.patch"
-                                       "gcc-5.0-libvtv-runpath.patch"))
+                                       "gcc-5.0-libvtv-runpath.patch"
+                                       "gcc-mangle-guix-store.patch"))
               (modules '((guix build utils)))
               (snippet gcc-canadian-cross-objdump-snippet)))
     (arguments (substitute-keyword-arguments arguments
@@ -1045,7 +1047,8 @@ It also includes runtime support libraries for these languages.")
                 "0knj4ph6y7r7yhnp1v4339af7mki5nkh7ni9b948433bhabdk3s3"))
               (patches (search-patches "gcc-12-strmov-store-file-names.patch"
                                        "gcc-5.0-libvtv-runpath.patch"
-                                       "gcc-hurd-split-stack.patch"))
+                                       "gcc-hurd-split-stack.patch"
+                                       "gcc-mangle-guix-store.patch"))
               (modules '((guix build utils)))
               (snippet gcc-canadian-cross-objdump-snippet)))
     (arguments
