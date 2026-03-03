@@ -1277,7 +1277,9 @@ definition in @samp{$GUIX_CHECKOUT/guix/build/gnu-build-system.scm}:
   ;; Standard build phases, as a list of symbol/procedure pairs.
   (let-syntax ((phases (syntax-rules ()
                          ((_ p ...) `((p . ,p) ...)))))
-    (phases set-SOURCE-DATE-EPOCH set-paths install-locale unpack
+    (phases separate-from-pid1
+            set-GUIX_GCC_MANGLE_PREFIX_MAP set-SOURCE-DATE-EPOCH
+            set-paths install-locale unpack
             bootstrap
             patch-usr-bin-file
             patch-source-shebangs configure patch-generated-file-shebangs
@@ -1299,7 +1301,7 @@ Or from the REPL:
 (add-to-load-path "/path/to/guix/checkout")
 ,use (guix build gnu-build-system)
 (map car %standard-phases)
-@result{} (set-SOURCE-DATE-EPOCH set-paths install-locale unpack bootstrap patch-usr-bin-file patch-source-shebangs configure patch-generated-file-shebangs build check install patch-shebangs strip validate-runpath validate-documentation-location delete-info-dir-file patch-dot-desktop-files make-dynamic-linker-cache install-license-files reset-gzip-timestamps compress-documentation)
+@result{} (separate-from-pid1 set-GUIX_GCC_MANGLE_PREFIX_MAP set-SOURCE-DATE-EPOCH set-paths install-locale unpack bootstrap patch-usr-bin-file patch-source-shebangs configure patch-generated-file-shebangs build check install patch-shebangs strip validate-runpath validate-documentation-location delete-info-dir-file patch-dot-desktop-files make-dynamic-linker-cache install-license-files reset-gzip-timestamps compress-documentation)
 @end lisp
 
 If you want to know more about what happens during those phases, consult the

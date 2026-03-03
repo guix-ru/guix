@@ -1,0 +1,70 @@
+Patch for GCC to mangle store item references to inputs introduced by __FILE__
+macros from derivation outputs.  This helps reduce the closure size of certain
+packages.
+
+This patch is based on:
+https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/compilers/gcc/patches/13/mangle-NIX_STORE-in-__FILE__.patch
+
+At the time of writting, this patch applies successfuly for GCC versions from
+13 to 16.  The patch is not meant to be upstreamed, it provides a solution to
+a specific problem of Guix.
+---
+ gcc/file-prefix-map.cc | 28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/file-prefix-map.cc b/gcc/file-prefix-map.cc
+index 6b432e2a15a..6cc20bacd38 100644
+--- a/gcc/file-prefix-map.cc
++++ b/gcc/file-prefix-map.cc
+@@ -74,7 +74,7 @@ add_prefix_map (file_prefix_map *&maps, const char *arg, const char *opt)
+    remapping was performed.  */
+ 
+ static const char *
+-remap_filename (file_prefix_map *maps, const char *filename)
++remap_filename (file_prefix_map *maps, const char *filename, bool mangle_guix_store = false)
+ {
+   file_prefix_map *map;
+   char *s;
+@@ -102,6 +102,30 @@ remap_filename (file_prefix_map *maps, const char *filename)
+       break;
+   if (!map)
+     {
++      if (mangle_guix_store && getenv("GUIX_GCC_MANGLE_PREFIX_MAP"))
++	{
++	  /* Remap all fo $NIX_STORE/.{32} paths to uppercase
++	   *
++	   * That way we avoid argument parameters explosion
++	   * and still avoid embedding headers into runtime closure:
++	   *   https://gcc.gnu.org/PR111527
++	   */
++	   const char * guix_store = getenv("NIX_STORE") ? getenv("NIX_STORE") : "/gnu/store";
++	   size_t guix_store_len = guix_store ? strlen(guix_store) : 0;
++	   const char * name = realname ? realname : filename;
++	   size_t name_len = strlen(name);
++	   if (guix_store && name_len >= guix_store_len + 1 + 32 && memcmp(name, guix_store, guix_store_len) == 0)
++	     {
++		s = (char *) ggc_alloc_atomic (name_len + 1);
++		memcpy(s, name, name_len + 1);
++		for (size_t i = guix_store_len + 1; i < guix_store_len + 1 + 32; i++) {
++		  s[i] = TOUPPER(s[i]);
++		}
++		if (realname != filename)
++		  free (const_cast <char *> (realname));
++		return s;
++	     }
++	}
+       if (realname != filename)
+ 	free (const_cast <char *> (realname));
+       return filename;
+@@ -163,7 +187,7 @@ add_profile_prefix_map (const char *arg)
+ const char *
+ remap_macro_filename (const char *filename)
+ {
+-  return remap_filename (macro_prefix_maps, filename);
++  return remap_filename (macro_prefix_maps, filename, true);
+ }
+ 
+ /* Remap using -fdebug-prefix-map.  Return the GC-allocated new name
+-- 
+2.52.0
+
