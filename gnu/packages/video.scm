@@ -6450,20 +6450,18 @@ spec for MP4), which can be obtained from the ISO or found online.")
     (license license:expat)))
 
 (define-public vidstab
-  (let ((commit "aeabc8daa7904f9edf7441a11f293965a5ef53b8")
-        (revision "0"))
     (package
       (name "vidstab")
-      (version (git-version "1.1.0" revision commit))
+      (version "1.1.1")
       (source (origin
                 (method git-fetch)
                 (uri (git-reference
                       (url "https://github.com/georgmartius/vid.stab")
-                      (commit commit)))
+                      (commit (string-append "v" version))))
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "042iy0f3khwzr68djzvqgn301sy21ljvkf52rnc2c73q7ircnzzn"))))
+                  "19k822bwsnw58ikbfh4fhh97zpn89ji9k1gdvh9r2ljy82g52md7"))))
       (build-system cmake-build-system)
       (arguments
        '(#:tests? #f)) ; tests are not run as part of standard build process
@@ -6475,7 +6473,7 @@ vehicle typically suffers from undesirable shakes and jitters.  Activities such
 as surfing, skiing, riding and walking while shooting videos are especially
 prone to erratic camera shakes.  Vidstab targets these video contents to help
 create smoother and stable videos.")
-      (license license:gpl2+))))
+      (license license:gpl2+)))
 
 (define-public libopenshot
   (package
