@@ -13,6 +13,7 @@
 ;;; Copyright © 2020 EuAndreh <eu@euandre.org>
 ;;; Copyright © 2022, 2024, 2025 gemmaro <gemmaro.dev@gmail.com>
 ;;; Copyright © 2023 Maxim Cournoyer maxim@guixotic.coop>
+;;; Copyright © 2026 Robin Templeton <robin@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -119,6 +120,14 @@
                                    ;; See 'coreutils' for the rationale.
                                    ((" test-tls\\$\\(EXEEXT\\) ") " ")))
                               '())))))
+               (add-after 'install 'patch-gettext.sh
+                 (lambda _
+                   ;; This matches only the relevant command invocations, but
+                   ;; is sensitive to the formatting of gettext.sh.  (The
+                   ;; string "gettext" appears in program output.)
+                   (substitute* (string-append #$output "/bin/gettext.sh")
+                     (("(^  |`|; )(gettext|ngettext|envsubst)" _ prefix program)
+                      (string-append prefix #$output "/bin/" program)))))
           #$@(if (%current-target-system)
                  #~((add-after 'install 'patch-cross-shebangs
                       (lambda _
