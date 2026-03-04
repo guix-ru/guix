@@ -1100,7 +1100,7 @@ to aid in debugging.")
                           ;; Shorten paths to sockets in tests.
                           (lambda _ (setenv "TMPDIR" "/tmp"))))
            #:test-target "test"))
-    (native-inputs (list python))      ; for tests
+    (native-inputs (list python python-setuptools)) ; for tests
     (synopsis "Fault injector in userspace")
     (description "Fiu provides CLI utilities and a C library
 to mark points of failure inside your code
