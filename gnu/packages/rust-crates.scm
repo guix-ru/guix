@@ -711,6 +711,10 @@
   (crate-source "arbitrary" "1.4.2"
                 "1wcbi4x7i3lzcrkjda4810nqv03lpmvfhb0a85xrq1mbqjikdl63"))
 
+(define rust-arbitrary-int-1.2.7
+  (crate-source "arbitrary-int" "1.2.7"
+                "0vgl3n5zzpdn2hxpz6gqk8zg2psk5gwyjzsgpngzd9iqwc1w0ky8"))
+
 (define rust-arboard-3.5.0
   (crate-source "arboard" "3.5.0"
                 "0w1yqcx51153hy5w3y0702xjc9nmlhncw9f5l0rdwbl62pvj3py1"))
@@ -1321,6 +1325,10 @@
   (crate-source "attribute-derive-macro" "0.10.3"
                 "06zph2lyllkp6g1lsv7v4p84dnglbw2gw58r9fpn1d6m1ynm6fs6"))
 
+(define rust-attrs-0.2.9
+  (crate-source "attrs" "0.2.9"
+                "0pvy6b7arfr2f6awwkw6k1hc8sxidjxhj1fyyf2m5rixyi07s81a"))
+
 (define rust-atty-0.2.11
   (crate-source "atty" "0.2.11"
                 "0lln6vaczj521qqjbaqnb81w5p6xk4fjfkg33r0m22cm4f3mnzcs"))
@@ -1761,6 +1769,14 @@
 (define rust-biblatex-0.11.0
   (crate-source "biblatex" "0.11.0"
                 "0rlzfa1m33mh89ygwd4igfblphz71kq1qz1a0icrl6xszrsc7l2k"))
+
+(define rust-bilge-0.2.0
+  (crate-source "bilge" "0.2.0"
+                "0mvvwq9caiq701bmmwyd4q4pc8c69i5zaj3zdk6ya7gqxgc7ww6w"))
+
+(define rust-bilge-impl-0.2.0
+  (crate-source "bilge-impl" "0.2.0"
+                "1n5jml0c1z0np76ms0h5rxx19krblz46h84wycx29b9q4001xcgy"))
 
 (define rust-binascii-0.1.4
   (crate-source "binascii" "0.1.4"
@@ -3143,6 +3159,10 @@
 (define rust-cfg-expr-0.20.2
   (crate-source "cfg-expr" "0.20.2"
                 "01l25g563n04ci6cjv0509d8ig91djvwidx9iln4h3qg7zb5im68"))
+
+(define rust-cfg-expr-0.20.3
+  (crate-source "cfg-expr" "0.20.3"
+                "0p0y56pd9yns6wsi7slxv0xhv22ds0qf5j5138sjbhjyy8xmyb0s"))
 
 (define rust-cfg-if-0.1.10
   (crate-source "cfg-if" "0.1.10"
@@ -6113,6 +6133,10 @@
   (crate-source "ego-tree" "0.10.0"
                 "1n2csy99chk5v5vzjl0ff79vxpxhl76xmcb3aj6brrzzipmjz5xj"))
 
+(define rust-either-1.12.0
+  (crate-source "either" "1.12.0"
+                "12xmhlrv5gfsraimh6xaxcmb0qh6cc7w7ap4sw40ky9wfm095jix"))
+
 (define rust-either-1.13.0
   (crate-source "either" "1.13.0"
                 "1w2c1mybrd7vljyxk77y9f4w9dyjrmp3yp82mk7bcm8848fazcb0"))
@@ -7204,6 +7228,10 @@
   (crate-source "fontdue" "0.9.3"
                 "0aqxjgghmn8javsc5jcvx8lqpcrzajndl7v6q1j47zz87xmy2mrf"
                 #:snippet '(delete-file-recursively "images")))
+
+(define rust-foreign-0.3.1
+  (crate-source "foreign" "0.3.1"
+                "0ijqb18gllqr0319brxsrjdb036cgaf81wc6ygd21ly9x1dipjhp"))
 
 (define rust-foreign-types-0.3.2
   (crate-source "foreign-types" "0.3.2"
@@ -10107,6 +10135,10 @@
 (define rust-glib-sys-0.20.10
   (crate-source "glib-sys" "0.20.10"
                 "05f29ky5dnvy8vp5rdld5f8r2lgr5w7dxqr7p27km016s4g9xdwa"))
+
+(define rust-glib-sys-0.21.2
+  (crate-source "glib-sys" "0.21.2"
+                "1q97z7ii4qgmyxcz0m7c5xil9n7vbm3b0msfcwhra8zpvl7kv7fh"))
 
 (define rust-glib-sys-0.9.1
   (crate-source "glib-sys" "0.9.1"
@@ -13037,6 +13069,10 @@
 (define rust-libc-0.2.155
   (crate-source "libc" "0.2.155"
                 "0z44c53z54znna8n322k5iwg80arxxpdzjj5260pxxzc9a58icwp"))
+
+(define rust-libc-0.2.162
+  (crate-source "libc" "0.2.162"
+                "1633a00yyx45kzx9r54fndvr8njsjqyr7zl12mzgsmgyczg8glhq"))
 
 (define rust-libc-0.2.169
   (crate-source "libc" "0.2.169"
@@ -25733,6 +25769,10 @@
   (crate-source "unicode-ident" "1.0.12"
                 "0jzf1znfpb2gx8nr8mvmyqs1crnv79l57nxnbiszc7xf7ynbjm1k"
                 #:snippet '(delete-file-recursively "tests")))
+
+(define rust-unicode-ident-1.0.12-unpatched
+  (crate-source "unicode-ident" "1.0.12"
+                "0jzf1znfpb2gx8nr8mvmyqs1crnv79l57nxnbiszc7xf7ynbjm1k"))
 
 (define rust-unicode-ident-1.0.13
   (crate-source "unicode-ident" "1.0.13"
@@ -54210,6 +54250,43 @@
                                          rust-windows-x86-64-gnu-0.52.6
                                          rust-windows-x86-64-gnullvm-0.52.6
                                          rust-windows-x86-64-msvc-0.52.6))
+                     (qemu =>
+                           (list rust-anyhow-1.0.98
+                                 rust-arbitrary-int-1.2.7
+                                 rust-attrs-0.2.9
+                                 rust-bilge-0.2.0
+                                 rust-bilge-impl-0.2.0
+                                 rust-cfg-expr-0.20.3
+                                 rust-either-1.12.0
+                                 rust-equivalent-1.0.2
+                                 rust-foreign-0.3.1
+                                 rust-glib-sys-0.21.2
+                                 rust-hashbrown-0.16.0
+                                 rust-heck-0.5.0
+                                 rust-indexmap-2.11.4
+                                 rust-itertools-0.11.0
+                                 rust-libc-0.2.162
+                                 rust-memchr-2.7.6
+                                 rust-pkg-config-0.3.32
+                                 rust-proc-macro-error-1.0.4
+                                 rust-proc-macro-error-attr-1.0.4
+                                 rust-proc-macro2-1.0.95
+                                 rust-quote-1.0.36
+                                 rust-serde-1.0.226
+                                 rust-serde-core-1.0.226
+                                 rust-serde-derive-1.0.226
+                                 rust-serde-spanned-0.6.9
+                                 rust-smallvec-1.15.1
+                                 rust-syn-2.0.104
+                                 rust-system-deps-7.0.5
+                                 rust-target-lexicon-0.13.2
+                                 rust-toml-0.8.23
+                                 rust-toml-datetime-0.6.11
+                                 rust-toml-edit-0.22.27
+                                 rust-unicode-ident-1.0.12-unpatched
+                                 rust-version-compare-0.2.0
+                                 rust-version-check-0.9.4
+                                 rust-winnow-0.7.13))
                      (rabbitmqadmin =>
                                     (list rust-addr2line-0.24.2
                                      rust-adler2-2.0.1
