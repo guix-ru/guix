@@ -47217,7 +47217,7 @@
                                  rust-errno-0.3.12
                                  rust-hashbrown-0.14.1
                                  rust-indexmap-2.2.6
-                                 rust-libc-0.2.168
+                                 rust-libc-0.2.171
                                  rust-log-0.4.27
                                  ;rust-once-cell-1.8.0  ; Unavailable upstream.
                                  rust-paste-1.0.14
@@ -47230,12 +47230,14 @@
                                  rust-remain-0.2.12
                                  rust-roxmltree-0.20.0
                                  rust-rustc-hash-2.1.1
-                                 rust-rustix-1.0.7
+                                 rust-rustix-1.1.2
                                  rust-syn-2.0.87
                                  rust-thiserror-2.0.11
                                  rust-thiserror-impl-2.0.11
                                  rust-ucd-trie-0.1.6
                                  rust-unicode-ident-1.0.12-unpatched
+                                 rust-windows-link-0.2.0
+                                 rust-windows-sys-0.61.1
                                  rust-zerocopy-0.8.13
                                  rust-zerocopy-derive-0.8.13))
                      (mollysocket =>
