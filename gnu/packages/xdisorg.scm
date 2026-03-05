@@ -242,6 +242,7 @@
     (native-inputs
      (list python-pyhamcrest
            git-minimal
+           gobject-introspection
            python-pytest
            python-setuptools))
     (inputs
