@@ -16307,6 +16307,10 @@
   (crate-source "omnipath" "0.1.6"
                 "0xd5a4xwsfmhzk59v6wz65f59rk16d7gvkg90w1qhb0jg08b7bc0"))
 
+(define rust-once-cell-1.8.0
+  (crate-source "once_cell" "1.8.0"
+                "0mkbbxg6416z11r2yzsq91cqrkj9w1iyx5hakq15h5sbnriwnbv9"))
+
 (define rust-once-cell-1.18.0
   (crate-source "once_cell" "1.18.0"
                 "0vapcd5ambwck95wyz3ymlim35jirgnqn9a0qmi19msymv95v2yx"))
@@ -47219,7 +47223,7 @@
                                  rust-indexmap-2.2.6
                                  rust-libc-0.2.171
                                  rust-log-0.4.27
-                                 ;rust-once-cell-1.8.0  ; Unavailable upstream.
+                                 rust-once-cell-1.8.0
                                  rust-paste-1.0.14
                                  rust-pest-2.8.0
                                  rust-pest-derive-2.8.0
