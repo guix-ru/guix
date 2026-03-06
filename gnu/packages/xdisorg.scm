@@ -2328,7 +2328,8 @@ connectivity of the X server running on a particular @code{DISPLAY}.")
               (lambda _
                 (setenv "HOME"
                         (getcwd)))))))
-      (native-inputs (list intltool
+      (native-inputs (list gobject-introspection
+                           intltool
                            python-mock
                            python-pytest
                            python-pytest-mock
