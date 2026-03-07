@@ -562,16 +562,15 @@ the base compiler.  Use XBINUTILS as the associated cross-Binutils."
                         (srfi srfi-26))
              ,@(package-arguments glibc/hurd-headers))
          ((#:phases phases)
-          `(modify-phases ,phases
-             (add-after 'unpack 'set-cross-headers-path
-               (lambda* (#:key inputs #:allow-other-keys)
-                 (let* ((mach (assoc-ref inputs "gnumach-headers"))
-                        (hurd (assoc-ref inputs "hurd-headers"))
-                        (cpath (string-append mach "/include:"
-                                              hurd "/include")))
-                   (for-each (cut setenv <> cpath)
-                             ',%gcc-cross-include-paths)
-                   #t)))))
+          #~(modify-phases #$phases
+              (add-after 'unpack 'set-cross-headers-path
+                (lambda* (#:key inputs #:allow-other-keys)
+                  (let* ((mach (assoc-ref inputs "gnumach-headers"))
+                         (hurd (assoc-ref inputs "hurd-headers"))
+                         (cpath (string-append mach "/include:"
+                                               hurd "/include")))
+                    (for-each (cut setenv <> cpath)
+                              '#$%gcc-cross-include-paths))))))
          ((#:configure-flags flags)
           `(cons* ,(string-append "--build=" (%current-system))
                   ,(string-append "--host=" target)
@@ -686,80 +685,78 @@ returned."
       (name (string-append "glibc-cross-" target))
       (arguments
        (substitute-keyword-arguments
-         `(;; Disable stripping (see above.)
-           #:strip-binaries? #f
+           `(;; Disable stripping (see above.)
+             #:strip-binaries? #f
 
-           ;; This package is used as a target input, but it should not have
-           ;; the usual cross-compilation inputs since that would include
-           ;; itself.
-           #:implicit-cross-inputs? #f
+                               ;; This package is used as a target input, but it should not have
+                               ;; the usual cross-compilation inputs since that would include
+                               ;; itself.
+                               #:implicit-cross-inputs? #f
 
-           ;; We need SRFI 26.
-           #:modules ((guix build gnu-build-system)
-                      (guix build utils)
-                      (srfi srfi-26))
+                               ;; We need SRFI 26.
+                               #:modules ((guix build gnu-build-system)
+                                          (guix build utils)
+                                          (srfi srfi-26))
 
-               ,@(package-arguments libc))
-           ((#:configure-flags flags)
-            `(cons ,(string-append "--host=" target)
-                   ,(if (target-hurd? target)
-                        `(append (list "--disable-werror")
-                                 ,flags)
+                               ,@(package-arguments libc))
+         ((#:configure-flags flags)
+          #~(cons #$(string-append "--host=" target)
+                  #$(if (target-hurd? target)
+                        #~(append (list "--disable-werror")
+                                  #$flags)
                         flags)))
-           ((#:phases phases)
-            `(modify-phases ,phases
-               (add-before 'configure 'set-cross-kernel-headers-path
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (let* ((kernel (assoc-ref inputs "kernel-headers"))
-                          (cpath (string-append kernel "/include")))
-                     (for-each (cut setenv <> cpath)
-                               ',%gcc-cross-include-paths)
-                     (setenv "CROSS_LIBRARY_PATH"
-                             (string-append kernel "/lib")) ; for Hurd's libihash
-                     #t)))
-               (add-before 'configure 'add-cross-binutils-to-PATH
-                 (lambda* (#:key native-inputs inputs #:allow-other-keys)
-                   ;; Add BINUTILS/TARGET/bin to $PATH so that 'gcc
-                   ;; -print-prog-name=objdump' returns the correct name.  See
-                   ;; <https://inbox.sourceware.org/libc-alpha/d72f5f6f-cc3a-bd89-0800-ffb068928e0f@linaro.org/t/>.
-                   (define cross-objdump
-                     (search-input-file
-                      (or native-inputs inputs)
-                      (string-append ,target "/bin/objdump")))
+         ((#:phases phases)
+          #~(modify-phases #$phases
+              (add-before 'configure 'set-cross-kernel-headers-path
+                (lambda* (#:key inputs #:allow-other-keys)
+                  (let* ((kernel (assoc-ref inputs "kernel-headers"))
+                         (cpath (string-append kernel "/include")))
+                    (for-each (cut setenv <> cpath)
+                              '#$%gcc-cross-include-paths)
+                    (setenv "CROSS_LIBRARY_PATH"
+                            (string-append kernel "/lib"))))) ; for Hurd's libihash
+              (add-before 'configure 'add-cross-binutils-to-PATH
+                (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                  ;; Add BINUTILS/TARGET/bin to $PATH so that 'gcc
+                  ;; -print-prog-name=objdump' returns the correct name.  See
+                  ;; <https://inbox.sourceware.org/libc-alpha/d72f5f6f-cc3a-bd89-0800-ffb068928e0f@linaro.org/t/>.
+                  (define cross-objdump
+                    (search-input-file
+                     (or native-inputs inputs)
+                     (string-append #$target "/bin/objdump")))
 
-                   (define cross-binutils
-                     (dirname cross-objdump))
+                  (define cross-binutils
+                    (dirname cross-objdump))
 
-                   (format #t "adding '~a' to the front of 'PATH'~%"
-                           cross-binutils)
-                   (setenv "PATH" (string-append cross-binutils ":"
-                                                 (getenv "PATH")))))
+                  (format #t "adding '~a' to the front of 'PATH'~%"
+                          cross-binutils)
+                  (setenv "PATH" (string-append cross-binutils ":"
+                                                (getenv "PATH")))))
 
-               ;; This phase would require running 'localedef' built for
-               ;; TARGET, which is impossible by definition.
-               (delete 'install-utf8-c-locale)
+              ;; This phase would require running 'localedef' built for
+              ;; TARGET, which is impossible by definition.
+              (delete 'install-utf8-c-locale)
 
-               ,@(if (target-hurd? target)
-                     `((add-after 'install 'augment-libc.so
-                         (lambda* (#:key outputs #:allow-other-keys)
-                           (let ((out (assoc-ref outputs "out")))
-                             (substitute* (string-append out "/lib/libc.so")
-                               (("/[^ ]+/lib/libc.so.0.3")
-                                (string-append out "/lib/libc.so.0.3"
-                                               " libmachuser.so libhurduser.so"))))))
-                       (add-after 'install 'create-machine-symlink
-                         (lambda* (#:key outputs #:allow-other-keys)
-                           (let* ((out (assoc-ref outputs "out"))
-                                  (cpu ,(match target
-                                          ((? target-x86-32?)
-                                           "i386")
-                                          ((? target-x86-64?)
-                                           "x86_64")))
+              #$@(if (target-hurd? target)
+                     #~((add-after 'install 'augment-libc.so
+                          (lambda _
+                            (substitute* (string-append #$output "/lib/libc.so")
+                              (("/[^ ]+/lib/libc.so.0.3")
+                               (string-append #$output "/lib/libc.so.0.3"
+                                              " libmachuser.so libhurduser.so")))))
+                        (add-after 'install 'create-machine-symlink
+                          (lambda _
+                            (let ((cpu #$(match target
+                                           ((? target-x86-32?)
+                                            "i386")
+                                           ((? target-x86-64?)
+                                            "x86_64")))
                                   (machine (string-append
-                                            out "/include/mach/machine")))
-                             (unless (file-exists? machine)
-                               (symlink cpu machine))))))
-                     '())))))
+                                            #$output
+                                            "/include/mach/machine")))
+                              (unless (file-exists? machine)
+                                (symlink cpu machine))))))
+                     #~())))))
 
       ;; Shadow the native "kernel-headers" because glibc's recipe expects the
       ;; "kernel-headers" input to point to the right thing.
