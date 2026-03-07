@@ -8,6 +8,7 @@
 ;;; Copyright © 2022 Christopher Baines <mail@cbaines.net>
 ;;; Copyright © 2023 Frank Pursel <frank.pursel@gmail.com>
 ;;; Copyright © 2024, 2025 Hartmut Goebel <h.goebel@crazy-compilers.com>
+;;; Copyright © 2026 Arun Isaac <arunisaac@systemreboot.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -995,8 +996,14 @@ Weaver, anyhow not depending on depending on the Axiom API.")
                 "17dx6w48ka3d1g20qisvafbc1rmnvfg0vnm8zfz4vkhqfjbkp6j8"))))
     (build-system ant-build-system)
     (arguments
-     `(#:tests? #f  ;; tests are not included in release archives
-       #:jar-name "saxon-he.jar"))
+     (list #:tests? #f  ;; tests are not included in release archives
+           #:jar-name "saxon-he.jar"
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'build 'copy-resources
+                 (lambda _
+                   (copy-recursively "src/net/sf/saxon/data"
+                                     "build/classes/net/sf/saxon/data"))))))
     (native-inputs (list unzip))
     (inputs
      (list java-axiom-impl
