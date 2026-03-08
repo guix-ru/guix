@@ -1191,7 +1191,11 @@ tst_qt_cmake_create.cpp"
                        ;; This test may fail non-deterministically as reported
                        ;; in Guix bug#73233 and upstream at
                        ;; https://bugreports.qt.io/browse/QTBUG-119321.
-                       "tst_qsharedmemory")
+                       "tst_qsharedmemory"
+
+                       ;; This test fails deterministically on a non-privileged
+                       ;; daemon.
+                       "tst_qstandardpaths")
                       #$@(cond
                            ((target-ppc64le?)
                              #~((list
