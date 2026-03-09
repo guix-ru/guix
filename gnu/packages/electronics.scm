@@ -4884,6 +4884,74 @@ front-end program for Yosys-based formal hardware verification flows.")
 code{yosys}-based formal hardware verification flows.")
       (license license:isc))))
 
+(define-public surelog
+  (package
+    (name "surelog")
+    (version "1.86")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/chipsalliance/Surelog/")
+              (commit (string-append "v" version))
+              ;; Custom verion of the antlr4; see third_party/README.
+              (recursive? #t)))
+       (file-name (git-file-name name version))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils)
+                         (ice-9 ftw)
+                         (srfi srfi-26))
+            (define (delete-all-but directory . preserve)
+              (with-directory-excursion directory
+                (let* ((pred (negate (cut member <>
+                                          (cons* "." ".." preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (cut delete-file-recursively <>) items))))
+            (delete-all-but "third_party"
+                            "antlr4" "antlr4_bin" "tests" "UVM")))
+       (sha256
+        (base32 "0pj84bb3iyhrq09ggwfbhdhzb5c3d9ifga87pn0rjw9ym17ns1vh"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "-DBUILD_SHARED_LIBS=ON"
+              "-DSURELOG_BUILD_TESTS=ON"
+              "-DSURELOG_USE_HOST_JSON=ON"
+              "-DSURELOG_USE_HOST_GTEST=ON"
+              "-DSURELOG_USE_HOST_UHDM=ON"
+              "-DSURELOG_USE_HOST_ANTLR=OFF"
+              "-DSURELOG_WITH_ZLIB=ON"
+              "-DSURELOG_WITH_TCMALLOC=ON")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'check-setup
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                (invoke "cmake" "--build" "." "--target" "UnitTests")))))))
+    (native-inputs
+     (list googletest
+           nlohmann-json
+           perl
+           pkg-config
+           python-minimal-wrapper
+           python-psutil
+           swig-4.4
+           tcl
+           tcsh
+           uhdm))
+    (inputs
+     (list capnproto openjdk python-orderedmultidict zlib))
+    (home-page "https://github.com/chipsalliance/Surelog/")
+    (synopsis "Pre-procesor and parser for SystemVerilog 2017")
+    (description
+     "Surelog is a pre-processor, parser, elaborator and @acronym{UHDM,
+Universal Hardware Data Model} compiler.  It provides IEEE design, a C/C++
+@acronym{VPI, Verilog Procedural Interface} and a Python @acronym{AST,
+Abstract Syntax Trees} API.")
+    (license license:asl2.0)))
+
 (define-deprecated-package symbiyosys
   sby)
 
