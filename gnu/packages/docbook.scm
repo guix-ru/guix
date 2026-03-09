@@ -9,6 +9,7 @@
 ;;; Copyright © 2021 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2021 Andrew Whatson <whatson@gmail.com>
 ;;; Copyright © 2023 Bruno Victal <mirai@makinata.eu>
+;;; Copyright © 2026 Arun Isaac <arunisaac@systemreboot.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -31,6 +32,8 @@
   #:use-module (gnu packages bash)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages groff)
+  #:use-module (gnu packages java)
+  #:use-module (gnu packages java-xml)
   #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages inkscape)
   #:use-module (gnu packages tex)
@@ -38,6 +41,7 @@
   #:use-module (gnu packages perl)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages base)
   #:use-module (gnu packages web)
   #:use-module (gnu packages web-browsers)
@@ -50,6 +54,7 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
+  #:use-module (guix build-system ant)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system pyproject)
@@ -502,6 +507,194 @@ V4.1.2 that adds support for MathML in equation markup.")
       (description
        "This package provides XSL style sheets for DocBook.")
       (license (license:x11-style "" "See 'COPYING' file.")))))
+
+(define-public docbook-xsltng
+  ;; docbook-xsltng 1.4.0 is the last version that does not depend on
+  ;; org.xmlresolver.
+  (package
+    (name "docbook-xsltng")
+    ;; When updating this package, also update the gitref in the build phase.
+    (version "1.4.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://codeberg.org/DocBook/xslTNG")
+                     ;; The Codeberg repo does not have the tag for the 1.4.0
+                     ;; release; only the older GitHub repo does.
+                     (commit "f5c8bd9930d75191d029a3f01d3b58d8bb873551")))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0assl9p52lhrscyd47j1dq9r48j6d8jcl4a75350x5d20qc5f6yy"))
+              (snippet
+               #~(begin
+                   ;; Delete bundled CSS and javascript files.
+                   (for-each delete-file
+                             (list "src/main/web/css/prism.css"
+                                   "src/main/web/js/prism.js"))))))
+    (build-system ant-build-system)
+    ;; Upstream uses gradle to build and run the tests. Since we don't have a
+    ;; gradle package yet, we translate many of the build steps to scheme. For
+    ;; simplicity, we skip the tests for now.
+    (arguments
+     (list
+      #:tests? #f
+      #:jar-name "docbook-xsltng.jar"
+      #:source-dir "src/main/java"
+      #:modules '((guix build ant-build-system)
+                  (guix build utils)
+                  (ice-9 match))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'rearrange-sources
+            (lambda _
+              ;; Unify all sources under the same directory tree.
+              (rename-file "buildSrc/src/main/java/org/docbook/xsltng/extensions"
+                           "src/main/java/org/docbook/xsltng/extensions")
+              ;; From line 29 of buildSrc/build.gradle
+              (call-with-output-file "src/main/java/org/docbook/xsltng/BuildConfig.java"
+                (lambda (port)
+                  (format port
+                          "package org.docbook.xsltng;
+
+public final class BuildConfig {
+  public static final String TITLE = \"DocBook xslTNG\";
+  public static final String VERSION = \"~a\";
+  public static final String SAXON_VERSION = \"~a\";
+  private BuildConfig() {}
+}
+"
+                          #$version
+                          #$(package-version java-saxon-he-10))))
+              ;; We have not packaged com.nwalsh.xslt and
+              ;; org.iso_relax.verifier. Hence we cannot compile these
+              ;; extensions; delete them for now.
+              (substitute* "src/main/java/org/docbook/xsltng/extensions/Register.java"
+                (("config\\.registerExtensionFunction\\(new XInclude\\(\\)\\);")
+                 "")
+                (("config\\.registerExtensionFunction\\(new ValidateRNG\\(\\)\\);")
+                 ""))
+              (for-each delete-file
+                        (list "src/main/java/org/docbook/xsltng/extensions/ValidateRNG.java"
+                              "src/main/java/org/docbook/xsltng/extensions/XInclude.java"))))
+          (add-after 'build 'build-stylesheets
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Build XSLT stylesheets using saxon.
+              (let ((saxon (search-input-file inputs "share/java/saxon-he.jar")))
+                (for-each (match-lambda
+                            ((source stylesheet output params ...)
+                             (format #t "SAXON ~a + ~a -> ~a ~a~%"
+                                     source stylesheet output params)
+                             (apply invoke
+                                    "java"
+                                    "-classpath" saxon
+                                    "net.sf.saxon.Transform"
+                                    (string-append "-s:" source)
+                                    (string-append "-xsl:" stylesheet)
+                                    (string-append "-o:" output)
+                                    params)))
+                          `(("src/main/xslt/param.xsl"
+                             "tools/parameter-maps.xsl"
+                             "src/main/xslt/parameter-maps.xsl")
+                            ("tools/version.xsl"
+                             "tools/version.xsl"
+                             "src/main/xslt/VERSION.xsl"
+                             ,(string-append "version=" #$version)
+                             ;; When updating this package, update this gitref
+                             ;; to the commit corresponding to the release.
+                             "gitref=f5c8bd993")
+                            ,@(map (lambda (xml)
+                                     (list xml
+                                           "tools/xform-locale.xsl"
+                                           (string-append "src/main/xslt/locale/"
+                                                          (basename xml))))
+                                   (find-files "src/main/locales/locale"
+                                               "\\.xml$")))))
+              ;; Substitute in TITLE and VERSION.
+              (substitute* (append (find-files "src/main/web/css" "\\.css$")
+                                   (find-files "src/main/web/js" "\\.js$"))
+                (("@@TITLE@@") "DocBook xslTNG")
+                (("@@VERSION@@") #$version))
+              ;; ;; Generate pygments CSS file.
+              (invoke "python3" "tools/generate-pygments.py"
+                      "--version" #$version
+                      "--title" "DocBook xslTNG"
+                      "--output" "src/main/web/css/pygments.css")))
+          (add-after 'install 'install-bin
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              ;; Install XSLT stylesheets.
+              (copy-recursively "src/main/xslt"
+                                (string-append #$output
+                                               "/xml/xsl/docbook-xsltng-"
+                                               #$version))
+              ;; Install CSS and javascript files.
+              (copy-recursively "src/main/web"
+                                (string-append #$output "/share/web"))
+              ;; Configure paths in docbook script.
+              (let ((bin (string-append #$output "/bin")))
+                (mkdir-p bin)
+                (substitute* "src/bin/docbook.py"
+                  ;; Path to java
+                  (("self._java = None")
+                   (string-append "self._java = \""
+                                  (search-input-file inputs "bin/java")
+                                  "\""))
+                  ;; Path to docbook.xsl
+                  (("\\{self\\.root\\}/xslt/docbook.xsl")
+                   (search-input-file outputs
+                                      (string-append "xml/xsl/docbook-xsltng-"
+                                                     #$version
+                                                     "/docbook.xsl")))
+                  ;; Path to web resources
+                  (("\\{self\\.root\\}/resources")
+                   (search-input-directory outputs "share/web"))
+                  ;; Disable computing classpath.
+                  (("docbook\\.compute_dependencies\\(\\)") "")
+                  ;; Set classpath explicitly.
+                  (("cp = self\\.classpath\\(\\)")
+                   (let ((docbook-xsltng
+                          (search-input-file outputs
+                                             "share/java/docbook-xsltng.jar"))
+                         (metadata-extractor
+                          (search-input-file inputs
+                                             "share/java/metadata-extractor.jar"))
+                         (saxon
+                          (search-input-file inputs
+                                             "share/java/saxon-he.jar")))
+                     (string-append "cp = \""
+                                    (list->search-path-as-string
+                                     (list docbook-xsltng
+                                           metadata-extractor
+                                           saxon)
+                                     ":")
+                                    "\"")))
+                  ;; Disable references to org.xmlresolver dependencies that
+                  ;; have not been packaged yet.
+                  (("\"-x:org.xmlresolver.tools.ResolvingXMLReader\",") "")
+                  (("\"-y:org.xmlresolver.tools.ResolvingXMLReader\",") "")
+                  (("\"-r:org.xmlresolver.Resolver\",") ""))
+                ;; Install docbook script.
+                (copy-file "src/bin/docbook.py"
+                           (string-append bin "/docbook"))
+                ;; Wrap docbook script in python environment.
+                (wrap-program (string-append bin "/docbook")
+                  `("GUIX_PYTHONPATH" ":" prefix
+                    (,(getenv "GUIX_PYTHONPATH"))))))))))
+    (inputs
+     (list bash-minimal
+           java-metadata-extractor
+           java-saxon-he-10
+           python
+           python-click
+           python-pygments))
+    (home-page "https://xsltng.docbook.org/")
+    (synopsis "XSLT 3.0 stylesheets for DocBook")
+    (description "This package provides XSLT 3.0 stylesheets for DocBook.
+They transform DocBook XML documents into clean, semantically rich HTML5.  CSS
+stylesheet and javascript suitable for online presentation is included.
+Producing high quality print output with a paged media capable CSS processor
+is also supported.")
+    (license license:expat)))
 
 (define-public docbook-dsssl
   (package
