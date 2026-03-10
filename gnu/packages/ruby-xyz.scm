@@ -9305,7 +9305,7 @@ services library.")
 (define-public ruby-fog-libvirt
   (package
     (name "ruby-fog-libvirt")
-    (version "0.12.0")
+    (version "0.15.0")
     (source (origin
               (method git-fetch)        ; for tests
               (uri (git-reference
@@ -9314,7 +9314,7 @@ services library.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0b1qafb0l24anmr8fviwhp9vj14g0fic0mkg9n1i11h68zhqkj2v"))))
+                "1ljv08gg78sgg17wmpg4zv9aabwv1zh754q7i2a2mi1wc0y3z1z8"))))
     (build-system ruby-build-system)
     (native-inputs (list ruby-minitest-stub-const ruby-mocha ruby-net-ssh
                          ruby-netrc ruby-octokit ruby-pry ruby-rubocop
