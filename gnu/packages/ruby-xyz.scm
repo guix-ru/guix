@@ -9213,7 +9213,7 @@ native C API.")
 (define-public ruby-fog-core
   (package
     (name "ruby-fog-core")
-    (version "2.4.0")
+    (version "2.6.0")
     (source (origin
               (method git-fetch)        ; for tests
               (uri (git-reference
@@ -9222,7 +9222,7 @@ native C API.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "184vpi81az7raz98652m7d98ikabdl9di37dgal0adr76q57j03c"))))
+                "1k1xivzgmzqk6svaxsgznyvy5911gvsc2rjrc3jm67057wnx9w8c"))))
     (build-system ruby-build-system)
     (arguments
      (list
