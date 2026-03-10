@@ -13550,7 +13550,7 @@ parser for writing http servers, clients and proxies.")
 (define-public ruby-excon
   (package
     (name "ruby-excon")
-    (version "1.3.2")
+    (version "1.4.2")
     (source (origin
               (method git-fetch)        ;for tests
               (uri (git-reference
@@ -13559,11 +13559,10 @@ parser for writing http servers, clients and proxies.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0vcgnkvbk3accblncvs37vikmvd4dlziq9d7r4rli00wl2lj51w6"))))
+                "0ym2jaj9cyn4kwv0936z6fvxh1j6jfw0j7dln1gy8xnsszv0p4w8"))))
     (build-system ruby-build-system)
     (arguments
      (list
-      #:tests? #f  ;; some tests require DNS
       #:phases
       #~(modify-phases %standard-phases
           (replace 'replace-git-ls-files
@@ -13571,12 +13570,11 @@ parser for writing http servers, clients and proxies.")
               (substitute* "excon.gemspec"
                 (("`git ls-files -- data/. lib/.`")
                  "`find data lib -type f`"))))
-          (add-before 'check 'disable-server-spec-checks
-            (lambda _ ;; TODO: Remove this if ruby-unicorn is available.
-              ;; Some of the tests in this file require ruby-unicorn, which is
-              ;; not yet packaged for guix and would pull in a lot of other
-              ;; dependencies.
-              (delete-file "spec/excon/test/server_spec.rb"))))))
+          (add-before 'check 'disable-incompatible-tests
+            (lambda _
+              ;; Tests require networking
+              (delete-file "spec/requests/resolv_resolver_spec.rb")
+              (delete-file "spec/requests/dns_timeout_spec.rb"))))))
     (native-inputs
      (list
       ruby-activesupport
@@ -13588,6 +13586,7 @@ parser for writing http servers, clients and proxies.")
       ruby-shindo
       ruby-sinatra
       ruby-webrick))
+    (propagated-inputs (list ruby-logger))
     (synopsis "Usable, fast, simple Ruby HTTP 1.1")
     (description "Excon was designed to be simple, fast and performant.  It
 works great as a general HTTP(s) client and is particularly well suited to
