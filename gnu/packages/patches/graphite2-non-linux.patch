@@ -1,0 +1,57 @@
+From https://sources.debian.org/src/graphite2/1.3.14-11/debian/patches/non-linux.diff
+and https://github.com/silnrsi/graphite/pull/59
+
+From 9bfb76afa1d4036743902be9942f47db0642e330 Mon Sep 17 00:00:00 2001
+From: Mattia Rizzolo <mattia@mapreri.org>
+Date: Mon, 19 Aug 2019 10:05:38 +0200
+Subject: [PATCH] Apply the same settings used for Linux also to k*BSD and GNU
+ Hurd
+
+The patch was originally written by Pino Toscano for Debian back in 2014.
+
+Signed-off-by: Mattia Rizzolo <mattia@mapreri.org>
+---
+ src/CMakeLists.txt            | 2 +-
+ tests/examples/CMakeLists.txt | 2 +-
+ tests/vm/CMakeLists.txt       | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index b6ac26bf..7bcc4030 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -102,7 +102,7 @@ set_target_properties(graphite2 PROPERTIES  PUBLIC_HEADER "${GRAPHITE_HEADERS}"
+                                             LT_VERSION_REVISION ${GRAPHITE_API_REVISION}
+                                             LT_VERSION_AGE ${GRAPHITE_API_AGE})
+ 
+-if  (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if  (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "k.*BSD" OR ${CMAKE_SYSTEM_NAME} STREQUAL "GNU")
+     set_target_properties(graphite2 PROPERTIES
+         COMPILE_FLAGS   "-Wall -Wextra -Wno-unknown-pragmas -Wendif-labels -Wshadow -Wctor-dtor-privacy -Wnon-virtual-dtor -fno-rtti -fno-exceptions -fvisibility=hidden -fvisibility-inlines-hidden"
+         LINK_FLAGS      "-nodefaultlibs ${GRAPHITE_LINK_FLAGS}"
+diff --git a/tests/examples/CMakeLists.txt b/tests/examples/CMakeLists.txt
+index 103c78be..c4b78813 100644
+--- a/tests/examples/CMakeLists.txt
++++ b/tests/examples/CMakeLists.txt
+@@ -23,7 +23,7 @@ macro(test_example TESTNAME SRCFILE)
+     set_tests_properties(${TESTNAME} PROPERTIES TIMEOUT 3)
+ endmacro()
+ 
+-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "k.*BSD" OR ${CMAKE_SYSTEM_NAME} STREQUAL "GNU")
+     find_package(Freetype)
+     if (${FREETYPE_FOUND})
+         include_directories(${FREETYPE_INCLUDE_DIRS})
+diff --git a/tests/vm/CMakeLists.txt b/tests/vm/CMakeLists.txt
+index ee866de9..e94f710c 100644
+--- a/tests/vm/CMakeLists.txt
++++ b/tests/vm/CMakeLists.txt
+@@ -29,7 +29,7 @@ if  (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+ 	target_link_libraries(vm-test-direct vm-test-common)
+ endif()
+ 
+-if  (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if  (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "k.*BSD" OR ${CMAKE_SYSTEM_NAME} STREQUAL "GNU")
+ 	add_definitions(-fno-rtti -fno-exceptions)
+ 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+ 		add_definitions(-DNDEBUG -fomit-frame-pointer)

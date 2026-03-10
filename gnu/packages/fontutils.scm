@@ -1690,9 +1690,18 @@ translated keywords and acts.")
    (inputs
     (list freetype))
    (arguments
-    (if (system-hurd?)
-        (list #:test-exclude "awamicmp3")
-        '()))
+    (list
+     #:phases
+     (if (target-hurd?)
+         #~(modify-phases %standard-phases
+             (add-after 'unpack 'apply-patch
+               (lambda _
+                 ;; use same linker settings as on linux
+                 ;; harfbuzz complains about being linked against libstdc++
+                 (let ((patch #$(local-file
+                                 (search-patch "graphite2-non-linux.patch"))))
+                   (invoke "patch" "--force" "-p1" "-i" patch)))))
+         #~%standard-phases)))
    (synopsis "Reimplementation of the SIL Graphite text processing engine")
    (description
     "Graphite2 is a reimplementation of the SIL Graphite text processing
