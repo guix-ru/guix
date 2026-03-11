@@ -252,68 +252,6 @@ environment spectrum.")
       (license (list license:bsd-3 license:expat license:cc-by3.0
                      license:cc-by4.0 license:asl2.0)))))
 
-(define-public xarcan
-  (package
-    (name "xarcan")
-    (version "0.6.3")
-    (source
-     (origin
-       (method git-fetch)
-       (file-name (git-file-name name version))
-       (uri (git-reference
-             (url "https://github.com/letoram/xarcan")
-             (commit version)))
-       (sha256
-        (base32 "1g24mmwnc45ig0x8jk0v91488k8933w07vxi4305sla56q4n82p4"))))
-    (build-system meson-build-system)
-    (arguments
-     (list
-      #:configure-flags
-      #~(list
-         "-Dglamor=true" "-Dint10=false"
-         "-Dipv6=true"
-         "-Dsystemd_logind=false"
-
-         ;; The following arguments were taken from the Xwayland package.
-
-         ;; The build system insist on providing a default font path; give
-         ;; that of dejavu, the same used for our fontconfig package.
-         (string-append "-Ddefault_font_path="
-                        #$(this-package-input "font-dejavu") "/share/fonts")
-         (string-append "-Dxkb_dir=" #$(this-package-input "xkeyboard-config")
-                        "/share/X11/xkb")
-         (string-append "-Dxkb_bin_dir=" #$(this-package-input "xkbcomp")
-                        "/bin")
-         (format #f "-Dbuilder_string=\"Build ID: ~a ~a\"" #$name #$version))))
-    (native-inputs
-     (list pkg-config autoconf automake libtool util-macros))
-    (inputs
-     (list arcan
-           font-dejavu
-           font-util
-           libdrm
-           libepoxy
-           libtirpc
-           libx11
-           libxfont2
-           libxkbfile
-           libxshmfence
-           mesa
-           openssl
-           pixman
-           xcb-util
-           xcb-util-wm
-           xkbcomp
-           xkeyboard-config
-           xorgproto
-           xtrans))
-    (home-page "https://arcan-fe.com")
-    (synopsis "Patched Xserver that bridges connections to Arcan")
-    (description "Patched Xserver with a KDrive backend that uses the arcan-shmif
- to map Xlib/Xcb/X clients to a running arcan instance.  It allows running an X session
-as a window under Arcan.")
-    (license (list license:bsd-3 license:expat))))
-
 ;; Package was merged into arcan in upstream.
 (define-deprecated-package arcan-wayland
   arcan)
