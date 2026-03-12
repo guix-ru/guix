@@ -5,6 +5,7 @@
 ;;; Copyright © 2021 Brice Waegeneire <brice@waegenei.re>
 ;;; Copyright © 2024 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2024 Rostislav Svoboda <Rostislav.Svoboda@gmail.com>
+;;; Copyright © 2026 Simon Tournier <zimon.toutoune@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -245,13 +246,18 @@ could be found at DIRECTORY or one of its ancestors."
 (define (channel-reference channel)
   "Return the \"reference\" for CHANNEL, an sexp suitable for
 'latest-repository-commit'."
-  (match (channel-commit channel)
-    (#f      (let ((branch (channel-branch channel)))
-               (if (and (string? branch)
-                        (string-prefix? "refs/" branch))
-                   `(symref . ,branch)
-                   `(branch . ,branch))))
-    (commit  `(tag-or-commit . ,(channel-commit channel)))))
+  (let* ((commit (channel-commit channel))
+         (branch (channel-branch channel))
+         (refs? (and branch
+                     (string? branch)
+                     (string-prefix? "refs/" branch))))
+    (if commit
+        (if refs?
+            `(symref        . (,branch . ,commit))
+            `(tag-or-commit . ,commit))
+        (if refs?
+            `(symref . ,branch)
+            `(branch . ,branch)))))
 
 (define sexp->channel-introduction
   (match-lambda

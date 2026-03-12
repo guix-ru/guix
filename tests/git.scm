@@ -1,6 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2019-2020, 2022, 2024 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz
+;;; Copyright © 2026 Simon Tournier <zimon.toutoune@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -278,5 +279,76 @@
                                                    #:cache-directory cache)))
            (not (file-exists?
                  (in-vicinity cache "stale-untracked-file")))))))))
+
+(test-assert "update-cached-checkout, symref tag"
+  (call-with-temporary-directory
+   (lambda (cache)
+     (with-temporary-git-repository directory
+         '((add "a.txt" "A")
+           (commit "First commit")
+           (tag "v1.0" "release-1.0")
+           (branch "develop")
+           (checkout "develop")
+           (add "b.txt" "B")
+           (commit "Second commit")
+           (tag "v1.1" "release-1.1")
+           (checkout "master"))
+       (let* ((tag-directory   (let* ((pipe (open-pipe* OPEN_READ (git-command)
+                                                        "-C" directory
+                                                        "rev-parse" "v1.1"))
+                                      (str  (get-string-all pipe)))
+                                 (close-pipe pipe)
+                                 (string-trim-right str)))
+              (cached-directory commit relation
+                                (update-cached-checkout directory
+                                                        #:ref '(symref . "refs/tags/v1.1")
+                                                        #:cache-directory cache))
+              (head-cached   (let* ((pipe (open-pipe* OPEN_READ (git-command)
+                                                      "-C" cached-directory
+                                                      ;; switch-to-ref doesn't dereference the Git object,
+                                                      ;; thus it points to a Git tag object.
+                                                      ;; And HEAD points to a Git commit object.
+                                                      ;; Hence, the check is against Git tag objects.
+                                                      ;; For the difference see:
+                                                      ;;   git show-ref --dereference v1.1
+                                                      "rev-parse" "v1.1"))
+                                    (str  (get-string-all pipe)))
+                               (close-pipe pipe)
+                               (string-trim-right str))))
+         (and (string=? commit        head-cached)
+              (string=? tag-directory head-cached)))))))
+
+(test-assert "update-cached-checkout, symref pull-request"
+  (call-with-temporary-directory
+   (lambda (cache)
+     (with-temporary-git-repository directory
+         '((add "a.txt" "A")
+           (commit "First commit")
+           (tag "v1.0" "release-1.0")
+           (branch "develop")
+           (checkout "develop")
+           (add "b.txt" "B")
+           (commit "Second commit")
+           (tag "v1.1" "release-1.1")
+           (symbolic-ref "refs/pull/1/head" "refs/heads/develop")
+           (checkout "master"))
+       (let* ((head-directory   (let* ((pipe (open-pipe* OPEN_READ (git-command)
+                                                         "-C" directory
+                                                         "rev-parse" "refs/pull/1/head"))
+                                       (str  (get-string-all pipe)))
+                                  (close-pipe pipe)
+                                  (string-trim-right str)))
+              (cached-directory commit relation
+                                (update-cached-checkout directory
+                                                        #:ref '(symref . "refs/pull/1/head")
+                                                        #:cache-directory cache))
+              (head-cached   (let* ((pipe (open-pipe* OPEN_READ (git-command)
+                                                      "-C" cached-directory
+                                                      "rev-parse" "HEAD"))
+                                    (str  (get-string-all pipe)))
+                               (close-pipe pipe)
+                               (string-trim-right str))))
+         (and (string=? commit      head-directory)
+              (string=? head-cached head-directory)))))))
 
 (test-end "git")

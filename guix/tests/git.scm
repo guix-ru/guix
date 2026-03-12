@@ -1,6 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2019, 2020, 2021 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;; Copyright © 2026 Simon Tournier <zimon.toutoune@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -120,6 +121,9 @@ Return DIRECTORY on success."
        (loop rest))
       ((('reset to) rest ...)
        (git "reset" "--hard" to)
+       (loop rest))
+      ((('symbolic-ref name ref) rest ...)
+       (git "symbolic-ref" name ref)
        (loop rest)))))
 
 (define (call-with-temporary-git-repository directives proc)
