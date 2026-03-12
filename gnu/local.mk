@@ -1375,6 +1375,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/ganeti-template-haskell-2.17.patch	\
   %D%/packages/patches/ganeti-template-haskell-2.18.patch	\
   %D%/packages/patches/gawk-shell.patch				\
+  %D%/packages/patches/gdc-11-druntime-hurd.patch		\
+  %D%/packages/patches/gdc-14-druntime-hurd.patch		\
   %D%/packages/patches/gcc-arm-bug-71399.patch			\
   %D%/packages/patches/gcc-arm-link-spec-fix.patch		\
   %D%/packages/patches/gcc-asan-missing-include.patch		\
