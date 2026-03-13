@@ -274,7 +274,7 @@
                             (lambda (file stat)
                               (executable-file? file))
                             #:stat lstat)))))
-         (add-after 'install 'install-npmrc
+         (add-after 'install 'fix-node-gyp-reference
            ;; Note: programs like node-gyp only receive these values if
            ;; they are started via `npm` or `npx`.
            ;; See: https://github.com/nodejs/node-gyp#npm-configuration
@@ -1001,6 +1001,6 @@ fi"
         `(cons* "--shared" "--without-npm" ,flags))
        ((#:phases phases '%standard-phases)
         `(modify-phases ,phases
-           (delete 'install-npmrc)
+           (delete 'fix-node-gyp-reference)
            (delete 'patch-nested-shebangs)
            (delete 'ignore-number-of-hardlinks)))))))
