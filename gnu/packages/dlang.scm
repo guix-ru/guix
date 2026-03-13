@@ -351,7 +351,9 @@ integration tests...\n")
               (file-name (git-file-name "dmd" version))
               (sha256
                (base32
-                "0qvg2fb73kyng8k1wj482g07ar2qw5laa5fynwx7pdd610n0pjpc"))))
+                "0qvg2fb73kyng8k1wj482g07ar2qw5laa5fynwx7pdd610n0pjpc"))
+              (patches
+               (search-patches "dmd-hurd.patch"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -372,7 +374,16 @@ integration tests...\n")
               ;; Do not build the shared libphobos2.so library, to avoid
               ;; retaining a reference to gcc:lib.
               "SHARED=0"
-              "DIFFABLE=1"              ;constant timestamp
+              #$@(if (target-hurd?)
+                     (list (string-append "DISABLED_TESTS=core/thread/osthread "
+                                          "std/parallelism " ;; pthread stubs
+                                          "std/file " ;;  rename (NULL, "")
+                                          "std/socket " ;; ENOPROTOOPT
+                                          "std/datetime/systime "
+                                          "std/datetime/timezone " ;; TZDIR
+                                          "std/net/curl ")) ;; dlopen curl
+                     '())
+                     "DIFFABLE=1"              ;constant timestamp
               "VERBOSE=1")
       #:modules
       `(,@%default-gnu-modules
@@ -470,7 +481,19 @@ integration tests...\n")
                                    "long_backtrace_trunc rt_trap_exceptions "))
                    ""))
                 (substitute* "dmd/druntime/test/gc/Makefile"
-                  ((" invariant ") " "))))
+                  ((" invariant ") " "))
+
+                #$@(if (target-hurd?)
+                       '((for-each
+                          delete-file
+                          ;; environment differs in LD_ORIGIN_PATH
+                          '("dmd/compiler/test/dshell/sameenv.d"
+                            ;; Non _GLIBCXX_USE_CXX98_ABI version prints a warning
+                            "dmd/compiler/test/runnable_cxx/cppa.d"))
+                         ;; Segfault
+                         (substitute* "dmd/druntime/test/shared/Makefile"
+                           (("loadDR host ") "")))
+                       '())))
             (delete 'bootstrap)
             (delete 'configure)
             (replace 'build
@@ -492,7 +515,8 @@ integration tests...\n")
               (phase-in-sub-dir 'check "phobos"))
             (replace 'install
               (lambda* (#:key outputs #:allow-other-keys)
-                (let* ((platform (cond (#$(target-linux?) "linux")))
+                (let* ((platform (cond (#$(target-linux?) "linux")
+                                       (#$(target-hurd?)  "hurd")))
                        (bits (if #$(target-64bit?) 64 32))
                        (build-sub-dir (format #f "generated/~a/release/~a"
                                               platform bits))
@@ -536,17 +560,22 @@ integration tests...\n")
     (inputs
      (list bash-minimal))
     (native-inputs
-     (list gdmd which
-           gdb/pinned   ; for tests
-           (origin
-             (method git-fetch)
-             (uri (git-reference
-                    (url "https://github.com/dlang/phobos")
-                    (commit (string-append "v" version))))
-             (file-name (git-file-name "phobos" version))
-             (sha256
-              (base32
-               "0afi5glnf96242cbnr10ccjvfsgkh4k5y7qnmxv4ph5g0izvi1dc")))))
+     (append
+      (if (target-linux?)
+          ;; gdb tests only on on linux
+          (list gdb/pinned)
+          '())
+      (list gdmd which
+            (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/dlang/phobos")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name "phobos" version))
+              (sha256
+               (base32
+                "0afi5glnf96242cbnr10ccjvfsgkh4k5y7qnmxv4ph5g0izvi1dc"))
+              (patches (search-patches "phobos-hurd.patch"))))))
     (outputs '("out" "lib" "debug"))
     (synopsis "Reference D Programming Language compiler")
     (description "@acronym{DMD, Digital Mars D compiler} is the reference
@@ -555,7 +584,8 @@ compiler for the D programming language.")
     (home-page "https://github.com/dlang/dmd")
     ;; As reported by upstream:
     ;; https://wiki.dlang.org/Compilers#Comparison
-    (supported-systems '("i686-linux" "x86_64-linux" "aarch64-linux"))
+    (supported-systems '("i686-linux" "x86_64-linux" "aarch64-linux"
+                         "i586-gnu" "x86_64-gnu"))
 
     ;; This variant exists only for bootstrapping purposes.
     (properties '((hidden? . #t)))))
