@@ -1210,6 +1210,37 @@ re-sourced, but they will be rendered in a single-line format.")
     (home-page "https://github.com/rspec-given/sorcerer")
     (license license:expat)))
 
+(define-public ruby-test-unit-rr
+  (package
+    (name "ruby-test-unit-rr")
+    (version "1.0.5")
+    (source
+     (origin
+       (method git-fetch) ;for tests
+       (uri (git-reference
+             (url "https://github.com/test-unit/test-unit-rr")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "13jprjp6psc125ji6h3cpjj6nzhg1van6v1qczcwg1m24908i2qx"))))
+    (build-system ruby-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Do not use Rake to avoid the Packnga setup.
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                (invoke "ruby" "test/run-test.rb")))))))
+    (propagated-inputs (list ruby-rr ruby-test-unit))
+    (synopsis "Test double framework adapter for Ruby's test-unit")
+    (description
+     "This is a test-unit adapter for RR, which is a Ruby's test double
+framework.")
+    (home-page "https://github.com/test-unit/test-unit-rr")
+    (license license:lgpl2.1+)))
+
 (define-public ruby-unindent
   (package
   (name "ruby-unindent")
