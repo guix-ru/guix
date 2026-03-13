@@ -105,6 +105,7 @@
                             source
                             (phases '%standard-phases)
                             (grammar-directories '("."))
+                            (lockfiles %default-lockfiles)
                             (tests? #t)
                             (outputs '("out" "js"))
                             (search-paths '())
@@ -123,6 +124,7 @@
                                #:source #+source
                                #:system #$system
                                #:phases #$phases
+                               #:lockfiles '#$lockfiles
                                #:tests? #$tests?
                                #:grammar-directories '#$grammar-directories
                                #:outputs #$(outputs->gexp outputs)
@@ -145,6 +147,7 @@
                                   guile source
                                   (phases '%standard-phases)
                                   (grammar-directories '("."))
+                                  (lockfiles %default-lockfiles)
                                   (tests? #t)
                                   (outputs '("out" "js"))
                                   (search-paths '())
@@ -179,6 +182,7 @@
                                #:build #$build
                                #:target #$target
                                #:phases #$phases
+                               #:lockfiles '#$lockfiles
                                #:tests? #$tests?
                                #:grammar-directories '#$grammar-directories
                                #:outputs #$(outputs->gexp outputs)
