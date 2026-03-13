@@ -2968,7 +2968,7 @@ guidelines.")
            python
            cups
            gtk+
-           python-dbus-1.2
+           python-dbus
            python-pygobject
            python-pycups
            python-requests
