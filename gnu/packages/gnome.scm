@@ -12201,7 +12201,7 @@ advanced image management tool")
            gsettings-desktop-schemas
            gtk+
            python-wrapper
-           python-dbus-1.2
+           python-dbus
            python-notify2
            python-pycairo
            python-pygobject
