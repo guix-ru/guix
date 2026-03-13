@@ -30,7 +30,8 @@
   #:use-module (guix search-paths)
   #:use-module (guix build-system)
   #:use-module (guix build-system gnu)
-  #:export (%node-build-system-modules
+  #:export (%default-lockfiles
+            %node-build-system-modules
             node-build
             node-build-system))
 
