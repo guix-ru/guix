@@ -3501,23 +3501,6 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 (define %boot5-inputs %boot4-inputs)
 (define with-boot5 with-boot4)
 
-(define (make-gnu-make-final)
-  "Compute the final GNU Make, which uses the final Guile."
-  (let ((pkg-config (package
-                      (inherit %pkg-config)       ;the native pkg-config
-                      (inputs (cons* guile-final (%boot5-inputs)))
-                      (arguments
-                       (cons* #:implicit-inputs? #f
-                              (package-arguments %pkg-config))))))
-    (package
-      (inherit (package-with-bootstrap-guile gnu-make))
-      (inputs (cons* guile-final (%boot5-inputs)))
-      (native-inputs (list pkg-config))
-      (arguments
-       (cons* #:implicit-inputs? #f
-              (package-arguments gnu-make))))))
-
-
 (define coreutils-final
   ;; The final Coreutils.  Treat them specially because some packages, such as
   ;; Findutils, keep a reference to the Coreutils they were built with.
@@ -3595,12 +3578,15 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
                            (list (if (target-hurd?)
                                      glibc-utf8-locales-final/hurd
                                      glibc-utf8-locales-final))))
+                        (package/inherit gnu-make ;without Guile support
+                          (outputs '("out"))      ;no "debug" output
+                          (native-inputs '())
+                          (inputs '()))
                         zstd))
              (list sed-final
                    grep-final
                    xz-final
                    coreutils-final
-                   (make-gnu-make-final)
                    bash-final
                    ld-wrapper
                    binutils-final)))
