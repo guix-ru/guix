@@ -1,0 +1,26 @@
+Ensure that the examples tarball is reproducible.
+
+See https://reproducible-builds.org/docs/archives/
+
+diff -upr a/gprofng/doc/Makefile.in b/gprofng/doc/Makefile.in
+--- a/gprofng/doc/Makefile.in	2025-02-02 01:00:00.000000000 +0100
++++ b/gprofng/doc/Makefile.in	2026-03-15 11:03:49.597737186 +0100
+@@ -894,14 +894,14 @@ gprofng-display-text.1: $(srcdir)/gprofn
+ 
+ info: $(man_MANS)
+ 
+-examples.tar.gz:
+-	$(AM_V_at)( tar czf $@ $(srcdir)/../examples )
++examples.tar:
++	$(AM_V_at)( tar --owner=0 --group=0 --sort=name --mtime='2015-10-21 00:00Z' -cf $@ $(srcdir)/../examples )
+ 
+ .PHONY: install-data-local
+ 
+-install-data-local:  examples.tar.gz
++install-data-local:  examples.tar
+ 	$(mkinstalldirs) $(DESTDIR)$(docdir)/gprofng
+-	$(INSTALL_DATA) examples.tar.gz $(DESTDIR)$(docdir)/gprofng
++	$(INSTALL_DATA) examples.tar $(DESTDIR)$(docdir)/gprofng
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
