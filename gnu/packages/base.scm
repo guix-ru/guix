@@ -678,6 +678,7 @@ change.  GNU make offers many powerful extensions over the standard utility.")
       (sha256
        (base32 "0fnwaasfglbphqzvz5n25js9gl695p7pjbmb1z81g8gsc6k90qzn"))
       (patches (search-patches
+                "binutils-reproducible-tar.patch"
                 "binutils-2.41-fix-cross.patch"
                 "binutils-loongson-workaround.patch"))))
    (build-system gnu-build-system)
