@@ -90,12 +90,13 @@
                                   "gettext-tools/projects/GNOME/trigger")
                      (("/bin/pwd") "pwd"))))
                (add-before 'check 'patch-tests
-                 (lambda* (#:key inputs #:allow-other-keys)
+                 (lambda* (#:key native-inputs inputs #:allow-other-keys)
                    ;;libgettextlib-1.0.so => not found
                    (substitute* "gettext-tools/gnulib-tests/test-execute.sh"
                      (("^#!.*" all)
                       (string-append all "exit 77;\n")))
-                   (let* ((bash (search-input-file inputs "bin/sh")))
+                   (let* ((bash (search-input-file (or native-inputs inputs)
+                                                   "bin/sh")))
                      ;; Some of the files we're patching are
                      ;; ISO-8859-1-encoded, so choose it as the default
                      ;; encoding so the byte encoding is preserved.
