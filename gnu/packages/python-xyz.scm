@@ -10337,9 +10337,6 @@ errors when data is invalid.")
     (propagated-inputs
      (list python-typing-extensions))))
 
-;; It may be removed after 2026-01-05.
-(define-deprecated/public-alias python-pydantic-2 python-pydantic)
-
 (define-public python-pydantic-core
   (package
     (name "python-pydantic-core")
