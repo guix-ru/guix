@@ -10385,7 +10385,7 @@ errors when data is invalid.")
     (native-inputs
      (append
       (list maturin
-            python-dirty-equals
+            python-dirty-equals-bootstrap
             python-pytest
             python-pytest-benchmark ;TODO: disable in pyproject.toml
             python-pytest-mock
