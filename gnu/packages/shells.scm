@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2013 Cyril Roelandt <tipecaml@gmail.com>
-;;; Copyright © 2013, 2016 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013, 2016, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2014, 2015 David Thompson <davet@gnu.org>
 ;;; Copyright © 2014 Kevin Lemonnier <lemonnierk@ulrar.net>
 ;;; Copyright © 2015 Jeff Mickey <j@codemac.net>
@@ -1046,23 +1046,22 @@ JavaScript users who avoid shell.")
 (define-public gash
   (package
     (name "gash")
-    (version "0.3.1")
+    (version "0.3.2")
     (source
-     ;; Use a copy built from the unofficial 'EBADF-fixes' branch,
-     ;; <https://codeberg.org/civodul/gash/commit/7c9bf2110cfe85424fba0cd14445d5f0926c3fbd>.
-     ;; See <https://issues.guix.gnu.org/75658>.
+     ;; Note: Pre-built tarballs are no longer hosted at
+     ;; <https://savannah.nongnu.org/projects/gash>.
      (origin (method url-fetch)
              (uri (string-append "mirror://gnu/guix/mirror/gash-"
                                  version ".tar.gz"))
              (sha256
               (base32
-               "069wizkfkkifij9n0r6fkwbgcnjyr6xvnjid11ckppx0waixc0s7"))))
+               "1r74k5qms2rrpx7cywpg9hdywd3y893rl1f4467l86h1gpkih368"))))
     (build-system gnu-build-system)
     (native-inputs
      (list pkg-config))
     (inputs
      (list guile-3.0))
-    (home-page "https://savannah.nongnu.org/projects/gash/")
+    (home-page "https://codeberg.org/guix/gash")
     (synopsis "POSIX-compatible shell written in Guile Scheme")
     (description "Gash is a POSIX-compatible shell written in Guile
 Scheme.  It provides both the shell interface, as well as a Guile
