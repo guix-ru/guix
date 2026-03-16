@@ -4487,6 +4487,22 @@ systems which avoid allocation.  It has several downsides as compared to
     (description "This library provides types for integers of various widths.")
     (license license:expat)))
 
+(define-public ocaml-gel
+  (package
+    (name "ocaml5-gel")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "gel" version
+      "0j614lb2blb2zn8pqx51jx19pwhd8vv8ki3fm3sp0da8nb2yaq6c"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-jane))
+    (home-page "https://github.com/janestreet/gel")
+    (synopsis "Treats local fields as global values")
+    (description
+     "This library is used to mark non-record fields as global.  GEL stands for
+``Global Even if inside a Local''.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
