@@ -4378,6 +4378,29 @@ are intended to be used with the runner provided by the core_bench library.")
 nodes for lazily rendering log messages.")
     (license license:expat)))
 
+(define-public ocaml-ppx-diff
+  (package
+    (name "ocaml5-ppx-diff")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_diff" version
+      "07lypj65xhnxyx4ymf6skh68kndzvwpgnfb4rxhwqdg3hc8fav3r"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base
+                             ocaml-gel
+                             ocaml-ppx-compare
+                             ocaml-ppx-enumerate
+                             ocaml-ppx-jane
+                             ocaml-ppxlib-jane
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_diff")))
+    (home-page "https://github.com/janestreet/ppx_diff")
+    (synopsis "Generates the implementation of [Ldiffable.S].")
+    (description
+     "A PPX rewriter that generates the implementation of
+[Ldiffable.S].  Generates diffs and update functions for OCaml types.")
+    (license license:expat)))
+
 (define-public ocaml-splittable-random
   (package
     (name "ocaml5-splittable-random")
