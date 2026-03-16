@@ -4767,6 +4767,26 @@ stubs for all targets.")
 javascript.")
     (license license:expat)))
 
+(define-public ocaml-textutils
+  (package
+    (name "ocaml5-textutils")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "textutils" version
+      "000jxpfpczjr5pm3gf77kg8h488b9f1fmirrrb4iv4szkym2r7r7"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-core
+                             ocaml-core-kernel
+                             ocaml-core-unix
+                             ocaml-ppx-jane
+                             ocaml-textutils-kernel
+                             ocaml-uutf))
+    (home-page "https://github.com/janestreet/textutils")
+    (synopsis "Jane Street utilities for formatting terminal output")
+    (description
+     "Utilities for working with terminal output, such as color printing.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
