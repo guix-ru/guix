@@ -1775,6 +1775,37 @@ standard library that was developed by Jane Street.")
 the full Core is not available, such as in Javascript.")
     (license license:expat)))
 
+(define-public ocaml-core-unix
+  (package
+    (name "ocaml5-core-unix")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "core_unix" version
+      "198jzjln8i1p74xw3c284kc0wmh4qy917z3xwv8pq1n1lidh36n4"))
+    (build-system dune-build-system)
+    (arguments
+     ;; test-validate-parsing.t is broken
+     `(#:tests? #f))
+    (propagated-inputs (list ocaml-core
+                             ocaml-core-kernel
+                             ocaml-expect-test-helpers-core
+                             ocaml-jane-street-headers
+                             ocaml-jst-config
+                             ocaml-intrinsics
+                             ocaml-ppx-diff
+                             ocaml-ppx-jane
+                             ocaml-ppx-optcomp
+                             ocaml-sexplib
+                             ocaml-timezone
+                             ocaml-spawn))
+    (properties `((upstream-name . "core_unix")))
+    (home-page "https://github.com/janestreet/core_unix")
+    (synopsis "Unix-specific portions of Core")
+    (description
+     "Unix-specific extensions to some of the modules defined in core and
+core_kernel.")
+    (license license:expat)))
+
 (define-public ocaml-parsexp
   (package
     (name "ocaml5-parsexp")
