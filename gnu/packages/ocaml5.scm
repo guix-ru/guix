@@ -4302,6 +4302,26 @@ to record their startup time.")
 are intended to be used with the runner provided by the core_bench library.")
     (license license:expat)))
 
+(define-public ocaml-splittable-random
+  (package
+    (name "ocaml5-splittable-random")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "splittable_random" version
+      "0q25b8cq94n09dby97rv1qqmlymsczr9yabvvxf1c63vpp284mif"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-assert ocaml-ppx-bench
+                             ocaml-ppx-inline-test ocaml-ppx-sexp-message))
+    (properties `((upstream-name . "splittable_random")))
+    (home-page "https://github.com/janestreet/splittable_random")
+    (synopsis "PRNG that can be split into independent streams")
+    (description
+     "This package provides a
+@acronym{PRNG,pseudo-random number generator} which can also be split to
+produce a second, independent stream of random values.  The algorithm
+sacrifices cryptographic-quality randomness in favor of performance.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
