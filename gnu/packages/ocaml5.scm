@@ -4663,6 +4663,25 @@ version themselves.  The more protocols that add themselves to
 a service while using the wrong protocol.")
     (license license:expat)))
 
+(define-public ocaml-intrinsics
+  (package
+    (name "ocaml5-intrinsics")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ocaml_intrinsics" version
+      "04pkfws8xj8z842c03qv961d22rg866zf02nmwrid62sy9j7mnrm"))
+    (build-system dune-build-system)
+    (propagated-inputs (list dune-configurator))
+    (native-inputs (list ocaml-expect-test-helpers-core ocaml-core))
+    (properties `((upstream-name . "ocaml_intrinsics")))
+    (home-page "https://github.com/janestreet/ocaml_intrinsics")
+    (synopsis "AMD64 intrinsics with emulated fallbacks")
+    (description
+     "Provides an OCaml interface to operations that have dedicated hardware
+instructions on some micro-architectures, with default implementations using C
+stubs for all targets.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
