@@ -4584,6 +4584,25 @@ systems which avoid allocation.  It has several downsides as compared to
 ``Global Even if inside a Local''.")
     (license license:expat)))
 
+(define-public ocaml-protocol-version-header
+  (package
+    (name "ocaml5-protocol-version-header")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "protocol_version_header" version
+      "1pkj6b2hhvbqs4dbjchdb214bwk1qlxnzibgyfl3x6k6m2yvib2q"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-core ocaml-ppx-jane))
+    (properties `((upstream-name . "protocol_version_header")))
+    (home-page "https://github.com/janestreet/protocol_version_header")
+    (synopsis "API for Protocol versioning")
+    (description
+     "This library offers a lightweight way for applications protocols to
+version themselves.  The more protocols that add themselves to
+@code{Known_protocol}, the nicer error messages we will get when connecting to
+a service while using the wrong protocol.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
