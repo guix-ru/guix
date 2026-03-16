@@ -4700,6 +4700,23 @@ instructions on some micro-architectures, with default implementations using C
 stubs for all targets.")
     (license license:expat)))
 
+(define-public ocaml-textutils-kernel
+  (package
+    (name "ocaml5-textutils-kernel")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "textutils_kernel" version
+      "0al68g4spx6rn4is09v7f6hargd18raz0x4zah8hwjqildn33487"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-core ocaml-ppx-jane ocaml-uutf))
+    (properties `((upstream-name . "textutils_kernel")))
+    (home-page "https://github.com/janestreet/textutils_kernel")
+    (synopsis "Portable utilities for formatting terminal output")
+    (description
+     "The subset of textutils using only core_kernel and working in
+javascript.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
