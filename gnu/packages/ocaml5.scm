@@ -4412,6 +4412,49 @@ thousands of times faster than fork.
 @end itemize")
     (license license:asl2.0)))
 
+(define-public ocaml-ppx-jane
+  (package
+    (name "ocaml5-ppx-jane")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_jane" version
+      "1jym28vadcyc32vw0kmn1cw4lrsis8w25fk8f03mv4c9p1pjh0hy"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base-quickcheck
+                             ocaml-ppx-assert
+                             ocaml-ppx-base
+                             ocaml-ppx-bench
+                             ocaml-ppx-bin-prot
+                             ocaml-ppx-custom-printf
+                             ocaml-ppx-disable-unused-warnings
+                             ocaml-ppx-expect
+                             ocaml-ppx-fields-conv
+                             ocaml-ppx-fixed-literal
+                             ocaml-ppx-here
+                             ocaml-ppx-ignore-instrumentation
+                             ocaml-ppx-inline-test
+                             ocaml-ppx-let
+                             ocaml-ppx-log
+                             ocaml-ppx-module-timer
+                             ocaml-ppx-optcomp
+                             ocaml-ppx-optional
+                             ocaml-ppx-pipebang
+                             ocaml-ppx-sexp-message
+                             ocaml-ppx-sexp-value
+                             ocaml-ppx-stable
+                             ocaml-ppx-string
+                             ocaml-ppx-string-conv
+                             ocaml-ppx-tydi
+                             ocaml-ppx-typerep-conv
+                             ocaml-ppx-variants-conv
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_jane")))
+    (home-page "https://github.com/janestreet/ppx_jane")
+    (synopsis "Standard Jane Street ppx rewriters")
+    (description "This package installs a ppx-jane executable, which is a ppx
+driver including all standard Jane Street ppx rewriters.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
