@@ -4268,6 +4268,23 @@ according to them.")
 variant types.")
     (license license:expat)))
 
+(define-public ocaml-ppx-module-timer
+  (package
+    (name "ocaml5-ppx-module-timer")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_module_timer" version
+      "1wic880klh1bpy43jp5gh3hvw3a3znn9alvryhj1n0s97wi3asir"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-base ocaml-stdio
+                             ocaml-time-now ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_module_timer")))
+    (home-page "https://github.com/janestreet/ppx_module_timer")
+    (synopsis "Ppx rewriter that records top-level module startup times")
+    (description "Modules using @samp{ppx_module_timer} have instrumentation
+to record their startup time.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
