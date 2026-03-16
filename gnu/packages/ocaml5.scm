@@ -1086,6 +1086,22 @@ QuickCheck-style property-based testing and the magical bug-finding powers of
 @uref{http://lcamtuf.coredump.cx/afl/, afl-fuzz}.")
     (license license:expat)))
 
+(define-public ocaml-timezone
+  (package
+    (name "ocaml5-timezone")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "timezone" version
+      "0wf5apsln4clxxndzavxpcwh7zpaf8sf6xnj9jah9jg4r9c8p8zz"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-core ocaml-ppx-jane))
+    (home-page "https://github.com/janestreet/timezone")
+    (synopsis "Parsing and manipulation of timezone data")
+    (description
+     "Timezone handles parsing timezone data and create @code{Timezone.t}
+that can later be used to manipulate time in core_kernel or core.")
+    (license license:expat)))
+
 (define-public ocaml-camlp-streams
   (package
     (name "ocaml5-camlp-streams")
