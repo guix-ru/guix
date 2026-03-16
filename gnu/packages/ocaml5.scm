@@ -2302,6 +2302,29 @@ output-generating code, interleaved with @code{%expect} extension expressions
 to denote the expected output.")
     (license license:expat)))
 
+(define-public ocaml-expect-test-helpers-core
+  (package
+    (name "ocaml5-expect-test-helpers-core")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "expect_test_helpers_core" version
+      "0rmvr0spshh1la6gglzhk501sh9qpnhqk1m56yfm091pr5kl6ydy"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base
+                             ocaml-base-quickcheck
+                             ocaml-core
+                             ocaml-ppx-jane
+                             ocaml-sexp-pretty
+                             ocaml-stdio
+                             ocaml-re))
+    (properties `((upstream-name . "expect_test_helpers_core")))
+    (home-page "https://github.com/janestreet/expect_test_helpers_core")
+    (synopsis "Helpers for writing tests with expect-ppx")
+    (description
+     "Expect_test_helpers_core is a library intended for use with expect tests,
+i.e. the let%expect_test syntax.")
+    (license license:expat)))
+
 (define %ocaml-odoc-base
   (package
     (name "ocaml5-odoc-base")
