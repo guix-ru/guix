@@ -1075,6 +1075,28 @@ threads.  System calls that block are delegated to a thread pool managed by
 Async_kernel.")
     (license license:expat)))
 
+(define-public ocaml-async-log
+  (package
+    (name "ocaml5-async-log")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "async_log" version
+      "0l76v6mffny7s2hwd4gs275a3iawsv9arjs0vhmqm7xlh3g85rax"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-async-kernel
+                             ocaml-async-unix
+                             ocaml-core
+                             ocaml-core-kernel
+                             ocaml-ppx-jane
+                             ocaml-timezone))
+    (properties `((upstream-name . "async_log")))
+    (home-page "https://github.com/janestreet/async_log")
+    (synopsis "Logging library built on top of Async_unix")
+    (description
+     "This library provides logging via Async_unix for multiple payload types,
+including structured messages.")
+    (license license:expat)))
+
 (define-public ocaml-ounit2
   (package
     (name "ocaml5-ounit2")
