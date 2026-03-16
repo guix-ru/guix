@@ -4250,6 +4250,24 @@ according to them.")
     (description "This extension provides a syntax for string interpolation.")
     (license license:expat)))
 
+(define-public ocaml-ppx-string-conv
+  (package
+    (name "ocaml5-ppx-string-conv")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_string_conv" version
+      "1x5w45c20zx84ddjdrcafycyb7vqlhzg9gdnna15rig34mnyxrdg"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-capitalization ocaml-ppx-let
+                             ocaml-ppx-string ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_string_conv")))
+    (home-page "https://github.com/janestreet/ppx_string_conv")
+    (synopsis "Ppx extension for generating `of_string` and `to_string`")
+    (description
+     "This extension derives `of_string` and `to_string` functions, primarily for
+variant types.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
