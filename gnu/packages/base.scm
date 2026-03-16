@@ -714,7 +714,8 @@ change.  GNU make offers many powerful extensions over the standard utility.")
           ;; For some reason, the build machinery insists on rebuilding .info
           ;; files, even though they're already provided by the tarball.
           #:make-flags #~'("MAKEINFO=true")))
-   (native-inputs (list bison))                   ;needed to build 'gprofng'
+   (native-inputs (list bison  ;needed to build 'gprofng'
+                        perl)) ;needed to build the man pages (pod2man)
    (synopsis "Binary utilities: bfd gas gprof ld")
    (description
     "GNU Binutils is a collection of tools for working with binary files.
