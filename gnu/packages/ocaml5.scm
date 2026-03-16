@@ -4328,6 +4328,40 @@ to record their startup time.")
 are intended to be used with the runner provided by the core_bench library.")
     (license license:expat)))
 
+(define-public ocaml-ppx-log
+  (package
+    (name "ocaml5-ppx-log")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "ppx_log" version
+      "13hcsjx13yma4215fk4nc52vf0vpf6s2186pb8wyiqa7w9cy6ncn"))
+    (build-system dune-build-system)
+    (arguments
+     ;; Dune file for tests appears broken. Sample error: "No
+     ;; rule found for test/jbuild"
+     `(#:tests? #f))
+    (propagated-inputs (list ocaml-base
+                             ocaml-ppx-compare
+                             ocaml-ppx-enumerate
+                             ocaml-ppx-expect
+                             ocaml-ppx-fields-conv
+                             ocaml-ppx-here
+                             ocaml-ppx-let
+                             ocaml-ppx-sexp-conv
+                             ocaml-ppx-sexp-message
+                             ocaml-ppx-sexp-value
+                             ocaml-ppx-string
+                             ocaml-ppx-variants-conv
+                             ocaml-sexplib
+                             ocaml-stdio
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_log")))
+    (home-page "https://github.com/janestreet/ppx_log")
+    (synopsis "Extension nodes for lazily rendering log messages")
+    (description "This package provides ppx_sexp_message-like extension
+nodes for lazily rendering log messages.")
+    (license license:expat)))
+
 (define-public ocaml-splittable-random
   (package
     (name "ocaml5-splittable-random")
