@@ -4382,6 +4382,36 @@ produce a second, independent stream of random values.  The algorithm
 sacrifices cryptographic-quality randomness in favor of performance.")
     (license license:expat)))
 
+(define-public ocaml-spawn
+  (package
+    (name "ocaml5-spawn")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "spawn" version
+      "0wxp4yl8hjw1g68j6gii84agd3n31gcc99nrfxbnrfxrn4nic510"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-odoc))
+    (native-inputs (list ocaml-ppx-expect))
+    (home-page "https://github.com/janestreet/spawn")
+    (synopsis "Utilities for spawning sub-processes")
+    (description
+     "Spawn is a small library exposing only one functionality: spawning
+sub-process.  It has three main goals:
+
+@itemize
+@item provide missing features of Unix.create_process such as providing a
+working directory,
+@item provide better errors when a system call fails in the
+sub-process.  For instance if a command is not found, you get a proper
+@code{Unix.Unix_error} exception,
+@item improve performances by using vfork when available.  It is often
+claimed that nowadays fork is as fast as vfork, however in practice
+fork takes time proportional to the process memory while vfork is
+constant time.  In application using a lot of memory, vfork can be
+thousands of times faster than fork.
+@end itemize")
+    (license license:asl2.0)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
