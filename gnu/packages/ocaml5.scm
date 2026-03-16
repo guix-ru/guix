@@ -1659,6 +1659,48 @@ Haskell's Quickcheck library, with support for built-in types as well as
 types provided by Base.")
     (license license:expat)))
 
+(define-public ocaml-core
+  (package
+    (name "ocaml5-core")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "core" version
+      "1m1nkpd412skknd3lj2gr74v0p3rz7xbsrk2kpar4m15z1r02h2y"))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "core"
+       ;; Require a cyclic dependency: core_extended
+       #:tests? #f))
+    (propagated-inputs (list ocaml-base
+                             ocaml-base-bigstring
+                             ocaml-base-quickcheck
+                             ocaml-bin-prot
+                             ocaml-fieldslib
+                             ocaml-jane-street-headers
+                             ocaml-jst-config
+                             ocaml-ppx-assert
+                             ocaml-ppx-base
+                             ocaml-ppx-bin-prot
+                             ocaml-ppx-diff
+                             ocaml-ppx-hash
+                             ocaml-ppx-inline-test
+                             ocaml-ppx-jane
+                             ocaml-ppx-sexp-conv
+                             ocaml-ppx-sexp-message
+                             ocaml-sexplib
+                             ocaml-splittable-random
+                             ocaml-stdio
+                             ocaml-time-now
+                             ocaml-typerep
+                             ocaml-variantslib))
+    (home-page "https://github.com/janestreet/core")
+    (synopsis "Alternative to OCaml's standard library")
+    (description "The Core suite of libraries is an alternative to OCaml's
+standard library that was developed by Jane Street.")
+    ;; Also contains parts of OCaml, relicensed to expat, as permitted
+    ;; by OCaml's license for consortium members (see THIRD-PARTY.txt).
+    (license license:expat)))
+
 (define-public ocaml-parsexp
   (package
     (name "ocaml5-parsexp")
