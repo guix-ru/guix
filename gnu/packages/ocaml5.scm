@@ -1717,6 +1717,27 @@ standard library that was developed by Jane Street.")
     ;; by OCaml's license for consortium members (see THIRD-PARTY.txt).
     (license license:expat)))
 
+(define-public ocaml-core-kernel
+  (package
+    (name "ocaml5-core-kernel")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "core_kernel" version
+      "1nrj8amx76cdgak6j4i9pabnq7hg1hhiw0c3l7mp8d02smwk9dcp"))
+    (build-system dune-build-system)
+    (arguments
+     ;; Cyclic dependency with ocaml-core
+     `(#:tests? #f))
+    (propagated-inputs (list ocaml-base ocaml-core ocaml-int-repr
+                             ocaml-ppx-jane ocaml-uopt))
+    (properties `((upstream-name . "core_kernel")))
+    (home-page "https://github.com/janestreet/core_kernel")
+    (synopsis "System-independent portions of ocaml-core.")
+    (description
+     "Core_kernel is the system-independent part of Core.  It is aimed for cases when
+the full Core is not available, such as in Javascript.")
+    (license license:expat)))
+
 (define-public ocaml-parsexp
   (package
     (name "ocaml5-parsexp")
