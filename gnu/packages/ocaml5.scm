@@ -1052,6 +1052,29 @@ part of the Unix-oriented Async_rpc library, and is actively used in
 JavaScript.")
     (license license:expat)))
 
+(define-public ocaml-async-unix
+  (package
+    (name "ocaml5-async-unix")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "async_unix" version
+      "1905v8bpwr6dqyawky71ia5x31sj8qxx4yn69i6gnyyd17j5w3bw"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-async-kernel
+                             ocaml-core
+                             ocaml-cstruct
+                             ocaml-core-kernel
+                             ocaml-core-unix
+                             ocaml-ppx-jane))
+    (properties `((upstream-name . "async_unix")))
+    (home-page "https://github.com/janestreet/async_unix")
+    (synopsis "Unix-specific APIs for Async")
+    (description
+     "Unix-related dependencies for things like system calls and
+threads.  System calls that block are delegated to a thread pool managed by
+Async_kernel.")
+    (license license:expat)))
+
 (define-public ocaml-ounit2
   (package
     (name "ocaml5-ounit2")
