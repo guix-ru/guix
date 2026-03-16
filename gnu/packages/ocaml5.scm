@@ -1015,6 +1015,24 @@ process.  Also, in many cases, Lwt threads can interact without the need for
 locks or other synchronization primitives.")
     (license license:lgpl2.1)))
 
+(define-public ocaml-async-kernel
+  (package
+    (name "ocaml5-async-kernel")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "async_kernel" version
+      "1zlpppywmzwvszgdc077fgsplv3b6vx0nbrnm70pj94f8znfhikw"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-core ocaml-core-kernel ocaml-ppx-jane))
+    (properties `((upstream-name . "async_kernel")))
+    (home-page "https://github.com/janestreet/async_kernel")
+    (synopsis "Monadic concurrency library")
+    (description
+     "Contains @code{Async}'s core data structures, like
+@code{Deferred}.  @code{Async_kernel} is portable, and so can be used in
+JavaScript using @code{Async_js}.")
+    (license license:expat)))
+
 (define-public ocaml-ounit2
   (package
     (name "ocaml5-ounit2")
