@@ -4147,6 +4147,29 @@ debugging messages, where one needs to construct an S-expression based on
 various element of the context such as function arguments.")
     (license license:expat)))
 
+(define-public ocaml-sexp-pretty
+  (package
+    (name "ocaml5-sexp-pretty")
+    (version "0.17.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/janestreet/sexp_pretty")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0dq1gk64rhzjznlnwv7135b3ww38pcw3yn1i8fsw003p1abhpj0d"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-base ocaml-sexplib ocaml-re))
+    (properties `((upstream-name . "sexp_pretty")))
+    (home-page "https://github.com/janestreet/sexp_pretty")
+    (synopsis "S-expression pretty-printer")
+    (description
+     "Library for pretty-printing s-expressions, using better indentation
+rules than the default pretty printer in Sexplib.")
+    (license license:expat)))
+
 (define-public ocaml-bin-prot
   (package
     (name "ocaml5-bin-prot")
