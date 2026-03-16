@@ -1097,6 +1097,35 @@ Async_kernel.")
 including structured messages.")
     (license license:expat)))
 
+(define-public ocaml-async
+  (package
+    (name "ocaml5-async")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "async" version
+      "058lxypv3c9nsqaminrbahkx5axwb43kfrnplrm74r25kcgly10b"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-async-kernel
+                             ocaml-async-log
+                             ocaml-async-rpc-kernel
+                             ocaml-async-unix
+                             ocaml-core
+                             ocaml-core-kernel
+                             ocaml-core-unix
+                             ocaml-ppx-jane
+                             ocaml-ppx-log
+                             ocaml-textutils))
+    ;; Test dependency "netkit_sockets" is unknown.
+    (arguments
+     '(#:tests? #f))
+    (home-page "https://github.com/janestreet/async")
+    (synopsis "Asynchronous execution library")
+    (description
+     "Library for asynchronous programming, i.e., programming where some part
+of the program must wait for things that happen at times determined by some
+external entity (like a human or another program).")
+    (license license:expat)))
+
 (define-public ocaml-ounit2
   (package
     (name "ocaml5-ounit2")
