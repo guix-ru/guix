@@ -3,6 +3,7 @@
 ;;; Copyright © 2018 Mark H Weaver <mhw@netris.org>
 ;;; Copyright © 2020 Brendan Tildesley <mail@brendan.scot>
 ;;; Copyright © 2021, 2022 Maxim Cournoyer <maxim.cournoyer@gmail.com>
+;;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -770,7 +771,7 @@ MAN-COMPRESSOR, using MAN-COMPRESSOR-FLAGS."
 
 (define* (patch-dot-desktop-files #:key outputs inputs #:allow-other-keys)
   "Replace any references to executables in '.desktop' files with their
-absolute file names."
+absolute file names and set executable permissions."
   (define bin-directories
     (append-map (match-lambda
                   ((_ . directory)
@@ -804,7 +805,16 @@ which cannot be found~%"
                           (string-append "Exec=" (which binary) rest))
                          (("^TryExec=([^/[:blank:]\r\n]+)(.*)$" _ binary rest)
                           (string-append "TryExec="
-                                         (which binary) rest)))))))))
+                                         (which binary) rest))))
+                     ;; Program launchers such as Plasma's expect desktop
+                     ;; files to be either owned by root or executable, this
+                     ;; is a security measure since any exec line in a
+                     ;; desktop file essentially makes the file as dangerous as
+                     ;; an executable file.
+                     ;;
+                     ;; For more information, read the discussion on:
+                     ;; https://codeberg.org/guix/guix/issues/1578
+                     (for-each make-file-executable files))))))
             outputs))
 
 (define* (make-dynamic-linker-cache #:key outputs
