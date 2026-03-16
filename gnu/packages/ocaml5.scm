@@ -1633,6 +1633,32 @@ provided by companion libraries such as
 @url{https://github.com/janestreet/stdio, ocaml-stdio}.")
     (license license:expat)))
 
+(define-public ocaml-base-quickcheck
+  (package
+    (name "ocaml5-base-quickcheck")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "base_quickcheck" version
+      "1sa3adxp9milapmm6vbm0p4mn64mqwmjbfghisagc5mndfq39knj"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base
+                             ocaml-ppx-base
+                             ocaml-ppx-fields-conv
+                             ocaml-ppx-let
+                             ocaml-ppx-sexp-message
+                             ocaml-ppx-sexp-value
+                             ocaml-splittable-random
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "base_quickcheck")))
+    (home-page "https://github.com/janestreet/base_quickcheck")
+    (synopsis
+     "Randomized testing framework, designed for compatibility with Base")
+    (description
+     "@samp{base-quickcheck} provides randomized testing in the style of
+Haskell's Quickcheck library, with support for built-in types as well as
+types provided by Base.")
+    (license license:expat)))
+
 (define-public ocaml-parsexp
   (package
     (name "ocaml5-parsexp")
