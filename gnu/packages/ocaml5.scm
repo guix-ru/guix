@@ -4285,6 +4285,23 @@ variant types.")
 to record their startup time.")
     (license license:expat)))
 
+(define-public ocaml-ppx-bench
+  (package
+    (name "ocaml5-ppx-bench")
+    (version "0.17.1")
+    (source
+     (janestreet-git-origin "ppx_bench" version
+      "0npwvfg2rgwry645rck4vsfi7xim2pd5mgbb90x9z6br495rjylw"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ppx-inline-test ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_bench")))
+    (home-page "https://github.com/janestreet/ppx_bench")
+    (synopsis "Syntax extension for writing in-line benchmarks in ocaml code")
+    (description
+     "This extension is for writing in-line benchmarks in ocaml code.  These benchmarks
+are intended to be used with the runner provided by the core_bench library.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
