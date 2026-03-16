@@ -4472,6 +4472,21 @@ systems which avoid allocation.  It has several downsides as compared to
 [option], and is not recommended for use in general-purpose software.")
     (license license:expat)))
 
+(define-public ocaml-int-repr
+  (package
+    (name "ocaml5-int-repr")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "int_repr" version
+      "008gmlc5bw7gi15kgijmcrx9wkq9gh6rch0gldq1vk3r1z7q1rn9"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-jane))
+    (properties `((upstream-name . "int_repr")))
+    (home-page "https://github.com/janestreet/int_repr")
+    (synopsis "Integer types of various widths")
+    (description "This library provides types for integers of various widths.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
