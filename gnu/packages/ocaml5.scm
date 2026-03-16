@@ -1033,6 +1033,25 @@ locks or other synchronization primitives.")
 JavaScript using @code{Async_js}.")
     (license license:expat)))
 
+(define-public ocaml-async-rpc-kernel
+  (package
+    (name "ocaml5-async-rpc-kernel")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "async_rpc_kernel" version
+      "0w7qmf7sp0cnylx76s9x2zri8d2j66l253bqym96igcv1i3acand"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-async-kernel ocaml-core ocaml-ppx-jane
+                             ocaml-protocol-version-header))
+    (properties `((upstream-name . "async_rpc_kernel")))
+    (home-page "https://github.com/janestreet/async_rpc_kernel")
+    (synopsis "Platform-independent core of Async RPC library")
+    (description
+     "Library for building RPC-style protocols.  This library is the portable
+part of the Unix-oriented Async_rpc library, and is actively used in
+JavaScript.")
+    (license license:expat)))
+
 (define-public ocaml-ounit2
   (package
     (name "ocaml5-ounit2")
