@@ -4455,6 +4455,23 @@ thousands of times faster than fork.
 driver including all standard Jane Street ppx rewriters.")
     (license license:expat)))
 
+(define-public ocaml-uopt
+  (package
+    (name "ocaml5-uopt")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "uopt" version
+      "1hxdm39g9922ngvr29vs2y2jdsq8k29hbqhc2y2wqjbla4jqai5p"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-ppx-jane))
+    (home-page "https://github.com/janestreet/uopt")
+    (synopsis "An [option]-like type that incurs no allocation.")
+    (description
+     "Uopt provides an unboxed option type, for use in high-performance
+systems which avoid allocation.  It has several downsides as compared to
+[option], and is not recommended for use in general-purpose software.")
+    (license license:expat)))
+
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
 ;;; of a merge conflict, place them above by existing packages with similar
