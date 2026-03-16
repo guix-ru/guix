@@ -4294,6 +4294,22 @@ according to them.")
 variant types.")
     (license license:expat)))
 
+(define-public ocaml-base-bigstring
+  (package
+    (name "ocaml5-base-bigstring")
+    (version "0.17.0")
+    (source
+     (janestreet-git-origin "base_bigstring" version
+      "1qb02dzc7zhdmhzcw735is6hq8mbbfdw2y626srl3mwlaf8ysq5l"))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-base ocaml-int-repr ocaml-ppx-jane))
+    (properties `((upstream-name . "base_bigstring")))
+    (home-page "https://github.com/janestreet/base_bigstring")
+    (synopsis "String type based on [Bigarray], for use in I/O and C-bindings")
+    (description "This package provides string type based on [Bigarray], for
+use in I/O and C-bindings.")
+    (license license:expat)))
+
 (define-public ocaml-ppx-module-timer
   (package
     (name "ocaml5-ppx-module-timer")
