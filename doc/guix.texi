@@ -11669,8 +11669,16 @@ Create @var{directory} if it does not exist and copy @var{file} in there
 under the same name.
 @end deffn
 
+@deffn {Procedure} set-file-permissions file permissions
+Set the permissions of @var{file} to @var{permissions}.
+@end deffn
+
 @deffn {Procedure} make-file-writable file
 Make @var{file} writable for its owner.
+@end deffn
+
+@deffn {Procedure} make-file-executable file
+Make @var{file} executable.
 @end deffn
 
 @deffn {Procedure} copy-recursively source destination @
