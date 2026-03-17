@@ -9159,7 +9159,7 @@ source projects must be able to link to it.")
 (define-public ruby-vagrant-cloud
   (package
     (name "ruby-vagrant-cloud")
-    (version "3.1.1")
+    (version "3.1.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -9168,7 +9168,7 @@ source projects must be able to link to it.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0bnjd8b86lrgj5ar1l7pg5if95bv0sxa75mz7x2ikqyz6q8rmjb3"))))
+                "06hlijj4b1z5ki8l4hsjwmjwccs5qbf6h6bjrd22n1x71l3jnm4i"))))
     (build-system ruby-build-system)
     (arguments
      (list
@@ -9181,7 +9181,7 @@ source projects must be able to link to it.")
                 (("dependency 'rexml', .*")
                  "dependency 'rexml'\n")))))))
     (native-inputs (list ruby-rspec ruby-webmock))
-    (propagated-inputs (list ruby-excon ruby-log4r ruby-rexml))
+    (propagated-inputs (list ruby-excon ruby-log4r ruby-oauth2 ruby-rexml))
     (synopsis "Vagrant Cloud API library")
     (description "This library provides the functionality to create, modify,
 and delete boxes, versions, and providers on HashiCorp's Vagrant Cloud.")
