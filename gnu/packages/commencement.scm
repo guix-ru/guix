@@ -502,7 +502,19 @@ MesCC-Tools), and finally M2-Planet.")
                 (for-each (lambda (x) (install-file x cache))
                           (append (objects-in-dir "m2")
                                   (objects-in-dir ".")
-                                  (objects-in-dir "mescc-lib")))))))))
+                                  (objects-in-dir "mescc-lib"))))))
+          (add-after 'install 'use-64-bit-file-offsets
+            (lambda _
+              ;; In Mes-Libc headers such as 'kernel-stat.h',
+              ;; __SIZEOF_LONG_LONG__ determines the layout of structures like
+              ;; 'struct stat' in the same way _FILE_OFFSET_BITS normally
+              ;; does.  While 'mescc' defines this macro, 'tcc' does not,
+              ;; which leads to discrepancies.  Thus hardcode it.
+              (substitute* (find-files (string-append #$output "/include")
+                                       (lambda (file stat)
+                                         (string-suffix? ".h" file)))
+                (("__SIZEOF_LONG_LONG__ == 8") "1")
+                (("__SIZEOF_LONG_LONG__ != 8") "0")))))))
     (native-search-paths
      (list (search-path-specification
             (variable "C_INCLUDE_PATH")
@@ -925,8 +937,9 @@ MesCC-Tools), and finally M2-Planet.")
            #:strip-binaries? #f ; no strip yet
            #:configure-flags
            #~(let ((cppflags (string-append
-                              " -D __GLIBC_MINOR__=6"
-                              " -D MES_BOOTSTRAP=1"))
+                              " -D__GLIBC_MINOR__=6"
+                              " -DMES_BOOTSTRAP=1"
+                              " -D_FILE_OFFSET_BITS=64"))
                    (bash (search-input-file %build-inputs "/bin/sh")))
                (list (string-append "CONFIG_SHELL=" bash)
                      (string-append "CPPFLAGS=" cppflags)
@@ -1005,7 +1018,8 @@ MesCC-Tools), and finally M2-Planet.")
                (add-before 'configure 'setenv
                  (lambda _
                    (let ((shell (search-input-file %build-inputs "/bin/bash"))
-                         (cppflags " -D __GLIBC_MINOR__=6"))
+                         (cppflags (string-append " -D __GLIBC_MINOR__=6"
+                                                  " -D_FILE_OFFSET_BITS=64")))
                      (setenv "CONFIG_SHELL" shell)
                      (setenv "CPPFLAGS" cppflags)
                      (setenv "CC" (string-append "tcc" cppflags))
@@ -1195,6 +1209,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
             (replace 'setenv
               (lambda _
                 (setenv "CONFIG_SHELL" (which "sh"))
+                (setenv "CPPFLAGS" "-D_FILE_OFFSET_BITS=64")
                 (with-output-to-file "config.cache"
                   (lambda _
                     (display "
