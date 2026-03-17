@@ -422,23 +422,20 @@ MesCC-Tools), and finally M2-Planet.")
   (package
     (inherit mes)
     (name "mes-boot")
-    (version "0.25.1")
+    (version "0.27.1")
     (source (origin
               (method url-fetch)
-              (uri (list (string-append "mirror://gnu/mes/"
-                                   "mes-" version ".tar.gz")
-                         (string-append "https://lilypond.org/janneke/mes/"
-                                        "mes-" version ".tar.gz")))
+              (uri (string-append "mirror://gnu/mes/"
+                                  "mes-" version ".tar.gz"))
               (sha256
                (base32
-                "03np6h4qx94givjdvq2rmhvab38y5f91254n0avg4vq2j0cx78in"))))
+                "0pgjzlynfzdfq5xrxirvsrj4sdvnwq99s6xxwfhzhjga8zm40fhq"))))
     (inputs '())
     (propagated-inputs '())
-    (supported-systems '("i686-linux" "x86_64-linux" "riscv64-linux"))
     (native-inputs
      (cons* stage0-posix
             (bootstrap-origin
-             (origin (inherit (package-source nyacc-1.00.2))
+             (origin (inherit (package-source nyacc-2.02))
                      (snippet #f)))
             (%boot-gash-inputs)))
     (arguments
@@ -465,8 +462,10 @@ MesCC-Tools), and finally M2-Planet.")
           (replace 'configure
             (lambda* (#:key inputs #:allow-other-keys)
               (let ((dir (with-directory-excursion ".." (getcwd))))
-                (setenv "GUILE_LOAD_PATH" (string-append
-                                           dir "/nyacc-1.00.2/module"))
+                (setenv "GUILE_LOAD_PATH"
+                        (string-append dir "/nyacc-"
+                                       #$(package-version nyacc-2.02)
+                                       "/module"))
                 (invoke "gash" "configure.sh"
                         (string-append "--prefix=" #$output)
                         (string-append "--host="
