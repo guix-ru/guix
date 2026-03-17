@@ -48,7 +48,7 @@
 (define-public nuspell
   (package
     (name "nuspell")
-    (version "5.1.4")
+    (version "5.1.7")
     (source
      (origin
        (method git-fetch)
@@ -58,12 +58,14 @@
          (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "05j1hmczy6v9dyxp77vxhgyl7y5hff3v45vlp86gyh7m9lgqpmra"))))
+        (base32 "1xvy8qrpw1282akr873xzja61afnr27f1gab6jc4cgy8pkfqq308"))))
     (build-system cmake-build-system)
     (arguments
-     (if (%current-target-system)
-         (list #:configure-flags #~(list "-DBUILD_TESTING=OFF"))
-         '()))
+     (list #:configure-flags
+           #~(list "-DBUILD_DOCS=OFF"   ;do not pull Pandoc
+                   #$@(if (%current-target-system)
+                          '("-DBUILD_TESTING=OFF")
+                          '()))))
     (native-inputs (list catch2-3 pkg-config))
     (propagated-inputs (list icu4c))
     (native-search-paths (list (search-path-specification
