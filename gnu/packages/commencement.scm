@@ -459,10 +459,8 @@ MesCC-Tools), and finally M2-Planet.")
                  ((filename . source)
                   ;; Conveniently select archives other than "source", here nyacc
                   (when (string-suffix? ".tar.gz" filename)
-                    ;; Unpack it
                     (with-directory-excursion ".."
-                      (or (invoke "tar" "xvf" source)
-                          (error "failed to unpack tarball" source))))))
+                      (invoke "tar" "xvf" source)))))
                inputs)))
           (replace 'configure
             (lambda* (#:key inputs #:allow-other-keys)
@@ -577,8 +575,7 @@ MesCC-Tools), and finally M2-Planet.")
                   (when (string-suffix? ".tar.gz" filename)
                     ;; Unpack it
                     (with-directory-excursion ".."
-                      (or (invoke "tar" "xvf" source)
-                          (error "failed to unpack tarball" source))))))
+                      (invoke "tar" "xvf" source)))))
                inputs)))
           (replace 'configure
             (lambda* (#:key inputs outputs #:allow-other-keys)
@@ -1325,8 +1322,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
             ;; Only select archives other than "source"
             (and (or gz xz)
                  ;; Unpack them
-                 (or (invoke "tar" "xvf" source)
-                     (error "failed to unpack tarball" source))
+                 (invoke "tar" "xvf" source)
                  ;; Create symlinks like `gmp' -> `gmp-x.y.z'.
                  (let* ((suffix (if gz ".tar.gz" ".tar.xz"))
                         (name-version (string-trim-right
