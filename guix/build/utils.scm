@@ -10,6 +10,7 @@
 ;;; Copyright © 2021, 2022 Maxime Devos <maximedevos@telenet.be>
 ;;; Copyright © 2021 Brendan Tildesley <mail@brendan.scot>
 ;;; Copyright © 2023 Carlo Zancanaro <carlo@zancanaro.id.au>
+;;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -74,7 +75,9 @@
             with-directory-excursion
             mkdir-p
             install-file
+            set-file-permissions
             make-file-writable
+            make-file-executable
             copy-recursively
             delete-file-recursively
             file-name-predicate
@@ -422,10 +425,18 @@ name."
   (mkdir-p directory)
   (copy-file file (string-append directory "/" (basename file))))
 
+(define (set-file-permissions file permissions)
+  "Set the permissions of FILE to PERMISSIONS."
+  (let ((stat (lstat file)))
+    (chmod file (logior permissions (stat:perms stat)))))
+
 (define (make-file-writable file)
   "Make FILE writable for its owner."
-  (let ((stat (lstat file)))                      ;XXX: symlinks
-    (chmod file (logior #o600 (stat:perms stat)))))
+  (set-file-permissions file #o600))
+
+(define (make-file-executable file)
+  "Make FILE executable."
+  (set-file-permissions file #o555))
 
 (define* (copy-recursively source destination
                            #:key
@@ -1650,7 +1661,15 @@ https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-lat
                         value))
              (_
               (parse key value)))
-           (loop (cddr args))))))))
+           (loop (cddr args)))))))
+  ;; Program launchers such as Plasma's expect desktop files to be either
+  ;; owned by root or executable, this is a security measure since any exec
+  ;; line in a desktop file essentially makes the file as dangerous as an
+  ;; executable file.
+  ;;
+  ;; For more information, read the discussion on:
+  ;; https://codeberg.org/guix/guix/issues/1578
+  (make-file-executable destination))
 
 
 ;;;
