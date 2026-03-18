@@ -9837,6 +9837,23 @@ line, which can often be more convenient.
 
 @c TODO: specifications->package, etc.
 
+@deffn {Procedure} build-system->manifest build-system [system] [#:target]
+Given @var{build-system}, a variable referring to a build system value
+suitable for the @code{build-system} field in the @code{package} record
+type, return a manifest providing all the packages required by the build
+system, for @var{system}, optionally when cross-compiling to
+@var{target}.
+
+In order to be able to use a build system variable, the corresponding
+module must be loaded, as in the following example:
+
+@lisp
+(use-modules (guix build-system cmake))
+
+(build-system->manifest cmake-build-system)
+@end lisp
+@end deffn
+
 
 @node Build Systems
 @section Build Systems

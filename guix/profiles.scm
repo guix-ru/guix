@@ -127,6 +127,7 @@
             package->manifest-entry
             package->development-manifest
             packages->manifest
+            build-system->manifest
             ca-certificate-bundle
             %default-profile-hooks
             %manifest-format-version
@@ -461,6 +462,23 @@ argument and returning an alist."
                        "Wrong package object: ~S" (list thing) (list thing)))))
          packages)
     manifest-entry=?)))
+
+(define* (build-system->manifest build-system
+                                 #:optional
+                                 (system (%current-system))
+                                 #:key target)
+  "Return a manifest containing the list of packages pulled by BUILD-SYSTEM, a
+variable that defines a build system suitable for the PACKAGE record type."
+  (let ((empty-package (package
+                         (name "empty")
+                         (version "1")
+                         (source #f)
+                         (build-system build-system)
+                         (home-page #f)
+                         (synopsis #f)
+                         (description #f)
+                         (license #f))))
+    (package->development-manifest empty-package system #:target target)))
 
 (define %manifest-format-version
   ;; The current manifest format version.

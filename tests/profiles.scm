@@ -1,6 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2013-2023 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2014 Alex Kost <alezost@gmail.com>
+;;; Copyright © 2026 Simon Tournier <zimon.toutoune@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -270,6 +271,18 @@
              (manifest-installed? manifest
                                   (manifest-pattern (name name))))
            '("gcc" "binutils" "glibc" "coreutils" "grep" "sed"))))
+
+(test-assert "build-system->manifest"
+  (let* ((package packages:hello)
+         (development-manifest   (package->development-manifest package))
+         (build-system-manifest (build-system->manifest (package-build-system
+                                                           package)))
+         (development-entries  (manifest-entries development-manifest))
+         (build-system-entries (manifest-entries build-system-manifest)))
+    (and (eqv? (length development-entries)
+               (length build-system-entries))
+         (null? (lset-difference manifest-entry=?
+                                 development-entries build-system-entries)))))
 
 (test-assertm "profile-derivation"
   (mlet* %store-monad
