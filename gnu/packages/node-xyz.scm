@@ -72,7 +72,8 @@
              ;; We need to remove the prepare script from "package.json", as
              ;; it would try to use the build environment and would block the
              ;; automatic building by other packages making use of node-acorn.
-             (modify-json (delete-fields '(("scripts" "prepare"))))))
+             (modify-json "package.json"
+               (delete-json-fields '(("scripts" "prepare"))))))
          (replace 'build
            (lambda* (#:key inputs native-inputs #:allow-other-keys)
              (let ((esbuild (search-input-file (or native-inputs inputs)
@@ -347,7 +348,8 @@ addons in a wide array of potential locations.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'neuter-prepare-script
             (lambda _
-              (modify-json (delete-fields '("scripts.prepare"))))))))
+              (modify-json "package.json"
+                (delete-json-fields '("scripts.prepare"))))))))
     (native-inputs (list node-typescript))
     (home-page "https://github.com/fb55/boolbase")
     (synopsis "Two functions: One that returns true, one that returns false")
@@ -907,10 +909,12 @@ text differences, similar to Unix diff.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'neuter-prepare-script
             (lambda _
-              (modify-json (delete-fields '("scripts.prepare")))))
+              (modify-json "package.json"
+                (delete-json-fields '("scripts.prepare")))))
           (add-after 'patch-dependencies 'delete-dev-dependencies
             (lambda _
-              (modify-json (delete-dev-dependencies)))))))
+              (modify-json "package.json"
+                (delete-dev-dependencies)))))))
     (native-inputs (list node-typescript))
     (home-page "https://github.com/fb55/domelementtype")
     (synopsis "Node.js types for htmlparser2's DOM")
@@ -1256,27 +1260,29 @@ It can handle big files (tested up to 100mb). XML Entities, HTML entities, and D
         (guix build utils)
         (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'jest'.
-      #:phases #~(modify-phases %standard-phases
-        (add-before 'patch-dependencies 'modify-package (lambda _
-          (modify-json
-            (delete-dev-dependencies)
-            (delete-fields (list
-              "scripts.prepare"
-              "scripts.build")))))
-        (replace 'build (lambda _
-          (for-each
-            (match-lambda ((format outdir parameters)
-              (apply invoke (append
-                (list
-                  "esbuild"
-                  "mod.ts"
-                  (string-append "--format=" format)
-                  "--target=es2015"
-                  (string-append "--outdir=" outdir))
-                parameters))))
-            (list
-              (list "esm" "esm" (list "--sourcemap"))
-              (list "cjs" "." (list "--platform=node")))))))))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'patch-dependencies 'modify-package
+            (lambda _
+              (modify-json "package.json"
+                (delete-dev-dependencies)
+                (delete-json-fields (list "scripts.prepare" "scripts.build")))))
+          (replace 'build
+            (lambda _
+              (for-each
+               (match-lambda
+                 ((format outdir parameters)
+                  (apply invoke (append
+                                 (list
+                                  "esbuild"
+                                  "mod.ts"
+                                  (string-append "--format=" format)
+                                  "--target=es2015"
+                                  (string-append "--outdir=" outdir))
+                                 parameters))))
+               (list
+                (list "esm" "esm" (list "--sourcemap"))
+                (list "cjs" "." (list "--platform=node")))))))))
     (synopsis "Fastest Levenshtein distance implementation in JS")
     (description "Fastest JS/TS implemenation of Levenshtein distance.
 Measure the difference between two strings.")
@@ -1389,35 +1395,35 @@ suitable for use with the @code{fs} module functions.")
         (guix build utils)
         (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'c8' and 'tap'.
-      #:phases #~(modify-phases %standard-phases
-        (add-before 'patch-dependencies 'modify-package
-          (lambda _
-            (modify-json
-              (delete-dev-dependencies)
-              (delete-fields (list
-                "scripts.prepare"))
-              (delete-dependencies (list
-                ; Not currently used in other packages, but if there are
-                ; issues we may need to add this in.
-                "fs.realpath")))))
-        (replace 'build
-          (lambda _
-            (define output "output")
-            (for-each
-              (match-lambda ((format directory)
-                (invoke
-                "esbuild"
-                "src/*.ts"
-                "--platform=node"
-                (string-append "--format=" format)
-                "--target=es2022"
-                "--sourcemap"
-                (string-append "--outdir=" output "/dist/" directory))))
-              (list (list "cjs" "cjs") (list "esm" "mjs")))
-            (for-each
-              (lambda (file) (install-file file output))
-              (list "LICENSE" "README.md" "package.json"))
-            (chdir output))))))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'patch-dependencies 'modify-package
+            (lambda _
+              (modify-json "package.json"
+                (delete-dev-dependencies)
+                (delete-json-fields (list "scripts.prepare"))
+                ;; Not currently used in other packages, but if there are
+                ;; issues we may need to add this in.
+                (delete-dependencies (list "fs.realpath")))))
+          (replace 'build
+            (lambda _
+              (define output "output")
+              (for-each
+               (match-lambda
+                 ((format directory)
+                  (invoke
+                   "esbuild"
+                   "src/*.ts"
+                   "--platform=node"
+                   (string-append "--format=" format)
+                   "--target=es2022"
+                   "--sourcemap"
+                   (string-append "--outdir=" output "/dist/" directory))))
+               (list (list "cjs" "cjs") (list "esm" "mjs")))
+              (for-each
+               (lambda (file) (install-file file output))
+               (list "LICENSE" "README.md" "package.json"))
+              (chdir output))))))
     (synopsis "Match files using the patterns the shell uses")
     (description "The most correct and second fastest glob implementation in JavaScript.")
     (home-page (git-reference-url (origin-uri source)))
@@ -2063,8 +2069,7 @@ user-land JavaScript.")
           (lambda _
             (modify-json
               (delete-dev-dependencies)
-              (delete-fields (list
-                "scripts.prepare")))))
+              (delete-json-fields (list "scripts.prepare")))))
         (replace 'build
           (lambda _
             (define output "output")
@@ -2148,9 +2153,9 @@ random number generator.")
              ;; from mime-db.  These files are already generated during the Guix
              ;; build.  Remove the script to prevent npm from trying to re-run it
              ;; when this package is used as a file: dependency.
-             (modify-json #:file (string-append (assoc-ref outputs "out")
-                                                "/lib/node_modules/mime/package.json")
-                          (delete-fields '(("scripts" "prepare")))))))))
+             (modify-json (string-append (assoc-ref outputs "out")
+                                         "/lib/node_modules/mime/package.json")
+               (delete-json-fields '(("scripts" "prepare")))))))))
     (home-page "https://github.com/broofa/mime")
     (synopsis "Comprehensive MIME type mapping API")
     (description "This package provides a library for MIME type mapping based
@@ -2212,8 +2217,7 @@ JavaScript.")
           (lambda _
             (modify-json
               (delete-dev-dependencies)
-              (delete-fields (list
-                "scripts.prepare")))))
+              (delete-json-fields (list "scripts.prepare")))))
         (replace 'build
           (lambda _
             (define output "output")
@@ -2285,22 +2289,22 @@ It works by converting glob expressions into JavaScript RegExp objects.")
     (build-system node-build-system)
     (arguments (list
       #:tests? #f ; FIXME: Tests require 'tap'.
-      #:phases #~(modify-phases %standard-phases
-        (add-before 'patch-dependencies 'modify-package
-          (lambda _
-            (modify-json
-              (delete-dev-dependencies)
-              (delete-fields (list
-                "scripts.prepare")))))
-        (replace 'build
-          (lambda _
-            (define output "output")
-            (mkdir output)
-            (invoke "node" "./scripts/transpile-to-esm.js")
-            (for-each
-              (lambda (file) (install-file file output))
-              (list "index.js" "index.mjs" "LICENSE" "package.json" "README.md"))
-            (chdir output))))))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'patch-dependencies 'modify-package
+            (lambda _
+              (modify-json "package.json"
+                (delete-dev-dependencies)
+                (delete-json-fields (list "scripts.prepare")))))
+          (replace 'build
+            (lambda _
+              (define output "output")
+              (mkdir output)
+              (invoke "node" "./scripts/transpile-to-esm.js")
+              (for-each
+               (lambda (file) (install-file file output))
+               (list "index.js" "index.mjs" "LICENSE" "package.json" "README.md"))
+              (chdir output))))))
     (synopsis "Minimal implementation of a PassThrough stream")
     (description "A very minimal implementation of a PassThrough stream
 It's very fast for objects, strings, and buffers.
@@ -2341,32 +2345,33 @@ This is not a through or through2 stream. It doesn't transform the data, it just
         (guix build utils)
         (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'tap'.
-      #:phases #~(modify-phases %standard-phases
-        (add-before 'patch-dependencies 'modify-package
-          (lambda _
-            (modify-json
-              (delete-dev-dependencies)
-              (delete-fields (list
-                "scripts.prepare")))))
-        (replace 'build
-          (lambda _
-            (define output "output")
-            (for-each
-              (match-lambda ((format directory type)
-                (define target-output (string-append output "/dist/" directory))
-                (invoke
-                  "esbuild"
-                  "src/index.ts"
-                  "--platform=node"
-                  "--target=es2022"
-                  (string-append "--format=" format)
-                  "--jsx=transform"
-                  "--sourcemap"
-                  (string-append "--outdir=" target-output))
-                (with-output-to-file
-                  (string-append target-output "/package.json")
-                  (lambda _ (display (string-append "{\"type\": \"" type "\"}"))))))
-              (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'patch-dependencies 'modify-package
+            (lambda _
+              (modify-json "package.json"
+                (delete-dev-dependencies)
+                (delete-json-fields (list "scripts.prepare")))))
+          (replace 'build
+            (lambda _
+              (define output "output")
+              (for-each
+               (match-lambda
+                 ((format directory type)
+                  (define target-output (string-append output "/dist/" directory))
+                  (invoke "esbuild"
+                          "src/index.ts"
+                          "--platform=node"
+                          "--target=es2022"
+                          (string-append "--format=" format)
+                          "--jsx=transform"
+                          "--sourcemap"
+                          (string-append "--outdir=" target-output))
+                  (call-with-output-file
+                      (string-append target-output "/package.json")
+                    (lambda (port)
+                      (format port "{type: ~s}" type)))))
+               (list
                 (list "cjs" "commonjs" "commonjs")
                 (list "esm" "esm" "module")))
             (for-each
@@ -2684,7 +2689,7 @@ particular cross-platform spellings of the PATH environment variable key.")
           (lambda _
             (modify-json
               (delete-dev-dependencies)
-              (delete-fields (list "scripts.prepare")))))
+              (delete-json-fields (list "scripts.prepare")))))
         (replace 'build
           (lambda _
             (define output "output")
@@ -3622,8 +3627,9 @@ it to make a new binding for a different platform or underling technology.")))
                                                  "node-abi")))))
          (add-after 'chdir 'avoid-prebuild-install
            (lambda args
-             (modify-json (delete-fields '(("scripts" "install")))
-                          (replace-fields '(("gypfile" . #f)))))))
+             (modify-json "package.json"
+               (delete-json-fields '(("scripts" "install")))
+               (replace-fields '(("gypfile" . #f)))))))
        #:tests? #f))
     (synopsis "Abstract base class for Node SerialPort bindings")
     (description "Node SerialPort is a modular suite of Node.js packages for
@@ -3896,7 +3902,7 @@ connection.")))
           (modify-json
             (delete-dev-dependencies)
             ; Build only builds browser-source-map-support.js which we don't currently use
-            (delete-fields (list "scripts.build"))))))))
+            (delete-json-fields (list "scripts.build"))))))))
     (synopsis "Fixes stack traces for files with source maps")
     (description "This module provides source map support for stack traces in node via\
  the V8 stack trace API. It uses the source-map module to replace the paths and line\
@@ -4017,7 +4023,7 @@ connection.")))
                ;; We need to remove the install script from "package.json",
                ;; as it would try to use node-pre-gyp and would block the
                ;; automatic building performed by `npm install`.
-               (delete-fields `(("scripts" "install")))))))))
+               (delete-json-fields `(("scripts" "install")))))))))
     (home-page "https://github.com/mapbox/node-sqlite3")
     (synopsis "Node.js bindings for SQLite3")
     (description
@@ -4200,7 +4206,7 @@ sequences.")
         (add-before 'patch-dependencies 'modify-package (lambda _
           (modify-json
             (delete-dev-dependencies)
-            (delete-fields (list "type"))
+            (delete-json-fields (list "type"))
             (replace-fields (list (cons "version" #$version))))))
         (replace 'build (lambda _
           (define problem-file "strnum.js")
