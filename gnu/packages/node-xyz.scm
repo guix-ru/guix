@@ -149,8 +149,9 @@ architecture supporting plugins.")
                              "semver"))
                ;; We can't run the js-based tests,
                ;; but we can still do the C++ parts
-               (replace-fields (list (cons
-                 "scripts.test" "echo stopping after pretest on Guix")))))))))
+               (replace-json-fields
+                (list (cons "scripts.test"
+                            "echo stopping after pretest on Guix")))))))))
     (home-page "https://github.com/nodejs/node-addon-api")
     (synopsis "Node.js API (Node-API) header-only C++ wrappers")
     (description "This module contains header-only C++ wrapper classes which
@@ -3683,7 +3684,7 @@ it to make a new binding for a different platform or underling technology.")))
            (lambda args
              (modify-json "package.json"
                (delete-json-fields '(("scripts" "install")))
-               (replace-fields '(("gypfile" . #f)))))))
+               (replace-json-fields '(("gypfile" . #f)))))))
        #:tests? #f))
     (synopsis "Abstract base class for Node SerialPort bindings")
     (description "Node SerialPort is a modular suite of Node.js packages for
@@ -3907,7 +3908,8 @@ connection.")))
         (add-before 'patch-dependencies 'modify-package (lambda _
           (modify-json
             (delete-dev-dependencies)
-            (replace-fields (list (cons "scripts.test" "node test/run-tests.js"))))))
+            (replace-json-fields
+             (list (cons "scripts.test" "node test/run-tests.js"))))))
         (replace 'build (lambda _
           (for-each
             (match-lambda ((name parameters)
@@ -4261,7 +4263,7 @@ sequences.")
           (modify-json
             (delete-dev-dependencies)
             (delete-json-fields (list "type"))
-            (replace-fields (list (cons "version" #$version))))))
+            (replace-json-fields (list (cons "version" #$version))))))
         (replace 'build (lambda _
           (define problem-file "strnum.js")
           (substitute* problem-file (("^export default ") ""))
@@ -4404,10 +4406,10 @@ tablets.
           (add-after 'unpack 'setup
             (lambda _
               (chdir (string-append "types/" #$type))
-              (modify-json
+              (modify-json "package.json"
                (delete-dev-dependencies)
-               (replace-fields (list
-                                (cons "version" #$version)))))))))
+               (replace-json-fields
+                (list (cons "version" #$version)))))))))
     (synopsis (string-append "TypeScript definitions for " type))
     (description (string-append "Typescript definition files (*.d.ts) for '"
                                 type "'."))
@@ -4702,7 +4704,7 @@ function with browser support.")
           (add-after 'patch-dependencies 'delete-dev-dependencies
             (lambda _
               (modify-json (delete-dev-dependencies)
-                           (replace-fields
+                           (replace-json-fields
                             '(("scripts.install:l10n-dev" . "true")))))))))
     (home-page "https://github.com/Microsoft/vscode-l10n")
     (synopsis "Helper library to assist in localizing VS Code subprocesses")
