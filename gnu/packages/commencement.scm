@@ -996,10 +996,7 @@ MesCC-Tools), and finally M2-Planet.")
            #~(let* ((libtcc1.a (search-input-file %build-inputs
                                                   "/lib/libtcc1.a"))
                     (tcc (dirname (dirname libtcc1.a))))
-               (list "CC=tcc -static -D __GLIBC_MINOR__=6"
-                     "OLDCC=tcc -static -D __GLIBC_MINOR__=6"
-                     "CC_FOR_BUILD=tcc -static -D __GLIBC_MINOR__=6"
-                     "AR=ar"
+               (list "AR=ar"
                      "RANLIB=ranlib"
                      "LANGUAGES=c"
                      (string-append "LIBGCC2_INCLUDES=-I " tcc "/include")
