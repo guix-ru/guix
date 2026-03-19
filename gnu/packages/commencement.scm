@@ -3165,37 +3165,38 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 (define/system-dependent glibc-final
   ;; The final glibc, which embeds the statically-linked Bash built above.
   ;; Use 'package/inherit' so we get the 'replacement' of 'glibc', if any.
-  (let ((libc (libc-for-target (%current-system))))
+  (let ((libc (libc-for-target (%current-system)))
+        (final glibc-final-with-bootstrap-bash))
     (package/inherit libc
       (name "glibc")
       (source (bootstrap-origin (package-source libc)))
+      ;; The final libc only refers to itself, but the 'debug' output contains
+      ;; references to GCC-BOOT0 and to the Linux headers.  XXX: Would be great
+      ;; if 'allowed-references' were per-output.
+      (arguments
+       (cons*
+        #:allowed-references
+        (append (list (gexp-input gcc-boot0 "lib")
+                      (kernel-headers-boot0)
+                      static-bash-for-glibc)
+                (if (system-hurd?)
+                    (list gnumach-headers-boot0 hurd-headers-boot0)
+                    '())
+                (package-outputs final))
+        (package-arguments final)))
+
       (inputs
-       (modify-inputs (package-inputs glibc-final-with-bootstrap-bash)
+       (modify-inputs (package-inputs final)
          (delete "bash-mesboot")
          (append static-bash-for-glibc)))
 
       ;; This time we need 'msgfmt' to install all the libc.mo files.
       (native-inputs
-       (modify-inputs (package-native-inputs glibc-final-with-bootstrap-bash)
+       (modify-inputs (package-native-inputs final)
          (append gettext-boot0)))
 
       (propagated-inputs
-       (package-propagated-inputs glibc-final-with-bootstrap-bash))
-
-      ;; The final libc only refers to itself, but the 'debug' output contains
-      ;; references to GCC-BOOT0 and to the Linux headers.  XXX: Would be great
-      ;; if 'allowed-references' were per-output.
-      (arguments
-       `(#:allowed-references
-         (,(gexp-input gcc-boot0 "lib")
-          ,(kernel-headers-boot0)
-          ,static-bash-for-glibc
-          ,@(if (system-hurd?)
-                `(,gnumach-headers-boot0
-                  ,hurd-headers-boot0)
-                '())
-          ,@(package-outputs glibc-final-with-bootstrap-bash))
-         ,@(package-arguments glibc-final-with-bootstrap-bash))))))
+       (package-propagated-inputs final)))))
 
 (define/system-dependent gcc-boot0-wrapped
   ;; Make the cross-tools GCC-BOOT0 and BINUTILS-BOOT0 available under the
