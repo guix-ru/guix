@@ -3461,13 +3461,10 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
   ;; with the full range of Unicode codepoints (remember
   ;; 'scm_to_locale_string' is called every time a string is passed to a C
   ;; function.)
-  (package
-    (inherit glibc-utf8-locales)
-    (properties `((hidden? . #t)
-                  ,@(package-properties glibc-utf8-locales)))
-    (native-inputs
-     `(("glibc" ,glibc-final)
-       ("gzip" ,(with-boot4 gzip))))))
+  (hidden-package
+   (package
+     (inherit glibc-utf8-locales)
+     (native-inputs (list glibc-final (with-boot4 gzip))))))
 
 (define-public glibc-utf8-locales-final/hurd
   ;; Locales for the libc version used on GNU/Hurd.
