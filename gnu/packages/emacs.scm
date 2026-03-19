@@ -630,6 +630,8 @@ editor (console only)")
                libx11
                libxft
                libxpm
+               libxrender
+               libxt
                libwebp
                pango
                poppler)))))
