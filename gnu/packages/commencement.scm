@@ -3468,13 +3468,10 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 
 (define-public glibc-utf8-locales-final/hurd
   ;; Locales for the libc version used on GNU/Hurd.
-  (package
-    (inherit glibc-utf8-locales/hurd)
-    (properties `((hidden? . #t)
-                  ,@(package-properties glibc-utf8-locales/hurd)))
-    (native-inputs
-     `(("glibc" ,glibc-final)
-       ("gzip" ,(with-boot4 gzip))))))
+  (hidden-package
+   (package
+     (inherit glibc-utf8-locales/hurd)
+     (native-inputs (list glibc-final (with-boot4 gzip))))))
 
 (define-public ld-wrapper
   ;; The final 'ld' wrapper, which uses the final Guile and Binutils.
