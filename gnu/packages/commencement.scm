@@ -3660,27 +3660,25 @@ COREUTILS-FINAL vs. COREUTILS, etc."
       (source #f)
       (build-system trivial-build-system)
       (arguments
-       '(#:modules ((guix build union))
-         #:builder (begin
-                     (use-modules (ice-9 match)
-                                  (srfi srfi-1)
-                                  (srfi srfi-26)
-                                  (guix build union))
+       (list
+        #:modules '((guix build union))
+        #:builder
+        #~(begin
+            (use-modules (ice-9 match)
+                         (srfi srfi-1)
+                         (srfi srfi-26)
+                         (guix build union))
 
-                     (let ((out (assoc-ref %outputs "out")))
-                       (union-build out
-                                    (filter-map (match-lambda
-                                                  (("libc-debug" . _) #f)
-                                                  (("libc-static" . _) #f)
-                                                  ((_ . directory) directory))
-                                                %build-inputs))
-
-                       (union-build (assoc-ref %outputs "debug")
-                                    (list (assoc-ref %build-inputs
-                                                     "libc-debug")))
-                       (union-build (assoc-ref %outputs "static")
-                                    (list (assoc-ref %build-inputs
-                                                     "libc-static")))))))
+            (union-build #$output
+                         (filter-map (match-lambda
+                                       (("libc-debug" . _) #f)
+                                       (("libc-static" . _) #f)
+                                       ((_ . directory) directory))
+                                     %build-inputs))
+            (union-build #$output:debug
+                         (list (assoc-ref %build-inputs "libc-debug")))
+            (union-build #$output:static
+                         (list (assoc-ref %build-inputs "libc-static"))))))
 
       (native-search-paths
        (append (package-native-search-paths gcc)
