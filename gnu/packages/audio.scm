@@ -585,15 +585,17 @@ synth (like DX7) or FM chip.")
 (define-public libgme
   (package
     (name "libgme")
-    (version "0.6.3")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://bitbucket.org/mpyne/game-music-emu/"
-                                  "downloads/game-music-emu-" version
-                                  ".tar.xz"))
-              (sha256
-               (base32
-                "07857vdkak306d9s5g6fhmjyxk7vijzjhkmqb15s7ihfxx9lx8xb"))))
+    (version "0.6.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+         (url "https://github.com/libgme/game-music-emu")
+         (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "093pz3avnj6a230bqbwwzqlzcjxnxidfxipnn7zirwp3h396szff"))))
     (build-system cmake-build-system)
     (arguments
      '(#:tests? #f                                ;no check target
@@ -602,7 +604,7 @@ synth (like DX7) or FM chip.")
        ;; header file names in libgme.so, meaning that libgme retains a
        ;; reference to GCC.  Disable UBSAN to avoid that.
        #:configure-flags '("-DENABLE_UBSAN=OFF")))
-    (home-page "https://bitbucket.org/mpyne/game-music-emu")
+    (home-page "https://github.com/libgme/game-music-emu/wiki")
     (synopsis "Video game music file playback library")
     (description
      "Game-music-emu is a collection of video game music file emulators that
