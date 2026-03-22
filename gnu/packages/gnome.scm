@@ -9206,7 +9206,7 @@ library.")
 (define-public gdm
   (package
     (name "gdm")
-    (version "48.0")
+    (version "49.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -9214,7 +9214,7 @@ library.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1pqaqg8ngs8y2nwysxm03cdllix3blpgkd7c6xg7pv4ky2pnvh0v"))
+                "01ksb7gf2pfccnvw7dr363nppz0fwrk7hhsal478c3szkwgn64wq"))
               (patches
                (search-patches
                 "gdm-default-session.patch"
@@ -9222,6 +9222,7 @@ library.")
                 "gdm-wayland-session-wrapper-from-env.patch"
                 "gdm-pass-gdk-pixbuf-loader-env.patch"))))
     (build-system meson-build-system)
+    (outputs '("out" "debug"))
     (arguments
      (list
       #:glib-or-gtk? #t
