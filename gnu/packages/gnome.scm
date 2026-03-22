@@ -4644,7 +4644,7 @@ and RDP protocols.")
 (define-public dconf
   (package
     (name "dconf")
-    (version "0.40.0")
+    (version "0.49.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -4653,7 +4653,7 @@ and RDP protocols.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0cs5nayg080y8pb9b7qccm1ni8wkicdmqp1jsgc22110r6j24zyg"))))
+                "0dkc7nbd0byibf6i5gm9xqclr7i94n1p1qbqcnwxnml1lm4px90n"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -4662,7 +4662,8 @@ and RDP protocols.")
       ;; there and loaded without having to set GCONF_PROFILE, which cannot be
       ;; safely set globally (as a gconf profile is a per-user thing).
       #:configure-flags #~(list "--sysconfdir=/etc"
-                                "-Dgtk_doc=true")
+                                "-Dgtk_doc=true"
+                                "--wrap-mode=nodownload") ;for gvdb
       #:phases #~(modify-phases %standard-phases
                    (add-after 'unpack 'increase-test-timeout
                      (lambda _
