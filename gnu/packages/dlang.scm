@@ -342,7 +342,7 @@ integration tests...\n")
     ;; and their names must have the same length to avoid corrupting the
     ;; binary.
     (name "dmd")
-    (version "2.111.0")
+    (version "2.112.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -351,7 +351,7 @@ integration tests...\n")
               (file-name (git-file-name "dmd" version))
               (sha256
                (base32
-                "0cz5qdd1j89w2s7nzw9ahzwsqiraidg4ajy7syy7qkk7mwcyrf6r"))))
+                "0qvg2fb73kyng8k1wj482g07ar2qw5laa5fynwx7pdd610n0pjpc"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -546,7 +546,7 @@ integration tests...\n")
              (file-name (git-file-name "phobos" version))
              (sha256
               (base32
-               "1ydls3ar6d3f7ffqvidr46x3zrz3wlzjln5qa0nbz843ndjr4g7n")))))
+               "0afi5glnf96242cbnr10ccjvfsgkh4k5y7qnmxv4ph5g0izvi1dc")))))
     (outputs '("out" "lib" "debug"))
     (synopsis "Reference D Programming Language compiler")
     (description "@acronym{DMD, Digital Mars D compiler} is the reference
