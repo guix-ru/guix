@@ -123,6 +123,7 @@
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages sphinx)
   #:use-module (gnu packages sqlite)
+  #:use-module (gnu packages ssh)
   #:use-module (gnu packages statistics)
   #:use-module (gnu packages swig)
   #:use-module (gnu packages textutils)
@@ -293,6 +294,77 @@ libraries such as PyTorch and TensorFlow.")
        (file-name (git-file-name name version))
        (sha256
         (base32 "18sbbglh1p2yaslzsbrlnfm4rg0bfxnjs2vy9sa5vpq8shnyx61r"))))))
+
+(define-public git-ai
+  (package
+    (name "git-ai")
+    (version "1.1.18")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/git-ai-project/git-ai")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "0yf864shgi5b35s0f6frds0lf9jwwn8qw4pxiniplhnxadrbpx2f"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list #:install-source? #f
+           #:cargo-test-flags
+           ''("--"
+              ;;This test requires network access.
+              "--skip=test_load_ai_touched_files_for_specific_commits"
+              ;;This test fails in the build environment.
+              "--skip=exit_status_was_interrupted_on_sigint")
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'patch-/bin/sh
+                 (lambda _
+                   (substitute* (list "tests/integration/continue_session.rs"
+                                      "tests/integration/diff.rs"
+                                      "tests/integration/stats.rs"
+                                      "tests/integration/status_ignore.rs"
+                                      "tests/integration/git_ai_hooks.rs"
+                                      "tests/integration/hook_forwarding.rs"
+                                      "tests/integration/hook_modes.rs"
+                                      "tests/integration/rebase.rs")
+                     (("#!/bin/sh") (string-append "#!" (which "sh"))))))
+               (add-after 'unpack 'set-home
+                 (lambda _
+                   (setenv "HOME" (getenv "TMPDIR"))))
+               (add-before 'check 'setup-git-path
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((git (assoc-ref inputs "git-minimal"))
+                         (home (getenv "HOME")))
+                     (mkdir-p (string-append home "/.git-ai"))
+                     (let ((port (open-file
+                                  (string-append home "/.git-ai/config.json")
+                                  "a")))
+                       (format port "{\"git_path\": \"~a/bin/git\"}" git)
+                       (close port))
+
+                     (substitute* "src/config.rs"
+                       (("\"/usr/bin/git\"")
+                        (string-append "\"" git "/bin/git\""))))))
+               (add-before 'check 'git-init
+                 (lambda _
+                   ;;The tests expect a git repo with at least one commit.
+                   (invoke "git" "init")
+                   (invoke "git" "config" "--global" "user.email" "user@mail.org")
+                   (invoke "git" "config" "--global" "user.name" "User Name")
+                   (invoke "git" "add" ".")
+                   (invoke "git" "commit" "-m" "Commit all."))))))
+    (native-inputs (list
+                    git-minimal/pinned ;for tests
+                    pkg-config))
+    (inputs
+     (cons*
+      libgit2 libssh2 openssl sqlite zlib (cargo-inputs 'git-ai)))
+    (home-page "https://usegitai.com/")
+    (synopsis "Git extension for tracking LLM-generated code")
+    (description "@code{git-ai} is an extension for git that tracks which
+lines of code were created by an LLM along with metadata about how and why.")
+    (license license:asl2.0)))
 
 (define-public python-apricot-select
   (package
