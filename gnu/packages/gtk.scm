@@ -1329,7 +1329,6 @@ application suites.")
     (inputs
      (list colord                       ;for color printing support
            cups                         ;for CUPS print-backend
-           ffmpeg                       ;for ffmpeg media-backend
            fribidi
            gi-docgen
            gstreamer                    ;for gstreamer media-backend
