@@ -44,7 +44,7 @@
   sddm-configuration      make-sddm-configuration
   sddm-configuration?
   (sddm                   sddm-configuration-sddm
-                          (default sddm))
+                          (default sddm-qt5))
 
   ;; [General]
   ;; valid values are x11 and wayland

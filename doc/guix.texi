@@ -25995,13 +25995,8 @@ This data type represents the configuration of the SDDM login manager.
 The available fields are:
 
 @table @asis
-@item @code{sddm} (default: @code{sddm})
+@item @code{sddm} (default: @code{sddm-qt5})
 The SDDM package to use.
-
-@quotation Note
-sddm has Qt6 enabled by default. If you want to still use a Qt5 theme,
-you need to set it to @code{sddm-qt5}.
-@end quotation
 
 @item @code{display-server} (default: "x11")
 Select display server to use for the greeter.  Valid values are
