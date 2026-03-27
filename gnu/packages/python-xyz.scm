@@ -15960,6 +15960,42 @@ implementation of D-Bus.")
     (home-page "https://www.freedesktop.org/wiki/Software/DBusBindings/")
     (license license:expat)))
 
+(define-public python-dasbus
+  (package
+    (name "python-dasbus")
+    (version "1.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dasbus-project/dasbus")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1dii0skg7pqi4jhy1dkshqmn49i5ngq92sw7w7j4sxd3g8pjhj46"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda* (#:key tests? (test-flags '()) #:allow-other-keys)
+              (when tests?
+                (apply invoke "dbus-launch" "pytest" "-vv" test-flags)))))))
+    (native-inputs
+     (list dbus
+           python-hatchling
+           python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-pygobject))
+    (home-page "https://dasbus.readthedocs.io/")
+    (synopsis "DBus library in Python")
+    (description
+     "This DBus library is written in Python, based on GLib and inspired by
+@code{pydbus}.")
+    (license license:lgpl2.1+)))
+
 (define-public python-notify2
   (package
     (name "python-notify2")
