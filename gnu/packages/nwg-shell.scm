@@ -25,8 +25,10 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (gnu packages)
+  #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages curl)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
@@ -36,9 +38,14 @@
   #:use-module (gnu packages image)
   #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages image-viewers)
+  #:use-module (gnu packages linux)
+  #:use-module (gnu packages music)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages pulseaudio)
   #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-web)
   #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages terminals)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages xdisorg)
@@ -801,3 +808,123 @@ executors.
 
 This application is a part of the nwg-shell project.")
     (license (list license:bsd-2 license:expat)))) ;dual-licensed
+
+(define-public nwg-panel
+  (package
+    (name "nwg-panel")
+    (version "0.10.13")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-panel")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1iy528zvk26k48dd8rd1qr69y52nvvhvfv4zfvf821n26r33dwad"))
+       (modules '((guix build utils)))
+       ;; Replace systemd commands with elogind commands.
+       (snippet
+        '(substitute* '("nwg_panel/config.py"
+                        "nwg_panel/main.py"
+                        "nwg_panel/config/config"
+                        "nwg_panel/modules/menu_start.py")
+           (("\"systemctl (-i |)") "\"loginctl ")))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:modules '((guix build pyproject-build-system)
+                  (guix build utils)
+                  (srfi srfi-26))                     ;for cute
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Sanity check requires a running sway or Hyprland session.
+          (delete 'sanity-check)
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Set default backgrounds directory.
+              (substitute* "nwg_panel/config.py"
+                (("\\/usr(\\/share\\/backgrounds)" _ suffix)
+                 (string-append #$(this-package-input "nwg-shell-wallpapers")
+                                suffix)))
+              ;; Patch the default data directory.
+              (substitute* '("nwg_panel/icons.py"
+                             "nwg_panel/modules/pinned.py")
+                (("\\/usr\\/share") (string-append #$output "/share")))
+              ;; Fix the dbus service.
+              (substitute* "nwg-panel.service"
+                (("\\/bin\\/sh") (search-input-file inputs "/bin/bash"))
+                (("\\/usr") #$output))))
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (for-each (cute install-file <>
+                              (string-append #$output "/share/applications"))
+                        '("nwg-panel-config.desktop" "nwg-processes.desktop"))
+              (for-each (cute install-file <>
+                              (string-append #$output "/share/pixmaps"))
+                        '("nwg-panel.svg" "nwg-shell.svg" "nwg-processes.svg"))
+              (install-file "nwg-panel.service"
+                            (string-append #$output "/share/dbus-1/services"))
+              (install-file "README.md"
+                            (string-append #$output "/share/doc/nwg-panel"))))
+          (add-after 'create-entrypoints 'wrap-programs
+            (lambda _
+              (for-each (lambda (file)
+                          (wrap-program file
+                            `("PATH" ":" prefix
+                              (,(dirname (which "brightnessctl"))
+                               ,(dirname (which "curl"))
+                               ,(dirname (which "foot"))
+                               ,(dirname (which "gopsuinfo"))
+                               ,(dirname (which "htop"))
+                               ,(dirname (which "nwg-icon-picker"))
+                               ,(dirname (which "nwg-menu"))
+                               ,(dirname (which "notify-send"))
+                               ,(dirname (which "pactl"))
+                               ,(dirname (which "pkill"))
+                               ,(dirname (which "playerctl"))
+                               ,(dirname (which "swaync-client"))
+                               ,(dirname (which "wlr-randr"))))
+                            `("GI_TYPELIB_PATH" =
+                              (,(getenv "GI_TYPELIB_PATH")))))
+                        (find-files (string-append #$output "/bin"))))))))
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list bash-minimal
+           curl                 ;for the default executors
+           brightnessctl        ;for controlling brightness
+           foot                 ;for the default executors
+           gopsuinfo            ;for the default executors
+           gtk+
+           gtk-layer-shell
+           hicolor-icon-theme
+           htop                 ;for the default executors
+           libappindicator
+           libdbusmenu
+           libnotify
+           nwg-icon-picker      ;for chosing icons for buttons
+           nwg-menu             ;optional plugin
+           nwg-shell-wallpapers ;for random wallpaper module
+           playerctl            ;optional plugin
+           procps
+           pulseaudio           ;for controlling audio
+           python-pycairo
+           python-dasbus
+           python-i3ipc
+           python-psutil
+           python-pygobject
+           python-requests
+           swaynotificationcenter
+           wlr-randr))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/nwg-panel")
+    (synopsis "GTK3-based panel for sway and Hyprland")
+    (description
+     "nwg-panel is a GTK3-based panel for sway and Hyprland Wayland compositors.
+The panel is equipped with a graphical configuration program that frees the user
+from the need to manually edit configuration files.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
