@@ -18,15 +18,21 @@
 
 (define-module (gnu packages nwg-shell)
   #:use-module (guix build-system copy)
+  #:use-module (guix build-system go)
   #:use-module (guix build-system pyproject)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (gnu packages)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages golang-graphics)
+  #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages gtk)
+  #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python-build))
 
 (define-public nwg-shell-wallpapers
@@ -143,6 +149,86 @@ nwg-shell project.")
      "nwg-hello is a GTK3-based greeter for the @command{greetd} daemon, written
 in Python.  It is meant to work under a Wayland compositor, like sway or
 Hyprland.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
+
+(define-public nwg-drawer
+  (package
+    (name "nwg-drawer")
+    (version "0.7.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-drawer")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1f347n1f9nzqr2ryc49nv74kz6qyh6yk8g2b0rdbd3flgx4kap8v"))
+       (patches
+        (search-patches "nwg-drawer-0.7.5-fallback-paths.patch"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:import-path "github.com/nwg-piotr/nwg-drawer"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (with-directory-excursion "src/github.com/nwg-piotr/nwg-drawer"
+                (substitute* '("main.go" "tools.go")
+                  (("\\/usr\\/bin\\/env") (search-input-file inputs "/bin/env"))
+                  (("\\/usr\\/share") (string-append #$output "/share"))))))
+          (add-after 'install 'install-data
+            (lambda _
+              (mkdir-p (string-append #$output "/share/nwg-drawer"))
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/"
+                                                       "nwg-drawer")
+                (copy-recursively "desktop-directories"
+                                  (string-append #$output "/share/"
+                                                 "nwg-drawer/"
+                                                 "desktop-directories"))
+                (copy-recursively "img"
+                                  (string-append #$output "/share/"
+                                                 "nwg-drawer/img"))
+                (install-file "drawer.css"
+                              (string-append #$output "/share/nwg-drawer"))
+                (install-file "README.md"
+                              (string-append #$output
+                                             "/share/doc/nwg-drawer")))))
+          (add-after 'install 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-drawer")
+                `("PATH" prefix
+                  (,(dirname (which "xdg-open"))))
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (native-inputs
+     (list gobject-introspection
+           go-github-com-allan-simon-go-singleinstance
+           go-github-com-diamondburned-gotk4
+           go-github-com-diamondburned-gotk4-layer-shell
+           go-github-com-expr-lang-expr
+           go-github-com-fsnotify-fsnotify
+           go-github-com-google-shlex
+           go-github-com-joshuarubin-go-sway
+           go-github-com-sirupsen-logrus
+           pkg-config))
+    (inputs
+     (list bash-minimal
+           coreutils-minimal
+           gtk+
+           gtk-layer-shell
+           xdg-utils))       ;for 'xdg-open'
+    (home-page "https://nwg-piotr.github.io/nwg-shell/nwg-drawer")
+    (synopsis "Application drawer for wlroots-based Wayland compositors")
+    (description
+     "nwg-drawer is an application launcher.  It's being developed with sway and
+Hyprland in mind, but should also work with other wlroots-based Wayland
+compositors.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
