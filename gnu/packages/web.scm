@@ -6110,38 +6110,70 @@ It uses the uwsgi protocol for all the networking/interprocess communications.")
 (define-public jq
   (package
     (name "jq")
-    (version "1.8.1")
+    (version "1.8.2")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "https://github.com/jqlang/jq"
-                           "/releases/download/jq-" version
-                           "/jq-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jqlang/jq")
+             (commit (string-append "jq-" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1c3yhg537p0ilc4c57vz7sggp57n1ahyp432j3ai3jyf55qlxrib"))
+        (base32 "1m798zky0s4smpf4jxl5g0ndg8ybd9f6ca8vhld4yma1ga7r71vk"))
        (modules '((guix build utils)))
        (snippet
-        ;; Remove bundled onigurama.
-        '(delete-file-recursively "vendor/oniguruma"))))
+        #~(begin
+            (delete-file "jq.1.prebuilt")
+            (delete-file "tests/man.test")
+            (delete-file "tests/manonig.test")
+            ;; TODO: unbundle decnumber, which is maintained in GCC.
+            ;; Remove bundled onigurama.
+            (delete-file-recursively "vendor/oniguruma")
+            (substitute* "Makefile.am"
+              (("SUBDIRS = vendor/oniguruma") ""))))))
     (arguments
-     (if (or (target-x86-32?)
-             (target-arm32?))
-         ;; requires 64bit time_t
-         (list #:make-flags #~'("XFAIL_TESTS=tests/optionaltest"))
-         '()))
+     (list #:configure-flags
+           #~'("--enable-docs" "--disable-static")
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'bootstrap 'unrequire-git-and-pipenv
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (substitute* "configure.ac"
+                     (("^m4_define\\(\\[jq_version\\], .*\\)")
+                      (simple-format #f "m4_define([jq_version], [~a])"
+                        #$(package-version this-package))))
+                   ;; configure tries to launch $PIPENV.
+                   (setenv "PIPENV" "true")
+                   (substitute* "Makefile.am"
+                     (("\\$\\(PIPENV\\) run python (.*\\.py)" all prog)
+                      ;; Schema validation requires python-jsonschema,
+                      ;; which transitively depends on rustc.
+                      ;; Since jq is a transitive dependency of guix,
+                      ;; skipping this static analysis helps
+                      ;; with its bootstrapping cost.
+                      (if (string=? prog "validate_manual_schema.py")
+                          "true"
+                          (string-append "python3 " prog)))))))))
     (inputs
      (list oniguruma))
     (native-inputs
-     (append
-       ;; TODO: fix gems to generate documentation
-       ;(list ruby bundler)
-       (list tzdata-for-tests)  ; needed for tests
+     (cons*
+       autoconf
+       automake
+       libtool
+       ;; Docs dependencies:
+       python
+       python-lxml
+       python-markdown
+       python-pyyaml
+       ;; Test dependencies:
+       tzdata-for-tests
        (if (member (%current-system)
                    (package-supported-systems valgrind/pinned))
          (list valgrind/pinned)
          '())))
     (build-system gnu-build-system)
-    (home-page "https://jqlang.github.io/jq/")
+    (home-page "https://jqlang.org")
     (synopsis "Command-line JSON processor")
     (description "jq is like sed for JSON data – you can use it to slice and
 filter and map and transform structured data with the same ease that sed, awk,
@@ -6149,10 +6181,9 @@ grep and friends let you play with text.  It is written in portable C.  jq can
 mangle the data format that you have into the one that you want with very
 little effort, and the program to do so is often shorter and simpler than
 you'd expect.")
-    (license (list license:expat license:cc-by3.0))
-    ;; Both those CVEs are actually fixed in version 1.7.1.
-    (properties `((lint-hidden-cve . ("CVE-2023-50246"
-                                      "CVE-2023-50268"))))))
+    (license (list license:cc-by3.0     ;docs
+                   license:x11          ;vendor/decNumber
+                   license:expat))))    ;rest
 
 (define-public go-jqp
   (package
