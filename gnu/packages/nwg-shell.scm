@@ -232,3 +232,80 @@ compositors.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public nwg-menu
+  (package
+    (name "nwg-menu")
+    (version "0.1.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-menu")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "19z29v3iym9z0cpw2bhgvc2l5v0x6jgihvrri8ib78ghfgs7rwyx"))
+       (modules '((guix build utils)))
+       ;; Replace systemd commands with elogind commands.
+       (snippet
+        '(substitute* "main.go"
+           (("systemctl ((-i |)poweroff|reboot|suspend)" _ arg)
+            (string-append "loginctl " arg))))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:import-path "github.com/nwg-piotr/nwg-menu"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/nwg-menu")
+                (substitute* "main.go"
+                  (("\\/usr(\\/share\\/nwg-menu)" _ suffix)
+                   (string-append #$output suffix)))
+                (substitute* "tools.go"
+                  (("\\/usr\\/bin\\/env") (search-input-file inputs "/bin/env"))
+                  (("\\/usr\\/share") (string-append #$output "/share"))))))
+          (add-after 'install 'install-data
+            (lambda _
+              (mkdir-p (string-append #$output "/share/nwg-menu"))
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/nwg-menu")
+                (copy-recursively "desktop-directories"
+                                  (string-append #$output "/share/nwg-menu/"
+                                                 "desktop-directories"))
+                (install-file "menu-start.css"
+                              (string-append #$output "/share/nwg-menu"))
+                (install-file "README.md"
+                              (string-append #$output
+                                             "/share/doc/nwg-menu")))))
+
+          (add-after 'install 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-menu")
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (native-inputs
+     (list gobject-introspection
+           go-github-com-allan-simon-go-singleinstance
+           go-github-com-dlasky-gotk3-layershell
+           go-github-com-gotk3-gotk3
+           go-github-com-joshuarubin-go-sway
+           go-github-com-sirupsen-logrus
+           pkg-config))
+    (inputs
+     (list bash-minimal
+           coreutils-minimal
+           gtk+
+           gtk-layer-shell))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/nwg-menu")
+    (synopsis "MenuStart plugin to nwg-panel")
+    (description
+     "nwg-menu provides the MenuStart plugin to nwg-panel.  It also may be used
+standalone, however, with a little help from command line arguments.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
