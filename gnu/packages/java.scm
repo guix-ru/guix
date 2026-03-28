@@ -3712,7 +3712,13 @@ sharing common test data, and test runners for running tests.")
      `(#:jar-name "junitparams.jar"
        #:source-dir "src/main/java"
        #:test-dir "src/test"
-       #:test-exclude (list "**/SuperclassTest.java")))
+       #:test-exclude (list
+                        ;; Abstract class: no tests
+                        "**/SuperclassTest.java"
+                        ;; Incompatible tests with junit 4.13.2
+                        "**/BeforeAfterClassTest.java"
+                        "**/FilterableTest.java"
+                        "**/RulesTest.java")))
     (inputs
      (list java-junit))
     (native-inputs
