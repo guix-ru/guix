@@ -9357,7 +9357,6 @@ VCF.")
            zlib))
     (native-inputs
      `(("ant-apache-bcel" ,ant-apache-bcel)
-       ("ant-junit" ,ant-junit)
        ("java-testng" ,java-testng)
        ("java-commons-bcel" ,java-commons-bcel)
        ("java-jcommander" ,java-jcommander)

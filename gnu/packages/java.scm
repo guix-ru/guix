@@ -2154,34 +2154,8 @@ build process and its dependencies, whereas Make uses Makefile format.")
      (modify-inputs (package-inputs ant/java8)
        (prepend java-commons-bcel)))))
 
-(define-public ant-junit
-  (package
-    (inherit ant/java8)
-    (name "ant-junit")
-    (arguments
-     (substitute-keyword-arguments (package-arguments ant/java8)
-       ((#:phases phases)
-        #~(modify-phases #$phases
-            (add-after 'unpack 'link-junit
-              (lambda* (#:key inputs #:allow-other-keys)
-                (for-each (lambda (file)
-                            (symlink file
-                                     (string-append "lib/optional/"
-                                                    (basename file))))
-                          (find-files (assoc-ref inputs "java-junit")
-                                      "\\.jar$"))))
-            (add-after 'build 'install
-              (lambda _
-                (let ((share (string-append #$output "/share/java"))
-                      (bin   (string-append #$output "/bin"))
-                      (lib   (string-append #$output "/lib")))
-                  (mkdir-p share)
-                  (install-file (string-append lib "/ant-junit.jar") share)
-                  (delete-file-recursively bin)
-                  (delete-file-recursively lib))))))))
-    (inputs
-     (modify-inputs (package-inputs ant/java8)
-       (prepend java-junit)))))
+(define-deprecated-package ant-junit
+  ant/java8)
 
 (define-public libantlr3c
   (package
