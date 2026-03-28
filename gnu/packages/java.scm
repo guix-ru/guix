@@ -2067,108 +2067,65 @@ build process and its dependencies, whereas Make uses Makefile format.")
               (sha256
                (base32
                 "1xy30f1w5gaqk6g3f0vw7ygix4rb6032qkcw42y4z8wd9jihgygd"))))
-    ;; XXX: we do this to avoid a rebuild.  This mess will be cleaned up
-    ;; later.
     (arguments
-     (substitute-keyword-arguments
-         `(#:modules ((srfi srfi-1)
-                      (guix build gnu-build-system)
-                      (guix build utils))
-           #:tests? #f                  ; no "check" target
-           #:phases
-           (modify-phases %standard-phases
-             (delete 'bootstrap)
-             (delete 'configure)
-             (add-before 'build 'define-java-environment-variables
-               (lambda* (#:key inputs #:allow-other-keys)
-                 ;; First, set environment variables (eases debugging on -K).
-                 (setenv "JAVA_HOME" (assoc-ref inputs "jamvm"))
-                 (setenv "JAVACMD" (search-input-file inputs "/bin/jamvm"))
-                 (setenv "JAVAC" (search-input-file inputs "/bin/jikes"))
-                 (setenv "CLASSPATH" (search-input-file inputs "/lib/rt.jar"))))
-             (replace 'build
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 ;; Ant complains if this file doesn't exist.
-                 (setenv "HOME" "/tmp")
-                 (with-output-to-file "/tmp/.ant.properties"
-                   (lambda _ (display "")))
+      `(#:modules ((srfi srfi-1)
+                   (guix build gnu-build-system)
+                   (guix build utils))
+        #:tests? #f                  ; no "check" target
+        #:phases
+        (modify-phases %standard-phases
+          (delete 'bootstrap)
+          (delete 'configure)
+          (add-after 'unpack 'remove-scripts
+            ;; Remove bat / cmd scripts for DOS as well as the antRun and runant
+            ;; wrappers.
+            (lambda _
+              (for-each delete-file
+                        (find-files "src/script"
+                                    "(.*\\.(bat|cmd)|runant.*|antRun.*)"))))
+          (replace 'build
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (setenv "JAVA_HOME" (assoc-ref inputs "jdk"))
 
-                 ;; Use jikes instead of javac for <javac ...> tags in build.xml
-                 (setenv "ANT_OPTS" "-Dbuild.compiler=jikes")
-
-                 ;; jikes produces lots of warnings, but they are not very
-                 ;; interesting, so we silence them.
-                 (setenv "$BOOTJAVAC_OPTS" "-nowarn")
-
-                 ;; Without these JamVM options the build may freeze.
-                 (substitute* "bootstrap.sh"
-                   (("^\"\\$\\{JAVACMD\\}\" " m)
-                    ,@(if (string-prefix? "armhf" (or (%current-system)
-                                                      (%current-target-system)))
-                          `((string-append m "-Xnocompact "))
-                          `((string-append m "-Xnocompact -Xnoinlining ")))))
-
-                 ;; Disable tests because we are bootstrapping and thus don't have
-                 ;; any of the dependencies required to build and run the tests.
-                 (substitute* "build.xml"
-                   (("depends=\"jars,test-jar\"") "depends=\"jars\""))
-                 (invoke "bash" "bootstrap.sh"
-                         (string-append "-Ddist.dir="
-                                        (assoc-ref outputs "out")))))
-             (add-after 'build 'strip-jar-timestamps ;based on ant-build-system
-               (lambda* (#:key outputs #:allow-other-keys)
-                 (define (repack-archive jar)
-                   (let* ((dir (mkdtemp "jar-contents.XXXXXX"))
-                          (manifest (string-append dir "/META-INF/MANIFESTS.MF")))
-                     (with-directory-excursion dir
-                       (invoke "unzip" jar))
-                     (delete-file jar)
-                     ;; XXX: copied from (gnu build install)
-                     (for-each (lambda (file)
-                                 (let ((s (lstat file)))
-                                   (unless (eq? (stat:type s) 'symlink)
-                                     (utime file  0 0 0 0))))
-                               (find-files dir #:directories? #t))
-                     ;; It is important that the manifest appears first.
-                     (with-directory-excursion dir
-                       (let* ((files (find-files "." ".*" #:directories? #t))
-                              ;; To ensure that the reference scanner can
-                              ;; detect all store references in the jars
-                              ;; we disable compression with the "-0" option.
-                              (command (if (file-exists? manifest)
-                                           `("zip" "-0" "-X" ,jar ,manifest
-                                             ,@files)
-                                           `("zip" "-0" "-X" ,jar ,@files))))
-                         (apply invoke command)))))
-                 (for-each repack-archive
-                           (find-files
-                            (string-append (assoc-ref %outputs "out") "/lib")
-                            "\\.jar$"))))
-             (delete 'install)))
-       ((#:phases phases)
-        `(modify-phases ,phases
-           (delete 'define-java-environment-variables)
-           (add-after 'unpack 'remove-scripts
-             ;; Remove bat / cmd scripts for DOS as well as the antRun and runant
-             ;; wrappers.
-             (lambda _
-               (for-each delete-file
-                         (find-files "src/script"
-                                     "(.*\\.(bat|cmd)|runant.*|antRun.*)"))
-               #t))
-           (replace 'build
-             (lambda* (#:key inputs outputs #:allow-other-keys)
-               (setenv "JAVA_HOME" (assoc-ref inputs "jdk"))
-
-               ;; Disable tests to avoid dependency on hamcrest-core, which needs
-               ;; Ant to build.  This is necessary in addition to disabling the
-               ;; "check" phase, because the dependency on "test-jar" would always
-               ;; result in the tests to be run.
-               (substitute* "build.xml"
-                 (("depends=\"jars,test-jar") "depends=\"jars"))
-               (invoke "bash" "bootstrap.sh"
-                       (string-append "-Ddist.dir="
-                                      (assoc-ref outputs "out")))))))))
+              ;; Disable tests to avoid dependency on hamcrest-core, which needs
+              ;; Ant to build.  This is necessary in addition to disabling the
+              ;; "check" phase, because the dependency on "test-jar" would always
+              ;; result in the tests to be run.
+              (substitute* "build.xml"
+                (("depends=\"jars,test-jar") "depends=\"jars"))
+              (invoke "bash" "bootstrap.sh"
+                      (string-append "-Ddist.dir="
+                                     (assoc-ref outputs "out")))))
+          (add-after 'build 'strip-jar-timestamps ;based on ant-build-system
+            (lambda* (#:key outputs #:allow-other-keys)
+              (define (repack-archive jar)
+                (let* ((dir (mkdtemp "jar-contents.XXXXXX"))
+                       (manifest (string-append dir "/META-INF/MANIFESTS.MF")))
+                  (with-directory-excursion dir
+                    (invoke "unzip" jar))
+                  (delete-file jar)
+                  ;; XXX: copied from (gnu build install)
+                  (for-each (lambda (file)
+                              (let ((s (lstat file)))
+                                (unless (eq? (stat:type s) 'symlink)
+                                  (utime file  0 0 0 0))))
+                            (find-files dir #:directories? #t))
+                  ;; It is important that the manifest appears first.
+                  (with-directory-excursion dir
+                    (let* ((files (find-files "." ".*" #:directories? #t))
+                           ;; To ensure that the reference scanner can
+                           ;; detect all store references in the jars
+                           ;; we disable compression with the "-0" option.
+                           (command (if (file-exists? manifest)
+                                        `("zip" "-0" "-X" ,jar ,manifest
+                                          ,@files)
+                                        `("zip" "-0" "-X" ,jar ,@files))))
+                      (apply invoke command)))))
+              (for-each repack-archive
+                        (find-files
+                         (string-append (assoc-ref %outputs "out") "/lib")
+                         "\\.jar$"))))
+          (delete 'install))))
     (native-inputs
      `(("jdk" ,icedtea-7 "jdk")
        ("zip" ,zip)
