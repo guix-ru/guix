@@ -2238,7 +2238,8 @@ build process and its dependencies, whereas Make uses Makefile format.")
 ;; The 1.9.x series is the last that can be built with GCJ.  The 1.10.x series
 ;; requires Java 8.
 (define-public ant
-  (package (inherit ant/java8)
+  (package
+    (name "ant")
     (version "1.9.15")
     (source (origin
               (method url-fetch)
@@ -2247,6 +2248,7 @@ build process and its dependencies, whereas Make uses Makefile format.")
               (sha256
                (base32
                 "1xy30f1w5gaqk6g3f0vw7ygix4rb6032qkcw42y4z8wd9jihgygd"))))
+    (build-system gnu-build-system)
     (arguments
       `(#:modules ((srfi srfi-1)
                    (guix build gnu-build-system)
@@ -2309,7 +2311,15 @@ build process and its dependencies, whereas Make uses Makefile format.")
     (native-inputs
      `(("jdk" ,icedtea-7 "jdk")
        ("zip" ,zip)
-       ("unzip" ,unzip)))))
+       ("unzip" ,unzip)))
+    (home-page "https://ant.apache.org")
+    (synopsis "Build tool for Java")
+    (description
+     "Ant is a platform-independent build tool for Java.  It is similar to
+make but is implemented using the Java language, requires the Java platform,
+and is best suited to building Java projects.  Ant uses XML to describe the
+build process and its dependencies, whereas Make uses Makefile format.")
+    (license license:asl2.0)))
 
 (define-public ant-apache-bcel
   (package
