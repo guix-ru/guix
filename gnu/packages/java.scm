@@ -3294,6 +3294,9 @@ is implemented.")
      `(;; Tests require junit
        #:tests? #f
        #:jar-name "qdox.jar"
+       ;; Explicitely use an ant version that includes the junit tasks, since
+       ;; it is a dependency of junit.
+       #:ant ,ant
        #:phases
        (modify-phases %standard-phases
          (replace 'unpack
@@ -3402,6 +3405,9 @@ documentation tools.")
      `(;; Tests require junit, which ultimately depends on this package.
        #:tests? #f
        #:build-target "jar"
+       ;; Explicitely use an ant version that includes the junit tasks, since
+       ;; it is a dependency of junit.
+       #:ant ,ant
        #:phases
        (modify-phases %standard-phases
          (add-before 'build 'do-not-use-bundled-asm
@@ -3500,6 +3506,9 @@ testing frameworks, mocking libraries and UI validation rules.")
     (build-system ant-build-system)
     (arguments
      `(#:tests? #f ; Tests require junit
+       ;; Explicitely use an ant version that includes the junit tasks, since
+       ;; it is a dependency of junit.
+       #:ant ,ant
        #:modules ((guix build ant-build-system)
                   (guix build java-utils)
                   (guix build utils)
@@ -3585,6 +3594,9 @@ testing frameworks, mocking libraries and UI validation rules.")
     (native-inputs '())
     (arguments
      `(#:tests? #f
+       ;; Explicitely use an ant version that includes the junit tasks, since
+       ;; it is a dependency of junit.
+       #:ant ,ant
        #:phases
        (modify-phases %standard-phases
          (delete 'configure)
@@ -3647,6 +3659,9 @@ testing frameworks, mocking libraries and UI validation rules.")
      `(#:jar-name "junit.jar"
        #:source-dir "src/main/java"
        #:test-dir "src/test"
+       ;; Explicitely use an ant version that includes the junit tasks, so
+       ;; we can run the tests.
+       #:ant ,ant
        #:test-exclude (list "**/SimpleTest.java" "**/StackTracesTest.java"
                             "**/RuleChainTest.java" "**/TestWatchmanTest.java")
        #:phases
@@ -5156,6 +5171,9 @@ complex transformations and code analysis tools.")
     (build-system ant-build-system)
     (arguments
      `(#:tests? #f
+       ;; Explicitely use an ant version that includes the junit tasks, since
+       ;; it is a dependency of junit.
+       #:ant ,ant
        #:phases
        (modify-phases %standard-phases
          (delete 'unpack)
@@ -5177,6 +5195,9 @@ including java-asm.")
     (properties '((hidden? . #t)))
     (arguments
      (substitute-keyword-arguments (package-arguments java-asm)
+       ;; Explicitely use an ant version that includes the junit tasks, since
+       ;; it is a dependency of junit.
+       ((#:ant _ ant) ant)
        ((#:tests? _) #f)))
     (native-inputs `())))
 
