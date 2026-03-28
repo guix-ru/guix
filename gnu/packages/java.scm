@@ -3648,7 +3648,7 @@ testing frameworks, mocking libraries and UI validation rules.")
 (define-public java-junit
   (package
     (name "java-junit")
-    (version "4.12")
+    (version "4.13.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3657,7 +3657,7 @@ testing frameworks, mocking libraries and UI validation rules.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1j8avi91px1z8rjc89cfikwrvfifdmmsarwiyrcnr59ynvpz0v8h"))
+                "1r7k4zzscc8019np3is3bzfigw8fxd6s3259cbhzzh02q6d5p9h3"))
               (modules '((guix build utils)))
               (snippet
                '(begin
