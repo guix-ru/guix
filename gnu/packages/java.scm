@@ -1980,15 +1980,12 @@ OpenJDK.")
               (snippet
                '(begin
                   (for-each delete-file
-                            (find-files "lib/optional" "\\.jar$"))
-                  #t))))
-    (build-system gnu-build-system)
+                            (find-files "lib/optional" "\\.jar$"))))))
+    (build-system ant-build-system)
     (arguments
      (list
-      #:modules '((srfi srfi-1)
-                  (guix build gnu-build-system)
-                  (guix build utils))
-      #:tests? #f                       ;no "check" target
+      #:ant ant
+      #:test-target "test"
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'remove-scripts
@@ -1998,54 +1995,41 @@ OpenJDK.")
               (for-each delete-file
                         (find-files "src/script"
                                     "(.*\\.(bat|cmd)|runant.*|antRun.*)"))))
+          (add-after 'unpack 'link-test-dependencies
+            (lambda* (#:key inputs #:allow-other-keys)
+              (for-each (lambda (file)
+                          (symlink file
+                                   (string-append "lib/optional/"
+                                                  (basename file))))
+                        (append
+                          (find-files (assoc-ref inputs "java-hamcrest-core")
+                                      "\\.jar$")
+                          (find-files (assoc-ref inputs "java-hamcrest-library")
+                                      "\\.jar$")
+                          (find-files (assoc-ref inputs "java-junit")
+                                      "\\.jar$")))))
+          (add-before 'build 'fix-test-failures
+            (lambda _
+              ;; Failure because the directory does not exist
+              (substitute* "src/etc/testcases/taskdefs/exec/exec-with-redirector.xml"
+                (("/usr/bin") (getcwd)))
+              ;; Failure because it cannot read root's name in the build
+              ;; container
+              (delete-file "src/tests/junit/org/apache/tools/ant/types/selectors/OwnedBySelectorTest.java")
+              ;; Cause timestamp issue when trying to rollback time by a few
+              ;; seconds.
+              (for-each (lambda (file) (utime file 5000))
+                        (find-files "src/etc/testcases/taskdefs" "" #:directories? #t))))
           (delete 'bootstrap)
           (delete 'configure)
           (replace 'build
             (lambda* (#:key inputs #:allow-other-keys)
               (setenv "JAVA_HOME" (assoc-ref inputs "jdk"))
-
-              ;; Disable tests to avoid dependency on hamcrest-core, which needs
-              ;; Ant to build.  This is necessary in addition to disabling the
-              ;; "check" phase, because the dependency on "test-jar" would always
-              ;; result in the tests to be run.
-              (substitute* "build.xml"
-                (("depends=\"jars,test-jar") "depends=\"jars"))
               (invoke "bash" "bootstrap.sh"
                       (string-append "-Ddist.dir=" #$output))))
-          (add-after 'build 'strip-jar-timestamps ;based on ant-build-system
-            (lambda _
-              (define (repack-archive jar)
-                (let* ((dir (mkdtemp "jar-contents.XXXXXX"))
-                       (manifest (string-append dir "/META-INF/MANIFESTS.MF")))
-                  (with-directory-excursion dir
-                    (invoke "unzip" jar))
-                  (delete-file jar)
-                  ;; XXX: copied from (gnu build install)
-                  (for-each (lambda (file)
-                              (let ((s (lstat file)))
-                                (unless (eq? (stat:type s) 'symlink)
-                                  (utime file  0 0 0 0))))
-                            (find-files dir #:directories? #t))
-                  ;; It is important that the manifest appears first.
-                  (with-directory-excursion dir
-                    (let* ((files (find-files "." ".*" #:directories? #t))
-                           ;; To ensure that the reference scanner can
-                           ;; detect all store references in the jars
-                           ;; we disable compression with the "-0" option.
-                           (command (if (file-exists? manifest)
-                                        `("zip" "-0" "-X" ,jar ,manifest
-                                          ,@files)
-                                        `("zip" "-0" "-X" ,jar ,@files))))
-                      (apply invoke command)))))
-              (for-each repack-archive
-                        (find-files
-                         (string-append #$output "/lib")
-                         "\\.jar$"))))
           (delete 'install))))
-    (native-inputs
-     `(("jdk" ,icedtea-8 "jdk")
-       ("zip" ,zip)
-       ("unzip" ,unzip)))
+    (inputs
+     (list java-junit java-hamcrest-core java-hamcrest-library))
     (home-page "https://ant.apache.org")
     (synopsis "Build tool for Java")
     (description
