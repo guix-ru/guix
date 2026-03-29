@@ -1083,11 +1083,17 @@ tst_qt_cmake_create.cpp"
 
                        ;; See https://bugreports.qt.io/browse/QTBUG-113371
                        ;; Adding glibc-utf8-locales to native-inpus is no help.
-                       ;; TODO: when core-updates is merged, check again.
                        "tst_selftests"
 
-                       ;; The 'tst_qsqlthread' test sometimes fails.
-                       "tst_qsqlthread"
+                       ;; The qsqldatabase test is flaky (see:
+                       ;; <https://qt-project.atlassian.net/browse/QTBUG-145385>).
+                       "tst_qsqldatabase"
+
+                       ;; The 'tst_qtimer' test has a propensity to hang and
+                       ;; fail (see:
+                       ;; <https://qt-project.atlassian.net/browse/QTBUG-145261>).
+                       "tst_qtimer"
+                       "tst_qtimer_no_glib"
 
                        ;; The 'tst_qthread' test is also flaky, despite the
                        ;; patch applied that promised to fix it.
