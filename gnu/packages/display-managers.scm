@@ -279,9 +279,9 @@ Guix's logo.  Based on Arch linux's archlinux-simplyblack theme.")
                      (("QtVersion=6")
                       "QtVersion=5"))))))))
 
-(define-public chili-sddm-theme
+(define-public chili-sddm-theme-qt5
   (package
-    (name "chili-sddm-theme")
+    (name "chili-sddm-theme-qt5")
     (version "0.1.5")
     (source (origin
               (method git-fetch)
@@ -308,6 +308,9 @@ Guix's logo.  Based on Arch linux's archlinux-simplyblack theme.")
     (description "Chili reduces all the clutter and leaves you with a clean,
 easy to use, login interface with a modern yet classy touch.")
     (license license:gpl3+)))
+
+;; TODO: Remove after 2027-01.
+(define-deprecated-package chili-sddm-theme chili-sddm-theme-qt5)
 
 (define-public sugar-dark-sddm-theme
   (package
