@@ -346,9 +346,9 @@ experience for your users, your family and yourself")
 ;; TODO: Remove after 2027-01.
 (define-deprecated-package sugar-dark-sddm-theme sugar-dark-sddm-theme-qt5)
 
-(define-public sugar-light-sddm-theme
+(define-public sugar-light-sddm-theme-qt5
   (package
-    (name "sugar-light-sddm-theme")
+    (name "sugar-light-sddm-theme-qt5")
     (version "1.0")
     (source (origin
               (method git-fetch)
@@ -376,6 +376,9 @@ experience for your users, your family and yourself")
 probably cause you diabetes just from looking at it.  Sweeten the login
 experience for your users, your family and yourself")
     (license license:gpl3+)))
+
+;; TODO: Remove after 2027-01.
+(define-deprecated-package sugar-light-sddm-theme sugar-light-sddm-theme-qt5)
 
 (define-public where-is-my-sddm-theme
     (package
