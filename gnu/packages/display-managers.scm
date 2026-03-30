@@ -312,9 +312,9 @@ easy to use, login interface with a modern yet classy touch.")
 ;; TODO: Remove after 2027-01.
 (define-deprecated-package chili-sddm-theme chili-sddm-theme-qt5)
 
-(define-public sugar-dark-sddm-theme
+(define-public sugar-dark-sddm-theme-qt5
   (package
-    (name "sugar-dark-sddm-theme")
+    (name "sugar-dark-sddm-theme-qt5")
     (version "1.2")
     (source (origin
               (method git-fetch)
@@ -342,6 +342,9 @@ easy to use, login interface with a modern yet classy touch.")
 probably cause you diabetes just from looking at it.  Sweeten the login
 experience for your users, your family and yourself")
     (license license:gpl3+)))
+
+;; TODO: Remove after 2027-01.
+(define-deprecated-package sugar-dark-sddm-theme sugar-dark-sddm-theme-qt5)
 
 (define-public sugar-light-sddm-theme
   (package
