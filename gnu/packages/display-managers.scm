@@ -31,6 +31,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages display-managers)
+  #:use-module (guix deprecation)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -170,11 +171,11 @@ to create smooth, animated user interfaces.")
               (replace "qtwayland" qtwayland-5)
               (append qtgraphicaleffects qtquickcontrols-5 qtquickcontrols2-5)))))
 
-(define-public abstractdark-sddm-theme
+(define-public abstractdark-sddm-theme-qt5
   (let ((commit "e817d4b27981080cd3b398fe928619ffa16c52e7")
         (revision "0"))
     (package
-      (name "abstractdark-sddm-theme")
+      (name "abstractdark-sddm-theme-qt5")
       (version (git-version "0.0.0" revision commit))
       (source (origin
                 (method git-fetch)
@@ -194,6 +195,9 @@ to create smooth, animated user interfaces.")
        "This package provides a minimalistic dark theme for SDDM, black
 background with abstract shapes.  Inspired by solarized-sddm-theme.")
       (license license:gpl3+))))
+
+;; TODO: Remove after 2027-01.
+(define-deprecated-package abstractdark-sddm-theme abstractdark-sddm-theme-qt5)
 
 (define-public dexy-color-sddm-theme
   ;; No upstream releases or tags
