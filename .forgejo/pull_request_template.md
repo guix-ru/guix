@@ -52,7 +52,7 @@ total: ...
   - [ ] Synopsis and description are written in conformance with [the guidelines](https://guix.gnu.org/manual/devel/en/html_node/Synopses-and-Descriptions.html).
 
 - [ ] Commit messages follow [the "ChangeLog" style](https://www.gnu.org/prep/standards/html_node/Change-Logs.html).
-- [ ] The change doesn't break `guix pull` (`guix pull --url=/path/to/your/checkout --profile=/tmp/guix.master --disable-authentication`).
+- [ ] The change doesn't break `guix pull` (`guix pull --url=/path/to/your/checkout --profile=/tmp/guix.master --no-channel-files --disable-authentication`).
 
 - Successfully cross-compiled to the following target(s) (this is optional):
   - [ ] x86_64-linux-gnu
