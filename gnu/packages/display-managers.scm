@@ -199,12 +199,12 @@ background with abstract shapes.  Inspired by solarized-sddm-theme.")
 ;; TODO: Remove after 2027-01.
 (define-deprecated-package abstractdark-sddm-theme abstractdark-sddm-theme-qt5)
 
-(define-public dexy-color-sddm-theme
+(define-public dexy-color-sddm-theme-qt5
   ;; No upstream releases or tags
   (let ((commit "4785d3b80d725cf55cecd7b27181f77151c4e3e2")
         (revision "0"))
     (package
-      (name "dexy-color-sddm-theme")
+      (name "dexy-color-sddm-theme-qt5")
       (version (git-version "0.0.0" revision commit))
       (source (origin
                 (method git-fetch)
@@ -225,6 +225,9 @@ background with abstract shapes.  Inspired by solarized-sddm-theme.")
        "This package provides a minimalistic and modern SDDM theme with a
 blurred background.")
       (license license:gpl3+))))
+
+;; TODO: Remove after 2027-01.
+(define-deprecated-package dexy-color-sddm-theme dexy-color-sddm-theme-qt5)
 
 (define-public guix-simplyblack-sddm-theme
   (package
