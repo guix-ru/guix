@@ -507,6 +507,9 @@ Makefile, simplifying the entire process for the developer.")
      (list ;; Libltdl is provided as a separate package, so don't install it here.
            #:configure-flags #~'("--disable-ltdl-install")
 
+           ;; The 'libtool' script refers to the toolchain; tolerate it.
+           #:disallowed-references '()
+
            ;; XXX: There are test failures on mips64el-linux starting from 2.4.4:
            ;; <http://hydra.gnu.org/build/181662>.
            ;; Also, do not run tests when cross compiling
