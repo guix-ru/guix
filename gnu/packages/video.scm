@@ -5260,18 +5260,16 @@ specifications.")
 (define-public libaacs
   (package
     (name "libaacs")
-    (version "0.11.0")
+    (version "0.11.1")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://ftp.videolan.org/pub/videolan/libaacs/"
                            version "/libaacs-" version ".tar.bz2"))
        (sha256
-        (base32 "11skjqjlldmbjkyxdcz4fmcn6y4p95r1xagbcnjy4ndnzf0l723d"))))
-    (inputs
-     (list libgcrypt))
-    (native-inputs
-     (list bison flex))
+        (base32 "0f8ax9dp49mrm1484bl2df659b34xyrjmngzmvvpg2n9wkms12m8"))))
+    (inputs (list libgcrypt))
+    (native-inputs (list bison flex))
     (build-system gnu-build-system)
     (home-page "https://www.videolan.org/developers/libaacs.html")
     (synopsis "Library for decrypting certain Blu-Ray discs")
