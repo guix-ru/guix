@@ -3959,7 +3959,7 @@ $(libdir)/guile/@GUILE_EFFECTIVE_VERSION@/site-ccache\n")))))))
      (list autoconf
            automake
            texinfo
-           gettext-minimal
+           gettext-minimal-0.23              ;for 'AC_LIB_LINKFLAGS_FROM_LIBS'
            guile-3.0
            pkg-config))
     (inputs
