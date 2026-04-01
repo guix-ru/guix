@@ -282,7 +282,7 @@ across a broad spectrum of applications.")
               (patches
                  (list (boost-patch
                         "0001-unordered-fix-copy-assign.patch" version
-                        "09j61m5xh7099k5na9i43x5rra51znf7vm2nyh89yqpizcll9q66")))
+                        "0l520lqh2vxdlyzvpki6hy2ylqimag8v18n2sdbmliifxiiha4gl")))
               (patch-flags '("-p2"))
               (sha256
                (base32
