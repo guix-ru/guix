@@ -2990,7 +2990,7 @@ Format) file format decoder and encoder.")
 (define-public libjxl
   (package
     (name "libjxl")
-    (version "0.11.1")
+    (version "0.11.2")
     (outputs (list "out" "pixbuf-loader"))
     (source
      (origin
@@ -3001,7 +3001,7 @@ Format) file format decoder and encoder.")
              (recursive? #t)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1wfxzrhj8a19z6x47ib1qbmgyg56jsxjs955xcvqhdkrx8l2271r"))
+        (base32 "1c7d0mlxmmjby00hzgwqfyr6nb6lqcgcjsqcdmg2l10rmxiw33rg"))
        (modules '((guix build utils)))
        (snippet
         ;; Delete the bundles that will not be used.
