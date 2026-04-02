@@ -2071,7 +2071,7 @@ OpenJDK.")
     (license license:gpl2+)))
 
 
-(define-public ant/java8
+(define-public ant
   (package
     (name "ant")
     (version "1.10.17")
@@ -2090,7 +2090,7 @@ OpenJDK.")
     (build-system ant-build-system)
     (arguments
      (list
-      #:ant ant
+      #:ant ant/java7
       #:test-target "test"
       #:phases
       #~(modify-phases %standard-phases
@@ -2240,7 +2240,7 @@ build process and its dependencies, whereas Make uses Makefile format.")
 
 ;; The 1.9.x series is the last that can be built with GCJ.  The 1.10.x series
 ;; requires Java 8.
-(define-public ant
+(define-public ant/java7
   (package
     (name "ant")
     (version "1.9.15")
@@ -2326,10 +2326,10 @@ build process and its dependencies, whereas Make uses Makefile format.")
 
 (define-public ant-apache-bcel
   (package
-    (inherit ant/java8)
+    (inherit ant)
     (name "ant-apache-bcel")
     (arguments
-     (substitute-keyword-arguments (package-arguments ant/java8)
+     (substitute-keyword-arguments (package-arguments ant)
        ((#:phases phases)
         #~(modify-phases #$phases
             (add-after 'unpack 'link-bcel
@@ -2350,11 +2350,11 @@ build process and its dependencies, whereas Make uses Makefile format.")
                   (delete-file-recursively bin)
                   (delete-file-recursively lib))))))))
     (inputs
-     (modify-inputs (package-inputs ant/java8)
+     (modify-inputs (package-inputs ant)
        (prepend java-commons-bcel)))))
 
 (define-deprecated-package ant-junit
-  ant/java8)
+  ant)
 
 (define-public libantlr3c
   (package
@@ -3613,7 +3613,7 @@ is implemented.")
        #:jar-name "qdox.jar"
        ;; Explicitely use an ant version that includes the junit tasks, since
        ;; it is a dependency of junit.
-       #:ant ,ant
+       #:ant ,ant/java7
        #:phases
        (modify-phases %standard-phases
          (replace 'unpack
@@ -3724,7 +3724,7 @@ documentation tools.")
        #:build-target "jar"
        ;; Explicitely use an ant version that includes the junit tasks, since
        ;; it is a dependency of junit.
-       #:ant ,ant
+       #:ant ,ant/java7
        #:phases
        (modify-phases %standard-phases
          (add-before 'build 'do-not-use-bundled-asm
@@ -3825,7 +3825,7 @@ testing frameworks, mocking libraries and UI validation rules.")
      `(#:tests? #f ; Tests require junit
        ;; Explicitely use an ant version that includes the junit tasks, since
        ;; it is a dependency of junit.
-       #:ant ,ant
+       #:ant ,ant/java7
        #:modules ((guix build ant-build-system)
                   (guix build java-utils)
                   (guix build utils)
@@ -3913,7 +3913,7 @@ testing frameworks, mocking libraries and UI validation rules.")
      `(#:tests? #f
        ;; Explicitely use an ant version that includes the junit tasks, since
        ;; it is a dependency of junit.
-       #:ant ,ant
+       #:ant ,ant/java7
        #:phases
        (modify-phases %standard-phases
          (delete 'configure)
@@ -3978,7 +3978,7 @@ testing frameworks, mocking libraries and UI validation rules.")
        #:test-dir "src/test"
        ;; Explicitely use an ant version that includes the junit tasks, so
        ;; we can run the tests.
-       #:ant ,ant
+       #:ant ,ant/java7
        #:test-exclude (list "**/SimpleTest.java" "**/StackTracesTest.java"
                             "**/RuleChainTest.java" "**/TestWatchmanTest.java")
        #:phases
@@ -5513,7 +5513,7 @@ complex transformations and code analysis tools.")
      `(#:tests? #f
        ;; Explicitely use an ant version that includes the junit tasks, since
        ;; it is a dependency of junit.
-       #:ant ,ant
+       #:ant ,ant/java7
        #:phases
        (modify-phases %standard-phases
          (delete 'unpack)
@@ -5537,7 +5537,7 @@ including java-asm.")
      (substitute-keyword-arguments (package-arguments java-asm)
        ;; Explicitely use an ant version that includes the junit tasks, since
        ;; it is a dependency of junit.
-       ((#:ant _ ant) ant)
+       ((#:ant _ ant/java7) ant/java7)
        ((#:tests? _) #f)))
     (native-inputs `())))
 
