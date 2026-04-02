@@ -412,7 +412,7 @@ similar to javadoc."))))
       (inherit base)
       (arguments
        `(;#:tests? #f;Requires spock-framework which is a circular dependency
-         #:ant ,ant/java8; ant is actually a dependency of this package, and we need 1.10
+         #:ant ,ant; ant is actually a dependency of this package, and we need 1.10
          ,@(substitute-keyword-arguments arguments
              ((#:phases phases)
               `(modify-phases ,phases
