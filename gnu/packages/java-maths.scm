@@ -75,7 +75,7 @@
     (inputs
      (list openblas))
     (native-inputs
-     `(("ant" ,ant)
+     `(("ant" ,ant/java7)
        ("ruby" ,ruby)                   ; for configure script
        ("gfortran" ,gfortran)
        ("jdk" ,icedtea "jdk")))

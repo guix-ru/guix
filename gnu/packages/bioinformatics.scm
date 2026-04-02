@@ -9283,7 +9283,7 @@ VCF.")
        ;; [testng] Exception in thread "main" java.lang.NoClassDefFoundError: com/beust/jcommander/ParameterException
        #:tests? #f
        #:jdk ,icedtea-8
-       #:ant ,ant/java8
+       #:ant ,ant
        ;; This is only used for tests.
        #:make-flags
        (list "-Dsamjdk.intel_deflater_so_path=lib/jni/libIntelDeflater.so")
@@ -9353,7 +9353,7 @@ VCF.")
      (list java-snappy-1
            java-commons-jexl-2
            java-cofoja
-           ant/java8                    ;for bzip2 support at runtime
+           ant                          ;for bzip2 support at runtime
            zlib))
     (native-inputs
      `(("ant-apache-bcel" ,ant-apache-bcel)

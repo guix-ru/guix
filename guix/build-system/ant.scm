@@ -52,7 +52,7 @@
 
 (define (default-ant)
   "Return the default Ant package, resolved lazily."
-  (@* (gnu packages java) ant/java8))
+  (@* (gnu packages java) ant))
 
 (define (default-zip)
   "Return the default ZIP package, resolved lazily."

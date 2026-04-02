@@ -341,7 +341,7 @@ runtime.")
        ("java-jgit" ,java-jgit-4.2)
        ("axoloti-runtime" ,axoloti-runtime)))
     (native-inputs
-     (list ant zip ; for repacking the jar
+     (list ant/java7 zip ; for repacking the jar
            unzip))
     (description
      "The Axoloti patcher offers a “patcher” environment similar to Pure Data
@@ -647,7 +647,7 @@ This package provides the runtime.")
        ("java-slf4j-api" ,java-slf4j-api)
        ("ksoloti-runtime" ,ksoloti-runtime)))
     (native-inputs
-     (list ant zip                      ;for repacking the jar
+     (list ant/java7 zip                      ;for repacking the jar
            unzip))
     (description
      "Ksoloti is an environment for generating and processing digital audio.
