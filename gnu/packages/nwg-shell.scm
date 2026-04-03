@@ -38,7 +38,8 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-xyz)
-  #:use-module (gnu packages wm))
+  #:use-module (gnu packages wm)
+  #:use-module (gnu packages xorg))
 
 (define-public nwg-shell-wallpapers
   (package
@@ -429,3 +430,74 @@ commands.
 This application is a part of the nwg-shell project.")
     (license (list license:gpl3
                    license:bsd-3)))) ;azote/colorthief.py
+
+(define-public nwg-look
+  (package
+    (name "nwg-look")
+    (version "1.0.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-look")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1z4hybdfd8d98hy8az7z580a0fx4laf0vfrknjnlpk6xss159mbh"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+       ;Tests fail due to a call having arguments but no formatting
+      ;; directives and wrong types of int and float64.
+      #:tests? #f
+      #:install-source? #f
+      #:import-path "github.com/nwg-piotr/nwg-look"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (substitute* "src/github.com/nwg-piotr/nwg-look/tools.go"
+                (("\\/usr\\/share") (string-append #$output "/share")))))
+          (add-after 'install 'install-data
+            (lambda _
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/nwg-look")
+                (install-file "stuff/main.glade"
+                              (string-append #$output "/share/nwg-look"))
+                (install-file "stuff/nwg-look.desktop"
+                              (string-append #$output "/share/applications"))
+                (install-file "stuff/nwg-look.svg"
+                              (string-append #$output "/share/pixmaps"))
+                (copy-recursively "langs"
+                                  (string-append #$output "/share/nwg-look/"
+                                                 "langs"))
+                (install-file "README.md"
+                              (string-append #$output
+                                             "/share/doc/nwg-look")))))
+          (add-after 'install 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-look")
+                `("PATH" ":" prefix
+                  (,(dirname (which "gsettings"))
+                   ,(dirname (which "xcur2png"))))
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (native-inputs
+     (list gobject-introspection
+           go-github-com-gotk3-gotk3
+           go-github-com-sirupsen-logrus
+           pkg-config))
+    (inputs
+     (list bash-minimal
+           coreutils-minimal
+           `(,glib "bin")    ;for 'gsettings'
+           gtk+
+           xcur2png))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/nwg-look")
+    (synopsis "GTK3 settings editor for wlroots environment")
+    (description
+     "nwg-look is a GTK3 settings editor, designed to work properly in
+wlroots-based Wayland environment.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
