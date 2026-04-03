@@ -39,6 +39,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages webkit)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages xorg))
 
@@ -567,4 +568,69 @@ This application is a part of the nwg-shell project.")
     (description
      "nwg-displays is an output management utility for sway and Hyprland Wayland
 compositor, inspired by wdisplays and wlay.")
+    (license license:expat)))
+
+(define-public nwg-readme-browser
+  (package
+    (name "nwg-readme-browser")
+    (version "0.1.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-readme-browser")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "039f8xdm2i2dyvhk8nw7z3pl552mfg7ncl2amsfqpnn8v6y6vd1q"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              ;; Set the default doc directory to the system doc directory.
+              (substitute* "nwg_readme_browser/main.py"
+                (("\\/usr") "/run/current-system/profile"))))
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (install-file "nwg-readme-browser.desktop"
+                            (string-append #$output "/share/applications"))
+              (install-file "nwg-readme-browser.svg"
+                            (string-append #$output "/share/pixmaps"))
+              (install-file "README.md"
+                            (string-append #$output
+                                           "/share/doc/nwg-readme-browser"))))
+          (add-after 'create-entrypoints 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-readme-browser")
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH"))))))
+          (add-before 'sanity-check 'check-setup
+            (lambda _
+              (setenv "HOME" (getcwd)))))))
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list adwaita-icon-theme
+           bash-minimal
+           gtk+
+           python-docutils
+           python-markdown2
+           python-pygobject
+           webkitgtk-for-gtk3))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/nwg-readme-browser")
+    (synopsis "WebKitGTK-based README file browser")
+    (description
+     "nwg-readme-browser was conceived as @acronym{RTFM, Read The Fucking
+Manual} with a graphical user interface.  It searches a configurable path for
+@file{README.*} files, and displays them in @code{WebKit2.WebView}.  It supports
+@file{.md}, @file{.rst}, @file{.html} and plain text.  It does not support
+@file{.pdf} format.  Although the program was written with nwg-shell for sway
+and Hyprland in mind, it may also be used standalone.
+
+This application is a part of the nwg-shell project.")
     (license license:expat)))
