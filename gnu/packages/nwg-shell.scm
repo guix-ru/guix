@@ -29,6 +29,7 @@
   #:use-module (gnu packages bash)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages gnome)
   #:use-module (gnu packages golang-graphics)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages gtk)
@@ -500,4 +501,70 @@ This application is a part of the nwg-shell project.")
 wlroots-based Wayland environment.
 
 This application is a part of the nwg-shell project.")
+    (license license:expat)))
+
+(define-public nwg-displays
+  (package
+    (name "nwg-displays")
+    (version "0.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-displays")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1wgmj933fx4kl83q71phzm67wmkzfp543mb956dzbc5hkrac0nvv"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'sanity-check)
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (with-directory-excursion "nwg_displays"
+                (substitute* "tools.py"
+                  (("\\//usr(.*nwg-displays\\/.svg)" _ suffix)
+                   (string-append #$output suffix)))
+                (substitute* "wallpaper_manager/wallpaper_manager.py"
+                  (("\\/usr\\/bin\\/env bash")
+                   (string-append #$(this-package-input "bash-minimal")
+                                  "/bin/bash"))))))
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (install-file "nwg-displays.desktop"
+                            (string-append #$output "/share/applications"))
+              (install-file "nwg-displays.svg"
+                            (string-append #$output "/share/pixmaps"))
+              (install-file "README.md"
+                            (string-append #$output
+                                           "/share/doc/nwg-displays"))))
+          (add-after 'create-entrypoints 'wrap-programs
+            (lambda _
+              (for-each (lambda (file)
+                          (wrap-program file
+                            `("PATH" ":" prefix
+                              (,(dirname (which "notify-send"))
+                               ,(dirname (which "swaybg"))))
+                            `("GI_TYPELIB_PATH" =
+                              (,(getenv "GI_TYPELIB_PATH")))))
+                        (find-files (string-append #$output "/bin"))))))))
+    (native-inputs
+     (list gobject-introspection))
+    (inputs
+     (list bash-minimal
+           gtk+
+           gtk-layer-shell
+           libnotify
+           python-pygobject
+           python-i3ipc
+           swaybg))
+    (home-page "https://github.com/nwg-piotr/nwg-displays")
+    (synopsis "GUI display configuration tool for wlroots compositors")
+    (description
+     "nwg-displays is an output management utility for sway and Hyprland Wayland
+compositor, inspired by wdisplays and wlay.")
     (license license:expat)))
