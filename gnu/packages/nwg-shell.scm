@@ -695,3 +695,58 @@ for use with sway, Hyprland and other wlroots-based Wayland compositors.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public nwg-icon-picker
+  (package
+    (name "nwg-icon-picker")
+    (version "0.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-icon-picker")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0b7mds438br3labjl2c3lpgga5xmypp1a58ygf96kawy5s2wjv8s"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (install-file "nwg-icon-picker.desktop"
+                            (string-append #$output "/share/applications"))
+              (install-file "nwg-icon-picker.svg"
+                            (string-append #$output "/share/pixmaps"))
+              (install-file "README.md"
+                            (string-append #$output
+                                           "/share/doc/nwg-icon-picker"))))
+          (add-after 'create-entrypoints 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-icon-picker")
+                `("XDG_DATA_DIRS" prefix
+                  (,(string-append #$output "/share")))
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (propagated-inputs
+     (list hicolor-icon-theme))
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list bash-minimal
+           gtk+
+           python-pygobject))
+    (home-page "https://github.com/nwg-piotr/nwg-icon-picker")
+    (synopsis "GTK icon chooser with a text search option")
+    (description
+     "nwg-icon-picker is intended to work as the icon picker for nwg-panel, but
+it may be used standalone.  It displays a window to choose an icon with a
+textual search entry, and returns the icon name.  You can also open a file from
+the search result in GIMP or Inkscape, if installed.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
