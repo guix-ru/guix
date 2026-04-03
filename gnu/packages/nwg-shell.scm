@@ -1073,3 +1073,67 @@ and the launcher button.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public typobuster
+  (package
+    (name "typobuster")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/typobuster")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1n8nqfwj9ih1vdzvmlnjp463rnr66ca30sdc7a82g42brmlkk5wv"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (substitute* "typobuster/tools.py"
+                (("\\/usr\\/share") (string-append #$output "/share")))))
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (install-file "typobuster.desktop"
+                            (string-append #$output "/share/applications"))
+              (install-file "typobuster.svg"
+                            (string-append #$output "/share/pixmaps"))
+              (install-file "README.md"
+                            (string-append #$output "/share/doc/typobuster"))))
+          (add-after 'create-entrypoints 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/typobuster")
+                `("PATH" prefix
+                  (,(dirname (which "gsettings"))))
+                `("GI_TYPELIB_PATH" prefix
+                  (,(getenv "GI_TYPELIB_PATH")))
+                `("XDG_DATA_DIRS" prefix
+                  (,(string-append #$(this-package-input "gtksourceview")
+                                   "/share")))))))))
+    (propagated-inputs
+     ;; avoid runtime error:
+     ;; No such schema “org.gnome.desktop.interface”
+     (list gsettings-desktop-schemas))
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list bash-minimal
+           `(,glib "bin")     ;for gsettings
+           gtk+
+           gtksourceview-4
+           python-pycairo
+           python-pygobject))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/typobuster")
+    (synopsis "Text editor with text transformations and auto-correction")
+    (description
+     "Typobuster is a simplified text editor with a wide selection of
+transformations and automatic correction of common typos.
+
+This application is a part of the nwg-shell project.")
+    (license license:gpl3)))
