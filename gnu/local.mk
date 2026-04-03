@@ -2019,6 +2019,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/nvi-assume-preserve-path.patch		\
   %D%/packages/patches/nvi-dbpagesize-binpower.patch		\
   %D%/packages/patches/nvi-db4.patch				\
+  %D%/packages/patches/nwg-bar-0.1.6-fallback-paths.patch	\
+  %D%/packages/patches/nwg-bar-0.1.6-fix-silent-errors.patch	\
   %D%/packages/patches/nwg-dock-0.4.3-fallback-paths.patch	\
   %D%/packages/patches/nwg-dock-hyprland-0.4.8-fallback-paths.patch	\
   %D%/packages/patches/nwg-drawer-0.7.5-fallback-paths.patch	\

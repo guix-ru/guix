@@ -169,6 +169,79 @@ Hyprland.
 This application is a part of the nwg-shell project.")
     (license license:expat)))
 
+(define-public nwg-bar
+  (package
+    (name "nwg-bar")
+    (version "0.1.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-bar")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0yds8sivilirw2cqkq621z731l4hragzgpajjls79f4zkwlrdpz4"))
+       (patches
+        (search-patches
+         ;; TODO: Remove this patch in the next update.
+         "nwg-bar-0.1.6-fix-silent-errors.patch"
+         "nwg-bar-0.1.6-fallback-paths.patch"))
+       (modules '((guix build utils)))
+       ;; Replace systemd commands with elogind commands.
+       (snippet
+        '(substitute* "config/bar.json"
+           (("\"systemctl (-i |)") "\"loginctl ")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:import-path "github.com/nwg-piotr/nwg-bar"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (with-directory-excursion "src/github.com/nwg-piotr/nwg-bar"
+                (substitute* '("tools.go" "config/bar.json")
+                  (("\\/usr\\/share") (string-append #$output "/share"))))))
+          (add-after 'install 'install-data
+            (lambda _
+              (mkdir-p (string-append #$output "/share"))
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/nwg-bar")
+                (copy-recursively "config"
+                                  (string-append #$output "/share/nwg-bar"))
+                (copy-recursively "images"
+                                  (string-append #$output "/share/nwg-bar/"
+                                                 "images"))
+                (install-file "README.md"
+                              (string-append #$output "/share/doc/nwg-bar")))))
+          (add-after 'install 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-bar")
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (native-inputs
+     (list gobject-introspection
+           go-github-com-allan-simon-go-singleinstance
+           go-github-com-dlasky-gotk3-layershell
+           go-github-com-gotk3-gotk3
+           go-github-com-joshuarubin-go-sway
+           pkg-config))
+    (inputs
+     (list bash-minimal
+           gtk+
+           gtk-layer-shell))
+    (home-page "https://github.com/nwg-piotr/nwg-bar")
+    (synopsis "GTK3-based button bar for wlroots-based compositors")
+    (description
+     "nwg-bar is a Golang replacement to the @command{nwgbar} command (a part of
+nwg-launchers), with some improvements.  Originally aimed at sway, works with
+wlroots-based compositors only.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
+
 (define-public nwg-drawer
   (package
     (name "nwg-drawer")

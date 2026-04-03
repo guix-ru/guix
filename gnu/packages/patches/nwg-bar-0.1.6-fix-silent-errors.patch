@@ -1,0 +1,36 @@
+From 899ac58b9c2db70d5ab2fabeb1d255d848bae109 Mon Sep 17 00:00:00 2001
+From: BBaoVanC <bbaovanc@bbaovanc.com>
+Date: Fri, 30 Aug 2024 13:15:24 -0500
+Subject: [PATCH] Fix a few silent errors
+
+---
+ main.go | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/main.go b/main.go
+index 26cbd24..d2660f1 100644
+--- a/main.go
++++ b/main.go
+@@ -106,12 +106,14 @@ func main() {
+ 	if !pathExists(filepath.Join(configDirectory, "style.css")) {
+ 		err := copyFile(filepath.Join(dataHome, "nwg-bar/style.css"), filepath.Join(configDirectory, "style.css"))
+ 		if err != nil {
++			log.Fatal("error copying default style.css: ", err)
+ 			return
+ 		}
+ 	}
+ 	if !pathExists(filepath.Join(configDirectory, "bar.json")) {
+ 		err := copyFile(filepath.Join(dataHome, "nwg-bar/bar.json"), filepath.Join(configDirectory, "bar.json"))
+ 		if err != nil {
++			log.Fatal("error copying default bar.json: ", err)
+ 			return
+ 		}
+ 	}
+@@ -127,6 +129,7 @@ func main() {
+ 		// parse JSON to []Button
+ 		err := json.Unmarshal([]byte(templateJson), &buttons)
+ 		if err != nil {
++			log.Fatal("error parsing config: ", err)
+ 			return
+ 		} else {
+ 			println(fmt.Sprintf("%v items loaded from template %s", len(buttons), *templateFileName))
