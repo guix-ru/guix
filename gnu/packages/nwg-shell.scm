@@ -41,6 +41,7 @@
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages wm)
+  #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xorg))
 
 (define-public nwg-shell-wallpapers
@@ -631,6 +632,66 @@ Manual} with a graphical user interface.  It searches a configurable path for
 @file{.md}, @file{.rst}, @file{.html} and plain text.  It does not support
 @file{.pdf} format.  Although the program was written with nwg-shell for sway
 and Hyprland in mind, it may also be used standalone.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
+
+(define-public nwg-clipman
+  (package
+    (name "nwg-clipman")
+    (version "0.2.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-clipman")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ha3yvdxcid0fgsx28cibc6n20qikc1x9y9hpjv26jc2dkikql0r"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (install-file "nwg-clipman.desktop"
+                            (string-append #$output "/share/applications"))
+              (install-file "nwg-clipman.svg"
+                            (string-append #$output "/share/pixmaps"))
+              (install-file "README.md"
+                            (string-append #$output
+                                           "/share/doc/nwg-clipman"))))
+          (add-after 'create-entrypoints 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-clipman")
+                `("PATH" ":" prefix
+                  (,(dirname (which "cliphist"))
+                   ,(dirname (which "wl-copy"))))
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH"))))))
+          (add-before 'sanity-check 'check-setup
+            (lambda _
+              (setenv "HOME" (getcwd)))))))
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list bash-minimal
+           cliphist
+           gtk+
+           gtk-layer-shell
+           python-pygobject
+           wl-clipboard))
+    (home-page "https://github.com/nwg-piotr/nwg-clipman")
+    (synopsis "Clipboard manager for nwg-shell")
+    (description
+     "nwg-clipman is a GTK3-based GUI for @command{cliphist}.  It provides
+access to previously copied items, as well as management of the clipboard
+history from a window opened on @code{gtk-layer-shell}.  The program is intended
+for use with sway, Hyprland and other wlroots-based Wayland compositors.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
