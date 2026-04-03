@@ -750,3 +750,54 @@ the search result in GIMP or Inkscape, if installed.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public gopsuinfo
+  (package
+    (name "gopsuinfo")
+    (version "0.1.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/gopsuinfo")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1nv70mgnmq941cc8wldk59kmdkjmwz2bga2f1v5qh3c3p8ww7c64"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:import-path "github.com/nwg-piotr/gopsuinfo"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "src/github.com/nwg-piotr/gopsuinfo/gopsuinfo.go"
+                (("\\/usr") #$output))))
+          (add-after 'install 'install-data
+            (lambda _
+              (mkdir-p (string-append #$output "/share/gopsuinfo"))
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/gopsuinfo")
+                (copy-recursively "icons_dark"
+                                  (string-append #$output "/share/gopsuinfo/"
+                                                 "icons_dark"))
+                (copy-recursively "icons_light"
+                                  (string-append #$output "/share/gopsuinfo/"
+                                                 "icons_light"))
+                (install-file "README.md"
+                              (string-append #$output
+                                             "/share/doc/gopsuinfo"))))))))
+    (native-inputs
+     (list go-github-com-shirou-gopsutil))
+    (home-page "https://github.com/nwg-piotr/gopsuinfo")
+    (synopsis "Display system usage info as text")
+    (description
+     "gopsuinfo is a Go version of the @command{psuinfo} python script.  It
+provides @command{gopsuinfo}, a gopsutil-based command, to display system usage
+info as text in panels like Waybar or icon/text in tint2 and nwg-panel
+executors.
+
+This application is a part of the nwg-shell project.")
+    (license (list license:bsd-2 license:expat)))) ;dual-licensed
