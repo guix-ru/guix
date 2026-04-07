@@ -524,6 +524,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/nushell.scm			\
   %D%/packages/nutrition.scm			\
   %D%/packages/nvi.scm				\
+  %D%/packages/nwg-shell.scm		\
   %D%/packages/nx.scm				\
   %D%/packages/ocaml.scm			\
   %D%/packages/ocr.scm				\
