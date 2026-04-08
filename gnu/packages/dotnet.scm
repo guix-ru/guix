@@ -2668,6 +2668,121 @@ compiler that can be used to bootstrap newer Roslyn versions.")
 from source using @code{roslyn-2.0} as the bootstrap compiler.  It produces
 a C# 7.1 compiler that supports default literals, which is needed to build
 newer Roslyn versions.")))
+
+;;;
+;;; roslyn-2.8: inherits roslyn-2.3, built with csc 2.3
+;;;
+
+(define-public roslyn-2.8
+  (package
+    (inherit roslyn-2.3)
+    (version "2.8.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dotnet/roslyn")
+              (commit (string-append "version-" version))))
+       (file-name (git-file-name "roslyn" version))
+       (sha256
+        (base32
+         "0xf30h91wf96gj7n2azqplzybzcllfni6cjkibyrr6pr7sv9an1x"))
+       (patches
+        (search-patches "roslyn-2.8.2-csharp-7.2-for-csc-2.3.patch"))))
+    (native-inputs (list roslyn-2.3))
+    (arguments
+     (substitute-keyword-arguments (package-arguments roslyn-2.3)
+       ((#:phases phases '())
+        #~(modify-phases #$phases
+            ;; No compiler-compat fixes needed; the patch handles everything.
+            (replace 'fix-compiler-compat (lambda _ #t))
+
+            ;; 2.8.2 also has DiaSymReader COM files to replace.
+            (replace 'remove-stale-files
+              (lambda _
+                ;; Rename file with trailing space in its name.
+                (rename-file
+                 "src/Compilers/Core/Portable/Operations/IConstructorBodyOperation .cs"
+                 "src/Compilers/Core/Portable/Operations/IConstructorBodyOperation.cs")
+                (for-each
+                 (lambda (f) (when (file-exists? f) (delete-file f)))
+                 (append
+                  '#$%roslyn-stale-files
+                  '("src/Compilers/Core/Portable/DiaSymReader/Utilities/IUnsafeComStream.cs"
+                    "src/Compilers/Core/Portable/DiaSymReader/Utilities/ComMemoryStream.cs")))))
+
+            ;; 2.8.2 also needs DiaSymReader COM stubs.
+            (add-after 'create-com-memory-stream-stub 'create-diasymreader-stubs
+              (lambda _
+                (call-with-output-file
+                    "src/Compilers/Core/Portable/DiaSymReader/Utilities/ComMemoryStream.cs"
+                  (lambda (port)
+                    (display
+                     "using System; using System.Collections.Generic; using System.IO;
+namespace Microsoft.DiaSymReader
+{
+    internal sealed class ComMemoryStream : Stream
+    {
+        public override bool CanRead => false;
+        public override bool CanSeek => true;
+        public override bool CanWrite => true;
+        public override long Length => _length;
+        public override long Position { get; set; }
+        private long _length;
+        public override void Flush() {}
+        public override int Read(byte[] b, int o, int c)
+            => throw new NotSupportedException();
+        public override long Seek(long o, SeekOrigin so) => 0;
+        public override void SetLength(long v) { _length = v; }
+        public override void Write(byte[] b, int o, int c) {}
+        public IEnumerable<ArraySegment<byte>> GetChunks()
+            => Array.Empty<ArraySegment<byte>>();
+    }
+}
+" port)))
+                (call-with-output-file
+                    "src/Compilers/Core/Portable/DiaSymReader/Utilities/IUnsafeComStream.cs"
+                  (lambda (port)
+                    (display
+                     "namespace Microsoft.DiaSymReader { internal interface IUnsafeComStream {} }\n"
+                     port)))))
+
+            ;; Not needed; 2.8.2 has generated files checked in.
+            (delete 'delete-generated-files)
+
+            ;; Point at roslyn-2.3's csc explicitly.
+            (replace 'create-csc-wrapper
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "bootstrap-bin")
+                (call-with-output-file "bootstrap-bin/csc"
+                  (lambda (port)
+                    (format port "#!~a~%exec mono ~a \"$@\"~%"
+                            (which "bash")
+                            (string-append (assoc-ref inputs "roslyn") "/lib/roslyn/csc.exe"))))
+                (chmod "bootstrap-bin/csc" #o755)
+                (setenv "PATH"
+                        (string-append (getcwd) "/bootstrap-bin:"
+                                       (getenv "PATH")))))
+
+            ;; 2.8.2 source uses C# 7.1 features (default literals).
+            ;; -d:NET46 selects Mono-compatible code paths in csc.exe.
+            (replace 'create-csc-rsp
+              (lambda _
+                (call-with-output-file "csc.rsp"
+                  (lambda (port)
+                    (display "-langversion:7.1\n-d:NET46\n" port)))))
+
+            ;; 2.8.2 has generated files checked in; skip regeneration.
+            (delete 'generate-source)
+
+            ;; prepare-srm-source, build, compile, and install are all
+            ;; inherited from roslyn-2.3.
+            ))))
+    (synopsis "C# 7.2 compiler bootstrapped from source")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}), built
+from source using @code{roslyn-2.3} as the bootstrap compiler.  It produces
+a C# 7.2 compiler.")))
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
 (define-public msbuild

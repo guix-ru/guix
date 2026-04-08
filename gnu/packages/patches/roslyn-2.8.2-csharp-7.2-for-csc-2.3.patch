@@ -1,0 +1,665 @@
+Author: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: 2026-04-08
+Subject: Avoid keyword arguments that come before positional arguments--except as first argument.  Avoid readonly struct.
+
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder.ValueChecks.cs b/src/Compilers/CSharp/Portable/Binder/Binder.ValueChecks.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder.ValueChecks.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder.ValueChecks.cs	2026-04-08 01:57:17.283148573 +0000
+@@ -380,7 +380,7 @@
+                         var receiver = ((BoundPointerElementAccess)expr).Expression;
+                         if (receiver is BoundFieldAccess fieldAccess && fieldAccess.FieldSymbol.IsFixed)
+                         {
+-                            return CheckValueKind(node, fieldAccess.ReceiverOpt, valueKind, checkingReceiver: true, diagnostics);
++                            return CheckValueKind(node, fieldAccess.ReceiverOpt, valueKind, true, diagnostics);
+                         }
+                     }
+ 
+@@ -689,7 +689,7 @@
+             // Only ref-assigns produce LValues
+             if (assignment.IsRef)
+             {
+-                return CheckValueKind(node, assignment.Left, valueKind, checkingReceiver: false, diagnostics);
++                return CheckValueKind(node, assignment.Left, valueKind, false, diagnostics);
+             }
+ 
+             Error(diagnostics, GetStandardLvalueError(valueKind), node);
+@@ -2075,7 +2075,7 @@
+                         assignment.Left,
+                         escapeFrom,
+                         escapeTo,
+-                        checkingReceiver: false,
++                        false,
+                         diagnostics);
+             }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder.WithQueryLambdaParametersBinder.cs b/src/Compilers/CSharp/Portable/Binder/Binder.WithQueryLambdaParametersBinder.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder.WithQueryLambdaParametersBinder.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder.WithQueryLambdaParametersBinder.cs	2026-04-08 01:57:17.286176376 +0000
+@@ -89,10 +89,10 @@
+                 LookupResult lookupResult = LookupResult.GetInstance();
+                 LookupOptions options = LookupOptions.MustBeInstance;
+                 HashSet<DiagnosticInfo> useSiteDiagnostics = null;
+-                LookupMembersWithFallback(lookupResult, receiver.Type, name, 0, ref useSiteDiagnostics, basesBeingResolved: null, options: options);
++                LookupMembersWithFallback(lookupResult, receiver.Type, name, 0, ref useSiteDiagnostics, null, options);
+                 diagnostics.Add(node, useSiteDiagnostics);
+ 
+-                var result = BindMemberOfType(node, node, name, 0, indexed: false, receiver, default(SeparatedSyntaxList<TypeSyntax>), default(ImmutableArray<TypeSymbol>), lookupResult, BoundMethodGroupFlags.None, diagnostics);
++                var result = BindMemberOfType(node, node, name, 0, false, receiver, default(SeparatedSyntaxList<TypeSyntax>), default(ImmutableArray<TypeSymbol>), lookupResult, BoundMethodGroupFlags.None, diagnostics);
+                 lookupResult.Free();
+                 return result;
+             }
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder_Await.cs b/src/Compilers/CSharp/Portable/Binder/Binder_Await.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_Await.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_Await.cs	2026-04-08 01:57:17.281209149 +0000
+@@ -327,7 +327,7 @@
+         {
+             var receiver = new BoundLiteral(node, ConstantValue.Null, awaiterType);
+             var name = WellKnownMemberNames.IsCompleted;
+-            var qualified = BindInstanceMemberAccess(node, node, receiver, name, 0, default(SeparatedSyntaxList<TypeSyntax>), default(ImmutableArray<TypeSymbol>), invoked: false, indexed: false, diagnostics);
++            var qualified = BindInstanceMemberAccess(node, node, receiver, name, 0, default(SeparatedSyntaxList<TypeSyntax>), default(ImmutableArray<TypeSymbol>), false, false, diagnostics);
+             if (qualified.HasAnyErrors)
+             {
+                 isCompletedProperty = null;
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs b/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs	2026-04-08 01:58:18.449827968 +0000
+@@ -712,15 +712,15 @@
+                         // We will not check constraints at this point as this code path
+                         // is failure-only and the caller is expected to produce a diagnostic.
+                         var tupleType = TupleTypeSymbol.Create(
+-                            locationOpt: null,
++                            null,
+                             subExpressions.SelectAsArray(e => e.Type),
+-                            elementLocations: default,
++                            default,
+                             tupleNames,
+                             Compilation,
+-                            shouldCheckConstraints: false,
+-                            errorPositions: disallowInferredNames ? inferredPositions : default);
++                            false,
++                            disallowInferredNames ? inferredPositions : default);
+ 
+-                        return new BoundTupleLiteral(syntax, argumentNamesOpt: default, inferredPositions, subExpressions, tupleType);
++                        return new BoundTupleLiteral(syntax, default, inferredPositions, subExpressions, tupleType);
+                     }
+                 default:
+                     throw ExceptionUtilities.UnexpectedValue(node.Kind());
+@@ -2726,11 +2726,11 @@
+             return BindStackAllocWithInitializer(
+                 node,
+                 initializer,
+-                type: GetStackAllocType(node, bestType, diagnostics, out bool hasErrors),
+-                elementType: bestType,
+-                sizeOpt: null,
++                GetStackAllocType(node, bestType, diagnostics, out bool hasErrors),
++                bestType,
++                null,
+                 diagnostics,
+-                hasErrors: hasErrors,
++                hasErrors,
+                 boundInitializerExpressions);
+         }
+ 
+@@ -3132,7 +3132,7 @@
+             }
+ 
+             return node.Initializer == null
+-                ? new BoundStackAllocArrayCreation(node, elementType, count, initializerOpt: null, type, hasErrors: hasErrors)
++                ? new BoundStackAllocArrayCreation(node, elementType, count, null, type, hasErrors)
+                 : BindStackAllocWithInitializer(node, node.Initializer, type, elementType, count, diagnostics, hasErrors);
+         }
+ 
+@@ -3929,13 +3929,13 @@
+ 
+                     // Bind member initializer value, i.e. right part of assignment
+                     BoundExpression boundRight = BindInitializerExpressionOrValue(
+-                        syntax: initializer.Right,
+-                        type: boundLeft.Type,
+-                        typeSyntax: boundLeft.Syntax,
+-                        diagnostics: diagnostics);
++                        initializer.Right,
++                        boundLeft.Type,
++                        boundLeft.Syntax,
++                        diagnostics);
+ 
+                     // Bind member initializer assignment expression
+-                    return BindAssignment(initializer, boundLeft, boundRight, isRef: false, diagnostics);
++                    return BindAssignment(initializer, boundLeft, boundRight, false, diagnostics);
+                 }
+             }
+ 
+@@ -4403,12 +4403,12 @@
+ 
+             if (implicitReceiver.Type.IsDynamic())
+             {
+-                var hasErrors = ReportBadDynamicArguments(elementInitializer, boundElementInitializerExpressions, refKinds: default, diagnostics, queryClause: null);
++                var hasErrors = ReportBadDynamicArguments(elementInitializer, boundElementInitializerExpressions, default, diagnostics, null);
+ 
+                 return new BoundDynamicCollectionElementInitializer(
+                     elementInitializer,
+-                    arguments: boundElementInitializerExpressions,
+-                    applicableMethods: ImmutableArray<MethodSymbol>.Empty,
++                    boundElementInitializerExpressions,
++                    ImmutableArray<MethodSymbol>.Empty,
+                     type: GetSpecialType(SpecialType.System_Void, diagnostics, elementInitializer),
+                     hasErrors: hasErrors);
+             }
+@@ -4996,9 +4996,9 @@
+                 else
+                 {
+                     result.ReportDiagnostics(
+-                        binder: this, location: errorLocation, nodeOpt: null, diagnostics,
+-                        name: errorName, receiver: null, invokedExpression: null, analyzedArguments,
+-                        memberGroup: candidateConstructors, typeContainingConstructors, delegateTypeBeingInvoked: null);
++                        this, errorLocation, null, diagnostics,
++                        errorName, null, null, analyzedArguments,
++                        candidateConstructors, typeContainingConstructors, null);
+                 }
+             }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder_Invocation.cs b/src/Compilers/CSharp/Portable/Binder/Binder_Invocation.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_Invocation.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_Invocation.cs	2026-04-08 01:57:17.284392483 +0000
+@@ -83,7 +83,7 @@
+         {
+             Debug.Assert(receiver != null);
+ 
+-            var boundExpression = BindInstanceMemberAccess(node, node, receiver, methodName, typeArgs.NullToEmpty().Length, typeArgsSyntax, typeArgs, invoked: true, indexed: false, diagnostics);
++            var boundExpression = BindInstanceMemberAccess(node, node, receiver, methodName, typeArgs.NullToEmpty().Length, typeArgsSyntax, typeArgs, true, false, diagnostics);
+ 
+             // The other consumers of this helper (await and collection initializers) require the target member to be a method.
+             if (!allowFieldsAndProperties && (boundExpression.Kind == BoundKind.FieldAccess || boundExpression.Kind == BoundKind.PropertyAccess))
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs b/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs	2026-04-08 01:57:17.288589747 +0000
+@@ -590,7 +590,7 @@
+ 
+             if (!best.HasValue)
+             {
+-                resultSignature = new BinaryOperatorSignature(kind, leftType: null, rightType: null, CreateErrorType());
++                resultSignature = new BinaryOperatorSignature(kind, null, null, CreateErrorType());
+                 foundOperator = false;
+             }
+             else
+@@ -612,7 +612,7 @@
+ 
+                 if (isNullableEquality)
+                 {
+-                    resultSignature = new BinaryOperatorSignature(kind | BinaryOperatorKind.NullableNull, leftType: null, rightType: null,
++                    resultSignature = new BinaryOperatorSignature(kind | BinaryOperatorKind.NullableNull, null, null,
+                         GetSpecialType(SpecialType.System_Boolean, diagnostics, node));
+ 
+                     foundOperator = true;
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder_Statements.cs b/src/Compilers/CSharp/Portable/Binder/Binder_Statements.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_Statements.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_Statements.cs	2026-04-08 01:57:17.284982789 +0000
+@@ -1166,11 +1166,11 @@
+                     initializer.Syntax,
+                     initializer,
+                     methodName,
+-                    rightArity: 0,
+-                    typeArgumentsSyntax: default,
+-                    typeArguments: default,
+-                    invoked: true,
+-                    indexed: false,
++                    0,
++                    default,
++                    default,
++                    true,
++                    false,
+                     bindingDiagnostics);
+ 
+                 if (boundAccess.Kind != BoundKind.MethodGroup)
+@@ -1387,7 +1387,7 @@
+                 if (op1.Type.IsByRefLikeType)
+                 {
+                     var leftEscape = GetValEscape(op1, LocalScopeDepth);
+-                    op2 = ValidateEscape(op2, leftEscape, isByRef: false, diagnostics);
++                    op2 = ValidateEscape(op2, leftEscape, false, diagnostics);
+                 }
+             }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Binder_TupleOperators.cs b/src/Compilers/CSharp/Portable/Binder/Binder_TupleOperators.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_TupleOperators.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_TupleOperators.cs	2026-04-08 01:57:17.289303605 +0000
+@@ -25,8 +25,8 @@
+ 
+             // The converted types are only used for the semantic model, so we don't need the conversion diagnostics
+             DiagnosticBag discardDiagnostics = DiagnosticBag.GetInstance();
+-            BoundExpression convertedLeft = ApplyConvertedTypes(left, operators, isRight: false, discardDiagnostics);
+-            BoundExpression convertedRight = ApplyConvertedTypes(right, operators, isRight: true, discardDiagnostics);
++            BoundExpression convertedLeft = ApplyConvertedTypes(left, operators, false, discardDiagnostics);
++            BoundExpression convertedRight = ApplyConvertedTypes(right, operators, true, discardDiagnostics);
+             discardDiagnostics.Free();
+ 
+             TypeSymbol resultType = GetSpecialType(SpecialType.System_Boolean, diagnostics, node);
+@@ -60,7 +60,7 @@
+                         builder.Add(ApplyConvertedTypes(arguments[i], multiple.Operators[i], isRight, diagnostics));
+                     }
+ 
+-                    return tuple.Update(argumentNamesOpt: default, inferredNamesOpt: default, builder.ToImmutableAndFree(), tuple.Type);
++                    return tuple.Update(default, default, builder.ToImmutableAndFree(), tuple.Type);
+                 }
+ 
+                 // This element isn't getting a converted type
+@@ -103,7 +103,7 @@
+             BinaryOperatorAnalysisResult analysisResult;
+ 
+             bool foundOperator = BindSimpleBinaryOperatorParts(node, diagnostics, left, right, kind,
+-                out resultKind, originalUserDefinedOperators: out _, out signature, out analysisResult);
++                out resultKind, out _, out signature, out analysisResult);
+ 
+             if (!foundOperator)
+             {
+@@ -407,9 +407,9 @@
+ 
+             ImmutableArray<Location> elementLocations = elements.SelectAsArray(e => e.Syntax.Location);
+ 
+-            var tuple = TupleTypeSymbol.Create(locationOpt: null, elementTypes: convertedTypes,
+-                elementLocations, elementNames: names, compilation,
+-                shouldCheckConstraints: true, errorPositions: default, syntax, diagnostics);
++            var tuple = TupleTypeSymbol.Create(null, convertedTypes,
++                elementLocations, names, compilation,
++                true, default, syntax, diagnostics);
+ 
+             if (!isNullable)
+             {
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/ForEachLoopBinder.cs b/src/Compilers/CSharp/Portable/Binder/ForEachLoopBinder.cs
+--- a/src/Compilers/CSharp/Portable/Binder/ForEachLoopBinder.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/ForEachLoopBinder.cs	2026-04-08 01:57:17.280914487 +0000
+@@ -268,10 +268,10 @@
+ 
+                             hasErrors |= !CheckMethodReturnValueKind(
+                                 builder.CurrentPropertyGetter,
+-                                callSyntaxOpt: null,
++                                null,
+                                 collectionExpr.Syntax,
+                                 requiredCurrentKind,
+-                                checkingReceiver: false,
++                                false,
+                                 diagnostics);
+                         }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversion.cs b/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversion.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversion.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversion.cs	2026-04-08 01:57:17.280225176 +0000
+@@ -72,7 +72,7 @@
+         private class DeconstructionUncommonData : UncommonData
+         {
+             internal DeconstructionUncommonData(DeconstructMethodInfo deconstructMethodInfoOpt, ImmutableArray<Conversion> nestedConversions)
+-                : base(isExtensionMethod: false, isArrayIndex: false, conversionResult: default, conversionMethod: null, nestedConversions)
++                : base(false, false, default, null, nestedConversions)
+             {
+                 Debug.Assert(!nestedConversions.IsDefaultOrEmpty);
+                 DeconstructMethodInfo = deconstructMethodInfoOpt;
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversions.cs b/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversions.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversions.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Semantics/Conversions/Conversions.cs	2026-04-08 01:57:17.279728415 +0000
+@@ -78,7 +78,7 @@
+             }
+             else
+             {
+-                return binder.ResolveMethodGroup(source, analyzedArguments: null, isMethodGroupConversion: true, ref useSiteDiagnostics);
++                return binder.ResolveMethodGroup(source, null, true, ref useSiteDiagnostics);
+             }
+         }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs b/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs
+--- a/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs	2026-04-08 01:57:17.281726569 +0000
+@@ -3015,7 +3015,7 @@
+                 arguments.Arguments.Count,
+                 argumentAnalysis.ArgsToParamsOpt,
+                 arguments.RefKinds,
+-                isMethodGroupConversion: false,
++                false,
+                 allowRefOmittedArguments,
+                 out hasAnyRefOmittedArgument);
+ 
+@@ -3027,7 +3027,7 @@
+                 arguments.Arguments.Count,
+                 argumentAnalysis.ArgsToParamsOpt,
+                 arguments.RefKinds,
+-                isMethodGroupConversion: false,
++                false,
+                 allowRefOmittedArguments);
+ 
+             // The member passed to the following call is returned in the result (possibly a constructed version of it).
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/BoundTree/Constructors.cs b/src/Compilers/CSharp/Portable/BoundTree/Constructors.cs
+--- a/src/Compilers/CSharp/Portable/BoundTree/Constructors.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/BoundTree/Constructors.cs	2026-04-08 01:57:17.279510577 +0000
+@@ -567,7 +567,7 @@
+     internal partial class BoundAddressOfOperator
+     {
+         public BoundAddressOfOperator(SyntaxNode syntax, BoundExpression operand, TypeSymbol type, bool hasErrors = false)
+-             : this(syntax, operand, isManaged: false, type, hasErrors)
++             : this(syntax, operand, false, type, hasErrors)
+         {
+         }  
+     }
+@@ -575,7 +575,7 @@
+     internal partial class BoundForEachStatement
+     {
+         public BoundForEachStatement(SyntaxNode syntax, ForEachEnumeratorInfo enumeratorInfoOpt, Conversion elementConversion, BoundTypeExpression iterationVariableType, ImmutableArray<LocalSymbol> iterationVariables, BoundExpression expression, BoundForEachDeconstructStep deconstructionOpt, BoundStatement body, bool @checked, GeneratedLabelSymbol breakLabel, GeneratedLabelSymbol continueLabel, bool hasErrors = false) :
+-            this(syntax, enumeratorInfoOpt, elementConversion, iterationVariableType, iterationVariables, iterationErrorExpressionOpt: null, expression, deconstructionOpt, body, @checked, breakLabel, continueLabel, hasErrors)
++            this(syntax, enumeratorInfoOpt, elementConversion, iterationVariableType, iterationVariables, null, expression, deconstructionOpt, body, @checked, breakLabel, continueLabel, hasErrors)
+         {
+         }
+     }
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/CodeGen/EmitStackAllocInitializer.cs b/src/Compilers/CSharp/Portable/CodeGen/EmitStackAllocInitializer.cs
+--- a/src/Compilers/CSharp/Portable/CodeGen/EmitStackAllocInitializer.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/CodeGen/EmitStackAllocInitializer.cs	2026-04-08 01:57:17.279312666 +0000
+@@ -32,15 +32,15 @@
+                 ImmutableArray<byte> data = this.GetRawData(initExprs);
+                 if (data.All(datum => datum == data[0]))
+                 {
+-                    _builder.EmitStackAllocBlockInitializer(data, inits.Syntax, emitInitBlock: true, _diagnostics);
++                    _builder.EmitStackAllocBlockInitializer(data, inits.Syntax, true, _diagnostics);
+                 }
+                 else if (elementType.SpecialType.SizeInBytes() == 1)
+                 {
+-                    _builder.EmitStackAllocBlockInitializer(data, inits.Syntax, emitInitBlock: false, _diagnostics);
++                    _builder.EmitStackAllocBlockInitializer(data, inits.Syntax, false, _diagnostics);
+ 
+                     if (initializationStyle == ArrayInitializerStyle.Mixed)
+                     {
+-                        EmitElementStackAllocInitializers(elementType, initExprs, includeConstants: false);
++                        EmitElementStackAllocInitializers(elementType, initExprs, false);
+                     }
+                 }
+                 else
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_Call.cs b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_Call.cs
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_Call.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_Call.cs	2026-04-08 01:57:17.283964612 +0000
+@@ -465,7 +465,7 @@
+                 parameters,
+                 argumentRefKindsOpt,
+                 rewrittenArguments,
+-                forceLambdaSpilling: false, // lambda conversions can be re-orderd in calls without side affects
++                false, // lambda conversions can be re-orderd in calls without side affects
+                 actualArguments,
+                 refKinds,
+                 storesToTemps);
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs	2026-04-08 01:57:17.285679855 +0000
+@@ -286,12 +286,12 @@
+                 parameters,
+                 argumentRefKinds,
+                 rewrittenArguments,
+-                forceLambdaSpilling: true, // lambdas must produce exactly one delegate so they must be spilled into a temp
++                true, // lambdas must produce exactly one delegate so they must be spilled into a temp
+                 actualArguments,
+                 refKinds,
+                 storesToTemps);
+ 
+-            // Step two: If we have a params array, build the array and fill in the argument.
++            // Step two: If we have a params array, build the array and fill in the argument.
+             if (expanded)
+             {
+                 BoundExpression array = BuildParamsArray(syntax, indexer, argsToParamsOpt, rewrittenArguments, parameters, actualArguments[actualArguments.Length - 1]);
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_FixedStatement.cs b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_FixedStatement.cs
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_FixedStatement.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_FixedStatement.cs	2026-04-08 01:57:17.285919134 +0000
+@@ -382,9 +382,9 @@
+                 pinAndGetPtr = new BoundLoweredConditionalAccess(
+                     initializerSyntax,
+                     initializerExpr,
+-                    hasValueMethodOpt: null,
+-                    whenNotNull: pinAndGetPtr,
+-                    whenNullOpt: null, // just return default(T*)
++                    null,
++                    pinAndGetPtr,
++                    null, // just return default(T*)
+                     currentConditionalAccessID,
+                     localType);
+             }
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForEachStatement.cs b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForEachStatement.cs
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForEachStatement.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForEachStatement.cs	2026-04-08 01:57:17.282578725 +0000
+@@ -437,15 +437,15 @@
+ 
+             // (V)a[p]
+             BoundExpression iterationVarInitValue = MakeConversionNode(
+-                syntax: forEachSyntax,
+-                rewrittenOperand: BoundCall.Synthesized(
+-                    syntax: forEachSyntax,
+-                    receiverOpt: boundArrayVar,
++                forEachSyntax,
++                BoundCall.Synthesized(
++                    forEachSyntax,
++                    boundArrayVar,
+                     indexerGet,
+                     boundPositionVar),
+-                conversion: node.ElementConversion,
+-                rewrittenType: node.IterationVariableType.Type,
+-                @checked: node.Checked);
++                node.ElementConversion,
++                node.IterationVariableType.Type,
++                @node.Checked);
+ 
+             // V v = (V)a[p];   /* OR */   (D1 d1, ...) = (V)a[p];
+             ImmutableArray<LocalSymbol> iterationVariables = node.IterationVariables;
+@@ -458,14 +458,14 @@
+ 
+             // a.Length
+             BoundExpression arrayLength = BoundCall.Synthesized(
+-                syntax: forEachSyntax,
+-                receiverOpt: boundArrayVar,
++                forEachSyntax,
++                boundArrayVar,
+                 lengthGet);
+ 
+             // p < a.Length
+             BoundExpression exitCondition = new BoundBinaryOperator(
+-                syntax: forEachSyntax,
+-                operatorKind: BinaryOperatorKind.IntLessThan,
++                forEachSyntax,
++                BinaryOperatorKind.IntLessThan,
+                 left: boundPositionVar,
+                 right: arrayLength,
+                 constantValueOpt: null,
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_PointerElementAccess.cs b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_PointerElementAccess.cs
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_PointerElementAccess.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_PointerElementAccess.cs	2026-04-08 01:57:17.285470974 +0000
+@@ -20,7 +20,7 @@
+             {
+                 var loweredFieldReceiver = VisitExpression(fieldAccess.ReceiverOpt);
+                 fieldAccess = fieldAccess.Update(loweredFieldReceiver, fieldAccess.FieldSymbol, fieldAccess.ConstantValueOpt, fieldAccess.ResultKind, fieldAccess.Type);
+-                return new BoundAddressOfOperator(receiver.Syntax, fieldAccess, isManaged: true, fieldAccess.Type);
++                return new BoundAddressOfOperator(receiver.Syntax, fieldAccess, true, fieldAccess.Type);
+             }
+ 
+             return VisitExpression(receiver);
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_TupleBinaryOperator.cs b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_TupleBinaryOperator.cs
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_TupleBinaryOperator.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_TupleBinaryOperator.cs	2026-04-08 01:57:17.283671002 +0000
+@@ -143,12 +143,12 @@
+ 
+             BoundExpression leftHasValue, leftValue;
+             bool isLeftNullable;
+-            MakeNullableParts(left, temps, innerEffects, outerEffects, saveHasValue: true, out leftHasValue, out leftValue, out isLeftNullable);
++            MakeNullableParts(left, temps, innerEffects, outerEffects, true, out leftHasValue, out leftValue, out isLeftNullable);
+ 
+             BoundExpression rightHasValue, rightValue;
+             bool isRightNullable;
+             // no need for local for right.HasValue since used once
+-            MakeNullableParts(right, temps, innerEffects, outerEffects, saveHasValue: false, out rightHasValue, out rightValue, out isRightNullable);
++            MakeNullableParts(right, temps, innerEffects, outerEffects, false, out rightHasValue, out rightValue, out isRightNullable);
+ 
+             // Produces:
+             //     ... logical expression using leftValue and rightValue ...
+@@ -158,7 +158,7 @@
+             //     leftValue = left.GetValueOrDefault(); (or left if !leftNullable)
+             //     rightValue = right.GetValueOrDefault(); (or right if !rightNullable)
+             //     ... logical expression using leftValue and rightValue ...
+-            BoundExpression innerSequence = MakeSequenceOrResultValue(locals: ImmutableArray<LocalSymbol>.Empty, innerEffects.ToImmutableAndFree(), logicalExpression);
++            BoundExpression innerSequence = MakeSequenceOrResultValue(ImmutableArray<LocalSymbol>.Empty, innerEffects.ToImmutableAndFree(), logicalExpression);
+ 
+             if (!isLeftNullable && !isRightNullable)
+             {
+@@ -340,14 +340,14 @@
+                 // !((left == right).op_false)
+                 // (left != right).op_true
+ 
+-                BoundExpression dynamicResult = _dynamicFactory.MakeDynamicBinaryOperator(single.Kind, left, right, isCompoundAssignment: false, _compilation.DynamicType).ToExpression();
++                BoundExpression dynamicResult = _dynamicFactory.MakeDynamicBinaryOperator(single.Kind, left, right, false, _compilation.DynamicType).ToExpression();
+                 if (operatorKind == BinaryOperatorKind.Equal)
+                 {
+-                    return _factory.Not(MakeUnaryOperator(UnaryOperatorKind.DynamicFalse, left.Syntax, method: null, dynamicResult, boolType));
++                    return _factory.Not(MakeUnaryOperator(UnaryOperatorKind.DynamicFalse, left.Syntax, null, dynamicResult, boolType));
+                 }
+                 else
+                 {
+-                    return MakeUnaryOperator(UnaryOperatorKind.DynamicTrue, left.Syntax, method: null, dynamicResult, boolType);
++                    return MakeUnaryOperator(UnaryOperatorKind.DynamicTrue, left.Syntax, null, dynamicResult, boolType);
+                 }
+             }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs b/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs
+--- a/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs	2026-04-08 01:57:17.280561306 +0000
+@@ -591,7 +591,7 @@
+                 {
+                     builder.Add(PEParameterSymbol.Create(
+                         moduleSymbol, this, this.IsMetadataVirtual(), i,
+-                        paramInfo[i + 1], isReturn: false, out isBadParameter));
++                        paramInfo[i + 1], false, out isBadParameter));
+ 
+                     if (isBadParameter)
+                     {
+@@ -616,7 +616,7 @@
+ 
+             var returnParam = PEParameterSymbol.Create(
+                 moduleSymbol, this, this.IsMetadataVirtual(), 0,
+-                paramInfo[0], isReturn: true, out isBadParameter);
++                paramInfo[0], true, out isBadParameter);
+ 
+             if (makeBad || isBadParameter)
+             {
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEParameterSymbol.cs b/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEParameterSymbol.cs
+--- a/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEParameterSymbol.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEParameterSymbol.cs	2026-04-08 01:57:17.279949039 +0000
+@@ -177,7 +177,7 @@
+             return Create(
+                 moduleSymbol, containingSymbol, isContainingSymbolVirtual, ordinal,
+                 parameterInfo.IsByRef, parameterInfo.RefCustomModifiers, parameterInfo.Type,
+-                handle, parameterInfo.CustomModifiers, isReturn: false, out isBad);
++                handle, parameterInfo.CustomModifiers, false, out isBad);
+         }
+ 
+         private PEParameterSymbol(
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/CSharp/Portable/Symbols/Source/SourceLocalSymbol.cs b/src/Compilers/CSharp/Portable/Symbols/Source/SourceLocalSymbol.cs
+--- a/src/Compilers/CSharp/Portable/Symbols/Source/SourceLocalSymbol.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/CSharp/Portable/Symbols/Source/SourceLocalSymbol.cs	2026-04-08 01:57:17.282290665 +0000
+@@ -604,7 +604,7 @@
+                 SyntaxToken identifierToken,
+                 ExpressionSyntax collection,
+                 LocalDeclarationKind declarationKind) :
+-                    base(containingSymbol, scopeBinder, allowRefKind: true, typeSyntax, identifierToken, declarationKind)
++                    base(containingSymbol, scopeBinder, true, typeSyntax, identifierToken, declarationKind)
+             {
+                 Debug.Assert(declarationKind == LocalDeclarationKind.ForEachIterationVariable);
+                 _collection = collection;
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Core/Portable/Collections/BitVector.cs b/src/Compilers/Core/Portable/Collections/BitVector.cs
+--- a/src/Compilers/Core/Portable/Collections/BitVector.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Core/Portable/Collections/BitVector.cs	2026-04-08 01:57:17.259296305 +0000
+@@ -216,7 +216,7 @@
+         /// For the purposes of the intersection, any bits beyond the current length will be treated as zeroes.
+         /// Return true if any changes were made to the bits of this bit vector.
+         /// </summary>
+-        public bool IntersectWith(in BitVector other)
++        public bool IntersectWith(BitVector other)
+         {
+             bool anyChanged = false;
+             int otherLength = other._bits.Length;
+@@ -268,7 +268,7 @@
+         /// <returns>
+         /// True if any bits were set as a result of the union.
+         /// </returns>
+-        public bool UnionWith(in BitVector other)
++        public bool UnionWith(BitVector other)
+         {
+             bool anyChanged = false;
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Core/Portable/CommandLine/CommonCompiler.cs b/src/Compilers/Core/Portable/CommandLine/CommonCompiler.cs
+--- a/src/Compilers/Core/Portable/CommandLine/CommonCompiler.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Core/Portable/CommandLine/CommonCompiler.cs	2026-04-08 01:57:17.279039244 +0000
+@@ -647,7 +647,7 @@
+             analyzerDriver = null;
+ 
+             // Print the diagnostics produced during the parsing stage and exit if there were any errors.
+-            compilation.GetDiagnostics(CompilationStage.Parse, includeEarlierStages: false, diagnostics, cancellationToken);
++            compilation.GetDiagnostics(CompilationStage.Parse, false, diagnostics, cancellationToken);
+             if (diagnostics.HasAnyErrors())
+             {
+                 return;
+@@ -673,7 +673,7 @@
+                 reportAnalyzer = Arguments.ReportAnalyzer && !analyzers.IsEmpty;
+             }
+ 
+-            compilation.GetDiagnostics(CompilationStage.Declare, includeEarlierStages: false, diagnostics, cancellationToken);
++            compilation.GetDiagnostics(CompilationStage.Declare, false, diagnostics, cancellationToken);
+             if (diagnostics.HasAnyErrors())
+             {
+                 return;
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Core/Portable/Diagnostic/Diagnostic.cs b/src/Compilers/Core/Portable/Diagnostic/Diagnostic.cs
+--- a/src/Compilers/Core/Portable/Diagnostic/Diagnostic.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Core/Portable/Diagnostic/Diagnostic.cs	2026-04-08 01:57:17.278667628 +0000
+@@ -105,7 +105,7 @@
+             ImmutableDictionary<string, string> properties,
+             params object[] messageArgs)
+         {
+-            return Create(descriptor, location, effectiveSeverity: descriptor.DefaultSeverity, additionalLocations, properties, messageArgs);
++            return Create(descriptor, location, descriptor.DefaultSeverity, additionalLocations, properties, messageArgs);
+         }
+ 
+         /// <summary>
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Core/Portable/PEWriter/DebugDirectoryExtensions.cs b/src/Compilers/Core/Portable/PEWriter/DebugDirectoryExtensions.cs
+--- a/src/Compilers/Core/Portable/PEWriter/DebugDirectoryExtensions.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Core/Portable/PEWriter/DebugDirectoryExtensions.cs	2026-04-08 01:57:17.236542465 +0000
+@@ -88,7 +88,7 @@
+         }
+     }
+ 
+-    internal readonly struct PdbChecksumDebugDirectoryData
++    internal struct PdbChecksumDebugDirectoryData
+     {
+         /// <summary>
+         /// Checksum algorithm name.
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Core/Portable/Serialization/ObjectBinderSnapshot.cs b/src/Compilers/Core/Portable/Serialization/ObjectBinderSnapshot.cs
+--- a/src/Compilers/Core/Portable/Serialization/ObjectBinderSnapshot.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Core/Portable/Serialization/ObjectBinderSnapshot.cs	2026-04-08 01:57:17.236643093 +0000
+@@ -6,7 +6,7 @@
+ 
+ namespace Roslyn.Utilities
+ {
+-    internal readonly struct ObjectBinderSnapshot
++    internal struct ObjectBinderSnapshot
+     {
+         private readonly Dictionary<Type, int> _typeToIndex;
+         private readonly ImmutableArray<Type> _types;
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Shared/BuildServerConnection.cs b/src/Compilers/Shared/BuildServerConnection.cs
+--- a/src/Compilers/Shared/BuildServerConnection.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Shared/BuildServerConnection.cs	2026-04-08 02:04:15.196339561 +0000
+@@ -126,7 +126,7 @@
+                 try
+                 {
+                     var clientMutexName = GetClientMutexName(pipeName);
+-                    clientMutex = new Mutex(initiallyOwned: true, name: clientMutexName, out holdsMutex);
++                    clientMutex = new Mutex(true, clientMutexName, out holdsMutex);
+                 }
+                 catch
+                 {
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' a/src/Compilers/Shared/DesktopBuildClient.cs b/src/Compilers/Shared/DesktopBuildClient.cs
+--- a/src/Compilers/Shared/DesktopBuildClient.cs	2018-05-16 21:06:56.000000000 +0000
++++ b/src/Compilers/Shared/DesktopBuildClient.cs	2026-04-08 02:04:15.199139747 +0000
+@@ -33,7 +33,7 @@
+             {
+                 // Register encodings for console
+                 // https://github.com/dotnet/roslyn/issues/10785
+-                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
++                // CodePagesEncodingProvider not available in Mono
+             }
+ 
+             var client = new DesktopBuildClient(language, compileFunc, analyzerAssemblyLoader);

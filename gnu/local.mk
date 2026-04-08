@@ -2426,6 +2426,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/rocprim-placement-new-delete.patch	\
   %D%/packages/patches/roslyn-2.0.0-bootstrap-with-mono.patch	\
   %D%/packages/patches/roslyn-2.3.0-default-literal-for-csc-2.0.patch	\
+  %D%/packages/patches/roslyn-2.8.2-csharp-7.2-for-csc-2.3.patch	\
   %D%/packages/patches/rottlog-direntry.patch 			\
   %D%/packages/patches/ruby-actionpack-remove-browser-tests.patch	\
   %D%/packages/patches/ruby-activesupport-fix-deprecation-warning.patch	\
