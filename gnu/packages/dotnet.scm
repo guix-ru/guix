@@ -2957,6 +2957,59 @@ a C# 7.2 compiler.")))
      "This package provides the Roslyn C# compiler (@command{csc}), built
 from source using @code{roslyn-2.8} as the bootstrap compiler.  It produces
 a C# 8.0 compiler.")))
+
+
+;;;
+;;; roslyn-3.2: inherits roslyn-3.0, built with csc 3.0
+;;; Adds 'notnull' constraint support needed by roslyn 3.8+.
+;;;
+
+(define-public roslyn-3.2
+  (package
+    (inherit roslyn-3.0)
+    (version "3.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dotnet/roslyn")
+             (commit (string-append "version-" version))))
+       (file-name (git-file-name "roslyn" version))
+       (sha256
+        (base32
+         "0brx9i0jrx2j3zircalgyabc24qqy8ghd8hcjazga8w58a0gmvpc"))
+       (patches
+        (search-patches "roslyn-3.2.0-bootstrap-with-csc-3.0.patch"))))
+    (native-inputs (list roslyn-3.0))
+    (arguments
+     (substitute-keyword-arguments (package-arguments roslyn-3.0)
+       ((#:phases phases '())
+        #~(modify-phases #$phases
+            ;; 3.2 uses static local functions (C# 8 preview in csc 3.0).
+            (replace 'create-csc-rsp
+              (lambda _
+                (call-with-output-file "csc.rsp"
+                  (lambda (port)
+                    (display "-langversion:preview\n-d:NET472\n" port)))))
+            ;; Point at roslyn-3.0's csc.
+            (replace 'create-csc-wrapper
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "bootstrap-bin")
+                (call-with-output-file "bootstrap-bin/csc"
+                  (lambda (port)
+                    (format port "#!~a~%exec mono ~a \"$@\"~%"
+                            (which "bash")
+                            (string-append (assoc-ref inputs "roslyn") "/lib/roslyn/csc.exe"))))
+                (chmod "bootstrap-bin/csc" #o755)
+                (setenv "PATH"
+                        (string-append (getcwd) "/bootstrap-bin:"
+                                       (getenv "PATH")))))))))
+    (synopsis "C# 8.0 compiler with notnull constraint support")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}), built
+from source using @code{roslyn-3.0} as the bootstrap compiler.  It adds
+support for the @code{notnull} generic constraint, which is needed to build
+newer Roslyn versions.")))
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
 (define-public msbuild
