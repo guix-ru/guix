@@ -1864,7 +1864,7 @@ most of the heavy lifting.")
     ;;  "")
     ))
 
-(define-public mono-6.12.0
+(define mono-bootstrap
   (package
     (inherit mono-5.10.0)
     (version "6.12.0.206")
@@ -2051,19 +2051,17 @@ most of the heavy lifting.")
                           port))))
                    (find-files gac "^System[.]Windows[.]Forms[.]dll$")))))))))))
 
-(define-public mono mono-6.12.0)
-
 (define-public mono-system-collections-immutable-bootstrap
   (hidden-package
    (package
      (name "mono-system-collections-immutable-bootstrap")
      (version
-      (package-version mono))
+      (package-version mono-bootstrap))
      (source
-      (package-source mono))
+      (package-source mono-bootstrap))
      (build-system gnu-build-system)
      (native-inputs
-      (list mono))
+      (list mono-bootstrap))
      (arguments
       (list #:tests? #f ; tests would require xunit which is not in the bootstrap path.
             #:phases
@@ -2107,14 +2105,14 @@ the source code included within the Mono source tree.")
      (name "mono-system-reflection-metadata-bootstrap")
      ;; Upstream version 1.4.2; but for bootstrap packages it's more useful to have the mono version here.
      (version
-      (package-version mono))
+      (package-version mono-bootstrap))
      (source
-      (package-source mono))
+      (package-source mono-bootstrap))
      (build-system gnu-build-system)
      (inputs
       (list mono-system-collections-immutable-bootstrap)) ; not required: mono-system-buffers-bootstrap
      (native-inputs
-      (list mono))
+      (list mono-bootstrap))
      (arguments
       (list #:tests? #f ; would require xunit which is not in the bootstrap path
             #:phases
@@ -2186,7 +2184,7 @@ the source code included within the Mono source tree.")
     (build-system gnu-build-system)
     (inputs
      (list bash-minimal
-           mono mono-system-reflection-metadata-bootstrap
+           mono-bootstrap mono-system-reflection-metadata-bootstrap
            mono-system-collections-immutable-bootstrap))
     (arguments
      (list #:tests? #f ; would require xunit which is not in the bootstrap path
