@@ -2561,6 +2561,113 @@ entirely from source using Mono's @command{mcs}.  It produces a C# 7.0
 compiler that can be used to bootstrap newer Roslyn versions.")
     (license license:asl2.0)
     (properties '((hidden? #t)))))
+
+
+;;;
+;;; roslyn-2.3: inherits roslyn-2.0, built with csc 2.0
+;;;
+
+(define-public roslyn-2.3
+  (package
+    (inherit roslyn-2.0)
+    (version "2.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dotnet/roslyn")
+              (commit (string-append "version-" version))))
+       (file-name (git-file-name "roslyn" version))
+       (sha256
+        (base32
+         "1hr7lh7vm8lbj73a63xwlwwgmwm068mll1rcihn2cmg5bi5jkzp6"))
+       (patches
+        (search-patches "roslyn-2.3.0-default-literal-for-csc-2.0.patch"))))
+    (native-inputs (list roslyn-2.0))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases '())
+        #~(modify-phases #$phases
+            ;; Replace mcs-specific fixes with csc-2.0-specific fixes.
+            (replace 'fix-compiler-compat
+              (lambda _
+                ;; csc 2.0 does not support "= default)" (C# 7.1).
+                (substitute* "src/Compilers/Core/Portable/AdditionalTextFile.cs"
+                  (("CancellationToken cancellationToken = default\\)")
+                   "CancellationToken cancellationToken = default(CancellationToken))"))
+                (substitute* "src/Compilers/Core/Portable/FileSystemExtensions.cs"
+                  (("CancellationToken cancellationToken = default\\)")
+                   "CancellationToken cancellationToken = default(CancellationToken))"))))
+
+            ;; Delete pre-generated files; we regenerate from XML.
+            (add-after 'remove-stale-files 'delete-generated-files
+              (lambda _
+                (for-each delete-file
+                          (find-files "src/Compilers/CSharp/Portable/Generated"
+                                      "\\.cs$"))))
+
+            ;; Replace the mcs wrapper with one that calls roslyn-2.0's csc.
+            ;; Mono's /bin/csc is broken (points at nonexistent csc.exe),
+            ;; so we must ensure our wrapper is found first.
+            (replace 'create-csc-wrapper
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "bootstrap-bin")
+                (call-with-output-file "bootstrap-bin/csc"
+                  (lambda (port)
+                    (format port "#!~a~%exec mono ~a \"$@\"~%"
+                            (which "bash")
+                            (string-append (assoc-ref inputs "roslyn") "/lib/roslyn/csc.exe"))))
+                (chmod "bootstrap-bin/csc" #o755)
+                (setenv "PATH"
+                        (string-append (getcwd) "/bootstrap-bin:"
+                                       (getenv "PATH")))))
+
+            ;; SRM source needs C# 7.2 -> 7.0 downgrades for csc 2.0.
+            (replace 'prepare-srm-source
+              (lambda _
+                (copy-recursively #$%srm-source-dir "srm-src-patched")
+                (for-each make-file-writable
+                          (find-files "srm-src-patched"))
+                (for-each
+                 (lambda (file)
+                   (substitute* file
+                     (("readonly partial struct") "partial struct")
+                     (("readonly struct") "struct")))
+                 (find-files "srm-src-patched" "\\.cs$"))
+                (for-each
+                 (lambda (file)
+                   (substitute* file
+                     (("\\bin MemoryBlock ") "MemoryBlock ")
+                     (("metadataTableStream = default;")
+                      "metadataTableStream = default(MemoryBlock);")
+                     (("standalonePdbStream = default;")
+                      "standalonePdbStream = default(MemoryBlock);")))
+                 (find-files "srm-src-patched" "MetadataReader\\.cs$"))
+                (substitute*
+                    "srm-src-patched/System/Reflection/Metadata/Ecma335/Encoding/ControlFlowBuilder.cs"
+                  (("label: default, opCode: default\\)")
+                   "label: default(LabelHandle), opCode: default(ILOpCode))"))
+                (for-each
+                 (lambda (file)
+                   (substitute* file
+                     (("StandaloneSignatureHandle localVariablesSignature = default,")
+                      "StandaloneSignatureHandle localVariablesSignature = default(StandaloneSignatureHandle),")
+                     (("\\) : default;")
+                      ") : default(ExceptionRegionEncoder);")))
+                 (find-files "srm-src-patched/System/Reflection/Metadata/Ecma335/Encoding"
+                             "\\.cs$"))
+                (for-each
+                 (lambda (file)
+                   (substitute* file
+                     (("type: ") "") (("version: ") "") (("stamp: ") "")))
+                 (find-files "srm-src-patched/System/Reflection/PortableExecutable/DebugDirectory"
+                             "\\.cs$"))))))))
+    (synopsis "C# 7.1 compiler bootstrapped from source")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}), built
+from source using @code{roslyn-2.0} as the bootstrap compiler.  It produces
+a C# 7.1 compiler that supports default literals, which is needed to build
+newer Roslyn versions.")))
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
 (define-public msbuild

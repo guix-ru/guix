@@ -1,0 +1,35 @@
+Author: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: 2026-04-08
+Subject: Avoid C# 7.1 implicit default literals (fix csc 2.0 incompatibilities) for bootstrap.
+
+--- a/src/Compilers/CSharp/Portable/Lowering/LambdaRewriter/LambdaRewriter.cs
++++ b/src/Compilers/CSharp/Portable/Lowering/LambdaRewriter/LambdaRewriter.cs
+@@ -1349,7 +1349,7 @@
+                     closureKind = ClosureKind.Static;
+                     closureOrdinal = LambdaDebugInfo.StaticClosureOrdinal;
+                 }
+-                structClosures = default;
++                structClosures = default(ImmutableArray<TypeSymbol>);
+             }
+             else
+             {
+@@ -1368,7 +1368,7 @@
+                 }
+                 else
+                 {
+-                    structClosures = default;
++                    structClosures = default(ImmutableArray<TypeSymbol>);
+                 }
+ 
+                 containerAsFrame = null;
+--- a/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_PatternSwitchStatement.cs
++++ b/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_PatternSwitchStatement.cs
+@@ -182,7 +182,7 @@
+                     Add(loweredDecisionTree, (e, t) => new DecisionTree.Guarded(
+                         expression: loweredExpression,
+                         type: loweredExpression.Type,
+-                        bindings: default,
++                        bindings: default(ImmutableArray<KeyValuePair<BoundExpression, BoundExpression>>),
+                         sectionSyntax: defaultSection,
+                         guard: null,
+                         label: defaultLabel));
