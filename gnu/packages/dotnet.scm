@@ -3010,6 +3010,451 @@ a C# 8.0 compiler.")))
 from source using @code{roslyn-3.0} as the bootstrap compiler.  It adds
 support for the @code{notnull} generic constraint, which is needed to build
 newer Roslyn versions.")))
+
+
+;;;
+;;; roslyn-3.8: inherits roslyn-3.2, built with csc 3.2
+;;; This is the target version for Mono 6.12 compatibility.
+;;;
+
+(define-public roslyn-3.8
+  (package
+    (inherit roslyn-3.2)
+    (version "3.8.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dotnet/roslyn")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name "roslyn" version))
+       (sha256
+        (base32
+         "0z003zysqbd35dmw5dby3rs4471cb8qh5jlswyibc4qffh0dkfx4"))
+       (patches
+        (search-patches "roslyn-3.8.0-bootstrap-with-csc-3.2.patch"))))
+    (native-inputs (list roslyn-3.2))
+    (arguments
+     (substitute-keyword-arguments (package-arguments roslyn-3.2)
+       ((#:phases phases '())
+        #~(modify-phases #$phases
+            (replace 'create-csc-rsp
+              (lambda _
+                (call-with-output-file "csc.rsp"
+                  (lambda (port)
+                    (display "-langversion:preview\n-d:NET472\n" port)))))
+
+            ;; Point at roslyn-3.2's csc.
+            (replace 'create-csc-wrapper
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "bootstrap-bin")
+                (call-with-output-file "bootstrap-bin/csc"
+                  (lambda (port)
+                    (format port "#!~a~%exec mono ~a \"$@\"~%"
+                            (which "bash")
+                            (string-append (assoc-ref inputs "roslyn") "/lib/roslyn/csc.exe"))))
+                (chmod "bootstrap-bin/csc" #o755)
+                (setenv "PATH"
+                        (string-append (getcwd) "/bootstrap-bin:"
+                                       (getenv "PATH")))))
+
+            ;; 3.8 has more files with PathUtilities ambiguity
+            ;; between SRM's and Roslyn's PathUtilities classes.
+            ;; PathUtilities ambiguity already handled by the patch.
+            (delete 'fix-srm-inline)
+            (delete 'fix-srm-inline-3.0)
+
+            ;; Mono 6.12's mscorlib provides NotNullWhenAttribute etc.
+            ;; (backported from .NET Core 3.0), but NOT MemberNotNullAttribute
+            ;; or MemberNotNullWhenAttribute (added in .NET 5).
+            ;; Replace the polyfill file: remove types that conflict with
+            ;; mscorlib, keep the two that Mono lacks.
+            (replace 'remove-stale-files
+              (lambda _
+                (for-each
+                 (lambda (f) (when (file-exists? f) (delete-file f)))
+                 '("src/Compilers/Core/Portable/DiaSymReader/Utilities/IUnsafeComStream.cs"
+                   "src/Compilers/Core/Portable/DiaSymReader/Utilities/ComMemoryStream.cs"
+                   ;; Index/Range polyfills are internal and shadow
+                   ;; Mono 6.12's public mscorlib types.  Delete so
+                   ;; csc finds the mscorlib versions.
+                   "src/Compilers/Core/Portable/InternalUtilities/Index.cs"
+                   "src/Compilers/Core/Portable/InternalUtilities/Range.cs"))
+                (call-with-output-file
+                    "src/Compilers/Core/Portable/InternalUtilities/NullableAttributes.cs"
+                  (lambda (port)
+                    (display
+"namespace System.Diagnostics.CodeAnalysis
+{
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
+    internal sealed class MemberNotNullAttribute : System.Attribute
+    {
+        public MemberNotNullAttribute(string member) => Members = new[] { member };
+        public MemberNotNullAttribute(params string[] members) => Members = members;
+        public string[] Members { get; }
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
+    internal sealed class MemberNotNullWhenAttribute : System.Attribute
+    {
+        public MemberNotNullWhenAttribute(bool returnValue, string member) { ReturnValue = returnValue; Members = new[] { member }; }
+        public MemberNotNullWhenAttribute(bool returnValue, params string[] members) { ReturnValue = returnValue; Members = members; }
+        public bool ReturnValue { get; }
+        public string[] Members { get; }
+    }
+}
+" port)))))
+
+            ;; 3.8 removed DesktopShim, DesktopBuildClient, and
+            ;; DesktopAnalyzerAssemblyLoader source files.  The inherited
+            ;; compile phase still references them; create empty stubs.
+            (add-before 'compile 'create-desktop-stubs
+              (lambda _
+                (for-each
+                 (lambda (f)
+                   (unless (file-exists? f)
+                     (call-with-output-file f
+                       (lambda (port) (newline port)))))
+                 '("src/Compilers/Shared/DesktopShim.cs"
+                   "src/Compilers/Shared/DesktopBuildClient.cs"
+                   "src/Compilers/Shared/DesktopAnalyzerAssemblyLoader.cs"))))
+
+            ;; Core IVT needs Scripting and VB assembly names so they
+            ;; can access internal APIs.
+            (replace 'build
+              (lambda _
+                ;; Bootstrap SR class from SRM string resources.
+                ;; Roslyn 2.0-3.2: resx at src/Dependencies/.../Strings.resx
+                ;; Roslyn 3.8+: resx at %srm-source-dir/Resources/Strings.resx
+                (invoke "resx2sr" "-o" "srm-strings.cs" "-n" "System.SR"
+                        "--warn-mismatch"
+                        (string-append #$%srm-source-dir "/Resources/Strings.resx"))
+                (invoke "resx2sr" "-o" "bootstrap-sr.cs" "-n"
+                        "Microsoft.CodeAnalysis.CodeAnalysisResources"
+                        "src/Compilers/Core/Portable/CodeAnalysisResources.resx")
+                ;; SR.Format wrappers (resx2sr only generates constants;
+                ;; SRM code calls SR.Format for string interpolation).
+                (call-with-output-file "srm-strings-format.cs"
+                  (lambda (port)
+                    (display
+"namespace System {
+partial class SR {
+    internal static string Format(string f, object a0) => string.Format(f, a0);
+    internal static string Format(string f, object a0, object a1) => string.Format(f, a0, a1);
+    internal static string Format(string f, object a0, object a1, object a2) => string.Format(f, a0, a1, a2);
+    internal static string Format(string f, params object[] args) => string.Format(f, args);
+}
+}
+" port)))
+                ;; CodeAnalysisResources.ResourceManager property
+                ;; (needed by diagnostic message formatting).
+                (call-with-output-file "bootstrap-resourcemanager.cs"
+                  (lambda (port)
+                    (display
+"namespace Microsoft.CodeAnalysis {
+partial class CodeAnalysisResources {
+    static System.Resources.ResourceManager _rm;
+    public static System.Resources.ResourceManager ResourceManager {
+        get {
+            if (_rm == null)
+                _rm = new System.Resources.ResourceManager(
+                    \"Microsoft.CodeAnalysis.CodeAnalysisResources\",
+                    typeof(CodeAnalysisResources).Assembly);
+            return _rm;
+        }
+    }
+}
+}
+" port)))
+                ;; Core IVT: allow CSharp, VB, Scripting, csc, csi, vbc.
+                (call-with-output-file "bootstrap-ivt.cs"
+                  (lambda (port)
+                    (for-each
+                     (lambda (asm)
+                       (format port
+                               "[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(~s)]~%"
+                               asm))
+                     '("Microsoft.CodeAnalysis.CSharp"
+                       "Microsoft.CodeAnalysis.VisualBasic"
+                       "Microsoft.CodeAnalysis.Scripting"
+                       "Microsoft.CodeAnalysis.CSharp.Scripting"
+                       "csc" "csi" "vbc" "VBCSCompiler"))))
+                ;; CSharp IVT: allow csc, csi, CSharp.Scripting.
+                (call-with-output-file "bootstrap-csharp-ivt.cs"
+                  (lambda (port)
+                    (format port "using System.Runtime.CompilerServices;
+using System.Reflection;
+[assembly: InternalsVisibleTo(\"csc\")]
+[assembly: InternalsVisibleTo(\"csi\")]
+[assembly: InternalsVisibleTo(\"Microsoft.CodeAnalysis.CSharp.Scripting\")]
+[assembly: AssemblyVersion(\"~a.0\")]
+[assembly: AssemblyFileVersion(\"~a.0\")]
+[assembly: AssemblyInformationalVersion(\"~a\")]
+" #$(package-version this-package)
+  #$(package-version this-package)
+  #$(package-version this-package))))
+                ;; Scripting IVT: allow CSharp.Scripting, csi.
+                (call-with-output-file "bootstrap-scripting-ivt.cs"
+                  (lambda (port)
+                    (display "using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo(\"Microsoft.CodeAnalysis.CSharp.Scripting\")]
+[assembly: InternalsVisibleTo(\"csi\")]
+" port)))
+                ;; .resources from .resx for all assemblies.
+                (invoke "resgen"
+                        "src/Compilers/Core/Portable/CodeAnalysisResources.resx"
+                        "Microsoft.CodeAnalysis.CodeAnalysisResources.resources")
+                (invoke "resgen"
+                        "src/Compilers/CSharp/Portable/CSharpResources.resx"
+                        "Microsoft.CodeAnalysis.CSharp.CSharpResources.resources")
+                ;; CSharpResources.Designer.cs for string constants.
+                (invoke "resx2sr" "-o"
+                        "src/Compilers/CSharp/Portable/CSharpResources.Designer.cs"
+                        "-n" "Microsoft.CodeAnalysis.CSharp.CSharpResources"
+                        "src/Compilers/CSharp/Portable/CSharpResources.resx")
+                ;; ScriptingResources.Designer.cs.
+                (invoke "resx2sr" "-o"
+                        "src/Scripting/Core/ScriptingResources.Designer.cs"
+                        "-n" "Microsoft.CodeAnalysis.Scripting.ScriptingResources"
+                        "src/Scripting/Core/ScriptingResources.resx")
+                ;; CSharpScriptingResources.Designer.cs.
+                (invoke "resx2sr" "-o"
+                        "src/Scripting/CSharp/CSharpScriptingResources.Designer.cs"
+                        "-n" "Microsoft.CodeAnalysis.CSharp.Scripting.CSharpScriptingResources"
+                        "src/Scripting/CSharp/CSharpScriptingResources.resx")))
+
+            ;; Build CSharpSyntaxGenerator from source and regenerate
+            ;; the three Syntax.xml.*.Generated.cs files.  The generator
+            ;; reads Syntax.xml and produces C# 8 compatible output
+            ;; (patched SourceWriter.cs emits casts for switch expressions
+            ;; and removes TResult?/where TResult : default).
+            (add-before 'compile 'generate-source
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "generated")
+                ;; Delete checked-in generated files; we regenerate them
+                ;; with C# 8 compatible output from patched generators.
+                (for-each delete-file
+                          (find-files "src/Compilers/CSharp/Portable/Generated"
+                                     "\\.cs$"))
+                ;; CSharpSyntaxGenerator needs 4 source files from the
+                ;; compiler tree (enum/constant definitions only).
+                ;; -d:NETCOREAPP is harmless here (no code gated on it
+                ;; in 3.8) but needed by 3.9 where the CLI entry point
+                ;; moved behind #if NETCOREAPP.  Passing it here lets
+                ;; 3.9 inherit this phase unchanged.
+                (apply invoke "csc" "@csc.rsp" "-d:NETCOREAPP"
+                       "-out:generated/CSharpSyntaxGenerator.exe"
+                       "-r:System.dll" "-r:System.Core.dll"
+                       "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                       (string-append
+                        "-r:" (search-input-file
+                               inputs
+                               "/lib/mono/4.5/System.Collections.Immutable.dll"))
+                       (append
+                        (find-files
+                         "src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator"
+                         "\\.cs$")
+                        (list
+                         "src/Compilers/CSharp/Portable/Syntax/SyntaxKind.cs"
+                         "src/Compilers/CSharp/Portable/Syntax/SyntaxKindFacts.cs"
+                         "src/Compilers/CSharp/Portable/Declarations/DeclarationModifiers.cs"
+                         "src/Compilers/Core/Portable/Symbols/WellKnownMemberNames.cs")))
+                (invoke "mono" "generated/CSharpSyntaxGenerator.exe"
+                        "src/Compilers/CSharp/Portable/Syntax/Syntax.xml"
+                        "generated/")
+                ;; BoundTreeGenerator.
+                (apply invoke "csc" "@csc.rsp"
+                       "-out:generated/BoundTreeGenerator.exe"
+                       "-r:System.dll" "-r:System.Core.dll"
+                       "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                       (find-files
+                        "src/Tools/Source/CompilerGeneratorTools/Source/BoundTreeGenerator"
+                        "\\.cs$"))
+                (invoke "mono" "generated/BoundTreeGenerator.exe" "CSharp"
+                        "src/Compilers/CSharp/Portable/BoundTree/BoundNodes.xml"
+                        "generated/BoundNodes.xml.Generated.cs")
+                ;; CSharpErrorFactsGenerator.
+                (apply invoke "csc" "@csc.rsp"
+                       "-out:generated/CSharpErrorFactsGenerator.exe"
+                       "-r:System.dll" "-r:System.Core.dll"
+                       (find-files
+                        "src/Tools/Source/CompilerGeneratorTools/Source/CSharpErrorFactsGenerator"
+                        "\\.cs$"))
+                (invoke "mono" "generated/CSharpErrorFactsGenerator.exe"
+                        "src/Compilers/CSharp/Portable/Errors/ErrorCode.cs"
+                        "generated/ErrorFacts.Generated.cs")
+                ;; CoreAssemblyLoaderImpl stub: the real implementation
+                ;; uses .NET Core's AssemblyLoadContext; on Mono the
+                ;; Desktop loader is used instead.
+                (call-with-output-file "CoreAssemblyLoaderImpl_stub.cs"
+                  (lambda (port)
+                    (display
+"namespace Microsoft.CodeAnalysis.Scripting.Hosting {
+    internal sealed class CoreAssemblyLoaderImpl : AssemblyLoaderImpl {
+        internal CoreAssemblyLoaderImpl(InteractiveAssemblyLoader loader) : base(loader)
+        { throw new System.PlatformNotSupportedException(); }
+        public override System.Reflection.Assembly LoadFromStream(System.IO.Stream peStream, System.IO.Stream pdbStream)
+        { throw new System.PlatformNotSupportedException(); }
+        public override AssemblyAndLocation LoadFromPath(string assemblyFilePath)
+        { throw new System.PlatformNotSupportedException(); }
+        public override void Dispose() { }
+    }
+}
+" port)))))
+
+            ;; Compile all assemblies: Core, CSharp, Scripting,
+            ;; CSharp.Scripting, and csc.exe.
+            (replace 'compile
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let* ((sci-dll
+                        (search-input-file
+                         inputs "/lib/mono/4.5/System.Collections.Immutable.dll"))
+                       (srm-dir
+                        (if (file-exists? "srm-src-patched")
+                            "srm-src-patched"
+                            #$%srm-source-dir))
+                       (srm-source-files
+                        (filter
+                         (lambda (f)
+                           (not (or (string-contains f "netstandard")
+                                    (string-contains f "netcoreapp")
+                                    (string-contains f "AssemblyInfo")
+                                    (string-suffix? "/SR.cs" f))))
+                         (find-files srm-dir "\\.cs$")))
+                       (deps-dir
+                        (if (file-exists? "src/Dependencies/CodeAnalysis.Metadata")
+                            "src/Dependencies/CodeAnalysis.Metadata"
+                            "src/Dependencies/CodeAnalysis.Debugging")))
+
+                  ;; 1. Microsoft.CodeAnalysis.dll (Core)
+                  (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                         "-out:Microsoft.CodeAnalysis.dll"
+                         (string-append
+                          "-resource:Microsoft.CodeAnalysis.CodeAnalysisResources.resources"
+                          ",Microsoft.CodeAnalysis.CodeAnalysisResources.resources")
+                         "-r:System.dll" "-r:System.Core.dll"
+                         "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                         "-r:System.Numerics.dll" "-r:System.IO.Compression.dll"
+                         "-r:System.Security.dll"
+                         "-r:System.Runtime.Serialization.dll"
+                         (string-append "-r:" sci-dll)
+                         "-d:COMPILERCORE" "-d:SRM"
+                         "srm-strings.cs" "srm-strings-format.cs"
+                         "bootstrap-sr.cs" "bootstrap-resourcemanager.cs"
+                         "bootstrap-ivt.cs"
+                         "src/Compilers/Shared/CoreClrShim.cs"
+                         "src/Compilers/Shared/DesktopShim.cs"
+                         (append
+                          (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                          (find-files "src/Compilers/Core/AnalyzerDriver" "\\.cs$")
+                          (find-files deps-dir "\\.cs$")
+                          (find-files "src/Dependencies/PooledObjects" "\\.cs$")
+                          srm-source-files))
+
+                  ;; 2. Microsoft.CodeAnalysis.CSharp.dll
+                  (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                         "-out:Microsoft.CodeAnalysis.CSharp.dll"
+                         (string-append
+                          "-resource:Microsoft.CodeAnalysis.CSharp.CSharpResources.resources"
+                          ",Microsoft.CodeAnalysis.CSharp.CSharpResources.resources")
+                         "-r:System.dll" "-r:System.Core.dll"
+                         "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                         "-r:System.Numerics.dll" "-r:System.IO.Compression.dll"
+                         (string-append "-r:" sci-dll)
+                         "-r:Microsoft.CodeAnalysis.dll"
+                         "bootstrap-csharp-ivt.cs"
+                         "src/Compilers/CSharp/CSharpAnalyzerDriver/CSharpDeclarationComputer.cs"
+                         (append
+                          (find-files "src/Compilers/CSharp/Portable" "\\.cs$")
+                          (if (file-exists? "generated")
+                              (find-files "generated" "\\.cs$")
+                              '())))
+
+                  ;; 3. Microsoft.CodeAnalysis.Scripting.dll
+                  (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                         "-d:SCRIPTING"
+                         "-out:Microsoft.CodeAnalysis.Scripting.dll"
+                         "-r:System.dll" "-r:System.Core.dll"
+                         "-r:System.Runtime.Serialization.dll"
+                         (string-append "-r:" sci-dll)
+                         "-r:Microsoft.CodeAnalysis.dll"
+                         "bootstrap-scripting-ivt.cs"
+                         "CoreAssemblyLoaderImpl_stub.cs"
+                         (append
+                          (filter
+                           ;; Exclude .NET Core-only assembly loader.
+                           (lambda (f)
+                             (not (string-suffix? "CoreAssemblyLoaderImpl.cs" f)))
+                           (find-files "src/Scripting/Core" "\\.cs$"))
+                          (find-files
+                           "src/Compilers/Shared/GlobalAssemblyCacheHelpers"
+                           "\\.cs$")))
+
+                  ;; 4. Microsoft.CodeAnalysis.CSharp.Scripting.dll
+                  (apply invoke "csc" "@csc.rsp" "-target:library"
+                         "-out:Microsoft.CodeAnalysis.CSharp.Scripting.dll"
+                         "-r:System.dll" "-r:System.Core.dll"
+                         (string-append "-r:" sci-dll)
+                         "-r:Microsoft.CodeAnalysis.dll"
+                         "-r:Microsoft.CodeAnalysis.CSharp.dll"
+                         "-r:Microsoft.CodeAnalysis.Scripting.dll"
+                         (find-files "src/Scripting/CSharp" "\\.cs$"))
+
+                  ;; 5. csc.exe
+                  (invoke "csc" "@csc.rsp" "-out:csc.exe"
+                          "-r:System.dll" "-r:System.Core.dll"
+                          (string-append "-r:" sci-dll)
+                          "-r:Microsoft.CodeAnalysis.dll"
+                          "-r:Microsoft.CodeAnalysis.CSharp.dll"
+                          "src/Compilers/CSharp/csc/Program.cs"
+                          "src/Compilers/Shared/Csc.cs"
+                          "src/Compilers/Shared/BuildClient.cs"
+                          "src/Compilers/Shared/BuildServerConnection.cs"
+                          "src/Compilers/Shared/DesktopBuildClient.cs"
+                          "src/Compilers/Shared/DesktopAnalyzerAssemblyLoader.cs"
+                          "src/Compilers/Shared/ExitingTraceListener.cs"
+                          "src/Compilers/Shared/CoreClrShim.cs"
+                          "src/Compilers/Shared/DesktopShim.cs"
+                          "src/Compilers/Shared/NamedPipeUtil.cs"
+                          "src/Compilers/Shared/RuntimeHostInfo.cs"
+                          "src/Compilers/Core/CommandLine/BuildProtocol.cs"
+                          "src/Compilers/Core/CommandLine/NativeMethods.cs"
+                          "src/Compilers/Core/CommandLine/ConsoleUtil.cs"
+                          "src/Compilers/Core/CommandLine/CompilerServerLogger.cs"))))
+
+            ;; Install all assemblies.
+            (replace 'install
+              (lambda* (#:key inputs outputs #:allow-other-keys)
+                (let* ((out (assoc-ref outputs "out"))
+                       (lib (string-append out "/lib/roslyn"))
+                       (bin (string-append out "/bin"))
+                       (sci-dll (search-input-file
+                                 inputs
+                                 "/lib/mono/4.5/System.Collections.Immutable.dll")))
+                  (mkdir-p lib)
+                  (mkdir-p bin)
+                  (for-each
+                   (lambda (f) (install-file f lib))
+                   '("csc.exe"
+                     "Microsoft.CodeAnalysis.dll"
+                     "Microsoft.CodeAnalysis.CSharp.dll"
+                     "Microsoft.CodeAnalysis.Scripting.dll"
+                     "Microsoft.CodeAnalysis.CSharp.Scripting.dll"))
+                  (symlink sci-dll
+                           (string-append lib "/System.Collections.Immutable.dll"))
+                  (call-with-output-file (string-append bin "/csc")
+                    (lambda (port)
+                      (format port "#!~a~%exec mono ~a/csc.exe \"$@\"~%"
+                              (search-input-file inputs "/bin/bash") lib)))
+                  (chmod (string-append bin "/csc") #o755))))))))
+    (synopsis "C# 9.0 compiler and scripting libraries, bootstrapped from source")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}) and
+scripting libraries, built from source using @code{roslyn-3.2} as the
+bootstrap compiler.  It produces a C# 9.0 compiler matching Mono 6.12.")))
+
+(define roslyn roslyn-3.8)
+
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
 (define-public msbuild

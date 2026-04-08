@@ -1,0 +1,1366 @@
+Author: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: 2026-04-08
+Subject: Downgrade C# 9 syntax to C# 8.
+
+Downgrade C# 9 syntax to C# 8 (is-not-null, or/and patterns, static
+lambdas, target-typed new, index operator, unconstrained T?).
+Patch CSharpSyntaxGenerator templates to emit C# 8 compatible generated code.
+
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs	2026-04-10 00:08:17.363689190 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Binder/Binder_Operators.cs	2026-04-10 02:52:52.308934599 +0000
+@@ -1354,13 +1354,13 @@
+                         {
+                             var int32Value = valueLeft.Int32Value << valueRight.Int32Value;
+                             var int64Value = valueLeft.Int64Value << valueRight.Int32Value;
+-                            return (int32Value == int64Value) ? int32Value : null;
++                            return (int32Value == int64Value) ? (object)int32Value : null;
+                         }
+                     case BinaryOperatorKind.NUIntLeftShift:
+                         {
+                             var uint32Value = valueLeft.UInt32Value << valueRight.Int32Value;
+                             var uint64Value = valueLeft.UInt64Value << valueRight.Int32Value;
+-                            return (uint32Value == uint64Value) ? uint32Value : null;
++                            return (uint32Value == uint64Value) ? (object)uint32Value : null;
+                         }
+                 }
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs	2026-04-10 00:08:17.371692276 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Binder/Semantics/OverloadResolution/OverloadResolution.cs	2026-04-10 02:52:52.309580449 +0000
+@@ -440,7 +440,7 @@
+             }
+ 
+             Debug.Assert(!expectedConvention.CallKind.HasUnknownCallingConventionAttributeBits());
+-            Debug.Assert(expectedConvention.UnmanagedCallingConventionTypes is not null);
++            Debug.Assert(expectedConvention.UnmanagedCallingConventionTypes != null);
+             Debug.Assert(expectedConvention.UnmanagedCallingConventionTypes.IsEmpty || expectedConvention.CallKind == Cci.CallingConvention.Unmanaged);
+ 
+             Debug.Assert(!_binder.IsEarlyAttributeBinder);
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/BoundTree/NullabilityRewriter.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/BoundTree/NullabilityRewriter.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/BoundTree/NullabilityRewriter.cs	2026-04-10 00:08:17.373331829 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/BoundTree/NullabilityRewriter.cs	2026-04-10 02:52:52.309994114 +0000
+@@ -54,13 +54,18 @@
+                 var right = (BoundExpression)Visit(currentBinary.Right);
+                 var type = foundInfo ? infoAndType.Type : currentBinary.Type;
+ 
+-                currentBinary = currentBinary switch
++                switch (currentBinary)
+                 {
+-                    BoundBinaryOperator binary => binary.Update(binary.OperatorKind, binary.ConstantValueOpt, GetUpdatedSymbol(binary, binary.MethodOpt), binary.ResultKind, binary.OriginalUserDefinedOperatorsOpt, leftChild, right, type!),
++                    case BoundBinaryOperator binary:
++                        currentBinary = binary.Update(binary.OperatorKind, binary.ConstantValueOpt, GetUpdatedSymbol(binary, binary.MethodOpt), binary.ResultKind, binary.OriginalUserDefinedOperatorsOpt, leftChild, right, type!);
++                        break;
+                     // https://github.com/dotnet/roslyn/issues/35031: We'll need to update logical.LogicalOperator
+-                    BoundUserDefinedConditionalLogicalOperator logical => logical.Update(logical.OperatorKind, logical.LogicalOperator, logical.TrueOperator, logical.FalseOperator, logical.ResultKind, logical.OriginalUserDefinedOperatorsOpt, leftChild, right, type!),
+-                    _ => throw ExceptionUtilities.UnexpectedValue(currentBinary.Kind),
+-                };
++                    case BoundUserDefinedConditionalLogicalOperator logical:
++                        currentBinary = logical.Update(logical.OperatorKind, logical.LogicalOperator, logical.TrueOperator, logical.FalseOperator, logical.ResultKind, logical.OriginalUserDefinedOperatorsOpt, leftChild, right, type!);
++                        break;
++                    default:
++                        throw ExceptionUtilities.UnexpectedValue(currentBinary.Kind);
++                }
+ 
+                 if (foundInfo)
+                 {
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Compilation/CSharpCompilation.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Compilation/CSharpCompilation.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Compilation/CSharpCompilation.cs	2026-04-10 00:08:17.377739511 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Compilation/CSharpCompilation.cs	2026-04-10 02:52:52.310254011 +0000
+@@ -2183,7 +2183,7 @@
+ 
+         private BinderFactory GetBinderFactory(SyntaxTree syntaxTree, bool ignoreAccessibility, ref WeakReference<BinderFactory>[]? cachedBinderFactories)
+         {
+-            Debug.Assert(System.Runtime.CompilerServices.Unsafe.AreSame(ref cachedBinderFactories, ref ignoreAccessibility ? ref _ignoreAccessibilityBinderFactories : ref _binderFactories));
++            // Debug.Assert for ref-equality check removed: Unsafe.AreSame not available on Mono
+ 
+             var treeNum = GetSyntaxTreeOrdinal(syntaxTree);
+             WeakReference<BinderFactory>[]? binderFactories = cachedBinderFactories;
+@@ -3372,7 +3372,7 @@
+                 throw new ArgumentException(CSharpResources.OutIsNotValidForReturn);
+             }
+ 
+-            if (callingConvention != SignatureCallingConvention.Unmanaged && !callingConventionTypes.IsDefaultOrEmpty)
++            if (callingConvention != (SignatureCallingConvention)9 && !callingConventionTypes.IsDefaultOrEmpty)
+             {
+                 throw new ArgumentException(string.Format(CSharpResources.CallingConventionTypesRequireUnmanaged, nameof(callingConventionTypes), nameof(callingConvention)));
+             }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Compilation/CSharpSemanticModel.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Compilation/CSharpSemanticModel.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Compilation/CSharpSemanticModel.cs	2026-04-10 00:08:17.377739511 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Compilation/CSharpSemanticModel.cs	2026-04-10 02:52:52.310803922 +0000
+@@ -2231,7 +2231,7 @@
+ 
+             return CSharpTypeInfo.None;
+ 
+-            static (TypeSymbol, NullabilityInfo) getTypeAndNullability(BoundExpression expr) => (expr.Type, expr.TopLevelNullability);
++            (TypeSymbol, NullabilityInfo) getTypeAndNullability(BoundExpression expr) => (expr.Type, expr.TopLevelNullability);
+         }
+ 
+         // Gets the method or property group from a specific bound node.
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Compiler/MethodCompiler.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Compiler/MethodCompiler.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Compiler/MethodCompiler.cs	2026-04-10 00:08:17.380448579 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Compiler/MethodCompiler.cs	2026-04-10 02:52:52.311281156 +0000
+@@ -599,7 +599,7 @@
+             if (!hasStaticConstructor &&
+                 processedStaticInitializers.BoundInitializers.IsDefaultOrEmpty &&
+                 _compilation.LanguageVersion >= MessageID.IDS_FeatureNullableReferenceTypes.RequiredVersion() &&
+-                containingType is { IsImplicitlyDeclared: false, TypeKind: TypeKind.Class or TypeKind.Struct or TypeKind.Interface })
++                containingType is { IsImplicitlyDeclared: false } && (containingType.TypeKind == TypeKind.Class || containingType.TypeKind == TypeKind.Struct || containingType.TypeKind == TypeKind.Interface))
+             {
+                 NullableWalker.AnalyzeIfNeeded(
+                     this._compilation,
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker.cs	2026-04-10 00:08:17.385284232 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker.cs	2026-04-10 02:52:52.312107153 +0000
+@@ -753,7 +753,7 @@
+                                 var memberToInitialize = member;
+                                 switch (member)
+                                 {
+-                                    case PropertySymbol:
++                                    case PropertySymbol _:
+                                         // skip any manually implemented properties.
+                                         continue;
+                                     case FieldSymbol { IsConst: true }:
+@@ -965,7 +965,7 @@
+             foreach (var inputParam in parameters)
+             {
+                 if (inputParamNames.Contains(inputParam.Name)
+-                    && GetOrCreateSlot(inputParam) is > 0 and int inputSlot
++                    && GetOrCreateSlot(inputParam) is int inputSlot && inputSlot > 0
+                     && state[inputSlot].IsNotNull())
+                 {
+                     var location = syntaxOpt?.GetLocation() ?? methodMainNode.Syntax.GetLastToken().GetLocation();
+@@ -4736,7 +4736,7 @@
+             }
+ 
+             var argsToParamsOpt = compareExchangeInfo.ArgsToParamsOpt;
+-            Debug.Assert(argsToParamsOpt is { IsDefault: true } or { Length: 3 });
++            Debug.Assert(argsToParamsOpt is { IsDefault: true } || argsToParamsOpt is { Length: 3 });
+             var (comparandIndex, valueIndex, locationIndex) = argsToParamsOpt.IsDefault
+                 ? (2, 1, 0)
+                 : (argsToParamsOpt.IndexOf(2), argsToParamsOpt.IndexOf(1), argsToParamsOpt.IndexOf(0));
+@@ -6169,7 +6169,7 @@
+             Debug.Assert(false); // If this assert fails, add an appropriate test.
+             return symbol;
+ 
+-            bool tryAsMemberOfSingleType(NamedTypeSymbol singleType, [NotNullWhen(true)] out Symbol? result)
++            bool tryAsMemberOfSingleType(NamedTypeSymbol singleType, out Symbol? result)
+             {
+                 if (!singleType.Equals(symbolContainer, TypeCompareKind.AllIgnoreOptions))
+                 {
+@@ -9180,7 +9180,7 @@
+             VisitRvalue(node.Argument);
+             // https://github.com/dotnet/roslyn/issues/31018: Check for delegate mismatch.
+             if (node.Argument.ConstantValue?.IsNull != true
+-                && MakeMemberSlot(receiverOpt, @event) is > 0 and var memberSlot)
++                && MakeMemberSlot(receiverOpt, @event) is var memberSlot && memberSlot > 0)
+             {
+                 this.State[memberSlot] = node.IsAddition
+                     ? this.State[memberSlot].Meet(ResultType.State)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker_Patterns.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker_Patterns.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker_Patterns.cs	2026-04-10 00:08:17.385284232 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/FlowAnalysis/NullableWalker_Patterns.cs	2026-04-10 02:52:52.312792848 +0000
+@@ -638,7 +638,7 @@
+             var inferredTypeWithAnnotations = TypeWithAnnotations.Create(inferredType);
+ 
+             // Convert elements to best type to determine element top-level nullability and to report nested nullability warnings
+-            if (inferredType is not null)
++            if (inferredType is object)
+             {
+                 for (int i = 0; i < numSwitchArms; i++)
+                 {
+@@ -651,7 +651,7 @@
+             var inferredState = BestTypeInferrer.GetNullableState(resultTypes);
+             var resultType = TypeWithState.Create(inferredType, inferredState);
+ 
+-            if (inferredType is not null)
++            if (inferredType is object)
+             {
+                 inferredTypeWithAnnotations = resultType.ToTypeWithAnnotations(compilation);
+                 if (resultType.State == NullableFlowState.MaybeDefault)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs	2026-04-10 00:08:17.400434771 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_CompoundAssignmentOperator.cs	2026-04-10 02:52:52.312948951 +0000
+@@ -336,7 +336,7 @@
+             // Step three: Now fill in the optional arguments. (Dev11 uses the getter for optional arguments in
+             // compound assignments, but for deconstructions we use the setter if the getter is missing.)
+             var accessor = indexer.GetOwnOrInheritedGetMethod() ?? indexer.GetOwnOrInheritedSetMethod();
+-            Debug.Assert(accessor is not null);
++            Debug.Assert(accessor != null);
+             InsertMissingOptionalArguments(syntax, accessor.Parameters, actualArguments, refKinds);
+ 
+             // For a call, step four would be to optimize away some of the temps.  However, we need them all to prevent
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_IndexerAccess.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_IndexerAccess.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_IndexerAccess.cs	2026-04-10 00:08:17.400434771 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_IndexerAccess.cs	2026-04-10 02:52:52.313080297 +0000
+@@ -127,7 +127,7 @@
+             else
+             {
+                 var getMethod = indexer.GetOwnOrInheritedGetMethod();
+-                Debug.Assert(getMethod is not null);
++                Debug.Assert(getMethod != null);
+ 
+                 // We have already lowered each argument, but we may need some additional rewriting for the arguments,
+                 // such as generating a params array, re-ordering arguments based on argsToParamsOpt map, inserting arguments for optional parameters, etc.
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Operations/CSharpOperationFactory_Methods.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Operations/CSharpOperationFactory_Methods.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Operations/CSharpOperationFactory_Methods.cs	2026-04-10 00:08:17.405137886 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Operations/CSharpOperationFactory_Methods.cs	2026-04-10 02:52:52.313195282 +0000
+@@ -217,7 +217,7 @@
+                     {
+                         var boundObjectInitializerMember = (BoundObjectInitializerMember)containingExpression;
+                         var property = (PropertySymbol?)boundObjectInitializerMember.MemberSymbol;
+-                        Debug.Assert(property is not null);
++                        Debug.Assert(property != null);
+                         MethodSymbol? accessor = isObjectOrCollectionInitializer ? property.GetOwnOrInheritedGetMethod() : property.GetOwnOrInheritedSetMethod();
+                         return DeriveArguments(
+                                     boundObjectInitializerMember,
+@@ -335,7 +335,7 @@
+                 return ImmutableArray<IArgumentOperation>.Empty;
+             }
+ 
+-            Debug.Assert(optionalParametersMethod is not null);
++            Debug.Assert(optionalParametersMethod != null);
+ 
+             return LocalRewriter.MakeArgumentsInEvaluationOrder(
+                  operationFactory: this,
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs	2026-04-10 00:08:17.405450612 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs	2026-04-10 02:52:52.314101741 +0000
+@@ -10627,11 +10627,10 @@
+                 {
+                     tk = this.PeekToken(i).Kind;
+                 }
+-                return tk
+-                    is SyntaxKind.OpenParenToken
+-                    or SyntaxKind.OpenBracketToken
+-                    or SyntaxKind.DotToken
+-                    or SyntaxKind.QuestionToken;
++                return tk == SyntaxKind.OpenParenToken
++                    || tk == SyntaxKind.OpenBracketToken
++                    || tk == SyntaxKind.DotToken
++                    || tk == SyntaxKind.QuestionToken;
+             }
+         }
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Parser/LanguageParser_Patterns.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Parser/LanguageParser_Patterns.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Parser/LanguageParser_Patterns.cs	2026-04-10 00:08:17.405450612 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Parser/LanguageParser_Patterns.cs	2026-04-10 02:52:52.314937557 +0000
+@@ -39,10 +39,10 @@
+             var pattern = ParsePattern(GetPrecedence(SyntaxKind.IsPatternExpression), afterIs: true);
+             return pattern switch
+             {
+-                ConstantPatternSyntax cp when ConvertExpressionToType(cp.Expression, out NameSyntax type) => type,
+-                TypePatternSyntax tp => tp.Type,
+-                DiscardPatternSyntax dp => _syntaxFactory.IdentifierName(ConvertToIdentifier(dp.UnderscoreToken)),
+-                var p => p,
++                ConstantPatternSyntax cp when ConvertExpressionToType(cp.Expression, out NameSyntax type) => (CSharpSyntaxNode)type,
++                TypePatternSyntax tp => (CSharpSyntaxNode)tp.Type,
++                DiscardPatternSyntax dp => (CSharpSyntaxNode)_syntaxFactory.IdentifierName(ConvertToIdentifier(dp.UnderscoreToken)),
++                var p => (CSharpSyntaxNode)p,
+             };
+         }
+ 
+@@ -455,10 +455,10 @@
+             var pattern = ParsePattern(Precedence.Conditional, whenIsKeyword: true);
+             return pattern switch
+             {
+-                ConstantPatternSyntax cp => cp.Expression,
+-                TypePatternSyntax tp when ConvertTypeToExpression(tp.Type, out ExpressionSyntax expr) => expr,
+-                DiscardPatternSyntax dp => _syntaxFactory.IdentifierName(ConvertToIdentifier(dp.UnderscoreToken)),
+-                var p => p,
++                ConstantPatternSyntax cp => (CSharpSyntaxNode)cp.Expression,
++                TypePatternSyntax tp when ConvertTypeToExpression(tp.Type, out ExpressionSyntax expr) => (CSharpSyntaxNode)expr,
++                DiscardPatternSyntax dp => (CSharpSyntaxNode)_syntaxFactory.IdentifierName(ConvertToIdentifier(dp.UnderscoreToken)),
++                var p => (CSharpSyntaxNode)p,
+             };
+         }
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/SymbolDisplay/SymbolDisplayVisitor.Members.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/SymbolDisplay/SymbolDisplayVisitor.Members.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/SymbolDisplay/SymbolDisplayVisitor.Members.cs	2026-04-10 00:08:17.411756432 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/SymbolDisplay/SymbolDisplayVisitor.Members.cs	2026-04-10 02:52:52.315077990 +0000
+@@ -560,7 +560,7 @@
+ 
+                     var conventionTypes = symbol.UnmanagedCallingConventionTypes;
+ 
+-                    if (symbol.CallingConvention != SignatureCallingConvention.Unmanaged || !conventionTypes.IsEmpty)
++                    if (symbol.CallingConvention != (SignatureCallingConvention)9 || !conventionTypes.IsEmpty)
+                     {
+                         AddPunctuation(SyntaxKind.OpenBracketToken);
+ 
+@@ -579,7 +579,7 @@
+                                 builder.Add(CreatePart(SymbolDisplayPartKind.ClassName, symbol, "Fastcall"));
+                                 break;
+ 
+-                            case SignatureCallingConvention.Unmanaged:
++                            case (SignatureCallingConvention)9:
+                                 Debug.Assert(!conventionTypes.IsDefaultOrEmpty);
+                                 bool isFirst = true;
+                                 foreach (var conventionType in conventionTypes)
+@@ -593,7 +593,7 @@
+                                     isFirst = false;
+                                     Debug.Assert(conventionType.Name.StartsWith("CallConv"));
+                                     const int CallConvLength = 8;
+-                                    builder.Add(CreatePart(SymbolDisplayPartKind.ClassName, conventionType, conventionType.Name[CallConvLength..]));
++                                    builder.Add(CreatePart(SymbolDisplayPartKind.ClassName, conventionType, conventionType.Name.Substring(CallConvLength)));
+                                 }
+ 
+                                 break;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/FunctionPointers/FunctionPointerTypeSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/FunctionPointers/FunctionPointerTypeSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/FunctionPointers/FunctionPointerTypeSymbol.cs	2026-04-10 00:08:17.415170982 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/FunctionPointers/FunctionPointerTypeSymbol.cs	2026-04-10 02:52:52.315373944 +0000
+@@ -206,7 +206,7 @@
+         /// </summary>
+         internal static bool IsCallingConventionModifier(NamedTypeSymbol modifierType)
+         {
+-            Debug.Assert(modifierType.ContainingAssembly is not null || modifierType.IsErrorType());
++            Debug.Assert(modifierType.ContainingAssembly != null || modifierType.IsErrorType());
+             return (object?)modifierType.ContainingAssembly == modifierType.ContainingAssembly?.CorLibrary
+                    && modifierType.Arity == 0
+                    && modifierType.Name != "CallConv"
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs	2026-04-10 00:08:17.415735200 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PEMethodSymbol.cs	2026-04-10 02:52:52.315517133 +0000
+@@ -1439,7 +1439,7 @@
+             {
+                 var containingModule = (PEModuleSymbol)ContainingModule;
+                 var unmanagedCallersOnlyData = containingModule.Module.TryGetUnmanagedCallersOnlyAttribute(_handle, new MetadataDecoder(containingModule),
+-                    static (name, value, isField) => MethodSymbol.TryDecodeUnmanagedCallersOnlyCallConvsField(name, value, isField, location: null, diagnostics: null));
++                    (name, value, isField) => MethodSymbol.TryDecodeUnmanagedCallersOnlyCallConvsField(name, value, isField, location: null, diagnostics: null));
+ 
+                 Debug.Assert(!ReferenceEquals(unmanagedCallersOnlyData, UnmanagedCallersOnlyAttributeData.Uninitialized)
+                              && !ReferenceEquals(unmanagedCallersOnlyData, UnmanagedCallersOnlyAttributeData.AttributePresentDataNotBound));
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/MethodSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/MethodSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/MethodSymbol.cs	2026-04-10 00:08:17.415735200 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/MethodSymbol.cs	2026-04-10 02:52:52.315693734 +0000
+@@ -1010,7 +1010,7 @@
+         {
+             Debug.Assert((location == null) == (diagnostics == null));
+ 
+-            if (!IsStatic || MethodKind is not (MethodKind.Ordinary or MethodKind.LocalFunction))
++            if (!IsStatic || (MethodKind != MethodKind.Ordinary && MethodKind != MethodKind.LocalFunction))
+             {
+                 // `UnmanagedCallersOnly` can only be applied to ordinary static methods or local functions.
+                 diagnostics?.Add(ErrorCode.ERR_UnmanagedCallersOnlyRequiresStatic, location);
+@@ -1025,7 +1025,7 @@
+ 
+             return false;
+ 
+-            static bool isGenericMethod([DisallowNull] MethodSymbol? method)
++            static bool isGenericMethod(MethodSymbol? method)
+             {
+                 do
+                 {
+@@ -1035,7 +1035,7 @@
+                     }
+ 
+                     method = method.ContainingSymbol as MethodSymbol;
+-                } while (method is not null);
++                } while (method != null);
+ 
+                 return false;
+             }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/OverriddenOrHiddenMembersHelpers.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/OverriddenOrHiddenMembersHelpers.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/OverriddenOrHiddenMembersHelpers.cs	2026-04-10 00:08:17.415735200 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/OverriddenOrHiddenMembersHelpers.cs	2026-04-10 02:52:52.315860175 +0000
+@@ -148,10 +148,10 @@
+             // matching is not sufficient. This member is treated as being as good as an exact match.
+             Symbol knownOverriddenMember = member switch
+             {
+-                MethodSymbol method => KnownOverriddenClassMethod(method),
+-                PEPropertySymbol { GetMethod: PEMethodSymbol { ExplicitlyOverriddenClassMethod: { AssociatedSymbol: PropertySymbol overriddenProperty } } } => overriddenProperty,
+-                RetargetingPropertySymbol { GetMethod: RetargetingMethodSymbol { ExplicitlyOverriddenClassMethod: { AssociatedSymbol: PropertySymbol overriddenProperty } } } => overriddenProperty,
+-                _ => null
++                MethodSymbol method => (Symbol)KnownOverriddenClassMethod(method),
++                PEPropertySymbol { GetMethod: PEMethodSymbol { ExplicitlyOverriddenClassMethod: { AssociatedSymbol: PropertySymbol overriddenProperty } } } => (Symbol)overriddenProperty,
++                RetargetingPropertySymbol { GetMethod: RetargetingMethodSymbol { ExplicitlyOverriddenClassMethod: { AssociatedSymbol: PropertySymbol overriddenProperty } } } => (Symbol)overriddenProperty,
++                _ => (Symbol)null
+             };
+ 
+             for (NamedTypeSymbol currType = containingType.BaseTypeNoUseSiteDiagnostics;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/AliasSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/AliasSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/AliasSymbol.cs	2026-04-10 00:08:17.415735200 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/AliasSymbol.cs	2026-04-10 02:52:52.316002773 +0000
+@@ -35,8 +35,8 @@
+             visitor.VisitAlias(this);
+         }
+ 
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor)
+-            where TResult : default
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor)
++           
+         {
+             return visitor.VisitAlias(this);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/ArrayTypeSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/ArrayTypeSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/ArrayTypeSymbol.cs	2026-04-10 00:08:17.418856711 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/ArrayTypeSymbol.cs	2026-04-10 02:52:52.316070700 +0000
+@@ -77,8 +77,8 @@
+             visitor.VisitArrayType(this);
+         }
+ 
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor)
+-            where TResult : default
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor)
++           
+         {
+             return visitor.VisitArrayType(this);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/DiscardSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/DiscardSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/DiscardSymbol.cs	2026-04-10 00:08:17.418856711 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/DiscardSymbol.cs	2026-04-10 02:52:52.316137004 +0000
+@@ -38,6 +38,6 @@
+         CodeAnalysis.NullableAnnotation IDiscardSymbol.NullableAnnotation => _underlying.TypeWithAnnotations.ToPublicAnnotation();
+ 
+         protected override void Accept(SymbolVisitor visitor) => visitor.VisitDiscard(this);
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor) where TResult : default => visitor.VisitDiscard(this);
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor) => visitor.VisitDiscard(this);
+     }
+ }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/DynamicTypeSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/DynamicTypeSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/DynamicTypeSymbol.cs	2026-04-10 00:08:17.418856711 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/DynamicTypeSymbol.cs	2026-04-10 02:52:52.316205703 +0000
+@@ -38,8 +38,8 @@
+             visitor.VisitDynamicType(this);
+         }
+ 
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor)
+-            where TResult : default
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor)
++           
+         {
+             return visitor.VisitDynamicType(this);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/EventSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/EventSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/EventSymbol.cs	2026-04-10 00:08:17.418856711 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/EventSymbol.cs	2026-04-10 02:52:52.316272448 +0000
+@@ -97,8 +97,8 @@
+             visitor.VisitEvent(this);
+         }
+ 
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor)
+-            where TResult : default
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor)
++           
+         {
+             return visitor.VisitEvent(this);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/FunctionPointerTypeSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/FunctionPointerTypeSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/FunctionPointerTypeSymbol.cs	2026-04-10 00:08:17.418856711 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/FunctionPointerTypeSymbol.cs	2026-04-10 02:52:52.316339183 +0000
+@@ -27,8 +27,8 @@
+         protected override void Accept(SymbolVisitor visitor)
+             => visitor.VisitFunctionPointerType(this);
+ 
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor)
+-            where TResult : default
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor)
++           
+         {
+             return visitor.VisitFunctionPointerType(this);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/LabelSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/LabelSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/PublicModel/LabelSymbol.cs	2026-04-10 00:08:17.418856711 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/PublicModel/LabelSymbol.cs	2026-04-10 02:52:52.316412310 +0000
+@@ -35,8 +35,8 @@
+             visitor.VisitLabel(this);
+         }
+ 
+-        protected override TResult? Accept<TResult>(SymbolVisitor<TResult> visitor)
+-            where TResult : default
++        protected override TResult Accept<TResult>(SymbolVisitor<TResult> visitor)
++           
+         {
+             return visitor.VisitLabel(this);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/ParameterHelpers.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/ParameterHelpers.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/ParameterHelpers.cs	2026-04-10 00:08:17.421120344 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/ParameterHelpers.cs	2026-04-10 02:52:52.316505825 +0000
+@@ -453,7 +453,7 @@
+             }
+             else if (parameter.TypeWithAnnotations.IsStatic)
+             {
+-                Debug.Assert(parameter.ContainingSymbol is FunctionPointerMethodSymbol or { ContainingType: not null });
++                Debug.Assert(parameter.ContainingSymbol is FunctionPointerMethodSymbol || (parameter.ContainingSymbol is { ContainingType: { } }));
+                 // error CS0721: '{0}': static types cannot be used as parameters
+                 diagnostics.Add(
+                     ErrorFacts.GetStaticClassParameterCode(parameter.ContainingSymbol.ContainingType?.IsInterfaceType() ?? false),
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol.cs	2026-04-10 00:08:17.421120344 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol.cs	2026-04-10 02:52:52.316775791 +0000
+@@ -425,7 +425,7 @@
+                     {
+                         BaseTypeDeclarationSyntax typeDecl => typeDecl.Identifier,
+                         DelegateDeclarationSyntax delegateDecl => delegateDecl.Identifier,
+-                        _ => null
++                        _ => (SyntaxToken?)null
+                     };
+ 
+                     ReportTypeNamedRecord(identifier?.Text, this.DeclaringCompilation, diagnostics, identifier?.GetLocation() ?? Location.None);
+@@ -3062,7 +3062,7 @@
+             var getHashCode = addGetHashCode(equalityContract);
+             addEqualityOperators();
+ 
+-            if (thisEquals is not SynthesizedRecordEquals && getHashCode is SynthesizedRecordGetHashCode)
++            if (!(thisEquals is SynthesizedRecordEquals) && getHashCode is SynthesizedRecordGetHashCode)
+             {
+                 diagnostics.Add(ErrorCode.WRN_RecordEqualsWithoutGetHashCode, thisEquals.Locations[0], declaration.Name);
+             }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol_ImplementationChecks.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol_ImplementationChecks.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol_ImplementationChecks.cs	2026-04-10 00:08:17.421120344 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/SourceMemberContainerSymbol_ImplementationChecks.cs	2026-04-10 02:52:52.317116619 +0000
+@@ -83,7 +83,7 @@
+             foreach (var abstractMember in this.AbstractMembers)
+             {
+                 // Dev10 reports failure to implement properties/events in terms of the accessors
+-                if (abstractMember.Kind == SymbolKind.Method && abstractMember is not SynthesizedRecordOrdinaryMethod)
++                if (abstractMember.Kind == SymbolKind.Method && !(abstractMember is SynthesizedRecordOrdinaryMethod))
+                 {
+                     diagnostics.Add(ErrorCode.ERR_UnimplementedAbstractMethod, this.Locations[0], this, abstractMember);
+                 }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/SourceMethodSymbolWithAttributes.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/SourceMethodSymbolWithAttributes.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Source/SourceMethodSymbolWithAttributes.cs	2026-04-10 00:08:17.421120344 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Source/SourceMethodSymbolWithAttributes.cs	2026-04-10 02:52:52.317321323 +0000
+@@ -442,9 +442,9 @@
+                     // it still gets marked as present.
+                     Debug.Assert(earlyData is { UnmanagedCallersOnlyAttributePresent: true });
+                 }
+-                else if (earlyData is null or { UnmanagedCallersOnlyAttributePresent: false })
++                else if (earlyData == null || (earlyData is { UnmanagedCallersOnlyAttributePresent: false }))
+                 {
+-                    Debug.Assert(lateData is null or { UnmanagedCallersOnlyAttributeData: null });
++                    Debug.Assert(lateData == null || (lateData is { UnmanagedCallersOnlyAttributeData: null }));
+                 }
+             }
+ #endif
+@@ -933,7 +933,7 @@
+ 
+             static UnmanagedCallersOnlyAttributeData DecodeUnmanagedCallersOnlyAttributeData(SourceMethodSymbolWithAttributes @this, CSharpAttributeData attribute, Location location, DiagnosticBag diagnostics)
+             {
+-                Debug.Assert(attribute.AttributeClass is not null);
++                Debug.Assert(attribute.AttributeClass is object);
+                 ImmutableHashSet<CodeAnalysis.Symbols.INamedTypeSymbolInternal>? callingConventionTypes = null;
+                 if (attribute.CommonNamedArguments is { IsDefaultOrEmpty: false } namedArgs)
+                 {
+@@ -945,7 +945,7 @@
+                         // member results in an Ambiguous Member error, and we never get to this piece of code at all.
+                         // See UnmanagedCallersOnly_PropertyAndFieldNamedCallConvs for an example
+                         bool isField = attribute.AttributeClass.GetMembers(key).Any(
+-                            static (m, systemType) => m is FieldSymbol { Type: ArrayTypeSymbol { ElementType: NamedTypeSymbol elementType } } && elementType.Equals(systemType, TypeCompareKind.ConsiderEverything),
++                            (m, systemType) => m is FieldSymbol { Type: ArrayTypeSymbol { ElementType: NamedTypeSymbol elementType } } && elementType.Equals(systemType, TypeCompareKind.ConsiderEverything),
+                             systemType);
+ 
+                         var namedArgumentDecoded = TryDecodeUnmanagedCallersOnlyCallConvsField(key, value, isField, location, diagnostics);
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Synthesized/Records/SynthesizedRecordPrintMembers.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Synthesized/Records/SynthesizedRecordPrintMembers.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Symbols/Synthesized/Records/SynthesizedRecordPrintMembers.cs	2026-04-10 00:08:17.426300644 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Symbols/Synthesized/Records/SynthesizedRecordPrintMembers.cs	2026-04-10 02:52:52.317491602 +0000
+@@ -170,7 +170,7 @@
+                         _ => throw ExceptionUtilities.UnexpectedValue(member.Kind)
+                     };
+ 
+-                    Debug.Assert(value.Type is not null);
++                    Debug.Assert(value.Type is object);
+                     if (value.Type.IsValueType)
+                     {
+                         block.Add(F.ExpressionStatement(
+@@ -222,7 +222,7 @@
+                 if (m.Kind is SymbolKind.Property)
+                 {
+                     var property = (PropertySymbol)m;
+-                    return !property.IsIndexer && !property.IsOverride && property.GetMethod is not null;
++                    return !property.IsIndexer && !property.IsOverride && property.GetMethod != null;
+                 }
+ 
+                 return false;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxNode.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxNode.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxNode.cs	2026-04-10 00:08:17.429360529 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxNode.cs	2026-04-10 02:52:52.317599594 +0000
+@@ -114,7 +114,7 @@
+             return tree;
+         }
+ 
+-        public abstract TResult? Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor);
++        public abstract TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor);
+ 
+         public abstract void Accept(CSharpSyntaxVisitor visitor);
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxTree.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxTree.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxTree.cs	2026-04-10 00:08:17.429360529 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxTree.cs	2026-04-10 02:52:52.317739226 +0000
+@@ -724,7 +724,8 @@
+         {
+             return provider?.IsGenerated(this, cancellationToken) switch
+             {
+-                null or GeneratedKind.Unknown => isGeneratedHeuristic(),
++                null => isGeneratedHeuristic(),
++                GeneratedKind.Unknown => isGeneratedHeuristic(),
+                 GeneratedKind kind => kind != GeneratedKind.NotGenerated
+             };
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxVisitor.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxVisitor.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxVisitor.cs	2026-04-10 00:08:17.429360529 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/CSharpSyntaxVisitor.cs	2026-04-10 02:52:52.317864370 +0000
+@@ -16,7 +16,7 @@
+     /// </typeparam>
+     public abstract partial class CSharpSyntaxVisitor<TResult>
+     {
+-        public virtual TResult? Visit(SyntaxNode? node)
++        public virtual TResult Visit(SyntaxNode? node)
+         {
+             if (node != null)
+             {
+@@ -27,7 +27,7 @@
+             return default;
+         }
+ 
+-        public virtual TResult? DefaultVisit(SyntaxNode node)
++        public virtual TResult DefaultVisit(SyntaxNode node)
+         {
+             return default;
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/SyntaxFacts.cs roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/SyntaxFacts.cs
+--- roslyn-3.8-clean/src/Compilers/CSharp/Portable/Syntax/SyntaxFacts.cs	2026-04-10 00:08:17.430559025 +0000
++++ roslyn-3.8-patched/src/Compilers/CSharp/Portable/Syntax/SyntaxFacts.cs	2026-04-10 02:52:52.317942367 +0000
+@@ -554,7 +554,7 @@
+             return node is object &&
+                    node.DescendantNodesAndSelf(child =>
+                    {
+-                       Debug.Assert(ReferenceEquals(node, child) || child is not (MemberDeclarationSyntax or TypeDeclarationSyntax));
++                       Debug.Assert(ReferenceEquals(node, child) || !(child is MemberDeclarationSyntax || child is TypeDeclarationSyntax));
+                        return !IsNestedFunction(child) && !(node is ExpressionSyntax);
+                    }).Any(n => n is YieldStatementSyntax);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/CodeGen/TokenMap.cs roslyn-3.8-patched/src/Compilers/Core/Portable/CodeGen/TokenMap.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/CodeGen/TokenMap.cs	2026-04-10 00:08:17.562148886 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/CodeGen/TokenMap.cs	2026-04-10 02:52:52.318057302 +0000
+@@ -24,8 +24,8 @@
+     /// </summary>
+     internal sealed class TokenMap
+     {
+-        private readonly ConcurrentDictionary<IReferenceOrISignature, uint> _itemIdentityToToken = new();
+-        private readonly Dictionary<IReferenceOrISignatureEquivalent, uint> _itemEquivalentToToken = new();
++        private readonly ConcurrentDictionary<IReferenceOrISignature, uint> _itemIdentityToToken = new ConcurrentDictionary<IReferenceOrISignature, uint>();
++        private readonly Dictionary<IReferenceOrISignatureEquivalent, uint> _itemEquivalentToToken = new Dictionary<IReferenceOrISignatureEquivalent, uint>();
+         private object[] _items = Array.Empty<object>();
+         private int _count = 0;
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs	2026-04-10 00:08:17.563679485 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs	2026-04-10 02:52:52.318150627 +0000
+@@ -392,7 +392,7 @@
+             return false;
+         }
+ 
+-        public static async ValueTask<T?> FirstOrDefaultAsync<T>(this ImmutableArray<T> array, Func<T, Task<bool>> predicateAsync)
++        public static async ValueTask<T> FirstOrDefaultAsync<T>(this ImmutableArray<T> array, Func<T, Task<bool>> predicateAsync)
+         {
+             int n = array.Length;
+             for (int i = 0; i < n; i++)
+@@ -639,16 +639,16 @@
+         // TODO(https://github.com/dotnet/corefx/issues/34126): Remove when System.Collections.Immutable
+         // provides a Span API
+         internal static T[] DangerousGetUnderlyingArray<T>(this ImmutableArray<T> array)
+-            => Unsafe.As<ImmutableArray<T>, ImmutableArrayProxy<T>>(ref array).MutableArray;
++            => System.Linq.Enumerable.ToArray(array);
+ 
+         internal static ReadOnlySpan<T> AsSpan<T>(this ImmutableArray<T> array)
+             => array.DangerousGetUnderlyingArray();
+ 
+         internal static ImmutableArray<T> DangerousCreateFromUnderlyingArray<T>([MaybeNull] ref T[] array)
+         {
+-            var proxy = new ImmutableArrayProxy<T> { MutableArray = array };
+-            array = null!;
+-            return Unsafe.As<ImmutableArrayProxy<T>, ImmutableArray<T>>(ref proxy);
++            var result = ImmutableArray.CreateRange(array);
++            array = null;
++            return result;
+         }
+ 
+         internal static Dictionary<K, ImmutableArray<T>> ToDictionary<K, T>(this ImmutableArray<T> items, Func<T, K> keySelector, IEqualityComparer<K>? comparer = null)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Compilation/Compilation.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Compilation/Compilation.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Compilation/Compilation.cs	2026-04-10 00:08:17.565622216 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Compilation/Compilation.cs	2026-04-10 02:52:52.318357565 +0000
+@@ -2828,7 +2828,7 @@
+ 
+             if (moduleBeingBuilt.DebugInformationFormat == DebugInformationFormat.Embedded && !RoslynString.IsNullOrEmpty(pePdbFilePath))
+             {
+-                pePdbFilePath = PathUtilities.GetFileName(pePdbFilePath);
++                pePdbFilePath = Roslyn.Utilities.PathUtilities.GetFileName(pePdbFilePath);
+             }
+ 
+             EmitStream? emitPeStream = null;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalysisState.cs roslyn-3.8-patched/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalysisState.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalysisState.cs	2026-04-10 00:08:17.569325578 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalysisState.cs	2026-04-10 02:52:52.318629785 +0000
+@@ -232,11 +232,11 @@
+ 
+                     break;
+ 
+-                case CompilationStartedEvent:
++                case CompilationStartedEvent _:
+                     compilationStartedOrCompletedEventCommon(compilationEvent, add);
+                     break;
+ 
+-                case CompilationCompletedEvent:
++                case CompilationCompletedEvent _:
+                     compilationStartedOrCompletedEventCommon(compilationEvent, add);
+                     if (!add)
+                     {
+@@ -318,9 +318,9 @@
+         {
+             return compilationEvent switch
+             {
+-                CompilationStartedEvent => actionCounts.CompilationActionsCount > 0 || actionCounts.SyntaxTreeActionsCount > 0 || actionCounts.AdditionalFileActionsCount > 0,
+-                CompilationCompletedEvent => actionCounts.CompilationEndActionsCount > 0,
+-                SymbolDeclaredCompilationEvent => actionCounts.SymbolActionsCount > 0 || actionCounts.HasAnyExecutableCodeActions,
++                CompilationStartedEvent _ => actionCounts.CompilationActionsCount > 0 || actionCounts.SyntaxTreeActionsCount > 0 || actionCounts.AdditionalFileActionsCount > 0,
++                CompilationCompletedEvent _ => actionCounts.CompilationEndActionsCount > 0,
++                SymbolDeclaredCompilationEvent _ => actionCounts.SymbolActionsCount > 0 || actionCounts.HasAnyExecutableCodeActions,
+                 _ => actionCounts.SemanticModelActionsCount > 0
+             };
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerExecutor.cs roslyn-3.8-patched/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerExecutor.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerExecutor.cs	2026-04-10 00:08:17.569325578 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerExecutor.cs	2026-04-10 02:52:52.318804652 +0000
+@@ -1923,7 +1923,7 @@
+             AnalysisState? analysisState,
+             out AnalyzerStateData? analyzerState)
+         {
+-            Debug.Assert(nonSymbolCompilationEvent is not SymbolDeclaredCompilationEvent);
++            Debug.Assert(!(nonSymbolCompilationEvent is SymbolDeclaredCompilationEvent));
+             Debug.Assert(analysisScope.Contains(analyzer));
+ 
+             analyzerState = null;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/DiagnosticAnalyzer/AsyncQueue.cs roslyn-3.8-patched/src/Compilers/Core/Portable/DiagnosticAnalyzer/AsyncQueue.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/DiagnosticAnalyzer/AsyncQueue.cs	2026-04-10 00:08:17.569325578 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/DiagnosticAnalyzer/AsyncQueue.cs	2026-04-10 02:52:52.319002413 +0000
+@@ -308,7 +308,7 @@
+ 
+             var cancelableTaskCompletionSource = new CancelableTaskCompletionSource<T>(taskCompletionSource, cancellationToken);
+             cancelableTaskCompletionSource.CancellationTokenRegistration = cancellationToken.Register(
+-                static s =>
++                s =>
+                 {
+                     var t = (CancelableTaskCompletionSource<T>)s!;
+                     t.TaskCompletionSource.TrySetCanceled(t.CancellationToken);
+@@ -318,7 +318,7 @@
+ 
+             Debug.Assert(taskCompletionSource.Task.CreationOptions.HasFlag(TaskCreationOptions.RunContinuationsAsynchronously));
+             taskCompletionSource.Task.ContinueWith(
+-                static (_, s) =>
++                (_, s) =>
+                 {
+                     var t = (CancelableTaskCompletionSource<T>)s!;
+                     t.CancellationTokenRegistration.Dispose();
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Emit/CommonPEModuleBuilder.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Emit/CommonPEModuleBuilder.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Emit/CommonPEModuleBuilder.cs	2026-04-10 00:08:17.572862377 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Emit/CommonPEModuleBuilder.cs	2026-04-10 02:52:52.319123981 +0000
+@@ -33,9 +33,9 @@
+         internal Cci.IMethodReference DebugEntryPoint;
+ 
+         private readonly ConcurrentDictionary<IMethodSymbolInternal, Cci.IMethodBody> _methodBodyMap;
+-        private readonly TokenMap _referencesInILMap = new();
+-        private readonly ItemTokenMap<string> _stringsInILMap = new();
+-        private readonly ItemTokenMap<Cci.DebugSourceDocument> _sourceDocumentsInILMap = new();
++        private readonly TokenMap _referencesInILMap = new TokenMap();
++        private readonly ItemTokenMap<string> _stringsInILMap = new ItemTokenMap<string>();
++        private readonly ItemTokenMap<Cci.DebugSourceDocument> _sourceDocumentsInILMap = new ItemTokenMap<Cci.DebugSourceDocument>();
+ 
+         private ImmutableArray<Cci.AssemblyReferenceAlias> _lazyAssemblyReferenceAliases;
+         private ImmutableArray<Cci.ManagedResource> _lazyManagedResources;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs	2026-04-10 00:08:17.573029109 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs	2026-04-10 02:52:52.319290483 +0000
+@@ -633,7 +633,7 @@
+ 
+             if (localVariables.Length > 0)
+             {
+-                var writer = PooledBlobBuilder.GetInstance();
++                var writer = Microsoft.Cci.PooledBlobBuilder.GetInstance();
+                 var encoder = new BlobEncoder(writer).LocalVariableSignature(localVariables.Length);
+ 
+                 foreach (ILocalDefinition local in localVariables)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/EncodedStringText.cs roslyn-3.8-patched/src/Compilers/Core/Portable/EncodedStringText.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/EncodedStringText.cs	2026-04-10 00:08:17.573874584 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/EncodedStringText.cs	2026-04-10 02:52:52.319442998 +0000
+@@ -33,11 +33,11 @@
+         {
+             try
+             {
+-                if (CodePagesEncodingProvider.Instance != null)
++                if (false)
+                 {
+                     // If we're running on CoreCLR we have to register the CodePagesEncodingProvider
+                     // first
+-                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
++                    // not available in Mono
+                 }
+ 
+                 // Try to get the default ANSI code page in the operating system's
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/FileSystem/PathUtilities.cs roslyn-3.8-patched/src/Compilers/Core/Portable/FileSystem/PathUtilities.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/FileSystem/PathUtilities.cs	2026-04-10 00:08:17.574345176 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/FileSystem/PathUtilities.cs	2026-04-10 02:52:52.319545791 +0000
+@@ -767,7 +767,7 @@
+         internal static class TestAccessor
+         {
+             internal static string? GetDirectoryName(string path, bool isUnixLike)
+-                => PathUtilities.GetDirectoryName(path, isUnixLike);
++                => Roslyn.Utilities.PathUtilities.GetDirectoryName(path, isUnixLike);
+         }
+     }
+ }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/ConsList`1.cs roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/ConsList`1.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/ConsList`1.cs	2026-04-10 00:08:17.575615157 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/ConsList`1.cs	2026-04-10 02:52:52.319660015 +0000
+@@ -19,12 +19,12 @@
+     {
+         public static readonly ConsList<T> Empty = new ConsList<T>();
+ 
+-        private readonly T? _head;
++        private readonly T _head;
+         private readonly ConsList<T>? _tail;
+ 
+         internal struct Enumerator : IEnumerator<T>
+         {
+-            private T? _current;
++            private T _current;
+             private ConsList<T> _tail;
+ 
+             internal Enumerator(ConsList<T> list)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/EnumerableExtensions.cs roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/EnumerableExtensions.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/EnumerableExtensions.cs	2026-04-10 00:08:17.575615157 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/EnumerableExtensions.cs	2026-04-10 02:52:52.319741468 +0000
+@@ -529,7 +529,7 @@
+         /// Returns the only element of specified sequence if it has exactly one, and default(TSource) otherwise.
+         /// Unlike <see cref="Enumerable.SingleOrDefault{TSource}(IEnumerable{TSource})"/> doesn't throw if there is more than one element in the sequence.
+         /// </summary>
+-        internal static TSource? AsSingleton<TSource>(this IEnumerable<TSource>? source)
++        internal static TSource AsSingleton<TSource>(this IEnumerable<TSource>? source)
+         {
+             if (source == null)
+             {
+@@ -620,7 +620,7 @@
+             return true;
+         }
+ 
+-        public static T? AggregateOrDefault<T>(this IEnumerable<T> source, Func<T, T, T> func)
++        public static T AggregateOrDefault<T>(this IEnumerable<T> source, Func<T, T, T> func)
+         {
+             using (var e = source.GetEnumerator())
+             {
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/OneOrMany.cs roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/OneOrMany.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/OneOrMany.cs	2026-04-10 00:08:17.575615157 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/OneOrMany.cs	2026-04-10 02:52:52.319839101 +0000
+@@ -19,7 +19,7 @@
+     internal struct OneOrMany<T>
+         where T : notnull
+     {
+-        private readonly T? _one;
++        private readonly T _one;
+         private readonly ImmutableArray<T> _many;
+ 
+         public OneOrMany(T one)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/ReflectionUtilities.cs roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/ReflectionUtilities.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/ReflectionUtilities.cs	2026-04-10 00:08:17.575615157 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/ReflectionUtilities.cs	2026-04-10 02:52:52.319919030 +0000
+@@ -117,7 +117,7 @@
+             return (T)methodInfo.CreateDelegate(typeof(T));
+         }
+ 
+-        public static T? InvokeConstructor<T>(this ConstructorInfo? constructorInfo, params object?[] args)
++        public static T InvokeConstructor<T>(this ConstructorInfo? constructorInfo, params object?[] args)
+         {
+             if (constructorInfo == null)
+             {
+@@ -126,7 +126,7 @@
+ 
+             try
+             {
+-                return (T?)constructorInfo.Invoke(args);
++                return (T)constructorInfo.Invoke(args);
+             }
+             catch (TargetInvocationException e)
+             {
+@@ -142,9 +142,9 @@
+             return constructorInfo.InvokeConstructor<object?>(args);
+         }
+ 
+-        public static T? Invoke<T>(this MethodInfo methodInfo, object obj, params object?[] args)
++        public static T Invoke<T>(this MethodInfo methodInfo, object obj, params object?[] args)
+         {
+-            return (T?)methodInfo.Invoke(obj, args);
++            return (T)methodInfo.Invoke(obj, args);
+         }
+     }
+ }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/RoslynLazyInitializer.cs roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/RoslynLazyInitializer.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/RoslynLazyInitializer.cs	2026-04-10 00:08:17.575615157 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/RoslynLazyInitializer.cs	2026-04-10 02:52:52.319995063 +0000
+@@ -21,11 +21,11 @@
+             => LazyInitializer.EnsureInitialized<T>(ref target!, valueFactory);
+ 
+         /// <inheritdoc cref="LazyInitializer.EnsureInitialized{T}(ref T, ref bool, ref object)"/>
+-        public static T EnsureInitialized<T>([NotNull] ref T? target, ref bool initialized, [NotNull] ref object? syncLock)
+-            => LazyInitializer.EnsureInitialized<T>(ref target!, ref initialized, ref syncLock);
++        public static T EnsureInitialized<T>([NotNull] ref T target, ref bool initialized, [NotNull] ref object? syncLock)
++            => LazyInitializer.EnsureInitialized<T>(ref target, ref initialized, ref syncLock);
+ 
+         /// <inheritdoc cref="LazyInitializer.EnsureInitialized{T}(ref T, ref bool, ref object, Func{T})"/>
+-        public static T EnsureInitialized<T>([NotNull] ref T? target, ref bool initialized, [NotNull] ref object? syncLock, Func<T> valueFactory)
+-            => LazyInitializer.EnsureInitialized<T>(ref target!, ref initialized, ref syncLock, valueFactory);
++        public static T EnsureInitialized<T>([NotNull] ref T target, ref bool initialized, [NotNull] ref object? syncLock, Func<T> valueFactory)
++            => LazyInitializer.EnsureInitialized<T>(ref target, ref initialized, ref syncLock, valueFactory);
+     }
+ }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/WeakReferenceExtensions.cs roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/WeakReferenceExtensions.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/InternalUtilities/WeakReferenceExtensions.cs	2026-04-10 00:08:17.575687950 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/InternalUtilities/WeakReferenceExtensions.cs	2026-04-10 02:52:52.320058532 +0000
+@@ -11,7 +11,7 @@
+     // Helpers that are missing from Dev11 implementation:
+     internal static class WeakReferenceExtensions
+     {
+-        public static T? GetTarget<T>(this WeakReference<T> reference) where T : class?
++        public static T GetTarget<T>(this WeakReference<T> reference) where T : class?
+         {
+             reference.TryGetTarget(out var target);
+             return target;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/MetadataReader/PEModule.cs roslyn-3.8-patched/src/Compilers/Core/Portable/MetadataReader/PEModule.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/MetadataReader/PEModule.cs	2026-04-10 00:08:17.578106367 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/MetadataReader/PEModule.cs	2026-04-10 02:52:52.320221617 +0000
+@@ -1172,7 +1172,7 @@
+                         }
+                     }
+                 }
+-                catch (Exception ex) when (ex is BadImageFormatException or UnsupportedSignatureContent)
++                catch (Exception ex) when (ex is BadImageFormatException || ex is UnsupportedSignatureContent)
+                 {
+                 }
+             }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/Members.cs roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/Members.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/Members.cs	2026-04-10 00:08:17.582009142 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/Members.cs	2026-04-10 02:52:52.320494539 +0000
+@@ -60,7 +60,7 @@
+         /// Extensible calling convention protocol. This represents either the union of calling convention modopts after the paramcount specifier
+         /// in IL, or platform default if none are present
+         /// </summary>
+-        Unmanaged = SignatureCallingConvention.Unmanaged,
++        Unmanaged = 9,
+ 
+         /// <summary>
+         /// The convention for calling a generic method.
+@@ -87,7 +87,7 @@
+             | SignatureCallingConvention.ThisCall
+             | SignatureCallingConvention.FastCall
+             | SignatureCallingConvention.VarArgs
+-            | SignatureCallingConvention.Unmanaged;
++            | (SignatureCallingConvention)9;
+ 
+         private const SignatureAttributes SignatureAttributesMask =
+             SignatureAttributes.Generic
+@@ -105,7 +105,7 @@
+         }
+ 
+         internal static bool IsValid(this SignatureCallingConvention convention)
+-            => convention <= SignatureCallingConvention.VarArgs || convention == SignatureCallingConvention.Unmanaged;
++            => convention <= SignatureCallingConvention.VarArgs || convention == (SignatureCallingConvention)9;
+ 
+         internal static SignatureCallingConvention ToSignatureConvention(this CallingConvention convention)
+             => (SignatureCallingConvention)convention & SignatureCallingConventionMask;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/MetadataWriter.PortablePdb.cs roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/MetadataWriter.PortablePdb.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/MetadataWriter.PortablePdb.cs	2026-04-10 00:08:17.582009142 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/MetadataWriter.PortablePdb.cs	2026-04-10 02:52:52.320633790 +0000
+@@ -914,7 +914,7 @@
+             {
+                 if (metadataReference is PortableExecutableReference portableReference && portableReference.FilePath is object)
+                 {
+-                    var fileName = PathUtilities.GetFileName(portableReference.FilePath);
++                    var fileName = Roslyn.Utilities.PathUtilities.GetFileName(portableReference.FilePath);
+                     var reference = module.CommonCompilation.GetAssemblyOrModuleSymbol(portableReference);
+                     var peReader = GetReader(reference);
+ 
+@@ -939,12 +939,12 @@
+                         ? 0b10
+                         : 0b0);
+ 
+-                    kindAndEmbedInteropTypes |= portableReference.Properties.Kind switch
++                    kindAndEmbedInteropTypes |= (byte)(portableReference.Properties.Kind switch
+                     {
+                         MetadataImageKind.Assembly => 1,
+                         MetadataImageKind.Module => 0,
+                         _ => throw ExceptionUtilities.UnexpectedValue(portableReference.Properties.Kind)
+-                    };
++                    });
+ 
+                     builder.WriteByte(kindAndEmbedInteropTypes);
+                     builder.WriteInt32(peReader.PEHeaders.CoffHeader.TimeDateStamp);
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/PeWriter.cs roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/PeWriter.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/PeWriter.cs	2026-04-10 00:08:17.582009142 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/PeWriter.cs	2026-04-10 02:52:52.320763934 +0000
+@@ -348,7 +348,7 @@
+                 _resourceSection = resourceSection;
+             }
+ 
+-            protected override void Serialize(BlobBuilder builder, SectionLocation location)
++            protected internal override void Serialize(BlobBuilder builder, SectionLocation location)
+             {
+                 NativeResourceWriter.SerializeWin32Resources(builder, _resourceSection, location.RelativeVirtualAddress);
+             }
+@@ -364,7 +364,7 @@
+                 _resources = resources;
+             }
+ 
+-            protected override void Serialize(BlobBuilder builder, SectionLocation location)
++            protected internal override void Serialize(BlobBuilder builder, SectionLocation location)
+             {
+                 NativeResourceWriter.SerializeWin32Resources(builder, _resources, location.RelativeVirtualAddress);
+             }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/ReferenceIndexerBase.cs roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/ReferenceIndexerBase.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/PEWriter/ReferenceIndexerBase.cs	2026-04-10 00:08:17.582009142 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/PEWriter/ReferenceIndexerBase.cs	2026-04-10 02:52:52.320863791 +0000
+@@ -13,8 +13,8 @@
+ {
+     internal abstract class ReferenceIndexerBase : MetadataVisitor
+     {
+-        private readonly HashSet<IReferenceOrISignatureEquivalent> _alreadySeen = new();
+-        private readonly HashSet<IReferenceOrISignatureEquivalent> _alreadyHasToken = new();
++        private readonly HashSet<IReferenceOrISignatureEquivalent> _alreadySeen = new HashSet<IReferenceOrISignatureEquivalent>();
++        private readonly HashSet<IReferenceOrISignatureEquivalent> _alreadyHasToken = new HashSet<IReferenceOrISignatureEquivalent>();
+         protected bool typeReferenceNeedsToken;
+ 
+         internal ReferenceIndexerBase(EmitContext context)
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/StrongName/DesktopStrongNameProvider.cs roslyn-3.8-patched/src/Compilers/Core/Portable/StrongName/DesktopStrongNameProvider.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/StrongName/DesktopStrongNameProvider.cs	2026-04-10 00:08:17.588983134 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/StrongName/DesktopStrongNameProvider.cs	2026-04-10 02:52:52.320972274 +0000
+@@ -55,7 +55,7 @@
+ 
+         internal DesktopStrongNameProvider(ImmutableArray<string> keyFileSearchPaths, StrongNameFileSystem strongNameFileSystem)
+         {
+-            if (!keyFileSearchPaths.IsDefault && keyFileSearchPaths.Any(path => !PathUtilities.IsAbsolute(path)))
++            if (!keyFileSearchPaths.IsDefault && keyFileSearchPaths.Any(path => !Roslyn.Utilities.PathUtilities.IsAbsolute(path)))
+             {
+                 throw new ArgumentException(CodeAnalysisResources.AbsolutePathExpected, nameof(keyFileSearchPaths));
+             }
+@@ -80,7 +80,7 @@
+                         return new StrongNameKeys(StrongNameKeys.GetKeyFileError(messageProvider, keyFilePath, CodeAnalysisResources.FileNotFound));
+                     }
+ 
+-                    Debug.Assert(PathUtilities.IsAbsolute(resolvedKeyFile));
++                    Debug.Assert(Roslyn.Utilities.PathUtilities.IsAbsolute(resolvedKeyFile));
+                     var fileContent = ImmutableArray.Create(FileSystem.ReadAllBytes(resolvedKeyFile));
+                     return StrongNameKeys.CreateHelper(fileContent, keyFilePath, hasCounterSignature);
+                 }
+@@ -117,9 +117,9 @@
+         internal static string? ResolveStrongNameKeyFile(string path, StrongNameFileSystem fileSystem, ImmutableArray<string> keyFileSearchPaths)
+         {
+             // Dev11: key path is simply appended to the search paths, even if it starts with the current (parent) directory ("." or "..").
+-            // This is different from PathUtilities.ResolveRelativePath.
++            // This is different from Roslyn.Utilities.PathUtilities.ResolveRelativePath.
+ 
+-            if (PathUtilities.IsAbsolute(path))
++            if (Roslyn.Utilities.PathUtilities.IsAbsolute(path))
+             {
+                 if (fileSystem.FileExists(path))
+                 {
+@@ -131,9 +131,9 @@
+ 
+             foreach (var searchPath in keyFileSearchPaths)
+             {
+-                string? combinedPath = PathUtilities.CombineAbsoluteAndRelativePaths(searchPath, path);
++                string? combinedPath = Roslyn.Utilities.PathUtilities.CombineAbsoluteAndRelativePaths(searchPath, path);
+ 
+-                Debug.Assert(combinedPath == null || PathUtilities.IsAbsolute(combinedPath));
++                Debug.Assert(combinedPath == null || Roslyn.Utilities.PathUtilities.IsAbsolute(combinedPath));
+ 
+                 if (fileSystem.FileExists(combinedPath))
+                 {
+@@ -192,7 +192,7 @@
+             {
+                 return ClrStrongName.GetInstance();
+             }
+-            catch (MarshalDirectiveException) when (PathUtilities.IsUnixLikePlatform)
++            catch (MarshalDirectiveException) when (Roslyn.Utilities.PathUtilities.IsUnixLikePlatform)
+             {
+                 // CoreCLR, when not on Windows, doesn't support IClrStrongName (or COM in general).
+                 // This is really hard to detect/predict without false positives/negatives.
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/Attributes/CommonAttributeData.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/Attributes/CommonAttributeData.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/Attributes/CommonAttributeData.cs	2026-04-10 00:08:17.589891927 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/Attributes/CommonAttributeData.cs	2026-04-10 02:52:52.321082941 +0000
+@@ -140,7 +140,7 @@
+         /// Returns the value of a constructor argument as type <typeparamref name="T"/>.
+         /// Throws if no constructor argument exists or the argument cannot be converted to the type.
+         /// </summary>
+-        internal T? GetConstructorArgument<T>(int i, SpecialType specialType)
++        internal T GetConstructorArgument<T>(int i, SpecialType specialType)
+         {
+             var constructorArgs = this.CommonConstructorArguments;
+             return constructorArgs[i].DecodeValue<T>(specialType);
+@@ -158,12 +158,12 @@
+         /// For user defined attributes VB allows duplicate named arguments and uses the last value.
+         /// Dev11 reports an error for pseudo-custom attributes when emitting metadata. We don't.
+         /// </remarks>
+-        internal T? DecodeNamedArgument<T>(string name, SpecialType specialType, T? defaultValue = default)
++        internal T DecodeNamedArgument<T>(string name, SpecialType specialType, T defaultValue = default)
+         {
+             return DecodeNamedArgument<T>(CommonNamedArguments, name, specialType, defaultValue);
+         }
+ 
+-        private static T? DecodeNamedArgument<T>(ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments, string name, SpecialType specialType, T? defaultValue = default)
++        private static T DecodeNamedArgument<T>(ImmutableArray<KeyValuePair<string, TypedConstant>> namedArguments, string name, SpecialType specialType, T defaultValue = default)
+         {
+             int index = IndexOfNamedArgument(namedArguments, name);
+             return index >= 0 ? namedArguments[index].Value.DecodeValue<T>(specialType) : defaultValue;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/Attributes/UnmanagedCallersOnlyAttributeData.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/Attributes/UnmanagedCallersOnlyAttributeData.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/Attributes/UnmanagedCallersOnlyAttributeData.cs	2026-04-10 00:08:17.589891927 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/Attributes/UnmanagedCallersOnlyAttributeData.cs	2026-04-10 02:52:52.321191705 +0000
+@@ -22,7 +22,8 @@
+         internal static UnmanagedCallersOnlyAttributeData Create(ImmutableHashSet<INamedTypeSymbolInternal>? callingConventionTypes)
+             => callingConventionTypes switch
+             {
+-                null or { IsEmpty: true } => PlatformDefault,
++                null => PlatformDefault,
++                { IsEmpty: true } => PlatformDefault,
+                 _ => new UnmanagedCallersOnlyAttributeData(callingConventionTypes)
+             };
+ 
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/SymbolVisitor`1.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/SymbolVisitor`1.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/SymbolVisitor`1.cs	2026-04-10 00:08:17.589891927 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/SymbolVisitor`1.cs	2026-04-10 02:52:52.321287665 +0000
+@@ -8,109 +8,109 @@
+ {
+     public abstract class SymbolVisitor<TResult>
+     {
+-        public virtual TResult? Visit(ISymbol? symbol)
++        public virtual TResult Visit(ISymbol? symbol)
+         {
+             return symbol == null
+-                ? default(TResult?)
++                ? default(TResult)
+                 : symbol.Accept(this);
+         }
+ 
+-        public virtual TResult? DefaultVisit(ISymbol symbol)
++        public virtual TResult DefaultVisit(ISymbol symbol)
+         {
+-            return default(TResult?);
++            return default(TResult);
+         }
+ 
+-        public virtual TResult? VisitAlias(IAliasSymbol symbol)
++        public virtual TResult VisitAlias(IAliasSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitArrayType(IArrayTypeSymbol symbol)
++        public virtual TResult VisitArrayType(IArrayTypeSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitAssembly(IAssemblySymbol symbol)
++        public virtual TResult VisitAssembly(IAssemblySymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitDiscard(IDiscardSymbol symbol)
++        public virtual TResult VisitDiscard(IDiscardSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitDynamicType(IDynamicTypeSymbol symbol)
++        public virtual TResult VisitDynamicType(IDynamicTypeSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitEvent(IEventSymbol symbol)
++        public virtual TResult VisitEvent(IEventSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitField(IFieldSymbol symbol)
++        public virtual TResult VisitField(IFieldSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitLabel(ILabelSymbol symbol)
++        public virtual TResult VisitLabel(ILabelSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitLocal(ILocalSymbol symbol)
++        public virtual TResult VisitLocal(ILocalSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitMethod(IMethodSymbol symbol)
++        public virtual TResult VisitMethod(IMethodSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitModule(IModuleSymbol symbol)
++        public virtual TResult VisitModule(IModuleSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitNamedType(INamedTypeSymbol symbol)
++        public virtual TResult VisitNamedType(INamedTypeSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitNamespace(INamespaceSymbol symbol)
++        public virtual TResult VisitNamespace(INamespaceSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitParameter(IParameterSymbol symbol)
++        public virtual TResult VisitParameter(IParameterSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitPointerType(IPointerTypeSymbol symbol)
++        public virtual TResult VisitPointerType(IPointerTypeSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitFunctionPointerType(IFunctionPointerTypeSymbol symbol)
++        public virtual TResult VisitFunctionPointerType(IFunctionPointerTypeSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitProperty(IPropertySymbol symbol)
++        public virtual TResult VisitProperty(IPropertySymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitRangeVariable(IRangeVariableSymbol symbol)
++        public virtual TResult VisitRangeVariable(IRangeVariableSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+ 
+-        public virtual TResult? VisitTypeParameter(ITypeParameterSymbol symbol)
++        public virtual TResult VisitTypeParameter(ITypeParameterSymbol symbol)
+         {
+             return DefaultVisit(symbol);
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/TypedConstant.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/TypedConstant.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Symbols/TypedConstant.cs	2026-04-10 00:08:17.589891927 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Symbols/TypedConstant.cs	2026-04-10 02:52:52.321373636 +0000
+@@ -126,7 +126,7 @@
+             }
+         }
+ 
+-        internal T? DecodeValue<T>(SpecialType specialType)
++        internal T DecodeValue<T>(SpecialType specialType)
+         {
+             TryDecodeValue(specialType, out T value);
+             return value;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Core/Portable/Text/TextChange.cs roslyn-3.8-patched/src/Compilers/Core/Portable/Text/TextChange.cs
+--- roslyn-3.8-clean/src/Compilers/Core/Portable/Text/TextChange.cs	2026-04-10 00:08:17.595607440 +0000
++++ roslyn-3.8-patched/src/Compilers/Core/Portable/Text/TextChange.cs	2026-04-10 02:52:52.321592145 +0000
+@@ -99,8 +99,8 @@
+             var newTextDisplay = NewText switch
+             {
+                 null => "null",
+-                { Length: < 10 } => $"\"{NewText}\"",
+-                { Length: var length } => $"(NewLength = {length})"
++                _ when NewText.Length < 10 => $"\"{NewText}\"",
++                _ when NewText != null => $"(NewLength = {NewText.Length})"
+             };
+             return $"new TextChange(new TextSpan({Span.Start}, {Span.Length}), {newTextDisplay})";
+         }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Compilers/Shared/BuildClient.cs roslyn-3.8-patched/src/Compilers/Shared/BuildClient.cs
+--- roslyn-3.8-clean/src/Compilers/Shared/BuildClient.cs	2026-04-10 00:08:17.604992792 +0000
++++ roslyn-3.8-patched/src/Compilers/Shared/BuildClient.cs	2026-04-10 02:52:52.321712912 +0000
+@@ -76,12 +76,11 @@
+         internal static int Run(IEnumerable<string> arguments, RequestLanguage language, CompileFunc compileFunc)
+         {
+             var sdkDir = GetSystemSdkDirectory();
+-            if (RuntimeHostInfo.IsCoreClrRuntime)
+-            {
+-                // Register encodings for console
+-                // https://github.com/dotnet/roslyn/issues/10785
+-                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+-            }
++            // CodePagesEncodingProvider not available on Mono; only needed on .NET Core
++            // if (RuntimeHostInfo.IsCoreClrRuntime)
++            // {
++            //     System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
++            // }
+ 
+             var client = new BuildClient(language, compileFunc);
+             var clientDir = AppContext.BaseDirectory;
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Scripting/Core/Hosting/AssemblyLoader/InteractiveAssemblyLoader.cs roslyn-3.8-patched/src/Scripting/Core/Hosting/AssemblyLoader/InteractiveAssemblyLoader.cs
+--- roslyn-3.8-clean/src/Scripting/Core/Hosting/AssemblyLoader/InteractiveAssemblyLoader.cs	2026-04-10 00:08:18.018665626 +0000
++++ roslyn-3.8-patched/src/Scripting/Core/Hosting/AssemblyLoader/InteractiveAssemblyLoader.cs	2026-04-10 02:52:52.321822307 +0000
+@@ -170,7 +170,7 @@
+                 throw new ArgumentNullException(nameof(dependency));
+             }
+ 
+-            if (!PathUtilities.IsAbsolute(path))
++            if (!Roslyn.Utilities.PathUtilities.IsAbsolute(path))
+             {
+                 throw new ArgumentException(ScriptingResources.AbsolutePathExpected, nameof(path));
+             }
+diff -ruN '--exclude=*.dll' '--exclude=*.exe' '--exclude=*.resources' '--exclude=*.Designer.cs' '--exclude=bootstrap-*' '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=generated' '--exclude=*.orig' '--exclude=*.rej' '--exclude=CSharpSyntaxGenerator.exe' '--exclude=Test' '--exclude=*.g4' '--exclude=Syntax.xml.Internal.Generated.cs' '--exclude=Syntax.xml.Main.Generated.cs' '--exclude=Syntax.xml.Syntax.Generated.cs' roslyn-3.8-clean/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator/SourceWriter.cs roslyn-3.8-patched/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator/SourceWriter.cs
+--- roslyn-3.8-clean/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator/SourceWriter.cs	2026-04-10 00:08:18.037151666 +0000
++++ roslyn-3.8-patched/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator/SourceWriter.cs	2026-04-10 02:52:52.321989079 +0000
+@@ -269,7 +269,7 @@
+                     for (int i = 0, n = nodeFields.Count; i < n; i++)
+                     {
+                         var field = nodeFields[i];
+-                        WriteLine($"{i} => this.{CamelCase(field.Name)},");
++                        WriteLine($"{i} => (GreenNode)this.{CamelCase(field.Name)},");
+                     }
+                     WriteLine("_ => null,");
+                     CloseBlock(";");
+@@ -1076,7 +1076,7 @@
+                                 WriteLine($"{index} => GetRed(ref this.{CamelCase(field.Name)}, {index}){suffix},");
+                             }
+                         }
+-                        WriteLine("_ => null,");
++                        WriteLine("_ => (SyntaxNode)null,");
+                         CloseBlock(";");
+                         Unindent();
+                     }
+@@ -1109,7 +1109,7 @@
+                         {
+                             WriteLine($"{index} => this.{CamelCase(field.Name)},");
+                         }
+-                        WriteLine("_ => null,");
++                        WriteLine("_ => (SyntaxNode)null,");
+                         CloseBlock(";");
+                         Unindent();
+                     }
+@@ -1151,7 +1151,7 @@
+         private void WriteRedAcceptMethod(Node node, bool genericResult)
+         {
+             string genericArgs = genericResult ? "<TResult>" : "";
+-            WriteLine($"public override {(genericResult ? "TResult?" : "void")} Accept{genericArgs}(CSharpSyntaxVisitor{genericArgs} visitor){(genericResult ? " where TResult : default" : "")} => visitor.Visit{StripPost(node.Name, "Syntax")}(this);");
++            WriteLine($"public override {(genericResult ? "TResult" : "void")} Accept{genericArgs}(CSharpSyntaxVisitor{genericArgs} visitor) => visitor.Visit{StripPost(node.Name, "Syntax")}(this);");
+         }
+ 
+         private void WriteRedVisitors()
+@@ -1175,7 +1175,7 @@
+                     WriteLine();
+                 nWritten++;
+                 WriteComment($"<summary>Called when the visitor visits a {node.Name} node.</summary>");
+-                WriteLine($"public virtual {(genericResult ? "TResult?" : "void")} Visit{StripPost(node.Name, "Syntax")}({node.Name} node) => this.DefaultVisit(node);");
++                WriteLine($"public virtual {(genericResult ? "TResult" : "void")} Visit{StripPost(node.Name, "Syntax")}({node.Name} node) => this.DefaultVisit(node);");
+             }
+             CloseBlock();
+         }
