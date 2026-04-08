@@ -1,0 +1,112 @@
+Author: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: 2026-04-08
+Subject: Make roslyn 2.0.0 build with mono 6.
+
+--- a/src/Compilers/CSharp/Portable/Symbols/SymbolExtensions.cs
++++ b/src/Compilers/CSharp/Portable/Symbols/SymbolExtensions.cs
+@@ -165,7 +165,7 @@
+                 // "this" can be accessed in a lambda in a field initializer if the initializer is 
+                 // a script field initializer or global statement because these are initialized 
+                 // after the call to the base constructor.
+-                return type.IsScriptClass ? type.InstanceConstructors.Single().ThisParameter : null;
++                return type.IsScriptClass ? System.Linq.Enumerable.Single(type.InstanceConstructors).ThisParameter : null;
+             }
+         }
+ 
+@@ -199,7 +199,7 @@
+         /// </summary>
+         public static bool IsContainingSymbolOfAllTypeParameters(this Symbol containingSymbol, ImmutableArray<TypeSymbol> types)
+         {
+-            return types.All(containingSymbol.IsContainingSymbolOfAllTypeParameters);
++            return System.Linq.Enumerable.All(types, containingSymbol.IsContainingSymbolOfAllTypeParameters);
+         }
+ 
+         private static readonly Func<TypeSymbol, Symbol, bool, bool> s_hasInvalidTypeParameterFunc = (type, containingSymbol, unused) => HasInvalidTypeParameter(type, containingSymbol);
+@@ -292,14 +292,14 @@
+         {
+             if ((object)symbol != null)
+             {
+-                SyntaxReference reference = symbol.DeclaringSyntaxReferences.FirstOrDefault();
++                SyntaxReference reference = symbol.DeclaringSyntaxReferences.Length > 0 ? symbol.DeclaringSyntaxReferences[0] : null;
+ 
+                 if (reference == null && symbol.IsImplicitlyDeclared)
+                 {
+                     Symbol containingSymbol = symbol.ContainingSymbol;
+                     if ((object)containingSymbol != null)
+                     {
+-                        reference = containingSymbol.DeclaringSyntaxReferences.FirstOrDefault();
++                        reference = containingSymbol.DeclaringSyntaxReferences.Length > 0 ? containingSymbol.DeclaringSyntaxReferences[0] : null;
+                     }
+                 }
+ 
+@@ -328,7 +328,7 @@
+ 
+         internal static ImmutableArray<TypeSymbol> ToTypes(this ImmutableArray<TypeWithModifiers> typesWithModifiers, out bool hasModifiers)
+         {
+-            hasModifiers = typesWithModifiers.Any(a => !a.CustomModifiers.IsDefaultOrEmpty);
++            hasModifiers = System.Linq.Enumerable.Any(typesWithModifiers, a => !a.CustomModifiers.IsDefaultOrEmpty);
+             return typesWithModifiers.SelectAsArray(a => a.Type);
+         }
+ 
+--- a/src/Compilers/CSharp/Portable/Symbols/TypeMap.cs
++++ b/src/Compilers/CSharp/Portable/Symbols/TypeMap.cs
+@@ -26,7 +26,7 @@
+ 
+         // Only when the caller passes allowAlpha=true do we tolerate substituted (alpha-renamed) type parameters as keys
+         internal TypeMap(ImmutableArray<TypeParameterSymbol> from, ImmutableArray<TypeParameterSymbol> to, bool allowAlpha = false)
+-            : this(from, to.SelectAsArray(TypeSymbolAsTypeWithModifiers), allowAlpha)
++            : this(from, Microsoft.CodeAnalysis.ImmutableArrayExtensions.SelectAsArray<Symbols.TypeParameterSymbol, Symbols.TypeWithModifiers>(to, TypeSymbolAsTypeWithModifiers), allowAlpha)
+         {
+             // mapping contents are read-only hereafter
+         }
+--- a/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs
++++ b/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs
+@@ -2274,7 +2274,7 @@
+         {
+             foreach (Symbol member in ContainingType?.GetMembers(identifier) ?? ImmutableArray<Symbol>.Empty)
+             {
+-                GlobalExpressionVariable field;
++                GlobalExpressionVariable field = null;
+                 if (member.Kind == SymbolKind.Field &&
+                     (field = member as GlobalExpressionVariable)?.SyntaxTree == node.SyntaxTree &&
+                     field.SyntaxNode == node)
+--- a/src/Dependencies/CodeAnalysis.Metadata/CustomDebugInfoReader.cs
++++ b/src/Dependencies/CodeAnalysis.Metadata/CustomDebugInfoReader.cs
+@@ -72,7 +72,7 @@
+             }
+ 
+             int offset = 0;
+-            ReadGlobalHeader(customDebugInfo, ref offset, out var globalVersion, out var globalCount);
++            ReadGlobalHeader(customDebugInfo, ref offset, out byte globalVersion, out byte globalCount);
+ 
+             if (globalVersion != CustomDebugInfoConstants.Version)
+             {
+@@ -81,7 +81,7 @@
+ 
+             while (offset <= customDebugInfo.Length - CustomDebugInfoConstants.RecordHeaderSize)
+             {
+-                ReadRecordHeader(customDebugInfo, ref offset, out var version, out var kind, out var size, out var alignmentSize);
++                ReadRecordHeader(customDebugInfo, ref offset, out byte version, out CustomDebugInfoKind kind, out int size, out int alignmentSize);
+                 if (size < CustomDebugInfoConstants.RecordHeaderSize)
+                 {
+                     throw new InvalidOperationException("Invalid header.");
+@@ -495,7 +495,7 @@
+                 char ch1 = importString[1];
+                 if ('0' <= ch1 && ch1 <= '9')
+                 {
+-                    if (int.TryParse(importString.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture, out var tempMethodToken))
++                    if (int.TryParse(importString.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture, out int tempMethodToken))
+                     {
+                         importStrings = getMethodImportStrings(tempMethodToken, arg);
+                         Debug.Assert(!importStrings.IsDefault);
+--- a/src/Dependencies/PooledObjects/ArrayBuilder.cs
++++ b/src/Dependencies/PooledObjects/ArrayBuilder.cs
+@@ -402,7 +402,7 @@
+             {
+                 var item = this[i];
+                 var key = keySelector(item);
+-                if (!accumulator.TryGetValue(key, out var bucket))
++                if (!accumulator.TryGetValue(key, out ArrayBuilder<T> bucket))
+                 {
+                     bucket = ArrayBuilder<T>.GetInstance();
+                     accumulator.Add(key, bucket);

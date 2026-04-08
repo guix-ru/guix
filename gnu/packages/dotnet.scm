@@ -2161,6 +2161,406 @@ the source code included within the Mono source tree.")
      (home-page "https://dot.net/")
      (license license:expat))))
 
+;;;
+;;; Bootstrap chain: mcs -> csc 2.0 (C# 7.0) -> csc 2.3 (C# 7.1) -> csc 2.8 (C# 7.2)
+;;;
+
+(define %srm-source-dir
+  (file-append (package-source mono-bootstrap)
+               "/external/corefx/src/System.Reflection.Metadata/src"))
+
+(define %roslyn-stale-files
+  '("src/Compilers/Core/Portable/TextLineSpan.cs"
+    "src/Compilers/Core/Portable/Serialization/SimpleRecordingObjectBinder.cs"
+    "src/Compilers/Core/Portable/System/Reflection/BlobBuilder.cs"
+    "src/Compilers/Core/Portable/System/Reflection/BlobWriter.cs"
+    "src/Compilers/Core/Portable/System/Reflection/Internal/Utilities/BlobUtilities.cs"
+    "src/Compilers/Core/Portable/System/Reflection/Metadata/Ecma335/MetadataBuilder.Tables.cs"
+    "src/Compilers/Core/Portable/System/Reflection/Metadata/Ecma335/MetadataBuilder.Heaps.cs"
+    "src/Compilers/Core/Portable/NativePdbWriter/IUnsafeComStream.cs"
+    "src/Compilers/Core/Portable/NativePdbWriter/ComMemoryStream.cs"
+    "src/Compilers/CSharp/Portable/FlowAnalysis/AbstractFlowPass.AbstractLocalState.cs"
+    "src/Compilers/CSharp/Portable/Compiler/Compiler.cs"
+    "src/Compilers/CSharp/Portable/Lowering/TempHelpers.cs"
+    "src/Compilers/CSharp/Portable/Lowering/StateMachineRewriter/StateMachineHoistedLocalSymbol.cs"))
+
+
+;;;
+;;; roslyn-2.0: bootstrapped from Mono's mcs
+;;;
+
+(define-public roslyn-2.0
+  (package
+    (name "roslyn")
+    (version "2.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dotnet/roslyn")
+              (commit (string-append "version-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1gimga04ripx5znkh6gxr9k7179n032mcvl9w7wc2rfx7wrnly4a"))
+       (patches
+        (search-patches "roslyn-2.0.0-bootstrap-with-mono.patch"))))
+    (build-system gnu-build-system)
+    (inputs (list bash-minimal
+                  mono-bootstrap
+                  mono-system-collections-immutable-bootstrap))
+    (arguments
+     (list
+      #:tests? #f
+      #:modules '((guix build gnu-build-system)
+                  (guix build utils)
+                  (ice-9 rdelim))
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; mcs-specific workarounds.
+          (add-after 'unpack 'fix-compiler-compat
+            (lambda _
+              ;; mcs crashes on "is null" at emit time in yield methods.
+              (for-each
+               (lambda (file)
+                 (substitute* file ((" is null")
+                                    " == null")))
+               (append
+                (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                (find-files "src/Compilers/Core/AnalyzerDriver" "\\.cs$")
+                (find-files "src/Compilers/CSharp/Portable" "\\.cs$")
+                (find-files "src/Compilers/Shared" "\\.cs$")
+                (find-files "src/Dependencies" "\\.cs$")))
+              ;; mcs crashes emitting "out var" inside yield methods.
+              (substitute*
+                  "src/Dependencies/CodeAnalysis.Metadata/CustomDebugInfoReader.cs"
+                (("out var globalVersion, out var globalCount")
+                 "out byte globalVersion, out byte globalCount")
+                (("out var version, out var kind, out var size, out var alignmentSize")
+                 "out byte version, out CustomDebugInfoKind kind, out int size, out int alignmentSize")
+                (("out var tempMethodToken")
+                 "out int tempMethodToken"))
+              (substitute* "src/Dependencies/PooledObjects/ArrayBuilder.cs"
+                (("out var bucket") "out ArrayBuilder<T> bucket"))
+              ;; mcs does not track definite assignment through "?.".
+              (substitute*
+                  "src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs"
+                (("GlobalExpressionVariable field;")
+                 "GlobalExpressionVariable field = null;"))))
+
+          ;; Mono mscorlib compatibility (shared by all versions).
+          (add-after 'fix-compiler-compat 'fix-mono-compat
+            (lambda _
+              (substitute*
+                  "src/Compilers/Core/Portable/InternalUtilities/KeyValuePair.cs"
+                (("static class KeyValuePair")
+                 "static class KeyValuePairUtil"))
+              (for-each
+               (lambda (file)
+                 (substitute* file
+                   (("KeyValuePair\\.Create") "KeyValuePairUtil.Create")))
+               (append
+                (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                (find-files "src/Compilers/CSharp/Portable" "\\.cs$")))
+              (substitute* "src/Compilers/Core/Portable/EncodedStringText.cs"
+                (("if \\(CodePagesEncodingProvider\\.Instance != null\\)")
+                 "if (false)")
+                (("Encoding\\.RegisterProvider\\(CodePagesEncodingProvider\\.Instance\\);")
+                 "// not available in Mono"))))
+
+          ;; SRM inline compilation conflicts (shared by all versions).
+          (add-after 'fix-mono-compat 'fix-srm-inline
+            (lambda _
+              (substitute*
+                  "src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs"
+                (("var writer = PooledBlobBuilder")
+                 "var writer = Microsoft.Cci.PooledBlobBuilder"))
+              (substitute* (list
+                            "src/Compilers/Core/Portable/Compilation/Compilation.cs"
+                            "src/Compilers/Core/Portable/StrongName/StrongNameProvider.cs")
+                (("\\bPathUtilities\\.")
+                 "Roslyn.Utilities.PathUtilities."))
+              (substitute* "src/Compilers/Core/Portable/PEWriter/PeWriter.cs"
+                (("protected override void Serialize\\(BlobBuilder builder, SectionLocation location\\)")
+                 "protected internal override void Serialize(BlobBuilder builder, SectionLocation location)"))))
+
+          (add-after 'fix-srm-inline 'remove-stale-files
+            (lambda _
+              (for-each
+               (lambda (f) (when (file-exists? f) (delete-file f)))
+               '#$%roslyn-stale-files)))
+
+          ;; ComMemoryStream is used by the Windows native PDB writer.
+          ;; On Linux we never write native PDBs, but the type must
+          ;; exist for compilation.
+          (add-after 'remove-stale-files 'create-com-memory-stream-stub
+            (lambda _
+              (call-with-output-file
+                  "src/Compilers/Core/Portable/NativePdbWriter/ComMemoryStream.cs"
+                (lambda (port)
+                  (display
+                   "using System; using System.IO;
+namespace Roslyn.Utilities
+{
+    internal sealed class ComMemoryStream : Stream
+    {
+        public override bool CanRead => false;
+        public override bool CanSeek => true;
+        public override bool CanWrite => true;
+        public override long Length => _length;
+        public override long Position { get; set; }
+        private long _length;
+        public override void Flush() {}
+        public override int Read(byte[] b, int o, int c)
+            => throw new NotSupportedException();
+        public override long Seek(long o, SeekOrigin so) => 0;
+        public override void SetLength(long v) { _length = v; }
+        public override void Write(byte[] b, int o, int c) {}
+        internal byte[] GetChunks() => Array.Empty<byte>();
+    }
+}
+" port)))))
+
+          (delete 'configure)
+
+          ;; Create a compiler wrapper so the build phase can use "csc"
+          ;; uniformly.  Inherited versions replace this phase to point
+          ;; at the previously-built csc instead of mcs.
+          (add-before 'build 'create-csc-wrapper
+            (lambda _
+              (mkdir-p "bootstrap-bin")
+              (call-with-output-file "bootstrap-bin/csc"
+                (lambda (port)
+                  (format port "#!~a~%exec mcs -langversion:7.2 \"$@\"~%"
+                          (which "bash"))))
+              (chmod "bootstrap-bin/csc" #o755)
+              (setenv "PATH"
+                      (string-append (getcwd) "/bootstrap-bin:"
+                                     (getenv "PATH")))))
+
+          ;; Response file for additional compiler flags.  Empty by
+          ;; default; roslyn-2.8 replaces this to add -langversion:7.1.
+          (add-before 'build 'create-csc-rsp
+            (lambda _
+              (call-with-output-file "csc.rsp"
+                (lambda (port) #t))))
+
+          ;; Generate bootstrap support files (SR class, IVT, .resources).
+          (replace 'build
+            (lambda _
+              ;; Bootstrap SR class from SRM string resources.
+              (invoke "resx2sr" "-o" "srm-strings.cs" "-n" "System.SR"
+                      "--warn-mismatch"
+                      (string-append #$%srm-source-dir "/Resources/Strings.resx"))
+              (call-with-output-file "bootstrap-sr.cs"
+                (lambda (port)
+                  (display
+                   "namespace System
+{
+    internal class SR
+    {
+        internal static string Format(string f, object a0) => string.Format(f, a0);
+        internal static string Format(string f, object a0, object a1) => string.Format(f, a0, a1);
+        internal static string Format(string f, object a0, object a1, object a2) => string.Format(f, a0, a1, a2);
+        internal static string Format(string f, params object[] args) => string.Format(f, args);
+" port)
+                  (call-with-input-file "srm-strings.cs"
+                    (lambda (in)
+                      (let loop ()
+                        (let ((line (read-line in)))
+                          (unless (eof-object? line)
+                            (when (string-contains line "public const")
+                              (display line port)
+                              (newline port))
+                            (loop))))))
+                  (display "    }\n}\n" port)))
+              ;; InternalsVisibleTo attributes.
+              (call-with-output-file "bootstrap-ivt.cs"
+                (lambda (port)
+                  (display
+                   "using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo(\"Microsoft.CodeAnalysis.CSharp\")]
+[assembly: InternalsVisibleTo(\"csc\")]
+[assembly: InternalsVisibleTo(\"Microsoft.CodeAnalysis.CompilerServer\")]
+[assembly: InternalsVisibleTo(\"VBCSCompiler\")]
+" port)))
+              (call-with-output-file "bootstrap-csharp-ivt.cs"
+                (lambda (port)
+                  (format port
+                          "using System.Runtime.CompilerServices;
+using System.Reflection;
+[assembly: InternalsVisibleTo(\"csc\")]
+[assembly: AssemblyVersion(\"~a.0\")]
+[assembly: AssemblyFileVersion(\"~a.0\")]
+[assembly: AssemblyInformationalVersion(\"~a\")]
+" #$(package-version this-package) #$(package-version this-package) #$(package-version this-package))))
+              ;; .resources from .resx.
+              (invoke "resgen"
+                      "src/Compilers/Core/Portable/CodeAnalysisResources.resx"
+                      "Microsoft.CodeAnalysis.CodeAnalysisResources.resources")
+              (invoke "resgen"
+                      "src/Compilers/CSharp/Portable/CSharpResources.resx"
+                      "Microsoft.CodeAnalysis.CSharp.CSharpResources.resources")))
+
+          ;; Build code generators from XML and run them.
+          ;; roslyn-2.8 deletes this phase (uses checked-in generated files).
+          (add-after 'build 'generate-source
+            (lambda _
+              (mkdir-p "generated")
+              (apply invoke "csc" "@csc.rsp"
+                     "-out:generated/CSharpSyntaxGenerator.exe"
+                     "-r:System.dll" "-r:System.Core.dll"
+                     "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                     (find-files
+                      "src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator"
+                      "\\.cs$"))
+              (invoke "mono" "generated/CSharpSyntaxGenerator.exe"
+                      "src/Compilers/CSharp/Portable/Syntax/Syntax.xml"
+                      "generated/")
+              (apply invoke "csc" "@csc.rsp"
+                     "-out:generated/BoundTreeGenerator.exe"
+                     "-r:System.dll" "-r:System.Core.dll"
+                     "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                     (find-files
+                      "src/Tools/Source/CompilerGeneratorTools/Source/BoundTreeGenerator"
+                      "\\.cs$"))
+              (invoke "mono" "generated/BoundTreeGenerator.exe" "CSharp"
+                      "src/Compilers/CSharp/Portable/BoundTree/BoundNodes.xml"
+                      "generated/BoundNodes.xml.Generated.cs")
+              (apply invoke "csc" "@csc.rsp"
+                     "-out:generated/CSharpErrorFactsGenerator.exe"
+                     "-r:System.dll" "-r:System.Core.dll"
+                     (find-files
+                      "src/Tools/Source/CompilerGeneratorTools/Source/CSharpErrorFactsGenerator"
+                      "\\.cs$"))
+              (invoke "mono" "generated/CSharpErrorFactsGenerator.exe"
+                      "src/Compilers/CSharp/Portable/Errors/ErrorCode.cs"
+                      "generated/ErrorFacts.Generated.cs")))
+
+          ;; Prepare SRM source for inline compilation.
+          ;; roslyn-2.0 uses the original source (mcs handles C# 7.2).
+          ;; roslyn-2.3 and roslyn-2.8 replace this to copy+patch for
+          ;; C# 7.2 -> 7.0/7.1 downgrades.
+          (add-after 'generate-source 'prepare-srm-source
+            (lambda _ #t))
+
+          ;; Compile the three assemblies.
+          (add-after 'prepare-srm-source 'compile
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((sci-dll
+                      (search-input-file
+                       inputs "/lib/mono/4.5/System.Collections.Immutable.dll"))
+                     (srm-dir
+                      (if (file-exists? "srm-src-patched")
+                          "srm-src-patched"
+                          #$%srm-source-dir))
+                     (srm-source-files
+                      (filter
+                       (lambda (f)
+                         (not (or (string-contains f "netstandard")
+                                  (string-contains f "netcoreapp")
+                                  (string-contains f "AssemblyInfo")
+                                  (string-suffix? "/SR.cs" f))))
+                       (find-files srm-dir "\\.cs$")))
+                     (deps-dir
+                      (if (file-exists? "src/Dependencies/CodeAnalysis.Metadata")
+                          "src/Dependencies/CodeAnalysis.Metadata"
+                          "src/Dependencies/CodeAnalysis.Debugging")))
+
+                ;; 1. Microsoft.CodeAnalysis.dll
+                (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                       "-out:Microsoft.CodeAnalysis.dll"
+                       (string-append
+                        "-resource:Microsoft.CodeAnalysis.CodeAnalysisResources.resources"
+                        ",Microsoft.CodeAnalysis.CodeAnalysisResources.resources")
+                       "-r:System.dll" "-r:System.Core.dll"
+                       "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                       "-r:System.Numerics.dll" "-r:System.IO.Compression.dll"
+                       "-r:System.Security.dll"
+                       "-r:System.Runtime.Serialization.dll"
+                       (string-append "-r:" sci-dll)
+                       "-d:COMPILERCORE" "-d:SRM"
+                       "bootstrap-sr.cs" "bootstrap-ivt.cs"
+                       "src/Compilers/Shared/CoreClrShim.cs"
+                       "src/Compilers/Shared/DesktopShim.cs"
+                       (append
+                        (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                        (find-files "src/Compilers/Core/AnalyzerDriver" "\\.cs$")
+                        (find-files deps-dir "\\.cs$")
+                        (find-files "src/Dependencies/PooledObjects" "\\.cs$")
+                        srm-source-files))
+
+                ;; 2. Microsoft.CodeAnalysis.CSharp.dll
+                (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                       "-out:Microsoft.CodeAnalysis.CSharp.dll"
+                       (string-append
+                        "-resource:Microsoft.CodeAnalysis.CSharp.CSharpResources.resources"
+                        ",Microsoft.CodeAnalysis.CSharp.CSharpResources.resources")
+                       "-r:System.dll" "-r:System.Core.dll"
+                       "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                       "-r:System.Numerics.dll" "-r:System.IO.Compression.dll"
+                       (string-append "-r:" sci-dll)
+                       "-r:Microsoft.CodeAnalysis.dll"
+                       "bootstrap-csharp-ivt.cs"
+                       "src/Compilers/CSharp/CSharpAnalyzerDriver/CSharpDeclarationComputer.cs"
+                       (append
+                        (find-files "src/Compilers/CSharp/Portable" "\\.cs$")
+                        ;; Generated source files (from generate-source phase
+                        ;; or checked into the source tree).
+                        (if (file-exists? "generated")
+                            (find-files "generated" "\\.cs$")
+                            '())))
+
+                ;; 3. csc.exe
+                (invoke "csc" "@csc.rsp" "-out:csc.exe"
+                        "-r:System.dll" "-r:System.Core.dll"
+                        (string-append "-r:" sci-dll)
+                        "-r:Microsoft.CodeAnalysis.dll"
+                        "-r:Microsoft.CodeAnalysis.CSharp.dll"
+                        "src/Compilers/CSharp/csc/Program.cs"
+                        "src/Compilers/Shared/Csc.cs"
+                        "src/Compilers/Shared/BuildClient.cs"
+                        "src/Compilers/Shared/BuildServerConnection.cs"
+                        "src/Compilers/Shared/DesktopBuildClient.cs"
+                        "src/Compilers/Shared/DesktopAnalyzerAssemblyLoader.cs"
+                        "src/Compilers/Shared/ExitingTraceListener.cs"
+                        "src/Compilers/Shared/CoreClrShim.cs"
+                        "src/Compilers/Shared/DesktopShim.cs"
+                        "src/Compilers/Core/CommandLine/BuildProtocol.cs"
+                        "src/Compilers/Core/CommandLine/NativeMethods.cs"
+                        "src/Compilers/Core/CommandLine/ConsoleUtil.cs"
+                        "src/Compilers/Core/CommandLine/CompilerServerLogger.cs"))))
+
+          (replace 'install
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (lib (string-append out "/lib/roslyn"))
+                     (bin (string-append out "/bin"))
+                     (sci-dll (search-input-file
+                               inputs
+                               "/lib/mono/4.5/System.Collections.Immutable.dll")))
+                (mkdir-p lib)
+                (mkdir-p bin)
+                (install-file "csc.exe" lib)
+                (install-file "Microsoft.CodeAnalysis.dll" lib)
+                (install-file "Microsoft.CodeAnalysis.CSharp.dll" lib)
+                (symlink sci-dll
+                         (string-append lib "/System.Collections.Immutable.dll"))
+                (call-with-output-file (string-append bin "/csc")
+                  (lambda (port)
+                    (format port "#!~a~%exec ~a ~a/csc.exe \"$@\"~%"
+                            (search-input-file inputs "/bin/bash")
+                            (search-input-file inputs "/bin/mono")
+                            lib)))
+                (chmod (string-append bin "/csc") #o755)))))))
+    (home-page "https://github.com/dotnet/roslyn")
+    (synopsis "C# 7.0 compiler bootstrapped from source with Mono")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}), built
+entirely from source using Mono's @command{mcs}.  It produces a C# 7.0
+compiler that can be used to bootstrap newer Roslyn versions.")
+    (license license:asl2.0)
+    (properties '((hidden? #t)))))
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
 (define-public msbuild
