@@ -1,0 +1,321 @@
+Author: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: 2026-04-08
+Subject: Avoid ReadOnlySpan since mono runtime doesn't have it.  Avoid CodePagesEncodingProvider.
+
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs b/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs
+--- a/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs	2026-04-08 04:40:30.652729285 +0000
+@@ -508,9 +508,9 @@
+         // TODO(https://github.com/dotnet/corefx/issues/34126): Remove when System.Collections.Immutable
+         // provides a Span API
+         internal static T[] DangerousGetUnderlyingArray<T>(this ImmutableArray<T> array)
+-            => Unsafe.As<ImmutableArray<T>, ImmutableArrayProxy<T>>(ref array).MutableArray;
++            => array.ToArray();
+ 
+-        internal static ReadOnlySpan<T> AsSpan<T>(this ImmutableArray<T> array)
++        internal static T[] AsSpan<T>(this ImmutableArray<T> array)
+             => array.DangerousGetUnderlyingArray();
+ 
+         internal static Dictionary<K, ImmutableArray<T>> ToDictionary<K, T>(this ImmutableArray<T> items, Func<T, K> keySelector, IEqualityComparer<K> comparer = null)
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriter.cs b/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriter.cs
+--- a/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriter.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriter.cs	2026-04-08 04:40:30.662352748 +0000
+@@ -44,7 +44,7 @@
+         /// <exception cref="ObjectDisposedException">Object has been disposed.</exception>
+         /// <exception cref="InvalidOperationException">Writes are not allowed to the underlying stream.</exception>
+         /// <exception cref="SymUnmanagedWriterException">Error occurred while writing PDB data.</exception>
+-        public abstract int DefineDocument(string name, Guid language, Guid vendor, Guid type, Guid algorithmId, ReadOnlySpan<byte> checksum, ReadOnlySpan<byte> source);
++        public abstract int DefineDocument(string name, Guid language, Guid vendor, Guid type, Guid algorithmId, byte[] checksum, byte[] source);
+ 
+         /// <summary>
+         /// Defines sequence points.
+@@ -127,8 +127,8 @@
+             int moveNextMethodToken,
+             int kickoffMethodToken,
+             int catchHandlerOffset,
+-            ReadOnlySpan<int> yieldOffsets,
+-            ReadOnlySpan<int> resumeOffsets);
++            int[] yieldOffsets,
++            int[] resumeOffsets);
+ 
+         /// <summary>
+         /// Associates custom debug information blob with the current method.
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriterImpl.cs b/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriterImpl.cs
+--- a/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriterImpl.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/DiaSymReader/Writer/SymUnmanagedWriterImpl.cs	2026-04-08 04:41:40.581693982 +0000
+@@ -137,7 +137,7 @@
+             }
+         }
+ 
+-        public override int DefineDocument(string name, Guid language, Guid vendor, Guid type, Guid algorithmId, ReadOnlySpan<byte> checksum, ReadOnlySpan<byte> source)
++        public override int DefineDocument(string name, Guid language, Guid vendor, Guid type, Guid algorithmId, byte[] checksum, byte[] source)
+         {
+             if (name == null)
+             {
+@@ -468,8 +468,8 @@
+             int moveNextMethodToken,
+             int kickoffMethodToken,
+             int catchHandlerOffset,
+-            ReadOnlySpan<int> yieldOffsets,
+-            ReadOnlySpan<int> resumeOffsets)
++            int[] yieldOffsets,
++            int[] resumeOffsets)
+         {
+             if (yieldOffsets == null) throw new ArgumentNullException(nameof(yieldOffsets));
+             if (resumeOffsets == null) throw new ArgumentNullException(nameof(resumeOffsets));
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/InternalUtilities/Hash.cs b/src/Compilers/Core/Portable/InternalUtilities/Hash.cs
+--- a/src/Compilers/Core/Portable/InternalUtilities/Hash.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/InternalUtilities/Hash.cs	2026-04-08 04:40:30.590942249 +0000
+@@ -180,7 +180,7 @@
+         /// <param name="data">The sequence of bytes that are likely to be ASCII text.</param>
+         /// <param name="isAscii">True if the sequence contains only characters in the ASCII range.</param>
+         /// <returns>The FNV-1a hash of <paramref name="data"/></returns>
+-        internal static int GetFNVHashCode(ReadOnlySpan<byte> data, out bool isAscii)
++        internal static int GetFNVHashCode(byte[] data, out bool isAscii)
+         {
+             int hashCode = Hash.FnvOffsetBias;
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/InternalUtilities/LittleEndianReader.cs b/src/Compilers/Core/Portable/InternalUtilities/LittleEndianReader.cs
+--- a/src/Compilers/Core/Portable/InternalUtilities/LittleEndianReader.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/InternalUtilities/LittleEndianReader.cs	2026-04-08 04:42:30.135720458 +0000
+@@ -1,62 +1,59 @@
+-﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+-
++// Bootstrap: rewritten to avoid ReadOnlySpan (csc 2.8 can't use its indexer).
+ using System;
+-using Roslyn.Utilities;
+-using static System.Buffers.Binary.BinaryPrimitives;
+ 
+-namespace Microsoft.CodeAnalysis
++namespace Roslyn.Utilities
+ {
+-    /// <summary>
+-    /// A Span-compatible version of <see cref="System.IO.BinaryReader"/>.
+-    /// </summary>
+-    internal ref struct LittleEndianReader
++    internal struct LittleEndianReader
+     {
+-        private ReadOnlySpan<byte> _span;
++        private readonly byte[] _data;
++        private int _offset;
+ 
+-        public LittleEndianReader(ReadOnlySpan<byte> span)
++        public LittleEndianReader(byte[] data)
+         {
+-            _span = span;
++            _data = data;
++            _offset = 0;
+         }
+ 
+         internal uint ReadUInt32()
+         {
+-            var result = ReadUInt32LittleEndian(_span);
+-            _span = _span.Slice(sizeof(uint));
++            var result = (uint)(_data[_offset] | _data[_offset+1] << 8 |
++                                _data[_offset+2] << 16 | _data[_offset+3] << 24);
++            _offset += sizeof(uint);
+             return result;
+         }
+ 
+         internal byte ReadByte()
+         {
+-            var result = _span[0];
+-            _span = _span.Slice(sizeof(byte));
+-            return result;
++            return _data[_offset++];
+         }
+ 
+         internal ushort ReadUInt16()
+         {
+-            var result = ReadUInt16LittleEndian(_span);
+-            _span = _span.Slice(sizeof(ushort));
++            var result = (ushort)(_data[_offset] | _data[_offset+1] << 8);
++            _offset += sizeof(ushort);
+             return result;
+         }
+ 
+-        internal ReadOnlySpan<byte> ReadBytes(int byteCount)
++        internal byte[] ReadBytes(int byteCount)
+         {
+-            var result = _span.Slice(0, byteCount);
+-            _span = _span.Slice(byteCount);
++            var result = new byte[byteCount];
++            Array.Copy(_data, _offset, result, 0, byteCount);
++            _offset += byteCount;
+             return result;
+         }
+ 
+         internal int ReadInt32()
+         {
+-            var result = ReadInt32LittleEndian(_span);
+-            _span = _span.Slice(sizeof(int));
++            var result = _data[_offset] | _data[_offset+1] << 8 |
++                         _data[_offset+2] << 16 | _data[_offset+3] << 24;
++            _offset += sizeof(int);
+             return result;
+         }
+ 
+-        internal byte[] ReadReversed(int byteCount)
++        internal byte[] ReadReversed(int count)
+         {
+-            var result = ReadBytes(byteCount).ToArray();
+-            result.ReverseContents();
++            var result = ReadBytes(count);
++            Array.Reverse(result);
+             return result;
+         }
+     }
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/InternalUtilities/StringTable.cs b/src/Compilers/Core/Portable/InternalUtilities/StringTable.cs
+--- a/src/Compilers/Core/Portable/InternalUtilities/StringTable.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/InternalUtilities/StringTable.cs	2026-04-08 04:45:58.668140916 +0000
+@@ -109,7 +109,7 @@
+ 
+         internal string Add(char[] chars, int start, int len)
+         {
+-            var span = chars.AsSpan(start, len);
++            var span = new string(chars, start, len).ToCharArray();
+             var hashCode = Hash.GetFNVHashCode(chars, start, len);
+ 
+             // capture array to avoid extra range checks
+@@ -295,7 +295,7 @@
+ 
+                 if (e != null)
+                 {
+-                    if (hash == hashCode && TextEquals(e, chars.AsSpan(start, len)))
++                    if (hash == hashCode && TextEquals(e, new string(chars, start, len).ToCharArray()))
+                     {
+                         break;
+                     }
+@@ -350,7 +350,7 @@
+             return e;
+         }
+ 
+-        private static string FindSharedEntryASCII(int hashCode, ReadOnlySpan<byte> asciiChars)
++        private static string FindSharedEntryASCII(int hashCode, byte[] asciiChars)
+         {
+             var arr = s_sharedTable;
+             int idx = SharedIdxFromHash(hashCode);
+@@ -581,7 +581,7 @@
+             return text;
+         }
+ 
+-        internal static string AddSharedUTF8(ReadOnlySpan<byte> bytes)
++        internal static string AddSharedUTF8(byte[] bytes)
+         {
+             bool isAscii;
+             int hashCode = Hash.GetFNVHashCode(bytes, out isAscii);
+@@ -598,13 +598,13 @@
+             return AddSharedSlow(hashCode, bytes, isAscii);
+         }
+ 
+-        private static string AddSharedSlow(int hashCode, ReadOnlySpan<byte> utf8Bytes, bool isAscii)
++        private static string AddSharedSlow(int hashCode, byte[] utf8Bytes, bool isAscii)
+         {
+             string text;
+ 
+             unsafe
+             {
+-                fixed (byte* bytes = &utf8Bytes.GetPinnableReference())
++                fixed (byte* bytes = utf8Bytes)
+                 {
+                     text = Encoding.UTF8.GetString(bytes, utf8Bytes.Length);
+                 }
+@@ -711,7 +711,7 @@
+             return true;
+         }
+ 
+-        internal static bool TextEqualsASCII(string text, ReadOnlySpan<byte> ascii)
++        internal static bool TextEqualsASCII(string text, byte[] ascii)
+         {
+ #if DEBUG
+             for (var i = 0; i < ascii.Length; i++)
+@@ -736,7 +736,7 @@
+             return true;
+         }
+ 
+-        internal static bool TextEquals(string array, ReadOnlySpan<char> text)
+-            => text.Equals(array.AsSpan(), StringComparison.Ordinal);
++        internal static bool TextEquals(string array, char[] text)
++            => string.Equals(new string(text), array, StringComparison.Ordinal);
+     }
+ }
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/InternalUtilities/TextKeyedCache.cs b/src/Compilers/Core/Portable/InternalUtilities/TextKeyedCache.cs
+--- a/src/Compilers/Core/Portable/InternalUtilities/TextKeyedCache.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/InternalUtilities/TextKeyedCache.cs	2026-04-08 04:43:25.581261044 +0000
+@@ -118,7 +118,7 @@
+ 
+             if (text != null && localSlot.HashCode == hashCode)
+             {
+-                if (StringTable.TextEquals(text, chars.AsSpan(start, len)))
++                if (StringTable.TextEquals(text, new string(chars, start, len).ToCharArray()))
+                 {
+                     return localSlot.Item;
+                 }
+@@ -155,7 +155,7 @@
+ 
+                 if (e != null)
+                 {
+-                    if (hash == hashCode && StringTable.TextEquals(e.Text, chars.AsSpan(start, len)))
++                    if (hash == hashCode && StringTable.TextEquals(e.Text, new string(chars, start, len).ToCharArray()))
+                     {
+                         break;
+                     }
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/MetadataReader/PEModule.cs b/src/Compilers/Core/Portable/MetadataReader/PEModule.cs
+--- a/src/Compilers/Core/Portable/MetadataReader/PEModule.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/MetadataReader/PEModule.cs	2026-04-08 04:40:42.540150457 +0000
+@@ -3151,7 +3151,7 @@
+ 
+             public unsafe override string GetString(byte* bytes, int byteCount)
+             {
+-                return StringTable.AddSharedUTF8(new ReadOnlySpan<byte>(bytes, byteCount));
++                var arr = new byte[byteCount]; System.Runtime.InteropServices.Marshal.Copy((System.IntPtr)bytes, arr, 0, byteCount); return StringTable.AddSharedUTF8(arr);
+             }
+         }
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/NativePdbWriter/PdbWriter.cs b/src/Compilers/Core/Portable/NativePdbWriter/PdbWriter.cs
+--- a/src/Compilers/Core/Portable/NativePdbWriter/PdbWriter.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/NativePdbWriter/PdbWriter.cs	2026-04-08 04:40:30.630288586 +0000
+@@ -573,8 +573,8 @@
+             }
+ 
+             Guid algorithmId;
+-            ReadOnlySpan<byte> checksum;
+-            ReadOnlySpan<byte> embeddedSource;
++            byte[] checksum;
++            byte[] embeddedSource;
+ 
+             DebugSourceInfo info = document.GetSourceInfo();
+             if (!info.Checksum.IsDefault)
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Core/Portable/StrongName/CryptoBlobParser.cs b/src/Compilers/Core/Portable/StrongName/CryptoBlobParser.cs
+--- a/src/Compilers/Core/Portable/StrongName/CryptoBlobParser.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Core/Portable/StrongName/CryptoBlobParser.cs	2026-04-08 04:41:40.581488708 +0000
+@@ -153,7 +153,7 @@
+             uint magic,
+             uint bitLen,
+             uint pubExp,
+-            ReadOnlySpan<byte> pubKeyData)
++            byte[] pubKeyData)
+         {
+             var w = new BlobWriter(3 * sizeof(uint) + s_offsetToKeyData + pubKeyData.Length);
+             w.WriteUInt32(AlgorithmId.RsaSign);
+@@ -250,7 +250,7 @@
+         /// Helper for RsaCryptoServiceProvider.ExportParameters()
+         /// Copied from https://github.com/dotnet/corefx/blob/5fe5f9aae7b2987adc7082f90712b265bee5eefc/src/System.Security.Cryptography.Csp/src/System/Security/Cryptography/CapiHelper.Shared.cs
+         /// </summary>
+-        internal static RSAParameters ToRSAParameters(this ReadOnlySpan<byte> cspBlob, bool includePrivateParameters)
++        internal static RSAParameters ToRSAParameters(this byte[] cspBlob, bool includePrivateParameters)
+         {
+             var br = new LittleEndianReader(cspBlob);
+ 
+diff -ruN '--exclude=*.resx' '--exclude=*.xlf' '--exclude=*.xml' '--exclude=*.rsp' '--exclude=srm-src-patched' '--exclude=*.resources' '--exclude=bootstrap-*' '--exclude=*.dll' '--exclude=*.exe' '--exclude=srm-strings.cs' '--exclude=generated' a/src/Compilers/Shared/DesktopBuildClient.cs b/src/Compilers/Shared/DesktopBuildClient.cs
+--- a/src/Compilers/Shared/DesktopBuildClient.cs	2019-03-20 01:30:13.000000000 +0000
++++ b/src/Compilers/Shared/DesktopBuildClient.cs	2026-04-08 04:48:35.412540299 +0000
+@@ -33,7 +33,7 @@
+             {
+                 // Register encodings for console
+                 // https://github.com/dotnet/roslyn/issues/10785
+-                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
++                // CodePagesEncodingProvider not available in Mono
+             }
+ 
+             var client = new DesktopBuildClient(language, compileFunc, analyzerAssemblyLoader);

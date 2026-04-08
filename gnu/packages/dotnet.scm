@@ -2783,6 +2783,180 @@ namespace Microsoft.DiaSymReader
      "This package provides the Roslyn C# compiler (@command{csc}), built
 from source using @code{roslyn-2.3} as the bootstrap compiler.  It produces
 a C# 7.2 compiler.")))
+
+;;;
+;;; roslyn-3.0: inherits roslyn-2.8, built with csc 2.8
+;;;
+
+(define-public roslyn-3.0
+  (package
+    (inherit roslyn-2.8)
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dotnet/roslyn")
+             (commit (string-append "version-" version))))
+       (file-name (git-file-name "roslyn" version))
+       (sha256
+        (base32
+         "17x9bapqaaapa7jsb2sz9pm20swgj40naxlgci4nc9xh7brahcqw"))
+       (patches
+        (search-patches "roslyn-3.0.0-bootstrap-with-csc-2.8.patch"))))
+    (native-inputs (list roslyn-2.8))
+    (arguments
+     (substitute-keyword-arguments (package-arguments roslyn-2.8)
+       ((#:phases phases '())
+        #~(modify-phases #$phases
+            ;; No compiler-compat or mono-compat fixes needed for 3.0;
+            ;; the patch handles ReadOnlySpan and other changes.
+            ;; KeyValuePair helper was removed in 3.0.
+            (replace 'fix-compiler-compat
+              (lambda _ #t))
+            (replace 'fix-mono-compat
+              (lambda _
+                ;; Only CodePagesEncodingProvider remains.
+                (substitute* "src/Compilers/Core/Portable/EncodedStringText.cs"
+                  (("if \\(CodePagesEncodingProvider\\.Instance != null\\)")
+                   "if (false)")
+                  (("Encoding\\.RegisterProvider\\(CodePagesEncodingProvider\\.Instance\\);")
+                   "// not available in Mono"))))
+
+            ;; 3.0 has more files with PathUtilities ambiguity.
+            (add-after 'fix-srm-inline 'fix-srm-inline-3.0
+              (lambda _
+                (substitute* (list
+                              "src/Compilers/Core/Portable/StrongName/DesktopStrongNameProvider.cs"
+                              "src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerFileReference.cs")
+                  (("\\bPathUtilities\\.")
+                   "Roslyn.Utilities.PathUtilities."))))
+
+            ;; 3.0 has no stale files from 2.x.  Only DiaSymReader COM
+            ;; files need stubbing (inherited from create-diasymreader-stubs).
+            ;; Rename file with trailing space in its name.
+            (replace 'remove-stale-files
+              (lambda _
+                (rename-file
+                 "src/Compilers/Core/Portable/Operations/IConstructorBodyOperation .cs"
+                 "src/Compilers/Core/Portable/Operations/IConstructorBodyOperation.cs")
+                (for-each
+                 (lambda (f) (when (file-exists? f) (delete-file f)))
+                 '("src/Compilers/Core/Portable/DiaSymReader/Utilities/IUnsafeComStream.cs"
+                   "src/Compilers/Core/Portable/DiaSymReader/Utilities/ComMemoryStream.cs"))))
+
+            ;; csc.rsp: C# 7.3 langversion, NET472 define (was NET46 in 2.8).
+            (replace 'create-csc-rsp
+              (lambda _
+                (call-with-output-file "csc.rsp"
+                  (lambda (port)
+                    (display "-langversion:7.3\n-d:NET472\n" port)))))
+
+            ;; Point at roslyn-2.8's csc.
+            (replace 'create-csc-wrapper
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "bootstrap-bin")
+                (call-with-output-file "bootstrap-bin/csc"
+                  (lambda (port)
+                    (format port "#!~a~%exec mono ~a \"$@\"~%"
+                            (which "bash")
+                            (string-append (assoc-ref inputs "roslyn") "/lib/roslyn/csc.exe"))))
+                (chmod "bootstrap-bin/csc" #o755)
+                (setenv "PATH"
+                        (string-append (getcwd) "/bootstrap-bin:"
+                                       (getenv "PATH")))))
+
+            ;; 3.0 csc.exe needs additional shared files.
+            (replace 'compile
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let* ((sci-dll
+                        (search-input-file
+                         inputs "/lib/mono/4.5/System.Collections.Immutable.dll"))
+                       (srm-dir
+                        (if (file-exists? "srm-src-patched")
+                            "srm-src-patched"
+                            #$%srm-source-dir))
+                       (srm-source-files
+                        (filter
+                         (lambda (f)
+                           (not (or (string-contains f "netstandard")
+                                    (string-contains f "netcoreapp")
+                                    (string-contains f "AssemblyInfo")
+                                    (string-suffix? "/SR.cs" f))))
+                         (find-files srm-dir "\\.cs$")))
+                       (deps-dir
+                        (if (file-exists? "src/Dependencies/CodeAnalysis.Metadata")
+                            "src/Dependencies/CodeAnalysis.Metadata"
+                            "src/Dependencies/CodeAnalysis.Debugging")))
+
+                  ;; 1. Microsoft.CodeAnalysis.dll
+                  (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                         "-out:Microsoft.CodeAnalysis.dll"
+                         (string-append
+                          "-resource:Microsoft.CodeAnalysis.CodeAnalysisResources.resources"
+                          ",Microsoft.CodeAnalysis.CodeAnalysisResources.resources")
+                         "-r:System.dll" "-r:System.Core.dll"
+                         "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                         "-r:System.Numerics.dll" "-r:System.IO.Compression.dll"
+                         "-r:System.Security.dll"
+                         "-r:System.Runtime.Serialization.dll"
+                         (string-append "-r:" sci-dll)
+                         "-d:COMPILERCORE" "-d:SRM"
+                         "bootstrap-sr.cs" "bootstrap-ivt.cs"
+                         "src/Compilers/Shared/CoreClrShim.cs"
+                         "src/Compilers/Shared/DesktopShim.cs"
+                         (append
+                          (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                          (find-files "src/Compilers/Core/AnalyzerDriver" "\\.cs$")
+                          (find-files deps-dir "\\.cs$")
+                          (find-files "src/Dependencies/PooledObjects" "\\.cs$")
+                          srm-source-files))
+
+                  ;; 2. Microsoft.CodeAnalysis.CSharp.dll
+                  (apply invoke "csc" "@csc.rsp" "-target:library" "-unsafe"
+                         "-out:Microsoft.CodeAnalysis.CSharp.dll"
+                         (string-append
+                          "-resource:Microsoft.CodeAnalysis.CSharp.CSharpResources.resources"
+                          ",Microsoft.CodeAnalysis.CSharp.CSharpResources.resources")
+                         "-r:System.dll" "-r:System.Core.dll"
+                         "-r:System.Xml.dll" "-r:System.Xml.Linq.dll"
+                         "-r:System.Numerics.dll" "-r:System.IO.Compression.dll"
+                         (string-append "-r:" sci-dll)
+                         "-r:Microsoft.CodeAnalysis.dll"
+                         "bootstrap-csharp-ivt.cs"
+                         "src/Compilers/CSharp/CSharpAnalyzerDriver/CSharpDeclarationComputer.cs"
+                         (append
+                          (find-files "src/Compilers/CSharp/Portable" "\\.cs$")
+                          (if (file-exists? "generated")
+                              (find-files "generated" "\\.cs$")
+                              '())))
+
+                  ;; 3. csc.exe - 3.0 added RuntimeHostInfo and NamedPipeUtil.
+                  (invoke "csc" "@csc.rsp" "-out:csc.exe"
+                          "-r:System.dll" "-r:System.Core.dll"
+                          (string-append "-r:" sci-dll)
+                          "-r:Microsoft.CodeAnalysis.dll"
+                          "-r:Microsoft.CodeAnalysis.CSharp.dll"
+                          "src/Compilers/CSharp/csc/Program.cs"
+                          "src/Compilers/Shared/Csc.cs"
+                          "src/Compilers/Shared/BuildClient.cs"
+                          "src/Compilers/Shared/BuildServerConnection.cs"
+                          "src/Compilers/Shared/DesktopBuildClient.cs"
+                          "src/Compilers/Shared/DesktopAnalyzerAssemblyLoader.cs"
+                          "src/Compilers/Shared/ExitingTraceListener.cs"
+                          "src/Compilers/Shared/CoreClrShim.cs"
+                          "src/Compilers/Shared/DesktopShim.cs"
+                          "src/Compilers/Shared/RuntimeHostInfo.cs"
+                          "src/Compilers/Shared/NamedPipeUtil.cs"
+                          "src/Compilers/Core/CommandLine/BuildProtocol.cs"
+                          "src/Compilers/Core/CommandLine/NativeMethods.cs"
+                          "src/Compilers/Core/CommandLine/ConsoleUtil.cs"
+                          "src/Compilers/Core/CommandLine/CompilerServerLogger.cs"))))))))
+    (synopsis "C# 8.0 compiler bootstrapped from source")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}), built
+from source using @code{roslyn-2.8} as the bootstrap compiler.  It produces
+a C# 8.0 compiler.")))
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
 (define-public msbuild
