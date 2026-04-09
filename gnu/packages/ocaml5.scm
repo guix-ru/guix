@@ -4358,6 +4358,29 @@ since an arbitrary point, and @code{PCLOCK} which counts time since the Unix
 epoch.")
     (license license:isc)))
 
+(define-public ocaml-mirage-ptime
+  (package
+    (name "ocaml5-mirage-ptime")
+    (version "5.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage-ptime")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0n88wfw5vz1fs9yxjpxagh8h09l4i1jdx289v5lsvabdbxg8g75b"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-ptime))
+    (home-page "https://github.com/mirage/mirage-ptime")
+    (synopsis "Libraries and module types for portable clocks")
+    (description
+     "This library implements portable support for an operating system timesource that
+is compatible with the MirageOS library interfaces. It implements a POSIX
+clock which counts time since the Unix epoch.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
