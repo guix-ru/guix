@@ -4576,6 +4576,17 @@ follow the Xen ABI and may be used to create or implement Xen virtual
 devices.")
     (license license:isc)))
 
+(define-public ocaml-shared-memory-ring-lwt
+  (package
+    (inherit ocaml-shared-memory-ring)
+    (name "ocaml5-shared-memory-ring-lwt")
+    (arguments
+     '(#:package "shared-memory-ring-lwt"))
+    (propagated-inputs (modify-inputs (package-propagated-inputs
+                                       ocaml-shared-memory-ring)
+                         (append ocaml-shared-memory-ring)))
+    (synopsis "LWT interface for Xen-style shared memory rings")))
+
 (define-public ocaml-mirage-profile
   (package
     (name "ocaml5-mirage-profile")
