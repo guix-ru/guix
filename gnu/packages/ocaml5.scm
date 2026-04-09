@@ -4583,6 +4583,20 @@ will optimise these calls away, meaning there should be no overhead in the
 non-profiling case.")
     (license license:bsd-2)))
 
+(define-public ocaml-mirage-profile-unix
+  (package
+    (inherit ocaml-mirage-profile)
+    (name "ocaml5-mirage-profile-unix")
+    (arguments
+     '(#:package "mirage-profile-unix"
+       ;; TODO cyclic dependency with mirage-profile
+       ;; It could be broken using package variants, if not for
+       ;; propagated inputs leading to version conflicts.
+       #:tests? #f))
+    (propagated-inputs (modify-inputs (package-propagated-inputs
+                                       ocaml-mirage-profile)
+                         (append ocaml-mirage-profile)))))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
