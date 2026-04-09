@@ -4466,6 +4466,27 @@ doubly-linked list with Lwt iterators.")
     (description "Library for passing boot parameters from Solo5 to MirageOS.")
     (license license:isc)))
 
+(define-public ocaml-mirage-time
+  (package
+    (name "ocaml5-mirage-time")
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage-time")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09aafcdz8n8p5nyarw7sarl0ac1hfcq5xyzb2x968lk18192pdyy"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-lwt ocaml-duration))
+    (home-page "https://github.com/mirage/mirage-time")
+    (synopsis "Time operations for MirageOS")
+    (description
+     "Defines the signature for time-related operations for MirageOS.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
