@@ -3578,6 +3578,18 @@ to access C-like structures directly from OCaml.  It supports both reading and
 writing to these structures, and they are accessed via the Bigarray module.")
     (license license:isc)))
 
+(define-public ocaml-ppx-cstruct
+  (package
+    (inherit ocaml-cstruct)
+    (name "ocaml5-ppx-cstruct")
+    (properties `((upstream-name . "ppx_cstruct")))
+    (arguments
+     '(#:package "ppx_cstruct"
+       ;; requires deprecated package ocaml-migrate-parsetree.
+       #:tests? #f))
+    (propagated-inputs (modify-inputs (package-propagated-inputs ocaml-cstruct)
+                         (append ocaml-cstruct ocaml-ppxlib ocaml-sexplib)))))
+
 (define-public ocaml-domain-name
   (package
     (name "ocaml5-domain-name")
