@@ -4402,6 +4402,27 @@ clock which counts time since the Unix epoch.")
 doubly-linked list with Lwt iterators.")
     (license license:expat)))
 
+(define-public ocaml-parse-argv
+  (package
+    (name "ocaml5-parse-argv")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/parse-argv")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "16n18zik6vkfnhv8jaigr90fwp1ykg23p61aqchym0jil4i4yq01"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-astring))
+    (native-inputs (list ocaml-ounit))
+    (home-page "https://github.com/mirage/parse-argv")
+    (synopsis "Process strings into sets of command-line arguments")
+    (description "This library implements a simple argv parser.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
