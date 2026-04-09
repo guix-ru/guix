@@ -4523,6 +4523,32 @@ page.")
      "Defines the signature for time-related operations for MirageOS.")
     (license license:isc)))
 
+(define-public ocaml-mirage-xenstore
+  (package
+    (name "ocaml5-mirage-xenstore")
+    (version "2.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/ocaml-xenstore")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1acld5gxmvnhl5iyyy5ancpm7fv9d6ns1x32krcmb62p2czd00ky"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-cstruct ocaml-ppx-cstruct ocaml-lwt))
+    (native-inputs (list ocaml-ounit2))
+    (home-page "https://github.com/mirage/ocaml-xenstore")
+    (synopsis "Xenstore protocol in pure OCaml")
+    (description "Xenstore, defined by the Xen project, is a protocol that
+implements a database to map filenames to values.  This package provides
+a client and server library for this protocol, as well as a server
+implementation that runs under Unix with libxc, and another implementation
+that runs on mirageOS.")
+    ;; Has a linking exception, see LICENSE.md.
+    (license license:lgpl2.1)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
