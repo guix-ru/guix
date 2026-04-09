@@ -4549,6 +4549,40 @@ that runs on mirageOS.")
     ;; Has a linking exception, see LICENSE.md.
     (license license:lgpl2.1)))
 
+(define-public ocaml-mirage-profile
+  (package
+    (name "ocaml5-mirage-profile")
+    (version "0.9.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage-profile/")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11p3ai8g993algds9mbg4xf3is0agqah127r69fb7rm35dryzq95"))))
+    (build-system dune-build-system)
+    (arguments
+     '(#:package "mirage-profile"
+       ;; depends on ocaml-mirage-profile-unix which would form a loop
+       #:tests? #f))
+    (propagated-inputs (list ocaml-cstruct ocaml-ocplib-endian ocaml-lwt
+                             ocaml-mtime ocaml-ppx-cstruct))
+    (native-inputs (list ocaml-ppx-cstruct))
+    (home-page "https://github.com/mirage/mirage-profile")
+    (synopsis "Collects Ocaml/Lwt profiling information in CTF format")
+    (description
+     "This package is used to trace execution of OCaml/Lwt programs (such as
+Mirage unikernels) at the level of Lwt threads.  The traces can be viewed using
+JavaScript or GTK viewers provided by mirage-trace-viewer or processed by
+tools supporting the Common Trace Format.
+
+When compiled against a normal version of Lwt, OCaml's cross-module inlining
+will optimise these calls away, meaning there should be no overhead in the
+non-profiling case.")
+    (license license:bsd-2)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
