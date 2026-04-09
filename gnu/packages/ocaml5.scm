@@ -1579,6 +1579,23 @@ viewer @code{chrome://tracing}.  This library offers no backwards
 compatibility guarantees.")
     (license license:expat)))
 
+(define-public ocaml-dune-build-info
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-build-info")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "dune-build-info")))
+    (propagated-inputs (list ocaml-odoc))
+    (synopsis "Embeds build information inside an executable")
+    (description
+     "This package allows one to access information about how the
+executable was built, such as the version of the project at which it was built
+or the list of statically linked libraries with their versions.  It supports
+reporting the version from the version control system during development to
+get an precise reference of when the executable was built.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
