@@ -4381,6 +4381,27 @@ is compatible with the MirageOS library interfaces. It implements a POSIX
 clock which counts time since the Unix epoch.")
     (license license:isc)))
 
+(define-public ocaml-lwt-dllist
+  (package
+    (name "ocaml5-lwt-dllist")
+    (version "1.1.0")
+    (home-page "https://github.com/mirage/lwt-dllist")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "06pipk9wm9pl3d8g7dcms5n2l64bzlr5pim5khkczpp1aspv728j"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-lwt))
+    (synopsis "Mutable doubly-linked list with Lwt iterators in OCaml")
+    (description "This OCaml library provides an implementation of a mutable
+doubly-linked list with Lwt iterators.")
+    (license license:expat)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
