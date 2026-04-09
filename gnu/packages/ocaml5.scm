@@ -1562,6 +1562,23 @@ so they don't expose everything at toplevel.  For instance, @code{Ast_helper}
 is now @code{Ocaml_common.Ast_helper}.")
     (license license:expat)))
 
+(define-public ocaml-dune-chrome-trace
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-chrome-trace")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "chrome-trace")))
+    (propagated-inputs (list ocaml-odoc))
+    (synopsis "Chrome trace event generation library for ocaml")
+    (description
+     "This package takes trace data from dune actions and generates a file in
+Chrome's trace_event format.  This format is compatible with chrome trace
+viewer @code{chrome://tracing}.  This library offers no backwards
+compatibility guarantees.")
+    (license license:expat)))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
