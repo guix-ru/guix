@@ -1,0 +1,254 @@
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Tue, 26 Aug 2025 00:00:00 +0000
+Subject: [PATCH] mcs: emit InAttribute modreq for ref readonly returns
+
+Why this exists
+
+Upstream Mono 6.12 normally builds the class libraries with the vendored
+Roslyn compiler (`external/roslyn-binaries/Microsoft.Net.Compilers/3.9.0`).
+Guix does not use that path for bootstrap.  The bootstrap build configures
+Mono with `--with-csc=mcs`, so `mscorlib.dll` is emitted by the older
+`mcs` compiler instead.
+
+For `ref readonly` returns, old `mcs` already emits the return-parameter
+attribute `System.Runtime.CompilerServices.IsReadOnlyAttribute`, but it omits
+the required return-type custom modifier
+`modreq(System.Runtime.InteropServices.InAttribute)` which Roslyn would
+have done.
+
+What is changed
+
+Patch every old-`mcs` method-signature emission path that can materialize
+source-defined `ref readonly` returns:
+
+  * ordinary methods via `MethodOrOperator.PrepareEmit()`
+  * accessors via `MethodData.DefineMethodBuilder(..., ParametersCompiled)`
+  * generated interface proxy methods via `PendingImplementation.DefineProxy()`
+
+For `ReadOnlyReferenceContainer` returns, these paths now emit the return-type
+custom modifier System.Runtime.InteropServices.InAttribute:
+
+The existing `IsReadOnlyAttribute` return-parameter emission is left alone for
+ordinary methods and accessors.  The proxy path did not previously emit it, so
+the patch adds it there too.
+
+Flags and fields involved
+
+`ref readonly` does not live in one place.  Mono has to encode it across
+separate method-definition and signature channels:
+
+  * `MethodAttributes flags`
+      Method definition flags such as visibility, `virtual`, `static`, and
+      `final`.  These do not encode `ref readonly`.
+  * `CallingConventions`
+      Signature-level calling convention bits such as `hasthis`, `standard`,
+      and `vararg`.  These also do not encode `ref readonly`.
+  * `returnTypeRequiredCustomModifiers`
+      Required custom modifiers serialized into the signature blob before the
+      return type.  This is where `modreq(InAttribute)` must live.
+  * `returnTypeOptionalCustomModifiers`
+      Optional custom modifiers (`modopt`); unused here, so it remains `null`.
+  * `parameterTypeRequiredCustomModifiers`
+      Required custom modifiers for each parameter.  Unchanged here because the
+      problem is on the return type.
+  * `parameterTypeOptionalCustomModifiers`
+      Optional custom modifiers for each parameter.  Also unchanged.
+  * `ReturnParameter` custom attributes
+      Attributes attached to parameter slot 0.  `mcs` already emits
+      `IsReadOnlyAttribute` there, but that attribute alone does not change the
+      signature blob.
+
+Why the signature fields are separate
+
+Mono and ECMA-335 treat method definition flags, calling convention bits, and
+type custom modifiers as separate parts of the metadata model.  `ref readonly`
+return identity depends on the return type itself, so the `modreq` must be
+attached to the return type in the signature blob rather than encoded as a
+method flag.
+
+Runtime and metadata impact
+
+This patch does not add a new VM capability.  Mono already stores and encodes
+return custom modifiers in Reflection.Emit and metadata:
+
+  * `mono/metadata/sre.c`
+  * `mono/metadata/sre-encode.c`
+  * `mono/metadata/metadata.c`
+
+However, the modifier is not merely decorative.  Mono includes custom
+modifiers in signature equality, and uses that in runtime paths such as method
+lookup, override/interface matching, property accessor matching, verifier
+checks, and AOT/JIT signature caches:
+
+  * `mono/metadata/metadata.c`
+  * `mono/metadata/class-init.c`
+  * `mono/metadata/loader.c`
+  * `mono/metadata/icall.c`
+  * `mono/metadata/metadata-verify.c`
+  * `mono/metadata/verify.c`
+  * `mono/mini/aot-runtime.c`
+  * `mono/mini/mini-runtime.c`
+
+So the direct effect of this patch is to change emitted signature identity for
+`mcs`-built `ref readonly` returns, not just compiler-facing decoration.
+
+Since we are bootstrapping from source anyway, this should be fine.
+Also, the mono 6.12.0 upstream binary would have compiled the libraries
+using Roslyn (which would do this anyway), not mcs--so we diverge a little
+less now.
+
+Reflection and marshaling impact
+
+Managed reflection normally strips custom modifiers from plain reflected
+`Type` objects, but Mono still exposes them through the parameter/return
+modifier icalls used by `RuntimeParameterInfo` and `RuntimePropertyInfo`.
+Return custom modifiers are also inspected by the marshaling layer for
+calling-convention modifiers, although `InAttribute` on returns is not
+special-cased there.
+
+Limitations
+
+This patch does not teach old `mcs` to import `ref readonly` returns from
+metadata.  It changes only what old `mcs` emits while Guix bootstraps Mono
+without upstream's vendored Roslyn.
+
+The immediate bootstrap motivation is to make the `mcs`-built `mscorlib.dll`
+expose Roslyn-compatible `ref readonly` return signatures for imported span
+members such as `ReadOnlySpan<T>.this[int]` and
+`ReadOnlySpan<T>.GetPinnableReference()`.
+---
+diff -urN a/mcs/mcs/method.cs b/mcs/mcs/method.cs
+--- a/mcs/mcs/method.cs
++++ b/mcs/mcs/method.cs
+@@ -875,8 +875,15 @@
+ 			// Generic method has been already defined to resolve method parameters
+ 			// correctly when they use type parameters
+ 			//
+-			mb.SetParameters (parameters.GetMetaInfo ());
+-			mb.SetReturnType (ReturnType.GetMetaInfo ());
++			var return_type_req_mods = MethodData.GetReturnTypeRequiredCustomModifiers ();
++			if (return_type_req_mods != null) {
++				mb.SetSignature (
++					ReturnType.GetMetaInfo (), return_type_req_mods, null,
++					parameters.GetMetaInfo (), null, null);
++			} else {
++				mb.SetParameters (parameters.GetMetaInfo ());
++				mb.SetReturnType (ReturnType.GetMetaInfo ());
++			}
+ 		}
+ 
+ 		public override void WriteDebugSymbol (MonoSymbolFile file)
+@@ -2167,6 +2174,20 @@
+ 			container.TypeBuilder.DefineMethodOverride (builder, (MethodInfo) implementing.GetMetaInfo ());
+ 		}
+ 
++		public MetaType[] GetReturnTypeRequiredCustomModifiers ()
++		{
++			if (!(method.ReturnType is ReadOnlyReferenceContainer))
++				return null;
++
++			var in_attribute = member.Module.PredefinedAttributes.In;
++			if (!in_attribute.Define ())
++				return null;
++
++			return new MetaType[] {
++				in_attribute.TypeSpec.GetMetaInfo ()
++			};
++		}
++
+ 		//
+ 		// Creates partial MethodBuilder for the method when has generic parameters used
+ 		// as arguments or return type
+@@ -2185,9 +2206,17 @@
+ 		//
+ 		public MethodBuilder DefineMethodBuilder (TypeDefinition container, ParametersCompiled param)
+ 		{
+-			DefineMethodBuilder (container);
+-			builder.SetReturnType (method.ReturnType.GetMetaInfo ());
+-			builder.SetParameters (param.GetMetaInfo ());
++			var return_type_req_mods = GetReturnTypeRequiredCustomModifiers ();
++			if (return_type_req_mods != null) {
++				builder = container.TypeBuilder.DefineMethod (
++					full_name, flags, method.CallingConventions,
++					method.ReturnType.GetMetaInfo (), return_type_req_mods, null,
++					param.GetMetaInfo (), null, null);
++			} else {
++				DefineMethodBuilder (container);
++				builder.SetReturnType (method.ReturnType.GetMetaInfo ());
++				builder.SetParameters (param.GetMetaInfo ());
++			}
+ 			return builder;
+ 		}
+ 
+@@ -2905,4 +2934,3 @@
+ 		}
+ 	}
+ }
+-
+diff -urN a/mcs/mcs/pending.cs b/mcs/mcs/pending.cs
+--- a/mcs/mcs/pending.cs
++++ b/mcs/mcs/pending.cs
+@@ -17,9 +17,11 @@
+ using System.Linq;
+ 
+ #if STATIC
++using MetaType = IKVM.Reflection.Type;
+ using IKVM.Reflection;
+ using IKVM.Reflection.Emit;
+ #else
++using MetaType = System.Type;
+ using System.Reflection;
+ using System.Reflection.Emit;
+ #endif
+@@ -484,15 +486,42 @@
+ 
+ 			var param = iface_method.Parameters;
+ 
+-			MethodBuilder proxy = container.TypeBuilder.DefineMethod (
+-				proxy_name,
+-				MethodAttributes.Private |
+-				MethodAttributes.HideBySig |
+-				MethodAttributes.NewSlot |
+-				MethodAttributes.CheckAccessOnOverride |
+-				MethodAttributes.Virtual | MethodAttributes.Final,
+-				CallingConventions.Standard | CallingConventions.HasThis,
+-				base_method.ReturnType.GetMetaInfo (), param.GetMetaInfo ());
++			MetaType[] return_type_req_mods = null;
++			if (base_method.ReturnType is ReadOnlyReferenceContainer) {
++				var in_attribute = container.Module.PredefinedAttributes.In;
++				if (in_attribute.Define ()) {
++					return_type_req_mods = new MetaType[] {
++						in_attribute.TypeSpec.GetMetaInfo ()
++					};
++				}
++			}
++
++			MethodBuilder proxy;
++			if (return_type_req_mods != null) {
++				proxy = container.TypeBuilder.DefineMethod (
++					proxy_name,
++					MethodAttributes.Private |
++					MethodAttributes.HideBySig |
++					MethodAttributes.NewSlot |
++					MethodAttributes.CheckAccessOnOverride |
++					MethodAttributes.Virtual | MethodAttributes.Final,
++					CallingConventions.Standard | CallingConventions.HasThis,
++					base_method.ReturnType.GetMetaInfo (), return_type_req_mods, null,
++					param.GetMetaInfo (), null, null);
++			} else {
++				proxy = container.TypeBuilder.DefineMethod (
++					proxy_name,
++					MethodAttributes.Private |
++					MethodAttributes.HideBySig |
++					MethodAttributes.NewSlot |
++					MethodAttributes.CheckAccessOnOverride |
++					MethodAttributes.Virtual | MethodAttributes.Final,
++					CallingConventions.Standard | CallingConventions.HasThis,
++					base_method.ReturnType.GetMetaInfo (), param.GetMetaInfo ());
++			}
++
++			if (base_method.ReturnType is ReadOnlyReferenceContainer)
++				container.Module.PredefinedAttributes.IsReadOnly.EmitAttribute (proxy.DefineParameter (0, ParameterAttributes.None, ""));
+ 
+ 			if (iface_method.IsGeneric) {
+ 				var gnames = iface_method.GenericDefinition.TypeParameters.Select (l => l.Name).ToArray ();

@@ -1886,6 +1886,7 @@ most of the heavy lifting.")
                            #$@prepare-mono-source-0))
               (patches (search-patches "mono-6.12.0-fix-ConditionParser.patch"
                                        "mono-6.12.0-add-runpath.patch"
+                                       "mono-6.12.0-emit-ref-readonly-return-modreq.patch"
                                        "mono-6.12.0-fix-AssemblyResolver.patch"))))
     (native-inputs (modify-inputs (package-native-inputs mono-5.10.0)
                      (replace "mono" mono-5.10.0)))

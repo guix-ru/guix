@@ -1973,6 +1973,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/mono-5.8.0-patches.patch		\
   %D%/packages/patches/mono-5.10.0-later-mcs-changes.patch	\
   %D%/packages/patches/mono-6.12.0-add-runpath.patch		\
+  %D%/packages/patches/mono-6.12.0-emit-ref-readonly-return-modreq.patch	\
   %D%/packages/patches/mono-6.12.0-fix-AssemblyResolver.patch	\
   %D%/packages/patches/mono-6.12.0-fix-ConditionParser.patch	\
   %D%/packages/patches/mono-mcs-patches-from-5.10.0.patch	\
