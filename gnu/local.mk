@@ -2430,6 +2430,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/roslyn-3.0.0-bootstrap-with-csc-2.8.patch	\
   %D%/packages/patches/roslyn-3.2.0-bootstrap-with-csc-3.0.patch	\
   %D%/packages/patches/roslyn-3.8.0-bootstrap-with-csc-3.2.patch	\
+  %D%/packages/patches/roslyn-3.9.0-bootstrap-with-csc-3.8.patch	\
   %D%/packages/patches/rottlog-direntry.patch 			\
   %D%/packages/patches/ruby-actionpack-remove-browser-tests.patch	\
   %D%/packages/patches/ruby-activesupport-fix-deprecation-warning.patch	\

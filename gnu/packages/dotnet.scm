@@ -3453,7 +3453,98 @@ using System.Reflection;
 scripting libraries, built from source using @code{roslyn-3.2} as the
 bootstrap compiler.  It produces a C# 9.0 compiler matching Mono 6.12.")))
 
-(define roslyn roslyn-3.8)
+;; roslyn-3.9: inherits roslyn-3.8, built with csc 3.8.
+;; Upstream mono 6.12.0.206 ships 3.9.0 (roslyn-binaries commit
+;; 1c6482470c).  Both 3.8 and 3.9 implement C# 9.  The only
+;; 3.9-specific change is project-wide nullable enable (was per-file
+;; in 3.8), plus a few new Mono-compat fixes in the patch
+;; (CodePagesEncodingProvider in BuildClient.cs, Unsafe.As in
+;; ImmutableArrayExtensions.cs).
+(define-public roslyn-3.9
+  (package
+    (inherit roslyn-3.8)
+    (version "3.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dotnet/roslyn")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name "roslyn" version))
+       (sha256
+        (base32
+         "1kgm9aq5kd3cb8hw7nrmdyxlxw0blxvhdayyc0f28dzns2ph6v58"))
+       (patches
+        (search-patches "roslyn-3.9.0-bootstrap-with-csc-3.8.patch"))))
+    (native-inputs (list roslyn-3.8))
+    (arguments
+     (substitute-keyword-arguments (package-arguments roslyn-3.8)
+       ((#:phases phases '())
+        #~(modify-phases #$phases
+            ;; Point at roslyn-3.8's csc.
+            (replace 'create-csc-wrapper
+              (lambda* (#:key inputs #:allow-other-keys)
+                (mkdir-p "bootstrap-bin")
+                (call-with-output-file "bootstrap-bin/csc"
+                  (lambda (port)
+                    (format port "#!~a~%exec mono ~a \"$@\"~%"
+                            (which "bash")
+                            (string-append (assoc-ref inputs "roslyn")
+                                           "/lib/roslyn/csc.exe"))))
+                (chmod "bootstrap-bin/csc" #o755)
+                (setenv "PATH"
+                        (string-append (getcwd) "/bootstrap-bin:"
+                                       (getenv "PATH")))))
+
+            ;; 3.9 uses project-wide nullable enable instead of
+            ;; per-file #nullable enable directives.
+            (replace 'create-csc-rsp
+              (lambda _
+                (call-with-output-file "csc.rsp"
+                  (lambda (port)
+                    (display
+                     "-langversion:preview\n-d:NET472\n-nullable:enable\n"
+                     port)))))
+
+            ;; Broad Mono workarounds that are impractical in a patch
+            ;; (too many files).  Targeted fixes are in the patch.
+            (add-after 'unpack 'fix-mono-compat-3.9
+              (lambda _
+                ;; SignatureCallingConvention.Unmanaged (value 9) not
+                ;; in Mono's SRM.  The enum initializer in Members.cs
+                ;; is handled by the patch; sweep remaining uses.
+                (for-each
+                 (lambda (file)
+                   (substitute* file
+                     (("SignatureCallingConvention\\.Unmanaged")
+                      "(SignatureCallingConvention)9")))
+                 (append
+                  (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                  (find-files "src/Compilers/CSharp/Portable" "\\.cs$")))
+                ;; PathUtilities ambiguity with SRM (too many files
+                ;; to patch individually).
+                (for-each
+                 (lambda (file)
+                   (substitute* file
+                     (("\\bPathUtilities\\.")
+                      "Roslyn.Utilities.PathUtilities.")))
+                 (append
+                  (find-files "src/Compilers/Core/Portable" "\\.cs$")
+                  (find-files "src/Scripting" "\\.cs$")))
+                ;; Index/Range polyfills are internal and shadow Mono's
+                ;; public mscorlib types.  Delete so csc finds the
+                ;; mscorlib versions.
+                (delete-file
+                 "src/Compilers/Core/Portable/InternalUtilities/Index.cs")
+                (delete-file
+                 "src/Compilers/Core/Portable/InternalUtilities/Range.cs")))))))
+    (synopsis "C# 9.0 compiler and scripting libraries, bootstrapped from source")
+    (description
+     "This package provides the Roslyn C# compiler (@command{csc}) and
+scripting libraries, built from source using @code{roslyn-3.8} as the
+bootstrap compiler.  This is the version shipped by upstream Mono 6.12.")))
+
+(define roslyn roslyn-3.9)
 
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0

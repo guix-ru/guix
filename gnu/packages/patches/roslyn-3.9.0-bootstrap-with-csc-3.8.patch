@@ -1,0 +1,84 @@
+--- a/src/Compilers/CSharp/Portable/Compilation/CSharpCompilation.cs
++++ b/src/Compilers/CSharp/Portable/Compilation/CSharpCompilation.cs
+@@ -2214,7 +2214,7 @@
+ 
+         private BinderFactory GetBinderFactory(SyntaxTree syntaxTree, bool ignoreAccessibility, ref WeakReference<BinderFactory>[]? cachedBinderFactories)
+         {
+-            Debug.Assert(System.Runtime.CompilerServices.Unsafe.AreSame(ref cachedBinderFactories, ref ignoreAccessibility ? ref _ignoreAccessibilityBinderFactories : ref _binderFactories));
++            // Unsafe.AreSame not available on Mono
+ 
+             var treeNum = GetSyntaxTreeOrdinal(syntaxTree);
+             WeakReference<BinderFactory>[]? binderFactories = cachedBinderFactories;
+--- a/src/Compilers/Shared/BuildClient.cs
++++ b/src/Compilers/Shared/BuildClient.cs
+@@ -84,7 +84,7 @@
+             {
+                 // Register encodings for console
+                 // https://github.com/dotnet/roslyn/issues/10785
+-                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
++                // CodePagesEncodingProvider not available on Mono
+             }
+ 
+             var client = new BuildClient(language, compileFunc, logger);
+--- a/src/Compilers/Core/Portable/PEWriter/Members.cs
++++ b/src/Compilers/Core/Portable/PEWriter/Members.cs
+@@ -58,7 +58,7 @@
+         /// Extensible calling convention protocol. This represents either the union of calling convention modopts after the paramcount specifier
+         /// in IL, or platform default if none are present
+         /// </summary>
+-        Unmanaged = SignatureCallingConvention.Unmanaged,
++        Unmanaged = 9,
+ 
+         /// <summary>
+         /// The convention for calling a generic method.
+--- a/src/Compilers/Core/Portable/PEWriter/PeWriter.cs
++++ b/src/Compilers/Core/Portable/PEWriter/PeWriter.cs
+@@ -350,7 +350,7 @@
+                 _resourceSection = resourceSection;
+             }
+ 
+-            protected override void Serialize(BlobBuilder builder, SectionLocation location)
++            protected internal override void Serialize(BlobBuilder builder, SectionLocation location)
+             {
+                 NativeResourceWriter.SerializeWin32Resources(builder, _resourceSection, location.RelativeVirtualAddress);
+             }
+@@ -366,7 +366,7 @@
+                 _resources = resources;
+             }
+ 
+-            protected override void Serialize(BlobBuilder builder, SectionLocation location)
++            protected internal override void Serialize(BlobBuilder builder, SectionLocation location)
+             {
+                 NativeResourceWriter.SerializeWin32Resources(builder, _resources, location.RelativeVirtualAddress);
+             }
+--- a/src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs
++++ b/src/Compilers/Core/Portable/Emit/EditAndContinue/DeltaMetadataWriter.cs
+@@ -635,7 +635,7 @@
+ 
+             if (localVariables.Length > 0)
+             {
+-                var writer = PooledBlobBuilder.GetInstance();
++                var writer = Microsoft.Cci.PooledBlobBuilder.GetInstance();
+                 var encoder = new BlobEncoder(writer).LocalVariableSignature(localVariables.Length);
+ 
+                 foreach (ILocalDefinition local in localVariables)
+--- a/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs
++++ b/src/Compilers/Core/Portable/Collections/ImmutableArrayExtensions.cs
+@@ -669,7 +669,7 @@
+         // TODO(https://github.com/dotnet/corefx/issues/34126): Remove when System.Collections.Immutable
+         // provides a Span API
+         internal static T[] DangerousGetUnderlyingArray<T>(this ImmutableArray<T> array)
+-            => Unsafe.As<ImmutableArray<T>, ImmutableArrayProxy<T>>(ref array).MutableArray;
++            => System.Linq.Enumerable.ToArray(array);
+ 
+         internal static ReadOnlySpan<T> AsSpan<T>(this ImmutableArray<T> array)
+             => array.DangerousGetUnderlyingArray();
+@@ -678,7 +678,7 @@
+         {
+             var proxy = new ImmutableArrayProxy<T> { MutableArray = array };
+             array = null!;
+-            return Unsafe.As<ImmutableArrayProxy<T>, ImmutableArray<T>>(ref proxy);
++            return System.Collections.Immutable.ImmutableArray.Create(proxy.MutableArray);
+         }
+ 
+         internal static Dictionary<K, ImmutableArray<T>> ToDictionary<K, T>(this ImmutableArray<T> items, Func<T, K> keySelector, IEqualityComparer<K>? comparer = null)
