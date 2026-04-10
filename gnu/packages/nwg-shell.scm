@@ -999,3 +999,77 @@ button.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public nwg-dock-hyprland
+  (package
+    (name "nwg-dock-hyprland")
+    (version "0.4.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-dock-hyprland")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1cfbrapdiw8qwfcbmyqz6k0q5ny8balzmpwsnp9b3rny2w0cvqkb"))
+       (patches
+        (search-patches "nwg-dock-hyprland-0.4.8-fallback-paths.patch"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+       ;Tests fail due to a call having arguments but no formatting
+      ;; directives.
+      #:tests? #f
+      #:install-source? #f
+      #:import-path "github.com/nwg-piotr/nwg-dock-hyprland"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/"
+                                                       "nwg-dock-hyprland")
+                (substitute* '("main.go" "tools.go")
+                  (("\\/usr\\/share") (string-append #$output "/share"))))))
+          (add-after 'install 'install-data
+            (lambda _
+              (mkdir-p (string-append #$output "/share"))
+              (with-directory-excursion (string-append "src/github.com/"
+                                                       "nwg-piotr/"
+                                                       "nwg-dock-hyprland")
+                (copy-recursively "config"
+                                  (string-append #$output
+                                                 "/share/nwg-dock-hyprland"))
+                (copy-recursively "images"
+                                  (string-append #$output "/share/"
+                                                 "nwg-dock-hyprland/images"))
+                (install-file "README.md"
+                              (string-append #$output "/share/doc/"
+                                             "nwg-dock-hyprland")))))
+          (add-after 'install 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/nwg-dock-hyprland")
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (native-inputs
+     (list gobject-introspection
+           go-github-com-allan-simon-go-singleinstance
+           go-github-com-diamondburned-gotk4
+           go-github-com-diamondburned-gotk4-layer-shell
+           go-github-com-sirupsen-logrus
+           pkg-config))
+    (inputs
+     (list bash-minimal
+           gtk+
+           gtk-layer-shell))
+    (home-page "https://github.com/nwg-piotr/nwg-dock-hyprland")
+    (synopsis "GTK3 based dock for Hyprland")
+    (description
+     "nwg-dock-hyprland is a fully configurable (w/ command line arguments and
+CSS) GTK3 based dock, written in Go, aimed exclusively at Hyprland Wayland
+compositor.  It features pinned buttons, task buttons, the workspace switcher
+and the launcher button.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
