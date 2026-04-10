@@ -62,6 +62,7 @@
   #:use-module (guix utils)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system gnu)
+  #:use-module (guix build-system trivial)
   #:use-module (ice-9 match))
 
 (define-public treecc
@@ -3546,6 +3547,77 @@ scripting libraries, built from source using @code{roslyn-3.8} as the
 bootstrap compiler.  This is the version shipped by upstream Mono 6.12.")))
 
 (define roslyn roslyn-3.9)
+
+(define-public mono
+  (package
+    (name "mono")
+    (version (package-version mono-bootstrap))
+    (source
+     #f)
+    (build-system trivial-build-system)
+    (inputs
+     `(("roslyn-bootstrap" ,roslyn)
+       ("mono-bootstrap" ,mono-bootstrap)))
+    (arguments
+     (list
+      #:modules '((guix build utils))
+      #:builder
+      #~(begin
+          (use-modules (guix build utils)
+                       (ice-9 ftw))
+          ;; Symlink tree of mono-bootstrap.
+          (copy-recursively (assoc-ref %build-inputs "mono-bootstrap")
+                            #$output
+                            #:copy-file (lambda (s d)
+                                          (symlink s d)))
+          ;; Replace Roslyn assemblies in lib/mono/4.5/.
+          (let ((bootstrap (assoc-ref %build-inputs "mono-bootstrap"))
+                (bin (string-append #$output "/bin"))
+                (mono45 (string-append #$output "/lib/mono/4.5"))
+                (roslyn
+                 (string-append (assoc-ref %build-inputs "roslyn-bootstrap")
+                                "/lib/roslyn")))
+            (define (script-wrapper? file)
+              (and (eq? 'symlink (stat:type (lstat file)))
+                   (call-with-input-file file
+                     (lambda (port)
+                       (let ((c1 (read-char port))
+                             (c2 (read-char port)))
+                         (and (char? c1)
+                              (char? c2)
+                              (char=? c1 #\#)
+                              (char=? c2 #\!)))))))
+            (define (rewrite-wrapper file)
+              (let ((source (readlink file)))
+                (delete-file file)
+                (copy-file source file)
+                (substitute* file
+                  ((bootstrap) #$output))
+                (chmod file #o755)))
+            (for-each (lambda (name)
+                        (let ((target (string-append mono45 "/" name)))
+                          (false-if-exception (delete-file target))
+                          (symlink (string-append roslyn "/" name) target)))
+                      '("csc.exe" "Microsoft.CodeAnalysis.dll"
+                        "Microsoft.CodeAnalysis.CSharp.dll"
+                        "Microsoft.CodeAnalysis.Scripting.dll"
+                        "Microsoft.CodeAnalysis.CSharp.Scripting.dll"
+                        ;; VB compiler is written in VB; needs separate bootstrap.
+                        ;; TODO: Microsoft.CodeAnalysis.VisualBasic.dll
+                        "System.Collections.Immutable.dll"))
+            ;; Materialize inherited shell wrappers so they no longer point
+            ;; back into mono-bootstrap.
+            (for-each (lambda (name)
+                        (let ((target (string-append bin "/" name)))
+                          (when (script-wrapper? target)
+                            (rewrite-wrapper target))))
+                      (scandir bin (lambda (name)
+                                     (not (member name '("." ".."))))))))))
+    (synopsis "Mono with Roslyn C# compiler built from source")
+    (description "This package provides Mono with the Roslyn C# compiler
+(@command{csc}) replacing the binary blob.")
+    (home-page "https://www.mono-project.com/")
+    (license (package-license mono-bootstrap))))
 
 ;; too new version: 15.9.21.664
 ;; too old (no support for mono) version: 14.0
