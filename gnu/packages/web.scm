@@ -2738,8 +2738,7 @@ directions.")
      `(#:configure-flags '("--with-gnutls")
        #:tests? #f))                         ; no test target
     (native-inputs (list flex))
-    (inputs `(("gnutls" ,gnutls)
-              ("libcrypt" ,libgcrypt)))
+    (inputs (list gnutls libgcrypt))
     (home-page "https://www.gedanken.org.uk/software/wwwoffle/")
     (synopsis "Caching web proxy optimized for intermittent internet links")
     (description "WWWOFFLE is a proxy web server that is especially good for
