@@ -6038,34 +6038,35 @@ a pure C99 library.")
 (define-public uwsgi
   (package
     (name "uwsgi")
-    (version "2.0.28")
+    (version "2.0.31")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri name version))
               (sha256
                (base32
-                "1l4r3smmgrdvqj82zwq33pax4jxr1s6fww84mc44bw9dxy8iijkr"))))
+                "0mv2qz8gjvsc4rdsqdmrjszi972jdw9vjisjls9zy1n1ri8b7y78"))))
     (build-system gnu-build-system)
     (outputs '("out" "python"))
     (arguments
-     '(;; XXX: The 'check' target runs cppcheck to do static code analysis.
-       ;;      But there is no obvious way to run the real tests.
-       #:tests? #f
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'configure
-           ;; Configuration is done by writing an ini file.
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out       (assoc-ref outputs "out"))
-                    (bindir    (string-append out "/bin"))
-                    (plugindir (string-append out "/lib/uwsgi")))
-               ;; The build phase outputs files to these directories directly.
-               (mkdir-p bindir)
-               (mkdir-p plugindir)
-               ;; XXX: Enable other plugins.
-               (call-with-output-file "buildconf/guix.ini"
-                 (lambda (port)
-                   (format port "[uwsgi]
+     (list
+      ;; XXX: The 'check' target runs cppcheck to do static code analysis.
+      ;;      But there is no obvious way to run the real tests.
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            ;; Configuration is done by writing an ini file.
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (bindir (string-append out "/bin"))
+                     (plugindir (string-append out "/lib/uwsgi")))
+                ;; The build phase outputs files to these directories directly.
+                (mkdir-p bindir)
+                (mkdir-p plugindir)
+                ;; XXX: Enable other plugins.
+                (call-with-output-file "buildconf/guix.ini"
+                  (lambda (port)
+                    (format port "[uwsgi]
 yaml = libyaml
 bin_name = ~a/uwsgi
 plugin_dir = ~a
@@ -6074,23 +6075,18 @@ inherit = base
 plugins = cgi,python
 embedded_plugins =
 " bindir plugindir))))
-             (setenv "PROFILE" "guix")
-             #t))
-         (replace 'install
-           ;; Move plugins into their own output.
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out           (assoc-ref outputs "out"))
-                    (plugindir     (string-append out "/lib/uwsgi"))
-                    (python-plugin (string-append
-                                    plugindir "/python_plugin.so")))
-               (install-file python-plugin
-                             (string-append
-                              (assoc-ref outputs "python") "/lib/uwsgi"))
-               (delete-file python-plugin)
-               #t))))))
+              (setenv "PROFILE" "guix")))
+          (replace 'install
+            ;; Move plugins into their own output.
+            (lambda _
+              (let* ((plugindir (string-append #$output "/lib/uwsgi"))
+                     (python-plugin (string-append plugindir
+                                                   "/python_plugin.so")))
+                (install-file python-plugin
+                              (string-append #$output:python "/lib/uwsgi"))
+                (delete-file python-plugin)))))))
     (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("python" ,python-wrapper)))
+     (list pkg-config python-wrapper))
     (inputs
      (list jansson
            libxml2
@@ -6100,7 +6096,7 @@ embedded_plugins =
            zlib
            ;; For plugins.
            python))
-    (home-page "https://uwsgi-docs.readthedocs.org/")
+    (home-page "https://uwsgi-docs.readthedocs.io/")
     (synopsis "Application container server")
     (description
      "uWSGI presents a complete stack for networked/clustered web applications,
