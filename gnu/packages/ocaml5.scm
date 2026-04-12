@@ -4711,6 +4711,29 @@ architectures and provide a best-effort boxed representation on 32-bit
 architectures.")
     (license license:isc)))
 
+(define-public ocaml-mirage-kv
+  (package
+    (name "ocaml5-mirage-kv")
+    (version "6.1.1")
+    (home-page "https://github.com/mirage/mirage-kv")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1i0q9023my6b2xy2jx65g52xywgi3fl0giixs744n9ryn83yrw7q"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-fmt ocaml-lwt ocaml-optint ocaml-ptime))
+    (native-inputs (list ocaml-alcotest))
+    (synopsis "MirageOS signatures for key/value devices")
+    (description
+     "mirage-kv provides the `Mirage_kv.RO` and `Mirage_kv.RW` signatures the
+@code{MirageOS} key/value devices should implement.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
