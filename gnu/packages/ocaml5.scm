@@ -1698,6 +1698,20 @@ about.")
 It offers no backwards compatibility guarantees.")
     (license license:expat)))
 
+(define-public ocaml-dune-ocamlc-loc
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-ocamlc-loc")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "ocamlc-loc")))
+    (propagated-inputs (list ocaml-dune-dyn ocaml-odoc))
+    (synopsis "Parse ocaml compiler output into structured form")
+    (description
+     "This library parses ocaml compiler output and returns it as ocaml values.
+This library offers no backwards compatibility guarantees.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
