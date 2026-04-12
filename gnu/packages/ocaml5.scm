@@ -1636,6 +1636,17 @@ defines its own algebra which some might find easier to work with and reason
 about.")
     (license license:expat)))
 
+(define-public ocaml-dune-ordering
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-ordering")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "ordering")))
+    (synopsis "Dune element ordering")
+    (description "This library represents element ordering in OCaml.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
