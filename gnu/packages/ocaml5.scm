@@ -1647,6 +1647,18 @@ about.")
     (synopsis "Dune element ordering")
     (description "This library represents element ordering in OCaml.")))
 
+(define-public ocaml-dune-dyn
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-dyn")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "dyn")))
+    (propagated-inputs (list ocaml-pp ocaml-dune-ordering))
+    (synopsis "Dune dynamic types")
+    (description "This library represents dynamic types in OCaml.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
