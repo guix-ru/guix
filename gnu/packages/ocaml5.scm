@@ -1659,6 +1659,19 @@ about.")
     (synopsis "Dune dynamic types")
     (description "This library represents dynamic types in OCaml.")))
 
+(define-public ocaml-stdune
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-stdune")
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "stdune")))
+    (propagated-inputs (list ocaml-dune-dyn ocaml-pp))
+    (native-inputs (list ocaml-ppx-expect ocaml-dune-xdg ocaml-dune-chrome-trace))
+    (synopsis "Unstable standard library from Dune")
+    (description
+     "This library implements the standard functions used by Dune.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
