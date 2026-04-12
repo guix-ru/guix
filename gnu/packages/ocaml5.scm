@@ -1953,6 +1953,30 @@ Knuth’s LR(1) parser construction technique.")
     ;; are QPL licensed.
     (license (list license:gpl2+ license:qpl))))
 
+(define-public ocaml-monolith
+  (package
+    (name "ocaml5-monolith")
+    (version "20210525")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.inria.fr/fpottier/monolith")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1b6jj4ivl9ni8kba7wls4xsqdy8nm7q9mnx9347jvb99dmmlj5mc"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-afl-persistent ocaml-pprint ocaml-seq))
+    (home-page "https://gitlab.inria.fr/fpottier/monolith")
+    (synopsis "Framework for testing an OCaml library using afl-fuzz")
+    (description
+     "Monolith offers facilities for testing an OCaml library (for
+instance, a data structure implementation) by comparing it against a reference
+implementation.  It can be used to perform either random testing or fuzz
+testing by using the @code{afl-fuzz} tool.")
+    (license license:lgpl3+)))
+
 (define-public ocaml-base
   (package
     (name "ocaml5-base")
