@@ -4687,6 +4687,30 @@ tracing is enabled (via mirage-profile), it also writes each log message to
 the trace buffer.")
     (license license:isc)))
 
+(define-public ocaml-optint
+  (package
+    (name "ocaml5-optint")
+    (version "0.3.0")
+    (home-page "https://github.com/mirage/optint")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1qj32bcw1in7s6raxdvbmjr3lvj99iwv98x1ar9cwxp4zf8ybfss"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-crowbar ocaml-monolith ocaml-fmt))
+    (synopsis "Efficient integer types on 64-bit architectures for OCaml")
+    (description
+     "This OCaml library provides two new integer types, @code{Optint.t} and
+@code{Int63.t}, which guarantee efficient representation on 64-bit
+architectures and provide a best-effort boxed representation on 32-bit
+architectures.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
