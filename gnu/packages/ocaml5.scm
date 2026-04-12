@@ -4734,6 +4734,30 @@ architectures.")
 @code{MirageOS} key/value devices should implement.")
     (license license:isc)))
 
+(define-public ocaml-mirage-kv-mem
+  (package
+    (name "ocaml5-mirage-kv-mem")
+    (version "4.0.1")
+    (home-page "https://github.com/mirage/mirage-kv-mem")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1bsqx7q54hjd5159pjp0mf5p2jm1kgjfw6r8xhzagl14kak5qhy4"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-mirage-ptime ocaml-mirage-kv ocaml-fmt
+                             ocaml-ptime ocaml-optint))
+    (native-inputs (list ocaml-alcotest))
+    (synopsis "In-memory key value store for MirageOS")
+    (description
+     "This package implements the mirage-kv interface, but does not provide a
+persistent data storage.  Use for testing or amnesia.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
