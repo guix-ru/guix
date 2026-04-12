@@ -1672,6 +1672,32 @@ about.")
     (description
      "This library implements the standard functions used by Dune.")))
 
+(define-public ocaml-fiber
+  (package
+    (name "ocaml5-fiber")
+    (home-page "https://github.com/ocaml-dune/fiber")
+    (version "3.7.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "085v1dfxrb4wnkgysghj5q4vr4nx3nxr84rqmy874dr3pk30740n"))))
+    (build-system dune-build-system)
+    (arguments
+     '(#:package "fiber"
+       ;; Requires ppx_expect < 0.17.
+       #:tests? #f))
+    (propagated-inputs (list ocaml-stdune ocaml-dune-dyn))
+    (native-inputs (list ocaml-odoc))
+    (synopsis "Structured concurrency library")
+    (description "This library implements structured concurrency for ocaml.
+It offers no backwards compatibility guarantees.")
+    (license license:expat)))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
