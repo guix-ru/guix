@@ -1610,6 +1610,32 @@ get an precise reference of when the executable was built.")))
      "This ocaml library returns user XDG directories such as XDG_CONFIG_HOME and
 XDG_STATE_HOME.")))
 
+(define-public ocaml-pp
+  (package
+    (name "ocaml5-pp")
+    (version "2.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml-dune/pp")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gfd6hrb031qzb54v2zhlfxs54x0vnbaj6a8as07pvpwx7qznyss"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-odoc))
+    (native-inputs (list ocaml-ppx-expect))
+    (home-page "https://github.com/ocaml-dune/pp")
+    (synopsis "Pretty-printing library using boxes and break hints")
+    (description
+     "This library provides an alternative to the @code{Format} module of the OCaml
+standard library.  Pp uses the same concepts of boxes and break hints, and the
+final rendering is done to formatter from the @code{Format} module.  However it
+defines its own algebra which some might find easier to work with and reason
+about.")
+    (license license:expat)))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
