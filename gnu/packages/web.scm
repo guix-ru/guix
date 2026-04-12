@@ -6887,6 +6887,96 @@ w3c webidl files and a binding configuration file.")
                                 "netsurf-longer-test-timeout.patch"
                                 "netsurf-message-timestamp.patch"))))
     (build-system glib-or-gtk-build-system)
+    (arguments
+     (list
+      #:make-flags
+      #~(list
+         (string-append "CC=" #$(cc-for-target))
+         (string-append "BUILD_CC=" #$(cc-for-target))
+         "TARGET=gtk3"
+         (string-append "PREFIX=" #$output)
+         (string-append "NSSHARED="
+                        #$(this-package-native-input "netsurf-buildsystem")
+                        "/share/netsurf-buildsystem"))
+      #:test-target "test"
+      #:modules `((ice-9 rdelim)
+                  (ice-9 match)
+                  (srfi srfi-1)
+                  (sxml simple)
+                  ,@%glib-or-gtk-build-system-default-modules)
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (add-after 'unpack 'remove-timestamps
+            ;; Avoid embedding timestamp for reproducible builds
+            (lambda _
+              (substitute* "tools/git-testament.pl"
+                (("WT_COMPILEDATE ..$compiledate")
+                 "WT_COMPILEDATE \\\""))))
+          (add-after 'build 'adjust-welcome
+            (lambda _
+              (substitute* "frontends/gtk/res/welcome.html"
+                ;; Close some XHTML tags.
+                (("<(img|input)([^>]*)>" _ tag contents)
+                 (string-append "<" tag contents " />"))
+                ;; Increase freedom.
+                ((" open source") ", free software"))
+              (with-atomic-file-replacement "frontends/gtk/res/welcome.html"
+                (lambda (in out)
+                  ;; Leave the DOCTYPE header as is.
+                  (display (read-line in 'concat) out)
+                  (sxml->xml
+                   (let rec
+                       ((sxml (xml->sxml in #:default-entity-handler
+                                         (lambda (port name)
+                                           (string-append "<ENTITY>"
+                                                          (symbol->string name)
+                                                          "</ENTITY>")))))
+                     ;; We'd like to use sxml-match here, but it can't
+                     ;; match against generic tag symbols...
+                     (match sxml
+                       ;; Remove default links so it doesn't seem we're
+                       ;; endorsing them.
+                       (`(div (@ (class "links")) . ,rest)
+                        '())
+                       ;; Prefer a more privacy-respecting default search
+                       ;; engine.
+                       (`(form . ,rest)
+                        `(form (@ (action "https://lite.duckduckgo.com/lite/")
+                                  (method "post"))
+                               (div (@ (class "websearch"))
+                                    (input (@ (type "text")
+                                              (size "42")
+                                              (name "q")
+                                              (autocomplete "off")
+                                              (value "")))
+                                    (input (@ (type "submit")
+                                              (value "DuckDuckGo Search"))))))
+                       (`(ENTITY ,ent)
+                        `(*ENTITY* ,ent))
+                       ((x ...)
+                        (map rec x))
+                       (x x)))
+                   out)))))
+          (add-before 'check 'patch-check
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* '("test/bloom.c" "test/hashtable.c")
+                (("/usr/share/dict/words")
+                 (search-input-file inputs "/share/web2")))))
+          (add-after 'install 'install-more
+            (lambda _
+              (let* ((share (string-append #$output "/share/"))
+                     (desktop (string-append share
+                                             "applications/netsurf.desktop")))
+                (mkdir-p (dirname desktop))
+                (copy-file "frontends/gtk/res/netsurf-gtk.desktop" desktop)
+                (substitute* desktop
+                  (("netsurf-gtk")
+                   (string-append #$output "/bin/netsurf-gtk3"))
+                  (("netsurf.png")
+                   (string-append share "/netsurf/netsurf.xpm")))
+                (install-file "docs/netsurf-gtk.1"
+                              (string-append share "man/man1/"))))))))
     (native-inputs
      (list netsurf-buildsystem
            nsgenbind
@@ -6897,111 +6987,21 @@ w3c webidl files and a binding configuration file.")
            pkg-config
            xxd))
     (inputs
-     `(("curl" ,curl)
-       ("gtk+" ,gtk+)
-       ("openssl" ,openssl)
-       ("utf8proc" ,utf8proc)
-       ("libpng" ,libpng)
-       ("libjpeg" ,libjpeg-turbo)
-       ("libcss" ,libcss)
-       ("libdom" ,libdom)
-       ("libnsbmp" ,libnsbmp)
-       ("libnsgif" ,libnsgif)
-       ("libnslog" ,libnslog)
-       ("libnspsl" ,libnspsl)
-       ("libnsutils" ,libnsutils)
-       ("libsvgtiny" ,libsvgtiny)
-       ("miscfiles" ,miscfiles)))
-    (arguments
-     `(#:make-flags `("CC=gcc" "BUILD_CC=gcc"
-                      "TARGET=gtk3"
-                      ,(string-append "PREFIX=" %output)
-                      ,(string-append "NSSHARED="
-                                      (assoc-ref %build-inputs
-                                                 "netsurf-buildsystem")
-                                      "/share/netsurf-buildsystem"))
-       #:test-target "test"
-       #:modules ((ice-9 rdelim)
-                  (ice-9 match)
-                  (srfi srfi-1)
-                  (sxml simple)
-                  ,@%glib-or-gtk-build-system-default-modules)
-       #:phases
-       (modify-phases %standard-phases
-         (delete 'configure)
-         (add-after 'unpack 'remove-timestamps
-           ;; Avoid embedding timestamp for reproducible builds
-           (lambda _
-             (substitute* "tools/git-testament.pl"
-               (("WT_COMPILEDATE ..$compiledate")
-                "WT_COMPILEDATE \\\""))))
-         (add-after 'build 'adjust-welcome
-           (lambda _
-             (substitute* "frontends/gtk/res/welcome.html"
-               ;; Close some XHTML tags.
-               (("<(img|input)([^>]*)>" _ tag contents)
-                (string-append "<" tag contents " />"))
-               ;; Increase freedom.
-               ((" open source") ", free software"))
-             (with-atomic-file-replacement "frontends/gtk/res/welcome.html"
-               (lambda (in out)
-                 ;; Leave the DOCTYPE header as is.
-                 (display (read-line in 'concat) out)
-                 (sxml->xml
-                  (let rec ((sxml (xml->sxml in
-                                             #:default-entity-handler
-                                             (lambda (port name)
-                                               (string-append "<ENTITY>"
-                                                              (symbol->string name)
-                                                              "</ENTITY>")))))
-                    ;; We'd like to use sxml-match here, but it can't
-                    ;; match against generic tag symbols...
-                    (match sxml
-                      ;; Remove default links so it doesn't seem we're
-                      ;; endorsing them.
-                      (`(div (@ (class "links")) . ,rest)
-                       '())
-                      ;; Prefer a more privacy-respecting default search
-                      ;; engine.
-                      (`(form . ,rest)
-                       `(form (@ (action "https://lite.duckduckgo.com/lite/")
-                                 (method "post"))
-                              (div (@ (class "websearch"))
-                                   (input (@ (type "text")
-                                             (size "42")
-                                             (name "q")
-                                             (autocomplete "off")
-                                             (value "")))
-                                   (input (@ (type "submit")
-                                             (value "DuckDuckGo Search"))))))
-                      (`(ENTITY ,ent)
-                       `(*ENTITY* ,ent))
-                      ((x ...)
-                       (map rec x))
-                      (x x)))
-                  out)))
-             #t))
-         (add-before 'check 'patch-check
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* '("test/bloom.c" "test/hashtable.c")
-               (("/usr/share/dict/words")
-                (search-input-file inputs "/share/web2")))
-             #t))
-         (add-after 'install 'install-more
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (desktop (string-append out "/share/applications/"
-                                            "netsurf.desktop")))
-               (mkdir-p (dirname desktop))
-               (copy-file "frontends/gtk/res/netsurf-gtk.desktop"
-                          desktop)
-               (substitute* desktop
-                 (("netsurf-gtk") (string-append out "/bin/netsurf-gtk3"))
-                 (("netsurf.png") (string-append out "/share/netsurf/"
-                                                 "netsurf.xpm")))
-               (install-file "docs/netsurf-gtk.1"
-                             (string-append out "/share/man/man1/"))
-               #t))))))
+     (list curl
+           gtk+
+           openssl
+           utf8proc
+           libpng
+           libjpeg-turbo
+           libcss
+           libdom
+           libnsbmp
+           libnsgif
+           libnslog
+           libnspsl
+           libnsutils
+           libsvgtiny
+           miscfiles))
     (home-page "https://www.netsurf-browser.org")
     (synopsis "Web browser")
     (description
