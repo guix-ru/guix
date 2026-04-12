@@ -1596,6 +1596,20 @@ or the list of statically linked libraries with their versions.  It supports
 reporting the version from the version control system during development to
 get an precise reference of when the executable was built.")))
 
+(define-public ocaml-dune-xdg
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-xdg")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "xdg")))
+    (propagated-inputs (list ocaml-odoc))
+    (synopsis "XDG Base Directory Specification library for ocaml")
+    (description
+     "This ocaml library returns user XDG directories such as XDG_CONFIG_HOME and
+XDG_STATE_HOME.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
