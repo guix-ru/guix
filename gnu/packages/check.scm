@@ -1140,8 +1140,7 @@ Anything Protocol} compliant programs can also be executed through Kyua.")
     (arguments
      `(#:tests? #f
        #:configure-flags '("-DBUILD_SHARED_LIBS=ON")))
-    (native-inputs
-     `(("python" ,python-wrapper)))
+    (native-inputs (list python-wrapper))
     (home-page "https://github.com/google/googletest/")
     (synopsis "Test discovery and XUnit test framework")
     (description "Google Test features an XUnit test framework, automated test
