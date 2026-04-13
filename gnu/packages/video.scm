@@ -520,22 +520,19 @@ video decode, encode and filtering on Intel's Gen graphics hardware platforms.")
     (build-system gnu-build-system)
     (outputs '("out" "doc"))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'move-docs
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (doc (assoc-ref outputs "doc")))
-               (mkdir-p (string-append doc "/share"))
-               (rename-file
-                (string-append out "/share/gtk-doc")
-                (string-append doc "/share/gtk-doc"))
-               #t))))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'move-docs
+            (lambda _
+              (let ((doc #$output:doc))
+                (mkdir-p (string-append doc "/share"))
+                (rename-file (string-append #$output "/share/gtk-doc")
+                             (string-append doc "/share/gtk-doc"))))))))
     (native-inputs
      (list dash gtk-doc/stable pkg-config))
     (inputs
-     `(("glew" ,glew)
-       ("opengl" ,mesa)))
+     (list glew mesa))
     (propagated-inputs
      (list orc))
     (synopsis "Dirac video codec")
