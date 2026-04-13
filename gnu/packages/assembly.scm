@@ -276,9 +276,7 @@ has strong support for macros.")
      '(#:parallel-tests? #f))           ; Some tests fail
                                         ; non-deterministically when run in
                                         ; parallel
-    (inputs
-     `(("python" ,python-wrapper)
-       ("xmlto" ,xmlto)))
+    (inputs (list python-wrapper xmlto))
     (home-page "https://yasm.tortall.net/")
     (synopsis "Rewrite of the NASM assembler")
     (description
