@@ -5654,39 +5654,43 @@ to answer a question.  Xmessage can also exit after a specified time.")
          (search-patches "xterm-370-explicit-xcursor.patch"))))
     (build-system gnu-build-system)
     (arguments
-     '(#:configure-flags '("--enable-wide-chars" "--enable-load-vt-fonts"
-                           "--enable-i18n" "--enable-doublechars"
-                           "--enable-luit" "--enable-mini-luit"
-                           "X_EXTRA_LIBS=-lXcursor")
-       #:tests? #f                      ; no test suite
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'build 'patch-file-names
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (substitute* "uxterm"
-                 (("([ `\\|])(sh|sed|awk|xmessage) " _ prefix command)
-                  (string-append prefix (which command) " "))
-                 (("(`|\"|LANG=C )(locale) " _ prefix command)
-                  (string-append prefix (which command) " "))
-                 (("=xterm")
-                  (string-append "=" out "/bin/xterm")))))))))
+     (list
+      #:tests? #f                       ; no test suite
+      #:configure-flags
+      #~(list "--enable-wide-chars"
+              "--enable-load-vt-fonts"
+              "--enable-i18n"
+              "--enable-doublechars"
+              "--enable-luit"
+              "--enable-mini-luit"
+              "X_EXTRA_LIBS=-lXcursor")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'build 'patch-file-names
+            (lambda _
+              (substitute* "uxterm"
+                (("([ `\\|])(sh|sed|awk|xmessage) " _ prefix command)
+                 (string-append prefix (which command) " "))
+                (("(`|\"|LANG=C )(locale) " _ prefix command)
+                 (string-append prefix (which command) " "))
+                (("=xterm")
+                 (string-append "=" #$output "/bin/xterm"))))))))
     (native-inputs
      (list pkg-config))
     (inputs
-     `(("luit" ,luit)
-       ("libXft" ,libxft)
-       ("fontconfig" ,fontconfig)
-       ("freetype" ,freetype)
-       ("ncurses" ,ncurses)
-       ("libICE" ,libice)
-       ("libSM" ,libsm)
-       ("libX11" ,libx11)
-       ("libXcursor" ,libxcursor)
-       ("libXext" ,libxext)
-       ("libXt" ,libxt)
-       ("xorgproto" ,xorgproto)
-       ("libXaw" ,libxaw)))
+     (list luit
+           libxft
+           fontconfig
+           freetype
+           ncurses
+           libice
+           libsm
+           libx11
+           libxcursor
+           libxext
+           libxt
+           xorgproto
+           libxaw))
     (home-page "https://invisible-island.net/xterm/")
     (synopsis "Terminal emulator for the X Window System")
     (description
