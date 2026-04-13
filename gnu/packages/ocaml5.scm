@@ -1712,6 +1712,24 @@ It offers no backwards compatibility guarantees.")
      "This library parses ocaml compiler output and returns it as ocaml values.
 This library offers no backwards compatibility guarantees.")))
 
+(define-public ocaml-dune-rpc
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-rpc")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "dune-rpc")))
+    (propagated-inputs (list ocaml-csexp
+                             ocaml-dune-ordering
+                             ocaml-dune-dyn
+                             ocaml-dune-xdg
+                             ocaml-stdune
+                             ocaml-pp
+                             ocaml-odoc))
+    (synopsis "RPC communication with OCaml dune")
+    (description "This library controls a running dune instance over RPC.")))
+
 (define-public ocaml-intrinsics-kernel
   (package
     (name "ocaml5-intrinsics-kernel")
