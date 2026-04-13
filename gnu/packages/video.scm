@@ -1479,10 +1479,10 @@ designed to encode video or images into an H.265 / HEVC encoded bitstream.")
     (native-inputs
      (list pkg-config nasm))
     (propagated-inputs
-     `(("freetype" ,freetype)
-       ("fribidi" ,fribidi)
-       ("fontconfig" ,fontconfig)
-       ("harfbuzz" ,harfbuzz)))
+     (list freetype
+           fribidi
+           fontconfig
+           harfbuzz))
     (home-page "https://github.com/libass/libass")
     (synopsis "Subtitle rendering library for the ASS/SSA format")
     (description "libass is a subtitle rendering library for the
