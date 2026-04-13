@@ -89,49 +89,43 @@
      ;; XXX:
      ;; There numerous issues with the testsuite.
      ;; Enable all of them once they are fixed in upstream.
-     `(#:tests? #f
-       #:parallel-build? #f
-       #:configure-flags
-       (list
-        "--enable-shared"
-        (string-append "LDFLAGS=-Wl,-rpath="
-                       (assoc-ref %outputs "out")
-                       "/lib"))
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-rpath
-           (lambda _
-             (substitute* "main/Makefile"
-              (("flite_LIBS_flags \\+= -Wl,-rpath [^ ]*")
-               "flite_LIBS_flags +="))
-             #t))
-         (delete 'check)
-         ;; Modifying testsuite/Makefile is not done in favor of
-         ;; overriding 'check.
-         ;; The path not taken would be:
-         ;; test:\n\t$(foreach x,$(subst tris1,,$(subst dcoffset_wave,,$(subst flite_test,,$(subst by_word,,$(subst bin2ascii,,$(subst lpc_resynth,,$(subst rfc,,$(subst compare_wave,,$(subst record_in_noise,,$(subst combine_waves,,$(patsubst play_%,,$(subst record_wave,,$(subst lex_lookup,,$(patsubst lpc_test%,,$(patsubst asciiS2U%,,$(patsubst asciiU2S%,,$(ALL))))))))))))))))),echo TEST $x && ./$x data.one && ) true
-         (add-after 'install 'check
-           (lambda _
-             (invoke "make" "-C" "testsuite")
-             (with-directory-excursion "testsuite"
-               (invoke "./token_test")
-               (invoke "./hrg_test")
-               (invoke "./regex_test")
-               (invoke "./nums_test")
-               (invoke "./lex_test")
-               (invoke "./utt_test")
-               (invoke "./multi_thread"))
-             #t))
-         (add-after 'install 'remove-static-libs
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out")))
-               (for-each delete-file
-                         (find-files out "\\.a$"))
-               #t))))))
+     (list
+      #:tests? #f
+      #:parallel-build? #f
+      #:configure-flags
+      #~(list "--enable-shared"
+              (string-append "LDFLAGS=-Wl,-rpath=" #$output "/lib"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-rpath
+            (lambda _
+              (substitute* "main/Makefile"
+                (("flite_LIBS_flags \\+= -Wl,-rpath [^ ]*")
+                 "flite_LIBS_flags +="))))
+          (delete 'check)
+          ;; Modifying testsuite/Makefile is not done in favor of
+          ;; overriding 'check.
+          ;; The path not taken would be:
+          ;; test:\n\t$(foreach x,$(subst tris1,,$(subst dcoffset_wave,,$(subst flite_test,,$(subst by_word,,$(subst bin2ascii,,$(subst lpc_resynth,,$(subst rfc,,$(subst compare_wave,,$(subst record_in_noise,,$(subst combine_waves,,$(patsubst play_%,,$(subst record_wave,,$(subst lex_lookup,,$(patsubst lpc_test%,,$(patsubst asciiS2U%,,$(patsubst asciiU2S%,,$(ALL))))))))))))))))),echo TEST $x && ./$x data.one && ) true
+          (add-after 'install 'check
+            (lambda _
+              (invoke "make" "-C" "testsuite")
+              (with-directory-excursion "testsuite"
+                (invoke "./token_test")
+                (invoke "./hrg_test")
+                (invoke "./regex_test")
+                (invoke "./nums_test")
+                (invoke "./lex_test")
+                (invoke "./utt_test")
+                (invoke "./multi_thread"))))
+          (add-after 'install 'remove-static-libs
+            (lambda _
+              (for-each delete-file
+                        (find-files #$output "\\.a$")))))))
     (native-inputs
      (list perl))
     (inputs
-     `(("alsa" ,alsa-lib)))
+     (list alsa-lib))
     (synopsis "Speech synthesis system")
     (description "Flite (festival-lite) is a small, fast run-time text to speech
 synthesis engine developed at CMU and primarily designed for small embedded
