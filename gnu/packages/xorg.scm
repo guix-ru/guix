@@ -1257,8 +1257,7 @@ treat it as part of their software base when porting.")
     (inputs
       (list libxt xorgproto libxext))
     (native-inputs
-     `(("gettext" ,gettext-minimal)
-       ("pkg-config" ,pkg-config)))
+     (list gettext-minimal pkg-config))
     (home-page "https://www.x.org/wiki/")
     (synopsis "Xorg XPM library")
     (description "XPM (X Pixmap) image file format library.")
