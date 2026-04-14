@@ -69,17 +69,6 @@
        (search-patches "libcanberra-sound-theme-freedesktop.patch"
                        "libcanberra-wayland-crash.patch"))))
     (build-system gnu-build-system)
-    (inputs
-     `(("alsa-lib" ,alsa-lib)
-       ("gstreamer" ,gstreamer)
-       ("gtk+" ,gtk+)
-       ("libltdl" ,libltdl)
-       ("libvorbis" ,libvorbis)
-       ("pulseaudio" ,pulseaudio)
-       ("udev" ,eudev)
-       ("sound-theme-freedesktop" ,sound-theme-freedesktop)))
-    (native-inputs
-     (list pkg-config))
     (arguments
      `(#:phases
        (modify-phases %standard-phases
@@ -87,10 +76,21 @@
            (lambda* (#:key inputs #:allow-other-keys)
              (substitute* "src/sound-theme-spec.c"
                (("@SOUND_THEME_DIRECTORY@")
-                (string-append
-                 (assoc-ref inputs "sound-theme-freedesktop")
-                 "/share")))
-             #t)))))
+                (dirname
+                 (dirname
+                  (search-input-directory inputs
+                                          "share/sounds/freedesktop"))))))))))
+    (inputs
+     (list alsa-lib
+           gstreamer
+           gtk+
+           libltdl
+           libvorbis
+           pulseaudio
+           eudev
+           sound-theme-freedesktop))
+    (native-inputs
+     (list pkg-config))
     (home-page "https://0pointer.de/lennart/projects/libcanberra/")
     (synopsis
      "Implementation of the XDG Sound Theme and Name Specifications")
