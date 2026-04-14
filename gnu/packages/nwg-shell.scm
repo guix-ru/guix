@@ -32,8 +32,13 @@
   #:use-module (gnu packages golang-graphics)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages gtk)
+  #:use-module (gnu packages image)
+  #:use-module (gnu packages imagemagick)
+  #:use-module (gnu packages image-viewers)
   #:use-module (gnu packages pkg-config)
-  #:use-module (gnu packages python-build))
+  #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages wm))
 
 (define-public nwg-shell-wallpapers
   (package
@@ -309,3 +314,118 @@ standalone, however, with a little help from command line arguments.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public azote
+  (package
+    (name "azote")
+    (version "1.16.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/azote")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ka1i3z6ycj8y74lpblxxbmjval8zbskgfs2gnpgwgsypxlqckg1"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (with-directory-excursion "azote"
+                (substitute* "main.py"
+                  (("\\/usr\\/bin\\/env bash")
+                   (string-append #$(this-package-input "bash-minimal")
+                                  "/bin/bash"))
+                  (("\\/usr(\\/share\\/azote)" _ suffix)
+                   (string-append #$output suffix))
+                  (("\\/usr(\\/share\\/applications)" _ suffix)
+                   (string-append #$output suffix)))
+                (substitute* "tools.py"
+                  (("\\/usr(\\/share\\/backgrounds\\/sway)" _ suffix)
+                   (string-append #$(this-package-input "sway") suffix))
+                  (("\\/usr(\\/share\\/backgrounds\\/nwg-shell)" _ suffix)
+                   (string-append #$(this-package-input "nwg-shell-wallpapers")
+                                  suffix))
+                  ;; Looking for mimeinfo.cache in a single directory does not
+                  ;; suite well with Guix.  Preventing this, Azote uses of the
+                  ;; default feh command to preview the wallpapers.
+                  (("\\/usr(\\/share\\/applications)" _ suffix)
+                   (string-append #$output suffix))))))
+          (add-after 'create-entrypoints 'install-data
+            (lambda _
+              (with-directory-excursion "dist"
+                (install-file "azote.desktop"
+                              (string-append #$output "/share/applications"))
+                (install-file "azote.svg"
+                              (string-append #$output "/share/pixmaps"))
+                (for-each (lambda (file)
+                            (install-file file
+                                          (string-append #$output
+                                                         "/share/azote")))
+                          (find-files "." "indicator.*\\.png$")))
+              (install-file "README.md"
+                            (string-append #$output "/share/doc/Azote"))))
+          (add-after 'create-entrypoints 'wrap-program
+            (lambda _
+              (wrap-program (string-append #$output "/bin/azote")
+                `("PATH" ":" prefix
+                  (,(dirname (which "cp"))
+                   ,(dirname (which "feh"))
+                   ,(dirname (which "find"))
+                   ,(dirname (which "grim"))
+                   ;; TODO: The current version of imagemagick does not contain
+                   ;; the magick command.  Update it and then add this:
+                   ;; ,(dirname (which "magick"))
+                   ,(dirname (which "slurp"))
+                   ,(dirname (which "swaybg"))
+                   ,(dirname (which "wlr-randr"))))
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    ;; These packages are propagated for compositors like Sway or Hyprland to
+    ;; load the backgrounds set by Azote.
+    (propagated-inputs
+     (list gdk-pixbuf                  ;for GDK_PIXBUF_MODULE_FILE
+           `(,libavif "pixbuf-loader") ;for loading AVIF backgrounds
+           libheif                     ;for loading HEIF backgrounds
+           `(,libjxl "pixbuf-loader")  ;for loading JXL backgrounds
+           swaybg))                    ;for ~/.azotebg and ~/.azotebg-hyprland
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list bash-minimal
+           coreutils-minimal
+           feh
+           findutils
+           grim
+           gtk+
+           imagemagick
+           libappindicator
+           nwg-shell-wallpapers
+           python-pillow
+           python-pillow-avif-plugin
+           python-pillow-heif
+           python-pillow-jxl-plugin
+           python-pycairo
+           python-pygobject
+           python-send2trash
+           python-xlib
+           slurp
+           sway
+           swaybg
+           wlr-randr))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/azote")
+    (synopsis "Wallpaper manager")
+    (description
+     "Azote is a GTK+ 3 based picture browser and background setter, as the
+frontend to the @command{swaybg} (sway/Wayland) and @command{feh} (X windows)
+commands.
+
+This application is a part of the nwg-shell project.")
+    (license (list license:gpl3
+                   license:bsd-3)))) ;azote/colorthief.py
