@@ -263,45 +263,40 @@ X11 GUIs.")
              (patches (search-patches "tk-find-library.patch"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases (modify-phases %standard-phases
-                  (add-before 'configure 'pre-configure
-                    (lambda _ (chdir "unix")))
-                  (add-after 'install 'create-wish-symlink
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let ((out (assoc-ref outputs "out")))
-                        (symlink (string-append out "/bin/wish"
-                                                ,(version-major+minor
-                                                  (package-version tk)))
-                                 (string-append out "/bin/wish")))))
-                  (add-after 'install 'add-fontconfig-flag
-                    (lambda* (#:key inputs outputs #:allow-other-keys)
-                      ;; Add the missing -L flag for Fontconfig in 'tk.pc' and
-                      ;; 'tkConfig.sh'.
-                      (let ((out        (assoc-ref outputs "out"))
-                            (fontconfig (assoc-ref inputs "fontconfig")))
-                        (substitute* (find-files out
-                                                 "^(tkConfig\\.sh|tk\\.pc)$")
-                          (("-lfontconfig")
-                           (string-append "-L" fontconfig
-                                          "/lib -lfontconfig")))))))
-
-       #:configure-flags
-       (list (string-append "--with-tcl="
-                            (assoc-ref %build-inputs "tcl")
-                            "/lib")
-             ;; This is needed when cross-compiling, see:
-             ;; https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=719247
-             ,@(if (%current-target-system)
-                   '("tcl_cv_strtod_buggy=1"
-                     "ac_cv_func_strtod=yes")
-                   '()))
-
-       ;; The tests require a running X server, so we just skip them.
-       #:tests? #f))
+     (list
+      ;; The tests require a running X server, so we just skip them.
+      #:tests? #f
+      #:configure-flags
+      #~(list (string-append "--with-tcl="
+                             (assoc-ref %build-inputs "tcl") "/lib")
+              ;; This is needed when cross-compiling, see:
+              ;; https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=719247
+              #$@(if (%current-target-system)
+                     '("tcl_cv_strtod_buggy=1" "ac_cv_func_strtod=yes")
+                     '()))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'pre-configure
+            (lambda _
+              (chdir "unix")))
+          (add-after 'install 'create-wish-symlink
+            (lambda _
+              (let ((version #$(version-major+minor (package-version tk)))
+                    (dest (string-append #$output "/bin/wish")))
+                (symlink (string-append dest version)
+                         dest))))
+          (add-after 'install 'add-fontconfig-flag
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              ;; Add the missing -L flag for Fontconfig in 'tk.pc' and
+              ;; 'tkConfig.sh'.
+              (let ((fontconfig (search-input-file inputs
+                                                   "lib/libfontconfig.so")))
+                (substitute* (find-files #$output "^(tkConfig\\.sh|tk\\.pc)$")
+                  (("-lfontconfig")
+                   (string-append "-L" (dirname fontconfig)
+                                  " -lfontconfig")))))))))
     (native-inputs (list pkg-config))
-    (inputs `(("libxft" ,libxft)
-              ("fontconfig" ,fontconfig)
-              ("tcl" ,tcl)))
+    (inputs (list libxft fontconfig tcl))
     ;; tk.h refers to X11 headers, hence the propagation.
     (propagated-inputs (list libx11 libxext))
 
