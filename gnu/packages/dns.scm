@@ -202,24 +202,24 @@ utilities for use in scripts.")
                  (cut patch-shebang <> path)
                  (find-files (string-append #$output "/etc/avahi"))))))))
     (inputs
-     `(("bash-minimal" ,bash-minimal)
-       ("dbus" ,dbus)
-       ("expat" ,expat)
-       ("gdbm" ,gdbm)
-       ("glib" ,glib)
-       ;; Do not use libcap when cross-compiling since it's not quite
-       ;; cross-compilable; and use it only for supported systems.
-       ,@(if (and (not (%current-target-system))
-                  (member (%current-system)
-                          (package-supported-systems libcap)))
-             `(("libcap" ,libcap))   ;to enable chroot support in avahi-daemon
-             '())
-       ("libdaemon" ,libdaemon)
-       ("libevent" ,libevent)))
+     (cons* bash-minimal
+            dbus
+            expat
+            gdbm
+            glib
+            libdaemon
+            libevent
+            ;; Do not use libcap when cross-compiling since it's not quite
+            ;; cross-compilable; and use it only for supported systems.
+            (if (and (not (%current-target-system))
+                     (member (%current-system)
+                             (package-supported-systems libcap)))
+                (list libcap)        ;to enable chroot support in avahi-daemon
+                (list))))
     (native-inputs
-     `(("gettext" ,gettext-minimal)
-       ("glib" ,glib "bin")
-       ("pkg-config" ,pkg-config)))
+     (list gettext-minimal
+           (list glib "bin")
+           pkg-config))
     (synopsis "Implementation of mDNS/DNS-SD protocols")
     (description
      "Avahi is a system which facilitates service discovery on a local
