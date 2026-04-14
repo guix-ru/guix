@@ -6658,7 +6658,7 @@ a safe way.")
                (base32
                 "0y70qh5kn2hyrrvbsfhg0iws2qggk5vkpz37f7rbd5rd9cjc57dp"))))
     (build-system perl-build-system)
-    (native-inputs `(("test-script" ,perl-test-script)))
+    (native-inputs (list perl-test-script))
     (synopsis "Portable implementation of the `which' utility")
     (description
      "File::Which was created to be able to get the paths to executable
