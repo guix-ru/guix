@@ -4895,65 +4895,62 @@ inadequately in modern network environments, and both should be deprecated.")
         (revision "0"))
     (package
       (name "net-tools")
-      (version (string-append "1.60-" revision "." (string-take commit 7)))
-      (source (origin
-               (method url-fetch)
-               (uri (string-append "https://sourceforge.net/code-snapshots/git/"
-                                   "n/ne/net-tools/code.git/net-tools-code-"
-                                   commit ".zip"))
-               (file-name (string-append name "-" version ".zip"))
-               (sha256
-                (base32
-                 "0hz9fda9d78spp774b6rr5xaxav7cm4h0qcpxf70rvdbrf6qx7vy"))))
+      (version (string-append "1.60-" revision "."
+                              (string-take commit 7)))
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append "https://sourceforge.net/code-snapshots/git/"
+                             "n/ne/net-tools/code.git/net-tools-code-" commit
+                             ".zip"))
+         (file-name (string-append name "-" version ".zip"))
+         (sha256
+          (base32 "0hz9fda9d78spp774b6rr5xaxav7cm4h0qcpxf70rvdbrf6qx7vy"))))
       (home-page "https://net-tools.sourceforge.net/")
       (build-system gnu-build-system)
       (arguments
-       `(#:modules ((guix build gnu-build-system)
+       (list
+        ;; Binaries that depend on libnet-tools.a don't declare that
+        ;; dependency, making it parallel-unsafe.
+        #:parallel-build? #f
+
+        #:tests? #f ;no test suite
+        #:make-flags
+        #~(list #$(string-append "CC=" (cc-for-target))
+                (string-append "BASEDIR=" #$output)
+                (string-append "INSTALLNLSDIR=" #$output "/share/locale")
+                (string-append "mandir=/share/man"))
+        #:modules `((guix build gnu-build-system)
                     (guix build utils)
                     (srfi srfi-1)
                     (srfi srfi-26))
-         #:phases
-         (modify-phases %standard-phases
-           (replace 'configure
-             (lambda* (#:key outputs #:allow-other-keys)
-               (let ((out (assoc-ref outputs "out")))
-                 (mkdir-p (string-append out "/bin"))
-                 (mkdir-p (string-append out "/sbin"))
+        #:phases
+        #~(modify-phases %standard-phases
+            (replace 'configure
+              (lambda _
+                (mkdir-p (string-append #$output "/bin"))
+                (mkdir-p (string-append #$output "/sbin"))
 
-                 ;; Pretend we have everything...
-                 (system "yes | make config")
+                ;; Pretend we have everything...
+                (system "yes | make config")
 
-                 ;; ... except for the things we don't have.
-                 ;; HAVE_AFDECnet requires libdnet, which we don't have.
-                 ;; HAVE_HWSTRIP and HAVE_HWTR require kernel headers
-                 ;; that have been removed.
-                 ;; XXX SELINUX and AFBLUETOOTH are removed for now, but we should
-                 ;; think about adding them later.
-                 (substitute* '("config.make" "config.h")
-                   (("^.*HAVE_(AFDECnet|HWSTRIP|HWTR|SELINUX|AFBLUETOOTH)[ =]1.*$")
-                    ""))
-                 #t)))
-           (add-after 'install 'remove-redundant-commands
-             (lambda* (#:key outputs #:allow-other-keys)
-               ;; Remove commands and man pages redundant with Inetutils.
-               (let* ((out (assoc-ref outputs "out"))
-                      (dup (append-map (cut find-files out <>)
-                                       '("^hostname"
-                                         "^(yp|nis|dns)?domainname"))))
-                 (for-each delete-file dup)
-                 #t))))
-         ;; Binaries that depend on libnet-tools.a don't declare that
-         ;; dependency, making it parallel-unsafe.
-         #:parallel-build? #f
-
-         #:tests? #f                                ; no test suite
-         #:make-flags (let ((out (assoc-ref %outputs "out")))
-                        (list ,(string-append "CC=" (cc-for-target))
-                              (string-append "BASEDIR=" out)
-                              (string-append "INSTALLNLSDIR=" out "/share/locale")
-                              (string-append "mandir=/share/man")))))
-      (native-inputs `(("gettext" ,gettext-minimal)
-                       ("unzip" ,unzip)))
+                ;; ... except for the things we don't have.
+                ;; HAVE_AFDECnet requires libdnet, which we don't have.
+                ;; HAVE_HWSTRIP and HAVE_HWTR require kernel headers
+                ;; that have been removed.
+                ;; XXX SELINUX and AFBLUETOOTH are removed for now, but we should
+                ;; think about adding them later.
+                (substitute* '("config.make" "config.h")
+                  (("^.*HAVE_(AFDECnet|HWSTRIP|HWTR|SELINUX|AFBLUETOOTH)[ =]1.*$")
+                   ""))))
+            (add-after 'install 'remove-redundant-commands
+              (lambda _
+                ;; Remove commands and man pages redundant with Inetutils.
+                (for-each delete-file
+                          (append-map (cute find-files #$output <>)
+                                      '("^hostname"
+                                        "^(yp|nis|dns)?domainname"))))))))
+      (native-inputs (list gettext-minimal unzip))
       (supported-systems (remove target-hurd? %supported-systems))
       (synopsis "Tools for controlling the network subsystem in Linux")
       (description
