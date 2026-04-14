@@ -34,9 +34,10 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-xyz)
+  #:use-module (guix download)
+  #:use-module (guix gexp)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
-  #:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system waf)
@@ -56,50 +57,50 @@
       (sha256
        (base32 "0pnifyhhvcqfjd6iaa4m14kvfyqhjjdw0aqbcizcdhhqrl6q4pjg"))))
    (build-system gnu-build-system)
-   (native-inputs
-    (list autoconf
-          automake
-          pkg-config))
-   (inputs
-    `(("libjpeg" ,libjpeg-turbo)
-      ("libpng" ,libpng)
-      ("libx11" ,libx11)
-      ("libxft" ,libxft)
-      ("mesa" ,mesa)
-      ("zlib" ,zlib)))
     (arguments
-     `(#:tests? #f                      ;TODO: compile programs in "test" dir
-       #:configure-flags
-       (list "--enable-shared"
-             (string-append "DSOFLAGS=-Wl,-rpath=" %output "/lib"))
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'patch-makeinclude
-           (lambda _
-             (substitute* "makeinclude.in"
-               (("/bin/sh") (which "sh")))
-             #t))
-         (add-after 'install 'patch-config
-           ;; Provide -L flags for image libraries when querying fltk-config to
-           ;; avoid propagating inputs.
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((conf (string-append (assoc-ref outputs "out")
-                                        "/bin/fltk-config"))
-                   (jpeg (assoc-ref inputs "libjpeg"))
-                   (png  (assoc-ref inputs "libpng"))
-                   (zlib (assoc-ref inputs "zlib")))
-               (substitute* conf
-                 (("-ljpeg") (string-append "-L" jpeg "/lib -ljpeg"))
-                 (("-lpng") (string-append "-L" png "/lib -lpng"))
-                 (("-lz") (string-append "-L" zlib "/lib -lz"))))
-             #t)))))
+     (list
+      #:tests? #f ;TODO: compile programs in "test" dir
+      #:configure-flags
+      #~(list "--enable-shared"
+              (string-append "DSOFLAGS=-Wl,-rpath=" %output "/lib"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'patch-makeinclude
+            (lambda _
+              (substitute* "makeinclude.in"
+                (("/bin/sh")
+                 (which "sh")))))
+          (add-after 'install 'patch-config
+            ;; Provide -L flags for image libraries when querying fltk-config to
+            ;; avoid propagating inputs.
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((conf (string-append #$output "/bin/fltk-config"))
+                    (libjpeg-so (search-input-file inputs "lib/libjpeg.so"))
+                    (libpng-so (search-input-file inputs "lib/libpng.so"))
+                    (libz-so (search-input-file inputs "lib/libz.so")))
+                (substitute* conf
+                  (("-ljpeg")
+                   (string-append "-L" (dirname libjpeg-so) " -ljpeg"))
+                  (("-lpng")
+                   (string-append "-L" (dirname libpng-so) " -lpng"))
+                  (("-lz")
+                   (string-append "-L" (dirname libz-so) " -lz")))))))))
+    (native-inputs (list autoconf automake pkg-config))
+    (inputs
+     (list libjpeg-turbo
+           libpng
+           libx11
+           libxft
+           mesa
+           zlib))
     (home-page "https://www.fltk.org")
     (synopsis "3D C++ GUI library")
-    (description "FLTK is a C++ GUI toolkit providing modern GUI functionality
-without the bloat.  It supports 3D graphics via OpenGL and its built-in GLUT
-emulation.  FLTK is designed to be small and modular enough to be statically
-linked, but works fine as a shared library.  FLTK also includes an excellent
-UI builder called FLUID that can be used to create applications in minutes.")
+    (description
+     "FLTK is a C++ GUI toolkit providing modern GUI functionality without the
+bloat.  It supports 3D graphics via OpenGL and its built-in GLUT emulation.
+FLTK is designed to be small and modular enough to be statically linked, but
+works fine as a shared library.  FLTK also includes an excellent UI builder
+called FLUID that can be used to create applications in minutes.")
     (license license:lgpl2.0))) ; plus certain additional permissions
 
 (define-public fltk
