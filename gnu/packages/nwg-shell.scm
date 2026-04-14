@@ -29,28 +29,34 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages curl)
+  #:use-module (gnu packages fonts)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages geo)
   #:use-module (gnu packages gnome)
+  #:use-module (gnu packages gnome-xyz)
   #:use-module (gnu packages golang-graphics)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages image)
   #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages image-viewers)
+  #:use-module (gnu packages kde-frameworks)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages music)
+  #:use-module (gnu packages networking)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages pulseaudio)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-web)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages terminals)
+  #:use-module (gnu packages web)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages xdisorg)
-  #:use-module (gnu packages xorg))
+  #:use-module (gnu packages xorg)
+  #:use-module (srfi srfi-1))
 
 (define-public nwg-shell-wallpapers
   (package
@@ -1361,3 +1367,197 @@ configuring sway and Hyprland Wayland compositors in nwg-shell.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+;; nwg-shell meta package
+(define-public nwg-shell
+  (package
+    (name "nwg-shell")
+    (version "0.5.50")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-shell")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1qb4k1w3ycp0n8gwfnk2nmxn8gxa6aab1hg3527x514yck3w1zcp"))
+       (modules '((guix build utils)))
+       (snippet
+        '(with-directory-excursion "nwg_shell"
+           ;; The skeleton files in /gnu/store directory are read-only, so make
+           ;; the installer install the configuration files without preserving
+           ;; permissions and then make make azotebg executable.
+           (substitute* "installer.py"
+             (("copy, copy2") "copyfile, copy")
+             (("copy\\(") "copyfile(")
+             (("copy2\\(") "copyfile(")
+             (("import os" all) (string-append all "\nimport stat"))
+             (("(.* )copyfile\\(.*\\(.*\"azotebg\"\\), bcg\\)" all indent)
+              (string-append all "\n" indent "st = os.stat(bcg)" "\n" indent
+                             "os.chmod(bcg, st.st_mode | stat.S_IEXEC)"))
+             ;; Copy .azotebg to .azotebg-hyprland preserving permissions.
+             (("copyfile(\\(.*\"\\.azotebg-hyprland\"\\))" _ suffix)
+              (string-append "copy" suffix)))
+           ;; Replace systemd commands with elogind commands.
+           (substitute* '("installer.py"
+                          "skel/data/nwg-shell-config/settings"
+                          "skel/data/nwg-shell-config/settings-hyprland"
+                          "skel/config/sway/config"
+                          "skel/config/nwg-panel/hyprland-0"
+                          "skel/config/nwg-panel/hyprland-1"
+                          "skel/config/nwg-panel/hyprland-2"
+                          "skel/config/nwg-panel/hyprland-3"
+                          "skel/config/nwg-panel/preset-0"
+                          "skel/config/nwg-panel/preset-1"
+                          "skel/config/nwg-panel/preset-2"
+                          "skel/config/nwg-panel/preset-3"
+                          "skel/config/hypr/hyprland.conf")
+             (("\"systemctl (-i |)") "\"loginctl "))
+           (substitute* '("skel/config/sway/config"
+                          "skel/config/hypr/hyprland.conf")
+             ;; Disable importing environment variables for systemd.
+             ((".*systemctl --user import-environment.*") "")
+             ;; Disable updating environment variables for systemd.
+             ((".*dbus-update-activation-environment --systemd.*") "")
+             ;; Disable executing polkit-gnome-authentication-agent-1.  Since it
+             ;; is not available in $PATH, it is difficult to predict in which
+             ;; profile it is installed.  So let users enable it and set the
+             ;; path manually.
+             (("exec (= |)\\/usr\\/lib\\/polkit-gnome" all)
+              (string-append "#" all)))
+           ;; Replace firefox with icecat.
+           (substitute* '("skel/config/foot/foot.ini"
+                          "skel/config/sway/config")
+             (("firefox") "icecat"))
+           (substitute* "installer.py"
+             ;; Add an entry for icecat browser.
+             (("\"firefox\", " all) (string-append all "\"icecat\", "))
+             ;; Add support to the icecat browser.
+             (("    \"firefox\": \"firefox\"," all)
+              (string-append all "\n    \"icecat\": \"icecat\",\n"))
+             ;; Remove Arch Linux related line from the warning.
+             ((".*on a fresh Arch Linux installation.*") ""))))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (with-directory-excursion "nwg_shell/skel"
+                ;; Patch path to the nwg-shell backgrounds directory.
+                (substitute* '("data/nwg-shell-config/settings"
+                               "data/nwg-shell-config/settings-hyprland"
+                               "config/nwg-panel/hyprland-0"
+                               "config/nwg-panel/preset-0")
+                  (("\\/usr(\\/share\\/backgrounds\\/nwg-shell)" _ suffix)
+                   (string-append #$(this-package-input "nwg-shell-wallpapers")
+                                  suffix)))
+                ;; Patch path to backgrounds directory.
+                (substitute* "stuff/azotebg"
+                  (("\\/usr") #$output)))))
+          (add-after 'create-entrypoints 'install-scripts
+            (lambda _
+              (install-file "scripts/screenshot"
+                            (string-append #$output "/bin"))))
+          (add-after 'install-scripts 'install-data
+            (lambda _
+              (install-file "nwg-shell.jpg"
+                            (string-append #$output "/share/backgrounds"))
+              (install-file "README.md"
+                            (string-append #$output
+                                           "/share/doc/nwg-shell"))))
+          (add-after 'install-data 'wrap-programs
+            (lambda _
+              (with-directory-excursion (string-append #$output "/bin")
+                (wrap-program "nwg-shell-installer"
+                 `("PATH" prefix
+                   (,(dirname (which "localectl")))))
+                (wrap-program (string-append #$output "/bin/screenshot")
+                 `("PATH" ":" prefix
+                   (,(dirname (which "echo"))
+                    ,(dirname (which "grim"))
+                    ,(dirname (which "jq"))
+                    ,(dirname (which "notify-send"))
+                    ,(dirname (which "slurp"))
+                    ,(dirname (which "swappy"))
+                    ,(dirname (which "wl-copy"))
+                    ,(dirname (which "xdg-user-dir"))))))
+              )))))
+    (propagated-inputs
+     (list adwaita-icon-theme
+           azote
+           blueman
+           brightnessctl
+           cliphist
+           font-abattis-cantarell
+           foot
+           gdk-pixbuf                  ;for GDK_PIXBUF_MODULE_FILE
+           gnome-themes-extra
+           gopsuinfo
+           gsettings-desktop-schemas
+           gtklock
+           i3-autotiling
+           kstatusnotifieritem
+           `(,libavif "pixbuf-loader") ;for loading AVIF backgrounds
+           libheif                     ;for loading HEIF backgrounds
+           `(,libjxl "pixbuf-loader")  ;for loading JXL backgrounds
+           network-manager-applet
+           nwg-bar
+           nwg-clipman
+           nwg-displays
+           nwg-dock
+           nwg-dock-hyprland
+           nwg-drawer
+           nwg-icon-picker
+           nwg-look
+           nwg-menu
+           nwg-panel
+           nwg-readme-browser
+           nwg-shell-config
+           nwg-shell-wallpapers
+           papirus-icon-theme
+           pulseaudio
+           playerctl
+           swaybg
+           swayidle
+           swaynotificationcenter
+           wl-clipboard
+           wlsunset))
+    (native-inputs
+     (list python-setuptools))
+    (inputs
+     (list bash-minimal
+           coreutils-minimal
+           grim
+           jq
+           libnotify
+           localed
+           slurp
+           swappy
+           wl-clipboard
+           xdg-user-dirs))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/")
+    (synopsis "GTK3-based shell for sway and Hyprland Wayland compositors")
+    (description
+     "nwg-shell is a GTK3-based shell for sway and Hyprland Wayland compositors.
+The project provides a common configuration tool (nwg-shell-config) that allows
+you to configure the system in a graphical UI, and a range of components such as
+nwg-panel (system panel), nwg-drawer (application launcher), nwg-dock (system
+dock) or nwg-menu (XDG-style menu).  It also includes several native tools as
+nwg-look (look and feel GTK settings editor), nwg-displays (display
+configuration tool), Azote (wallpaper manager), nwg-clipman (clipboard history
+manager), nwg-icon-picker (icon browser with textual search), nwg-readme-browser
+(documentation viewer) and nwg-hello (login manager).  Scripts and utilities
+such as autotiling (script for sway to automatically switch the horizontal /
+vertical window split orientation) and gopsuinfo (a command to display system
+usage info) are used in the background.  The shell also utilizes third party
+software as swaync (notification center), gtklock / swaylock (screen lockers)
+and more.
+
+This package acts as a metapackage and installer of default configuration
+files.")
+    (license (list license:expat
+                   license:cc-by4.0)))) ;for the graphics
