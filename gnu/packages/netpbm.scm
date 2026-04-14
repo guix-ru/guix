@@ -103,18 +103,6 @@
                 #t))))
 
    (build-system gnu-build-system)
-   (inputs `(("ghostscript" ,ghostscript)
-             ("libjpeg" ,libjpeg-turbo)
-             ("libpng" ,libpng)
-             ("libtiff" ,libtiff)
-             ("libxml2" ,libxml2)
-             ("xorg-rgb" ,xorg-rgb)
-             ("zlib" ,zlib)))
-   (native-inputs
-     `(("flex" ,flex)
-       ("perl" ,perl)
-       ("pkg-config" ,pkg-config)
-       ("python" ,python-wrapper)))
    (arguments
     `(#:modules ((guix build gnu-build-system)
                  (guix build utils)
@@ -172,8 +160,7 @@
 
              ;; Skip tests that use nonfree programs that we don't build.
              (("ps-alt-roundtrip.test") "" )
-             (("pbm-misc-converters.test") ""))
-           #t))
+             (("pbm-misc-converters.test") ""))))
        (replace 'install
          (lambda* (#:key outputs make-flags #:allow-other-keys)
            (let ((out (assoc-ref outputs "out")))
@@ -190,8 +177,17 @@
                  (symlink
                   (match (find-files "." "^libnetpbm\\.so\\.[^.]*\\.[^.]*$")
                          ((head _ ...) head))
-                  "libnetpbm.so"))
-               #t)))))))
+                  "libnetpbm.so")))))))))
+   (inputs
+    (list ghostscript
+          libjpeg-turbo
+          libpng
+          libtiff
+          libxml2
+          xorg-rgb
+          zlib))
+   (native-inputs
+     (list flex perl pkg-config python-wrapper))
    (synopsis "Toolkit for manipulation of images")
    (description
     "Netpbm is a toolkit for the manipulation of graphic images, including
