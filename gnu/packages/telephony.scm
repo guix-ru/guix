@@ -182,70 +182,68 @@ used as drop-in replacement for the non-free code from RFC 3591.")
     (build-system gnu-build-system)
     (outputs '("out" "doc" "static"))   ;doc contains HTML documentation
     (arguments
-     `(#:configure-flags '("--enable-doc=yes" "--enable-tests=yes")
-       #:parallel-build? #f ;non-deterministic build failures may occur otherwise
-       #:parallel-tests? #f ;fails removing the same the files twice otherwise
-       #:phases (modify-phases %standard-phases
-                  (add-after 'unpack 'patch-configure.ac
-                    (lambda _
-                      ;; spandsp looks at hard coded locations of the FHS to
-                      ;; find libxml2.
-                      (substitute* "configure.ac"
-                        (("AC_MSG_CHECKING\\(for libxml/xmlmemory\\.h.*" all)
-                         (string-append all
-                                        "PKG_CHECK_MODULES(XML2, libxml-2.0)\n"
-                                        "CPPFLAGS+=\" $XML2_CFLAGS\"\n")))
-                      ;; Force a regeneration of the autotools build system.
-                      (delete-file "autogen.sh")
-                      (delete-file "configure")
-                      #t))
-                  (add-after 'unpack 'do-not-install-data-files
-                    ;; The .tiff images produced for tests are not
-                    ;; reproducible and it is not desirable to have those
-                    ;; distributed.
-                    (lambda _
-                      (substitute* '("test-data/itu/fax/Makefile.am"
-                                     "test-data/etsi/fax/Makefile.am")
-                        (("nobase_data_DATA")
-                         "noinst_DATA"))
-                      #t))
-                  (add-after 'install 'install-doc
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let ((doc (string-append (assoc-ref outputs "doc")
-                                                "/share/doc/" ,name "-" ,version)))
-                        (copy-recursively "doc/t38_manual" doc)
-                        #t)))
-                  (add-after 'install 'move-static-libraries
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let ((out (assoc-ref outputs "out"))
-                            (static (assoc-ref outputs "static")))
-                        (mkdir-p (string-append static "/lib"))
-                        (with-directory-excursion out
-                          (for-each (lambda (file)
-                                      (rename-file file
-                                                   (string-append static "/"
-                                                                  file)))
-                                    (find-files "lib" "\\.a$")))
-                        #t))))))
+     (list
+      #:configure-flags #~'("--enable-doc=yes" "--enable-tests=yes")
+      #:parallel-build? #f ;non-deterministic build failures may occur otherwise
+      #:parallel-tests? #f ;fails removing the same the files twice otherwise
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-configure.ac
+            (lambda _
+              ;; spandsp looks at hard coded locations of the FHS to
+              ;; find libxml2.
+              (substitute* "configure.ac"
+                (("AC_MSG_CHECKING\\(for libxml/xmlmemory\\.h.*" all)
+                 (string-append all
+                                "PKG_CHECK_MODULES(XML2, libxml-2.0)\n"
+                                "CPPFLAGS+=\" $XML2_CFLAGS\"\n")))
+              ;; Force a regeneration of the autotools build system.
+              (delete-file "autogen.sh")
+              (delete-file "configure")))
+          (add-after 'unpack 'do-not-install-data-files
+            ;; The .tiff images produced for tests are not
+            ;; reproducible and it is not desirable to have those
+            ;; distributed.
+            (lambda _
+              (substitute* '("test-data/itu/fax/Makefile.am"
+                             "test-data/etsi/fax/Makefile.am")
+                (("nobase_data_DATA")
+                 "noinst_DATA"))))
+          (add-after 'install 'install-doc
+            (lambda _
+              (copy-recursively "doc/t38_manual"
+                                (string-append #$output:doc
+                                               "/share/doc/"
+                                               #$name "-"
+                                               #$version))))
+          (add-after 'install 'move-static-libraries
+            (lambda _
+              (let ((static #$output:static))
+                (mkdir-p (string-append static "/lib"))
+                (with-directory-excursion #$output
+                  (for-each (lambda (file)
+                              (rename-file file
+                                           (string-append static "/" file)))
+                            (find-files "lib" "\\.a$")))))))))
     (native-inputs
-     `(("autoconf" ,autoconf)
-       ("automake" ,automake)
-       ("libtool" ,libtool)
-       ("pkg-config" ,pkg-config)
-       ;; For the tests
-       ("fftw" ,fftw)
-       ("libpcap" ,libpcap)
-       ("libsndfile" ,libsndfile)
-       ("libjpeg" ,libjpeg-turbo)      ;XXX: should be propagated from libtiff
-       ("libtiff" ,libtiff)
-       ("netpbm" ,netpbm)
-       ("sox" ,sox)
-       ;; For the documentation
-       ("docbook-xml" ,docbook-xml-4.3)
-       ("docbook-xsl" ,docbook-xsl)
-       ("doxygen" ,doxygen)
-       ("libxml2" ,libxml2)
-       ("libxslt" ,libxslt)))
+     (list autoconf
+           automake
+           libtool
+           pkg-config
+           ;; For the tests
+           fftw
+           libpcap
+           libsndfile
+           libjpeg-turbo               ;XXX: should be propagated from libtiff
+           libtiff
+           netpbm
+           sox
+           ;; For the documentation
+           docbook-xml-4.3
+           docbook-xsl
+           doxygen
+           libxml2
+           libxslt))
     (synopsis "DSP library for telephony")
     (description "SpanDSP is a library of DSP functions for telephony, in the
 8000 sample per second world of E1s, T1s, and higher order PCM channels.  It
