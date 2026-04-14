@@ -5730,13 +5730,14 @@ software from KarypisLab, such as METIS.")
      `((release-monitoring-url
         . "http://glaros.dtc.umn.edu/gkhome/metis/metis/download")))
     (build-system cmake-build-system)
-    (inputs
-     `(("blas" ,openblas)))
     (arguments
-     `(#:tests? #f                      ;no tests
-       #:configure-flags `("-DSHARED=ON"
-                           ,(string-append "-DGKLIB_PATH=" (getcwd)
-                                           "/metis-" ,version "/GKlib"))))
+     (list
+      #:tests? #f                       ;no tests
+      #:configure-flags
+      #~(list "-DSHARED=ON"
+              (string-append "-DGKLIB_PATH="
+                             (getcwd) "/metis-" #$version "/GKlib"))))
+    (inputs (list openblas))
     (home-page "http://glaros.dtc.umn.edu/gkhome/metis/metis/overview")
     (synopsis "Graph partitioning and fill-reducing matrix ordering library")
     (description
