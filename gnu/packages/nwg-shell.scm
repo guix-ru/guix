@@ -31,6 +31,7 @@
   #:use-module (gnu packages curl)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages geo)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages golang-graphics)
   #:use-module (gnu packages golang-xyz)
@@ -1210,3 +1211,153 @@ transformations and automatic correction of common typos.
 
 This application is a part of the nwg-shell project.")
     (license license:gpl3)))
+
+(define-public nwg-shell-config
+  (package
+    (name "nwg-shell-config")
+    (version "0.5.64")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nwg-piotr/nwg-shell-config")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0sfh4sbpjf7bf5r2n96jwafzmwwc8yfhlfn5lsms5fq2f3srxyk2"))
+       (modules '((guix build utils)))
+       ;; Replace systemd commands with elogind commands.
+       (snippet
+        '(with-directory-excursion "nwg_shell_config"
+           ;; The skeleton files in the store directory is read-only, so do not
+           ;; install them preserving file permissions.
+           (substitute* '("hud.py" "tools.py")
+             (("copy2") "copyfile"))
+           (substitute* '("locker.py"
+                          "main_hyprland.py"
+                          "main_sway.py"
+                          "ui_components.py"
+                          "shell/custom"
+                          "shell/custom-hyprland"
+                          "shell/settings"
+                          "shell/settings-hyprland")
+             (("\"systemctl (-i |)") "\"loginctl ")
+             (("'systemctl (-i |)") "'loginctl "))
+           ;; Add support for icecat.
+           (substitute* "ui_components.py"
+             (("(.*)\"firefox\": \"(MOZ_ENABLE_WAYLAND=1 )firefox\"," all
+               indent env)
+              (string-append all "\n" indent "\"icecat\": \"" env "icecat\","))
+             (("\"firefox\", " all) (string-append all "\"icecat\", ")))))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests exist in source
+      #:modules '((guix build pyproject-build-system)
+                  (guix build utils)
+                  (srfi srfi-26))                     ;for cute
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Sanity check requires a running sway or Hyprland session.
+          (delete 'sanity-check)
+          (add-after 'unpack 'patch-paths
+            (lambda _
+              (with-directory-excursion "nwg_shell_config"
+                ;; Replace the default backgrounds directory.
+                (substitute* '("locker.py"
+                               "main_hyprland.py"
+                               "main_sway.py"
+                               "tools.py"
+                               "shell/settings"
+                               "shell/settings-hyprland")
+                  (("\\/usr(\\/share\\/backgrounds)" _ suffix)
+                   (string-append #$(this-package-input "nwg-shell-wallpapers")
+                                  suffix)))
+                ;; Patch path to the pixmaps directory.
+                (substitute* "tools.py"
+                  (("\\/usr\\/share\\/pixmaps")
+                   (string-append #$output "/share/pixmaps")))
+                ;; Patch path to swaync
+                (substitute* '("main_sway.py" "main_hyprland.py")
+                  (("\\/etc\\/xdg\\/swaync" all)
+                   (string-append #$(this-package-input
+                                     "swaynotificationcenter") all))))))
+          (add-after 'install 'install-data
+            (lambda _
+              (install-file "nwg-shell-config.desktop"
+                            (string-append #$output "/share/applications"))
+              (for-each (cute install-file <>
+                              (string-append #$output "/share/pixmaps"))
+                        '("nwg-shell-config.svg"
+                          "nwg-shell-update.svg"
+                          "nwg-shell-translate.svg"
+                          "nwg-update-noupdate.svg"
+                          "nwg-update-available.svg"
+                          "nwg-update-checking.svg"
+                          "nwg-screenshot.svg"
+                          "nwg-3.svg"
+                          "nwg-2.svg"
+                          "nwg-1.svg"
+                          "nwg-workspace.svg"))
+              (install-file "README.md"
+                            (string-append #$output
+                                           "/share/doc/nwg-shell-config"))))
+          (add-after 'create-entrypoints 'wrap-programs
+            (lambda _
+              (with-directory-excursion (string-append #$output "/bin")
+                (for-each (lambda (file)
+                            (wrap-program file
+                              `("PATH" ":" prefix
+                                (,(string-append #$output "/bin")
+                                 ,(dirname (which "foot"))
+                                 ,(dirname (which "gtklock"))
+                                 ,(dirname (which "killall"))
+                                 ,(dirname (which "notify-send"))
+                                 ,(dirname (which "pkill"))
+                                 ,(dirname (which "playerctl"))
+                                 ,(dirname (which "swappy"))
+                                 ,(dirname (which "swayidle"))
+                                 ,(dirname (which "swaync"))
+                                 ,(dirname (which "wlsunset"))))
+                              `("GI_TYPELIB_PATH" =
+                                (,(getenv "GI_TYPELIB_PATH")))))
+                          (find-files "." "nwg.*")))))
+          (add-after 'wrap 'install-nwg-system-update
+            (lambda _
+              ;; TODO: Add an argument to nwg-system-update for updating
+              ;; Guix and then add a code for it in
+              ;; nwg_shell_config/update_indicator.py.
+              (install-file "nwg-system-update"
+                            (string-append #$output "/bin")))))))
+    (native-inputs
+     (list gobject-introspection
+           python-setuptools))
+    (inputs
+     (list bash-minimal
+           foot
+           gtk+
+           gtk-layer-shell
+           gtklock
+           libappindicator
+           libnotify
+           nwg-shell-wallpapers
+           playerctl
+           procps
+           psmisc
+           python-geopy
+           python-i3ipc
+           python-pygobject
+           python-psutil
+           python-requests
+           swappy
+           swayidle
+           swaynotificationcenter
+           wlsunset))
+    (home-page "https://nwg-piotr.github.io/nwg-shell/nwg-shell-config")
+    (synopsis "nwg-shell configuration utility")
+    (description
+     "nwg-shell-config utility provides a graphical user interface for
+configuring sway and Hyprland Wayland compositors in nwg-shell.
+
+This application is a part of the nwg-shell project.")
+    (license license:expat)))
