@@ -7434,47 +7434,47 @@ factorization.")
            #t))))
     (build-system gnu-build-system)
     (arguments
-     `(#:tests? #f  ;no "check" target
-       #:make-flags
-       (list (string-append "CC=" ,(cc-for-target))
-             "TBB=-ltbb"
-             "MY_METIS_LIB=-lmetis"
+     (list
+      #:tests? #f                       ;no "check" target
+      #:make-flags
+      #~(list (string-append "CC=" #$(cc-for-target))
+              "TBB=-ltbb"
+              "MY_METIS_LIB=-lmetis"
 
-             ;; The default is to link against netlib lapack.  Use OpenBLAS
-             ;; instead.
-             "BLAS=-lopenblas" "LAPACK=-lopenblas"
+              ;; The default is to link against netlib lapack.  Use OpenBLAS
+              ;; instead.
+              "BLAS=-lopenblas"
+              "LAPACK=-lopenblas"
 
-             ;; Flags for cmake (required to build GraphBLAS and Mongoose)
-             (string-append "CMAKE_OPTIONS=-DCMAKE_INSTALL_PREFIX="
-                            (assoc-ref %outputs "out")
-                            " -DCMAKE_VERBOSE_MAKEFILE=ON"
-                            " -DCMAKE_C_FLAGS_RELEASE=\"$(CFLAGS) $(CPPFLAGS)\""
-                            " -DCMAKE_CXX_FLAGS_RELEASE=\"$(CXXFLAGS) $(CPPFLAGS)\""
-                            " -DCMAKE_SKIP_RPATH=TRUE"
-                            " -DCMAKE_BUILD_TYPE=Release"
-                            " -DCMAKE_INSTALL_LIBDIR=lib")
-             (string-append "INSTALL_LIB="
-                            (assoc-ref %outputs "out") "/lib")
-             (string-append "INSTALL_INCLUDE="
-                            (assoc-ref %outputs "out") "/include")
-             "library")
-       #:phases
-       (modify-phases %standard-phases
-         ,@(if (target-riscv64?)
-             ;; GraphBLAS FTBFS on riscv64-linux
-             `((add-after 'unpack 'skip-graphblas
-                 (lambda _
-                   (substitute* "Makefile"
-                     ((".*cd GraphBLAS.*") "")
-                     (("metisinstall gbinstall moninstall")
-                     "metisinstall moninstall")))))
-             '())
-         (delete 'configure))))         ;no configure script
+              ;; Flags for cmake (required to build GraphBLAS and Mongoose)
+              (string-append
+               "CMAKE_OPTIONS=-DCMAKE_INSTALL_PREFIX=" #$output
+               " -DCMAKE_VERBOSE_MAKEFILE=ON"
+               " -DCMAKE_C_FLAGS_RELEASE=\"$(CFLAGS) $(CPPFLAGS)\""
+               " -DCMAKE_CXX_FLAGS_RELEASE=\"$(CXXFLAGS) $(CPPFLAGS)\""
+               " -DCMAKE_SKIP_RPATH=TRUE"
+               " -DCMAKE_BUILD_TYPE=Release"
+               " -DCMAKE_INSTALL_LIBDIR=lib")
+              (string-append "INSTALL_LIB=" #$output "/lib")
+              (string-append "INSTALL_INCLUDE=" #$output "/include")
+              "library")
+      #:phases
+      #~(modify-phases %standard-phases
+          #$@(if (target-riscv64?)
+                 ;; GraphBLAS FTBFS on riscv64-linux
+                 #~((add-after 'unpack 'skip-graphblas
+                      (lambda _
+                        (substitute* "Makefile"
+                          ((".*cd GraphBLAS.*")
+                           "")
+                          (("metisinstall gbinstall moninstall")
+                           "metisinstall moninstall")))))
+                 #~())
+          (delete 'configure))))         ;no configure script
     (inputs
      (list tbb openblas gmp mpfr metis))
     (native-inputs
-     `(("cmake" ,cmake-minimal)
-       ("m4" ,m4)))
+     (list cmake-minimal m4))
     (home-page "https://faculty.cse.tamu.edu/davis/suitesparse.html")
     (synopsis "Suite of sparse matrix software")
     (description
