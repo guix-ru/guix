@@ -36,7 +36,7 @@
 (define-public jemalloc
   (package
     (name "jemalloc")
-    (version "5.3.0")
+    (version "5.3.1")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -44,7 +44,7 @@
                     version "/jemalloc-" version ".tar.bz2"))
               (sha256
                (base32
-                "1apyxjd1ixy4g8xkr61p0ny8jiz8vyv1j0k4nxqkxpqrf4g2vf1d"))))
+                "14kgf0hs864hp5xxqfqh37l1d8wwg57h7wv28rffs8ig4f0bq9iq"))))
     (build-system gnu-build-system)
     (arguments
      (list
