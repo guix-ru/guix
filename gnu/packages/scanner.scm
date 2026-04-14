@@ -132,99 +132,104 @@ both WSD and eSCL.")
                    (("asctime \\(localtime \\(&current_time\\)\\)")
                     "\"1970-01-01\""))))))
     (build-system gnu-build-system)
-    (native-inputs
-     `(("autoconf" ,autoconf)
-       ("autoconf-archive" ,autoconf-archive)
-       ("automake" ,automake)
-       ("gettext" ,gettext-minimal)
-       ("libtool" ,libtool)
-       ("pkg-config" ,pkg-config)
-       ;; For scripts/pixma_gen_options.py.
-       ("python" ,python-wrapper)))
-    (inputs
-     (list libusb))
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'bootstrap 'zap-unnecessary-git-dependency
-           (lambda _
-             ;; This runs before default patch-shebangs phase.
-             (substitute* "tools/git-version-gen"
-               (("/bin/sh") (which "sh")))
-             (with-output-to-file ".tarball-version"
-               (lambda _ (format #t ,version)))))
-         (add-before 'configure 'disable-backends
-           (lambda _
-             (setenv "BACKENDS" " ")
-
-             ;; Disable tests that may require back ends to be built.
-             (substitute* "testsuite/Makefile.in"
-               ((" backend ") " "))))
-         (add-before 'configure 'disable-failing-tests
-           (lambda _
-             ;; Disable unmaintained tests that that fail with errors resembling:
-             ;;
-             ;; < # by sane-desc 3.5 from sane-backends 1.0.24git on Jul 31 2013
-             ;; ---
-             ;; > # by sane-desc 3.5 from sane-backends 1.0.27 on 1970-01-01#
-             ;; FAIL: sane-desc -m usermap -s ./data
-             (for-each
-              (lambda (pattern)
-                (substitute* "testsuite/tools/Makefile.in"
-                  (((string-append " " pattern " ")) " ")))
-              (list "usermap" "db" "udev" "udev\\+acl" "udev\\+hwdb" "hwdb"))
-
-             ;; Disable tests that try to connect to actual USB hardware & fail
-             ;; with the following error when no USB access is allowed at all:
-             ;;
-             ;; sanei_usb_test: sanei_usb_test.c:849: main: Assertion
-             ;; `test_init (1)' failed.
-             (substitute* "testsuite/sanei/Makefile.in"
-               (("sanei_usb_test\\$\\(EXEEXT\\) ") ""))))
-         (add-before 'build 'build-pixma_sane_options.c
-           ;; "No rule to make target '../backend/pixma/pixma_sane_options.c',
-           ;; needed by 'sane-backends.pot-update'."
-           (lambda _
-             (invoke "make" "-C" "backend" "pixma/pixma_sane_options.c")))
-         (add-after 'install 'install-udev-rules
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (mkdir-p (string-append out "/lib/udev/rules.d"))
-               (copy-file "tools/udev/libsane.rules"
-                          (string-append out
-                                         "/lib/udev/rules.d/"
-                                         "60-libsane.rules")))))
-         (add-after 'install 'remove-dll.conf
-           (lambda _
-             ;; dll.conf lists enabled backends, so it should be removed as
-             ;; there are none in this package
-             (delete-file (string-append %output "/etc/sane.d/dll.conf"))))
-         (add-after 'install 'make-reproducible
-           ;; XXX Work around an old bug <https://issues.guix.gnu.org/26247>.
-           ;; Then work around "Throw to key `decoding-error' ..." by using sed.
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (locale (string-append out "/share/locale")))
-               (with-directory-excursion locale
-                 (for-each (lambda (file)
-                             (invoke "sed" "-i" "/^PO-Revision-Date:/d" file))
-                           (list "en@boldquot/LC_MESSAGES/sane-backends.mo"
-                                 "en@quot/LC_MESSAGES/sane-backends.mo")))))))))
-    (native-search-paths
      (list
-      (search-path-specification
-        (variable "SANE_CONFIG_DIR")
-        (files '("etc/sane.d")))
-      (search-path-specification
-        (variable "SANE_BACKEND_LIB_PATH")
-        (files '("lib/sane")))))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'bootstrap 'zap-unnecessary-git-dependency
+            (lambda _
+              ;; This runs before default patch-shebangs phase.
+              (substitute* "tools/git-version-gen"
+                (("/bin/sh")
+                 (which "sh")))
+              (with-output-to-file ".tarball-version"
+                (lambda _
+                  (format #t #$version)))))
+          (add-before 'configure 'disable-backends
+            (lambda _
+              (setenv "BACKENDS" " ")
+
+              ;; Disable tests that may require back ends to be built.
+              (substitute* "testsuite/Makefile.in"
+                ((" backend ")
+                 " "))))
+          (add-before 'configure 'disable-failing-tests
+            (lambda _
+              ;; Disable unmaintained tests that that fail with errors resembling:
+              ;;
+              ;; < # by sane-desc 3.5 from sane-backends 1.0.24git on Jul 31 2013
+              ;; ---
+              ;; > # by sane-desc 3.5 from sane-backends 1.0.27 on 1970-01-01#
+              ;; FAIL: sane-desc -m usermap -s ./data
+              (for-each (lambda (pattern)
+                          (substitute* "testsuite/tools/Makefile.in"
+                            (((string-append " " pattern " "))
+                             " ")))
+                        (list "usermap"
+                              "db"
+                              "udev"
+                              "udev\\+acl"
+                              "udev\\+hwdb"
+                              "hwdb"))
+
+              ;; Disable tests that try to connect to actual USB hardware & fail
+              ;; with the following error when no USB access is allowed at all:
+              ;;
+              ;; sanei_usb_test: sanei_usb_test.c:849: main: Assertion
+              ;; `test_init (1)' failed.
+              (substitute* "testsuite/sanei/Makefile.in"
+                (("sanei_usb_test\\$\\(EXEEXT\\) ")
+                 ""))))
+          (add-before 'build 'build-pixma_sane_options.c
+            ;; "No rule to make target '../backend/pixma/pixma_sane_options.c',
+            ;; needed by 'sane-backends.pot-update'."
+            (lambda _
+              (invoke "make" "-C" "backend" "pixma/pixma_sane_options.c")))
+          (add-after 'install 'install-udev-rules
+            (lambda _
+              (let ((dest (string-append #$output "/lib/udev/rules.d/"
+                                         "60-libsane.rules")))
+                (mkdir-p (dirname dest))
+                (copy-file "tools/udev/libsane.rules" dest))))
+          (add-after 'install 'remove-dll.conf
+            (lambda _
+              ;; dll.conf lists enabled backends, so it should be removed as
+              ;; there are none in this package
+              (delete-file (string-append #$output "/etc/sane.d/dll.conf"))))
+          (add-after 'install 'make-reproducible
+            ;; XXX Work around an old bug <https://issues.guix.gnu.org/26247>.
+            ;; Then work around "Throw to key `decoding-error' ..." by using sed.
+            (lambda _
+              (with-directory-excursion (string-append #$output "/share/locale")
+                (for-each (lambda (file)
+                            (invoke "sed" "-i" "/^PO-Revision-Date:/d" file))
+                          (list "en@boldquot/LC_MESSAGES/sane-backends.mo"
+                                "en@quot/LC_MESSAGES/sane-backends.mo"))))))))
+    (native-inputs
+     (list autoconf
+           autoconf-archive
+           automake
+           gettext-minimal
+           libtool
+           pkg-config
+           ;; For scripts/pixma_gen_options.py.
+           python-wrapper))
+    (inputs (list libusb))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "SANE_CONFIG_DIR")
+            (files '("etc/sane.d")))
+           (search-path-specification
+            (variable "SANE_BACKEND_LIB_PATH")
+            (files '("lib/sane")))))
     (home-page "http://www.sane-project.org")
     (synopsis
      "Raster image scanner library and drivers, without scanner support")
-    (description "SANE stands for \"Scanner Access Now Easy\" and is an API
-proving access to any raster image scanner hardware (flatbed scanner,
-hand-held scanner, video- and still-cameras, frame-grabbers, etc.).  The
-package contains the library, but no drivers.")
+    (description
+     "SANE stands for \"Scanner Access Now Easy\" and is an API proving access
+to any raster image scanner hardware (flatbed scanner, hand-held scanner,
+video- and still-cameras, frame-grabbers, etc.).  The package contains the
+library, but no drivers.")
     (license license:gpl2+))) ; plus linking exception
 
 (define-public sane-backends
