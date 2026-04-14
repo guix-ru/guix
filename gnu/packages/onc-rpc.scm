@@ -151,11 +151,7 @@ from the protocol files.")
     (arguments
      `(#:configure-flags '("--disable-static")))
     (native-inputs
-     `(("autoconf" ,autoconf)
-       ("automake" ,automake)
-       ("gettext" ,gettext-minimal)
-       ("libtool" ,libtool)
-       ("pkg-config" ,pkg-config)))
+     (list autoconf automake gettext-minimal libtool pkg-config))
     (inputs
      (list libtirpc))
     (synopsis "Public client interface for NIS(YP) and NIS+")
