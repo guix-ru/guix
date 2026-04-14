@@ -23,6 +23,7 @@
 ;;; Copyright © 2023 Bruno Victal <mirai@makinata.eu>
 ;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2024 Andreas Enge <andreas@enge.fr>
+;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -45,9 +46,11 @@
   #:autoload   (guix diagnostics) (warning formatted-message &fix-hint)
   #:autoload   (guix i18n) (G_)
   #:use-module (guix combinators)
+  #:use-module (guix packages)
   #:use-module (guix utils)
   #:use-module (gnu services)
   #:use-module (gnu services admin)
+  #:use-module (gnu services configuration)
   #:use-module (gnu services shepherd)
   #:use-module (gnu services sysctl)
   #:use-module (gnu system pam)
@@ -83,6 +86,7 @@
   #:use-module ((gnu packages file-systems)
                 #:select (bcachefs-tools exfat-utils jfsutils zfs))
   #:use-module (gnu packages fonts)
+  #:use-module ((gnu packages nwg-shell) #:select (nwg-hello))
   #:use-module (gnu packages terminals)
   #:use-module ((gnu packages wm) #:select (sway))
   #:use-module ((gnu build file-systems)
@@ -289,6 +293,31 @@
             greetd-wlgreet-configuration
             greetd-wlgreet-sway-session
             greetd-gtkgreet-sway-session
+            nwg-hello-configuration
+            nwg-hello-configuration?
+            nwg-hello-configuration-session-dirs
+            nwg-hello-configuration-custom-sessions
+            nwg-hello-configuration-environment-variables
+            nwg-hello-configuration-halt-command
+            nwg-hello-configuration-reboot-command
+            nwg-hello-configuration-shutdown-command
+            nwg-hello-configuration-gtk-theme
+            nwg-hello-configuration-icon-theme
+            nwg-hello-configuration-cursor-theme
+            nwg-hello-configuration-prefer-dark-theme?
+            nwg-hello-configuration-extra-config
+            nwg-hello-style
+            nwg-hello-style?
+            nwg-hello-style-background-image
+            nwg-hello-style-background-size
+            nwg-hello-style-extra-style
+            greetd-nwg-hello-sway-session
+            greetd-nwg-hello-sway-session?
+            greetd-nwg-hello-sway-session-sway
+            greetd-nwg-hello-sway-session-sway-configuration
+            greetd-nwg-hello-sway-session-nwg-hello
+            greetd-nwg-hello-sway-session-nwg-hello-config
+            greetd-nwg-hello-sway-session-nwg-hello-style
 
             %base-services))
 
@@ -4038,6 +4067,223 @@ to handle."
      (make-greetd-sway-greeter-command
       sway
       (make-greetd-gtkgreet-sway-session-sway-config session)))))
+
+(define (alist-of pred?)
+  "Return a procedure that takes an association list and check if all the
+elements of the list result in @code{#t} when applying PRED? on them."
+  (lambda (x)
+    (if (alist? x)
+        (every pred? x)
+        #f)))
+
+(define alist-of-strings-to-greetd-user-sessions?
+  (alist-of (match-lambda
+              ((key . value)
+               (if (and (string? key)
+                        (greetd-user-session? value))
+                   #t
+                   #f)))))
+
+(define alist-of-strings-to-strings?
+  (alist-of (match-lambda
+              ((key . value)
+               (if (and (string? key)
+                        (string? value))
+                   #t
+                   #f)))))
+
+(define-maybe/no-serialization alist-of-strings-to-strings)
+
+(define-configuration/no-serialization nwg-hello-configuration
+  (session-dirs
+   (list-of-strings
+    '("/run/current-system/profile/share/wayland-sessions"
+      "/run/current-system/profile/share/xsessions"))
+   "List of directories containing Wayland or X session desktop files.")
+  (custom-sessions
+   (alist-of-strings-to-greetd-user-sessions
+    `(("Shell" . ,(greetd-user-session))))
+   "Session names and the commands.")
+  (environment-variables
+   (alist-of-strings-to-strings '())
+   "Environment variables associated to their values to pass to user sessions.")
+  (halt-command
+   (string "loginctl suspend")
+   "Command to run when halting the device.")
+  (reboot-command
+   (string "loginctl reboot")
+   "Command to run when rebooting the device.")
+  (shutdown-command
+   (string "loginctl poweroff")
+   "Command to run when shutting down the device.")
+  (gtk-theme
+   (string "Advaita")
+   "GTK theme to use.")
+  (icon-theme
+   (string "Advaita")
+   "Icon theme to use.")
+  (cursor-theme
+   (string "Adwaita")
+   "Cursor theme to use.")
+  (prefer-dark-theme?
+   (boolean #t)
+   "Flag to prefer dark mode for the theme.")
+  (extra-config
+   (maybe-alist-of-strings-to-strings)
+   "Extra configuration of keys and values."))
+
+(define nwg-hello-configuration-file
+  (match-record-lambda <nwg-hello-configuration>
+      (session-dirs custom-sessions environment-variables halt-command
+       reboot-command shutdown-command gtk-theme icon-theme cursor-theme
+       prefer-dark-theme? extra-config)
+   (apply mixed-text-file "nwg-hello.json"
+          (append '("{")
+
+                  `("\n  \"session_dirs\": [\n    "
+                    ,(string-join (map (lambda (dir)
+                                         (string-append "\"" dir "\""))
+                                       session-dirs)
+                                  ",\n    ")
+                    "\n  ]")
+                  `(",\n  \"custom_sessions\": [\n    "
+                    ,@(append-map (lambda (custom-session)
+                                    `("{\n      "
+                                      "\"name\": \"" ,(car custom-session)
+                                      "\",\n      "
+                                      "\"exec\": \"" ,(cdr custom-session)
+                                      "\"\n    }"
+                                      ,(if (eq? custom-session
+                                                (list-ref custom-sessions
+                                                          (- (length
+                                                              custom-sessions)
+                                                             1)))
+                                           ""
+                                           ",\"\n    ")))
+                                  custom-sessions)
+                    "\n  ]")
+                  `(",\n  \"cmd-sleep\": \"" ,halt-command "\"")
+                  `(",\n  \"cmd-reboot\": \"" ,reboot-command "\"")
+                  `(",\n  \"cmd-poweroff\": \"" ,shutdown-command "\"")
+                  `(",\n  \"gtk-theme\": \"" ,gtk-theme "\"")
+                  `(",\n  \"gtk-icon-theme\": \"" ,icon-theme "\"")
+                  `(",\n  \"gtk-cursor-theme\": \"" ,cursor-theme "\"")
+                  `(",\n  \"prefer-dark-theme\": "
+                    ,(if prefer-dark-theme? "true" "false"))
+                  `(",\n  \"env-vars\": [\n    "
+                    ,(string-join (map (match-lambda
+                                         ((key . value)
+                                          (string-append "\"" key "="
+                                                         value "\"")))
+                                       environment-variables)
+                                  ",\n    ")
+                    "\n  ]")
+                  (if (maybe-value-set? extra-config)
+                      (map (match-lambda
+                             ((key . value)
+                              (string-append ",\n  \"" key "\": " value)))
+                           extra-config)
+                      '())
+                  '("\n}\n")))))
+
+(define (file-like-or-#f? value)
+  (or (file-like? value)
+      (not value)))
+
+(define alist-of-strings-to-alists-of-strings-to-strings?
+  (alist-of (match-lambda
+              ((key . value)
+               (if (and (string? key)
+                        (alist-of-strings-to-strings? value))
+                   #t
+                   #f)))))
+
+(define-maybe/no-serialization alist-of-strings-to-alists-of-strings-to-strings)
+
+(define-configuration/no-serialization nwg-hello-style
+  (background-image
+   (file-like-or-#f (file-append nwg-hello "/share/nwg-hello/nwg.jpg"))
+   "Image file to be set as the background.  Setting this to @code{#f} respects
+the background color.")
+  (background-size
+   (string "auto 100%")
+   "Size of the background image.  It can be @code{\"auto\"} (for preserving the
+original size), @code{\"cover\"} (for resizing to fill while allowing to cut or
+to stretch), @code{\"contain\"} (for resizing to fit assuring the full
+visibility of the image), or a string of a number suffixed with with @code{px}
+(to represent in pixels) or @code{%} (to represent in percentage).  It can also
+be a string of two such values separated by a whitespace, representing width and
+height respectively.")
+  (extra-style
+   (maybe-alist-of-strings-to-alists-of-strings-to-strings)
+   "List of CSS selectors associated to their lists of CSS properties
+associated to their values."))
+
+(define nwg-hello-stylesheet
+  (match-record-lambda <nwg-hello-style>
+      (background-image background-size extra-style)
+   (apply mixed-text-file "nwg-hello.css"
+          "window {\n\tbackground-image: "
+          #~(if #$background-image
+                (string-append "url(\"" #$background-image "\")")
+              "none")
+          "; background-size: " background-size ";\n}"
+          (append-map (match-lambda
+                        ((selector . declaration)
+                         `(,(string-append "\n" selector " {")
+                           ,@(map (match-lambda
+                                    ((property . value)
+                                     (string-append "\n\t" property ": " value
+                                                    ";")))
+                                  declaration)
+                           "\n}")))
+                      (if (maybe-value-set? extra-style) extra-style '())))))
+
+(define-maybe/no-serialization file-like)
+
+(define-configuration/no-serialization greetd-nwg-hello-sway-session
+  (sway
+   (package sway)
+   "Package providing the @command{sway} and @command{swaymsg} commands.")
+  (sway-configuration
+   (maybe-file-like)
+   "Extra configuration for @command{sway} to be included before executing the
+greeter.")
+  (nwg-hello
+   (package nwg-hello)
+   "Package providing the @command{nwg-hello} command.")
+  (nwg-hello-config
+   (nwg-hello-configuration (nwg-hello-configuration))
+   "Configuration of @command{nwg-hello}.")
+  (nwg-hello-style
+   (nwg-hello-style (nwg-hello-style))
+   "CSS style rules for @command{nwg-hello}."))
+
+(define make-greetd-nwg-hello-sway-session-sway-config
+  (match-record-lambda <greetd-nwg-hello-sway-session>
+      (sway sway-configuration nwg-hello nwg-hello-config nwg-hello-style)
+    (let ((nwg-hello-bin (file-append nwg-hello "/bin/nwg-hello"))
+          (nwg-hello-configuration-file
+           (nwg-hello-configuration-file nwg-hello-config))
+          (nwg-hello-stylesheet (nwg-hello-stylesheet nwg-hello-style))
+          (swaymsg-bin (file-append sway "/bin/swaymsg")))
+      (mixed-text-file "nwg-hello-sway-config"
+       (if (maybe-value-set? sway-configuration)
+           #~(string-append "include " #$sway-configuration "\n")
+           "")
+       "xwayland disable\n"
+       "exec \"" nwg-hello-bin " -l"
+       " -c " nwg-hello-configuration-file " -s " nwg-hello-stylesheet
+       "\""))))
+
+(define-gexp-compiler (greetd-nwg-hello-sway-session-compiler
+                       (session <greetd-nwg-hello-sway-session>)
+                       system target)
+  (match-record session <greetd-nwg-hello-sway-session> (sway)
+    (lower-object
+     (make-greetd-sway-greeter-command
+      sway
+      (make-greetd-nwg-hello-sway-session-sway-config session)))))
 
 (define-record-type* <greetd-terminal-configuration>
   greetd-terminal-configuration make-greetd-terminal-configuration
