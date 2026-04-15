@@ -1326,19 +1326,34 @@ displayed at the end of the run (with the full logs ready to inspect), with a
 simple (yet expressive) query language to select the tests to run.")
     (license license:isc)))
 
+;; Base for all packages hosted in the main dune repo.
+(define %dune-base
+  (package
+    (name "ocaml5-dune-base")
+    (version "3.19.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/dune")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "01ys792jnld5yihhyirwkk4jlqm59bk0vrqjvvk5xjn8pp26vryq"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/ocaml/dune")
+    (synopsis "OCaml build system")
+    (description
+     "Dune is a build system for OCaml.  It provides a consistent
+experience and takes care of the low-level details of OCaml compilation.
+Descriptions of projects, libraries and executables are provided in
+@file{dune} files following an s-expression syntax.")
+    (license license:expat)))
+
 (define-public ocaml5.3-dune-bootstrap
   (package
+    (inherit %dune-base)
     (name "ocaml5.3-dune")
-    (version "3.19.1")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                     (url "https://github.com/ocaml/dune")
-                     (commit version)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "01ys792jnld5yihhyirwkk4jlqm59bk0vrqjvvk5xjn8pp26vryq"))))
     (build-system ocaml-build-system)
     (arguments
      `(#:tests? #f; require odoc
@@ -1353,14 +1368,7 @@ simple (yet expressive) query language to select the tests to run.")
              (mkdir-p "src/dune")
              (invoke "./configure")
              #t)))))
-    (home-page "https://github.com/ocaml/dune")
-    (synopsis "OCaml build system")
-    (description "Dune is a build system for OCaml.  It provides a consistent
-experience and takes care of the low-level details of OCaml compilation.
-Descriptions of projects, libraries and executables are provided in
-@file{dune} files following an s-expression syntax.")
-    (properties '((hidden? . #t)))
-    (license license:expat)))
+    (properties '((hidden? . #t)))))
 
 ;; Use this alias for packages built with the default ocaml 5.x compiler.
 (define-public dune ocaml5.3-dune-bootstrap)
