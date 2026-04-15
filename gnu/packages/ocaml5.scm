@@ -4845,6 +4845,42 @@ the Logs library.")
     (description
      "This library provides an LWT interface for the Metrics library.")))
 
+(define-public ocaml-mirage-xen
+  (package
+    (name "ocaml5-mirage-xen")
+    (version "9.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage-xen")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ml09hj637kdyrqla4g0yfqg3p5kpq1sd54rrnzh69vbq8636knb"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-cstruct
+                             ocaml-lwt
+                             ocaml-shared-memory-ring-lwt
+                             ocaml-mirage-xenstore
+                             ocaml-lwt-dllist
+                             ocaml-io-page
+                             ocaml-mirage-sleep
+                             ocaml-mirage-metrics
+                             ocaml-mirage-metrics-lwt
+                             ocaml-mirage-runtime
+                             ocaml-logs
+                             ocaml-fmt
+                             ocaml-bheap
+                             ocaml-duration))
+    (home-page "https://github.com/mirage/mirage-xen")
+    (synopsis "Xen core platform libraries for MirageOS")
+    (description
+     "MirageOS OS library for Xen targets, which handles the main
+loop and timers.  It also provides the low level C startup code and C stubs
+required by the OCaml code.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
