@@ -68,16 +68,15 @@
 (define-public curl
   (package
     (name "curl")
-    (version "8.6.0")
+    (version "8.20.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://curl.se/download/curl-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "05fv468yjrb7qwrxmfprxkrcckbkij0myql0vwwnalgr3bcmbk9w"))
-              (patches (search-patches "curl-use-ssl-cert-env.patch"
-                                       "curl-CVE-2024-8096.patch"))))
+                "15mqw8y9vdxlz9cpr2z7q9r6552wgs7q7vr2k7lfl35s930jvzk3"))
+              (patches (search-patches "curl-use-ssl-cert-env.patch"))))
     (outputs '("out"
                "doc"))                  ;1.2 MiB of man3 pages
     (build-system gnu-build-system)
@@ -134,9 +133,17 @@
                           (display "1474\n" port)
                           (display "1501\n" port)
                           (close port)))))
-                 #~()))))
+                 #~())
+          (add-after 'install 'sanitize-libcurl.pc
+            (lambda _
+              ;; The pkgconfig file has all dependencies in Requires.private
+              ;; which is unnecessary for our shared library use and would
+              ;; require propagating them.
+              (substitute* (string-append #$output "/lib/pkgconfig/libcurl.pc")
+                (("^Requires.private:.*") "")))))))
     (native-inputs
-     (list nghttp2 perl pkg-config python-minimal-wrapper))
+     (list nghttp2 perl pkg-config python-minimal-wrapper
+           openssl))                    ;for tests
     (inputs
      (list gnutls libidn libpsl mit-krb5 `(,nghttp2 "lib") zlib))
     (native-search-paths
