@@ -4780,6 +4780,27 @@ persistent data storage.  Use for testing or amnesia.")
 handles the main loop and timers.")
     (license license:isc)))
 
+(define-public ocaml-mirage-sleep
+  (package
+    (name "ocaml5-mirage-sleep")
+    (version "4.1.0")
+    (home-page "https://github.com/mirage/mirage-sleep")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "139jh41j5yxg8l98lfk6rh9qpxh57gc0wazlimzd81s6wqmi5v3p"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-lwt ocaml-duration))
+    (synopsis "Sleep operation for MirageOS")
+    (description "Mirage_sleep defines the single function `ns`, which is used
+to sleep for a given amount of nanoseconds.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
