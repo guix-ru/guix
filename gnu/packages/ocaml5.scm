@@ -78,7 +78,8 @@
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module ((guix licenses) #:prefix license:)
-  #:use-module (guix packages))
+  #:use-module (guix packages)
+  #:use-module (guix utils))
 
 ;; An origin for a Jane Street project hosted on Github.
 (define (janestreet-git-origin name version hash-string)
@@ -1426,23 +1427,39 @@ module of this library is parameterised by the type of S-expressions.")
 ;; Use this alias for packages built with the default ocaml 5.x compiler.
 (define-public ocaml-csexp ocaml5.3-csexp)
 
+;; Base package for all libraries (not the binary) hosted in the main dune
+;; repo.
+(define %dune-lib-base
+  (package
+    (inherit %dune-base)
+    (name "ocaml5-dune-lib-base")
+    (arguments
+     (list
+      ;; Several dune libraries don't have standalone test suites.  Various
+      ;; issues arise with those that do: some tests create dependency cycles
+      ;; with other dune libraries, some have dependencies on vendored code
+      ;; (see below), and some are CRAM-style tests with unsatisfied
+      ;; environment dependencies.
+      #:tests? #f
+      ;; Remove vendored code, which is only strictly required to bootstrap
+      ;; the dune binary.  Deleting it more selectively would let us run a few
+      ;; tests, with the risk that vendored libs will conflict with future
+      ;; package definitions.
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'remove-vendor
+            (lambda _
+              (delete-file-recursively "vendor"))))))))
+
 (define-public ocaml5.3-dune-configurator
   (package
-    (inherit ocaml5.3-dune-bootstrap)
+    (inherit %dune-lib-base)
     (name "ocaml5.3-dune-configurator")
     (build-system dune-build-system)
     (arguments
-     `(#:package "dune-configurator"
-       #:dune ,ocaml5.3-dune-bootstrap
-       ;; require ppx_expect
-       #:tests? #f
-       #:phases (modify-phases %standard-phases
-                  ;; When building dune, these directories are normally removed after
-                  ;; the bootstrap.
-                  (add-before 'build 'remove-vendor
-                    (lambda _
-                      (delete-file-recursively "vendor/csexp")
-                      (delete-file-recursively "vendor/pp"))))))
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "dune-configurator")
+       ((#:dune _ #f) ocaml5.3-dune-bootstrap)))
     (propagated-inputs (list ocaml5.3-csexp))
     (synopsis "Dune helper library for gathering system configuration")
     (description
