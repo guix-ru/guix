@@ -4833,6 +4833,18 @@ are (will be) provided by default.  Metrics is heavily inspired by
 the Logs library.")
     (license license:isc)))
 
+(define-public ocaml-mirage-metrics-lwt
+  (package
+    (inherit ocaml-mirage-metrics)
+    (name "ocaml5-mirage-metrics-lwt")
+    (arguments
+     (list
+      #:package "metrics-lwt"))
+    (propagated-inputs (list ocaml-mirage-metrics ocaml-lwt ocaml-logs))
+    (synopsis "Lwt backend for the Metrics library")
+    (description
+     "This library provides an LWT interface for the Metrics library.")))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
