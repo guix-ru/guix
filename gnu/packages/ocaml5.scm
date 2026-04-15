@@ -4311,6 +4311,30 @@ mobile platforms.  Code can be developed on a normal OS and then compiled into
 a fully-standalone, specialised unikernel.")
     (license license:isc)))
 
+(define-public ocaml-mirage-clock
+  (package
+    (name "ocaml5-mirage-clock")
+    (version "4.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage-clock")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0rkara9i3dvnzrb8jl2vkx8hgamvxnksin67wmhbv9d4i758amjy"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/mirage/mirage-clock")
+    (synopsis "Libraries and module types for portable clocks")
+    (description
+     "This library implements portable support for an operating system
+timesource that is compatible with the MirageOS library interfaces.  It
+implements an @code{MCLOCK} module that represents a monotonic timesource
+since an arbitrary point, and @code{PCLOCK} which counts time since the Unix
+epoch.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
