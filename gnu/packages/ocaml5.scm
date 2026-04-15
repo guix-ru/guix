@@ -4801,6 +4801,38 @@ handles the main loop and timers.")
 to sleep for a given amount of nanoseconds.")
     (license license:isc)))
 
+(define-public ocaml-mirage-metrics
+  (package
+    (name "ocaml5-mirage-metrics")
+    (version "0.5.0")
+    (home-page "https://github.com/mirage/metrics")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "15k7ai5hn3xszhw3ivhqf2ff767sa91wbrqwyc7fvrc8k5vxndia"))))
+    (build-system dune-build-system)
+    (arguments
+     (list
+      #:package "metrics"))
+    (propagated-inputs (list ocaml-fmt))
+    (native-inputs (list ocaml-alcotest))
+    (synopsis "Metrics infrastructure for OCaml")
+    (description
+     "Metrics provides a basic infrastructure to monitor and gather runtime metrics
+for OCaml program.  Monitoring is performed on sources, indexed by tags,
+allowing users to enable or disable at runtime the gathering of data-points.  As
+disabled metric sources have a low runtime cost (only a closure allocation), the
+library is designed to instrument production systems.  Metric reporting is
+decoupled from monitoring and is handled by a custom reporter.  A few reporters
+are (will be) provided by default.  Metrics is heavily inspired by
+the Logs library.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
