@@ -1796,6 +1796,29 @@ arbitrary-precision integer and rational arithmetic that used to be part of
 the OCaml core distribution.")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-bheap
+  (package
+    (name "ocaml5-bheap")
+    (version "2.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/backtracking/bheap")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0b8md5zl4yz7j62jz0bf7lwyl0pyqkxqx36ghkgkbkxb4zzggfj1"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-stdlib-shims))
+    (home-page "https://github.com/backtracking/bheap")
+    (synopsis "Priority queues for OCaml")
+    (description
+     "Traditional implementation of priority queues using a binary heap
+encoded in a resizable array.")
+    ;; With static-linking exception
+    (license license:lgpl2.1)))
+
 (define-public ocaml-octavius
   (package
     (name "ocaml5-octavius")
