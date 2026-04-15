@@ -4758,6 +4758,28 @@ architectures.")
 persistent data storage.  Use for testing or amnesia.")
     (license license:isc)))
 
+(define-public ocaml-mirage-unix
+  (package
+    (name "ocaml5-mirage-unix")
+    (version "5.0.1")
+    (home-page "https://github.com/mirage/mirage-unix")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0sl1sj63m369zdfwh6dhc26msz7b6fxyzn5ha2p1xbgf38zrs7l9"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-lwt ocaml-duration ocaml-mirage-runtime))
+    (synopsis "Unix core platform libraries for MirageOS")
+    (description
+     "This package provides the MirageOS `OS` library for Unix targets, which
+handles the main loop and timers.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
