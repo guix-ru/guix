@@ -1451,7 +1451,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
 
 ;; Use this version of `dune-configurator` for packages built with the default
 ;; ocaml 5.x compiler.
-(define-public dune-configurator ocaml5.3-dune-bootstrap)
+(define-public dune-configurator ocaml5.3-dune-configurator)
 
 (define-public ocaml5.3-dune
   (package
