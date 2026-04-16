@@ -4096,15 +4096,16 @@ intercept and print the system calls executed by the program.")
 (define-public alsa-ucm-conf
   (package
     (name "alsa-ucm-conf")
-    (version "1.2.11")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append
-                    "ftp://ftp.alsa-project.org/pub/lib/" name "-"
-                    version ".tar.bz2"))
-              (sha256
-               (base32
-                "10dfzvrmpp9swflw47nxf35an6gj3ilb4wlggdnng8g2637h2z1q"))))
+    (version "1.2.15.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/alsa-project/alsa-ucm-conf")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1mlvzvz7npdvprlq1ff9pg3awsdvv3czv7wchfm96jflhks3pnsm"))))
     (build-system copy-build-system)
     (arguments
      '(#:install-plan
@@ -4113,9 +4114,9 @@ intercept and print the system calls executed by the program.")
     (home-page "https://www.alsa-project.org/wiki/Main_Page")
     (synopsis "The Advanced Linux Sound Architecture Use Case Manager")
     (description
-     "This package contains Advanced Linux Sound Architecture Use Case Manager
-configuration of audio input/output names and routing for specific audio
-hardware.")
+     "This package contains @acronym{ALSA, Advanced Linux Sound Architecture}
+@acronym{UCM, Use Case Manager} configuration of audio input/output names and
+routing for specific audio hardware.")
     (license license:bsd-3)))
 
 (define-public alsa-topology-conf
