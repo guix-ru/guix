@@ -138,14 +138,14 @@ correct rounding.")
 (define-public mpc
   (package
    (name "mpc")
-   (version "1.3.1")
+   (version "1.4.1")
    (source (origin
             (method url-fetch)
             (uri (string-append
-                  "mirror://gnu/mpc/mpc-" version ".tar.gz"))
+                  "mirror://gnu/mpc/mpc-" version ".tar.xz"))
             (sha256
               (base32
-                "1f2rqz0hdrrhx4y1i5f8pv6yv08a876k1dqcm9s2p26gyn928r5b"))))
+                "0cg9ff6vzl42d65zfc5bmld526b5rsladm4jr6vx6jqn5z9lq84i"))))
    (build-system gnu-build-system)
    (outputs '("out" "debug"))
    (propagated-inputs (list gmp ; <mpc.h> refers to both
