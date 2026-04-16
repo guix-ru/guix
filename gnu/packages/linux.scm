@@ -4122,15 +4122,16 @@ routing for specific audio hardware.")
 (define-public alsa-topology-conf
   (package
     (name "alsa-topology-conf")
-    (version "1.2.4")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append
-                    "ftp://ftp.alsa-project.org/pub/lib/" name "-"
-                    version ".tar.bz2"))
-              (sha256
-               (base32
-                "01zdg6q4s6d01k39z96wi4vbhrfw1i2g4yi5dijwfk6a5vjfdq2m"))))
+    (version "1.2.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/alsa-project/alsa-topology-conf")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "150065nc5ksrxcay0ia0f8ad2s0gpp3xgn7gc5xsyf0k5dwdby49"))))
     (build-system copy-build-system)
     (arguments
      '(#:install-plan
@@ -4138,8 +4139,8 @@ routing for specific audio hardware.")
     (home-page "https://www.alsa-project.org/wiki/Main_Page")
     (synopsis "The Advanced Linux Sound Architecture libraries")
     (description
-     "This package contains Advanced Linux Sound Architecture topology
-configuration files that can be used for specific audio hardware.")
+     "This package contains @acronym{ALSA, Advanced Linux Sound Architecture}
+topology configuration files that can be used for specific audio hardware.")
     (license license:bsd-3)))
 
 (define-public alsa-lib
