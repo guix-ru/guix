@@ -4146,15 +4146,16 @@ topology configuration files that can be used for specific audio hardware.")
 (define-public alsa-lib
   (package
     (name "alsa-lib")
-    (version "1.2.11")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append
-                    "https://www.alsa-project.org/files/pub/lib/"
-                    name "-" version ".tar.bz2"))
-              (sha256
-               (base32
-                "0kdvjlknc50fwfdkxj0z12xbz21skb3gnwlh6lvsvycmp5ljygwz"))))
+    (version "1.2.16")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/alsa-project/alsa-lib")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0khz38l87zm81q7dllv8gr4j9bj9c1jj69vnw03i3xvichjhwwxn"))))
     (build-system gnu-build-system)
     (arguments
      '(#:configure-flags (list (string-append "LDFLAGS=-Wl,-rpath="
@@ -4162,6 +4163,13 @@ topology configuration files that can be used for specific audio hardware.")
                                               "/lib"))
        #:phases
        (modify-phases %standard-phases
+         (replace 'bootstrap
+           (lambda _
+             (invoke "libtoolize" "--force" "--copy" "--automake")
+             (invoke "aclocal")
+             (invoke "autoheader")
+	     (invoke "automake" "--foreign" "--copy" "--add-missing")
+             (invoke "autoconf")))
          (add-before 'install 'pre-install
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((ucm
@@ -4182,12 +4190,17 @@ topology configuration files that can be used for specific audio hardware.")
                (symlink topology-share (string-append alsa "/topology")))
              #t)))))
     (inputs
-     (list alsa-ucm-conf alsa-topology-conf))
+     (list autoconf-2.72
+           automake
+           alsa-ucm-conf
+           alsa-topology-conf
+           libtool))
     (home-page "https://www.alsa-project.org/wiki/Main_Page")
     (synopsis "The Advanced Linux Sound Architecture libraries")
     (description
-     "The Advanced Linux Sound Architecture (ALSA) provides audio and
-MIDI functionality to the Linux-based operating system.")
+     "@acronym{ALSA, Advanced Linux Sound Architecture} provides audio and
+@acronym{MIDI, Musical Instrument Digital Interface} functionality to the
+Linux-based operating system.")
     (license license:lgpl2.1+)))
 
 (define-public alsa-utils
