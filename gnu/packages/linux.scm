@@ -4243,14 +4243,16 @@ Linux-based operating system.")
 (define-public alsa-plugins
   (package
     (name "alsa-plugins")
-    (version "1.2.2")
-    (source (origin
-             (method url-fetch)
-             (uri (string-append "ftp://ftp.alsa-project.org/pub/plugins/"
-                                 name "-" version ".tar.bz2"))
-             (sha256
-              (base32
-               "0z9k3ssbfk2ky2w13avgyf202j1drsz9sv3834bp33cj1i2hc3qw"))))
+    (version "1.2.12")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/alsa-project/alsa-plugins")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0izvzdvw3nj69l4a968p9d9xjxfxs7i3bdpj1r4cvm6b8w7j33z8"))))
     (build-system gnu-build-system)
     ;; TODO: Split libavcodec and speex if possible. It looks like they can not
     ;; be split, there are references to both in files.
@@ -4298,15 +4300,16 @@ Linux-based operating system.")
            ffmpeg ; libavcodec resampling plugin, a52 plugin
            pulseaudio)) ; PulseAudio plugin
     (native-inputs
-     (list pkg-config))
+     (list autoconf automake libtool pkg-config))
     (home-page "http://www.alsa-project.org/")
     (synopsis "Plugins for the Advanced Linux Sound Architecture (ALSA)")
     (description
-     "The Advanced Linux Sound Architecture (ALSA) provides audio and
-MIDI functionality to the Linux-based operating system.  This package enhances ALSA
-by providing additional plugins which include: upmixing, downmixing, jackd and
-pulseaudio support for native alsa applications, format conversion (s16 to a52), and
-external rate conversion.")
+     "@acronym{ALSA, Advanced Linux Sound Architecture} provides audio and
+@acronym{MIDI, Musical Instrument Digital Interface} functionality to the
+Linux-based operating system.  This package enhances @acronym{ALSA} by
+providing additional plugins which include: upmixing, downmixing, jackd and
+pulseaudio support for native alsa applications, format conversion (s16 to
+a52), and external rate conversion.")
     (license (list license:gpl2+
                    ;; `rate/rate_samplerate.c': LGPL v2.1 or later.
                    license:lgpl2.1+))))
