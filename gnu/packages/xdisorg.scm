@@ -103,6 +103,7 @@
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system qt)
   #:use-module (guix build-system scons)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -3965,28 +3966,9 @@ such as sway, similar to @command{rofi}.")
     (home-page "https://hg.sr.ht/~scoopta/wofi")
     (license license:gpl3+)))
 
-(define-public nwg-launchers
-  (package
-    (name "nwg-launchers")
-    (version "0.7.1.1")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/nwg-piotr/nwg-launchers")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0hq2qiqxvrw3g515ywcb676ljc8mdw3pyslgxr3vahizfljah1pv"))))
-    (build-system meson-build-system)
-    (native-inputs (list nlohmann-json pkg-config))
-    (inputs (list gtk-layer-shell gtkmm-3 (librsvg-for-system)))
-    (home-page "https://github.com/nwg-piotr/nwg-launchers")
-    (synopsis "Application launchers for wlroots")
-    (description
-     "This package provides an application grid, button bar, and dmenu
-applications for Sway and other wlroots-based Wayland compositors.")
-    (license license:gpl3+)))
+;; XXX: Deprecated on <2026-0624>
+(define-deprecated/public-alias nwg-launchers
+  (@ (gnu packages nwg-shell) nwg-launchers))
 
 (define-public dex
   (package

@@ -19,6 +19,7 @@
 (define-module (gnu packages nwg-shell)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system go)
+  #:use-module (guix build-system meson)
   #:use-module (guix build-system pyproject)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -29,6 +30,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages curl)
+  #:use-module (gnu packages cpp)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages glib)
@@ -175,6 +177,34 @@ Hyprland.
 
 This application is a part of the nwg-shell project.")
     (license license:expat)))
+
+(define-public nwg-launchers
+  (package
+    (name "nwg-launchers")
+    (version "0.7.1.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/nwg-piotr/nwg-launchers")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0hq2qiqxvrw3g515ywcb676ljc8mdw3pyslgxr3vahizfljah1pv"))))
+    (build-system meson-build-system)
+    (native-inputs
+     (list nlohmann-json
+           pkg-config))
+    (inputs
+     (list gtk-layer-shell
+           gtkmm-3
+           (librsvg-for-system)))
+    (home-page "https://github.com/nwg-piotr/nwg-launchers")
+    (synopsis "Application launchers for wlroots")
+    (description
+     "This package provides an application grid, button bar, and dmenu
+applications for Sway and other wlroots-based Wayland compositors.")
+    (license license:gpl3+)))
 
 (define-public nwg-bar
   (package
