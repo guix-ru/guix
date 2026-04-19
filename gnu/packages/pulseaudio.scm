@@ -62,6 +62,7 @@
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages libcanberra)
+  #:use-module (gnu packages mp3)
   #:use-module (gnu packages web)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages m4)
@@ -78,33 +79,53 @@
   #:use-module (gnu packages xorg))
 
 (define-public libsndfile
-  (package
-    (name "libsndfile")
-    (version "1.2.0")
-    (source (origin
-             (method git-fetch)
-             (uri (git-reference
-                    (url "https://github.com/libsndfile/libsndfile/")
-                    (commit version)))
-             (file-name (git-file-name name version))
-             (sha256
-              (base32
-               "10lm5mn171ynykkvq5ad8m1zriv01w25s6hx0l3wphdd4p6f7c92"))
-             (modules '((guix build utils)))
-             (snippet
-              '(begin
-                 ;; Fix hard coded executable name.
-                 (substitute* "tests/test_wrapper.sh.in"
-                   (("^/usr/bin/env") "env"))))))
-    (build-system gnu-build-system)
-    (propagated-inputs
-     (list flac libogg libvorbis opus))
-    (native-inputs
-     (list autoconf autogen automake libtool pkg-config python))
-    (home-page "http://www.mega-nerd.com/libsndfile/")
-    (synopsis "Reading and writing files containing sampled sound")
-    (description
-     "Libsndfile is a C library for reading and writing files containing
+  (let ((commit "68f6c16fe1407eff4cdde158566694c3ed666c2f")
+        (revision "0"))
+    (package
+      (name "libsndfile")
+      ;; release request https://github.com/libsndfile/libsndfile/issues/1075
+      (version (git-version "1.2.2" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/libsndfile/libsndfile/")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1sn955p6l060yzdb4rvxqsmjp90sv69s9hc525py5vn1ylr2axaf"))
+         (patches (search-patches "libsndfile-CVE-2025-52194.patch"
+                                  "libsndfile-CVE-2026-37555.patch"))))
+      (build-system gnu-build-system)
+      (arguments
+       (list
+        #:configure-flags
+        #~(list
+           ;; sqlite is only required by sndfile-regtest
+           "--disable-sqlite")
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'substitute-env-path
+              (lambda _
+                (substitute* "tests/test_wrapper.sh.in"
+                  (("^/usr/bin/env")
+                   "env")))))))
+      (propagated-inputs (list flac
+                               lame
+                               libmpg123
+                               libogg
+                               libvorbis
+                               opus))
+      (native-inputs (list autoconf
+                           autogen
+                           automake
+                           libtool
+                           pkg-config
+                           python))
+      (home-page "https://libsndfile.github.io/libsndfile/")
+      (synopsis "Reading and writing files containing sampled sound")
+      (description
+       "Libsndfile is a C library for reading and writing files containing
 sampled sound (such as MS Windows WAV and the Apple/SGI AIFF format) through
 one standard library interface.
 
@@ -114,7 +135,7 @@ little-endian (such as Intel and DEC/Compaq Alpha) processor systems as well
 as big-endian processor systems such as Motorola 68k, Power PC, MIPS and
 SPARC.  Hopefully the design of the library will also make it easy to extend
 for reading and writing new sound file formats.")
-    (license l:lgpl2.1+)))
+      (license l:lgpl2.1+))))
 
 (define-public libsamplerate
   (package

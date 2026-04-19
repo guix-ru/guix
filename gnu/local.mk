@@ -1816,6 +1816,8 @@ dist_patch_DATA =						\
   %D%/packages/patches/libphonenumber-reproducible-build.patch	\
   %D%/packages/patches/libquicktime-ffmpeg.patch 		\
   %D%/packages/patches/libsepol-versioned-docbook.patch		\
+  %D%/packages/patches/libsndfile-CVE-2025-52194.patch \
+  %D%/packages/patches/libsndfile-CVE-2026-37555.patch \
   %D%/packages/patches/libsoup-auth-digest-fix-crash.patch      \
   %D%/packages/patches/libsoup-deadlock-in-add_listener_in_thread.patch \
   %D%/packages/patches/libsoup-fix-merge-of-ranges.patch        \
