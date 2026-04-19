@@ -35,6 +35,7 @@
 (define-module (gnu packages embedded)
   #:use-module (guix utils)
   #:use-module (guix packages)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix memoization)
@@ -935,47 +936,9 @@ languages are C and C++.")
 SEGGER J-Link and compatible devices.")
     (license license:gpl2+)))
 
-(define-public jimtcl
-  (package
-    (name "jimtcl")
-    (version "0.82")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                     (url "https://github.com/msteveb/jimtcl")
-                     (commit version)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "01nxqzn41797ypph1vpwjfh3zqgks0l8ihh6932b4kb83apy6f08"))))
-    (build-system gnu-build-system)
-    (arguments
-     (list #:phases
-           #~(modify-phases %standard-phases
-               (replace 'configure
-                 ;; This package doesn't use autoconf.
-                 (lambda _
-                   (invoke "./configure"
-                           (string-append "--prefix=" #$output))))
-               (add-before 'check 'delete-failing-tests
-                 (lambda _
-                   ;; XXX All but 1 SSL tests fail (tries connecting to Google
-                   ;; servers).
-                   (delete-file "tests/ssl.test")))
-               #$@(if (target-32bit?)
-                      #~((add-after 'unpack 'delete-failing-tests/32bit
-                           (lambda _
-                             (delete-file "tests/file.test"))))
-                      #~()))))
-    (inputs (list openssl))
-    (native-inputs
-     ;; For tests.
-     (list inetutils))       ; for hostname
-    (home-page "http://jim.tcl.tk/index.html")
-    (synopsis "Small footprint Tcl implementation")
-    (description "Jim is a small footprint implementation of the Tcl programming
-language.")
-    (license license:bsd-2)))
+;; Deprecated on 2026-06-27.
+(define-deprecated/public-alias jimtcl
+  (@ (gnu packages tcl) jimtcl))
 
 (define-public openocd
   (package

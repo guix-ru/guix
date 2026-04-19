@@ -27,9 +27,9 @@
   #:use-module (gnu packages)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
-  #:use-module (gnu packages embedded)
   #:use-module (gnu packages libusb)
-  #:use-module (gnu packages pkg-config))
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages tcl))
 
 (define-public usb-modeswitch-data
   (package

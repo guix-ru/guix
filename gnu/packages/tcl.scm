@@ -1,13 +1,15 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013, 2014, 2015 Ludovic Courtès <ludo@gnu.org>
-;;; Copyright © 2014, 2015, 2018 Mark H Weaver <mhw@netris.org>
+;;; Copyright © 2013, 2014, 2015, 2021 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2014 Eric Bavier <bavier@member.fsf.org>
-;;; Copyright © 2016, 2018 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2014, 2015, 2018 Mark H Weaver <mhw@netris.org>
+;;; Copyright © 2016 David Craven <david@craven.ch>
+;;; Copyright © 2016, 2018, 2020 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2016, 2023, 2024, 2026 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2017 Kei Kebreau <kkebreau@posteo.net>
-;;; Copyright © 2018, 2022 Tobias Geerinckx-Rice <me@tobias.gr>
+;;; Copyright © 2018, 2020, 2022 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2019 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2019 Mathieu Othacehe <m.othacehe@gmail.com>
+;;; Copyright © 2026 Dariqq <dariqq@posteo.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -34,6 +36,7 @@
   #:use-module (guix build-system go)
   #:use-module (guix build-system perl)
   #:use-module (gnu packages)
+  #:use-module (gnu packages admin)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages image)
@@ -148,6 +151,48 @@
 a play on C++, and [incr Tcl] provides a similar object model, including
 multiple inheritance and public and private classes and variables.")
     (license license:public-domain)))
+
+(define-public jimtcl
+  (package
+    (name "jimtcl")
+    (version "0.82")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/msteveb/jimtcl")
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "01nxqzn41797ypph1vpwjfh3zqgks0l8ihh6932b4kb83apy6f08"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (replace 'configure
+                 ;; This package doesn't use autoconf.
+                 (lambda _
+                   (invoke "./configure"
+                           (string-append "--prefix=" #$output))))
+               (add-before 'check 'delete-failing-tests
+                 (lambda _
+                   ;; XXX All but 1 SSL tests fail (tries connecting to Google
+                   ;; servers).
+                   (delete-file "tests/ssl.test")))
+               #$@(if (target-32bit?)
+                      #~((add-after 'unpack 'delete-failing-tests/32bit
+                           (lambda _
+                             (delete-file "tests/file.test"))))
+                      #~()))))
+    (inputs (list openssl))
+    (native-inputs
+     ;; For tests.
+     (list inetutils))       ; for hostname
+    (home-page "http://jim.tcl.tk/index.html")
+    (synopsis "Small footprint Tcl implementation")
+    (description "Jim is a small footprint implementation of the Tcl programming
+language.")
+    (license license:bsd-2)))
 
 (define-public expect
   (package
