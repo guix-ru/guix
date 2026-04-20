@@ -54708,6 +54708,69 @@ Where the service will write its logs.  If unset, it defaults to
 @end table
 @end deftp
 
+@node XDG Home Services
+@subsection XDG Home Services
+
+The @code{(gnu home services xdg)} module provides services related to
+XDG specifications for the desktop.
+
+@subsubheading XDG User Directories
+
+@defvar{home-xdg-user-directories-service-type}
+
+This service sets the names of default user directories such as
+@samp{Downloads} and @samp{Documents}.  These settings are respected by
+most applications via @var{xdg-user-dirs}.
+
+To disable a directory, set it to @code{"$HOME"}.
+
+@end defvar
+
+@c %start of fragment
+
+@deftp {Data Type} home-xdg-user-directories-configuration
+Available @code{home-xdg-user-directories-configuration} fields are:
+
+@table @asis
+@item @code{desktop} (default: @code{"$HOME/Desktop"}) (type: string)
+Default @samp{Desktop} directory, this is what you see on your
+background when using a desktop environment, e.g.  KDE.
+
+@item @code{documents} (default: @code{"$HOME/Documents"}) (type: string)
+Default directory to put documents like PDFs.
+
+@item @code{download} (default: @code{"$HOME/Downloads"}) (type: string)
+Default directory downloaded files, this is where your Web-broser will
+put downloaded files in.
+
+@item @code{music} (default: @code{"$HOME/Music"}) (type: string)
+Default directory for audio files.
+
+@item @code{pictures} (default: @code{"$HOME/Pictures"}) (type: string)
+Default directory for pictures and images.
+
+@item @code{projects} (default: @code{"$HOME/Projects"}) (type: string)
+Default directory for projects.
+
+@item @code{publicshare} (default: @code{"$HOME/Public"}) (type: string)
+Default directory for shared files, which can be accessed by other users
+on local machine or via network.
+
+@item @code{templates} (default: @code{"$HOME/Templates"}) (type: string)
+Default directory for templates.  They can be used by graphical file
+manager or other apps for creating new files with some pre-populated
+content.
+
+@item @code{videos} (default: @code{"$HOME/Videos"}) (type: string)
+Default directory for videos.
+
+@end table
+
+@end deftp
+
+@c %end of fragment
+
+
 @node Guix Home Services
 @subsection Guix Home Services
 

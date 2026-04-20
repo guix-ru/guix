@@ -204,9 +204,8 @@ for example).")))
 (define-configuration home-xdg-user-directories-configuration
   (desktop
    (string "$HOME/Desktop")
-   "Default ``desktop'' directory, this is what you see on your
-desktop when using a desktop environment,
-e.g. GNOME (@pxref{XWindow,,,guix.info}).")
+   "Default @samp{Desktop} directory, this is what you see on your background
+when using a desktop environment, e.g. KDE.")
   (documents
    (string "$HOME/Documents")
    "Default directory to put documents like PDFs.")
@@ -220,6 +219,9 @@ will put downloaded files in.")
   (pictures
    (string "$HOME/Pictures")
    "Default directory for pictures and images.")
+  (projects
+   (string "$HOME/Projects")
+   "Default directory for projects.")
   (publicshare
    (string "$HOME/Public")
    "Default directory for shared files, which can be accessed by other
