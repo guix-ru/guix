@@ -2735,18 +2735,20 @@ Rendering Manager devices.")
 (define-public xdg-user-dirs
   (package
     (name "xdg-user-dirs")
-    (version "0.17")
+    (version "0.20")
     (source (origin
-              (method url-fetch)
-              (uri (string-append "http://user-dirs.freedesktop.org/releases/"
-                                    name "-" version ".tar.gz"))
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://gitlab.freedesktop.org/xdg/xdg-user-dirs.git")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
               (sha256
-               (base32 "13216b8rfkzak5k6bvpx6jvqv3cnbgpijnjwj8a8d3kq4cl0a1ra"))))
-    (build-system gnu-build-system)
+               (base32
+                "1s235wp6z0d94z5qhwf408ppli1p3s3zah8rynm9ljh3hmmv0p2g"))))
+    (build-system meson-build-system)
     (native-inputs
      (list gettext-minimal
            docbook-xsl
-           docbook-xml-4.3
            libxslt))
     (home-page "https://www.freedesktop.org/wiki/Software/xdg-user-dirs/")
     (synopsis "Tool to help manage \"well known\" user directories")
