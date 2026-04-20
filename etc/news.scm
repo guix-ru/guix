@@ -44,6 +44,27 @@
 (channel-news
  (version 0)
 
+ (entry (commit "72c521fffa3d0ce4c96111628498fd788ea71579")
+        (title
+         (en "New “Projects” user directory")
+         (de "Neues Benutzerverzeichnis „Projekte“")
+         (fr "Nouveau dossier « Projets » pour les utilisateurs"))
+        (body
+         (en "With the upgrade of xdg-user-dirs to version 0.20, desktop users
+will now see a new Projects directory in their home.  The name can be changed by
+using home-xdg-user-directories-service-type; the configuration of which has
+been expanded.")
+         (de "Durch die Aktualisierung von @code{xdg-user-dirs} auf Version
+0.20 wird nun ein neues Verzeichnis @samp{Projekte} in Ihrem Persönlichen
+Verzeichnis angelegt. Sie können den Namen dieses Verzeichnisses mittels
+@code{home-xdg-user-directories-service-type} anpassen; das entsprechende
+Feld @code{projects} wurde ergänzt.")
+         (fr "Avec la mise à jour de xdg-user-dirs vers la version 0.20, les
+utilisateurs de bureau ont maintenant un nouveau dossier « Projets » créé par
+défaut dans leur dossier personnel.  Le nom du dossier peut être modifié en
+utilisant le home-xdg-user-directories-service-type; dont la configuration a été
+agrandie.")))
+
  (entry (commit "b6c35016845f04f5e3a2f5eaf2064b9861f8707c")
         (title
          (en "Frei0r plugins have to be installed explicitly")
