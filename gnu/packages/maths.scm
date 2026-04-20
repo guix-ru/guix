@@ -3594,23 +3594,24 @@ can solve two kinds of problems:
             (variable "CURLOPT_CAPATH")
             (files '("etc/ssl/certs")))))
     (arguments
-     `(#:configure-flags
-       (list (string-append "--with-shell="
-                            (assoc-ref %build-inputs "bash")
-                            "/bin/sh")
+     (list
+      #:configure-flags
+      #~(list (string-append "--with-shell="
+                             (assoc-ref %build-inputs "bash")
+                             "/bin/sh")
 
-             ;; XXX: Without this flag, linking octave-cli fails with
-             ;; undefined references to 'logf@GLIBCXX_3.4' et.al. due to
-             ;; not pulling in liboctinterp.la for -lstdc++.
-             "--enable-link-all-dependencies")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'configure 'configure-makeinfo
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "libinterp/corefcn/help.h"
-               (("\"makeinfo\"")
-                (string-append
-                 "\"" (assoc-ref inputs "texinfo") "/bin/makeinfo\""))))))))
+              ;; XXX: Without this flag, linking octave-cli fails with
+              ;; undefined references to 'logf@GLIBCXX_3.4' et.al. due to
+              ;; not pulling in liboctinterp.la for -lstdc++.
+              "--enable-link-all-dependencies")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'configure 'configure-makeinfo
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "libinterp/corefcn/help.h"
+                (("\"makeinfo\"")
+                 (format #f "~s"
+                         (search-input-file inputs "bin/makeinfo")))))))))
     (home-page "https://www.gnu.org/software/octave/")
     (synopsis "High-level language for numerical computation (no GUI)")
     (description "GNU Octave is a high-level interpreted language that is
