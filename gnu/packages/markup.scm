@@ -17,6 +17,7 @@
 ;;; Copyright © 2024 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2025 Vinicius Monego <monego@posteo.net>
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
+;;; Copyright © 2026 Andy Tai <atai@atai.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -40,6 +41,7 @@
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix build-system gnu)
+  #:use-module (guix build-system meson)
   #:use-module (guix build-system go)
   #:use-module (guix build-system trivial)
   #:use-module (guix build-system cmake)
@@ -53,6 +55,8 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages glib)
+  #:use-module (gnu packages gtk)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages perl)
@@ -666,6 +670,32 @@ and smu is that smu doesn't support reference style links.")
 SAX-like interface.  It is compliant to the CommonMark specification,
 with a few extensions.")
     (license license:expat)))
+
+(define-public mdview-mtx
+  (package
+    (name "mdview-mtx")
+    (version "2025.10.30")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/step-/mdview")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0d9v7arbiw9q8bcfkak6v257f25pjigdm67fvw8f5xqbkmkjh0wj"))))
+    (build-system meson-build-system)
+    (inputs (list gtk+ md4c))
+    (native-inputs (list `(,glib "bin") ;for glib-compile-resources
+                         pkg-config))
+    (home-page "https://github.com/step-/mdview")
+    (synopsis "GTK markdown viewer and CLI converter")
+    (description
+     "MDVIEW MTX is a graphical Markdown viewer and CLI converter
+supporting the CommonMark specification.  Features include page and
+directory search, document and link navigation, hotkeys, and
+one-click export to web browser.")
+    (license license:gpl2)))
 
 (define-public python-mistletoe
   (package
