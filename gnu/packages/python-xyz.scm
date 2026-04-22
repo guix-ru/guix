@@ -184,6 +184,7 @@
 ;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 John Dawson <dawson.john.andrew@gmail.com>
+;;; Copyright © 2026 Kevin Deldycke <kevin@deldycke.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -776,6 +777,71 @@ templates language.")
     ;; Project is duo licensed, see: LICENSE.txt.
     (license (list license:zpl2.1
                    license:psfl))))
+
+(define-public python-click-extra
+  (package
+    (name "python-click-extra")
+    (version "8.1.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kdeldycke/click-extra")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1mglhfrmwq616irga69vv206bf3d20kp1jm8fvhgcidj53cxygj7"))))
+    (build-system pyproject-build-system)
+    ;; Upstream uses uv-build which is not yet available in Guix.
+    (arguments
+     (list
+      #:build-backend "setuptools.build_meta"
+           #:test-flags
+           ;; Skip the network tests.
+           #~(list "-m" "not network")
+           #:phases
+           ;; The setuptools backend used here (in place of upstream's
+           ;; uv-build) installs only ``*.py``; declare the data files loaded
+           ;; at import time as package data.
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'declare-package-data
+                 (lambda _
+                   (substitute* "pyproject.toml"
+                     (("^\\[build-system\\]")
+                      (string-append
+                       "[tool.setuptools.package-data]\n"
+                       "click_extra = [\"*.toml\", \"py.typed\"]\n"
+                       "\n[build-system]"))))))))
+
+    (native-inputs
+     ;; Optional libraries imported at module level by the test suite.
+     (list python-hjson
+           python-jsonschema
+           python-pygments
+           python-pytest
+           python-pytest-httpserver
+           python-pyyaml
+           python-requests
+           python-setuptools
+           python-tomlkit
+           python-xmltodict))
+    (propagated-inputs
+     (list python-boltons
+           python-click
+           python-cloup
+           python-deepmerge
+           python-extra-platforms
+           python-tabulate
+           python-wcmatch
+           python-wcwidth))
+    (home-page "https://kdeldycke.github.io/click-extra/")
+    (synopsis "Drop-in replacement for Click to build colorful CLIs")
+    (description
+     "Click Extra extends the Click framework with colored help screens,
+configuration file support, table rendering, and platform detection.  It
+serves as a drop-in replacement adding features for user-friendly command-line
+interfaces.")
+    (license license:gpl2+)))
 
 (define-public python-conda-content-trust
   (package
