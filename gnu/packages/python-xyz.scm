@@ -2308,6 +2308,41 @@ numbers like forty-second.")
 of Ordered Set.")
     (license license:expat)))
 
+(define-public python-packageurl
+  (package
+    (name "python-packageurl")
+    (version "0.17.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/package-url/packageurl-python")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "03b6nf6jxzcbgkmqdp3bsl2lvzszqiaiqfwk88cnpvqbgq67lafb"))
+       (modules '((guix build utils)))
+       ;; Remove bundled virtualenv and license files used only for
+       ;; development; not needed at build or runtime.
+       (snippet '(delete-file-recursively "thirdparty"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:test-flags
+           ;; test_purl_spec.py reads JSON fixtures from the 'spec' git
+           ;; submodule at import time; skip it when the submodule is absent.
+           #~(list "--ignore=tests/test_purl_spec.py")))
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (home-page "https://www.packageurl.org")
+    (synopsis "Package URL parser and builder")
+    (description
+     "This library parses and builds Package URLs (purls) as defined in the
+purl specification.  It provides a @code{PackageURL} class for creating,
+parsing, and normalizing package URL strings across different package
+management ecosystems.")
+    (license license:expat)))
+
 (define-public python-pandocfilters
   (package
     (name "python-pandocfilters")
