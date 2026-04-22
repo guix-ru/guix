@@ -657,6 +657,31 @@ including arbitrary-length lists, records, mixed types, and missing data,
 using NumPy-like idioms.")
     (license license:bsd-3)))
 
+(define-public python-bracex
+  (package
+    (name "python-bracex")
+    (version "2.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/facelessuser/bracex")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1j717bsjr3ms4snzrbv4izbblcwgdk1lzxzi2cjhr9365zgz4kdk"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatchling
+           python-pytest))
+    (home-page "https://facelessuser.github.io/bracex/")
+    (synopsis "Bash-style brace expansion for Python")
+    (description
+     "Bracex is a brace expansion library for Python that implements
+Bash-style brace expansion.  It can generate strings from patterns like
+@code{@{a,b,c@}} or @code{@{1..10@}}.")
+    (license license:expat)))
+
 (define-public python-bresenham
   (package
     (name "python-bresenham")
