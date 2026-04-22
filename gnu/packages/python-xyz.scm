@@ -1354,6 +1354,38 @@ Rust's @url{https://docs.rs/exitcode, exitcode}.")
 or random, matching strings to a given regular expression.")
     (license license:agpl3+)))
 
+(define-public python-extra-platforms
+  (package
+    (name "python-extra-platforms")
+    (version "13.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kdeldycke/extra-platforms")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0mqyz6m1sdy6y7iz9yf63hljpbjvzcw16vda394b0w2pb41s5sv1"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:build-backend "setuptools.build_meta"
+      ;; Skip network tests and one that shells out to ``uv``.
+      #:test-flags #~(list "-m" "not network"
+                           "--ignore=tests/test_sphinx_crossrefs.py")))
+    (native-inputs
+     (list python-pytest
+           python-requests
+           python-setuptools))
+    (home-page "https://kdeldycke.github.io/extra-platforms/")
+    (synopsis "Detection of architectures, platforms, and OS families")
+    (description
+     "Extra Platforms detects and identifies operating systems, platforms,
+architectures, and OS families.  It groups them by family for conditional
+logic in cross-platform applications.")
+    (license license:asl2.0)))
+
 (define-public python-ezdxf
   (package
     (name "python-ezdxf")
