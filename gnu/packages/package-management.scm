@@ -33,6 +33,7 @@
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
 ;;; Copyright © 2025 unwox <me@unwox.com>
 ;;; Copyright © 2026 Owen T. Heisler <writer@owenh.net>
+;;; Copyright © 2026 Kevin Deldycke <kevin@deldycke.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -927,6 +928,49 @@ interface for interacting with the application.")
      "The Guix Xsearch extension is a new implementation of Guix search sped up
 by using a Xapian cache.")
     (license (list license:gpl3+ license:cc0))))
+
+(define-public meta-package-manager
+  (package
+    (name "meta-package-manager")
+    (version "7.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kdeldycke/meta-package-manager")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1y56z5970kp540w408y0fzk7g7r27vplqqihdav7gf8mqzfd23sz"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:build-backend "setuptools.build_meta"
+      ;; test_cli_sbom.py needs the dropped [sbom] extra (cyclonedx,
+      ;; spdx-tools); skip it.
+      #:test-flags #~(list "--ignore=tests/test_cli_sbom.py")))
+    ;; python-pyyaml and python-tomlkit: tests/test_docs.py loads
+    ;; docs/docs_update.py, which imports them.
+    (native-inputs
+     (list python-pytest
+           python-pyyaml
+           python-setuptools
+           python-tomlkit))
+    (propagated-inputs
+     (list python-boltons
+           python-click-extra
+           python-extra-platforms
+           python-packageurl
+           python-tomli-w
+           python-xmltodict))
+    (home-page "https://kdeldycke.github.io/meta-package-manager/")
+    (synopsis "Package managers abstraction and unification tool")
+    (description
+     "Meta Package Manager (mpm) is a @acronym{Command Line Interface, CLI}
+that wraps multiple GNU/Linux package managers behind a unified interface.
+It can list, search, install, upgrade, and remove packages across all detected
+managers simultaneously.  Output formats include tables, JSON, and CSV.")
+    (license license:gpl2+)))
 
 
 ;;;
