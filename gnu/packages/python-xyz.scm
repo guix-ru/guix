@@ -41565,6 +41565,43 @@ portable.")
 operating systems and an elegant approach to concurrency using threading.")
     (license license:expat)))
 
+(define-public python-wcmatch
+  (package
+    (name "python-wcmatch")
+    (version "10.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/facelessuser/wcmatch")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1pz6wyz2hlckl88y6z7v32sm5mfp2mqgar4z5f1kz7mixsdpmh41"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:test-flags
+           ;; ``test_glob_match_real_outside_curdir`` walks paths outside
+           ;; the build directory which the sandbox does not permit.
+           #~(list "-k" "not test_glob_match_real_outside_curdir")
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'check 'set-home
+                 (lambda _
+                   (setenv "HOME" (getcwd)))))))
+    (native-inputs
+     (list python-hatchling
+           python-pytest))
+    (propagated-inputs
+     (list python-bracex))
+    (home-page "https://facelessuser.github.io/wcmatch/")
+    (synopsis "Wildcard and glob file name matcher")
+    (description
+     "Wcmatch provides an enhanced @code{fnmatch}, @code{glob}, and
+@code{pathlib} library.  It adds features such as brace expansion,extended
+glob patterns, and recursive globbing with configurable behavior.")
+    (license license:expat)))
+
 (define-public python-wcwidth
   (package
     (name "python-wcwidth")
