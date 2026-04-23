@@ -446,14 +446,14 @@ used to apply commands with arbitrarily long arguments.")
 (define-public coreutils
   (package
    (name "coreutils")
-   (version "9.10")
+   (version "9.11")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnu/coreutils/coreutils-"
                                 version ".tar.xz"))
             (sha256
              (base32
-              "098xsm5sybyifknrr524lfiyrx6rsfm15mp2cirh640bvyd5llqn"))))
+              "1hrwgkaj35d46l8rbhi9maiqzp353qhd376srqbm55d5l3nj8h1r"))))
    (build-system gnu-build-system)
    (inputs `(,acl                                 ;TODO: add SELinux
              ,attr                                ;for xattrs in ls, mv, etc
