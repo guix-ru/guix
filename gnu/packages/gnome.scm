@@ -9405,7 +9405,6 @@ logo='~a'~%" icon))))))
      (list accountsservice
            at-spi2-core
            check                        ; for testing
-           dbus
            dconf                        ; for wrap-accessibility-dependencies
            egl-wayland
            elogind
