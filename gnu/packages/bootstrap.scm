@@ -650,7 +650,7 @@ $out/bin/guile --version~%"
                                ("i586-gnu"
                                 "17kllqnf3fg79gzy9ansgi801c46yh9c23h4d923plvb0nfm1cfn")
                                ("x86_64-gnu"
-                                "04zksa2457h1vcl5ry2hyzhhsg8fckvfdgadp0viba3anwms2463")
+                                "0xnw5p6279m8xazbhal5ld5qxsya0249z2l6jcc7w9ndh2gnx07v")
                                ("powerpc-linux"
                                 "0kspxy0yczan2vlih6aa9hailr2inz000fqa0gn5x9d1fxxa5y8m")
                                ("riscv64-linux"
@@ -707,7 +707,7 @@ $out/bin/guile --version~%"
                         ("i586-gnu"
                          "/20200326/binutils-static-stripped-2.34-i586-pc-gnu.tar.xz")
                         ("x86_64-gnu"
-                         "/20241122/binutils-static-stripped-2.41-x86_64-pc-gnu.tar.xz")
+                         "/20260302/binutils-static-stripped-2.44-x86_64-pc-gnu.tar.xz")
                         ("powerpc-linux"
                          "/20200923/binutils-2.35.1.tar.xz")
                         ("riscv64-linux"
@@ -734,7 +734,7 @@ $out/bin/guile --version~%"
            ("i586-gnu"
             "11kykv1kmqc5wln57rs4klaqa13hm952smkc57qcsyss21kfjprs")
            ("x86_64-gnu"
-            "1fasv76rppnqlshjqc7dbzngic9cqswi5ydzg6w9rc075daqk8kb")
+            "033bgmaa012b2lw8g76b02mjgzdnzv2yd3jvaqbhqrr5q9r3xn04")
            ("powerpc-linux"
             "0asbg1c4avkrvh057mx0942xwddd136jni382zqsxzn79ls42yq8")
            ("mips64el-linux"
@@ -803,7 +803,7 @@ $out/bin/guile --version~%"
                                ("i586-gnu"
                                 "/20240816/glibc-stripped-2.39-i586-pc-gnu.tar.xz")
                                ("x86_64-gnu"
-                                "/20241122/glibc-stripped-2.39-x86_64-pc-gnu.tar.xz")
+                                "/20260302/glibc-stripped-2.41-x86_64-pc-gnu.tar.xz")
                                ("powerpc-linux"
                                 "/20200923/glibc-2.32.tar.xz")
                                ("riscv64-linux"
@@ -830,7 +830,7 @@ $out/bin/guile --version~%"
                   ("i586-gnu"
                    "0x2x6w611k6v9qdabacawamw2475p04hm3s0q95xcg063wjq4ig2")
                   ("x86_64-gnu"
-                   "1w4h91kxl64a62l646966i73zp2cj6w4dmyc64fh0c1hhdykxass")
+                   "1lpvk0l7qqvz46cnxm64a1a40zg0gj90j3glyk67i1sh5r4znlmy")
                   ("powerpc-linux"
                    "0smmssyjrlk5cvx49586smmk81gkwff0i6r91n4rir4jm6ba25sb")
                   ("mips64el-linux"
@@ -913,7 +913,7 @@ exec ~a/bin/~a -B~a/lib \
                                ("i586-gnu"
                                 "/20200326/gcc-stripped-5.5.0-i586-pc-gnu.tar.xz")
                                ("x86_64-gnu"
-                                "/20241122/gcc-stripped-14.2.0-x86_64-pc-gnu.tar.xz")
+                                "/20260302/gcc-stripped-14.3.0-x86_64-pc-gnu.tar.xz")
                                ("powerpc-linux"
                                 "/20200923/gcc-5.5.0.tar.xz")
                                ("riscv64-linux"
@@ -940,7 +940,7 @@ exec ~a/bin/~a -B~a/lib \
                   ("i586-gnu"
                    "1j2zc58wzil71a34h7c70sd68dmqvcscrw3rmn2whq79vd70zvv5")
                   ("x86_64-gnu"
-                   "1cgbhc76hlccx6v2z7kk7z173lryyq3la5mmbwivl6hbl1zcqg3m")
+                   "1fhi7f5zld08b6qsyv1d48ha7z0vr8pxr4kf8x7aq1a3kbcv5rkz")
                   ("powerpc-linux"
                    "1p7df3yixhm87dw5sccc6yn1i9db1r9hnmsg87wq5xi4rfmirq7w")
                   ("mips64el-linux"
