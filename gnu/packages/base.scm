@@ -197,33 +197,17 @@ including, for example, recursive directory searching.")
 (define-public sed
   (package
     (name "sed")
-    (version "4.9")
+    (version "4.10")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/sed/sed-" version
                                   ".tar.gz"))
               (sha256
                (base32
-                "0bi808vfkg3szmpy9g5wc7jnn2yk6djiz412d30km9rky0c8liyi"))))
+                "0xsj5xq22ljhbawssw29dy2s3ff3w4mh6z0zakndri1fz7x9y5sd"))))
     (build-system gnu-build-system)
     (synopsis "Stream editor")
-    (native-inputs (append (if (target-loongarch64?)
-                               (list config)
-                               '())
-                           (list perl)))                    ;for tests
-    (arguments (if (target-loongarch64?)
-                   (list #:phases
-                         #~(modify-phases %standard-phases
-                             (add-after 'unpack 'update-config-scripts
-                               (lambda* (#:key inputs native-inputs #:allow-other-keys)
-                                 ;; Replace outdated config.guess and config.sub.
-                                 (for-each (lambda (file)
-                                             (install-file
-                                              (search-input-file
-                                               (or native-inputs inputs)
-                                               (string-append "/bin/" file)) "./build-aux"))
-                                           '("config.guess" "config.sub"))))))
-                   '()))
+    (native-inputs (list perl))                    ;for tests
     (description
      "Sed is a non-interactive, text stream editor.  It receives a text
 input from a file or from standard input and it then applies a series of text
