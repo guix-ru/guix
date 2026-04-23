@@ -634,8 +634,8 @@ standard.")
    (arguments
     (append
      (if (target-hurd?)
-         (list #:configure-flags '("CFLAGS=-D__alloca=alloca"
-                                   "ac_cv_func_posix_spawn=no"))
+         (list #:configure-flags #~(list "CFLAGS=-D__alloca=alloca"
+                                         "ac_cv_func_posix_spawn=no"))
          (list))
      (list
       #:phases
