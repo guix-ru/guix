@@ -2236,10 +2236,20 @@ exec " gcc-bin "/" program
     (native-inputs '())
     (inputs (cons* gnu-make-boot0 (%bootstrap-inputs+toolchain)))
     (arguments
-     (list
-      #:implicit-inputs? #f
-      #:tests? #f
-      #:guile %bootstrap-guile))))
+     (append
+      (list
+       #:implicit-inputs? #f
+       #:tests? #f
+       #:guile %bootstrap-guile)
+      (substitute-keyword-arguments arguments
+        ((#:phases phases #~%standard-phases)
+         #~(modify-phases #$phases
+             (add-after 'unpack 'fix-gnulib-test
+               (lambda _
+                 ;; vma-iter test needs <linux/fs.h> which is not public
+                 ;; in %bootstrap-linux-libre-headers
+                 (substitute* '("gnulib-tests/vma-iter.c")
+                   (("# include <linux/fs.h>") "")))))))))))
 
 (define tar-boot0
   (package
