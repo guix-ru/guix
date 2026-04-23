@@ -2827,7 +2827,7 @@ memoized as a function of '%current-system'."
             (cons* gnumach-headers-boot0
                    hurd-headers-boot0
                    hurd-minimal-boot0
-                   (map cadr (%boot0-inputs))))))
+                   (%boot0-inputs)))))
 
 (define* (kernel-headers-boot0 #:optional (system (%current-system)))
   (match system
