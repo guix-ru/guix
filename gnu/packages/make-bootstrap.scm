@@ -7,6 +7,7 @@
 ;;; Copyright © 2019, 2020, 2022 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2020 Mathieu Othacehe <m.othacehe@gmail.com>
 ;;; Copyright © 2021 Pierre Langlois <pierre.langlois@gmx.com>
+;;; Copyright © 2026 Zheng Junjie <z572@z572.online>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -622,7 +623,7 @@ for `sh' in $PATH, and without nscd, and with static NSS modules."
 
       (propagated-inputs
        (modify-inputs propagated-inputs
-         (replace "libgc" libgc/static-libs)))
+         (replace "libgc" `(,libgc "static"))))
 
       (arguments
        (substitute-keyword-arguments arguments
