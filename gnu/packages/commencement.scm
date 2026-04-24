@@ -2987,7 +2987,7 @@ memoized as a function of '%current-system'."
          ld-wrapper-boot0
          binutils-boot0
          (fold delete (%boot0-inputs)
-               (list binutils-mesboot %bootstrap-gcc gcc-mesboot))))
+               (list %bootstrap-binutils binutils-mesboot gcc-mesboot))))
 
 (define/system-dependent glibc-final-with-bootstrap-bash
   ;; The final libc, "cross-built".  If everything went well, the resulting
