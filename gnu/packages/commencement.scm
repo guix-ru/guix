@@ -3220,7 +3220,10 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
          gcc-boot0-wrapped
          (fold delete
                (%boot1-inputs)
-               (list gcc-boot0 glibc-mesboot))))
+               (list %bootstrap-gcc
+                     %bootstrap-glibc
+                     gcc-boot0
+                     glibc-mesboot))))
 
 (define libstdc++
   ;; Intermediate libstdc++ that will allow us to build the final GCC
