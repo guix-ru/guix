@@ -2946,7 +2946,8 @@ memoized as a function of '%current-system'."
          ,@(if (system-hurd?)
                `((add-before 'build 'fix-regen
                    (lambda* (#:key inputs #:allow-other-keys)
-                     (let ((libc (assoc-ref inputs "libc")))
+                     (let* ((libc.so (search-input-file inputs "/lib/libc.so"))
+                            (libc (dirname (dirname libc.so))))
                        (substitute* "Lib/plat-generic/regen"
                          (("/usr/include/")
                           (string-append libc "/include/")))))))
