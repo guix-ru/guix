@@ -1724,8 +1724,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
                     version "/ghc-" version "-testsuite.tar.xz"))
              (sha256
               (base32
-               "04p2lawxxg3nyv6frzhyjyh3arhqqyh5ka3alxa2pxhcd2hdcja3"))
-             (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
+               "04p2lawxxg3nyv6frzhyjyh3arhqqyh5ka3alxa2pxhcd2hdcja3"))))
          ("ghc-alex" ,ghc-alex-bootstrap-for-9.4)
          ("ghc-happy" ,ghc-happy-bootstrap-for-9.4)
          ,@(filter (match-lambda
