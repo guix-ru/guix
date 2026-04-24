@@ -6,6 +6,7 @@
 ;;; Copyright © 2019, 2020, 2022 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2022, 2023 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright © 2026 Zheng Junjie <z572@z572.online>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -23,6 +24,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages bdw-gc)
+  #:use-module (guix deprecation)
   #:use-module (guix licenses)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -55,6 +57,8 @@
      #~(list
         ;; Install gc_cpp.h et al.
         "--enable-cplusplus"
+        ;; Used by 'guile-static'.
+        "--enable-static"
 
         ;; In GNU/Hurd systems during the 'check' phase,
         ;; there is a deadlock caused by the 'gctest' test.
@@ -68,7 +72,17 @@
                #~())
         #$@(if (target-mingw?)
                #~("--enable-threads=pthreads")
-               #~())))
+               #~()))
+     #:phases
+     #~(modify-phases %standard-phases
+         (add-after 'install 'move-static-library
+           (lambda _
+             (for-each
+              (lambda (a)
+                (install-file a (string-append #$output:static
+                                               "/lib"))
+                (delete-file a))
+              (find-files (string-append #$output "/lib") "\\.a"))))))
      (cond
        ((target-ppc64le?)
         (list #:make-flags
@@ -87,7 +101,7 @@
         ;; cross-compiling, and demands using libatomic-ops instead.
         (list libatomic-ops)
         '()))
-   (outputs '("out" "debug"))
+   (outputs '("out" "debug" "static"))
    (properties
     '((release-monitoring-url . "https://www.hboehm.info/gc/gc_source/")
       (upstream-name . "gc")))
@@ -112,16 +126,8 @@ C or C++ programs, though that is not its primary goal.")
 
    (license (x11-style (string-append home-page "license.txt")))))
 
-;; TODO: Add a static output in libgc in the next rebuild cycle.
-(define-public libgc/static-libs
-  (package/inherit
-   libgc
-   (arguments
-    (substitute-keyword-arguments arguments
-      ((#:configure-flags flags #~'())
-       #~(cons "--enable-static" #$flags))))
-
-   (properties '((hidden? . #t)))))
+;; XXX: Deprecated on <2026-04-25>.
+(define-deprecated/public-alias libgc/static-libs libgc)
 
 (define-public libgc-7
   (package
