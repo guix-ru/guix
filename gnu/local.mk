@@ -1914,6 +1914,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/mcrypt-CVE-2012-4409.patch			\
   %D%/packages/patches/mcrypt-CVE-2012-4426.patch			\
   %D%/packages/patches/mcrypt-CVE-2012-4527.patch			\
+  %D%/packages/patches/mle-1.8.1-no-var-lookbehind.patch	\
   %D%/packages/patches/mono-msbuild-15.7.179-fix-build.patch	\
   %D%/packages/patches/mono-msbuild-15.7.179-fix-resources.patch	\
   %D%/packages/patches/libmemcached-build-with-gcc7.patch	\

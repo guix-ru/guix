@@ -1903,7 +1903,7 @@ FreeDOS as a functional clone of the old MS-DOS program edlin.")
 (define-public mle
   (package
     (name "mle")
-    (version "1.5.0")
+    (version "1.8.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1912,9 +1912,13 @@ FreeDOS as a functional clone of the old MS-DOS program edlin.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1nhd00lsx9v12zdmps92magz76c2d8zzln3lxvzl4ng73gbvq3n0"))))
+                "08zp9yk13a7y5lwwl4lhx69210knvxjx722rj1k82kxahncaa9y7"))
+              ;; Remove patch on next release
+              ;; or when pcre2 is >= 10.44
+              (patches
+               (search-patches "mle-1.8.1-no-var-lookbehind.patch"))))
     (build-system gnu-build-system)
-    (inputs (list lua pcre uthash))
+    (inputs (list lua pcre2 uthash))
     (arguments
      `(#:test-target "test"
        #:phases (modify-phases %standard-phases
