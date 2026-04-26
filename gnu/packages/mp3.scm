@@ -439,23 +439,21 @@ This package contains the binary.")
 (define-public mpg123
   (package
     (name "mpg123")
-    (version "1.31.2")
+    (version "1.33.5")
     (source
      (origin
        (method url-fetch)
-       (uri (list (string-append "mirror://sourceforge/mpg123/mpg123/"
-                                 version "/mpg123-" version ".tar.bz2")
-                  (string-append
-                   "https://www.mpg123.org/download/mpg123-"
-                   version ".tar.bz2")))
+       (uri (list (string-append "mirror://sourceforge/mpg123/mpg123/" version
+                                 "/mpg123-" version ".tar.bz2")
+                  (string-append "https://www.mpg123.org/download/mpg123-"
+                                 version ".tar.bz2")))
        (sha256
-        (base32 "1pn777l9m7qbsx4v93gnav8bf6yi3skzdz8x81mkpx1ibs824zxi"))))
+        (base32 "1pfnz4wsgwwraj65ns2nn9dyw0p4vdm5lswc7hwcmwxgl26vqzhd"))))
     (build-system gnu-build-system)
-    (arguments '(#:configure-flags '("--with-default-audio=pulse")))
-    (native-inputs
-     (list pkg-config))
-    (inputs
-     (list alsa-lib pulseaudio))
+    (arguments
+     '(#:configure-flags '("--with-default-audio=pulse")))
+    (native-inputs (list pkg-config))
+    (inputs (list alsa-lib pulseaudio))
     (home-page "https://www.mpg123.org/")
     (synopsis "Console MP3 player and decoder library")
     (description
