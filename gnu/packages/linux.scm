@@ -7312,20 +7312,17 @@ event traces from the kernel (via the relaying through the debug file system).")
 (define-public sbc
   (package
     (name "sbc")
-    (version "1.5")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://kernel.org/linux/bluetooth/sbc-"
-                                  version ".tar.xz"))
-              (patches (search-patches "sbc-fix-build-non-x86.patch"))
-              (sha256
-               (base32
-                "1liig5856crb331dps18mp0s13zbkv7yh007zqhq97m94fcddfhc"))))
+    (version "2.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://kernel.org/linux/bluetooth/sbc-" version
+                           ".tar.xz"))
+       (sha256
+        (base32 "17mfhc9rn25vrqgfpihpjjc8syp3r56paqyhzg1gjnjyydpagbd1"))))
     (build-system gnu-build-system)
-    (inputs
-     (list libsndfile))
-    (native-inputs
-     (list pkg-config))
+    (inputs (list libsndfile))
+    (native-inputs (list pkg-config))
     (home-page "https://www.kernel.org/pub/linux/bluetooth/")
     (synopsis "Bluetooth subband audio codec")
     (description
