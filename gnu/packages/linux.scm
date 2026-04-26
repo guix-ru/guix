@@ -7321,14 +7321,65 @@ event traces from the kernel (via the relaying through the debug file system).")
        (sha256
         (base32 "17mfhc9rn25vrqgfpihpjjc8syp3r56paqyhzg1gjnjyydpagbd1"))))
     (build-system gnu-build-system)
-    (inputs (list libsndfile))
-    (native-inputs (list pkg-config))
+    (arguments
+      (list
+        #:configure-flags
+        #~(list "--disable-tester")))
     (home-page "https://www.kernel.org/pub/linux/bluetooth/")
     (synopsis "Bluetooth subband audio codec")
     (description
      "The SBC is a digital audio encoder and decoder used to transfer data to
 Bluetooth audio output devices like headphones or loudspeakers.")
     (license license:gpl2+)))
+
+(define-public sbctester
+  (package
+    (inherit sbc)
+    (name "sbctester")
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'write-build-files
+            (lambda _
+              (begin
+                (for-each delete-file
+                          (list "Makefile.in" "aclocal.m4" "configure"
+                                "config.h.in"))
+                (delete-file-recursively "build-aux")
+                (with-output-to-file "configure.ac"
+                  (lambda _
+                    (format #t
+                     "AC_PREREQ([2.69])
+                      AC_INIT([sbctester], [~a])
+                      AC_CONFIG_HEADERS(config.h)
+                      AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
+                      COMPILER_FLAGS
+                      AC_LANG([C])
+                      AC_PROG_CC
+                      AC_PROG_CC_PIE
+                      AC_PROG_INSTALL
+                      AC_PROG_LIBTOOL
+                    	PKG_CHECK_MODULES(SNDFILE, sndfile, dummy=yes,
+                    				AC_MSG_ERROR(sndfile library is required))
+                    	AC_SUBST(SNDFILE_LIBS)
+                    	AC_CONFIG_FILES([Makefile])
+                    	AC_OUTPUT
+                    	AC_MSG_RESULT([$PACKAGE_NAME $VERSION])
+                      ~%"
+                     #$(package-version sbc))))
+                (with-output-to-file "Makefile.am"
+                  (lambda _
+                    (format #t
+                     "bin_PROGRAMS = src/sbctester
+                      src_sbctester_SOURCES = src/sbctester.c
+                      src_sbctester_LDADD = @SNDFILE_LIBS@ -lm")))))))))
+    (inputs (list libsndfile))
+    (native-inputs (list autoconf automake libtool pkg-config))
+    (synopsis "Test utility for the sbc codec")
+    (description
+     "Utility to detect differences between two audio files, encoded with
+SBC.")))
 
 (define-public bluez
   (package
