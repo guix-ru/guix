@@ -1011,16 +1011,16 @@ saved to a file for further viewing in another window.")
 (define-public dillo
   (package
     (name "dillo")
-    (version "3.2.0")
+    (version "3.3.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/dillo-browser/dillo")
+             (url "https://git.dillo-browser.org/dillo")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "19rr09b4xvnz7isng8pzxm5879g3pqvml5v8vh4gbwwn93dnlwpn"))))
+        (base32 "14mrm84br4p6iq3ihzlyq07p8v8cdvrh8zhs9yhv1dxbdkjxhdrk"))))
     (build-system gnu-build-system)
     (native-inputs (list autoconf automake))
     (inputs (list fltk-1.3
@@ -1035,7 +1035,7 @@ saved to a file for further viewing in another window.")
                   libxft
                   libxrender
                   zlib))
-    (home-page "https://dillo-browser.github.io/")
+    (home-page "https://dillo-browser.org/")
     (synopsis "Very small and fast graphical web browser")
     (description
      "Dillo is a minimalistic web browser particularly intended for
