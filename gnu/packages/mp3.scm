@@ -451,16 +451,78 @@ This package contains the binary.")
         (base32 "1pfnz4wsgwwraj65ns2nn9dyw0p4vdm5lswc7hwcmwxgl26vqzhd"))))
     (build-system gnu-build-system)
     (arguments
-     '(#:configure-flags '("--with-default-audio=pulse")))
+     (list
+      #:configure-flags
+      #~(list "--disable-components" "--enable-programs"
+              "--with-default-audio=pulse" "CFLAGS=-lmpg123 -lout123 -lsyn123")))
     (native-inputs (list pkg-config))
-    (inputs (list alsa-lib pulseaudio))
+    (inputs (list libmpg123 libout123 libsyn123))
     (home-page "https://www.mpg123.org/")
-    (synopsis "Console MP3 player and decoder library")
+    (synopsis "Console audio player")
     (description
      "Mpg123 is a real time MPEG 1.0/2.0/2.5 audio player/decoder for layers
-1,2 and 3 (MPEG 1.0 layer 3 aka MP3 most commonly tested).  It comes with a
-command-line tool as well as a C library, libmpg123.")
+1,2 and 3 (MPEG 1.0 layer 3 aka MP3 most commonly tested).")
     (license license:lgpl2.1)))
+
+(define-public libmpg123
+  (package
+    (inherit mpg123)
+    (name "libmpg123")
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "--disable-components" "--enable-libmpg123")))
+    (inputs '())
+    (synopsis "Decoder library")
+    (description
+     "Libmpg123 is a MPEG 1.0/2.0/2.5 audio decoder library for layers 1, 2
+and 3 (MPEG 1.0 layer 3 aka MP3 most commonly tested).")))
+
+(define-public libout123
+  (package
+    (inherit mpg123)
+    (name "libout123")
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "--disable-components" "--enable-libout123"
+              "--enable-libout123-modules")))
+    (inputs (list alsa-lib pulseaudio))
+    (synopsis "Audio playback abstraction")
+    (description
+     "Libout123 is focused on continuous playback of audio streams
+via various platform-specific output methods.  It glosses over details of the
+native APIs to give an interface close to simply writing data to a file.  The
+focus of the library is to ease the use case of just getting raw audio data out
+there, without interruptions.")))
+
+(define-public libsyn123
+  (package
+    (inherit mpg123)
+    (name "libsyn123")
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "--disable-components" "--enable-libsyn123")))
+    (inputs '())
+    (synopsis "Audio signal generation")
+    (description
+     "Libsyn123 provides functionality to generate synthetic audio signal
+data.  It serves to verify the decoding of libmpg123 in automated testing.
+Libsyn123 offers:
+
+@itemize
+@item
+signal generation (mix of differing wave shapes, noise, a simulated Geiger
+counter)
+@item
+format conversion and channel mixing and amplification, with hard and soft
+clipping, also optional dithering
+@item
+near-zero-latency good-enough quite-fast resampling
+@item
+applying digital filters with user-provided coefficients
+@end itemize")))
 
 (define-public mpg321
   (package
