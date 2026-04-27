@@ -686,7 +686,7 @@ directory.")
     (propagated-inputs
      (modify-inputs (propagated-inputs-with-sdl2 sdl-mixer)
        ;; In Requires.private of SDL2_mixer.pc.
-       (append flac fluidsynth libmodplug libvorbis mpg123 opusfile)))
+       (append flac fluidsynth libmodplug libmpg123 libvorbis opusfile)))
     (properties '((upstream-name . "SDL2_mixer")))))
 
 (define-public sdl2-mixer-x

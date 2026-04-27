@@ -2749,7 +2749,7 @@ streaming protocols.")
            libdvdread                   ; ignored without libdvdnav
            libjpeg-turbo
            libmpeg2
-           mpg123                       ; audio codec for MP3
+           libmpg123                    ; audio codec for MP3
            libpng
            libtheora
            libvdpau
@@ -2816,7 +2816,7 @@ SVCD, DVD, 3ivx, DivX 3/4/5, WMV and H.264 movies.")
            ladspa
            lcms
            libbs2b
-           mpg123
+           libmpg123
            rsound
            vulkan-headers
            vulkan-loader

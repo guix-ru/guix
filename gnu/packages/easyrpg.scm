@@ -100,7 +100,7 @@ It can read and write LCF and XML files.")
            libsndfile
            libvorbis
            libxmp
-           mpg123
+           libmpg123
            opusfile
            pixman
            sdl2

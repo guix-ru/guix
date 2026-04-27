@@ -9427,11 +9427,11 @@ game fun for both novice and experts.")
                               (("/usr/local/games")
                                (string-append #$output "/bin"))))))))
     (build-system gnu-build-system)
-    (inputs (list libmikmod
+    (inputs (list flac
+                  libmikmod
+                  libmpg123
                   libvorbis
-                  flac
                   mesa
-                  mpg123
                   sdl2))
     (synopsis "First person shooter engine for Quake 1")
     (description "Quakespasm is a modern engine for id software's Quake 1.

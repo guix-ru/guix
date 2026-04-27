@@ -346,11 +346,13 @@ presented by the Linux kernel Focusrite Scarlett2 USB Protocol Mixer Driver.")
            ffmpeg
            flac
            fluidsynth
+           jack-1
            lame
            libbs2b
            libcddb
            libcdio-paranoia
            libcue
+           libmpg123
            libnotify
            libogg
            libopenmpt
@@ -361,9 +363,7 @@ presented by the Linux kernel Focusrite Scarlett2 USB Protocol Mixer Driver.")
            libxml2
            libxrender
            lirc
-           jack-1
            mesa
-           mpg123
            neon
            opusfile
            pulseaudio

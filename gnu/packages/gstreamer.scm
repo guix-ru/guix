@@ -705,17 +705,17 @@ for the GStreamer multimedia library.")
            libgudev
            libiec61883
            libjpeg-turbo
+           libmpg123
            libpng
            libshout
            libsoup
            libvpx
            libx11
            libxdamage
-           libxfixes
            libxext
+           libxfixes
            libxshmfence
            mesa
-           mpg123
            orc
            pulseaudio
            speex

@@ -8587,7 +8587,7 @@ related C functions to get information about the mounted file system.")
        `(("cffi" ,sbcl-cffi)
          ("cl-out123" ,sbcl-cl-out123)
          ("documentation-utils" ,sbcl-documentation-utils)
-         ("libmpg123" ,mpg123)
+         ("libmpg123" ,libmpg123)
          ("trivial-features" ,sbcl-trivial-features)
          ("trivial-garbage" ,sbcl-trivial-garbage)
          ("verbose" ,sbcl-verbose)))
@@ -8906,7 +8906,7 @@ OpenGL (Mesa), GLU and GLUT (FreeGLUT) APIs using CFFI.")
                  (("libout123.so")
                   (search-input-file inputs "/lib/libout123.so"))))))))
       (inputs
-       (list mpg123
+       (list libout123
              sbcl-bordeaux-threads
              sbcl-cffi
              sbcl-documentation-utils

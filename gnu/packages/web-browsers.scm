@@ -711,9 +711,9 @@ driven and does not detract you from your daily work.")
      (list freetype
            fribidi
            harfbuzz
+           libmpg123
            libunistring
            libwebp
-           mpg123
            openssl
            pcre
            sdl2

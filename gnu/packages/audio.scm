@@ -669,7 +669,7 @@ Sega Master System/Mark III, Sega Genesis/Mega Drive, BBC Micro
        ("sndfile" ,libsndfile)))
     (propagated-inputs
      ;; In Requires.private
-     (list libogg libvorbis mpg123 zlib))
+     (list libogg libvorbis libmpg123 zlib))
     (synopsis "Audio tracking library")
     (description "LibOpenMPT is a cross-platform C++ and C module playback
 library.  It is based on the player code of the Open ModPlug Tracker project.")
@@ -1456,7 +1456,7 @@ engineers, musicians, soundtrack editors and composers.")
            libjpeg-turbo
            ;;("libsbsms" ,libsbsms)         ;bundled version is modified
            libsndfile
-           mpg123
+           libmpg123
            opusfile
            rapidjson
            soundtouch
@@ -1618,7 +1618,7 @@ tools.")
            libjpeg-turbo
            ;;("libsbsms" ,libsbsms)         ;bundled version is modified
            libsndfile
-           mpg123
+           libmpg123
            soundtouch
            soxr ;replaces libsamplerate
            sqlite
@@ -4551,8 +4551,8 @@ buffers, and audio capture.")
     (native-inputs (list pkg-config))
     (inputs (list dumb
                   flac
-                  mpg123
                   libmodplug
+                  libmpg123
                   libsndfile
                   libvorbis
                   openal))
@@ -5552,7 +5552,7 @@ encode and decode wavpack files.")
         #~(list "-DBUILD_TESTS=ON")))
       (native-inputs (list googletest tinycmmc))
       ;; XXX: CMake-built dependents currently require propagation.
-      (propagated-inputs (list libmodplug libvorbis mpg123 openal opusfile))
+      (propagated-inputs (list libmodplug libmpg123 libvorbis openal opusfile))
       (home-page "https://github.com/WindstilleTeam/wstsound")
       (synopsis "C++ sound library")
       (description "This package provides a simple sound library for C++.")
@@ -5589,7 +5589,7 @@ encode and decode wavpack files.")
                 (when tests?
                   (invoke "./tester")))))))
       (native-inputs (list doxygen graphviz))
-      (inputs (list mpg123 ncurses))
+      (inputs (list libmpg123 ncurses))
       (home-page "https://github.com/Shirakumo/libmixed")
       (synopsis "Low-level audio mixer pipeline library")
       (description
@@ -6738,11 +6738,11 @@ on the ALSA software PCM plugin.")
            gmp
            gsl
            jack-2
+           libmpg123
            libsamplerate
            motif
            mpc
            mpfr
-           mpg123
            speex
            timidity++
            vorbis-tools
@@ -7642,18 +7642,18 @@ inter-plugin communication for VST2 plugins and quick startup times.")
     ;; It would be nice to add mikmod to inputs if that gets packaged
     ;; eventually.
     (inputs (list alsa-lib
-                  jack-1
-                  mpg123
-                  lame
-                  vorbis-tools
                   faad2
                   flac
-                  timidity++
-                  libsndfile
-                  libsamplerate
-                  ncurses
+                  jack-1
                   ladspa
-                  lilv))
+                  lame
+                  libmpg123
+                  libsamplerate
+                  libsndfile
+                  lilv
+                  ncurses
+                  timidity++
+                  vorbis-tools))
     (home-page "https://nosignal.fi/ecasound/index.php")
     (synopsis "Multitrack audio processing")
     (description "Ecasound is a software package designed for multitrack audio

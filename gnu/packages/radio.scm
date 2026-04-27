@@ -2773,13 +2773,13 @@ receiver.")
            faad2
            fftwf
            lame
+           libmpg123
            libusb
-           mpg123
-           rtl-sdr
-           qtdeclarative
-           qtcharts
            qt5compat
+           qtcharts
+           qtdeclarative
            qtmultimedia
+           rtl-sdr
            soapysdr))
     (arguments
      (list #:qtbase qtbase
