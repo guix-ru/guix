@@ -1721,10 +1721,13 @@ ac_cv_c_float_format='IEEE (little-endian)'
                                 "intl/Makefile")
                    (("de\\.po") "en_GB.po"))))
              (replace 'install
-               (lambda* (#:key make-flags #:allow-other-keys)
-                 (let* ((ioctl.h (search-input-file %build-inputs
-                                                    "/include/asm/ioctl.h"))
-                        (kernel-headers (dirname (dirname (dirname ioctl.h))))
+               (lambda* (#:key make-flags inputs #:allow-other-keys)
+                 (let* ((kernel-headers
+                         (search-input-directory inputs
+                                                 #$(if (system-hurd?)
+                                                       "include/mach"
+                                                       "include/linux")))
+                        (kernel-headers (dirname (dirname kernel-headers)))
                         (install-flags (cons "install" make-flags)))
                    (apply invoke "make" install-flags)
                    (copy-recursively kernel-headers #$output)))))))))))
