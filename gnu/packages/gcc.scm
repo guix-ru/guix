@@ -1187,10 +1187,17 @@ using compilers other than GCC."
           #$@(if (version>=? (package-version gcc) "11")
                  #~((add-after 'unpack 'hide-gcc-headers
                       (lambda* (#:key native-inputs inputs #:allow-other-keys)
-                        (let ((gcc (assoc-ref (or native-inputs inputs)
-                                              #$(if (%current-target-system)
-                                                    "cross-gcc"
-                                                    "gcc"))))
+                        ;; Depending on the actual gcc input, two locations
+                        ;; candidates to check to get gcc from the file tree.
+                        (let* ((gcc-nested (false-if-exception
+                                            (search-input-directory
+                                             (or native-inputs inputs)
+                                             "libexec/gcc")))
+                               (gcc-nested (or gcc-nested
+                                               (search-input-file
+                                                (or native-inputs inputs)
+                                                "bin/gcc")))
+                               (gcc (dirname (dirname gcc-nested))))
                           ;; Fix a regression in GCC 11 where the GCC headers
                           ;; shadows glibc headers when building libstdc++.  An
                           ;; upstream fix was added in GCC 11.3.0, but it only
