@@ -1168,6 +1168,36 @@ to JUnit and other XUnit testing frameworks.")
 other XUnit testing frameworks.")
     (license license:expat)))
 
+(define-public camlzip
+  (package
+    (name "ocaml5-camlzip")
+    (version "1.14")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/xavierleroy/camlzip")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0k1ldils85lqxzjav610ahsqvsrrxzyki0aja2xpjpw789nw08mx"))))
+    (build-system ocaml-build-system)
+    (propagated-inputs (list zlib))
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (delete 'configure))
+       #:install-target "install-findlib"
+       #:make-flags
+       ,#~(list "all" "allopt"
+                (string-append "INSTALLDIR=" #$output "/lib/ocaml"))))
+    (home-page "https://github.com/xavierleroy/camlzip")
+    (synopsis "Provides easy access to compressed files")
+    (description "This Objective Caml library provides easy access to
+compressed files in ZIP, GZIP and JAR format.  It provides functions for
+reading from and writing to compressed files in these formats.")
+    ;; With static-linking exception
+    (license license:lgpl2.1+)))
+
 (define-public ocaml-crowbar
   (package
     (name "ocaml5-crowbar")
