@@ -1010,8 +1010,10 @@ the store.")
                (find
                 (match-lambda
                   ((label . input)
-                   (and (file-exists?
-                         (string-append input "/include/asm/ioctl.h"))
+                   (and (directory-exists?
+                         (string-append input "/include/" #$(if (system-hurd?)
+                                                                "mach"
+                                                                "linux")))
                         ;; Ensure we're not refering to another libc.
                         (not (file-exists?
                               (string-append input "/include/locale.h"))))))

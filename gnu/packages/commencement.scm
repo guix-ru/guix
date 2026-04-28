@@ -3214,7 +3214,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
       (inputs
        (modify-inputs (package-inputs final)
          (delete "bash-mesboot")
-         (append static-bash-for-glibc)))
+         (prepend static-bash-for-glibc)))
 
       ;; This time we need 'msgfmt' to install all the libc.mo files.
       (native-inputs
