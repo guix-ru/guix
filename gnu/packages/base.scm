@@ -1178,25 +1178,25 @@ the store.")
                        (string-append locale "/C.UTF-8")))))
 
          #$@(if (target-hurd?)
-                `((add-after 'install 'augment-libc.so
-                    (lambda _
-                      (substitute* (string-append #$output "/lib/libc.so")
-                        (("/[^ ]+/lib/libc.so.0.3")
-                         (string-append #$output "/lib/libc.so.0.3"
-                                        " libmachuser.so libhurduser.so")))))
-                  (add-after 'install 'create-machine-symlink
-                    (lambda _
-                      (let* ((cpu #$(match (or (%current-target-system)
-                                               (%current-system))
-                                      ((? target-x86-32?)
-                                       "i386")
-                                      ((? target-x86-64?)
-                                       "x86_64")))
-                             (machine (string-append #$output
-                                                     "/include/mach/machine")))
-                        (unless (file-exists? machine)
-                          (symlink cpu machine))))))
-                '()))))
+                #~((add-after 'install 'augment-libc.so
+                     (lambda _
+                       (substitute* (string-append #$output "/lib/libc.so")
+                         (("/[^ ]+/lib/libc.so.0.3")
+                          (string-append #$output "/lib/libc.so.0.3"
+                                         " libmachuser.so libhurduser.so")))))
+                   (add-after 'install 'create-machine-symlink
+                     (lambda _
+                       (let* ((cpu #$(match (or (%current-target-system)
+                                                (%current-system))
+                                       ((? target-x86-32?)
+                                        "i386")
+                                       ((? target-x86-64?)
+                                        "x86_64")))
+                              (machine (string-append #$output
+                                                      "/include/mach/machine")))
+                         (unless (file-exists? machine)
+                           (symlink cpu machine))))))
+                #~()))))
 
    (inputs (list static-bash))
 
