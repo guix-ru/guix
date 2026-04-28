@@ -1604,13 +1604,16 @@ ac_cv_c_float_format='IEEE (little-endian)'
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags configure-flags)
-        #~(let ((ioctl.h (search-input-file %build-inputs
-                                            "/include/asm/ioctl.h")))
+        #~(let ((kernel-headers
+                 (search-input-directory %build-inputs
+                                         #$(if (system-hurd?)
+                                               "include/mach"
+                                               "include/linux"))))
             (list
              (string-append "--prefix=" #$output)
              "--disable-obsolete-rpc"
              "--host=i686-unknown-linux-gnu"
-             (string-append "--with-headers=" (dirname (dirname ioctl.h)))
+             (string-append "--with-headers=" (dirname kernel-headers))
              "--enable-static-nss"
              "--with-pthread"
              "--without-cvs"
@@ -1652,10 +1655,13 @@ ac_cv_c_float_format='IEEE (little-endian)'
                   (substitute* "configure"
                     (("/bin/pwd") "pwd")))))
             (replace 'install
-              (lambda* (#:key outputs make-flags #:allow-other-keys)
-                (let* ((ioctl.h (search-input-file %build-inputs
-                                                   "/include/asm/ioctl.h"))
-                       (kernel-headers (dirname (dirname (dirname ioctl.h)))))
+              (lambda* (#:key inputs outputs make-flags #:allow-other-keys)
+                (let* ((kernel-headers
+                        (search-input-directory inputs
+                                                #$(if (system-hurd?)
+                                                      "include/mach"
+                                                      "include/linux")))
+                       (kernel-headers (dirname (dirname kernel-headers))))
                   (apply invoke "make" make-flags)
                   (copy-recursively kernel-headers #$output))))
             (add-before 'configure 'remove-bashism
