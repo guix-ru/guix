@@ -1855,20 +1855,23 @@ exec " gcc-bin "/" program
                         (gcc      (dirname (dirname bin-gcc)))
                         (libc.a   (search-input-file inputs "/lib/libc.a"))
                         (glibc    (dirname (dirname libc.a)))
-                        (ioctl.h (search-input-file %build-inputs
-                                                    "/include/asm/ioctl.h"))
-                        (kernel-headers (dirname (dirname (dirname ioctl.h)))))
+                        (kernel-headers
+                         (search-input-directory inputs
+                                                 #$(if (system-hurd?)
+                                                       "include/mach"
+                                                       "include/linux")))
+                        (kernel-headers-include (dirname kernel-headers)))
                    (setenv "CONFIG_SHELL" (search-input-file inputs "bin/sh"))
                    (setenv "C_INCLUDE_PATH"
                            (string-append
                             gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
-                            ":" kernel-headers "/include"
+                            ":" kernel-headers-include
                             ":" glibc "/include"
                             ":" (getcwd) "/mpfr/src"))
                    (setenv "CPLUS_INCLUDE_PATH"
                            (string-append
                             gcc "/lib/gcc-lib/i686-unknown-linux-gnu/4.6.4/include"
-                            ":" kernel-headers "/include"
+                            ":" kernel-headers-include
                             ":" glibc "/include"
                             ":" (getcwd) "/mpfr/src"))
                    (setenv "LIBRARY_PATH"
