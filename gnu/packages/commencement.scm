@@ -1434,9 +1434,11 @@ ac_cv_c_float_format='IEEE (little-endian)'
                      (gcc (dirname (dirname gcc-lib)))
                      (libc.a (search-input-file inputs "/lib/libc.a"))
                      (glibc (dirname (dirname libc.a)))
-                     (ioctl.h (search-input-file %build-inputs
-                                                 "/include/asm/ioctl.h"))
-                     (kernel-headers-include (dirname (dirname ioctl.h))))
+                     (kernel-headers
+                      (search-input-directory inputs #$(if (system-hurd?)
+                                                           "include/mach"
+                                                           "include/linux")))
+                     (kernel-headers-include (dirname kernel-headers)))
                 (setenv "CONFIG_SHELL" shell)
                 (setenv "C_INCLUDE_PATH" (string-append
                                           gcc "/lib/gcc-lib/i686-unknown-linux-gnu/2.95.3/include"
