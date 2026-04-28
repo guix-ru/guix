@@ -1138,14 +1138,16 @@ ac_cv_c_float_format='IEEE (little-endian)'
       #~(list (string-append "SHELL="
                              (search-input-file %build-inputs "/bin/sh")))
       #:configure-flags
-      #~(let ((ioctl.h (search-input-file %build-inputs
-                                          "/include/asm/ioctl.h")))
+      #~(let ((kernel-headers (search-input-directory %build-inputs
+                                                      #$(if (system-hurd?)
+                                                            "include/mach"
+                                                            "include/linux"))))
           (list "--disable-shared"
                 "--enable-static"
                 "--disable-sanity-checks"
                 "--build=i686-unknown-linux-gnu"
                 "--host=i686-unknown-linux-gnu"
-                (string-append "--with-headers=" (dirname (dirname ioctl.h)))
+                (string-append "--with-headers=" (dirname kernel-headers))
                 "--enable-static-nss"
                 "--without-__thread"
                 "--without-cvs"
