@@ -46,6 +46,7 @@
 ;;; Copyright © 2026 Yarl Baudig <yarl-baudig@mailoo.org>
 ;;; Copyright © 2026 Laurent Gatto <lgatto@protonmail.ch>
 ;;; Copyright © 2026 John Dawson <dawson.john.andrew@gmail.com>
+;;; Copyright © 2026 gemmaro <gemmaro.dev@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -36139,8 +36140,28 @@ creating color scales and calculating color distances.")
        (method url-fetch)
        (uri (cran-uri "ore" version))
        (sha256
-        (base32 "11b952icdjv2g3pfbap7kyphwvbl3dssyvd61f0wrv7prscl8pbz"))))
+        (base32 "11b952icdjv2g3pfbap7kyphwvbl3dssyvd61f0wrv7prscl8pbz"))
+       (modules '((guix build utils)))
+       (snippet
+        '(begin
+           ;; Remove Onigmo sources
+           (delete-file "configure")
+           (delete-file "configure.ac")
+           (delete-file "configure.win")
+           (delete-file-recursively "src/onig")
+           (substitute* "src/Makevars"
+             ;; Remove Onigmo objects
+             (("^OBJECTS_ENC = .*")
+              "")
+             (("^OBJECTS_ONIG = .*")
+              "")
+             (("^(OBJECTS = .*?) $\\(OBJECTS_ONIG\\) .*" _ objects)
+              objects)
+             (("^PKG_CPPFLAGS = .*")
+              "PKG_CPPFLAGS = -DUNALIGNED_WORD_ACCESS=0
+PKG_LIBS = -lonigmo"))))))
     (build-system r-build-system)
+    (inputs (list onigmo))
     (home-page "https://github.com/jonclayden/ore")
     (synopsis "R interface to the Onigmo regular expression library")
     (description
