@@ -1592,45 +1592,12 @@ write native speed custom Git applications in any language with bindings.")
                '(begin
                   (delete-file-recursively "deps")))))))
 
+;; As of 2026-MM-DD.  If you see this warning, you're in trouble.
+(define-deprecated-package libgit2-1.3 libgit2-1.5)
+
 (define-public libgit2
   ;; Default version of libgit2.
   libgit2-1.9)
-
-(define-public libgit2-1.3
-  (package
-    (inherit libgit2-1.5)
-    (version "1.3.2")
-    (source (origin
-              (inherit (package-source libgit2-1.5))
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/libgit2/libgit2")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name "libgit2" version))
-              (sha256
-               (base32
-                "1dngga8jq419z6ps65wpmh2jihcf70k6r98pb1m1yiwj7qqh9792"))))
-    (arguments
-     (substitute-keyword-arguments (package-arguments libgit2-1.5)
-       ((#:configure-flags _ #~'())
-        ;; XXX: Drop '-DUSE_SHA1=HTTPS' to avoid a major rebuild.
-        #~(list "-DUSE_NTLMCLIENT=OFF"
-                "-DREGEX_BACKEND=pcre2"
-                "-DUSE_HTTP_PARSER=system"
-                "-DUSE_SSH=ON" ; cmake fails to find libssh if this is missing
-                ;; See https://github.com/libgit2/libgit2/issues/7169
-                #$@(if (target-32bit?)
-                       '("-DCMAKE_C_FLAGS=-D_FILE_OFFSET_BITS=64")
-                       '())))
-       ((#:phases _ '%standard-phases)
-        `(modify-phases %standard-phases
-           ;; Run checks more verbosely, unless we are cross-compiling.
-           (replace 'check
-             (lambda* (#:key (tests? #t) #:allow-other-keys)
-               (if tests?
-                   (invoke "./libgit2_clar" "-v" "-Q")
-                   ;; Tests may be disabled if cross-compiling.
-                   (format #t "Test suite not run.~%"))))))))))
 
 (define-public git-issue
   (let ((commit "d056998566d30235072b97982756ff607e9ecce9")
