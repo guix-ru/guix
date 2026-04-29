@@ -2835,6 +2835,31 @@ language understood by ocamldoc.")))
                          ocaml-yojson
                          jq))))
 
+(define-public ocaml-gg
+  (package
+    (name "ocaml5-gg")
+    (version "1.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://erratique.ch/repos/gg/")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "0zv4h6r2cfdmqi493qq6cafkcd2wnr22n2ny2f6a369schmna7id"))))
+    (build-system ocaml-build-system)
+    (arguments
+     '(#:build-flags '("build" "--tests" "true")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
+    (home-page "https://erratique.ch/software/gg")
+    (synopsis "Basic types and tools for computer graphics in OCaml")
+    (description "Gg provides basic types for computer graphics.  It defines
+types and functions for floats, vectors, points, sizes, matrices, quaternions,
+axis-aligned boxes, colors, color spaces, and raster data.")
+    (license license:isc)))
+
 (define-public ocaml-graphics
   (package
     (name "ocaml5-graphics")
