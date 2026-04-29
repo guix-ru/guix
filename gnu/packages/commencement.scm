@@ -783,7 +783,6 @@ MesCC-Tools), and finally M2-Planet.")
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref %outputs "out"))
                     (tcc (assoc-ref %build-inputs "tcc-boot0"))
-                    (libc (assoc-ref %build-inputs "libc"))
                     (interpreter "/mes/loader"))
                (invoke "sh" "configure"
                        (string-append "--cc=tcc")
@@ -797,7 +796,6 @@ MesCC-Tools), and finally M2-Planet.")
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref %outputs "out"))
                     (tcc (assoc-ref %build-inputs "tcc-boot0"))
-                    (libc (assoc-ref %build-inputs "libc"))
                     (interpreter "/mes/loader"))
                (invoke
                 "tcc"
