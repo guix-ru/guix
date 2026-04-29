@@ -3456,7 +3456,7 @@ exec ~a/bin/~a-~a -B~a/lib -Wl,-dynamic-linker -Wl,~a/~a \"$@\"~%"
 (define (%boot4-inputs)
   ;; Now use the final Bash.
   (cons* bash-final
-         (delete (%boot0-bash) (%boot3-inputs))))
+         (delete bash-mesboot (%boot3-inputs))))
 
 (define with-boot4
   (package-with-explicit-inputs
