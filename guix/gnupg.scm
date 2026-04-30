@@ -154,13 +154,14 @@ revoked.  Return a status s-exp if GnuPG failed."
           (loop (read-line input)
                 (cons (status-line->sexp line) result)))))
 
-  (let* ((pipe   (open-pipe* OPEN_READ (%gpgv-command) "--status-fd=1"
-                             "--keyring" keyring sig file))
-         (status (parse-status pipe)))
-    ;; Ignore PIPE's exit status since STATUS above should contain all the
-    ;; info we need.
-    (close-pipe pipe)
-    status))
+  (let* ((input+output (pipe))
+         (gpgv (%gpgv-command))
+         (gpgv-flags (list gpgv "--status-fd=1" "--keyring"
+                           keyring sig file))
+         (pid (spawn (%gpgv-command) gpgv-flags
+                     #:output (cdr input+output))))
+    (close-port (cdr input+output))
+    (parse-status (car input+output))))
 
 (define (gnupg-status-good-signature? status)
   "If STATUS, as returned by `gnupg-verify', denotes a good signature, return
@@ -193,13 +194,15 @@ GnuPG's default/configured one.  The key is added to KEYRING."
     (mkdir-p (dirname keyring))
     (call-with-output-file keyring (const #t))) ;create an empty keybox
 
-  (zero? (apply system*
-                `(,(%gpg-command)
-                  ,@(if server
-                        (list "--keyserver" server)
-                        '())
-                  "--no-default-keyring" "--keyring" ,keyring
-                  "--recv-keys" ,fingerprint/key-id))))
+  (let* ((keyserver-flags (if server '("--keyserver" server) '()))
+         (default-flags (list "--no-default-keyring"
+                              "--keyring" keyring
+                              "--recv-keys" fingerprint/key-id))
+         (gpg-flags (append keyserver-flags default-flags))
+         (pid (spawn (%gpg-command) gpg-flags)))
+        (match (waitpid pid)
+          ((_ . status)
+           (zero? status)))))
 
 (define* (gnupg-verify* sig file
                         #:key

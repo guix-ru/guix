@@ -750,6 +750,9 @@ FILE."
 (set! mkdir
   (error-reporting-wrapper mkdir (directory . args) directory))
 
+(set! spawn
+  (error-reporting-wrapper spawn (filename . args) filename))
+
 (define (make-regexp* regexp . flags)
   "Like 'make-regexp' but error out if REGEXP is invalid, reporting the error
 nicely."
