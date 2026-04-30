@@ -3410,7 +3410,6 @@ OPAM.")
                            (string-append "\"" bwrap "\"")))))))))
     (inputs (list bubblewrap))
     (propagated-inputs (list ocaml-base64
-                             ocaml-cmdliner
                              ocaml-opam-repository
                              ocaml-opam-solver
                              ocaml-opam-state
