@@ -3463,11 +3463,13 @@ allow = always")
                         ;; functionality
                         (("diff init.test init.out")
                          "run true")
-                        ;; Opam commit c4d912e normalizes test output to
-                        ;; exclude version strings, but this seems to break
-                        ;; some output assertions if $BASEDIR happens to
-                        ;; include the version.
+                        ;; These tests try to normalize output to exclude
+                        ;; version strings, but this seems to break some
+                        ;; output assertions if $BASEDIR happens to include
+                        ;; the version.
                         (("diff cli-versioning.test cli-versioning.out")
+                         "run true")
+                        (("diff hooks-variables.test hooks-variables.out")
                          "run true")
                         ;; Fails on noisy git output.
                         (("diff action-disk.test action-disk.out")
@@ -3507,7 +3509,6 @@ allow = always")
                                                                   commit))
                                         (sha256 (base32 hash))))))
                      `(("dune" ,dune)
-                       ("ocaml-cppo" ,ocaml-cppo)
 
                        ;; For tests.
                        ("git" ,git-minimal/pinned)
