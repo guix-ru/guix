@@ -3205,7 +3205,7 @@ See https://spdx.org/licenses/ for more details.")
 (define ocaml-opam-core
   (package
     (name "ocaml5-opam-core")
-    (version "2.4.1")
+    (version "2.5.1")
     (source
      (origin
        (method git-fetch)
@@ -3214,7 +3214,7 @@ See https://spdx.org/licenses/ for more details.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0php0b31cwyabhds477abk8qyz4whl3kncpbka4dynzpaf9xnqsm"))))
+        (base32 "10diw6wdl6v89kbvb8x22dbfacw1ikhl63hybyp2s7560450hygc"))))
     (build-system dune-build-system)
     (arguments
      `(#:package "opam-core"
@@ -3234,20 +3234,18 @@ See https://spdx.org/licenses/ for more details.")
                              ocaml-re
                              ocaml-patch
                              ocaml-uutf
-                             ocaml-cppo
                              ocaml-swhid-core
                              ocaml-jsonm
-                             ocaml-cmdliner
                              ocaml-sha))
-    (inputs (list bubblewrap ocaml-patch ocaml-uutf))
-    (home-page "https://opam.ocamlpro.com/")
+    (inputs (list bubblewrap))
+    (home-page "https://opam.ocaml.org")
     (synopsis "Package manager for OCaml")
     (description
      "OPAM is a tool to manage OCaml packages.  It supports multiple
 simultaneous compiler installations, flexible package constraints, and a
 Git-friendly development workflow.")
-    ;; The 'LICENSE' file waives some requirements compared to LGPLv3.
-    (license license:lgpl3)))
+    ;; The 'LICENSE' file waives some requirements compared to LGPLv2.1.
+    (license license:lgpl2.1)))
 
 (define ocaml-opam-format
   (package
