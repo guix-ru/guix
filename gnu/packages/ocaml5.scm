@@ -689,7 +689,7 @@ representation.")
        (sha256
         (base32 "0h2mjyzhay1p4k7n0mzaa7hlc7875kiy6m1i3r1n03j6hddpzahi"))))
     (build-system ocaml-build-system)
-    (native-inputs (list ocamlbuild opaline))
+    (native-inputs (list ocamlbuild opam-installer))
     (propagated-inputs (list ocaml-topkg))
     (arguments
      `(#:tests? #f
