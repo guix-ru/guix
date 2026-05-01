@@ -498,7 +498,7 @@ for mapping files in memory.  This function is the same as the
        (sha256
         (base32 "1ykhg9gd3iy7zsgyiy2p9b1wkpqg9irw5pvcqs3sphq71iir4ml6"))))
     (build-system ocaml-build-system)
-    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
     (arguments
      `(#:tests? #f
        #:build-flags (list "build")
