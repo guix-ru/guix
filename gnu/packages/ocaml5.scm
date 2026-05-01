@@ -585,7 +585,7 @@ string values and to directly encode characters in OCaml Buffer.t values.")
        (sha256
         (base32 "0q8j2in2473xh7k4hfgnppv9qy77f2ih89yp6yhpbp92ba021yzi"))))
     (build-system ocaml-build-system)
-    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
     (propagated-inputs (list ocaml-cmdliner ocaml-stdlib-shims))
     (arguments
      `(#:tests? #f
