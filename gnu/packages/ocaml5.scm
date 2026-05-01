@@ -4697,6 +4697,30 @@ browsers and Node.js.")
     (home-page "https://ocsigen.org/js_of_ocaml/")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-owl-base
+  (package
+    (name "ocaml5-owl-base")
+    (version "1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/owlbarn/owl")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0j0cdz5mpsqp98v5ic7c71ka7nwph7c6wyd9rf1jnwq5jz5zlbp1"))))
+    (build-system dune-build-system)
+    (arguments `(#:package "owl-base"))
+    (home-page "https://github.com/owlbarn/owl")
+    (synopsis "Base library of the Owl package")
+    (description
+     "Owl is an OCaml numerical library.  It supports N-dimensional arrays,
+dense and sparse matrix operations, linear algebra, regressions, fast Fourier
+transforms, algorithmic differentiation, and other advanced mathematical and
+statistical functions (such as Markov chain, or Monte Carlo methods).")
+    (license license:expat)))
+
 (define-public ocaml-pecu
   (package
     (name "ocaml5-pecu")
