@@ -333,20 +333,21 @@ file; as a result, it is often used in conjunction with \"tar\", resulting in
            #~(modify-phases %standard-phases
                (add-after 'set-paths 'hide-input-bzip2
                  (lambda* (#:key inputs #:allow-other-keys)
-                   (let ((bzip2 (assoc-ref inputs "bzip2")))
-                     (if bzip2
+                   (let ((libbz2.so (false-if-exception
+                                     (search-input-file inputs "lib/libbz2.so"))))
+                     (if libbz2.so
                          ;; Prevent the build system from retaining a reference to
-                         ;; BZIP2 from INPUTS.
+                         ;; BZIP2 from INPUTS (used in both implicit and bootstrap).
                          (begin
-                           (setenv "LIBRARY_PATH"
-                                   (string-join (delete (string-append bzip2 "/lib")
-                                                        (string-split (getenv "LIBRARY_PATH")
-                                                                      #\:))
-                                                ":"))
+                           (let ((library-path (string-split (getenv "LIBRARY_PATH")
+                                                             #\:)))
+                             (setenv "LIBRARY_PATH"
+                                     (string-join (delete (dirname libbz2.so)
+                                                          library-path)
+                                                  ":")))
                            (format #t "environment variable `LIBRARY_PATH' set to `~a'~%"
                                    (getenv "LIBRARY_PATH")))
-                         (format #t "no bzip2 found, nothing done~%"))
-                     #t)))
+                         (format #t "no bzip2 found, nothing done~%")))))
                (replace 'configure
                  (lambda* (#:key target #:allow-other-keys)
                    (when #$(%current-target-system)
