@@ -54,6 +54,11 @@
     ;; <http://lists.openembedded.org/pipermail/openembedded-core/2012-April/059850.html>.
     (list
       #:parallel-build? #f
+      #:make-flags
+      #~#$(if (and (not (%current-target-system))
+                   (target-hurd?))
+              #~'("XFAIL_TESTS=test-open")
+              #~'())
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'install 'move-static-library
