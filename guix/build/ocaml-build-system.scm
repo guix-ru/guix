@@ -95,19 +95,13 @@
              (string-append "-" install-target) build-flags))
      ((file-exists? "Makefile")
       (apply invoke "make" install-target make-flags))
-     ;; Use either opam-installer or opaline, which both understand
-     ;; opam's `.install` file format.  opam-installer is the standard
-     ;; platform tool, while opaline is a fallback for packages with
-     ;; circular dependencies involving opam.
-     ;; (https://codeberg.org/guix/guix/issues/3588)
+     ;; If there's no Makefile, look for an `.install` file that can be
+     ;; processed by opam-installer.
      ((which "opam-installer")
       (invoke "opam-installer" "-i" (string-append "--prefix=" out)
               (string-append "--libdir=" out "/lib/ocaml/site-lib")))
-     ((which "opaline")
-      (invoke "opaline" "-prefix" out
-              "-libdir" (string-append out "/lib/ocaml/site-lib")))
-     (else (error (string-append "Either 'opam-installer' or 'opaline' "
-                                 "must exist in $PATH at build time.")))))
+     (else (error
+            "'opam-installer' must exist in $PATH at build time."))))
   #t)
 
 (define* (prepare-install #:key outputs #:allow-other-keys)
