@@ -57,6 +57,7 @@
   #:use-module (gnu packages libevent)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages m4)
+  #:use-module (gnu packages maths)
   #:use-module (gnu packages node)
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
@@ -4797,6 +4798,21 @@ statistical functions (such as Markov chain, or Monte Carlo methods).")
 the @uref{https://docs.scipy.org/doc/numpy-1.14.2/neps/npy-format.html, npy
 format spec}.")
       (license license:asl2.0))))
+
+(define-public ocaml-owl
+  (package
+    (inherit ocaml-owl-base)
+    (name "ocaml5-owl")
+    (arguments
+     (substitute-keyword-arguments (package-arguments ocaml-owl-base)
+       ((#:package _ #f) "owl")))
+    (propagated-inputs (list openblas
+                             ocaml-ctypes
+                             dune-configurator
+                             ocaml-owl-base
+                             ocaml-npy))
+    (native-inputs (list ocaml-alcotest ocaml-base))
+    (synopsis "OCaml Scientific and Engineering Computing")))
 
 (define-public ocaml-pecu
   (package
