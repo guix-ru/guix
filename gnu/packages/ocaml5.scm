@@ -532,7 +532,7 @@ immutability.")
      `(#:build-flags (list "build" "--tests" "true" "--with-cmdliner" "true")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
-    (native-inputs (list ocamlbuild opaline))
+    (native-inputs (list ocamlbuild opam-installer))
     (propagated-inputs (list ocaml-cmdliner ocaml-topkg))
     (home-page "https://erratique.ch/software/uuidm")
     (synopsis "Universally unique identifiers for OCaml")
