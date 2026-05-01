@@ -781,7 +781,7 @@ message report is decoupled from logging and is handled by a reporter.")
        #:build-flags (list "build")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
-    (native-inputs (list ocamlbuild opaline))
+    (native-inputs (list ocamlbuild opam-installer))
     (propagated-inputs (list ocaml-topkg
                              ocaml-astring
                              ocaml-fmt
