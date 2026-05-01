@@ -55,6 +55,7 @@
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages libevent)
+  #:use-module (gnu packages libffi)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages node)
   #:use-module (gnu packages parallel)
@@ -3911,6 +3912,34 @@ writing to these structures, and they are accessed via the Bigarray module.")
 signed and unsigned integer types, together with aliases such as long and
 size_t whose sizes depend on the host platform.")
     (license license:expat)))
+
+(define-public ocaml-ctypes
+  (package
+   (name "ocaml5-ctypes")
+   (version "0.24.0")
+   (home-page "https://github.com/yallop/ocaml-ctypes")
+   (source (origin
+             (method git-fetch)
+             (uri (git-reference
+                    (url home-page)
+                    (commit version)))
+             (file-name (git-file-name name version))
+             (sha256
+              (base32
+               "03vhmh692sakfklk0bxa3f5x30092c1mapy28v46jnhjygxn8njs"))))
+   (build-system dune-build-system)
+   (propagated-inputs (list ocaml-bigarray-compat ocaml-integers))
+   (native-inputs (list pkg-config ocaml-ounit2 ocaml-lwt))
+   (inputs (list libffi))
+   (synopsis "Combinators for binding to C libraries without writing any C")
+   (description "Ctypes is a library for binding to C libraries using pure
+OCaml.  The primary aim is to make writing C extensions as straightforward as
+possible.  The core of ctypes is a set of combinators for describing the
+structure of C types -- numeric types, arrays, pointers, structs, unions and
+functions.  You can use these combinators to describe the types of the
+functions that you want to call, then bind directly to those functions -- all
+without writing or generating any C!")
+   (license license:expat)))
 
 (define-public ocaml-domain-name
   (package
