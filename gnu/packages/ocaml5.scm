@@ -814,7 +814,7 @@ run command line programs.")
        #:build-flags (list "build")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
-    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
     (propagated-inputs (list ocaml-uutf ocaml-cmdliner))
     (home-page "https://erratique.ch/software/jsonm")
     (synopsis "Non-blocking streaming JSON codec for OCaml")
