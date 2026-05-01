@@ -722,7 +722,7 @@ library.")
        #:build-flags (list "build")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
-    (native-inputs (list ocamlbuild opaline))
+    (native-inputs (list ocamlbuild opam-installer))
     (propagated-inputs (list ocaml-topkg ocaml-astring))
     (home-page "https://erratique.ch/software/fpath")
     (synopsis "File system paths for OCaml")
