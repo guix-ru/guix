@@ -749,7 +749,7 @@ file system and is independent from any system library.")
        #:build-flags (list "build" "--with-js_of_ocaml" "false")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
-    (native-inputs (list ocamlbuild opaline))
+    (native-inputs (list ocamlbuild opam-installer))
     (propagated-inputs (list ocaml-fmt
                              ocaml-lwt
                              ocaml-mtime
