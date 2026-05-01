@@ -130,8 +130,8 @@
 (define (default-ocaml5.0-dune)
   (@* (gnu packages ocaml) ocaml5.0-dune))
 
-(define (default-ocaml5.3)
-  (@* (gnu packages ocaml5) ocaml-5.3))
+(define (default-ocaml5.4)
+  (@* (gnu packages ocaml5) ocaml-5.4))
 
 (define (default-ocaml5.4-findlib)
   (@* (gnu packages ocaml5) ocaml5.4-findlib))
@@ -141,7 +141,7 @@
 
 ;; The default versions of core packages within the 5.x series.
 
-(define default-ocaml5 default-ocaml5.3)
+(define default-ocaml5 default-ocaml5.4)
 
 (define default-ocaml5-findlib default-ocaml5.4-findlib)
 
@@ -252,7 +252,7 @@ pre-defined variants."
     (properties (alist-delete 'ocaml5.0-variant (package-properties p)))))
 
 (define package-with-ocaml5.4
-  (package-with-explicit-ocaml (delay (default-ocaml5.3))
+  (package-with-explicit-ocaml (delay (default-ocaml5.4))
                                (delay (default-ocaml5.4-findlib))
                                (delay (default-ocaml5.4-dune))
                                "ocaml-" "ocaml5.4-"

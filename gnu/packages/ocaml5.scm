@@ -205,7 +205,7 @@ functional, imperative and object-oriented styles of programming.")
 
 ;; The default ocaml 5.x compiler, for those packages that depend on a
 ;; compiler explicitly.
-(define-public ocaml ocaml-5.3)
+(define-public ocaml ocaml-5.4)
 
 (define-public ocamlbuild
   (package
@@ -1413,7 +1413,7 @@ simple (yet expressive) query language to select the tests to run.")
 (define %dune-base
   (package
     (name "ocaml5-dune-base")
-    (version "3.19.1")
+    (version "3.22.2")
     (source
      (origin
        (method git-fetch)
@@ -1422,7 +1422,7 @@ simple (yet expressive) query language to select the tests to run.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01ys792jnld5yihhyirwkk4jlqm59bk0vrqjvvk5xjn8pp26vryq"))))
+        (base32 "0gnv5926xmvsna0bvgymj1rr9awkrc9krij6zbjnx90mcf091bsv"))))
     (build-system dune-build-system)
     (home-page "https://github.com/ocaml/dune")
     (synopsis "OCaml build system")
@@ -1741,6 +1741,30 @@ about.")
     (synopsis "Dune dynamic types")
     (description "This library represents dynamic types in OCaml.")))
 
+(define-public ocaml-dune-fs-io
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-fs-io")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "fs-io")))
+    (propagated-inputs (list ocaml-base))
+    (synopsis "Dune file system operations")
+    (description "This library is a collection of file system operations in OCaml.")))
+
+(define-public ocaml-dune-top-closure
+  (package
+    (inherit %dune-lib-base)
+    (name "ocaml5-dune-top-closure")
+    (build-system dune-build-system)
+    (arguments
+     (substitute-keyword-arguments (package-arguments %dune-lib-base)
+       ((#:package _ #f) "top-closure")))
+    (propagated-inputs (list ocaml-base))
+    (synopsis "Dune topological closure")
+    (description "This library is a generic topological closure in OCaml.")))
+
 (define-public ocaml-stdune
   (package
     (inherit %dune-lib-base)
@@ -1748,8 +1772,13 @@ about.")
     (arguments
      (substitute-keyword-arguments (package-arguments %dune-lib-base)
        ((#:package _ #f) "stdune")))
-    (propagated-inputs (list ocaml-dune-dyn ocaml-pp))
-    (native-inputs (list ocaml-ppx-expect ocaml-dune-xdg ocaml-dune-chrome-trace))
+    (propagated-inputs (list ocaml-base
+                             ocaml-csexp
+                             ocaml-dune-dyn
+                             ocaml-dune-fs-io
+                             ocaml-dune-ordering
+                             ocaml-pp
+                             ocaml-dune-top-closure))
     (synopsis "Unstable standard library from Dune")
     (description
      "This library implements the standard functions used by Dune.")))
@@ -1803,6 +1832,7 @@ This library offers no backwards compatibility guarantees.")))
      (substitute-keyword-arguments (package-arguments %dune-lib-base)
        ((#:package _ #f) "dune-rpc")))
     (propagated-inputs (list ocaml-csexp
+                             ocaml-dune-ocamlc-loc
                              ocaml-dune-ordering
                              ocaml-dune-dyn
                              ocaml-dune-xdg
@@ -2875,7 +2905,7 @@ i.e. the let%expect_test syntax.")
 (define %ocaml-odoc-base
   (package
     (name "ocaml5-odoc-base")
-    (version "3.0.0")
+    (version "3.2.1")
     (source
      (origin
        (method git-fetch)
@@ -2884,7 +2914,7 @@ i.e. the let%expect_test syntax.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0azxv64jfgncq11ys9li9mn2vc3s5a5k48pbnrj3qmaj2xzkslbw"))))
+        (base32 "0xfgg4zzkmfgw1jdpcdy38iz5nd86bddmbzip5xiaq1f4wpmxlc7"))))
     (build-system dune-build-system)
   (home-page "https://github.com/ocaml/odoc")
     (synopsis "OCaml documentation generator")
@@ -4015,7 +4045,7 @@ match expressions, and if expressions.")
 (define %ocaml-merlin-base
   (package
     (name "ocaml5-merlin-base")
-    (version "5.5-503")
+    (version "5.7.1-504")
     (source
      (origin
        (method git-fetch)
@@ -4024,7 +4054,7 @@ match expressions, and if expressions.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1qzj4aqx5x76ldwhpxzz2ynjdh43l8nk6lmj93hr53c6ykrgn9nw"))))
+        (base32 "1qi0rfka66gsq6aq4n18xg872b58yn2n6yh6g11s1z0dwjqwgwj2"))))
     (build-system dune-build-system)
     (home-page "https://ocaml.github.io/merlin/")
     (synopsis "Code completion, typing, and navigation in Vim and Emacs")
@@ -4174,7 +4204,7 @@ servers.  This is currently used only by ocaml-lsp.")))
 (define %ocaml-lsp-base
   (package
     (name "ocaml5-lsp-base")
-    (version "1.23.1")
+    (version "1.26.0")
     (home-page "https://github.com/ocaml/ocaml-lsp")
     (source
      (origin
@@ -4183,7 +4213,7 @@ servers.  This is currently used only by ocaml-lsp.")))
              (url home-page)
              (commit version)))
        (sha256
-        (base32 "1h02bgf3glf6d6mghk32ds8xm6a7h575f1zf9qkgr6y946rh0760"))
+        (base32 "0s22w4zc0m5q5w73gpi7waai4hidsgbccylflfsnhdfqm27dmk83"))
        (snippet #~(begin (use-modules (guix build utils))
                          ;; ocaml-lsp tends to vendor snapshots of
                          ;; dependencies containing critical fixes before
