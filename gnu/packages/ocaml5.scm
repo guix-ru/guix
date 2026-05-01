@@ -61,6 +61,7 @@
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages rsync)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages unicode)
@@ -4720,6 +4721,31 @@ dense and sparse matrix operations, linear algebra, regressions, fast Fourier
 transforms, algorithmic differentiation, and other advanced mathematical and
 statistical functions (such as Markov chain, or Monte Carlo methods).")
     (license license:expat)))
+
+(define-public ocaml-npy
+  (let ((commit "e37dddf5130b848d501fbef9fc7b6c49da542de3")
+        (revision "0"))
+    (package
+      (name "ocaml5-npy")
+      (version (git-version "0.0.9" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/LaurentMazare/npy-ocaml")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1bxnq3w4f9b7bp0b8zwyv8s24d1c8bxlkg68v6chmlkxzfcis3l8"))))
+      (build-system dune-build-system)
+      (propagated-inputs (list camlzip))
+      (native-inputs (list python-wrapper python-numpy))
+      (home-page "https://github.com/LaurentMazare/npy-ocaml")
+      (synopsis "Numpy file format support for OCaml")
+      (description "This package is a simple implementation of version 1.0 of
+the @uref{https://docs.scipy.org/doc/numpy-1.14.2/neps/npy-format.html, npy
+format spec}.")
+      (license license:asl2.0))))
 
 (define-public ocaml-pecu
   (package
