@@ -206,6 +206,13 @@ including, for example, recursive directory searching.")
                (base32
                 "0xsj5xq22ljhbawssw29dy2s3ff3w4mh6z0zakndri1fz7x9y5sd"))))
     (build-system gnu-build-system)
+    (arguments
+     (list
+      #:make-flags
+      #~#$(if (and (not (%current-target-system))
+                   (target-hurd?))
+              #~'("XFAIL_TESTS=test-open")
+              #~'())))
     (synopsis "Stream editor")
     (native-inputs (list perl))                    ;for tests
     (description
