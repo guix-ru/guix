@@ -3890,6 +3890,28 @@ writing to these structures, and they are accessed via the Bigarray module.")
     (propagated-inputs (modify-inputs (package-propagated-inputs ocaml-cstruct)
                          (append ocaml-cstruct ocaml-ppxlib ocaml-sexplib)))))
 
+(define-public ocaml-integers
+  (package
+    (name "ocaml5-integers")
+    (version "0.7.0")
+    (home-page "https://github.com/yallop/ocaml-integers")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url home-page)
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0c0bmy53ag6504kih0cvnp4yf7mbcimb18m1mgs592ffb0zj1rff"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-stdlib-shims))
+    (synopsis "Various signed and unsigned integer types for OCaml")
+    (description "This library provides a number of 8-, 16-, 32- and 64-bit
+signed and unsigned integer types, together with aliases such as long and
+size_t whose sizes depend on the host platform.")
+    (license license:expat)))
+
 (define-public ocaml-domain-name
   (package
     (name "ocaml5-domain-name")
