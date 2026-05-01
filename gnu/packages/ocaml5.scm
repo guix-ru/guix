@@ -666,7 +666,7 @@ spans without being subject to operating system calendar time adjustments.")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
     (propagated-inputs (list ocaml-result))
-    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
     (home-page "https://erratique.ch/software/ptime")
     (synopsis "POSIX time for OCaml")
     (description
