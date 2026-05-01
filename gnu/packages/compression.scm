@@ -321,7 +321,11 @@ file; as a result, it is often used in conjunction with \"tar\", resulting in
                 "0s92986cv0p692icqlw1j42y9nld8zd83qwhzbqd61p1dqbh6nmb"))))
     (build-system gnu-build-system)
     (arguments
-     (list #:modules '((guix build gnu-build-system)
+     (list #:make-flags #~(list (string-append "PREFIX=" #$output))
+           ;; Don't attempt to run the tests when cross-compiling.
+           #:tests? (not (%current-target-system))
+
+           #:modules '((guix build gnu-build-system)
                        (guix build utils)
                        (ice-9 ftw)
                        (srfi srfi-1))
@@ -356,8 +360,7 @@ file; as a result, it is often used in conjunction with \"tar\", resulting in
                         (string-append "RANLIB = " target "-ranlib\n"))
                        (("^all:(.*)test" _ prerequisites)
                         ;; Remove 'all' -> 'test' dependency.
-                        (string-append "all:" prerequisites "\n"))))
-                   #t))
+                        (string-append "all:" prerequisites "\n"))))))
                (add-before 'build 'build-shared-lib
                  (lambda* (#:key inputs #:allow-other-keys)
                    (patch-makefile-SHELL "Makefile-libbz2_so")
@@ -366,8 +369,7 @@ file; as a result, it is often used in conjunction with \"tar\", resulting in
                  (lambda* (#:key outputs #:allow-other-keys)
                    ;; The Makefile above does not have an 'install' target, nor does
                    ;; it create all the (un)versioned symlinks, so we handle it here.
-                   (let* ((out    (assoc-ref outputs "out"))
-                          (libdir (string-append out "/lib"))
+                   (let* ((libdir (string-append #$output "/lib"))
                           (soname "libbz2.so")
                           ;; Locate the built library (e.g. "libbz2.so.1.0.6").
                           (lib (car (scandir "."
@@ -384,28 +386,16 @@ file; as a result, it is often used in conjunction with \"tar\", resulting in
                          (unless (null? numbers)
                            (let ((so-file (string-append base "." (car numbers))))
                              (symlink so-file base)
-                             (loop so-file (cdr numbers))))))
-                     #t)))
+                             (loop so-file (cdr numbers)))))))))
                (add-after 'install-shared-lib 'move-static-lib
-                 (lambda* (#:key outputs #:allow-other-keys)
-                   (let ((out (assoc-ref outputs "out"))
-                         (static (assoc-ref outputs "static")))
-                     (with-directory-excursion (string-append out "/lib")
-                       (install-file "libbz2.a" (string-append static "/lib"))
-                       (delete-file "libbz2.a")
-                       #t))))
+                 (lambda _
+                   (with-directory-excursion (string-append #$output "/lib")
+                     (install-file "libbz2.a" (string-append #$output:static "/lib"))
+                     (delete-file "libbz2.a"))))
                (add-after 'install-shared-lib 'patch-scripts
-                 (lambda* (#:key outputs inputs #:allow-other-keys)
-                   (let* ((out (assoc-ref outputs "out")))
-                     (substitute* (string-append out "/bin/bzdiff")
-                       (("/bin/rm") "rm")))
-                   #t)))
-
-           #:make-flags #~(list (string-append "PREFIX="
-                                               (assoc-ref %outputs "out")))
-
-           ;; Don't attempt to run the tests when cross-compiling.
-           #:tests? (not (%current-target-system))))
+                 (lambda _
+                   (substitute* (string-append #$output "/bin/bzdiff")
+                     (("/bin/rm") "rm")))))))
     (inputs (if (%current-target-system)
                 (list bash-minimal)
                 (list)))
