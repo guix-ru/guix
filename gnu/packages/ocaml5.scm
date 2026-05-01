@@ -559,7 +559,7 @@ and 4 (random based) according to RFC 4122.")
        #:build-flags (list "build")
        #:phases ,#~(modify-phases %standard-phases
                      (delete 'configure))))
-    (native-inputs (list ocamlbuild ocaml-topkg opaline))
+    (native-inputs (list ocamlbuild ocaml-topkg opam-installer))
     (propagated-inputs (list ocaml-cmdliner))
     (home-page "https://erratique.ch/software/uutf")
     (synopsis "Non-blocking streaming Unicode codec for OCaml")
