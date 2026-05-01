@@ -308,7 +308,7 @@ defined in this library.")
                 "11ycfk0prqvifm9jca2308gw8a6cjb1hqlgfslbji2cqpan09kpq"))))
     (build-system ocaml-build-system)
     (native-inputs
-     (list ocamlbuild opaline))
+     (list ocamlbuild opam-installer))
     (propagated-inputs (list ocaml-result))
     (arguments
      `(#:tests? #f
