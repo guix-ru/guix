@@ -1100,7 +1100,7 @@ external entity (like a human or another program).")
 (define-public ocaml-ounit2
   (package
     (name "ocaml5-ounit2")
-    (version "2.2.6")
+    (version "2.2.7")
     (source
      (origin
        (method git-fetch)
@@ -1109,9 +1109,9 @@ external entity (like a human or another program).")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "04c841hpk2yij370w30w3pis8nibnr28v74mpq2qz7z5gb8l07p1"))))
+        (base32 "142vdamq3000fpqr0wjm2dsqhpmhn1zqhj5rf8c9bf7la413smp2"))))
     (build-system dune-build-system)
-    (propagated-inputs (list ocaml-lwt ocaml-stdlib-shims))
+    (propagated-inputs (list ocaml-seq ocaml-stdlib-shims ocaml-lwt))
     (home-page "https://github.com/gildor478/ounit")
     (synopsis "Unit testing framework for OCaml")
     (description "OUnit2 is a unit testing framework for OCaml.  It is similar
