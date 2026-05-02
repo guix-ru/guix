@@ -58,6 +58,7 @@
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages maths)
+  #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages node)
   #:use-module (gnu packages parallel)
   #:use-module (gnu packages perl)
@@ -5337,6 +5338,46 @@ the trace buffer.")
 architectures and provide a best-effort boxed representation on 32-bit
 architectures.")
     (license license:isc)))
+
+(define-public ocaml-zarith
+  (package
+    (name "ocaml5-zarith")
+    (version "1.14")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ocaml/Zarith")
+              (commit (string-append "release-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "10fjr5ahxl7clikj17wfqj1c7yrvksc0vfzc52vfbwlcpw7c2jn5"))))
+    (build-system ocaml-build-system)
+    (propagated-inputs (list gmp))
+    (arguments
+     `(#:tests? #f                      ; no test target
+       #:phases
+       ,#~(modify-phases %standard-phases
+            (replace 'configure
+              ;; The ocaml-build-system hardcodes the -out argument, but this
+              ;; ./configure script doesn't accept it.
+              (lambda* (#:key configure-flags #:allow-other-keys)
+                (apply invoke "./configure" configure-flags)))
+            (add-after 'install 'move-stublibs
+              (lambda* (#:key outputs #:allow-other-keys)
+                (let* ((lib (string-append #$output "/lib/ocaml/site-lib"))
+                       (stublibs (string-append lib "/stublibs"))
+                       (dll (string-append lib "/zarith/dllzarith.so")))
+                  (mkdir-p stublibs)
+                  (rename-file dll (in-vicinity stublibs "dllzarith.so"))))))))
+    (home-page "https://github.com/ocaml/Zarith")
+    (synopsis "Arbitrary-precision integers")
+    (description "Zarith implements arithmetic and logical operations over
+arbitrary-precision integers.  It uses GMP to efficiently implement arithmetic
+over big integers. Small integers are represented as Caml unboxed integers,
+for speed and space economy.")
+    ;; With static-linking exception
+    (license license:lgpl2.0)))
 
 (define-public ocaml-mirage-kv
   (package
