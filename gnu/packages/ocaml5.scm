@@ -2433,6 +2433,26 @@ ppx_yojson_conv, a ppx rewriter that can be used to convert ocaml types
 to a @code{Yojson.Safe} value.")
     (license license:expat)))
 
+(define-public ocaml-ppx-yojson-conv
+  (package
+    (name "ocaml5-ppx-yojson-conv")
+    (version "0.17.1")
+    (build-system dune-build-system)
+    (source
+     (janestreet-git-origin "ppx_yojson_conv" version
+      "1cpl74k2ic3y0mv0r4jakspy4l7jg3xw9a2ffvqj0yyabwvsx3a0"))
+    (propagated-inputs (list ocaml-base
+                             ocaml-capitalization
+                             ocaml-ppx-js-style
+                             ocaml-ppx-yojson-conv-lib
+                             ocaml-ppxlib))
+    (properties `((upstream-name . "ppx_yojson_conv")))
+    (home-page "https://github.com/janestreet/ppx_yojson_conv")
+    (synopsis "[@@deriving] plugin to generate Yojson conversion functions")
+    (description "ppx_yojson is a ppx rewriter that can be used to convert
+OCaml types to a @code{Yojson.Safe} value.")
+    (license license:expat)))
+
 (define-public ocaml-ppx-compare
   (package
     (name "ocaml5-ppx-compare")
