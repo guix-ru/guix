@@ -165,6 +165,7 @@
   #:use-module (gnu packages gperf)
   #:use-module (gnu packages graphics)
   #:use-module (gnu packages graphviz)
+  #:use-module (gnu packages groff)
   #:use-module (gnu packages gsasl)
   #:use-module (gnu packages gstreamer)
   #:use-module (gnu packages gtk)
@@ -2791,77 +2792,120 @@ watch your CPU playing while enjoying a cup of tea!")
 (define-public nethack
   (package
     (name "nethack")
-    (version "3.6.7")
+    (version "5.0.0")
     (source
-      (origin
-        (method url-fetch)
-        (uri
-         (string-append "https://www.nethack.org/download/" version "/nethack-"
-                        (string-join (string-split version #\.) "") "-src.tgz"))
-        (sha256
-          (base32 "1cmc596x8maixi2bkx9kblp3daxw156ahnklc656dygbdpgngkwq"))))
-    (native-inputs
-      (list bison flex))
-    (inputs
-      (list ncurses less))
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/NetHack/NetHack/")
+              (commit (string-append "NetHack-" version "_Released"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1zc2gn3kcrsg3xj4rpsh2k1jz4s8pwqr92ajn3bi5404253fqp5m"))))
     (build-system gnu-build-system)
     (arguments
-      '(#:make-flags
-        `(,(string-append "PREFIX=" (assoc-ref %outputs "out")))
-        #:phases
-        (modify-phases %standard-phases
-          (add-before 'configure 'patch-paths
+     (list
+      ;; Building in parallel might lead to a race condition where lua
+      ;; is copied twice, resulting in this error:
+      ;;   cp: cannot create regular file
+      ;;  'lib/lua/liblua-5.4.8.a': Permission denied
+      #:parallel-build? #f
+      ;; There are tests, but they won't run.
+      ;; The tests in sys/libnh/test seem to be MacOS specific.
+      ;; The tests in the top level test directory require human interaction.
+      #:tests? #f
+      #:make-flags
+      #~(list
+         (string-append "PREFIX=" #$output)
+         ;; Add the -W without overwriting the -I and -D.
+         "CFLAGS=-g -O2 -I../include -DNOTPARMDECL -Wno-error=cast-qual"
+         (string-append "CC=" #$(cc-for-target))
+         (string-append "GREPPATH="
+                        (search-input-file %build-inputs "/bin/grep")))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'do-not-change-to-hackdir
+            ;; The Nethack binary must be run in the HACKDIR (playground).
+            ;; The HACKDIR consists files which are installed in the 'install'
+            ;; phase and is also assumed to be writable.
+            ;; The usual way to start nethack is via this provided wrapper
+            ;; script which handles setting HACKDIR to the location of the
+            ;; installed files and changing to its directory before running the
+            ;; executable.  We will create another wrapper to solve the problem
+            ;; of a writable HACKDIR later; for now, assume that we are already
+            ;; in HACKDIR when executing this wrapper by removing the line to
+            ;; change to it.
+            ;; Removing CHDIR also making the default behavior of Nethack to
+            ;; treat the current dir as HACKDIR rather than change to some
+            ;; compiled-in directory.
             (lambda _
               (substitute* "sys/unix/nethack.sh"
-                (("^ *cd .*$") ""))
-              (substitute* "sys/unix/Makefile.utl"
-                (("^YACC *=.*$") "YACC = bison -y\n")
-                (("^LEX *=.*$") "LEX = flex\n")
-                (("^# CC = gcc") "CC = gcc"))
-              (substitute* "sys/unix/hints/linux"
-                (("/bin/gzip") (string-append
-                                 (assoc-ref %build-inputs "gzip")
-                                 "/bin/gzip"))
-                (("^WINTTYLIB=.*") "WINTTYLIB=-lncurses"))
+                (("cd \\$HACKDIR") ""))
               (substitute* "include/config.h"
-                (("^.*define CHDIR.*$") "")
+                (("^.*define CHDIR.*$") ""))))
+          (add-before 'configure 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "sys/unix/Makefile.top"
+                (("LUAHEADERS *=[^\n]+")
+                 (string-append
+                  "LUAHEADERS ="
+                  (dirname (search-input-file inputs "/include/lua.h"))))
+                (("LUATOP *=[^\n]+")
+                 (string-append
+                  "LUATOP = "
+                  (dirname (search-input-file inputs "/lib/liblua.so"))))
+                ;; Replace the ../ in this line:
+                ;; @echo '#include "../$(LUAHEADERS)/lua.h"' >> $@
+                (("include \"../") "include \""))
+              (substitute* "sys/unix/setup.sh"
+                (("^/bin/sh") (search-input-file inputs "/bin/bash")))
+              (substitute* "sys/unix/sysconf"
+                (("^.*GREPPATH[^\n]+")
+                 (string-append "GREPPATH="
+                                (search-input-file inputs "/bin/grep"))))))
+          (add-before 'configure 'add-compression
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "include/config.h"
+                (("^.*define COMPRESS [^\n]+")
+                 (string-append
+                  "#define COMPRESS \""
+                  (search-input-file inputs "/bin/compress")
+                  "\"")))))
+          (add-before 'configure 'make-reproducible
+            (lambda _
+              (substitute* "include/config.h"
                 (("^/\\* *#*define *REPRODUCIBLE_BUILD *\\*/")
                  ;; Honor SOURCE_DATE_EPOCH.
                  "#define REPRODUCIBLE_BUILD"))
-
               ;; Note: 'makedefs' rejects and ignores dates that are too old
               ;; or too new, so we must choose something reasonable here.
-              (setenv "SOURCE_DATE_EPOCH" "1531865062")
-
-              (substitute* "sys/unix/Makefile.src"
-                 (("^# CC = gcc") "CC = gcc"))
-              #t))
+              (setenv "SOURCE_DATE_EPOCH" "1531865062")))
           (replace 'configure
             (lambda _
-              (let ((bash (string-append
-                            (assoc-ref %build-inputs "bash")
-                            "/bin/bash")))
-                (with-directory-excursion "sys/unix"
-                  (substitute* "setup.sh" (("/bin/sh") bash))
-                  (invoke bash "setup.sh" "hints/linux"))
-                #t)))
-          (add-after 'install 'fixup-paths
-            (lambda _
-              (let* ((output (assoc-ref %outputs "out"))
-                     (nethack-script (string-append output "/bin/nethack")))
-                (mkdir-p (string-append output "/games/lib/nethackuserdir"))
+              (with-directory-excursion "sys/unix"
+                (invoke "./setup.sh" "hints/linux.500"))))
+          (add-after 'install 'make-writable-hackdir
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((nethack-script (string-append #$output "/bin/nethack")))
+                (mkdir-p (string-append #$output "/games/lib/nethackuserdir"))
                 (for-each
-                  (lambda (file)
-                    (rename-file
-                      (string-append output "/games/lib/nethackdir/" file)
-                      (string-append output "/games/lib/nethackuserdir/"
-                                     file)))
-                  '("xlogfile" "logfile" "perm" "record" "save"))
-                (mkdir-p (string-append output "/bin"))
+                 (lambda (file)
+                   (rename-file
+                    (string-append #$output "/games/lib/nethackdir/" file)
+                    (string-append #$output "/games/lib/nethackuserdir/" file)))
+                 ;; These HACKDIR files include the user's save games and are
+                 ;; assumed to be writable.  Set them aside, as described in
+                 ;; https://nethackwiki.com/wiki/Playground.
+                 '("xlogfile" "logfile" "perm" "record" "save"))
+                (mkdir-p (string-append #$output "/bin"))
                 (call-with-output-file nethack-script
+                  ;; Our custom wrapper script, which runs before the provided
+                  ;; wrapper (see phase 'do-not-change-to-hackdir').
+                  ;; Ensure all writable runtime files are in the user's home,
+                  ;; then symlink everything into a temporary HACKDIR and change
+                  ;; to it.
                   (lambda (port)
                     (format port "#!~a/bin/sh
-PATH=~a:$PATH
 if [ ! -d ~~/.config/nethack ]; then
   mkdir -p ~~/.config/nethack
   cp -r ~a/games/lib/nethackuserdir/* ~~/.config/nethack
@@ -2883,20 +2927,21 @@ for i in ~a/games/lib/nethackdir/*; do
   ln -s $i $(basename $i)
 done
 ~a/games/nethack \"$@\""
-                      (assoc-ref %build-inputs "bash")
-                      (list->search-path-as-string
-                        (list
-                          (string-append
-                            (assoc-ref %build-inputs "coreutils") "/bin")
-                          (string-append
-                            (assoc-ref %build-inputs "less") "/bin"))
-                        ":")
-                      output
-                      output
-                      output)))
-                (chmod nethack-script #o555)
-                #t)))
-          (delete 'check))))
+                            (search-input-file inputs "/bin/bash")
+                            #$output
+                            #$output
+                            #$output)))
+                (chmod nethack-script #o555)))))))
+    (native-inputs
+     (list groff-minimal
+           pkg-config))
+    (inputs
+     (list grep
+           less
+           lua-5.4
+           ncompress
+           ncurses/tinfo
+           perl))
     (home-page "https://nethack.org")
     (synopsis "Classic dungeon crawl game")
     (description "NetHack is a single player dungeon exploration game that runs
@@ -2910,8 +2955,8 @@ unlimited number of variations of the dungeon and its denizens to be discovered
 by the player in one of a number of characters: you can pick your race, your
 role, and your gender.")
     (license
-      (license:fsdg-compatible
-        "https://nethack.org/common/license.html"))))
+     (license:fsdg-compatible
+      "https://nethack.org/common/license.html"))))
 
 (define-public netpanzer
   (package
