@@ -467,19 +467,32 @@ windows systems.")
 (define-public libopusenc
   (package
     (name "libopusenc")
-    (version "0.2.1")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://archive.mozilla.org/pub/opus/"
-                                  "libopusenc-" version ".tar.gz"))
-              (sha256
-               (base32
-                "1ffb0vhlymlsq70pxsjj0ksz77yfm2x0a1x8q50kxmnkm1hxp642"))))
+    (version "0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.xiph.org/xiph/libopusenc.git")
+             (commit (string-append "v" version))))
+       (sha256
+        (base32 "147cpqgfyfz6nr85hi4prvcbs3d72zzad48w3rhgld429hhjd34z"))
+       (file-name (git-file-name name version))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config))
-    (propagated-inputs
-     (list opus))
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "--disable-static")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'bootstrap 'write-package_version-file
+            (lambda _
+              (with-output-to-file "package_version"
+                (lambda _
+                  (display
+                   (string-append "AUTO_UPDATE=no\n"
+                                  "PACKAGE_VERSION=\"" #$version "\"")))))))))
+    (native-inputs (list autoconf automake libtool pkg-config))
+    (propagated-inputs (list opus))
     (synopsis "Library for encoding Opus audio files and streams")
     (description "The libopusenc libraries provide a high-level API for
 encoding Opus files and streams.")
