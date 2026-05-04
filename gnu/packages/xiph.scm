@@ -396,31 +396,28 @@ incorporated technology from Skype's SILK codec and Xiph.Org's CELT codec.")
   (package
     (name "opus-tools")
     (version "0.2")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append
-                    "https://downloads.xiph.org/releases/opus/opus-tools-"
-                    version ".tar.gz"))
-              (sha256
-               (base32
-                "11pzl27s4vcz4m18ch72nivbhww2zmzn56wspb7rll1y1nq6rrdl"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.xiph.org/xiph/opus-tools.git")
+             (commit (string-append "v" version))))
+       (sha256
+        (base32 "1g1lrhi0jqk9i9pxmay8jhmy4zhaffbqh2rjhxkacildzl6xrvyz"))
+       (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
-     ;; The package developers misuse pkg-config such that it doesn't work
-     ;; when cross compiling.  Therefore we avoid it completely and set the
-     ;; necessary flags ourselves.
-     `(#:configure-flags (list (string-append "CFLAGS=-I"
-                                              (assoc-ref %build-inputs "libogg")
-                                              "/include -I"
-                                              (assoc-ref %build-inputs "opus")
-                                              "/include/opus"))))
-    (native-inputs
-     (list pkg-config))
-    (inputs
-     (list libopusenc opusfile flac))
+     (substitute-keyword-arguments (package-arguments libopusenc)
+       ((#:configure-flags configure-flags)
+        ;; The mechanism for detecting pkg-config does not work while cross
+        ;; compiling.  Therefore we skip the test by overriding it.
+        #~(list "HAVE_PKG_CONFIG=yes"))))
+    (native-inputs (list autoconf automake libtool pkg-config))
+    (inputs (list flac libopusenc opusfile))
     (synopsis
      "Command line utilities to encode, inspect, and decode .opus files")
-    (description "Opus is a royalty-free, highly versatile audio codec.
+    (description
+     "Opus is a royalty-free, highly versatile audio codec.
 Opus-tools provide command line utilities for creating, inspecting and
 decoding .opus files.")
     (license license:bsd-3)
