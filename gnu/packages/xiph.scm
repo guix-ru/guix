@@ -368,14 +368,14 @@ ogginfo, to obtain information (tags, bitrate, length, etc.) about
 (define-public opus
   (package
     (name "opus")
-    (version "1.5.2")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://downloads.xiph.org/releases/opus/opus-"
-                                  version ".tar.gz"))
-              (sha256
-               (base32
-                "1qbwk9zyhbk185ly8xjq6hwmibair53vx363h80b4bwzigvx5hb5"))))
+    (version "1.6.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://downloads.xiph.org/releases/opus/opus-"
+                           version ".tar.gz"))
+       (sha256
+        (base32 "188i4ibr80az4217q04z22cyrfv4xmk29cqmvy22bsbv429vbz3g"))))
     (build-system gnu-build-system)
     (arguments
      '(#:configure-flags '("--disable-static")))
@@ -387,8 +387,7 @@ but is also intended for storage and streaming applications.  It is
 standardized by the Internet Engineering Task Force (IETF) as RFC 6716 which
 incorporated technology from Skype's SILK codec and Xiph.Org's CELT codec.")
     ;; This package shows a sizable speed increase when tuned.
-    (properties `((tunable? . #t)
-                  (lint-hidden-cpe-vendors . ("discordjs"))))
+    (properties `((tunable? . #t) (lint-hidden-cpe-vendors "discordjs")))
     (license license:bsd-3)
     (home-page "https://www.opus-codec.org")))
 
