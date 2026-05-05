@@ -1921,6 +1921,8 @@ and REV-END, two git revision strings."
   (match args
     (("cc" . team-names)
      (apply cc (map find-team team-names)))
+    (("cc-all-team-members")
+     (apply cc (hash-map->list (lambda (_ team) team) %teams)))
     (("cc-members" patch-file)
      (unless (file-exists? patch-file)
        (error "patch file does not exist:" patch-file))
@@ -1962,6 +1964,8 @@ Commands:
       get git send-email flags for cc-ing <team-name>
   cc-members <start> <end> | <patch>
       cc teams related to files changed between revisions or in a patch file
+  cc-all-team-members
+      cc all members of all teams (useful in GCD processes)
   cc-members-header-cmd <patch>
       cc-members variant for use with 'git send-email --header-cmd'
   cc-mentors-header-cmd <patch>
