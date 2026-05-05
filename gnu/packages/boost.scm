@@ -271,7 +271,8 @@ across a broad spectrum of applications.")
                 "0yrgn6syk260ckq9ld44vjv1bl6bamhy3jbp10kikcipcv0d5na6"))))))
 
 (define-public boost-1.83
-  (package (inherit boost)
+  (package
+    (inherit boost)
     (name "boost")
     (version "1.83.0")
     (source (origin
@@ -313,6 +314,9 @@ across a broad spectrum of applications.")
                              #~())))
                      ;; Not cross-compiling.
                      #~())))))))
+
+(define-deprecated-package boost-with-python3
+  boost)
 
 (define-public boost-static
   (package
