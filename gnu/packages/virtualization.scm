@@ -3880,6 +3880,44 @@ create_header"))))))))))
                 numactl
                 yajl)))))
 
+(define-public libtpms
+  (package
+    (name "libtpms")
+    (version "0.10.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/stefanberger/libtpms")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "190qnjp384a8i8jqh3xyxac7i3cbsbphbl6wk91kw5gzjymjj4aj"))
+       (patches (search-patches "libtpms-pkgconfigdir.patch"))
+       (snippet
+        '(begin
+           (delete-file "autogen.sh")
+           (delete-file "bootstrap.sh")))))
+    (build-system gnu-build-system)
+    (home-page "https://github.com/stefanberger/libtpms")
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'drop-empty-pkg-installdir
+            (lambda _
+              (substitute* "configure.ac"
+                ;; This causes a syntax error in the generated configure script.
+                (("^PKG_INSTALLDIR\\(\\)") "")))))))
+    (inputs (list openssl))
+    (native-inputs (list autoconf-wrapper automake libtool
+                         ;; for pod2man
+                         perl))
+    (synopsis "TPM emulation library")
+    (description "The libtpms library provides software emulation of a
+Trusted Platform Module (TPM 1.2 and TPM 2.0).")
+    (license license:bsd-3)))
+
 (define-public virt-what
   (package
     (name "virt-what")

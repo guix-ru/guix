@@ -1,0 +1,16 @@
+Automake expects `pkgconfigdir` to be present here, add it.
+
+Upstream-status: Not presented upstream.
+
+diff --git a/Makefile.am b/Makefile.am
+index 03ed7e65..a05b022a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -38,6 +38,7 @@ EXTRA_DIST = \
+        libtpms.pc.in \
+        autogen.sh
+ 
++pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libtpms.pc
+ 
+ DISTCHECK_CONFIGURE_FLAGS = --with-openssl --with-tpm2
