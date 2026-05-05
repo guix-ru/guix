@@ -168,6 +168,7 @@
   #:use-module (gnu packages sphinx)
   #:use-module (gnu packages spice)
   #:use-module (gnu packages ssh)
+  #:use-module (gnu packages tcl)
   #:use-module (gnu packages texinfo)
   #:use-module (gnu packages textutils)
   #:use-module (gnu packages tls)
@@ -1364,6 +1365,106 @@ it emulates a variety of hardware and peripherals.")
       (description "Spike, the RISC-V ISA Simulator, implements a functional model
 of one or more RISC-V harts.")
       (license license:bsd-3))))
+
+(define-public swtpm
+  (package
+    (name "swtpm")
+    ;; When updating this package, please make sure that the path patching logic
+    ;; below is still functional.
+    (version "0.10.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/stefanberger/swtpm")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wah3zsnkasccazzlycq8scc52q4h1g58w0br45sr185inw6zgrp"))
+       (snippet
+        #~(begin
+            ;; Do not attempt to install /var.
+            (use-modules (guix build utils))
+            (substitute* "samples/Makefile.am"
+              (("install-data-local")
+               "install-data-local-DISABLED"))))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      ;; Most tests require networking, at least loopback.
+      #:make-flags
+      #~(let ((tests '("test_ctrlchannel4"
+                       "test_parameters"
+                       "test_print_capabilities"
+                       "test_swtpm_cert"
+                       "test_swtpm_setup_create_cert"
+                       "test_swtpm_setup_file_backend"
+                       "test_swtpm_setup_misc"
+                       "test_swtpm_setup_overwrite"
+                       "test_tpm2_parameters"
+                       "test_tpm2_print_capabilities"
+                       "test_tpm2_swtpm_cert"
+                       "test_tpm2_swtpm_cert_ecc"
+                       "test_tpm2_swtpm_localca"
+                       "test_tpm2_swtpm_setup_create_cert"
+                       "test_tpm2_swtpm_setup_overwrite")))
+          (list (string-append "TESTS=" (string-join tests " "))))
+      #:configure-flags
+      #~'("--localstatedir=/var")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-program-references
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "tests/common"
+                (("CERTTOOL=certtool")
+                 (string-append "CERTTOOL="
+                                (search-input-file inputs "bin/certtool"))))
+              (substitute* "src/swtpm_localca/swtpm_localca.c"
+                (("CERTTOOL_NAME \"certtool\"")
+                 (string-append "CERTTOOL_NAME \""
+                                (search-input-file inputs "bin/certtool") "\""))
+                (("g_find_program_in_path\\(\"swtpm_cert\"}\\)")
+                 (string-append "strdup(\""
+                                #$output "/bin/swtpm_cert"
+                                "\")")))
+              (substitute* "src/swtpm_setup/swtpm_setup.c"
+                (("g_find_program_in_path\\(\"swtpm\"\\)")
+                 (string-append "strdup(\""
+                                #$output "/bin/swtpm"
+                                "\")")))))
+          ;; The swtpm tools reference themselves,
+          ;; and #$output only exists after installation.
+          (delete 'check)
+          (add-after 'install 'check
+            (assoc-ref %standard-phases 'check)))))
+    (inputs (list  ;; can be removed once the following is released:
+                   ;; https://github.com/stefanberger/swtpm/pull/1119
+                   gnutls
+                   gmp
+                   openssl
+                   json-glib
+                   libseccomp
+                   libselinux
+                   libtasn1
+                   libtool
+                   libtpms))
+    (native-inputs (list autoconf
+                         automake
+                         bash-minimal
+                         expect
+                         iproute
+                         net-tools
+                         socat
+                         perl
+                         pkg-config
+                         python))
+    (home-page "https://github.com/stefanberger/swtpm")
+    (synopsis "TPM emulator")
+    (description
+     "swtpm provides a TPM emulator with socket, character device,
+and CUSE interface.  It can be combined with qemu & libvirt to expose TPM
+functionality to virtual machines.")
+    (license license:bsd-3)))
 
 (define-public incus
   (package
