@@ -10174,22 +10174,23 @@ offline (such as Wikipedia), without any access to Internet.")
 (define-public kiwix-tools
   (package
     (name "kiwix-tools")
-    (version "3.7.0")
+    (version "3.8.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://download.kiwix.org/release/"
                                   "kiwix-tools/kiwix-tools-" version ".tar.xz"))
               (sha256
                (base32
-                "032lzzgn3hicai4lx701cs6h731cs29x1h59j9gggcgrp1n4wxks"))))
+                "1y99r4vg8d3wy16s5f1i5j1prksv5g1cxxj6ysprhp7vhiczhf0j"))))
     (build-system meson-build-system)
     (inputs
      (list curl
            icu4c
-           kiwix-lib-13
+           kiwix-lib
            libmicrohttpd
            libzim
            pugixml
+           docopt-cpp
            xapian
            zlib
            `(,zstd "lib")))
