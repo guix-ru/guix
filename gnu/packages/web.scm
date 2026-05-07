@@ -10050,7 +10050,7 @@ for ZIM files.")
 (define-public kiwix-lib
   (package
     (name "kiwix-lib")
-    (version "14.0.0")
+    (version "14.2.0")
     (home-page "https://github.com/kiwix/kiwix-lib/")
     (source (origin
               (method git-fetch)
@@ -10059,7 +10059,7 @@ for ZIM files.")
                     (commit version)))
               (sha256
                (base32
-                "099arjsx1wgz5jhvzn49859wh0v8n3ya33kmnqaw69h55mjvgza0"))
+                "17chyyrbj239fd4iwcnb01yyk7p1zyxbn7fw1a9pr7r05ngsax1s"))
               (file-name (git-file-name name version))))
     (build-system meson-build-system)
     (arguments
