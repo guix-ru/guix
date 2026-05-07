@@ -9999,7 +9999,7 @@ email.  It can be used in MUA's like @url{http://aerc-mail.org, aerc} or
                                              testsuite-version)))
     (package
       (name "libzim")
-      (version "9.3.0")
+      (version "9.6.0")
       (source (origin
                 (method git-fetch)
                 (uri (git-reference
@@ -10007,7 +10007,7 @@ email.  It can be used in MUA's like @url{http://aerc-mail.org, aerc} or
                        (commit version)))
                 (sha256
                  (base32
-                  "1il1vc1hs954s3vnwhr337165dxbykvrldrvbilp5jxbkmwqb60d"))
+                  "15cg66djn3f3xivnkr6f9m52qivpj5d4qfl4hf73fwfp6gzng6pw"))
                 (file-name (git-file-name name version))))
       (build-system meson-build-system)
       (arguments
@@ -10105,7 +10105,15 @@ It contains the code shared by all Kiwix ports.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0mgzmqar70rj83x27a4zh7qr6yl5pi95g6i3fvvxysdjy76v18qc"))))))
+                "0mgzmqar70rj83x27a4zh7qr6yl5pi95g6i3fvvxysdjy76v18qc"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (add-before 'configure 'set-cflags
+              (lambda _
+                ;; Needed due to deprecation in libzim
+                (setenv "CPPFLAGS" "-Wno-error=deprecated-declarations")))))))))
 
 (define-public kiwix-desktop
   (package
