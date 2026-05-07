@@ -59,6 +59,7 @@
   #:use-module (gnu packages machine-learning)
   #:use-module (gnu packages monitoring)
   #:use-module (gnu packages networking)
+  #:use-module (gnu packages nss)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
@@ -1468,6 +1469,67 @@ for authoring custom addons.")
     (synopsis "Jupyter Server extension for serving Mathjax")
     (description "This package provides a Jupyter Server extension for serving
 Mathjax, the JavaScript display engine for mathematics.")
+    (license license:bsd-3)))
+
+(define-public python-jupyter-server-ydoc
+  (package
+    (name "python-jupyter-server-ydoc")
+    (version "2.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "jupyter_server_ydoc" version))
+       (sha256
+        (base32 "1g7yivy3mi4fph60rvffqgmg1kbjkgxnmwnd3x39ya4z3r4i3wrn"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list "-k"
+              (string-join
+               ;; Those tests hang.
+               (list "not test_get_document_"
+                     "test_room_handler_"
+                     "test_fork_handler"
+                     ;; ExceptionGroup assertion error.
+                     "test_dirty")
+               " and not "))
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Very insidious error cascading in dependent packages tests...
+          (add-after 'unpack 'fix-events-version
+            (lambda _
+              (substitute* (find-files "jupyter_server_ydoc/events" "\\.yaml$")
+                (("version: \"1\"") "version: 1"))))
+          (add-before 'check 'pre-check
+            (lambda _
+              (setenv "HOME" (dirname (getcwd))))))))
+    (propagated-inputs
+     (list python-jsonschema
+           python-jupyter-events
+           python-jupyter-server
+           python-jupyter-server-fileid
+           python-jupyter-ydoc
+           python-pycrdt
+           python-pycrdt-websocket))
+    (native-inputs
+     (list nss-certs-for-test
+           python-anyio
+           python-dirty-equals
+           python-hatchling
+           python-httpx-ws
+           python-importlib-metadata
+           python-jupyter-server
+           python-jupyter-server-fileid
+           python-pytest
+           python-pytest-jupyter))
+    (home-page
+     (string-append "https://github.com/jupyterlab/jupyter-collaboration"
+                    "/tree/main/projects/jupyter-server-ydoc"))
+    (synopsis "Collaborative service extension for Jupyter Server")
+    (description
+     "This package provides a Jupyter Server extension integrating
+collaborative shared models.")
     (license license:bsd-3)))
 
 (define-public python-jupyter-ydoc
