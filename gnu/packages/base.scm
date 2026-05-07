@@ -685,17 +685,16 @@ change.  GNU make offers many powerful extensions over the standard utility.")
 (define-public binutils
   (package
    (name "binutils")
-   (version "2.44")
+   (version "2.46.1")
    (source
     (origin
       (method url-fetch)
       (uri (string-append "mirror://gnu/binutils/binutils-"
                           version ".tar.bz2"))
       (sha256
-       (base32 "0fnwaasfglbphqzvz5n25js9gl695p7pjbmb1z81g8gsc6k90qzn"))
+       (base32 "0fd45n9rrymplx41vk32676d6pqnvfjlq42xma7a4cr6v85d8kij"))
       (patches (search-patches
                 "binutils-reproducible-tar.patch"
-                "binutils-2.41-fix-cross.patch"
                 "binutils-loongson-workaround.patch"))))
    (build-system gnu-build-system)
    (arguments
