@@ -1489,6 +1489,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/glibc-2.41-bootstrap-system.patch	\
   %D%/packages/patches/glibc-2.41-hurd-local-clock_gettime_MONOTONIC.patch	\
   %D%/packages/patches/glibc-2.41-ldd-x86_64.patch		\
+  %D%/packages/patches/glibc-2.43-hurd-unimplemented-ioctls.patch 	\
   %D%/packages/patches/glibc-allow-kernel-2.6.32.patch		\
   %D%/packages/patches/glibc-boot-2.2.5.patch			\
   %D%/packages/patches/glibc-boot-2.16.0.patch			\
@@ -1507,12 +1508,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/glibc-hurd-gettyent.patch		\
   %D%/packages/patches/glibc-hurd-mach-print.patch		\
   %D%/packages/patches/glibc-hurd-pthread_setcancelstate.patch	\
-  %D%/packages/patches/glibc-hurd-signal-fpe-exception.patch 	\
   %D%/packages/patches/glibc-hurd-signal-sa-siginfo.patch	\
-  %D%/packages/patches/glibc-hurd-2.41-pthread-once.patch	\
-  %D%/packages/patches/glibc-hurd-2.41-pthread-sigmask.patch	\
-  %D%/packages/patches/glibc-hurd-2.41-symlink.patch		\
-  %D%/packages/patches/glibc-hurd-xstate.patch  		\
   %D%/packages/patches/glibc-hurd64-gcc-14.2-tls-bug.patch	\
   %D%/packages/patches/glibc-ldd-powerpc.patch			\
   %D%/packages/patches/glibc-ldd-x86_64.patch			\
