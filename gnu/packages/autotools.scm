@@ -289,7 +289,7 @@ exec ~a --no-auto-compile \"$0\" \"$@\"
 (define-public autoconf-archive
   (package
     (name "autoconf-archive")
-    (version "2023.02.20")
+    (version "2024.10.16")
     (source
      (origin
       (method url-fetch)
@@ -297,7 +297,7 @@ exec ~a --no-auto-compile \"$0\" \"$@\"
                           version ".tar.xz"))
       (sha256
        (base32
-        "0cqsqdnmjdyybzw8wqhwkgs1vh7r5pbw66a6g7sz2a5fg6209m3i"))))
+        "0qvkll12bmljqlck507dwfninarx1rq4yvs3sw7abwqn3405vkbv"))))
     (build-system gnu-build-system)
     (home-page "https://www.gnu.org/software/autoconf-archive/")
     (synopsis "Collection of freely reusable Autoconf macros")
