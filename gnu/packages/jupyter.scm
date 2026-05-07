@@ -1275,6 +1275,47 @@ JavaScript build steps.")
 endpoints—to Jupyter web applications.")
     (license license:expat)))
 
+(define-public python-jupyter-server-client
+  ;; No tags upstream for recent versions.
+  (let ((commit "10b56e3effd72743a3b3b058908c6d07943a8aa7")
+        (revision "0"))
+    (package
+      (name "python-jupyter-server-client")
+      (version (git-version "0.1.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/datalayer/jupyter-server-client")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1m9iqcr16h5zj04f91rmjjl3dyd52dmg8dk98275p2kq81a23769"))))
+      (build-system pyproject-build-system)
+      (arguments
+       (list
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'disable-coverage
+              (lambda _
+                (substitute* "pyproject.toml"
+                  ((".*--cov.*") "")))))))
+      (propagated-inputs
+       (list python-pydantic
+             python-requests))
+      (native-inputs
+       (list python-hatchling
+             python-httpx
+             python-pytest
+             python-pytest-asyncio))
+      (home-page "https://github.com/datalayer/jupyter-server-client")
+      (synopsis "Client library to interact with Jupyter servers")
+      (description "This package provides a Python library to interact with
+Jupyter Server REST API for server management operations.  It provides
+server-level functionality including kernel listing (read-only) while avoiding
+duplication with existing kernel management libraries.")
+      (license license:bsd-3))))
+
 (define-public python-jupyter-server-terminals
   (package
     (name "python-jupyter-server-terminals")
