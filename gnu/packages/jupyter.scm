@@ -56,6 +56,7 @@
   #:use-module (gnu packages docker)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages machine-learning)
   #:use-module (gnu packages monitoring)
   #:use-module (gnu packages networking)
   #:use-module (gnu packages pkg-config)
@@ -1044,6 +1045,50 @@ emit events—structured data describing things happening inside the
 application.  Other software (e.g. client applications like JupyterLab) can
 listen and respond to these events.")
     (license license:bsd-3)))
+
+(define-public python-jupyter-mimetypes
+  ;; No tags upstream for recent versions.
+  (let ((commit "53d886c2e585cf0695cd39bae364168a10684bcf")
+        (revision "0"))
+    (package
+      (name "python-jupyter-mimetypes")
+      (version (git-version "0.2.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/datalayer/jupyter-mimetypes")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "07sf1i7h1j3lnsmci8knrhypiyv8b1hr9mr1vjf8499nlr788cyn"))))
+      (build-system pyproject-build-system)
+      (arguments
+       (list
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'check 'pre-check
+              (lambda _
+                (setenv "HOME" (dirname (getcwd))))))))
+      (propagated-inputs
+       (list python-requests
+             python-typing-extensions))
+      (native-inputs
+       (list python-hatchling
+             python-ipython
+             python-numpy
+             python-pandas
+             python-pyarrow
+             python-pytest
+             python-pytest-timeout
+             python-pytorch))
+      (home-page "https://github.com/datalayer/jupyter-mimetypes")
+      (synopsis "Enhanced Jupyter representation capabilities")
+      (description "This package Python provides enhanced Jupyter
+representation capabilities through proxy objects, enabling efficient Apache
+Arrow-based serialization for pandas DataFrames/Series and pickle-based
+serialization for generic Python objects in Jupyter environments.")
+      (license license:bsd-3))))
 
 (define-public python-jupyter-packaging
   (package
