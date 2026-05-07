@@ -1434,6 +1434,53 @@ for authoring custom addons.")
 Mathjax, the JavaScript display engine for mathematics.")
     (license license:bsd-3)))
 
+(define-public python-jupyter-ydoc
+  (package
+    (name "python-jupyter-ydoc")
+    (version "3.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jupyter-server/jupyter_ydoc")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "04k8dp4gklhnjwhkv5m3sxmlm2w229fn648v4rq2a7r2aqz14mhy"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      ;; These tests require Node.
+      #~(list "--deselect=tests/test_pycrdt_yjs.py::test_ypy_yjs_")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'fix-tests
+            (lambda _
+              (substitute* "tests/conftest.py"
+                (("^update_json_file.*" all)
+                 (string-append "# " all))))))))
+    (propagated-inputs (list python-anyio python-pycrdt))
+    (native-inputs
+     (list python-hatch-nodejs-version
+           python-hatchling
+           python-hypercorn
+           python-httpx-ws
+           python-pycrdt
+           python-pycrdt-websocket
+           python-pytest))
+    (home-page "https://jupyter.org")
+    (synopsis "Document structures for collaborative editing using Yjs")
+    (description
+     "This package provides @code{python-pycrdt}-based data structures for
+various documents used in the Jupyter ecosystem.  Built-in documents include:
+@itemize
+@item YBlob: a generic immutable binary document.
+@item YUnicode: a generic UTF8-encoded text document (YFile is an alias).
+@item YNotebook: a Jupyter notebook document.
+@end itemize")
+    (license license:bsd-3)))
+
 (define-public python-comm
   (package
     (name "python-comm")
