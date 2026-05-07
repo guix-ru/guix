@@ -118,7 +118,7 @@
 (define-public zlib
   (package
     (name "zlib")
-    (version "1.3.1")
+    (version "1.3.2")
     (source
      (origin
        (method url-fetch)
@@ -128,7 +128,7 @@
                                  version "/zlib-" version ".tar.gz")))
        (sha256
         (base32
-         "08yzf8xz0q7vxs8mnn74xmpxsrs6wy0aan55lpmpriysvyvv54ws"))))
+         "05lx27q69pm8vzi5w4ifsy86kq32q1kwcqcxa42ls9yh5h59lcmv"))))
     (build-system gnu-build-system)
     (outputs '("out" "static"))
     (arguments
