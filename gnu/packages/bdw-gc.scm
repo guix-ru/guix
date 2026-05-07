@@ -38,7 +38,7 @@
 (define-public libgc
   (package
    (name "libgc")
-   (version "8.2.8")
+   (version "8.2.12")
    (source (origin
             (method url-fetch)
             (uri (list (string-append "https://github.com/bdwgc/bdwgc/releases"
@@ -48,7 +48,7 @@
                                       "/gc-" version ".tar.gz")))
             (sha256
              (base32
-              "0q5imdfzpngpz81banf2wn6b8byrj0jp9j5m3xg349nb44304jbn"))))
+              "0knd6gw8mh3j7hppinlwjxfljas60ffbjgn80swgzdkas151kra2"))))
    (build-system gnu-build-system)
    (arguments
     (append
