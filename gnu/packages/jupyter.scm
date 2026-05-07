@@ -1316,6 +1316,42 @@ server-level functionality including kernel listing (read-only) while avoiding
 duplication with existing kernel management libraries.")
       (license license:bsd-3))))
 
+(define-public python-jupyter-server-fileid
+  (package
+    (name "python-jupyter-server-fileid")
+    (version "0.9.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jupyter-server/jupyter_server_fileid")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "12hx3160anqcrzrj52k0lsh1nswj63lfzia33j1xc69vlngf3gm1"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'pre-check
+            (lambda _
+              (setenv "HOME" (dirname (getcwd))))))))
+    (propagated-inputs
+     (list python-jupyter-events
+           python-jupyter-server))
+    (native-inputs
+     (list python-hatchling
+           python-jupyter-server
+           python-pytest
+           python-pytest-jupyter))
+    (home-page "https://github.com/jupyter-server/jupyter_server_fileid")
+    (synopsis "File ID service extension for Jupyter Server")
+    (description
+     "This package provides a Jupyter Server extension with an implementation
+of the File ID service.")
+    (license license:bsd-3)))
+
 (define-public python-jupyter-server-terminals
   (package
     (name "python-jupyter-server-terminals")
