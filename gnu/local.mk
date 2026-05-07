@@ -1081,7 +1081,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/binutils-cross-windres.patch		\
   %D%/packages/patches/binutils-loongson-workaround.patch	\
   %D%/packages/patches/binutils-mingw-w64-deterministic.patch	\
-  %D%/packages/patches/binutils-2.41-fix-cross.patch		\
   %D%/packages/patches/binutils-reproducible-tar.patch		\
   %D%/packages/patches/bloomberg-bde-tools-fix-install-path.patch	\
   %D%/packages/patches/bmake-run-check-separately.patch	\
