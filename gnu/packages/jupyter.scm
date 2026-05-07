@@ -1092,6 +1092,61 @@ application.  Other software (e.g. client applications like JupyterLab) can
 listen and respond to these events.")
     (license license:bsd-3)))
 
+(define-public python-jupyter-mcp-server
+  (package
+    (name "python-jupyter-mcp-server")
+    (version "1.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/datalayer/jupyter-mcp-server")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "01p81lmcx44cb30w1m2c65p2pyyzdnq09b5xpv0m1ij9cw6x5x4h"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; 1 failed, 79 passed, 1 skipped, 72 deselected, 2 warnings, 22 errors
+      #:tests? #f
+      #:test-flags
+      #~(list "-k" "not [jupyter_extension] and not [mcp_server]")))
+    (propagated-inputs
+     (list python-click
+           python-fastapi
+           python-httpx-sse
+           python-jupyter-kernel-client
+           ;; python-jupyter-mcp-tools
+           python-jupyter-mimetypes
+           python-jupyter-nbmodel-client
+           python-jupyter-server-client
+           ;; python-jupyter-server-nbmodel
+           python-jupyter-server
+           python-mcp
+           python-opentelemetry-api
+           python-opentelemetry-sdk
+           python-pydantic
+           python-sse-starlette
+           python-tornado
+           python-traitlets
+           python-uvicorn))
+    (native-inputs
+     (list python-hatchling
+           python-ipykernel
+           ;; python-jupyter-collaboration
+           python-jupyter-server
+           ;; python-jupyterlab
+           python-pillow
+           python-pytest
+           python-pytest-asyncio
+           python-pytest-timeout))
+    (home-page "https://github.com/datalayer/jupyter-mcp-server")
+    (synopsis "Jupyter MCP Server")
+    (description "This package provides a @acronym{Model Context Protocol,
+MCP} server for @code{jupyter}, bridging LLMs and Jupyter Notebooks.")
+    (license license:bsd-3)))
+
 (define-public python-jupyter-mimetypes
   ;; No tags upstream for recent versions.
   (let ((commit "53d886c2e585cf0695cd39bae364168a10684bcf")
