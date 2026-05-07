@@ -10118,7 +10118,7 @@ It contains the code shared by all Kiwix ports.")
 (define-public kiwix-desktop
   (package
     (name "kiwix-desktop")
-    (version "2.4.1")
+    (version "2.5.1")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -10127,7 +10127,7 @@ It contains the code shared by all Kiwix ports.")
                     ".tar.gz"))
               (sha256
                (base32
-                "1vkmk9j2jii7ri4lcayr0dr5b2w3dc24lyqmm3g4234834b1f4wl"))))
+                "14dgv92fpb9nzvqa59446818gzhf19sn32f5vgvxrb9llbn6z4rh"))))
     (build-system qt-build-system)
     (arguments
      (list
