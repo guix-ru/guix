@@ -919,15 +919,11 @@ the store.")
         "glibc-supported-locales.patch"
         "glibc-2.37-hurd-clock_t_centiseconds.patch"
         "glibc-2.41-hurd-local-clock_gettime_MONOTONIC.patch"
+        "glibc-2.43-hurd-unimplemented-ioctls.patch"
         "glibc-hurd-mach-print.patch"
         "glibc-hurd-gettyent.patch"
         "glibc-hurd-getauxval.patch"
         "glibc-hurd-pthread_setcancelstate.patch"
-        "glibc-hurd-signal-fpe-exception.patch"
-        "glibc-hurd-xstate.patch"
-        "glibc-hurd-2.41-pthread-once.patch"
-        "glibc-hurd-2.41-pthread-sigmask.patch"
-        "glibc-hurd-2.41-symlink.patch"
         "glibc-hurd64-gcc-14.2-tls-bug.patch"))
 
 (define-public glibc
@@ -935,13 +931,13 @@ the store.")
   ;; version 2.28, GNU/Hurd used a different glibc branch.
   (package
    (name "glibc")
-   (version "2.41")
+   (version "2.43")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnu/glibc/glibc-" version ".tar.xz"))
             (sha256
              (base32
-              "00g95047sshv0zxk9ja3mi7lzwi8wh8qx0nxngbvgmj5yli6p8m5"))
+              "0c9qzbaprh779ggvix9c8hcps5y59y2caw42w2il7nxxbmmnrj6r"))
             (patches (map search-patch %glibc-patches))))
    (properties `((lint-hidden-cve . ("CVE-2024-2961"
                                      "CVE-2024-33601" "CVE-2024-33602"
