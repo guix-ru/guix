@@ -725,6 +725,51 @@ JupyterLab (code navigation, hover suggestions, linters, autocompletion, and
 rename) using the Language Server Protocol.")
     (license license:bsd-3)))
 
+(define-public python-jupyter-kernel-client
+  ;; No tags upstream for recent versions.
+  (let ((commit "ffc57eee7db20cc7acf0417d580b7b63d7ddda43")
+        (revision "0"))
+    (package
+      (name "python-jupyter-kernel-client")
+      (version (git-version "0.9.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/datalayer/jupyter-kernel-client")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0mdb7n5yw39lbwf8g5a55ar1327v46r5hk8mvs07bzpmz0979c5h"))))
+      (build-system pyproject-build-system)
+      (arguments
+       (list
+        ;; All tests timeout.
+        #:tests? #f))
+      (propagated-inputs
+       (list python-jupyter-client
+             python-jupyter-core
+             python-jupyter-client
+             python-jupyter-core
+             python-requests
+             python-traitlets
+             python-websocket-client))
+      (native-inputs
+       (list python-hatchling
+             python-ipykernel
+             python-jupyter-server
+             python-jupyter-mimetypes
+             python-pandas
+             python-pytest
+             python-pytest-asyncio
+             python-pytest-timeout))
+      (home-page "https://github.com/datalayer/jupyter-kernel-client")
+      (synopsis "Connect to Jupyter Kernel through HTTP or WebSockets")
+      (description
+       "This package provides a library to conncet to live Jupyter Kernels
+through HTTP and WebSocket.")
+      (license license:bsd-3))))
+
 (define-public python-jupyter-kernel-test
   (package
     (name "python-jupyter-kernel-test")
