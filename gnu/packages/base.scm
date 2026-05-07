@@ -923,7 +923,6 @@ the store.")
         "glibc-hurd-mach-print.patch"
         "glibc-hurd-gettyent.patch"
         "glibc-hurd-getauxval.patch"
-        "glibc-hurd-pthread_setcancelstate.patch"
         "glibc-hurd64-gcc-14.2-tls-bug.patch"))
 
 (define-public glibc
