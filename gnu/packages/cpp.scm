@@ -870,6 +870,29 @@ combination of these streams.")
 enabled in different parts of your code.")
       (license license:zlib)))
 
+(define-public docopt-cpp
+  (package
+    (name "docopt-cpp")
+    (version "0.6.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/docopt/docopt.cpp")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0cz3vv7g5snfbsqcf3q8bmd6kv5qp84gj3avwkn4vl00krw13bl7"))))
+    (build-system cmake-build-system)
+    (arguments (list #:tests? #f))    ; no tests
+    (home-page "http://docopt.org/")
+    (synopsis "Command-line interface description language for C++")
+    (description
+     "This library allows the user to define a command-line interface from a
+program's help message rather than specifying it programmatically with
+command-line parsers like @code{getopt} and @code{argparse}.")
+    (license (list license:expat license:boost1.0))))
+
 (define-public xbyak
   (package
     (name "xbyak")
