@@ -4086,6 +4086,46 @@ libev.  This is currently used only by ocaml-lsp.")
      "This package provides a Csexp-based transport layer for Lev clients and
 servers.  This is currently used only by ocaml-lsp.")))
 
+(define %ocaml-lsp-base
+  (package
+    (name "ocaml5-lsp-base")
+    (version "1.23.1")
+    (home-page "https://github.com/ocaml/ocaml-lsp")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (sha256
+        (base32 "1h02bgf3glf6d6mghk32ds8xm6a7h575f1zf9qkgr6y946rh0760"))
+       (snippet #~(begin (use-modules (guix build utils))
+                         ;; ocaml-lsp tends to vendor snapshots of
+                         ;; dependencies containing critical fixes before
+                         ;; they're available in official releases. The
+                         ;; snapshot of ocaml-odoc here is now older than the
+                         ;; current release and can be omitted. Instead we
+                         ;; instruct dune to resolve ocaml-odoc via its public
+                         ;; package name, not the internal one.
+                         (delete-file-recursively "vendor")
+                         (substitute* "ocaml-lsp-server/src/dune"
+                           (("odoc_parser") "odoc-parser"))
+
+                         ;; Also replace submodules that have been extracted
+                         ;; into guix packages (lev, lev-fiber,
+                         ;; lev-fiber-csexp).
+                         (delete-file-recursively "submodules")
+                         (delete-file "ocaml-lsp-server/dune")
+                         (substitute* '("lsp-fiber/src/dune"
+                                        "ocaml-lsp-server/src/dune")
+                           (("lev_fiber_csexp") "lev-fiber-csexp")
+                           (("lev_fiber") "lev-fiber"))))))
+    (build-system dune-build-system)
+    (synopsis "LSP Server for OCaml")
+    (description
+     "This package implements an OCaml language server.")
+    (license license:isc)))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
