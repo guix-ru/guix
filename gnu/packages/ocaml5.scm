@@ -4155,6 +4155,47 @@ servers.  This is currently used only by ocaml-lsp.")))
      "This package implements the LSP protocol in OCaml.  It is designed to be as portable as
 possible and does not make any assumptions about IO.")))
 
+(define-public ocaml-lsp-server
+  (package
+    (inherit %ocaml-lsp-base)
+    (name "ocaml5-lsp-server")
+    (arguments
+     '(#:package "ocaml-lsp-server"
+       ;; tests require network access (for node.js and yarn)
+       #:tests? #f))
+    (propagated-inputs (list ocaml-dune-dyn
+                             ocaml-dune-ordering
+                             ocaml-dune-rpc
+                             ocaml-stdune
+                             ocaml-astring
+                             ocaml-base
+                             ocaml-camlp-streams
+                             ocaml-dune-chrome-trace
+                             ocaml-cinaps
+                             ocaml-csexp
+                             ocaml-dune-build-info
+                             ocaml-fiber
+                             ocaml-jsonrpc
+                             ocaml-lev
+                             ocaml-lev-fiber
+                             ocaml-lev-fiber-csexp
+                             ocaml-lsp
+                             ocaml-merlin-lib
+                             ocaml-odoc
+                             ocaml-odoc-parser
+                             ocaml-pp
+                             ocaml-ppx-yojson-conv-lib
+                             ocaml-re
+                             ocaml-spawn
+                             ocaml-uutf
+                             ocaml-dune-xdg
+                             ocaml-yojson
+                             ocaml-dune-ocamlc-loc
+                             ocaml-ocamlformat-rpc-lib))
+    (properties `((upstream-name . "ocaml-lsp-server")))
+    (synopsis "LSP Server for OCaml")
+    (description "This package implements an OCaml language server.")))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
