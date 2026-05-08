@@ -2968,6 +2968,26 @@ with the possibility to set them project-wide.  It supports the most common
 syntax extensions, and it is extensible for others.")
     (license license:lgpl2.1)))
 
+(define %ocaml-ocamlformat-base
+  (package
+    (name "ocaml5-ocamlformat-base")
+    (version "0.29.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml-ppx/ocamlformat")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "107pprrxyvxv23pp0753k82qydhjz5jwir209mgs3r93vhn0fd7v"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/ocaml-ppx/ocamlformat")
+    (synopsis "Auto-formatter for OCaml code")
+    (description "OCamlFormat is a tool to automatically format OCaml code in
+a uniform style.")
+    (license license:expat)))
+
 (define-public ocaml-graphics
   (package
     (name "ocaml5-graphics")
