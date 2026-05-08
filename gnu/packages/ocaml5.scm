@@ -4066,6 +4066,26 @@ ocaml-lsp.")
 libev.  This is currently used only by ocaml-lsp.")
 ))
 
+(define-public ocaml-lev-fiber-csexp
+  (package
+    (inherit %ocaml-lev-base)
+    (arguments '(#:package "lev-fiber-csexp"))
+    (name "ocaml5-lev-csexp")
+    (arguments
+     (substitute-keyword-arguments (package-arguments %ocaml-lev-base)
+       ((#:package _ #f) "lev-fiber-csexp")))
+    (propagated-inputs (list ocaml-lev-fiber
+                             ocaml-base
+                             ocaml-csexp
+                             ocaml-odoc
+                             ocaml-stdune
+                             ocaml-dune-dyn
+                             ocaml-fiber))
+    (synopsis "Csexp-based transport layer for Lev applications")
+    (description
+     "This package provides a Csexp-based transport layer for Lev clients and
+servers.  This is currently used only by ocaml-lsp.")))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
