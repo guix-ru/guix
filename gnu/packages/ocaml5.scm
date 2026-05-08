@@ -4036,6 +4036,17 @@ tools such as Merlin to perform project-wide occurrences queries.")))
 ocaml-lsp.")
       (license license:expat))))
 
+(define-public ocaml-lev
+  (package
+    (inherit %ocaml-lev-base)
+    (arguments '(#:package "lev"))
+    (name "ocaml5-lev")
+    (arguments
+     (substitute-keyword-arguments (package-arguments %ocaml-lev-base)
+       ((#:package _ #f) "lev")))
+    (propagated-inputs (list ocaml-base
+                             ocaml-odoc))))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
