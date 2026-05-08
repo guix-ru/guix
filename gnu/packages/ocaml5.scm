@@ -4047,6 +4047,25 @@ ocaml-lsp.")
     (propagated-inputs (list ocaml-base
                              ocaml-odoc))))
 
+(define-public ocaml-lev-fiber
+  (package
+    (inherit %ocaml-lev-base)
+    (arguments '(#:package "lev-fiber"))
+    (name "ocaml5-lev-fiber")
+    (arguments
+     (substitute-keyword-arguments (package-arguments %ocaml-lev-base)
+       ((#:package _ #f) "lev-fiber")))
+    (propagated-inputs (list ocaml-lev
+                             ocaml-base
+                             ocaml-odoc
+                             ocaml-stdune
+                             ocaml-fiber))
+    (synopsis "Fiber interface for OCaml Bindings to libev")
+    (description
+     "This package provides a high-level 'fiber' interface for interacting with
+libev.  This is currently used only by ocaml-lsp.")
+))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
