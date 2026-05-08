@@ -1998,6 +1998,31 @@ implementation.  It can be used to perform either random testing or fuzz
 testing by using the @code{afl-fuzz} tool.")
     (license license:lgpl3+)))
 
+(define-public ocaml-fix
+  (package
+    (name "ocaml5-fix")
+    (version "20220121")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.inria.fr/fpottier/fix")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "15785v43jcbqsw1y653cnb89alrcnbdri1h0w6zl6p7769ja9rdj"))))
+    (arguments
+     `(;; TODO: add "regenerate" and its dependencies, which are needed for
+       ;; tests
+       #:tests? #f))
+    (build-system dune-build-system)
+    (home-page "https://gitlab.inria.fr/fpottier/fix")
+    (synopsis "Facilities for memoization and fixed points")
+    (description "This package provides helpers with various constructions
+that involve memoization and recursion.")
+    ;; With static-linking exception
+    (license license:lgpl2.0)))
+
 (define-public ocaml-base
   (package
     (name "ocaml5-base")
