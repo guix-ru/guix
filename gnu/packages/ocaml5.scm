@@ -4139,6 +4139,22 @@ servers.  This is currently used only by ocaml-lsp.")))
     (description "This package implements the protocol described at
 @url{https://www.jsonrpc.org/specification}.")))
 
+(define-public ocaml-lsp
+  (package
+    (inherit %ocaml-lsp-base)
+    (name "ocaml5-lsp")
+    (arguments
+     '(#:package "lsp"
+       ;; tests require network access (for node.js and yarn)
+       #:tests? #f))
+    (propagated-inputs (list ocaml-jsonrpc ocaml-yojson))
+    (native-inputs (list ocaml-ppx-yojson-conv-lib ocaml-uutf
+                         ocaml-ocamlformat))
+    (synopsis "LSP protocol implementation in OCaml")
+    (description
+     "This package implements the LSP protocol in OCaml.  It is designed to be as portable as
+possible and does not make any assumptions about IO.")))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
