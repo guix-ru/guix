@@ -953,6 +953,37 @@ representations can be extracted.")
 selection of character properties of the Unicode character database.")
     (license license:isc)))
 
+(define-public ocaml-uuseg
+  (package
+    (name "ocaml5-uuseg")
+    (version "17.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://erratique.ch/software/uuseg/releases/"
+                           "uuseg-" version ".tbz"))
+       (sha256
+        (base32 "13jc7avvkg9ryvm2w58nz7pvbbggn8xgn0xr5kvwnv0565m3azhn"))))
+    (build-system ocaml-build-system)
+    (arguments
+     '(#:build-flags '("build" "--tests" "true")
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure))))
+    (propagated-inputs (list ocaml-uucp ocaml-uutf ocaml-cmdliner))
+    (native-inputs (list opam-installer ocamlbuild ocaml-topkg))
+    (home-page "https://erratique.ch/software/uuseg")
+    (synopsis "Unicode text segmentation for OCaml")
+    (description
+     "Uuseg is an OCaml library for segmenting Unicode text.  It
+implements the locale-independent Unicode text segmentation algorithms to
+detect grapheme cluster, word, and sentence boundaries.  It also uses the
+Unicode line breaking algorithm to detect line break opportunities.
+
+The library is independent from any IO mechanism or Unicode text data
+structure, and it can process text without a complete in-memory
+representation.")
+    (license license:isc)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
