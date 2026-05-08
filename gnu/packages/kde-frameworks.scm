@@ -4796,7 +4796,7 @@ script engines.")
 (define-public purpose
   (package
     (name "purpose")
-    (version "6.23.0")
+    (version "6.24.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -4805,7 +4805,7 @@ script engines.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0pcxw9fiq23k35mc9lh278q7wggqsfynj07hvaa4fffxsrs4amfi"))))
+                "0ixwpq2x4ga61mqdwpqka0kk8kg67hf9y7jql1aidgvrdwivlpg9"))))
     (build-system cmake-build-system)
     (native-inputs
      (list extra-cmake-modules gettext-minimal))
@@ -4813,23 +4813,34 @@ script engines.")
      (list
       ;;TODO: accounts-qml-module
       ;;TODO: kaccounts
+      kcmutils
+      kcompletion
       kconfig
       kcoreaddons
       kdeclarative
-      knotifications
       ki18n
       kio
       kirigami
-      kwidgetsaddons
       kitemmodels
       kitemviews
-      kcompletion
+      knotifications
       kservice
+      kwidgetsaddons
+      prison
       qtbase
-      qtdeclarative
-      prison))
+      qtdeclarative))
     (arguments
-     (list #:tests? #f)) ;; seem to require network; don't find QTQuick components
+     (list #:tests? #f ;; seem to require network; don't find QTQuick components
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'unrequire-qmlmodule
+                 (lambda _
+                   ;; HACK: ecm_find_qmlmodule cannot find qmlmodule on other
+                   ;; prefix, so we remove its requirement.
+                   (substitute* "CMakeLists.txt"
+                     (("(org\\.kde\\.prison) REQUIRED" _ keep) keep)
+                     (("(org\\.kde\\.kitemmodels) REQUIRED" _ keep) keep)
+                     (("(org\\.kde\\.kcmutils) REQUIRED" _ keep) keep)))))))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "Offers available actions for a specific purpose")
     (description "This framework offers the possibility to create integrate
