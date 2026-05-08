@@ -2913,6 +2913,30 @@ types and functions for floats, vectors, points, sizes, matrices, quaternions,
 axis-aligned boxes, colors, color spaces, and raster data.")
     (license license:isc)))
 
+(define-public ocaml-ocp-indent
+  (package
+    (name "ocaml5-ocp-indent")
+    (version "1.8.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/OCamlPro/ocp-indent")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1dvcl108ir9nqkk4mjm9xhhj4p9dx9bmg8bnms54fizs1x3x8ar3"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-cmdliner))
+    (home-page "https://www.typerex.org/ocp-indent.html")
+    (synopsis "Tool to indent OCaml programs")
+    (description
+     "Ocp-indent is based on an approximate, tolerant OCaml parser
+and a simple stack machine.  Presets and configuration options are available,
+with the possibility to set them project-wide.  It supports the most common
+syntax extensions, and it is extensible for others.")
+    (license license:lgpl2.1)))
+
 (define-public ocaml-graphics
   (package
     (name "ocaml5-graphics")
