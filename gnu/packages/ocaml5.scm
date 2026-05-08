@@ -3016,6 +3016,18 @@ a uniform style.")
      "This is the core library of the ocamlformat tool.  It's used to format OCaml
 code in a uniform style.")))
 
+(define-public ocaml-ocamlformat-rpc-lib
+  (package
+    (inherit %ocaml-ocamlformat-base)
+    (name "ocaml5-ocamlformat-rpc-lib")
+    (arguments
+     '(#:package "ocamlformat-rpc-lib"))
+    (propagated-inputs (list ocaml-csexp ocaml-odoc))
+    (synopsis "RPC interface for ocamlformat")
+    (description
+     "OCamlFormat is a tool to automatically format OCaml code in a uniform style.
+This package defines an RPC interface to OCamlFormat.")))
+
 (define-public ocaml-graphics
   (package
     (name "ocaml5-graphics")
