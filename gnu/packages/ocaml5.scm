@@ -354,6 +354,27 @@ compatibility with older compiler to use these new features in their code.")
     ;; with ocaml-linking exception
     (license license:lgpl2.1+)))
 
+(define-public ocaml-either
+  (package
+    (name "ocaml5-either")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/either")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "099p1m24vz5i0043zcfp88krzjsa2qbrphrm4bnx84gif5vgkxwm"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/mirage/either")
+    (synopsis
+     "Either module for backward compatibility with older Stdlib versions")
+    (description "This library is a compatibility module for the Either module
+introduced in Stdlib with OCaml 4.12.0.")
+    (license license:expat)))
+
 (define-public ocaml-cmdliner
   (package
     (name "ocaml5-cmdliner")
