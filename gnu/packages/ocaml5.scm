@@ -2988,6 +2988,34 @@ syntax extensions, and it is extensible for others.")
 a uniform style.")
     (license license:expat)))
 
+(define-public ocaml-ocamlformat-lib
+  (package
+    (inherit %ocaml-ocamlformat-base)
+    (name "ocaml5-ocamlformat-lib")
+    (arguments
+     '(#:package "ocamlformat-lib"))
+    (propagated-inputs (list ocaml-astring
+                             ocaml-csexp
+                             ocaml-version
+                             ocaml-base
+                             ocaml-camlp-streams
+                             ocaml-cmdliner
+                             ocaml-dune-build-info
+                             ocaml-either
+                             ocaml-fix
+                             ocaml-fpath
+                             ocaml-odoc
+                             ocaml-stdio
+                             ocaml-uuseg
+                             ocaml-uutf))
+    (native-inputs (list ocaml-menhir
+                         ;; for tests
+                         git-minimal/pinned ocaml-alcotest ocaml-ocp-indent))
+    (synopsis "Auto-formatting library for OCaml code")
+    (description
+     "This is the core library of the ocamlformat tool.  It's used to format OCaml
+code in a uniform style.")))
+
 (define-public ocaml-graphics
   (package
     (name "ocaml5-graphics")
