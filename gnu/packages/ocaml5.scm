@@ -4126,6 +4126,19 @@ servers.  This is currently used only by ocaml-lsp.")))
      "This package implements an OCaml language server.")
     (license license:isc)))
 
+(define-public ocaml-jsonrpc
+  (package
+    (inherit %ocaml-lsp-base)
+    (name "ocaml5-jsonrpc")
+    (arguments
+     `(#:package "jsonrpc"
+       ;; tests require network access (for node.js and yarn)
+       #:tests? #f))
+    (propagated-inputs (list ocaml-yojson ocaml-odoc))
+    (synopsis "JSON-RPC protocol implementation")
+    (description "This package implements the protocol described at
+@url{https://www.jsonrpc.org/specification}.")))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
