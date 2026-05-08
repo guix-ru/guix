@@ -135,7 +135,7 @@ direct descendant of NetBSD's Almquist Shell (@command{ash}).")
 (define-public fish
   (package
     (name "fish")
-    (version "4.7.0")
+    (version "4.7.1")
     (source
      (origin
        (method url-fetch)
@@ -143,7 +143,7 @@ direct descendant of NetBSD's Almquist Shell (@command{ash}).")
                            "releases/download/" version "/"
                            "fish-" version ".tar.xz"))
        (sha256
-        (base32 "1nx9m8kis1v4w27mdzzpj9l9mpnz0w7n1v7kaajd9lv5ny63njn5"))
+        (base32 "1pxpvcqxraz6hmk6i5zznylygv72c61a46fsvksy6f33i91mnkbg"))
        ;; TODO: Unbundle corrosion.
        (patches (search-patches "corrosion-honor-CARGO_BUILD_TARGET.patch"))))
     (build-system cmake-build-system)
