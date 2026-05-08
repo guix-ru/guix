@@ -3028,6 +3028,25 @@ code in a uniform style.")))
      "OCamlFormat is a tool to automatically format OCaml code in a uniform style.
 This package defines an RPC interface to OCamlFormat.")))
 
+(define-public ocaml-ocamlformat
+  (package
+    (inherit %ocaml-ocamlformat-base)
+    (name "ocaml5-ocamlformat")
+    (arguments
+     '(#:package "ocamlformat"
+       #:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'remove-unrelated-tests
+                    (lambda _
+                      ;; Tests related to ocamlformat-rpc-lib
+                      (delete-file-recursively "test/rpc"))))))
+    (propagated-inputs (list ocaml-ocamlformat-lib
+                             ocaml-csexp
+                             ocaml-version
+                             ocaml-cmdliner
+                             ocaml-odoc
+                             ocaml-re))
+    (native-inputs (list ocaml-menhir ocaml-alcotest ocaml-ocp-indent))))
+
 (define-public ocaml-graphics
   (package
     (name "ocaml5-graphics")
