@@ -1004,7 +1004,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/agg-am_c_prototype.patch			\
   %D%/packages/patches/agg-2.5-gcc8.patch			\
   %D%/packages/patches/akonadi-paths.patch		\
-  %D%/packages/patches/akonadi-not-relocatable.patch		\
   %D%/packages/patches/akonadi-timestamps.patch		\
   %D%/packages/patches/alure-dumb-2.patch			\
   %D%/packages/patches/amd-smi-newer-libdrm.patch		\
