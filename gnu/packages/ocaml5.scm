@@ -3999,6 +3999,43 @@ tools such as Merlin to perform project-wide occurrences queries.")))
                          ocaml-ppxlib ocaml-mdx jq))
     (license license:expat)))
 
+;; Base definition for a set of packages used only by ocaml-lsp, originally
+;; via a submodule.
+(define %ocaml-lev-base
+  (let ((commit
+         ;; Pin the repo to match the submodule.
+         "9258b71a2880de89762bcfac0b281979a58a2aa6")
+        (revision "0"))
+    (package
+      (name "ocaml5-lev-base")
+      (version (git-version "0" revision commit))
+      (home-page "https://github.com/rgrinberg/lev")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url home-page)
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1403dbbayq1sazvvrd64bda4civ4xwvagclq4fbf5nhraga57bc4"))
+         (snippet
+          #~(begin (use-modules (guix build utils))
+                   (substitute* "lev/src/dune"
+                     (("foreign_stubs")
+                      (string-append "foreign_stubs "
+                                     "(flags :standard "
+                                     "-Wno-implicit-function-declaration)")))))))
+      (build-system dune-build-system)
+      ;; Tests seem to depend on an obsolete version of ppx_expect.
+      (arguments '(#:tests? #f))
+      (properties '((hidden? . #t)))
+      (synopsis "OCaml Bindings to libev")
+      (description
+       "This package provides low-level bindings to libev, currently used only by
+ocaml-lsp.")
+      (license license:expat))))
+
 (define-public ocaml-qcheck
   (package
     (name "ocaml5-qcheck")
