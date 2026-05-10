@@ -7377,7 +7377,7 @@ fighting over what remains.")
 (define-public warzone2100
   (package
     (name "warzone2100")
-    (version "4.6.3")
+    (version "4.7.0")
     (source
      (origin
        (method url-fetch)
@@ -7404,7 +7404,7 @@ fighting over what remains.")
                                 "warzone2100-unbundle-utfcpp.patch"))
        (sha256
         (base32
-         "0fmiy0pm56yy69c0nhynjdiaslwlfg8cdvfl5s78g5pzdi1y47s3"))))
+         "0dsfgjwrxyzpr5d6114b8ni0i3h2hkm6f2r3ryqs23k8i1dlvvlm"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -7415,7 +7415,10 @@ fighting over what remains.")
                             "-DWZ_DOWNLOAD_PREBUILT_PACKAGES=off"
                             "-DWZ_INCLUDE_VIDEOS=off"
                             "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
-                            "-DENABLE_GNS_NETWORK_BACKEND=off")))
+                            "-DENABLE_GNS_NETWORK_BACKEND=off"
+                            ;; otherwise, installs a debug
+                            ;; ELF which fails validate-runpath
+                            "-DWZ_SKIP_ELF_SEPARATE_DEBUG=on")))
     (native-inputs
      (list basis-universal
            gettext-minimal
