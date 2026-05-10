@@ -885,14 +885,14 @@ some compression ratio).")
 (define-public lzip
   (package
     (name "lzip")
-    (version "1.25")
+    (version "1.26")
     (source (origin
              (method url-fetch)
              (uri (string-append "mirror://savannah/lzip/lzip-"
                                  version ".tar.gz"))
              (sha256
               (base32
-               "0vx5y39y6ipks1lcc203mrxx7x9xf04nx1dxyl9m2gxqixnqlh89"))))
+               "0wk53ri2ny749m29yi9g0gsyjm48di1q7j0c6hxvwp2jc44z6734"))))
     (build-system gnu-build-system)
     (arguments
      ;; The configure script doesn't recognise the --build or --host
