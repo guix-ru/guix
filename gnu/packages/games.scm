@@ -7206,6 +7206,18 @@ warzone2100.")
                 ;; everything else
                 license:gpl2+)))))
 
+(define-public warzone2100-terrain-classic
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+           (url "https://github.com/Warzone2100/data-terrain-classic")
+           ;; Matches warzone2100 v4.7.0
+           (commit "d26c3d0e0242721e24fe34fea2e61880c5805684")))
+    (file-name "warzone2100-terrain-classic")
+    (sha256
+     (base32
+      "0jjyy9rbkla7rdjl62r5pf2b565rk1054wf2qinlw72bgr12lb2j"))))
+
 (define-public warzone2100
   (package
     (name "warzone2100")
