@@ -1597,6 +1597,28 @@ by Pavel Raiskup.")
  bsmulti-lingual messages with GNU gettext's tools msgfmt.")
     (license license:gpl3+)))
 
+(define-public python-hatch-nodejs-version
+  (package
+    (name "python-hatch-nodejs-version")
+    (version "0.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/agoose77/hatch-nodejs-version")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "00ik9yjc9329qq487lk0hs04jsj6l0adffb39l3711p1bhf3pv9r"))))
+    (build-system pyproject-build-system)
+    (propagated-inputs (list python-hatchling))
+    (native-inputs (list python-hatchling python-pytest))
+    (home-page "https://github.com/agoose77/hatch-nodejs-version")
+    (synopsis "Hatch plugin for versioning from a package.json file")
+    (description "This package provides a hatch plugin for fetching a version
+from a @code{package.json} file.")
+    (license license:expat)))
+
 (define-public python-hatch-regex-commit
   (package
     (name "python-hatch-regex-commit")
