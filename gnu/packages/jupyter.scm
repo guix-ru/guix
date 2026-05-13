@@ -1136,6 +1136,45 @@ Arrow-based serialization for pandas DataFrames/Series and pickle-based
 serialization for generic Python objects in Jupyter environments.")
       (license license:bsd-3))))
 
+(define-public python-jupyter-nbmodel-client
+  (package
+    (name "python-jupyter-nbmodel-client")
+    (version "0.14.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+	      (url "https://github.com/datalayer/jupyter-nbmodel-client")
+	      (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+	(base32 "0xbq23hnkd6vdyp0dvbm7bri0v5hgs3sqrl3a7cx8qdi8ws0jxlg"))))
+    (build-system pyproject-build-system)
+    (arguments
+     ;; XXX: Most tests hang, find out why.
+     (list #:tests? #f))
+    (propagated-inputs
+     (list python-jupyter-ydoc
+           python-nbformat
+           python-pycrdt
+           python-requests
+           python-websockets))
+    (native-inputs
+     (list python-hatchling
+           python-hypercorn
+           python-ipykernel
+           python-jupyter-kernel-client
+           python-jupyter-server-ydoc
+           python-pycrdt-websocket
+           python-pytest
+           python-pytest-asyncio
+           python-pytest-timeout))
+    (home-page "https://github.com/datalayer/jupyter-nbmodel-client")
+    (synopsis "Jupyter NbModel Client")
+    (description "This package provides a Python library to interact with a
+	live Jupyter Notebooks.")
+    (license license:bsd-3)))
+
 (define-public python-jupyter-packaging
   (package
     (name "python-jupyter-packaging")
