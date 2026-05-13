@@ -7218,6 +7218,31 @@ warzone2100.")
      (base32
       "0jjyy9rbkla7rdjl62r5pf2b565rk1054wf2qinlw72bgr12lb2j"))))
 
+(define-public warzone2100-terrain-high
+  (package
+    (name "warzone2100-terrain-high")
+    (version "3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Warzone2100/data-terrain-high")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1raw6cdpv84zs7p7ngjvnbrnk1kprs2ndsqf7xnvy3rcw6j44xck"))))
+    (build-system copy-build-system)
+    (arguments
+     (list #:install-plan #~'(("." "/share/data/terrain_overrides/high"))))
+    (home-page "https://wz2100.net")
+    (synopsis "High quality tile textures for Warzone2100")
+    (description "warzone2100-terrain-high contains tile textures for
+warzone2100's high quality mode.")
+    (properties '((hidden? . #t)))
+    (license (list license:cc-by-sa3.0  ;either
+                   license:gpl2+))))
+
 (define-public warzone2100
   (package
     (name "warzone2100")
