@@ -7169,6 +7169,43 @@ in-window at 640x480 resolution or fullscreen.")
     ;; released under Public Domain terms.
     (license (list license:gpl2+ license:public-domain))))
 
+(define-public warzone2100-texpages
+  ;; Commit pinned by warzone2100 v4.7.0; latest release is 7 years old.
+  (let ((commit "009ec2f652a6230d8315cc3db4eadb5690f18fbd")
+        (revision "0"))
+    (package
+      (name "warzone2100-texpages")
+      (version (git-version "3.3.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/Warzone2100/data-texpages")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0n1cdsvjzy6y6dnxxy9hm18z5qddnhhp6jd4xz32zms5qj1asapw"))))
+      (build-system copy-build-system)
+      (arguments
+       (list #:install-plan #~'(("." "/share/data/base/texpages"))))
+      (home-page "https://wz2100.net")
+      (synopsis "Texpages data for Warzone2100")
+      (description "warzone2100-texpages is a set of textures to be used with
+warzone2100.")
+      (properties '((hidden? . #t)))
+      (license (list
+                ;; bdrops/backdrop[012].png
+                ;; page-6-features-rockies.png
+                ;; page-17-droid-weapons.png
+                license:cc-by-sa3.0
+                ;; bdrops/backdrop4.png
+                ;; bdrops/backdrop6.png
+                ;; page-25-sky-urban.png
+                license:cc0
+                ;; everything else
+                license:gpl2+)))))
+
 (define-public warzone2100
   (package
     (name "warzone2100")
