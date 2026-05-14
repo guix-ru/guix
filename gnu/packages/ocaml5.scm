@@ -5734,6 +5734,23 @@ curves (NIST P-256, P-384, P-521, and curve 25519), and a strong
 RNG (Fortuna).")
     (license license:isc)))
 
+(define-public ocaml-mirage-crypto-rng
+  (package
+    (inherit ocaml-mirage-crypto)
+    (name "ocaml5-mirage-crypto-rng")
+    (arguments
+     (substitute-keyword-arguments (package-arguments ocaml-mirage-crypto)
+       ((#:package _ #f) "mirage-crypto-rng")))
+    (propagated-inputs
+     (list ocaml-duration ocaml-logs ocaml-mirage-crypto ocaml-digestif))
+    (native-inputs (list ocaml-ounit2 ocaml-randomconv ocaml-ohex))
+    (synopsis "Cryptographically secure PRNG")
+    (description "The main library of mirage-crypto-rng provides a random
+number generator interface and two implementations, Fortuna and HMAC-DRBG. The
+unix submodule also provides an implementation based on @code{getrandom()} and
+@code{getentropy()}.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
