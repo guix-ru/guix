@@ -5601,6 +5601,13 @@ first and foremost the @code{Eqaf.equal} equality testing function for
 @code{string}.")
     (license license:expat)))
 
+(define-public ocaml-eqaf-cstruct
+  (package
+    (inherit ocaml-eqaf)
+    (name "ocaml5-eqaf-cstruct")
+    (propagated-inputs (list ocaml-cstruct ocaml-eqaf))
+    (arguments `(#:package "eqaf-cstruct"))))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
