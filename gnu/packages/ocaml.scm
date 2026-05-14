@@ -6205,8 +6205,6 @@ Atom.")
     (description "This package implements an Ocaml language server implementation.")
     (license license:isc)))
 
-(define-public ocaml5.0-lsp-server (package-with-ocaml5.0 ocaml-lsp-server))
-
 (define-public ocaml-gsl
   (package
     (name "ocaml-gsl")
