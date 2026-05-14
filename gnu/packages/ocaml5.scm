@@ -5701,6 +5701,39 @@ first and foremost the @code{Eqaf.equal} equality testing function for
 and OCaml.")
     (license license:isc)))
 
+(define-public ocaml-mirage-crypto
+  (package
+    (name "ocaml5-mirage-crypto")
+    (version "2.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/mirage-crypto")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0kmssrc1ly8ww9spw8rx1jfkfp238k52jr0mp0hcxy69ff321nzc"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-ounit2 ocaml-ohex))
+    (propagated-inputs (list ocaml-eqaf))
+    (arguments
+     `(#:package "mirage-crypto"
+       #:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-licenses
+                    (lambda _
+                      (delete-file "LICENSE.md.mirage-crypto-ec")
+                      (delete-file "LICENSE.md.mirage-crypto-rng-mirage"))))))
+    (home-page "https://github.com/mirage/mirage-crypto")
+    (synopsis "Cryptographic primitives for OCaml, in OCaml (also used in MirageOS)")
+    (description "This repository contains a small cryptographic library that
+puts emphasis on the applicative style and ease of use. It includes basic
+ciphers (AES, 3DES, RC4, ChaCha20/Poly1305), AEAD primitives (AES-GCM,
+AES-CCM, ChaCha20/Poly1305), public-key primitives (RSA, DSA, DH), elliptic
+curves (NIST P-256, P-384, P-521, and curve 25519), and a strong
+RNG (Fortuna).")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
