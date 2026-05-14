@@ -181,39 +181,6 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
  
      # In Chromium code, we define __STDC_foo_MACROS in order to get the
      # C99 macros on Mac and Linux.
-@@ -2399,32 +2261,6 @@ config("chromium_code") {
-       "__STDC_FORMAT_MACROS",
-     ]
- 
--    if (!is_debug && !using_sanitizer && current_cpu != "s390x" &&
--        current_cpu != "ppc64" && current_cpu != "mips" &&
--        current_cpu != "mips64" && current_cpu != "riscv64" &&
--        current_cpu != "loong64") {
--      # Non-chromium code is not guaranteed to compile cleanly with
--      # _FORTIFY_SOURCE. Also, fortified build may fail when optimizations are
--      # disabled, so only do that for Release build.
--      fortify_level = "2"
--
--      # ChromeOS's toolchain supports a high-quality _FORTIFY_SOURCE=3
--      # implementation with a few custom glibc patches. Use that if it's
--      # available.
--      if (is_chromeos_device) {
--        fortify_level = "3"
--      }
--
--      # _FORTIFY_SOURCE=3 is available in glibc 2.34+. Enable it when building
--      # with the sysroot where support is guaranteed. Clang is also required since
--      # the system gcc is often patched to add _FORTIFY_SOURCE=2 which would conflict
--      # with our definition.
--      if (use_sysroot && is_clang) {
--        fortify_level = "3"
--      }
--      defines += [ "_FORTIFY_SOURCE=" + fortify_level ]
--    }
--
-     if (is_apple) {
-       cflags_objc = [ "-Wimplicit-retain-self" ]
-       cflags_objcc = [ "-Wimplicit-retain-self" ]
  
 -- 
 2.52.0

@@ -465,6 +465,10 @@
            "ungoogled-chromium-extension-search-path.patch")))
         (local-file
          (assume-valid-file-name
+           (search-patch
+            "ungoogled-chromium-increase-fortify-level.patch")))
+        (local-file
+         (assume-valid-file-name
           (search-patch
            "ungoogled-chromium-RUNPATH.patch")))
         (local-file

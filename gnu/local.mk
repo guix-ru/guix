@@ -2573,6 +2573,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/ungoogled-chromium-custom-compiler.patch 	\
   %D%/packages/patches/ungoogled-chromium-empty-parsed-rustc-args.patch	\
   %D%/packages/patches/ungoogled-chromium-extension-search-path.patch	\
+  %D%/packages/patches/ungoogled-chromium-increase-fortify-level.patch	\
   %D%/packages/patches/ungoogled-chromium-RUNPATH.patch		\
   %D%/packages/patches/ungoogled-chromium-system-nspr.patch	\
   %D%/packages/patches/unknown-horizons-python-3.8-distro.patch	\
