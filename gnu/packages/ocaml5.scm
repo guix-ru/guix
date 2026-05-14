@@ -1833,7 +1833,7 @@ packages.")
 (define-public ocaml-num
   (package
     (name "ocaml5-num")
-    (version "1.4")
+    (version "1.6")
     (source
      (origin
        (method git-fetch)
@@ -1842,7 +1842,7 @@ packages.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1vzdnvpj5dbj3ifx03v25pj2jj1ccav072v4d29pk1czdba2lzfc"))))
+        (base32 "1m0jvsjxar16bvmq0h3ad3cwnmjxn1wnjhqljya9hahv3dcg8s95"))))
     (build-system dune-build-system)
     (arguments
      `(#:phases (modify-phases %standard-phases
