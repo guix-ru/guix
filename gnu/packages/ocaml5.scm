@@ -1567,7 +1567,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
        (sha256
         (base32 "1a0mxwf3mwl2n6ryqqsvcg73ly8ji0xi0xa2v1p02695495grkki"))))
     (build-system gnu-build-system)
-    (native-inputs (list m4 ocaml-5.3))
+    (native-inputs (list m4 ocaml))
     (arguments
      `(#:tests? #f ;no test suite
        #:parallel-build? #f
