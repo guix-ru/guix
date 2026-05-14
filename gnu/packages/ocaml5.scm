@@ -619,6 +619,28 @@ functions.")
 `Uchar` module introduced in OCaml 4.03.")
     (license license:lgpl2.1)))
 
+(define-public ocaml-ohex
+  (package
+    (name "ocaml5-ohex")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://git.robur.coop/robur/ohex")
+             (commit (string-append "v" version))))
+       (sha256
+        (base32 "1ky2vg25h18wjzjb40bm8qyv153wcgh9526xjdrp3f0m14h3yn7n"))
+       (file-name (git-file-name name version))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-alcotest))
+    (home-page "https://git.robur.coop/robur/ohex")
+    (synopsis "Hexadecimal encoding and decoding")
+    (description
+     "This package provides functionality to decode and encode strings into
+hexadecimal representation.")
+    (license license:bsd-2)))
+
 (define-public ocaml-mtime
   (package
     (name "ocaml5-mtime")
