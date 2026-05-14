@@ -5549,6 +5549,31 @@ loop and timers.  It also provides the low level C startup code and C stubs
 required by the OCaml code.")
     (license license:isc)))
 
+(define-public ocaml-bechamel
+  (package
+    (name "ocaml5-bechamel")
+    (version "0.5.0")
+    (home-page "https://github.com/mirage/bechamel")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url home-page)
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "18zvd220dfrh239mnb6wwh5c8qwd9mymq4rgm89y52ym139gqg39"))))
+    (build-system dune-build-system)
+    (arguments `(#:package "bechamel"))
+    (native-inputs (list ocaml-alcotest))
+    (propagated-inputs (list ocaml-fmt))
+    (synopsis "Yet Another Benchmark in OCaml")
+    (description
+     "Bechamel is a simple micro-benchmarking framework to record various
+metrics for a small function, such as monotonic clock time or memory
+allocations.")
+    (license license:expat)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
