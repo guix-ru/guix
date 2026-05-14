@@ -5574,6 +5574,33 @@ metrics for a small function, such as monotonic clock time or memory
 allocations.")
     (license license:expat)))
 
+(define-public ocaml-eqaf
+  (package
+    (name "ocaml5-eqaf")
+    (version "0.10")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/eqaf")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1pwj69j0nrmshngxa9xilj8k0v17r72jjsx8ch92npnhgfi1ij6w"))))
+    (build-system dune-build-system)
+    (native-inputs (list ocaml-base64
+                         ocaml-alcotest
+                         ocaml-crowbar
+                         ocaml-fmt
+                         ocaml-bechamel))
+    (arguments `(#:package "eqaf"))
+    (home-page "https://github.com/mirage/eqaf")
+    (synopsis "Constant-time equal function on string")
+    (description "This library implements various constant time algorithms,
+first and foremost the @code{Eqaf.equal} equality testing function for
+@code{string}.")
+    (license license:expat)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
