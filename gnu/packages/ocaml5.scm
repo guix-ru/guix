@@ -176,6 +176,20 @@ functional, imperative and object-oriented styles of programming.")
                (base32
                 "05jhy9zn53v12rn3sg3vllqf5blv1gp7f06803npimc58crxy6rv"))))))
 
+(define-public ocaml-5.4
+  (package
+    (inherit ocaml-5.0)
+    (version "5.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ocaml/ocaml")
+             (commit version)))
+       (file-name (git-file-name "ocaml" version))
+       (sha256
+        (base32 "0bpfwdfc7j53hb57arb6nxdj0ahkcxzkbj2ax90nvkjcyr96xcr3"))))))
+
 ;; The default ocaml 5.x compiler, for those packages that depend on a
 ;; compiler explicitly.
 (define-public ocaml ocaml-5.3)
