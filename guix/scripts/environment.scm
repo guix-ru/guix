@@ -100,7 +100,9 @@ shell'."
   (display (G_ "
       --pure             unset existing environment variables"))
   (display (G_ "
-  -E, --preserve=REGEXP  preserve environment variables that match REGEXP"))
+  -E, --preserve=REGEXP
+  -E VAR=VALUE           preserve environment variables that match REGEXP;
+                         if REGEXP contains `=', set VAR to VALUE instead"))
   (display (G_ "
       --search-paths     display needed environment variable definitions"))
   (display (G_ "
@@ -212,9 +214,15 @@ COMMAND or an interactive shell in that environment.\n"))
                    (alist-cons 'pure #t result)))
          (option '(#\E "preserve") #t #f
                  (lambda (opt name arg result)
-                   (alist-cons 'inherit-regexp
-                               (make-regexp* arg)
-                               result)))
+                   (let ((=-index (string-index arg #\=)))
+                     (if =-index
+                         (alist-cons 'environment-variables
+                                     (cons (substring arg 0 =-index)
+                                           (substring arg (1+ =-index)))
+                                     result)
+                         (alist-cons 'inherit-regexp
+                                     (make-regexp* arg)
+                                     result)))))
          (option '("inherit") #t #f               ;deprecated
                  (lambda (opt name arg result)
                    (warning (G_ "'--inherit' is deprecated, \
@@ -513,19 +521,23 @@ and suitable for 'exit'."
 
 (define* (launch-environment command profile manifest
                              #:key pure? (white-list '())
+                             (environment-variables '())
                              emulate-fhs?)
   "Load the environment of PROFILE, which corresponds to MANIFEST, and execute
 COMMAND.  When PURE?, pre-existing environment variables are cleared before
-setting the new ones, except those matching the regexps in WHITE-LIST.  When
-EMULATE-FHS?, first set up an FHS environment with $PATH and generate the LD
-cache."
+setting the new ones, except those matching the regexps in WHITE-LIST.
+Variables in ENVIRONMENT-VARIABLES (a list of pairs) are set in the
+environment.  When EMULATE-FHS?, first set up an FHS environment with $PATH
+and generate the LD cache."
   ;; Properly handle SIGINT, so pressing C-c in an interactive terminal
   ;; application works.
   (sigaction SIGINT SIG_DFL)
   ;; Restore original action for SIGPIPE.
   (sigaction SIGPIPE SIG_DFL)
   (load-profile profile manifest
-                #:pure? pure? #:white-list-regexps white-list)
+                #:pure? pure?
+                #:white-list-regexps white-list
+                #:environment-variables environment-variables)
 
   ;; Give users a way to know that they're in 'guix environment', so they can
   ;; adjust 'PS1' accordingly, for instance.  Set it to PROFILE so users can
@@ -734,15 +746,19 @@ command name."
                           closest))))))))
 
 (define* (launch-environment/fork command profile manifest
-                                  #:key pure? (white-list '()))
+                                  #:key
+                                  pure? (white-list '())
+                                  (environment-variables '()))
   "Run COMMAND in a new process with an environment containing PROFILE, with
 the search paths specified by MANIFEST.  When PURE?, pre-existing environment
 variables are cleared before setting the new ones, except those matching the
-regexps in WHITE-LIST."
+regexps in WHITE-LIST.  Variables in ENVIRONMENT-VARIABLES (a list of pairs)
+are set in the environment."
   (match (primitive-fork)
     (0 (launch-environment command profile manifest
                            #:pure? pure?
-                           #:white-list white-list))
+                           #:white-list white-list
+                           #:environment-variables environment-variables))
     (pid (match (waitpid pid)
            ((_ . status)
             status)))))
@@ -752,7 +768,8 @@ regexps in WHITE-LIST."
                                        map-cwd? cwd emulate-fhs? nesting?
                                        writable-root?
                                        (setup-hook #f)
-                                       (symlinks '()) (white-list '()))
+                                       (symlinks '()) (white-list '())
+                                       (environment-variables '()))
   "Run COMMAND within a container that features the software in PROFILE.
 Environment variables are set according to the search paths of MANIFEST.  The
 global shell is BASH, a file name for a GNU Bash binary in the store.  When
@@ -777,7 +794,10 @@ SYMLINKS must be a list of (SOURCE -> TARGET) tuples denoting symlinks to be
 added to the container.
 
 Preserve environment variables whose name matches the one of the regexps in
-WHILE-LIST."
+WHILE-LIST.
+
+Variables in ENVIRONMENT-VARIABLES (a list of pairs) are set in the
+environment."
   (define (optional-mapping->fs mapping)
     (and (file-exists? (file-system-mapping-source mapping))
          (file-system-mapping->bind-mount mapping)))
@@ -977,6 +997,7 @@ WHILE-LIST."
                                      (string-append home-dir "/.guix-profile")
                                      profile)
                                  manifest #:pure? #f
+                                 #:environment-variables environment-variables
                                  #:emulate-fhs? emulate-fhs?)))
           #:populate-file-system
           (lambda ()
@@ -1171,7 +1192,8 @@ command-line option processing with 'parse-command-line'."
                            '("/bin/sh")
                            (list %default-shell))))
          (mappings   (pick-all opts 'file-system-mapping))
-         (white-list (pick-all opts 'inherit-regexp)))
+         (white-list (pick-all opts 'inherit-regexp))
+         (environment-variables  (pick-all opts 'environment-variables)))
 
     (define store-needed?
       ;; Whether connecting to the daemon is needed.
@@ -1291,6 +1313,8 @@ when using '--container'; doing nothing~%"))
                                                   #:profile profile
                                                   #:manifest manifest
                                                   #:white-list white-list
+                                                  #:environment-variables
+                                                  environment-variables
                                                   #:link-profile? link-prof?
                                                   #:network? network?
                                                   #:map-cwd? (not no-cwd?)
@@ -1308,6 +1332,8 @@ when using '--container'; doing nothing~%"))
                    (exit/status
                     (launch-environment/fork command profile manifest
                                              #:white-list white-list
+                                             #:environment-variables
+                                             environment-variables
                                              #:pure? pure?)))))))))))))
 
 ;;; Local Variables:

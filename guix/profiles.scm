@@ -2171,14 +2171,20 @@ WHITE-LIST-REGEXPS and those listed in WHITE-LIST."
 (define* (load-profile profile
                        #:optional (manifest (profile-manifest profile))
                        #:key pure? (white-list-regexps '())
+                       (environment-variables '())
                        (white-list %precious-variables))
   "Set the environment variables specified by MANIFEST for PROFILE.  When
 PURE? is #t, unset the variables in the current environment except those that
 match the regexps in WHITE-LIST-REGEXPS and those listed in WHITE-LIST.
 Otherwise, augment existing environment variables with additional search
-paths."
+paths.  Environment variables in ENVIRONMENT-VARIABLES, a list of pairs, are
+@emph{set} in the environment."
   (when pure?
     (purify-environment white-list white-list-regexps))
+  (map (match-lambda
+         ((name . value)
+          (setenv name value)))
+       environment-variables)
   (for-each (match-lambda
               ((($ <search-path-specification> variable _ separator) . value)
                (let ((current (getenv variable)))

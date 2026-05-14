@@ -6803,20 +6803,26 @@ creating an environment in which search paths only contain package inputs.
 
 @item --preserve=@var{regexp}
 @itemx -E @var{regexp}
+@itemx -E @var{var}=@var{value}
 When used alongside @option{--pure}, preserve the environment variables
 matching @var{regexp}---in other words, put them on a ``white list'' of
-environment variables that must be preserved.  This option can be repeated
-several times.
+environment variables that must be preserved.  This option can be
+repeated several times.
+
+When @var{regexp} contains a variable assignment (with a @samp{=}
+character), the @var{var} environment variable is directly set to the
+@var{value} in the environment.  This is used in the example below to
+set the number of threads OpenMPI should use:
 
 @example
-guix shell --pure --preserve=^SLURM openmpi @dots{} \
+guix shell --pure --preserve=^SLURM -E OMP_NUM_THREADS=16 openmpi @dots{} \
   -- mpirun @dots{}
 @end example
 
 This example runs @command{mpirun} in a context where the only environment
 variables defined are @env{PATH}, environment variables whose name starts
-with @samp{SLURM}, as well as the usual ``precious'' variables (@env{HOME},
-@env{USER}, etc.).
+with @samp{SLURM}, variable @env{TERM} set to @samp{no=color}, as well as
+the usual ``precious'' variables (@env{HOME}, @env{USER}, etc.).
 
 @item --search-paths
 Display the environment variable definitions that make up the
@@ -7319,6 +7325,7 @@ creating an environment in which search paths only contain package inputs.
 
 @item --preserve=@var{regexp}
 @itemx -E @var{regexp}
+@itemx -E @var{var}=@var{value}
 When used alongside @option{--pure}, preserve the environment variables
 matching @var{regexp}---in other words, put them on a ``white list'' of
 environment variables that must be preserved.  This option can be repeated

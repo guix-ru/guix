@@ -49,18 +49,21 @@ test -x `sed -r 's/^export PATH="(.*)"/\1/' "$tmpdir/a"`/guile
 
 cmp "$tmpdir/a" "$tmpdir/b"
 
-# Check '--preserve'.
+# Check '--preserve', as well as its -E VAR=VALUE special case.
 GUIX_TEST_ABC=1
 GUIX_TEST_DEF=2
 GUIX_TEST_XYZ=3
+GUIX_TEST_ZZZ=4
 export GUIX_TEST_ABC GUIX_TEST_DEF GUIX_TEST_XYZ
 guix environment --bootstrap --ad-hoc guile-bootstrap --pure	\
      --preserve='^GUIX_TEST_A' --preserve='^GUIX_TEST_D'	\
+     --preserve='^GUIX_TEST_Z' -E 'GUIX_TEST_ZZZ=overridden'    \
      -- "$SHELL" -c set > "$tmpdir/a"
 grep '^PATH=' "$tmpdir/a"
 grep '^GUIX_TEST_ABC=1' "$tmpdir/a"
 grep '^GUIX_TEST_DEF=2' "$tmpdir/a"
 grep '^GUIX_TEST_XYZ=3' "$tmpdir/a" && false
+grep '^GUIX_TEST_ZZZ=overridden' "$tmpdir/a"
 
 # Make sure the exit value is preserved.
 if guix environment --bootstrap --ad-hoc guile-bootstrap --pure \
