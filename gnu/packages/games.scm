@@ -7243,6 +7243,18 @@ warzone2100's high quality mode.")
     (license (list license:cc-by-sa3.0  ;either
                    license:gpl2+))))
 
+(define-public warzone2100-data-music-opus
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+           (url "https://github.com/Warzone2100/data-music-opus")
+           ;; Matches warzone2100 v4.7.0.
+           (commit "db73d2b2e58dfaa8a09ab27ad771cc636be31118")))
+    (file-name "warzone2100-data-music-opus")
+    (sha256
+     (base32
+      "1liyhzasgbpjdy8w3m9906clm6kvq7x3dz45cg7ibjwq6xaqn4v1"))))
+
 (define-public warzone2100
   (package
     (name "warzone2100")
