@@ -254,9 +254,9 @@ the opam file format.")
     ;; With static-linking exception
     (license license:lgpl2.1+)))
 
-(define-public ocaml5.3-result
+(define-public ocaml5.4-result
   (package
-    (name "ocaml5.3-result")
+    (name "ocaml5.4-result")
     (version "1.5")
     (source
      (origin
@@ -269,7 +269,7 @@ the opam file format.")
         (base32 "166laj8qk7466sdl037c6cjs4ac571hglw4l5qpyll6df07h6a7q"))))
     (build-system dune-build-system)
     (arguments
-     `(#:dune ,ocaml5.3-dune-bootstrap))
+     `(#:dune ,ocaml5.4-dune-bootstrap))
     (home-page "https://github.com/janestreet/result")
     (synopsis "Compatibility Result module")
     (description
@@ -280,7 +280,7 @@ defined in this library.")
 
 ;; Use this version of `ocaml-result` for packages built with the default
 ;; ocaml 5.x compiler.
-(define-public ocaml-result ocaml5.3-result)
+(define-public ocaml-result ocaml5.4-result)
 
 (define-public ocaml-topkg
   (package
@@ -1420,10 +1420,10 @@ Descriptions of projects, libraries and executables are provided in
 @file{dune} files following an s-expression syntax.")
     (license license:expat)))
 
-(define-public ocaml5.3-dune-bootstrap
+(define-public ocaml5.4-dune-bootstrap
   (package
     (inherit %dune-base)
-    (name "ocaml5.3-dune")
+    (name "ocaml5.4-dune")
     (build-system ocaml-build-system)
     (arguments
      `(#:tests? #f; require odoc
@@ -1441,20 +1441,20 @@ Descriptions of projects, libraries and executables are provided in
     (properties '((hidden? . #t)))))
 
 ;; Use this alias for packages built with the default ocaml 5.x compiler.
-(define-public dune ocaml5.3-dune-bootstrap)
+(define-public dune ocaml5.4-dune-bootstrap)
 
 (define-public ocaml5.0-dune-bootstrap
   (package
-    (inherit ocaml5.3-dune-bootstrap)
+    (inherit ocaml5.4-dune-bootstrap)
     (name "ocaml5.0-dune-bootstrap")
     (arguments
-     `(,@(package-arguments ocaml5.3-dune-bootstrap)
+     `(,@(package-arguments ocaml5.4-dune-bootstrap)
        #:ocaml ,ocaml-5.0
        #:findlib ,ocaml5.0-findlib))))
 
-(define-public ocaml5.3-csexp
+(define-public ocaml5.4-csexp
   (package
-    (name "ocaml5.3-csexp")
+    (name "ocaml5.4-csexp")
     (version "1.5.2")
     (source
      (origin
@@ -1468,14 +1468,14 @@ Descriptions of projects, libraries and executables are provided in
     (build-system dune-build-system)
     (arguments
      `(#:tests? #f ;FIXME: needs ppx_expect, but which version?
-       #:dune ,ocaml5.3-dune-bootstrap
+       #:dune ,ocaml5.4-dune-bootstrap
        #:phases (modify-phases %standard-phases
                   (add-before 'build 'chmod
                     (lambda _
                       (for-each (lambda (file)
                                   (chmod file #o644))
                                 (find-files "." ".*")) #t)))))
-    (propagated-inputs (list ocaml5.3-result))
+    (propagated-inputs (list ocaml5.4-result))
     (home-page "https://github.com/ocaml-dune/csexp")
     (synopsis "Parsing and printing of S-expressions in Canonical form")
     (description
@@ -1494,7 +1494,7 @@ module of this library is parameterised by the type of S-expressions.")
     (license license:expat)))
 
 ;; Use this alias for packages built with the default ocaml 5.x compiler.
-(define-public ocaml-csexp ocaml5.3-csexp)
+(define-public ocaml-csexp ocaml5.4-csexp)
 
 ;; Base package for all libraries (not the binary) hosted in the main dune
 ;; repo.
@@ -1520,16 +1520,16 @@ module of this library is parameterised by the type of S-expressions.")
             (lambda _
               (delete-file-recursively "vendor"))))))))
 
-(define-public ocaml5.3-dune-configurator
+(define-public ocaml5.4-dune-configurator
   (package
     (inherit %dune-lib-base)
-    (name "ocaml5.3-dune-configurator")
+    (name "ocaml5.4-dune-configurator")
     (build-system dune-build-system)
     (arguments
      (substitute-keyword-arguments (package-arguments %dune-lib-base)
        ((#:package _ #f) "dune-configurator")
-       ((#:dune _ #f) ocaml5.3-dune-bootstrap)))
-    (propagated-inputs (list ocaml5.3-csexp))
+       ((#:dune _ #f) ocaml5.4-dune-bootstrap)))
+    (propagated-inputs (list ocaml5.4-csexp))
     (synopsis "Dune helper library for gathering system configuration")
     (description
      "Dune-configurator is a small library that helps writing
@@ -1545,17 +1545,17 @@ config.h files for instance.  Among other things, dune-configurator allows one t
 
 ;; Use this version of `dune-configurator` for packages built with the default
 ;; ocaml 5.x compiler.
-(define-public dune-configurator ocaml5.3-dune-configurator)
+(define-public dune-configurator ocaml5.4-dune-configurator)
 
-(define-public ocaml5.3-dune
+(define-public ocaml5.4-dune
   (package
-    (inherit ocaml5.3-dune-bootstrap)
-    (propagated-inputs (list ocaml5.3-dune-configurator))
+    (inherit ocaml5.4-dune-bootstrap)
+    (propagated-inputs (list ocaml5.4-dune-configurator))
     (properties '())))
 
-(define-public ocaml5.3-findlib
+(define-public ocaml5.4-findlib
   (package
-    (name "ocaml5.3-findlib")
+    (name "ocaml5.4-findlib")
     (version "1.9.8")
     (source
      (origin
@@ -1609,7 +1609,7 @@ compilers that can directly deal with packages.")
 
 (define-public ocaml5.0-findlib
   (package
-    (inherit ocaml5.3-findlib)
+    (inherit ocaml5.4-findlib)
     (name "ocaml5.0-findlib")
     (native-inputs
      (list m4 ocaml-5.0))))

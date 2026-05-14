@@ -1951,7 +1951,7 @@ Descriptions of projects, libraries and executables are provided in
      (list ocaml-csexp))
     (properties `((ocaml4.09-variant . ,(delay ocaml4.09-dune-configurator))
                   (ocaml5.0-variant . ,(delay ocaml5.0-dune-configurator))
-                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-dune-configurator))))
+                  (ocaml5.4-variant . ,(delay ocaml5:ocaml5.4-dune-configurator))))
     (synopsis "Dune helper library for gathering system configuration")
     (description "Dune-configurator is a small library that helps writing
 OCaml scripts that test features available on the system, in order to generate
@@ -1995,7 +1995,7 @@ config.h files for instance.  Among other things, dune-configurator allows one t
     (properties `((ocaml4.07-variant . ,(delay ocaml4.07-dune))
                   (ocaml4.09-variant . ,(delay ocaml4.09-dune))
                   (ocaml5.0-variant . ,(delay ocaml5.0-dune))
-                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-dune))))))
+                  (ocaml5.4-variant . ,(delay ocaml5:ocaml5.4-dune))))))
 
 (define-public ocaml4.09-dune
   (package
@@ -2149,7 +2149,7 @@ executables and libraries")))
      (list ocaml-result))
     (properties `((ocaml4.09-variant . ,(delay ocaml4.09-csexp))
                   (ocaml5.0-variant . ,(delay ocaml5.0-csexp))
-                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-csexp))))
+                  (ocaml5.4-variant . ,(delay ocaml5:ocaml5.4-csexp))))
     (home-page "https://github.com/ocaml-dune/csexp")
     (synopsis "Parsing and printing of S-expressions in Canonical form")
     (description "This library provides minimal support for Canonical
@@ -2310,7 +2310,7 @@ bitsrings in Erlang style as primitives to the language.")))
      `(#:dune ,dune-bootstrap))
     (properties `((ocaml4.09-variant . ,(delay ocaml4.09-result))
                   (ocaml5.0-variant . ,(delay ocaml5.0-result))
-                  (ocaml5.3-variant . ,(delay ocaml5:ocaml5.3-result))))
+                  (ocaml5.4-variant . ,(delay ocaml5:ocaml5.4-result))))
     (home-page "https://github.com/janestreet/result")
     (synopsis "Compatibility Result module")
     (description "Uses the new result type defined in OCaml >= 4.03 while
