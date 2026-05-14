@@ -4811,6 +4811,27 @@ browsers and Node.js.")
     (home-page "https://ocsigen.org/js_of_ocaml/")
     (license license:lgpl2.1+)))
 
+(define-public ocaml-randomconv
+  (package
+    (name "ocaml5-randomconv")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/hannesm/randomconv")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "16bc0x2r2l7zrax7488a33lnnas86fcbiw5728s3hgbd8gyz32r8"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/hannesm/randomconv")
+    (synopsis "Generates random native numbers in common types using
+byte-vector inputs")
+    (description "Given a generator for random byte vectors, this convenience
+library converts the output into common number representations.")
+    (license license:isc)))
+
 (define-public ocaml-owl-base
   (package
     (name "ocaml5-owl-base")
