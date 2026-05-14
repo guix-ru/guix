@@ -5608,6 +5608,34 @@ first and foremost the @code{Eqaf.equal} equality testing function for
     (propagated-inputs (list ocaml-cstruct ocaml-eqaf))
     (arguments `(#:package "eqaf-cstruct"))))
 
+(define-public ocaml-digestif
+  (package
+    (name "ocaml5-digestif")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mirage/digestif")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0qwyihi5bdqfy39m00db3v4simm6b0nbglav0zcdd00jpv6mgnc2"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-eqaf))
+    (native-inputs (list ocaml-fmt
+                         ocaml-alcotest
+                         ocaml-bos
+                         ocaml-astring
+                         ocaml-fpath
+                         ocaml-rresult
+                         ocaml-crowbar))
+    (home-page "https://github.com/mirage/digestif")
+    (synopsis "Hashes implementations (SHA*, RIPEMD160, BLAKE2* and MD5)")
+    (description "Digestif is a toolbox to provide hashes implementations in C
+and OCaml.")
+    (license license:isc)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
