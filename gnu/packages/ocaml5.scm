@@ -2986,24 +2986,29 @@ syntax extensions, and it is extensible for others.")
     (license license:lgpl2.1)))
 
 (define %ocaml-ocamlformat-base
-  (package
-    (name "ocaml5-ocamlformat-base")
-    (version "0.29.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/ocaml-ppx/ocamlformat")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "107pprrxyvxv23pp0753k82qydhjz5jwir209mgs3r93vhn0fd7v"))))
-    (build-system dune-build-system)
-    (home-page "https://github.com/ocaml-ppx/ocamlformat")
-    (synopsis "Auto-formatter for OCaml code")
-    (description "OCamlFormat is a tool to automatically format OCaml code in
+  (let ((commit
+         ;; Update for compatibility with dune 3.22:
+         ;; https://github.com/ocaml-ppx/ocamlformat/pull/2789
+         "1534010a9252edebc0b773ac8b993ae986ad0a80")
+        (revision "0"))
+    (package
+      (name "ocaml5-ocamlformat-base")
+      (version (git-version "0.29.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/ocaml-ppx/ocamlformat")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "05ip7c456idw90vxi2v5zh1xhn7r0h6qf2vms00sbbcw541fn60s"))))
+      (build-system dune-build-system)
+      (home-page "https://github.com/ocaml-ppx/ocamlformat")
+      (synopsis "Auto-formatter for OCaml code")
+      (description "OCamlFormat is a tool to automatically format OCaml code in
 a uniform style.")
-    (license license:expat)))
+      (license license:expat))))
 
 (define-public ocaml-ocamlformat-lib
   (package
