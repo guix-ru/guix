@@ -34,8 +34,8 @@
             strip-ocaml4.09-variant
             package-with-ocaml5.0
             strip-ocaml5.0-variant
-            package-with-ocaml5.3
-            strip-ocaml5.3-variant
+            package-with-ocaml5.4
+            strip-ocaml5.4-variant
             default-findlib
             default-ocaml
             default-dune
@@ -133,19 +133,19 @@
 (define (default-ocaml5.3)
   (@* (gnu packages ocaml5) ocaml-5.3))
 
-(define (default-ocaml5.3-findlib)
-  (@* (gnu packages ocaml5) ocaml5.3-findlib))
+(define (default-ocaml5.4-findlib)
+  (@* (gnu packages ocaml5) ocaml5.4-findlib))
 
-(define (default-ocaml5.3-dune)
-  (@* (gnu packages ocaml5) ocaml5.3-dune))
+(define (default-ocaml5.4-dune)
+  (@* (gnu packages ocaml5) ocaml5.4-dune))
 
 ;; The default versions of core packages within the 5.x series.
 
 (define default-ocaml5 default-ocaml5.3)
 
-(define default-ocaml5-findlib default-ocaml5.3-findlib)
+(define default-ocaml5-findlib default-ocaml5.4-findlib)
 
-(define default-ocaml5-dune default-ocaml5.3-dune)
+(define default-ocaml5-dune default-ocaml5.4-dune)
 
 (define* (package-with-explicit-ocaml ocaml findlib dune old-prefix new-prefix
                                        #:key variant-property)
@@ -251,18 +251,18 @@ pre-defined variants."
     (inherit p)
     (properties (alist-delete 'ocaml5.0-variant (package-properties p)))))
 
-(define package-with-ocaml5.3
+(define package-with-ocaml5.4
   (package-with-explicit-ocaml (delay (default-ocaml5.3))
-                               (delay (default-ocaml5.3-findlib))
-                               (delay (default-ocaml5.3-dune))
-                               "ocaml-" "ocaml5.3-"
-                               #:variant-property 'ocaml5.3-variant))
+                               (delay (default-ocaml5.4-findlib))
+                               (delay (default-ocaml5.4-dune))
+                               "ocaml-" "ocaml5.4-"
+                               #:variant-property 'ocaml5.4-variant))
 
-(define (strip-ocaml5.3-variant p)
-  "Remove the 'ocaml5.3-variant' property from P."
+(define (strip-ocaml5.4-variant p)
+  "Remove the 'ocaml5.4-variant' property from P."
   (package
     (inherit p)
-    (properties (alist-delete 'ocaml5.3-variant (package-properties p)))))
+    (properties (alist-delete 'ocaml5.4-variant (package-properties p)))))
 
 (define (make-lower default-ocaml default-findlib)
   (lambda* (name
