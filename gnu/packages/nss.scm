@@ -103,7 +103,7 @@ in the Mozilla clients.")
 (define-public nss
   (package
     (name "nss")
-    (version "3.101.4")                 ;update to latest ESR release
+    (version "3.112.5")                 ;update to latest ESR release
     (source (origin
               (method url-fetch)
               (uri (let ((version-with-underscores
@@ -114,12 +114,13 @@ in the Mozilla clients.")
                       "nss-" version ".tar.gz")))
               (sha256
                (base32
-                "1sqvh49qi9vq55sbg42c5n0kz6w6ni383hgiyhaym6drsmbzb86a"))
+                "03chsv0bjd2fi8lab241grbyqd4blapll5lbrpraddpd5mc8rjx4"))
               ;; Create nss.pc and nss-config.
               (patches (search-patches "nss-3.56-pkgconfig.patch"
                                        "nss-getcwd-nonnull.patch"
                                        "nss-increase-test-timeout.patch"
-                                       "nss-disable-broken-tests.patch"))
+                                       "nss-3.115-disable-broken-tests.patch"
+                                       "nss-3.115-disable-pkix-ocsp-tests.patch"))
               (modules '((guix build utils)))
               (snippet
                '(begin
