@@ -15,6 +15,7 @@
 ;;; Copyright © 2021 Pierre Langlois <pierre.langlois@gmx.com>
 ;;; Copyright © 2022, 2024 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2022, 2023 Ekaitz Zarraga <ekaitz@elenq.tech>
+;;; Copyright © 2026 Zheng Junjie <z572@z572.online>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -3735,6 +3736,9 @@ is the GNU Compiler Collection.")
 
 (define-public gcc-toolchain-15
   (make-gcc-toolchain gcc-15))
+
+(define-public gcc-toolchain-16
+  (make-gcc-toolchain gcc-16))
 
 ;; The default GCC
 (define-public gcc-toolchain

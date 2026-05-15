@@ -13,7 +13,7 @@
 ;;; Copyright © 2021 Chris Marusich <cmmarusich@gmail.com>
 ;;; Copyright © 2021 Sarah Morgensen <iskarian@mgsn.dev>
 ;;; Copyright © 2022 Greg Hogan <code@greghogan.com>
-;;; Copyright © 2024, 2025 Zheng Junjie <z572@z572.online>
+;;; Copyright © 2024-2026 Zheng Junjie <z572@z572.online>
 ;;; Copyright © 2023 Bruno Victal <mirai@makinata.eu>
 ;;; Copyright © 2023 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2024 Nguyễn Gia Phong <cnx@loang.net>
@@ -1078,6 +1078,34 @@ It also includes runtime support libraries for these languages.")
         ("x86_64" ,@%gcc-15-x86_64-micro-architectures))
        ,@(package-properties gcc-11)))))
 
+(define-public gcc-16
+  (package
+    (inherit gcc-15)
+    (version "16.1.0")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://gnu/gcc/gcc-"
+                                  version "/gcc-" version ".tar.xz"))
+              (sha256
+               (base32
+                "0y8ga5md6wdi0nzbfaizklfx6kcbfjyml6nnn3rsz5rk9kcv9vsh"))
+              (patches (search-patches "gcc-12-strmov-store-file-names.patch"
+                                       "gcc-5.0-libvtv-runpath.patch"))
+              (modules '((guix build utils)))
+              (snippet gcc-canadian-cross-objdump-snippet)))
+    ;; XXX: The libstdc++-headers package needs to be removed in order
+    ;; for gcc 16 to build successfully.
+    (inputs (modify-inputs inputs
+              (delete "libstdc++")))
+    (properties
+     `((compiler-cpu-architectures
+        ("aarch64" ,@%gcc-15-aarch64-micro-architectures)
+        ("armhf" ,@%gcc-13-armhf-micro-architectures)
+        ("i686" ,@%gcc-15-x86_64-micro-architectures)
+        ("powerpc64le" ,@%gcc-14-ppc64le-micro-architectures)
+        ("x86_64" ,@%gcc-15-x86_64-micro-architectures))
+       ,@(package-properties gcc-11)))))
+
 
 ;; Note: When changing the default gcc version, update
 ;;       the gcc-toolchain-* definitions.
@@ -1657,6 +1685,7 @@ misnomer.")))
 (define-public libgccjit-12 (make-libgccjit gcc-12))
 (define-public libgccjit-14 (make-libgccjit gcc-14))
 (define-public libgccjit-15 (make-libgccjit gcc-15))
+(define-public libgccjit-16 (make-libgccjit gcc-16))
 
 ;; This must match the 'gcc' variable, but it must also be 'eq?' to one of the
 ;; libgccjit-* packages above.
@@ -1738,6 +1767,10 @@ provides the GNU compiler for the Go programming language.")
 ;; Provides go-1.18
 (define-public gccgo-15
   (make-gccgo gcc-15))
+
+;; Provides go-1.18
+(define-public gccgo-16
+  (make-gccgo gcc-16))
 
 (define (make-libstdc++-doc gcc)
   "Return a package with the libstdc++ documentation for GCC."
