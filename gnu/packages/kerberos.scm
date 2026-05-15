@@ -61,7 +61,7 @@
 (define-public mit-krb5
   (package
     (name "mit-krb5")
-    (version "1.21")
+    (version "1.22.2")
     (source (origin
               (method url-fetch)
               (uri (list
@@ -74,7 +74,7 @@
               (patches (search-patches "mit-krb5-hurd.patch"))
               (sha256
                (base32
-                "0fx91rickkb5pvxm3imqmaavsncjkgcsrfx4czgk4j28hpzsmy39"))))
+                "04xg9ran75q0jzzn12v48168fmscqlfjmpf7vliarm54isygyhrj"))))
     (build-system gnu-build-system)
     (native-inputs
      (list bison perl)) ;required for some tests
@@ -98,7 +98,9 @@
                #:make-flags
                (list "CFLAGS+=-DDESTRUCTOR_ATTR_WORKS=1"))
              '(#:configure-flags
-               (list "--localstatedir=/var")))
+               (list "--localstatedir=/var")
+               ;; check-unix-ctxprf does not guard against missing python
+               #:make-flags (list "RUNPYTEST=true")))
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'enter-source-directory
