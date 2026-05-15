@@ -1684,7 +1684,9 @@ checksum tool based on the BLAKE3 cryptographic hash function.")
          "https://github.com/besser82/libxcrypt/releases/download/v" version
          "/libxcrypt-" version ".tar.xz"))
        (sha256
-        (base32 "0wf0mr17jp4xfw6bdd8gqpddc5gijpyk4yinsp68nhhsq0qkllbi"))))
+        (base32 "0wf0mr17jp4xfw6bdd8gqpddc5gijpyk4yinsp68nhhsq0qkllbi"))
+       (patches
+        (search-patches "libxcrypt-C23.patch"))))
     (build-system gnu-build-system)
     (native-inputs
      (list perl))

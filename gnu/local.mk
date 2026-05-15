@@ -1863,6 +1863,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/libvpx-CVE-2016-2818.patch		\
   %D%/packages/patches/libvpx-CVE-2026-2447.patch		\
   %D%/packages/patches/libxcb-path-max.patch			\
+  %D%/packages/patches/libxcrypt-C23.patch			\
   %D%/packages/patches/libxml2-xpath0-Add-option-xpath0.patch	\
   %D%/packages/patches/libwpd-gcc-compat.patch			\
   %D%/packages/patches/libxt-guix-search-paths.patch		\
