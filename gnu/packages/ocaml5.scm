@@ -5751,6 +5751,31 @@ unix submodule also provides an implementation based on @code{getrandom()} and
 @code{getentropy()}.")
     (license license:isc)))
 
+(define-public ocaml-mirage-crypto-rng-mirage
+  (package
+    (inherit ocaml-mirage-crypto-rng)
+    (name "ocaml5-mirage-crypto-rng-mirage")
+    (arguments
+     `(#:package "mirage-crypto-rng"
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'delete-licenses
+           (lambda _
+             (delete-file "LICENSE.md.mirage-crypto-ec")
+             (rename-file "LICENSE.md.mirage-crypto-rng-mirage" "LICENSE.md"))))))
+    (propagated-inputs
+     (list ocaml-mirage-crypto-rng
+           ocaml-duration
+           ocaml-logs
+           ocaml-lwt
+           ocaml-mirage-runtime
+           ocaml-mirage-sleep
+           ocaml-mirage-mtime))
+    (synopsis "Entropy collection for a cryptographically secure PRNG")
+    (description "Mirage-crypto-rng-mirage provides entropy collection code
+for the RNG.")
+    (license license:bsd-2)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
