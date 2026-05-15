@@ -71,7 +71,8 @@
                     (string-append "https://kerberos.org/dist/krb5/"
                                    (version-major+minor version)
                                    "/krb5-" version ".tar.gz")))
-              (patches (search-patches "mit-krb5-hurd.patch"))
+              (patches (search-patches "mit-krb5-hurd.patch"
+                                       "mit-krb5-C23.patch"))
               (sha256
                (base32
                 "04xg9ran75q0jzzn12v48168fmscqlfjmpf7vliarm54isygyhrj"))))
