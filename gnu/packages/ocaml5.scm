@@ -5512,6 +5512,28 @@ handles the main loop and timers.")
 to sleep for a given amount of nanoseconds.")
     (license license:isc)))
 
+(define-public ocaml-mirage-mtime
+  (package
+    (name "ocaml5-mirage-mtime")
+    (version "5.2.0")
+    (home-page "https://github.com/mirage/mirage-mtime")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0x1smji6hc5wjwky01d581vkil0c5b2kjqhw8s10rp262xsyhn24"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-mtime))
+    (synopsis "Libraries and module types for a monotonic clock")
+    (description "This library implements portable support for an operating
+system timesource that is compatible with the
+@url{https://mirageos.org,MirageOS} library interfaces.")
+    (license license:isc)))
+
 (define-public ocaml-mirage-metrics
   (package
     (name "ocaml5-mirage-metrics")
