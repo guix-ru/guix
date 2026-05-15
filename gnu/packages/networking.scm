@@ -1383,7 +1383,7 @@ and SSH, and it can use both TCP and UDP as transport mechanisms.")
 (define-public socat
   (package
     (name "socat")
-    (version "1.7.4.4")
+    (version "1.8.1.1")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -1391,7 +1391,7 @@ and SSH, and it can use both TCP and UDP as transport mechanisms.")
                     version ".tar.bz2"))
               (sha256
                (base32
-                "1b40ccdvxq5kaghsbwg4q3dq5aw4acw1bpqvs3v3ljp5y392pm7v"))))
+                "06ywg8rf4m5z7hsi0ja60rz4qq9sclhnas86i3wm6w22gxmn7g2y"))))
     (build-system gnu-build-system)
     (arguments '(#:tests? #f))          ; no test suite
     (inputs (list openssl readline))
