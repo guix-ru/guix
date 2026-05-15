@@ -590,7 +590,11 @@ exec ${system}/rc \"$@\"
                  (("/libexec/") (string-append out "/libexec/"))
                  (("/hurd/") (string-append out "/hurd/")))
                (substitute* "sutils/fsck.c"
-                 (("/sbin/") (in-vicinity e2fsprogs "sbin/"))))))
+                 (("/sbin/") (in-vicinity e2fsprogs "sbin/")))
+               (substitute* '("utils/remap.sh"
+                              "utils/fakeroot.sh")
+                 (("/bin/settrans") (string-append out "/bin/settrans"))
+                 (("/bin/fakeauth") (string-append out "/bin/fakeauth"))))))
          (add-after 'patch-shebangs 'patch-libexec-shebangs
            (lambda* (#:key inputs outputs #:allow-other-keys)
              ;; XXX: Since the 'patch-shebangs' phase doesn't traverse
