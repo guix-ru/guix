@@ -391,7 +391,7 @@ XXX TODO: use Linux xattr/setxattr to remove (settrans in) /libexec/RUNSYSTEM
             (to-load (find-long-option "gnu.load" args))
             (profile (string-append system "/profile"))
             (bin     (string-append profile "/bin"))
-            (sbin    (string-append profile "/bin")))
+            (sbin    (string-append profile "/sbin")))
 
        (setenv "PATH" (string-append bin ":" sbin))
 
