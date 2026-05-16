@@ -1521,7 +1521,7 @@ interactive environment for the functional language Haskell.")
     (supported-systems '("aarch64-linux"))
     ;; We need llvm until 9.2 which introduce aarch64 native code generation.
     ;; Make sure you have installed LLVM between [9 and 13)
-    (inputs (list gcc-13 gmp llvm-12 ncurses/tinfo numactl))
+    (inputs (list gcc-13 gmp llvm-12 ncurses numactl))
     (native-inputs
      (list patchelf perl))
     (arguments
@@ -1568,7 +1568,7 @@ interactive environment for the functional language Haskell.")
                    (invoke "patchelf" "--add-rpath"
                            (string-append #$gmp "/lib")  b)
                    (invoke "patchelf" "--add-rpath"
-                           (string-append (assoc-ref inputs "ncurses-with-tinfo") "/lib") b)
+                           (string-append (assoc-ref inputs "ncurses") "/lib") b)
                    (invoke "patchelf" "--add-rpath"
                            (string-append #$gcc-13:lib "/lib")  b)
                    (invoke "patchelf" "--add-rpath"
