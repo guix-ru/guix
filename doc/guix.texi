@@ -22765,49 +22765,6 @@ when using QEMU's user-mode network stack on @code{eth0} (@pxref{Using
 the user mode network stack,,, qemu, QEMU Documentation}).
 @end defvar
 
-@cindex DHCP, networking service
-@defvar dhcp-client-service-type
-This is the type of services that run @var{dhclient}, the ISC Dynamic
-Host Configuration Protocol (DHCP) client.
-@end defvar
-
-@deftp {Data Type} dhcp-client-configuration
-Data type representing the configuration of the ISC DHCP client service.
-
-@table @asis
-@item @code{package} (default: @code{isc-dhcp})
-The ISC DHCP client package to use.
-
-@item @code{interfaces} (default: @code{'all})
-Either @code{'all} or the list of interface names that the ISC DHCP
-client should listen on---e.g., @code{'("eno1")}.
-
-When set to @code{'all}, the ISC DHCP client listens on all the
-available non-loopback interfaces that can be activated.  Otherwise the
-ISC DHCP client listens only on the specified interfaces.
-
-@item @code{config-file} (default: @code{#f})
-The configuration file for the ISC DHCP client.
-
-@item @code{version} (default: @code{"4"})
-The DHCP protocol version to use, as a string.  Accepted values are
-@code{"4"} or @code{"6"} for DHCPv4 or DHCPv6, respectively, as well as
-@code{"4o6"}, for DHCPv4 over DHCPv6 (as specified by RFC 7341).
-
-@item @code{shepherd-requirement} (default: @code{'()})
-@itemx @code{shepherd-provision} (default: @code{'(networking)})
-This option can be used to provide a list of symbols naming Shepherd services
-that this service will depend on, such as @code{'wpa-supplicant} or
-@code{'iwd} if you require authenticated access for encrypted WiFi or Ethernet
-networks.
-
-Likewise, @code{shepherd-provision} is a list of Shepherd service names
-(symbols) provided by this service.  You might want to change the
-default value if you intend to run several ISC DHCP clients, only one of
-which provides the @code{networking} Shepherd service.
-@end table
-@end deftp
-
 @cindex DHCPCD, networking service
 
 @defvar dhcpcd-service-type

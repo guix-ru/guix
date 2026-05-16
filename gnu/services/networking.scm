@@ -94,16 +94,6 @@
   #:export (%facebook-host-aliases ;deprecated
             block-facebook-hosts-service-type
 
-            dhcp-client-service-type
-            dhcp-client-configuration
-            dhcp-client-configuration?
-            dhcp-client-configuration-package
-            dhcp-client-configuration-interfaces
-            dhcp-client-configuration-config-file
-            dhcp-client-configuration-shepherd-provision
-            dhcp-client-configuration-shepherd-requirement
-            dhcp-client-configuration-version
-
             dhcpd-service-type
             dhcpd-configuration
             dhcpd-configuration?
@@ -363,112 +353,6 @@
                              (const facebook-host-aliases))))
    (default-value #f)
    (description "Add a list of known Facebook hosts to @file{/etc/hosts}")))
-
-(define-record-type* <dhcp-client-configuration>
-  dhcp-client-configuration make-dhcp-client-configuration
-  dhcp-client-configuration?
-  (package      dhcp-client-configuration-package ;file-like
-                (default isc-dhcp))
-  (shepherd-requirement dhcp-client-configuration-shepherd-requirement
-                        (default '()))
-  (shepherd-provision   dhcp-client-configuration-shepherd-provision
-                        (default '(networking)))
-  (config-file dhcp-client-configuration-config-file
-               (default #f))
-  (interfaces   dhcp-client-configuration-interfaces
-                (default 'all))         ;'all | list of strings
-  (version dhcp-client-configuration-version ;"4", "6", or "4o6"
-           (default "4")))
-
-(define dhcp-client-shepherd-service
-  (match-lambda
-    ((? dhcp-client-configuration? config)
-     (match-record config <dhcp-client-configuration>
-                   (package shepherd-requirement shepherd-provision
-                            interfaces config-file version)
-       ;; Version the PID file to avoid conflicts in case multiple DHCP
-       ;; clients are run concurrently.
-       (let ((pid-file (if (string=? "4" version)
-                           "/var/run/dhclient.pid"
-                           (string-append "/var/run/dhclient-" version ".pid"))))
-         (list (shepherd-service
-                (documentation "Set up networking via DHCP.")
-                (requirement `(user-processes udev ,@shepherd-requirement))
-                (provision shepherd-provision)
-
-                ;; XXX: Running with '-nw' ("no wait") avoids blocking for a
-                ;; minute when networking is unavailable, but also means that
-                ;; the interface is not up yet when 'start' completes.  To
-                ;; wait for the interface to be ready, one should instead
-                ;; monitor udev events.
-                (start #~(lambda _
-                           (define dhclient
-                             (string-append #$package "/sbin/dhclient"))
-
-                           ;; When invoked without any arguments, 'dhclient'
-                           ;; discovers all non-loopback interfaces *that are
-                           ;; up*.  However, the relevant interfaces are
-                           ;; typically down at this point.  Thus we perform
-                           ;; our own interface discovery here.
-                           (define valid?
-                             (lambda (interface)
-                               (and (arp-network-interface? interface)
-                                    (not (loopback-network-interface? interface))
-                                    ;; XXX: Make sure the interfaces are up so
-                                    ;; that 'dhclient' can actually
-                                    ;; send/receive over them.  Ignore those
-                                    ;; that cannot be activated.
-                                    (false-if-exception
-                                     (set-network-interface-up interface)))))
-                           (define ifaces
-                             (filter valid?
-                                     #$(match interfaces
-                                         ('all
-                                          #~(all-network-interface-names))
-                                         (_
-                                          #~'#$interfaces))))
-
-                           (define config-file-args
-                             (if #$config-file
-                                 (list "-cf" #$config-file)
-                                 '()))
-
-                           (false-if-exception (delete-file #$pid-file))
-                           (let ((status (spawn-command
-                                          ;; By default dhclient uses a
-                                          ;; pre-standardization implementation of
-                                          ;; DDNS, which is incompatable with
-                                          ;; non-ISC DHCP servers; thus, pass '-I'.
-                                          ;; <https://kb.isc.org/docs/aa-01091>.
-                                          `(,dhclient "-nw" "-I"
-                                                      #$(string-append "-" version)
-                                                      "-pf" ,#$pid-file
-                                                      ,@config-file-args
-                                                      ,@ifaces))))
-                             (and (zero? status)
-                                  (read-pid-file #$pid-file)))))
-                (stop #~(make-kill-destructor)))))))
-    (package
-     (warning (G_ "'dhcp-client' service now expects a \
-'dhcp-client-configuration' record~%"))
-     (display-hint (G_ "The value associated with instances of
-@code{dhcp-client-service-type} must now be a @code{dhcp-client-configuration}
-record instead of a package.  Please adjust your configuration accordingly."))
-     (dhcp-client-shepherd-service
-      (dhcp-client-configuration
-       (package package))))))
-
-(define-deprecated dhcp-client-service-type
-  dhcpcd-service-type
-  (service-type (name 'dhcp-client)
-                (extensions
-                 (list (service-extension shepherd-root-service-type
-                                          dhcp-client-shepherd-service)))
-                (default-value (dhcp-client-configuration))
-                (description "Run @command{dhcp}, a Dynamic Host Configuration
-Protocol (DHCP) client, on all the non-loopback network interfaces.
-
-This services is deprecated as ISC's DHCP client reached its end-of-life.")))
 
 (define-record-type* <dhcpd-configuration>
   dhcpd-configuration make-dhcpd-configuration
