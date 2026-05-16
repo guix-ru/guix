@@ -150,7 +150,7 @@
                               '("curses" "ncurses" "form" "panel" "menu")))))))
        (list #:configure-flags
              #~`("--with-shared" "--without-debug" "--enable-widec"
-
+                 "--with-termlib=tinfo"
                  "--enable-pc-files"
                  ,(string-append "--with-pkg-config-libdir="
                                  #$output "/lib/pkgconfig")
@@ -217,15 +217,8 @@ ncursesw library provides wide character support.")
                 #$cf))))
     (inputs (list gpm))))
 
-;; Needed by u-boot 2022.04+
-;; Consider merging into ncurses for next core-updates cycle.
-(define-public ncurses/tinfo
-  (package/inherit ncurses
-    (name "ncurses-with-tinfo")
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:configure-flags cf)
-        #~(cons "--with-termlib=tinfo" #$cf))))))
+(define-deprecated-package ncurses/tinfo
+  ncurses)
 
 (define-public cdk
   (package

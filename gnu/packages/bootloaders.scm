@@ -893,7 +893,7 @@ tree binary files.  These are board description files used by Linux and BSD.")
            gnutls
            flex
            lz4
-           ncurses/tinfo
+           ncurses
            perl
            pkg-config                   ;for 'make menuconfig'
            python
@@ -961,7 +961,7 @@ Info manual.")))
            (modify-inputs native-inputs
                           (prepend python-filelock
                                    python-pycryptodomex))))
-    (inputs (list gnutls ncurses/tinfo))
+    (inputs (list gnutls ncurses))
     (arguments
      `(#:make-flags '("HOSTCC=gcc"
                       ,@(if (%current-target-system)
