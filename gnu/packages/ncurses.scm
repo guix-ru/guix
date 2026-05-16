@@ -45,7 +45,7 @@
 (define-public ncurses
   (package
     (name "ncurses")
-    (version "6.6.20260103")
+    (version "6.6.20251230")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/ncurses/ncurses-"
