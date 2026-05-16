@@ -1262,7 +1262,7 @@ specified in rfc2217 and a (Linux specific) CAN mode.")
     (native-inputs
      (list autoconf-2.71 automake gettext-minimal pkg-config))
     (inputs
-     (list ncurses/tinfo))
+     (list ncurses))
     (home-page "https://salsa.debian.org/minicom-team/minicom")
     (synopsis "Serial terminal emulator")
     (description "@code{minicom} is a serial terminal emulator.")
