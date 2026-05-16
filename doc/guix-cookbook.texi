@@ -3332,7 +3332,7 @@ is below. Save the resulting file as @file{guix-config.scm}.
                    %base-packages))
 
   (services (cons*
-             (service dhcp-client-service-type)
+             (service dhcpcd-service-type)
              (service openssh-service-type
                       (openssh-configuration
                        (openssh openssh-sans-x)

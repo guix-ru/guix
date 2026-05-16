@@ -19228,7 +19228,7 @@ As an example, an NFS file system would typically have a requirement for
 might not be sufficient as @code{networking} being marked as started
 does @emph{not} imply the network has already been configured and in
 working order (for example, when using
-@code{dhcp-client-service-type}).  For such cases, adding a
+@code{dhcpcd-service-type}).  For such cases, adding a
 requirement on a custom @code{network-online} service may be necessary.
 A sample @code{network-online} one-shot Shepherd service implementation
 is provided below:
@@ -22812,9 +22812,7 @@ which provides the @code{networking} Shepherd service.
 
 @defvar dhcpcd-service-type
 This the type for a service running @command{dhcpcd}, a @acronym{DHCP,
-Dynamic Host Configuration Protocol} client that can be used as a
-replacement for the historical ISC client supported by
-@code{dhcp-client-service-type}.
+Dynamic Host Configuration Protocol} client.
 
 Its value must be a @code{dhcpcd-configuration} record, as described
 below.  As an example, consider the following setup which runs
@@ -23311,7 +23309,7 @@ required to authenticate against encrypted WiFi networks.
 
 @quotation Warning
 By default @code{iwd} removes and re-creates interfaces it manages.  It
-doesn't play nicely with @code{dhcp-client-service-type} that enumerates
+doesn't play nicely with @code{dhcpcd-service-type} that enumerates
 wireless interfaces before starting the Shepherd service.  Use either
 @code{dhcpcd-service-type} or the @code{iwd}'s built-in DHCP client (see
 @code{enable-network-configuration} option below).
@@ -35099,7 +35097,7 @@ consults the @code{ldap} name service last:
   (services
     (cons*
       (service nslcd-service-type)
-      (service dhcp-client-service-type)
+      (service dhcpcd-service-type)
       %base-services))
   (name-service-switch
    (let ((services (list (name-service (name "db"))
@@ -37104,7 +37102,7 @@ A helper function to quickly add php to an @code{nginx-server-configuration}.
 
 A simple services setup for nginx with php can look like this:
 @lisp
-(services (cons* (service dhcp-client-service-type)
+(services (cons* (service dhcpcd-service-type)
                  (service php-fpm-service-type)
                  (service nginx-service-type
                           (nginx-server-configuration
@@ -50507,7 +50505,7 @@ evaluates to.  As an example, @var{file} might contain a definition like this:
                         (type "ext4"))
                        %base-file-systems))
    (services
-    (append (list (service dhcp-client-service-type)
+    (append (list (service dhcpcd-service-type)
                   (service openssh-service-type
                            (openssh-configuration
                             (permit-root-login #t)
@@ -50942,7 +50940,7 @@ the backing store of the ``myhd'' drive.
 
 The default @command{run-vm.sh} script that is returned by an invocation of
 @command{guix system vm} does not add a @command{-nic user} flag by default.
-To get network access from within the vm add the @code{(dhcp-client-service)}
+To get network access from within the vm add the @code{(dhcpcd-service-type)}
 to your system definition and start the VM using
 @command{$(guix system vm config.scm) -nic user}.  An important caveat of using
 @command{-nic user} for networking is that @command{ping} will not work, because
@@ -50978,7 +50976,7 @@ connection to an unknown host every time you connect.
 If you find the above @samp{hostfwd} example not to be working (e.g.,
 your SSH client hangs attempting to connect to the mapped port of your
 VM), make sure that your Guix System VM has networking support, such as
-by using the @code{dhcp-client-service-type} service type.
+by using the @code{dhcpcd-service-type} service type.
 @end quotation
 
 @subsection Using @command{virt-viewer} with Spice
