@@ -7804,7 +7804,7 @@ choice.")
            libogg
            libopenmpt
            libvorbis
-           ncurses/tinfo
+           ncurses
            openssl
            pipewire
            pulseaudio

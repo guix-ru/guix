@@ -1490,7 +1490,7 @@ APFS.")
            json-c
            acl
            boost-1.83
-           ncurses/tinfo
+           ncurses
            libxslt
            docbook-xsl
            gettext-minimal))
