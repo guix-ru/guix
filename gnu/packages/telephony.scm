@@ -1164,7 +1164,7 @@ It supports the following smartphones:
               (when tests?
                 (invoke "./sipp_unittest")))))))
     (inputs
-     (list gsl libpcap lksctp-tools ncurses/tinfo openssl))
+     (list gsl libpcap lksctp-tools ncurses openssl))
     (native-inputs
      (list googletest-1.8 pkg-config))
     (synopsis "Performance testing tool for the SIP protocol")
