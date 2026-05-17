@@ -1676,76 +1676,65 @@ graphics.")
   (package
     (name "openexr")
     (version "3.4.11")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url
-                     "https://github.com/AcademySoftwareFoundation/openexr")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0c0l62s42i4jxp6bsf47fqlmdrazpk783jfpgj4jnprsm2spdp75"))
-              (modules '((guix build utils)))
-              ;; Unbundle third party libraries.
-              (snippet #~(with-directory-excursion "external"
-                           (for-each delete-file-recursively
-                             '("deflate" "OpenJPH"))))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/AcademySoftwareFoundation/openexr")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256 (base32 "0c0l62s42i4jxp6bsf47fqlmdrazpk783jfpgj4jnprsm2spdp75"))
+       (modules '((guix build utils)))
+       ;; Unbundle third party libraries.
+       (snippet #~(with-directory-excursion "external"
+                    (for-each delete-file-recursively
+                      '("deflate" "OpenJPH"))))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags
-           #~(list #$@(match (%current-system)
-                        ;; A test explicitly checks for SSE2 (would fail on
-                        ;; i686-linux), so make sure it is enabled for both C
-                        ;; and CPP.
-                        ((or "x86_64-linux" "i686-linux")
-                         '("-DCMAKE_CXX_FLAGS=-mfpmath=sse -msse2"
-                           "-DCMAKE_C_FLAGS=-mfpmath=sse -msse2"))
-                        (_ '())))
-           #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'unpack 'patch-test-directory
-                 (lambda _
-                   (substitute* (list
-                                 "src/test/OpenEXRTest/tmpDir.h"
-                                 "src/test/OpenEXRCoreTest/main.cpp")
-                     (("/var/tmp")
-                      "/tmp"))))
-               #$@(if (target-32bit?)
-                      #~((add-after 'patch-test-directory 'disable-broken-tests
-                           (lambda _
-                             ;; Disable tests that fail at least on i686-linux.
-                             (substitute* '("src/test/OpenEXRCoreTest/main.cpp"
-					    "src/test/OpenEXRTest/main.cpp")
-                               (("TEST \\(testCompression, \"basic\"\\);")
-                                "")
-                               (("TEST\\( testNoCompression, \"core_compression\" \\);")
-                                "")
-                               (("TEST\\( testRLECompression, \"core_compression\" \\);")
-                                "")
-                               (("TEST\\( testZIPCompression, \"core_compression\" \\);")
-                                "")
-                               (("TEST\\( testZIPSCompression, \"core_compression\" \\);")
-                                "")
-                               (("TEST\\( testB44Compression, \"core_compression\" \\);")
-                                "")
-                               (("TEST\\( testB44ACompression, \"core_compression\" \\);")
-                                "")
-                               (("TEST \\(testOptimizedInterleavePatterns, \"basic\"\\);")
-                                "")))))
-                      #~())
-               #$@(if (target-aarch64?)
-                      #~((add-after 'patch-test-directory 'disable-broken-aarch64-tests
-                           ;; Disable tests known to fail on aarch64. Remove once
-                           ;; https://github.com/AcademySoftwareFoundation/openexr/issues/1460
-                           ;; is fixed.
-                           (lambda _
-                             (substitute* '("src/test/OpenEXRCoreTest/main.cpp")
-                               (("TEST \\(testDWAACompression, \"core_compression\"\\);")
-                                "")
-                               (("TEST \\(testDWABCompression, \"core_compression\"\\);")
-                                "")))))
-                      #~()))))
+     (list
+      #:configure-flags
+      #~(list #$@(match (%current-system)
+                   ;; A test explicitly checks for SSE2 (would fail on
+                   ;; i686-linux), so make sure it is enabled for both C
+                   ;; and CPP.
+                   ((or "x86_64-linux" "i686-linux")
+                    '("-DCMAKE_CXX_FLAGS=-mfpmath=sse -msse2"
+                      "-DCMAKE_C_FLAGS=-mfpmath=sse -msse2"))
+                   (_ '())))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-test-directory
+            (lambda _
+              (substitute* '("src/test/OpenEXRTest/tmpDir.h"
+                             "src/test/OpenEXRCoreTest/main.cpp")
+                (("/var/tmp") "/tmp"))))
+          ;; Disable tests that fail at least on i686-linux.
+          #$@(if (target-32bit?)
+                 #~((add-after 'patch-test-directory 'disable-broken-tests
+                      (lambda _
+                        (substitute* "src/test/OpenEXRCoreTest/main.cpp"
+                          ((".*testNoCompression, .*") "")
+                          ((".*testRLECompression, .*") "")
+                          ((".*testZIPCompression, .*") "")
+                          ((".*testZIPSCompression, .*") "")
+                          ((".*testB44Compression, .*") "")
+                          ((".*testB44ACompression, .*") ""))
+                        (substitute* "src/test/OpenEXRTest/main.cpp"
+                          ((".*testCompression, .*") "")
+                          ((".*testOptimizedInterleavePatterns, .*") "")))))
+                 #~())
+          ;; Disable tests known to fail on aarch64.  Remove once
+          ;; https://github.com/AcademySoftwareFoundation/openexr/issues/1460
+          ;; is fixed.
+          #$@(if (target-aarch64?)
+                 #~((add-after 'patch-test-directory 'disable-broken-tests
+                      (lambda _
+                        (substitute* '("src/test/OpenEXRCoreTest/main.cpp")
+                          (("TEST \\(testDWAACompression, \"core_compression\"\\);")
+                           "")
+                          (("TEST \\(testDWABCompression, \"core_compression\"\\);")
+                           "")))))
+                 #~()))))
     (propagated-inputs
      (list libdeflate ;marked as Requires.private in OpenEXR.pc
            imath      ;marked as Requires in OpenEXR.pc
