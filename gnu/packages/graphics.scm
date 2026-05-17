@@ -44,6 +44,7 @@
 ;;; Copyright © 2025 James Smith <jsubuntuxp@disroot.org>
 ;;; Copyright © 2026 Cayetano Santos <csantosb@inventati.org>
 ;;; Copyright © 2026 Jan Wielkiewicz <tona_kosmicznego_smiecia@interia.pl>
+;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1674,7 +1675,7 @@ graphics.")
 (define-public openexr
   (package
     (name "openexr")
-    (version "3.2.4")
+    (version "3.4.11")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1684,7 +1685,12 @@ graphics.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "00s1a05kggk71vfbnsvykyjc2j7y6yyzgl63sy4yiddshz2k2mcr"))))
+                "0c0l62s42i4jxp6bsf47fqlmdrazpk783jfpgj4jnprsm2spdp75"))
+              (modules '((guix build utils)))
+              ;; Unbundle third party libraries.
+              (snippet #~(with-directory-excursion "external"
+                           (for-each delete-file-recursively
+                             '("deflate" "OpenJPH"))))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags
@@ -1740,11 +1746,11 @@ graphics.")
                                (("TEST \\(testDWABCompression, \"core_compression\"\\);")
                                 "")))))
                       #~()))))
-    (inputs (list imath))
     (propagated-inputs
-     (list libdeflate ; Marked as Requires.private in OpenEXR.pc.
-           imath)) ; Marked as Requires in OpenEXR.pc.
-    (home-page "https://www.openexr.com/")
+     (list libdeflate ;marked as Requires.private in OpenEXR.pc
+           imath      ;marked as Requires in OpenEXR.pc
+           openjph))  ;marked as Requires.private in OpenEXR.pc
+    (home-page "https://openexr.com")
     (synopsis "High-dynamic-range file format library")
     (description
      "OpenEXR provides the specification and reference implementation of the
