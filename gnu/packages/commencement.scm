@@ -1374,7 +1374,6 @@ ac_cv_c_float_format='IEEE (little-endian)'
                   (guix build utils)
                   (ice-9 match)
                   (srfi srfi-1))
-      #:parallel-build? #f             ; for debugging
       #:make-flags
       #~(let* ((libc.a (search-input-file %build-inputs "/lib/libc.a"))
                (libc (dirname (dirname libc.a)))
