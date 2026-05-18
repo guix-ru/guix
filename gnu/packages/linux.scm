@@ -4603,7 +4603,7 @@ that the Ethernet protocol is much simpler than the IP protocol.")
               (substitute* "Makefile"
                 (("^.*ARPDDIR.*$") "")))))))
     (inputs
-     (list bdb iptables libmnl))
+     (list bdb iptables libbpf libcap libelf libmnl libselinux libtirpc))
     (native-inputs
      (list bison flex pkg-config))
     ;; For tests.
