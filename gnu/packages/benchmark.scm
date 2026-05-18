@@ -993,7 +993,7 @@ UPC++) libraries for CPUs and GPUs.")
       #:configure-flags
       #~(list (string-append "-DMODEL=hip")
               (string-append "-DCMAKE_CXX_COMPILER="
-                             #$(this-package-input "rocm-hip-runtime")
+                             #$(this-package-native-input "rocm-hipcc")
                              "/bin/hipcc")
               (string-append "-DCXX_EXTRA_FLAGS=--offload-arch="
                              #$(string-join (current-amd-gpu-targets) ",")))
@@ -1004,6 +1004,7 @@ UPC++) libraries for CPUs and GPUs.")
               (substitute* "CMakeLists.txt"
                 (("-march=native")
                  "-g")))))))
+    (native-inputs (list rocm-hipcc))
     (inputs (list rocm-hip-runtime lld-rocm llvm-rocm))
     (properties
      `((amd-gpu-targets . ,%default-amd-gpu-targets)

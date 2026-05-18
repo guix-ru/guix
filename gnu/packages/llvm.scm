@@ -2219,6 +2219,7 @@ the host.")
        (append lld-wrapper-rocm
                offload-rocm
                rocr-runtime
+               rocm-hipcc
                rocm-device-libs)))
     (arguments
      (substitute-keyword-arguments arguments

@@ -55,6 +55,8 @@
               ;; the reference to 'ROCM_FOUND' is incorrect.
               "-DROCM_FOUND=ON"
 
+              (string-append "-DHIP_ROOT_DIR="
+                             #$(this-package-native-input "rocm-hipcc"))
               (string-append "-DROCM_PATH="
                              #$(this-package-input "rocm-hip-runtime"))
               (string-append "-DHPL_MPI_DIR="
@@ -89,7 +91,7 @@
                 (rename-file (string-append #$output "/HPL.dat")
                              (string-append datadir "/HPL.dat"))))))))
     (native-inputs
-     (list rocm-cmake lld-rocm llvm-rocm git-minimal/pinned))
+     (list rocm-cmake rocm-hipcc lld-rocm llvm-rocm git-minimal/pinned))
     (inputs
      (list rocm-device-libs
            rocm-hip-runtime

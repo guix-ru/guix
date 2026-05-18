@@ -53,7 +53,7 @@
                 "0sv5f366ybzpsdpka0fb578pb4q3537h6hkn825m0kbssh32wxk7"))))
     (build-system cmake-build-system)
     ;; Sync with llvm version used by llvm-rocm.
-    (native-inputs (list clang-20 lld-20 python-minimal))
+    (native-inputs (list clang-20 lld-20 python-minimal rocm-hipcc))
     (inputs
      (list boost
            libffi

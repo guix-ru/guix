@@ -220,24 +220,35 @@ and in-process/in-memory compilation.")
                 ;; differentiate between CLANG and LLVM packages
                 (("\\$\\{HIP_LLVM_ROOT\\}")
                  (string-append  "${HIP_LLVM_ROOT} "
-                                 #$(this-package-input "clang-rocm"))))
+                                 #$(this-package-native-input "clang-rocm"))))
               (substitute* "hipamd/src/hip_embed_pch.sh"
                 (("\\$5") "$6")
                 (("LLVM_DIR=\"\\$4\"")
                  "LLVM_DIR=\"$4\"; CLANG_DIR=\"$5\";")
                 (("\\$LLVM_DIR/bin/clang")
                  (string-append "$CLANG_DIR/bin/clang")))))
-          ;; Re-wrap programs taken from `rocm-hipcc' so their paths point to
-          ;; this package output.
-          (add-after 'install 'wrap-programs
+          ;; Packages that require `hipcc' should use the `rocm-hipcc'
+          ;; package. This disables the installation of `hipcc' and
+          ;; `hipconfig' binaries, and makes sure that the references to them
+          ;; are expected to be found in $PATH.
+          (add-after 'chdir 'disable-hipcc-installation
             (lambda _
-              (let ((output-bindir (string-append #$output "/bin")))
-                (for-each
-                 (lambda (file)
-                   (wrap-program (string-append output-bindir "/" file)
-                     `("HIP_PATH" = ,(list #$output))
-                     `("PATH" suffix ,(list output-bindir))))
-                 '("hipcc" "hipconfig"))))))))
+              (substitute* "hipamd/CMakeLists.txt"
+                (("if \\(NOT \\$\\{HIPCC_BIN_DIR\\} STREQUAL \"\"\\)")
+                 "if (FALSE)"))
+              (substitute* "hipamd/hip-config.cmake.in"
+                (("\\$\\{hip_HIPCC_EXECUTABLE\\}")
+                 "hipcc")
+                (("\\$\\{hip_HIPCONFIG_EXECUTABLE\\}")
+                 "hipconfig"))))
+          ;; Adjust CMAKE helper so hipconfig is retrieved from path.
+          (add-after 'install 'adjust-cmake-helpers
+            (lambda _
+              (substitute* (string-append #$output "/bin/hipcc_cmake_linker_helper")
+                (("\\$HIP_PATH/bin/hipconfig")
+                 "hipconfig")
+                (("\\$HIP_PATH/bin/hipcc")
+                 "hipcc")))))))
     (inputs
      (list glew
            mesa
@@ -247,9 +258,8 @@ and in-process/in-memory compilation.")
            rocr-runtime
            rocm-device-libs
            rocprofiler-register
-           libffi
-           clang-rocm))
-    (native-inputs (list rocm-hipcc))
+           libffi))
+    (native-inputs (list rocm-hipcc clang-rocm))
     (propagated-inputs
      (list rocm-comgr rocminfo))
     (synopsis "ROCm HIP Runtime")
@@ -776,7 +786,7 @@ moves.")
       #:configure-flags
       #~(list
          (string-append "-DCMAKE_CXX_COMPILER="
-                        #$(this-package-input "rocm-hip-runtime")
+                        #$(this-package-native-input "rocm-toolchain")
                         "/bin/hipcc")
          (string-append "-DEXPLICIT_ROCM_VERSION=" #$%rocm-version)
          #$(string-append "-DGPU_TARGETS=" (current-amd-gpu-targets-string)))
