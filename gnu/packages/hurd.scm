@@ -718,7 +718,7 @@ exec ${system}/rc \"$@\"
        ("libpciaccess" ,libpciaccess-static)
 
        ;; For NFS support
-       ("libtirpc" ,libtirpc/hurd)
+       ("libtirpc" ,libtirpc)
 
        ;; Tools for the /libexec/* scripts.
        ("bash-minimal" ,bash-minimal)

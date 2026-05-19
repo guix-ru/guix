@@ -46,36 +46,34 @@
               (uri (string-append "mirror://sourceforge/libtirpc/libtirpc/"
                                   version "/libtirpc-"
                                   version ".tar.bz2"))
-              (patches (search-patches "libtirpc-CVE-2021-46828.patch"))
+              (patches (search-patches "libtirpc-hurd.patch"
+                                       "libtirpc-CVE-2021-46828.patch"))
               (sha256
                (base32
                 "05zf16ilwwkzv4cccaac32nssrj3rg444n9pskiwbgk6y359an14"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:configure-flags '("--disable-static")
+     (list
+      #:configure-flags
+      #~(list "--disable-static"
+              ;; When cross-building use the target system's krb5-config
+              #$@(if (%current-target-system)
+                     #~((string-append "ac_cv_prog_KRB5_CONFIG="
+                                            #$(this-package-input "mit-krb5")
+                                            "/bin/krb5-config"))
+                     '()))
        #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'adjust-netconfig-reference
-           (lambda* (#:key outputs #:allow-other-keys)
-             (substitute* '("man/netconfig.5"
-                            "man/getnetconfig.3t"
-                            "man/getnetpath.3t"
-                            "man/rpc.3t"
-                            "src/getnetconfig.c"
-                            "tirpc/netconfig.h")
-               (("/etc/netconfig") (string-append (assoc-ref outputs "out")
-                                                  "/etc/netconfig")))))
-         ,@(if (%current-target-system)
-             `((add-after 'unpack 'adjust-pkg-config
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (substitute* "libtirpc.pc.in"
-                     (("-ltirpc")
-                      (string-append "-ltirpc"
-                                     " -L" (dirname (search-input-file
-                                                      inputs "/lib/libkrb5.so"))
-                                     " -lkrb5"))))))
-             `()))))
-    (native-inputs (list mit-krb5)) ;; for cross-compilation
+       #~(modify-phases %standard-phases
+           (add-after 'unpack 'adjust-netconfig-reference
+             (lambda* (#:key outputs #:allow-other-keys)
+               (substitute* '("man/netconfig.5"
+                              "man/getnetconfig.3t"
+                              "man/getnetpath.3t"
+                              "man/rpc.3t"
+                              "src/getnetconfig.c"
+                              "tirpc/netconfig.h")
+                 (("/etc/netconfig") (string-append (assoc-ref outputs "out")
+                                                    "/etc/netconfig"))))))))
     (inputs (list mit-krb5))
     (home-page "https://sourceforge.net/projects/libtirpc/")
     (synopsis "Transport-independent Sun/ONC RPC implementation")
@@ -85,19 +83,8 @@ procedure calls) protocol in a transport-independent manner.  It supports both
 IPv4 and IPv6.  ONC RPC is notably used by the network file system (NFS).")
     (license bsd-3)))
 
-(define-public libtirpc/hurd
-  (package/inherit libtirpc
-    (name "libtirpc-hurd")
-    (source (origin (inherit (package-source libtirpc))
-                    (patches (search-patches "libtirpc-hurd.patch"
-                                             "libtirpc-CVE-2021-46828.patch"))))
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:configure-flags flags ''())
-        ;; When cross-building the target system's krb5-config should be used.
-        #~(list (string-append "ac_cv_prog_KRB5_CONFIG="
-                               #$(this-package-input "mit-krb5")
-                               "/bin/krb5-config")))))))
+;; XXX: Deprecated on 2026-05-26.
+(define-deprecated-package libtirpc/hurd libtirpc)
 
 (define-public rpcbind
   (package
