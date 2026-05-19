@@ -3013,30 +3013,29 @@ by AOM, including with alpha.")
 Format) file format decoder and encoder.")
     (license license:lgpl3+)))
 
+(define libjxl-testdata
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://github.com/libjxl/testdata")
+          (commit "ff8d743aaba05b3014f17e5475e576242fa979fc")))
+    (sha256
+     (base32 "05nba2h0m74n5f9jzl3vzvnj74fj3si09ncwk2dqg41qdc49d1ng"))))
+
 (define-public libjxl
   (package
     (name "libjxl")
-    (version "0.11.1")
+    (version "0.11.2")
     (outputs (list "out" "pixbuf-loader"))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/libjxl/libjxl")
-             (commit (string-append "v" version))
-             (recursive? #t)))
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1wfxzrhj8a19z6x47ib1qbmgyg56jsxjs955xcvqhdkrx8l2271r"))
-       (modules '((guix build utils)))
-       (snippet
-        ;; Delete the bundles that will not be used.
-        '(begin
-           (for-each (lambda (directory)
-                       (delete-file-recursively
-                        (string-append "third_party/" directory)))
-                     '("brotli" "googletest" "highway" "lcms" "libjpeg-turbo"
-                       "libpng" "zlib"))))))
+        (base32 "0a6fg2v81rqsbrzi97x1d7wadcikh2fizr64rsza668cwvsk631q"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -3065,6 +3064,32 @@ Format) file format decoder and encoder.")
                          (("8\\.7e-4") "8.7e-3"))))))
                (#t
                 #~()))
+         (add-after 'unpack 'patch-dependencies
+           (lambda* (#:key inputs #:allow-other-keys)
+             (with-directory-excursion "third_party"
+               ;; HACK: Create dummy files to pretend the bundled sjpeg and
+               ;; skcms exist.
+               (apply invoke "touch"
+                      '("sjpeg/CMakeLists.txt"
+                        "sjpeg/COPYING"
+                        "skcms/skcms.h"
+                        "skcms/LICENSE"))
+               (substitute* "CMakeLists.txt"
+                 (("include\\(skcms\\.cmake\\)")
+                  "find_library(SKCMS_LIB NAMES skcms REQUIRED)")
+                 (("include\\(sjpeg\\.cmake\\)")
+                  "find_package(sjpeg REQUIRED)")))
+             (with-directory-excursion "lib"
+               (substitute* "jxl_cms.cmake"
+                 (("target_link_skcms\\(jxl_cms\\)")
+                  "target_link_libraries(jxl_cms PRIVATE ${SKCMS_LIB})"))
+               (substitute* "jxl_extras.cmake"
+                 (("\\.\\.\\/third_party\\/sjpeg\\/src")
+                  (dirname (search-input-file inputs "src/sjpegi.h")))))))
+         (add-after 'unpack 'unpack-testdata
+           (lambda _
+             (rmdir "testdata")
+             (copy-recursively #$libjxl-testdata "testdata")))
          (add-after 'install 'split
            (lambda _
              (for-each
@@ -3077,7 +3102,12 @@ Format) file format decoder and encoder.")
               '("/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-jxl.so"
                 "/share/thumbnailers/jxl.thumbnailer")))))))
     (native-inputs
-     (list asciidoc doxygen googletest pkg-config python))
+     (list asciidoc
+           doxygen
+           googletest
+           pkg-config
+           python
+           (package-source sjpeg)))     ;for sjpegi.h
     (inputs
      (list freeglut
            gdk-pixbuf
@@ -3090,6 +3120,8 @@ Format) file format decoder and encoder.")
            libpng
            libwebp
            openexr
+           sjpeg
+           skcms
            zlib))
     ;; These are in Requires.private of libjxl.pc.
     (propagated-inputs
