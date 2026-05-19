@@ -40,17 +40,16 @@
 (define-public libtirpc
   (package
     (name "libtirpc")
-    (version "1.3.1")
+    (version "1.3.7")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://sourceforge/libtirpc/libtirpc/"
                                   version "/libtirpc-"
                                   version ".tar.bz2"))
-              (patches (search-patches "libtirpc-hurd.patch"
-                                       "libtirpc-CVE-2021-46828.patch"))
+              (patches (search-patches "libtirpc-hurd.patch"))
               (sha256
                (base32
-                "05zf16ilwwkzv4cccaac32nssrj3rg444n9pskiwbgk6y359an14"))))
+                "00n7cq5dggfknvyqr193c5qxlx0681n9l0fh0m5faj9mkp0klzdl"))))
     (build-system gnu-build-system)
     (arguments
      (list
