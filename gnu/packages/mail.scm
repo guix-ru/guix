@@ -54,7 +54,7 @@
 ;;; Copyright © 2022 Mathieu Laparie <mlaparie@disr.it>
 ;;; Copyright © 2023 Timo Wilken <guix@twilken.net>
 ;;; Copyright © 2023 Arjan Adriaanse <arjan@adriaan.se>
-;;; Copyright © 2023 Wilko Meyer <w@wmeyer.eu>
+;;; Copyright © 2023, 2026 Wilko Meyer <w@wmeyer.eu>
 ;;; Copyright © 2024 Benjamin Slade <slade@lambda-y.net>
 ;;; Copyright © 2024 Jean Simard <woshilapin@tuziwo.info>
 ;;; Copyright © 2024-2026 Zheng Junjie <z572@z572.online>
@@ -123,6 +123,7 @@
   #:use-module (gnu packages gawk)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages gdb)
+  #:use-module (gnu packages geo)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages ghostscript)
   #:use-module (gnu packages glib)
@@ -133,6 +134,7 @@
   #:use-module (gnu packages golang-crypto)
   #:use-module (gnu packages golang-web)
   #:use-module (gnu packages golang-xyz)
+  #:use-module (gnu packages gperf)
   #:use-module (gnu packages groff)
   #:use-module (gnu packages gsasl)
   #:use-module (gnu packages gtk)
@@ -181,6 +183,7 @@
   #:use-module (gnu packages rdf)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages regex)
+  #:use-module (gnu packages rsync)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages ruby-check)
   #:use-module (gnu packages ruby-xyz)
@@ -193,9 +196,11 @@
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages tcl)
   #:use-module (gnu packages texinfo)
+  #:use-module (gnu packages textutils)
   #:use-module (gnu packages time)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages version-control)
+  #:use-module (gnu packages vim)
   #:use-module (gnu packages w3m)
   #:use-module (gnu packages web)
   #:use-module (gnu packages webkit)
@@ -332,6 +337,75 @@ accounts, a ``quick compose'' function with pre-configured templates,
 and a direct connection to the Thunderbird database, making it
 completely independent from the extension API.")
     (license license:gpl3+)))
+
+(define-public cyrus-imapd
+  (package
+    (name "cyrus-imapd")
+    (version "3.12.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/cyrusimap/cyrus-imapd")
+              (commit (string-append name "-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ymkpsrf1j3wzjl6inwf7yn5fv1pd6kgs3wny0iq06zk8k21mwfc"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "--enable-http"
+              "--enable-jmap"
+              "--enable-nntp"
+              "--enable-unit-tests"
+              "--enable-xapian")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'bootstrap 'patch-git-version-script
+            (lambda _
+              (patch-shebang "tools/git-version.sh")))
+          (add-before 'check 'patch-tests
+            (lambda _
+              (substitute* "cunit/command.testc"
+                (("/usr/bin/touch") (which "touch"))
+                (("/bin/echo")      (which "echo"))
+                (("/bin/sh")        (which "sh"))
+                (("/usr/bin/tr")    (which "tr"))))))))
+    (inputs (list bison
+                  openssl
+                  cyrus-sasl
+                  cunit
+                  flex
+                  gperf
+                  jansson
+                  libbsd
+                  icu4c
+                  perl
+                  rsync
+                  util-linux
+                  sqlite
+                  libical
+                  libtool
+                  pcre2
+                  `(,zstd "lib")
+                  brotli
+                  libxml2
+                  `(,nghttp2 "lib")
+                  shapelib
+                  wslay
+                  xapian
+                  xxd
+                  zlib
+                  libchardet))
+    (native-inputs (list autoconf automake pkg-config))
+    (synopsis "E-Mail, contacts and calendar server.")
+    (description "Cyrus IMAP is an email, contacts and calendar server. It
+provides support for a variety of protocols including JMAP, IMAP/IMAP-S, and
+POP3/POP3-S as well as CalDAV and CardDAV.")
+    (license (license:non-copyleft "file://COPYING"
+                                   "See COPYING in the distribution."))
+    (home-page "https://cyrusimap.org")))
 
 (define-public mailutils
   (package
