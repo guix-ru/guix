@@ -41,6 +41,7 @@
 ;;; Copyright © 2024 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;; Copyright © 2025 John Khoo <johnkhootf@gmail.com>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
+;;; Copyright © 2026 Wilko Meyer <w@wmeyer.eu>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -277,6 +278,36 @@ case-folding, and other operations for data in the UTF-8 encoding.")
             ((#:tests? _ #t) #f))))
     (properties
      (alist-delete 'hidden? (package-properties utf8proc-bootstrap)))))
+
+(define-public libchardet
+  (package
+    (name "libchardet")
+    (version "1.0.6")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://github.com/Joungkyun/libchardet"
+                           "/releases/download/"
+                           version
+                           "/libchardet-"
+                           version
+                           ".tar.bz2"))
+       (sha256
+        (base32 "14hm4cqsbqlsynzniijz14pzsqbr5j98wwcgri8z6ylgiirxan49"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      ;; fix for build error: bits/c++config.h: No such file or directory
+      #~(modify-phases %standard-phases
+          (add-before 'build 'unset-cplus-include-path
+            (lambda _
+              (unsetenv "CPLUS_INCLUDE_PATH"))))))
+    (native-inputs (list autoconf automake pkg-config perl))
+    (synopsis "Universal charset detector")
+    (description "Libchardet is a universal charset detector C/C++ API.")
+    (license license:mpl1.1)
+    (home-page "https://github.com/Joungkyun/libchardet")))
 
 (define-public libconfuse
   (package
