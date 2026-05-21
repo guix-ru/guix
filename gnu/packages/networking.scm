@@ -695,8 +695,7 @@ and Ethernet frame transmission.")
            pkg-config))
     (inputs
      (list gstreamer
-           gst-plugins-base
-           libnsl))
+           gst-plugins-base))
     (propagated-inputs
      (list glib
            glib-networking
