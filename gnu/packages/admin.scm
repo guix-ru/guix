@@ -3405,7 +3405,6 @@ modules and plugins that extend Ansible.")
     (inputs
      (list ansible
            bash-minimal
-           encfs
            fuse
            util-linux ;; for umount
            findutils
