@@ -1058,17 +1058,26 @@ It also includes runtime support libraries for these languages.")
                 (let ((lib (assoc-ref outputs "lib"))
                       (out (assoc-ref outputs "out")))
                   (when lib
-                    (let ((modfile (string-append
-                                    lib "/lib/libstdc++.modules.json"))
-                          (origin (string-append out "/include/c++/bits"))
-                          (modpath (string-append lib "/include/c++/bits")))
-
-                      (for-each (lambda (file) (install-file file modpath))
-                                (find-files origin "\\.cc$"))
-                      (substitute* modfile
-                        ;; Relative path to out output
-                        (("\\.\\./\\.\\./.*/include")
-                         (string-append lib "/include"))))))))))))
+                    (let* ((target
+                            ;; Are we building a cross toolchain?
+                            #$(%current-target-system))
+                           (modfile
+                            (string-append
+                             lib
+                             (if target
+                                 (string-append "/" target)
+                                 "")
+                             "/lib/libstdc++.modules.json"))
+                           (origin (string-append out "/include/c++/bits"))
+                           (moddir (string-append lib "/include/c++/bits")))
+                      ;; no libstdc++.modules.json file in gcc-cross-sans-libc
+                      (when (file-exists? modfile)
+                        (for-each (lambda (file) (install-file file moddir))
+                                  (find-files origin "\\.cc$"))
+                        (substitute* modfile
+                          ;; Relative file to out output
+                          (("\\.\\./\\.\\./.*/include")
+                           (string-append lib "/include")))))))))))))
     (properties
      `((compiler-cpu-architectures
         ("aarch64" ,@%gcc-15-aarch64-micro-architectures)
