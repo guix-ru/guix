@@ -6792,17 +6792,20 @@ gkm-SVM.")
 (define-public python-pybigwig
   (package
     (name "python-pybigwig")
-    (version "0.3.22")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "pyBigWig" version))
-              (sha256
-               (base32
-                "0hr25lkp26mk0fp7irdjdrdsd5lann9kyv0xq9npyyxxakvjci2x"))
-              (modules '((guix build utils)))
-              (snippet
-               ;; Delete bundled libBigWig sources
-               '(delete-file-recursively "libBigWig"))))
+    (version "0.3.25")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/deeptools/pyBigWig")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "031hd0b39g35b38w4jg9zv8widshcf26fiyrwg4yda1nk1sd1bsn"))
+       (modules '((guix build utils)))
+       (snippet
+         ;; Delete bundled libBigWig sources
+         '(delete-file-recursively "libBigWig"))))
     (build-system pyproject-build-system)
     (arguments
      '(#:tests? #false      ;only one test exists and it needs internet access
