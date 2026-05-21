@@ -2687,10 +2687,8 @@ KDED module to handle authorization of Thunderbolt devices.")
                   libplasma
                   qtdeclarative
 
-                  cryfs
-                  fuse-2
-                  gocryptfs
-                  encfs))
+                  fuse
+                  gocryptfs))
     (arguments
      (list
       #:qtbase qtbase
@@ -2699,25 +2697,14 @@ KDED module to handle authorization of Thunderbolt devices.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch
             (lambda* (#:key inputs #:allow-other-keys)
-              (let ((fusermount (search-input-file inputs "/bin/fusermount"))
-                    (gocryptfs (search-input-file inputs "/bin/gocryptfs"))
-                    (cryfs (search-input-file inputs "/bin/cryfs"))
-                    (encfs (search-input-file inputs "/bin/encfs"))
-                    (encfsctl (search-input-file inputs "/bin/encfsctl")))
+              (let ((fusermount (search-input-file inputs "/bin/fusermount3"))
+                    (gocryptfs (search-input-file inputs "/bin/gocryptfs")))
                 (substitute* "kded/engine/fusebackend_p.cpp"
                   (("\"fusermount\"")
                    (string-append "\"" fusermount "\"")))
                 (substitute* "kded/engine/backends/gocryptfs/gocryptfsbackend.cpp"
                   (("\"gocryptfs\"")
-                   (string-append "\"" gocryptfs "\"")))
-                (substitute* "kded/engine/backends/cryfs/cryfsbackend.cpp"
-                  (("\"cryfs\"")
-                   (string-append "\"" cryfs "\"")))
-                (substitute* "kded/engine/backends/encfs/encfsbackend.cpp"
-                  (("\"encfs\"")
-                   (string-append "\"" encfs "\""))
-                  (("\"encfsctl\"")
-                   (string-append "\"" encfsctl "\"")))))))))
+                   (string-append "\"" gocryptfs "\"")))))))))
     (home-page "https://invent.kde.org/plasma/plasma-vault")
     (synopsis "Plasma applet and services for creating encrypted vaults")
     (description "Provides Plasma applet and services for creating encrypted
