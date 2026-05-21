@@ -6697,7 +6697,7 @@ meso, or continuum scale.")
 (define-public libbigwig
   (package
     (name "libbigwig")
-    (version "0.4.4")
+    (version "0.4.8")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -6706,7 +6706,7 @@ meso, or continuum scale.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "09693dmf1scdac5pyq6qyn8b4mcipvnmc370k9a5z41z81m3dcsj"))))
+                "1bqw2kbgxszvh5vd85p9zqdv32bvyqr25yvgy5crnxl0yn8xqs97"))))
     (build-system gnu-build-system)
     (arguments
      (list
