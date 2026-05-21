@@ -164,14 +164,14 @@ resolution, asynchronous file system operations, and threading primitives.")
   (package
     (inherit libuv)
     (name "libuv")
-    (version "1.51.0")
+    (version "1.52.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://dist.libuv.org/dist/v" version
                                   "/libuv-v" version ".tar.gz"))
               (sha256
                (base32
-                "1szqivvs7izbhw1a3nd1ipbk012yvqqkjg0sjmqxw1hi1fwmf1az"))))
+                "1rzrrylgqyjcnjarph3r2h5i3cxjpx7j7svr4bkc0d73wswi3mb6"))))
     (properties '((hidden? . #t)))))
 
 (define-public libuv-for-r-httpuv
