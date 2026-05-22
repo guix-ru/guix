@@ -2574,6 +2574,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/ungoogled-chromium-empty-parsed-rustc-args.patch	\
   %D%/packages/patches/ungoogled-chromium-extension-search-path.patch	\
   %D%/packages/patches/ungoogled-chromium-increase-fortify-level.patch	\
+  %D%/packages/patches/ungoogled-chromium-override-libdrm-assertion.patch	\
   %D%/packages/patches/ungoogled-chromium-RUNPATH.patch		\
   %D%/packages/patches/ungoogled-chromium-rust-toolchain-var.patch	\
   %D%/packages/patches/ungoogled-chromium-system-nspr.patch	\

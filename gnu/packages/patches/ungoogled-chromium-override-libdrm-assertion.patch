@@ -1,0 +1,10 @@
+--- a/build/config/linux/libdrm/BUILD.gn
++++ b/build/config/linux/libdrm/BUILD.gn
+@@ -15,7 +15,6 @@
+ }
+
+ if (use_system_libdrm) {
+-  assert(!is_linux, "System libdrm is not supported in linux")
+   pkg_config("libdrm_config") {
+     packages = [ "libdrm" ]
+   }

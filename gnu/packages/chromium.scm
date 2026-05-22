@@ -69,6 +69,7 @@
   #:use-module (gnu packages valgrind)
   #:use-module (gnu packages vulkan)
   #:use-module (gnu packages video)
+  #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xiph)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)
@@ -218,7 +219,6 @@
     "third_party/libaom/source/libaom/third_party/fastfeat" ;BSD-3
     "third_party/libaom/source/libaom/third_party/vector" ;Expat
     "third_party/libaom/source/libaom/third_party/x86inc" ;ISC
-    "third_party/libdrm" ; Expat
     "third_party/libgav1" ;ASL2.0
     "third_party/libjingle_xmpp" ;BSD-3
     "third_party/libpfm4" ;BSD
@@ -373,7 +373,6 @@
     "third_party/x11proto/keysymdef.h" ;X11
 
     "third_party/zlib/google" ;BSD-3
-    "third_party/zstd" ;BSD
     "third_party/zxcvbn-cpp" ;Expat
     "url/third_party/mozilla" ;BSD-3, MPL1.1/GPL2+/LGPL2.1+
     "v8/third_party/glibc/src/sysdeps/ieee754/dbl-64" ;LGPL2.1+
@@ -473,6 +472,10 @@
         (local-file
          (assume-valid-file-name
           (search-patch
+           "ungoogled-chromium-override-libdrm-assertion.patch")))
+        (local-file
+         (assume-valid-file-name
+          (search-patch
            "ungoogled-chromium-RUNPATH.patch")))
         (local-file
          (assume-valid-file-name
@@ -548,8 +551,8 @@
              "#if 0"))
           (invoke "python" "build/linux/unbundle/replace_gn_files.py"
                   "--system-libraries" "flac" "fontconfig" "freetype"
-                  "harfbuzz" "libjpeg" "libpng" "libwebp" "libxml"
-                  "libxslt" "openh264" "opus" "zlib")))))
+                  "harfbuzz" "libdrm" "libjpeg" "libpng" "libwebp"
+                  "libxml" "libxslt" "openh264" "opus" "zlib" "zstd")))))
 
 (define opus+custom
   (package/inherit opus
@@ -687,6 +690,7 @@
               "use_system_harfbuzz=true"
               "use_system_icu=false"
               "use_system_lcms2=true"
+              "use_system_libdrm=true"
               "use_system_libffi=true"
               "use_system_libjpeg=true"
               "use_system_libopenjpeg2=true"
@@ -1021,6 +1025,7 @@
            icu4c-77
            lcms
            libcxx
+           libdrm
            libffi
            libjpeg-turbo
            libpng
@@ -1058,7 +1063,8 @@
            eudev
            valgrind/pinned
            wayland
-           xdg-utils))
+           xdg-utils
+           `(,zstd "lib")))
     (native-search-paths
      (list (search-path-specification
             (variable "CHROMIUM_EXTENSION_DIRECTORY")
