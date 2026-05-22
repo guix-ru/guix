@@ -141,6 +141,7 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-check)
+  #:use-module (gnu packages python-compression)
   #:use-module (gnu packages python-crypto)
   #:use-module (gnu packages python-web)
   #:use-module (gnu packages python-xyz)
@@ -1150,6 +1151,58 @@ detach the client from the actual IRC server, and also from selected channels.
 Multiple clients from different locations can connect to a single ZNC account
 simultaneously and therefore appear under the same nickname on IRC.")
     (license license:asl2.0)))
+
+(define-public python-irc
+  (package
+    (name "python-irc")
+    (version "20.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jaraco/irc")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1x7n52sz5dq94mbg20qy1lf2ar3zbka6d3m55w3p1bj2j7fbhakq"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; Test tries to install project with Pip.
+      #:test-flags #~(list "-k" "not project")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'include-package-data
+            (lambda _
+              (substitute* "pyproject.toml"
+                ((".*tool.setuptools_scm.*" all)
+                 (string-append all
+                                "\n[tool.setuptools.package-data]
+irc = ['*.txt']"))))))))
+    (native-inputs
+     (list python-pygments
+           python-pytest
+           python-pytest-checkdocs
+           python-pytest-enabler
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-importlib-resources
+           python-jaraco-collections
+           python-jaraco-functools
+           python-jaraco-logging
+           python-jaraco-stream
+           python-jaraco-text
+           python-more-itertools
+           python-pytz
+           python-tempora))
+    (home-page "https://github.com/jaraco/irc")
+    (synopsis "@dfn{Internet Relay Chat} (IRC) protocol library for Python")
+    (description
+     "This library provides a low-level implementation of the IRC protocol for
+Python.  It provides an event-driven IRC client framework with support for the
+basic IRC protocol, CTCP, and DCC connections.")
+    (license license:expat)))
 
 (define-public python-nbxmpp
   (package
