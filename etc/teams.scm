@@ -545,6 +545,13 @@ of Rebar and Mix build systems and Hex.pm importer."
         "We focus on collaboration, project growth and future (social)
 challenges"))
 
+(define-team maintainers
+  (team 'maintainers
+        #:name "Maintainers"
+        #:description
+        "Looking after project policies, commit access and code of conduct
+reports."))
+
 (define-team core
   (team 'core
         #:name "Core / Tools / Internals"
@@ -1302,7 +1309,7 @@ the \"texlive\" importer."
 (define-member (person "Tobias Geerinckx-Rice"
                        "me@tobias.gr"
                        "nckx")
-  codeberg mentors)
+  maintainers codeberg mentors)
 
 (define-member (person "Steve George"
                        "steve@futurile.net"
@@ -1317,7 +1324,7 @@ the \"texlive\" importer."
 (define-member (person "Efraim Flashner"
                        "efraim@flashner.co.il"
                        "efraim")
-  codeberg embedded bootstrap release rust)
+  maintainers codeberg embedded bootstrap release rust)
 
 (define-member (person "jgart"
                        "jgart@dismail.de"
@@ -1347,7 +1354,7 @@ the \"texlive\" importer."
 (define-member (person "Mathieu Othacehe"
                        "othacehe@gnu.org"
                        "mothacehe")
-  codeberg installer mentors)
+  maintainers codeberg installer mentors)
 
 (define-member (person "Florian Pelz"
                        "pelzflorian@pelzflorian.de"
@@ -1412,7 +1419,7 @@ the \"texlive\" importer."
 (define-member (person "Maxim Cournoyer"
                        "maxim@guixotic.coop"
                        "apteryx")
-  codeberg core documentation electronics gnome qt telephony)
+  maintainers codeberg core documentation electronics gnome qt telephony)
 
 (define-member (person "Katherine Cox-Buday"
                        "cox.katherine.e+guix@gmail.com"
