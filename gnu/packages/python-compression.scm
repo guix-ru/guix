@@ -562,6 +562,33 @@ compression algorithm.")
 and decompression by implementing Python bindings for the ISA-L library.")
     (license license:expat)))
 
+(define-public python-jaraco-stream
+  (package
+    (name "python-jaraco-stream")
+    (version "3.0.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jaraco/jaraco.stream")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jsmyh37m78gfk70n3j5k5djh6pajn96sbkfi987sjil3r3ix854"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-more-itertools))
+    (home-page "https://github.com/jaraco/jaraco.stream")
+    (synopsis "Routines for dealing with data streams")
+    (description
+     "This package includes a set of generators for dynamically loading gzip
+data.  It is geared towards dealing with data streams.")
+    (license license:expat)))
+
 (define-public python-pylsqpack
   (package
     (name "python-pylsqpack")
