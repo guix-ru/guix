@@ -15218,6 +15218,33 @@ enforced method signatures and consistent documentation.")
 maintained @code{jaraco.util}.")
     (license license:expat)))
 
+(define-public python-jaraco-logging
+  (package
+    (name "python-jaraco-logging")
+    (version "3.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jaraco/jaraco.logging")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0c13wxbmk0rl1jd0fxp3p7qpsps8lj6p2wlkny2ng5z4qn21ahhi"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-tempora))
+    (home-page "https://github.com/jaraco/jaraco.logging")
+    (synopsis "Support for Python's logging facility")
+    (description
+     "This package allows soliciting log-level info from command-line
+parameters.")
+    (license license:expat)))
+
 (define-public python-jaraco-packaging
   (package
     (name "python-jaraco-packaging")
