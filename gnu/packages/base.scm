@@ -23,7 +23,7 @@
 ;;; Copyright © 2022 zamfofex <zamfofex@twdb.moe>
 ;;; Copyright © 2022, 2026 John Kehayias <john@guixotic.coop>
 ;;; Copyright © 2023 Josselin Poiret <dev@jpoiret.xyz>
-;;; Copyright © 2024, 2025 Zheng Junjie <z572@z572.online>
+;;; Copyright © 2024-2026 Zheng Junjie <z572@z572.online>
 ;;; Copyright © 2025 Nikita Mitasov <me@ch4og.com>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -65,6 +65,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages gettext)
+  #:use-module (guix deprecation)
   #:use-module (guix i18n)
   #:use-module (guix utils)
   #:use-module (guix gexp)
@@ -1706,7 +1707,9 @@ command.")
                      (copy-recursively (string-append out "/share/zoneinfo-leaps")
                                        (string-append out "/share/zoneinfo/right"))
                      (delete-file-recursively
-                      (string-append out "/share/zoneinfo-leaps")))))
+                      (string-append out "/share/zoneinfo-leaps"))
+                     (install-file "leap-seconds.list"
+                                   (string-append out "/share/zoneinfo")))))
                (delete 'configure))))
     (inputs (list (origin
                     (method url-fetch)
@@ -1735,19 +1738,8 @@ and daylight-saving rules.")
 ;;; package.
 (define-public tzdata-for-tests tzdata)
 
-;;; TODO: Move the 'install-leap-seconds' phase into the main package's
-;;; 'post-install' phase on the next rebuild cycle.
-(define-public tzdata/leap-seconds
-  (hidden-package
-    (package/inherit tzdata
-      (arguments
-        (substitute-keyword-arguments arguments
-          ((#:phases phases)
-           #~(modify-phases #$phases
-               (add-after 'post-install 'install-leap-seconds
-                 (lambda _
-                   (install-file "leap-seconds.list"
-                     (string-append #$output "/share/zoneinfo")))))))))))
+;; XXX: Deprecated on <2026-05-23>.
+(define-deprecated/public-alias tzdata/leap-seconds tzdata)
 
 (define-public libiconv
   (package
