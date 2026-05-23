@@ -155,7 +155,7 @@ package.")
                         (("/usr/share/zoneinfo") (dir "share/zoneinfo")))))))))
     (inputs
       (let ((tc (lambda (t) (and (cross-target? t) (cross-gcc-toolchain t)))))
-        (filter ->bool (list gcc-toolchain less tzdata/leap-seconds harec qbe
+        (filter ->bool (list gcc-toolchain less tzdata harec qbe
                              ;; provide cross toolchains for all
                              ;; non-native possible targets
                              (tc "aarch64-linux-gnu")
