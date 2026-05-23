@@ -40,12 +40,78 @@
   #:use-module (gnu packages linux)
   #:use-module (guix utils)
   #:use-module ((guix memoization) #:select (mlambda))
-  #:use-module (ice-9 match))
+  #:use-module (ice-9 match)
+  #:use-module (srfi srfi-9))
+
+;; helper record for the data needed to track multiple patches without verbose
+;; copy-paste code. could be moved up to its own module if other upstreams are
+;; released similarly
+(define-record-type <patch-data>
+  (patch-data file-name hash)
+  patch-data?
+  (file-name patch-file-name)
+  (hash patch-hash))
+
+(define ncurses-patch-seq
+  (list
+    (patch-data "ncurses-6.6-20251231.patch.gz"
+                "0a6wi8c0yb35sncx6k8jnzi81d52sz8d3g9kpmxl8c6h9a1imz8q")
+    (patch-data "ncurses-6.6-20260103.patch.gz"
+                "0v8bf0b8sddd14xlz36si0p32j49nr7l20l6am07cvgwk7xygh6i")
+    (patch-data "ncurses-6.6-20260117.patch.gz"
+                "1pacqrih1v2bfdlwsh1yab4kg50y60pazic529ybrmwvw8wsab8f")
+    (patch-data "ncurses-6.6-20260124.patch.gz"
+                "0dsywwjnsz66v29a4pmlfmzn27i9pkhn1m4606p35gf596prfaak")
+    (patch-data "ncurses-6.6-20260131.patch.gz"
+                "01pvg73ls84kzkzavkfdw18x9zrlw16ygyr62pd9was7v2qh7yf7")
+    (patch-data "ncurses-6.6-20260207.patch.gz"
+                "0ffva6iq342fcbna18fik589vhkjfh6ci8246anscjvrwsqhybkx")
+    (patch-data "ncurses-6.6-20260214.patch.gz"
+                "1a291j8njks84jgsmh2hfa0521v22hvl7gxlhgq5jqd3fcw09kyc")
+    (patch-data "ncurses-6.6-20260221.patch.gz"
+                "1a2552175ynhzh294r9mig2ydma2svrrxhn320mb0n6v695asiri")
+    (patch-data "ncurses-6.6-20260301.patch.gz"
+                "0rixwlf1d3fsklszz3vv1wvx8ir71j5xzjaf85i3d23xhhsvny70")
+    (patch-data "ncurses-6.6-20260307.patch.gz"
+                "05vgg6w36cn5fgy2dzxmdpw8mwbbmgrzcnsx3shgi69jhsydhw2g")
+    (patch-data "ncurses-6.6-20260314.patch.gz"
+                "1fh4aprsfivwqrb6n2j0d5zkayc2260l5a32fmilwcmnhwpc864g")
+    (patch-data "ncurses-6.6-20260321.patch.gz"
+                "085h35x247dmfwc4y49fvs6h0r8adb3vsinmvgkjnp36i9q9dzzz")
+    (patch-data "ncurses-6.6-20260328.patch.gz"
+                "13k2pzl2spaxhypyvmbjb3zxzzrry7yq1yjv7ba3j1gz225qzmvg")
+    (patch-data "ncurses-6.6-20260404.patch.gz"
+                "0y0pc3bskg3p89wvh2nyx5qf3109xahb1srs8ibc6lbpf9ilm78v")
+    (patch-data "ncurses-6.6-20260411.patch.gz"
+                "0nhyp7xg2dr739sybl4l00zia3qss2p527aig6p5rqxh84si3dhi")
+    (patch-data "ncurses-6.6-20260418.patch.gz"
+                "0rm23wszfa2cd3q519mfxsg6pfrk6s7j448ad05zaxxgsxvbnd56")
+    (patch-data "ncurses-6.6-20260425.patch.gz"
+                "06vnwhmg6r43zzmv9njpflyh29cx3wzizpnzfp38bjs9252dg66y")
+    (patch-data "ncurses-6.6-20260502.patch.gz"
+                "0sr7k7ckw3wyrdfiy1a2scnzblr9y0b78flkjp00w8wa21sl3cni")
+    (patch-data "ncurses-6.6-20260509.patch.gz"
+                "00h4rpkwdrwj48bsw8ha6vjan35babpvhyymc347kn9lw0j8h1ll")
+    (patch-data "ncurses-6.6-20260516.patch.gz"
+                "0amc0r5psmmp3zczgkxx7c6d0fv4fjwph4h8s69nhdm90xrch364")))
+
+(define ncurses-patches
+  (map (lambda (patch)
+         (origin
+           (method url-fetch)
+           (uri (string-append "https://invisible-mirror.net/"
+                               "archives/ncurses/6.6/"
+                               (patch-file-name patch)))
+           (sha256
+             (base32
+               (patch-hash patch)))
+           (file-name (patch-file-name patch))))
+       ncurses-patch-seq))
 
 (define-public ncurses
   (package
     (name "ncurses")
-    (version "6.6.20251230")
+    (version "6.6.20260516")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/ncurses/ncurses-"
@@ -180,6 +246,18 @@
                  #$@(if (target-mingw?) #~("--enable-term-driver") #~()))
              #:tests? #f                          ; no "check" target
              #:phases #~(modify-phases %standard-phases
+                          ;; Patches opnly available as individual files, used as origins...
+                          (add-after 'unpack 'apply-patches
+                            (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                              (for-each
+                               (lambda (patch-file-name)
+                                 (invoke "sh" "-c"
+                                         (string-append "zcat "
+                                                        (assoc-ref
+                                                         (or native-inputs inputs)
+                                                         patch-file-name)
+                                                        " | patch --verbose --strip=1")))
+                               '#$(map patch-file-name ncurses-patch-seq))))
                           (replace 'configure #$configure-phase)
                           (add-after 'install 'post-install
                             #$post-install-phase)
@@ -188,9 +266,11 @@
                           (add-before 'patch-source-shebangs 'remove-unneeded-shebang
                             #$remove-shebang-phase)))))
     (native-inputs
-     (if (%current-target-system)
-         (list pkg-config this-package)           ;for 'tic'
-         (list pkg-config)))
+     (append
+      (if (%current-target-system)
+          (list pkg-config this-package) ;for 'tic'
+          (list pkg-config))
+      ncurses-patches))
     (native-search-paths
      (list (search-path-specification
             (variable "TERMINFO_DIRS")
