@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2010-2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2010-2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2012, 2013 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2021 Simon Tournier <zimon.toutoune@gmail.com>
 ;;; Copyright © 2022 Maxime Devos <maximedevos@telenet.be>
@@ -944,12 +944,12 @@ to fetch a specific version."
        (else #f))))
 
   (when version
-    (report-error
-     (G_ "Updating to a specific version is not yet implemented for SourceForge.")))
+    (leave
+     (G_ "updating to a specific version is not yet implemented for SourceForge~%")))
 
   (when partial-version?
-    (report-error
-     (G_ "Updating to a partial version is not yet implemented for SourceForge.")))
+    (leave
+     (G_ "updating to a partial version is not yet implemented for SourceForge~%")))
 
   (let* ((name     (package-upstream-name package))
          (base     (string-append "https://sourceforge.net/projects/"
