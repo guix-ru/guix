@@ -13646,17 +13646,6 @@ libavif.")
 and a plugin for Pillow.")
     (license license:bsd-3)))
 
-(define-public python-pillow-heif-0.22
-  (package
-    (inherit python-pillow-heif)
-    (version "0.22.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (pypi-uri "pillow_heif" version))
-       (sha256
-        (base32 "16mkap63d14f69105b3bm8pi64fvpdznncgn48vhgls0jf977m31"))))))
-
 (define-public python-pillow-jxl-plugin
   (package
     (name "python-pillow-jxl-plugin")
