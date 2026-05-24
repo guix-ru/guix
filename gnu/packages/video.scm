@@ -6959,41 +6959,6 @@ downloader.  It does not require a Youtube API key.")
 
 (define-deprecated/public-alias mps-youtube python-yewtube)
 
-(define-public python-youtube-search
-  (package
-    (name "python-youtube-search")
-    ;; Original repository is archived, see
-    ;; https://github.com/alexmercerind/youtube-search-python/issues/189
-    ;; The most promising fork (in the sense that it works) is
-    ;; https://github.com/ahmedayyad-dev/youtube-search-python-fork,
-    ;; which is therefore packaged in Guix.
-    (properties '((commit . "6d7e16ebcdc90032392749c2f30f8e29ea0956ae")
-                  (revision . "0")))
-    (version (git-version "1.6.6"
-                          (assoc-ref properties 'revision)
-                          (assoc-ref properties 'commit)))
-    (source
-     (origin
-       (method git-fetch)
-       (uri
-        (git-reference
-          (url "https://github.com/ahmedayyad-dev/youtube-search-python-fork")
-          (commit (assoc-ref properties 'commit))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1b2sc0v0xw8kqrqy1844xkdsss70npkyk26fprpw3yhz09az5k3q"))))
-    (arguments (list #:tests? #f)) ;no tests in repository
-    (build-system pyproject-build-system)
-    (propagated-inputs (list python-httpx))
-    (native-inputs (list python-setuptools))
-    (home-page "https://github.com/ahmedayyad-dev/youtube-search-python-fork")
-    (synopsis "Search for YouTube videos, channels & playlists")
-    (description
-     "This package provides tools to search for @code{YouTube} videos,
-channels and playlists; as well as getting video metadata from links.  This
-package does not rely on the @code{YouTube} Data API v3.")
-    (license license:expat)))
-
 (define-public wf-recorder
   (package
     (name "wf-recorder")
