@@ -6777,62 +6777,6 @@ to allow the user to choose from a list of options, and terminal interaction
 helpers.")
     (license license:expat)))
 
-;; XXX: The project might be abandoned and this package has no users in Guix,
-;; consider to remove if it keeps failing.
-;; See: <https://github.com/ethanfurman/aenum/issues/45>,
-;;      <https://github.com/ethanfurman/aenum/issues/44>,
-;;      <https://github.com/ethanfurman/aenum/issues/27>.
-(define-public python-aenum
-  (package
-    (name "python-aenum")
-    (version "3.1.15")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/ethanfurman/aenum")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1yf656gigzn76yin8f6n6rbjq5d7l0sklni7pmm6nb5bzv84ml4v"))
-       (modules '((guix build utils)))
-       (snippet
-        ;; Delete the Python 2 specific files which won't compile
-        ;; in Python 3.
-        '(for-each delete-file
-                   (find-files "." "_py2.py$")))))
-    (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:test-flags
-      ;; These tests are defined in "aenum/test_v3.py" and require a function
-      ;; "test_pickle_dump_load" from "aenum/test.py" which is not imported
-      ;; into the module's scope.
-      #~(list "-k" (string-join
-                    (list "not test_pickle_enum_function_with_qualname"
-                          "test_class_nested_enum_and_pickle_protocol_four"
-                          "test_subclasses_with_getnewargs_ex"
-                          ;; This test fails from Python@3.12 onwards.
-                          ;; <enum 'Color'> has no attribute 'value'
-                          "test_extend_enum_shadow_property_stdlib")
-                    " and not "))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-tests
-            (lambda _
-              (substitute* "aenum/test_v3.py"
-                ;; tempdir variable is not defined in the module.
-                (("import tempfile.*")
-                 (format #f "import tempfile~%tempdir = tempfile.mkdtemp()~%"))))))))
-    (native-inputs
-     (list python-pytest python-setuptools))
-    (home-page "https://github.com/ethanfurman/aenum")
-    (synopsis "Advanced enumerations, namedtuples and constants for Python")
-    (description
-     "The aenum library includes an @code{Enum} base class, a metaclass-based
-@code{NamedTuple} implementation and a @code{NamedConstant} class.")
-    (license license:bsd-3)))
-
 (define-public python-calver
   (package
     (name "python-calver")
