@@ -2158,29 +2158,6 @@ It was originally developed as part of @code{psutil} test suite, and later
 split out into a standalone project.")
     (license license:bsd-3)))
 
-(define-public python-pyannotate
-  (package
-    (name "python-pyannotate")
-    (version "1.2.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/dropbox/pyannotate")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0gmhl4ldan0p774dhrs9a7bmjjphlsy3hhfqq84gak15rdjs59ga"))))
-    (build-system pyproject-build-system)
-    (arguments (list #:test-backend #~'unittest))
-    (native-inputs (list python-setuptools))
-    (propagated-inputs (list python-mypy-extensions python-six))
-    (home-page "https://github.com/dropbox/pyannotate")
-    (synopsis "Auto-generate PEP-484 annotations")
-    (description
-     "This package, PyAnnotate, is used to auto-generate PEP-484 annotations.")
-    (license license:asl2.0)))
-
 (define-public python-pycotap
   (package
     (name "python-pycotap")
