@@ -3013,58 +3013,43 @@ Format) file format decoder and encoder.")
                        "libpng" "zlib"))))))
     (build-system cmake-build-system)
     (arguments
-     `(#:modules ((guix build cmake-build-system)
-                  (guix build utils)
-                  (srfi srfi-26))
-       #:configure-flags
-       (list "-DJPEGXL_FORCE_SYSTEM_GTEST=true"
-             "-DJPEGXL_FORCE_SYSTEM_BROTLI=true"
-             "-DJPEGXL_FORCE_SYSTEM_LCMS2=true"
-             "-DJPEGXL_FORCE_SYSTEM_HWY=true"
-             "-DJPEGXL_BUNDLE_LIBPNG=false"
-             "-DJPEGXL_ENABLE_PLUGINS=true")
-       #:phases
-       (modify-phases %standard-phases
-         ,@(cond
-             ((target-riscv64?)
-              '((add-after 'unpack 'fix-atomic
-                  (lambda _
-                    (substitute* "lib/jxl/enc_xyb.cc"
-                      (("#include \"lib/jxl/enc_xyb.h\"" a)
-                       (string-append a "\n#include <atomic>")))))))
-             ((target-x86-32?)
-              '((add-after 'unpack 'loosen-test-parameter
-                  (lambda _
-                    ;; This test fails likely due to a floating point
-                    ;; rounding difference.
-                    (substitute* "lib/jxl/color_management_test.cc"
-                      (("8\\.7e-4") "8.7e-3"))))))
-             (#t '()))
+     (list
+      #:configure-flags
+      #~'("-DJPEGXL_FORCE_SYSTEM_GTEST=true"
+          "-DJPEGXL_FORCE_SYSTEM_BROTLI=true"
+          "-DJPEGXL_FORCE_SYSTEM_LCMS2=true"
+          "-DJPEGXL_FORCE_SYSTEM_HWY=true"
+          "-DJPEGXL_BUNDLE_LIBPNG=false"
+          "-DJPEGXL_ENABLE_PLUGINS=true")
+      #:phases
+      #~(modify-phases %standard-phases
+          #$@(cond
+               ((target-riscv64?)
+                #~((add-after 'unpack 'fix-atomic
+                     (lambda _
+                       (substitute* "lib/jxl/enc_xyb.cc"
+                         (("#include \"lib/jxl/enc_xyb.h\"" a)
+                          (string-append a "\n#include <atomic>")))))))
+               ((target-x86-32?)
+                #~((add-after 'unpack 'loosen-test-parameter
+                     (lambda _
+                       ;; This test fails likely due to a floating point
+                       ;; rounding difference.
+                       (substitute* "lib/jxl/color_management_test.cc"
+                         (("8\\.7e-4") "8.7e-3"))))))
+               (#t
+                #~()))
          (add-after 'install 'split
-           (lambda* (#:key outputs #:allow-other-keys)
-              (let* ((out            (assoc-ref outputs "out"))
-                     (out:pixbuf     (assoc-ref outputs "pixbuf-loader"))
-                     (thumbnailer    (string-append
-                                      out
-                                      "/share/thumbnailers/jxl.thumbnailer"))
-                     (thumbnailer*   (string-append
-                                      out:pixbuf
-                                      "/share/thumbnailers/jxl.thumbnailer"))
-                     (pixbuf-loader  (string-append
-                                      out
-                                      "/lib/gdk-pixbuf-2.0/2.10.0/loaders/"
-                                      "libpixbufloader-jxl.so"))
-                     (pixbuf-loader* (string-append
-                                      out:pixbuf
-                                      "/lib/gdk-pixbuf-2.0/2.10.0/loaders/"
-                                      "libpixbufloader-jxl.so")))
-
-                (for-each (lambda (old new)
-                            (install-file old (dirname new))
-                            (delete-file old)
-                            (chmod new #o555))
-                          (list thumbnailer pixbuf-loader)
-                          (list thumbnailer* pixbuf-loader*))))))))
+           (lambda _
+             (for-each
+              (lambda (path)
+                (let ((old (string-append #$output path))
+                      (new (string-append #$output:pixbuf-loader path)))
+                  (install-file old (dirname new))
+                  (delete-file old)
+                  (chmod new #o555)))
+              '("/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-jxl.so"
+                "/share/thumbnailers/jxl.thumbnailer")))))))
     (native-inputs
      (list asciidoc doxygen googletest pkg-config python))
     (inputs
