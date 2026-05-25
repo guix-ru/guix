@@ -6190,9 +6190,9 @@ these formats and provides some elementary operations (copying, scaling,
 alpha blending etc).")
     (license license:gpl3)))
 
-(define-public frei0r-plugins
+(define-public frei0r
   (package
-    (name "frei0r-plugins")
+    (name "frei0r")
     (version "3.2.1")
     (source
      (origin
@@ -6260,6 +6260,9 @@ counts more than 100 plugins.")
                    ;; src/filter/ndvi/gradientlut.hpp
                    ;; src/filter/facedetect/facedetect.cpp
                    license:lgpl2.1+))))
+
+;; XXX: Deprecated on 2026-05-18.
+(define-deprecated-package frei0r-plugins frei0r)
 
 (define-public frei0r-api
   (package
