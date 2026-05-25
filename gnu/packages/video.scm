@@ -4199,8 +4199,7 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
       #~(modify-phases %standard-phases
           (add-after 'install 'wrap-executable
             (lambda _
-              (let* ((frei0r #$(this-package-input "frei0r-plugins"))
-                     (ladspa #$(this-package-input "ladspa"))
+              (let* ((ladspa #$(this-package-input "ladspa"))
                      ;; In MLT 7, 'melt' symlinks to 'melt-7'.  Try to keep
                      ;; compatibility with MLT 6 where it's only 'melt'.
                      (major #$(version-major version))
@@ -4209,8 +4208,6 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
                                (string-append "melt-" major)
                                "melt")))
                 (wrap-program (string-append #$output "/bin/" exec)
-                  `("FREI0R_PATH" ":" =
-                    (,(string-append frei0r "/lib/frei0r-1")))
                   `("LADSPA_PATH" ":" =
                     (,(string-append ladspa "/lib/ladspa"))))))))))
     (inputs
@@ -4220,7 +4217,6 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
            eigen ; movit requires.private
            ffmpeg
            fftw
-           frei0r-plugins
            gdk-pixbuf
            gtk+
            jack-1
@@ -4243,7 +4239,11 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
            sox
            vidstab))
     (native-inputs
-     (list pkg-config python-minimal swig-4.0))
+     (list frei0r-api pkg-config python-minimal swig-4.0))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "FREI0R_PATH")
+            (files (list "lib/frei0r-1")))))
     (home-page "https://www.mltframework.org/")
     (synopsis "Author, manage, and run multitrack audio/video compositions")
     (description
