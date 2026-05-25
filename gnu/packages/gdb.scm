@@ -289,7 +289,7 @@ written in C, C++, Ada, Objective-C, Pascal and more.")
                   '("libxml2" "ncurses" "python-wrapper" "source-highlight")))))
 
 (define-public avr-gdb
-  (package/inherit gdb-14
+  (package/inherit gdb-15
     (name "avr-gdb")
     (arguments
      (substitute-keyword-arguments arguments
