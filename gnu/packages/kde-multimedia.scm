@@ -590,14 +590,11 @@ This package is part of the KDE multimedia module.")
           (add-after 'install 'wrap-executable
             (lambda _
               (let* ((ffmpeg #$(this-package-input "ffmpeg"))
-                     (frei0r #$(this-package-input "frei0r-plugins"))
                      (ladspa #$(this-package-input "ladspa"))
                      (qtbase #$(this-package-input "qtbase")))
                 (wrap-program (string-append #$output "/bin/kdenlive")
                   `("PATH" ":" prefix
                     ,(list (string-append ffmpeg "/bin")))
-                  `("FREI0R_PATH" ":" =
-                    (,(string-append frei0r "/lib/frei0r-1")))
                   `("LADSPA_PATH" ":" =
                     (,(string-append ladspa "/lib/ladspa")))
                   `("QT_QPA_PLATFORM_PLUGIN_PATH" ":" =
@@ -605,13 +602,12 @@ This package is part of the KDE multimedia module.")
                   `("MLT_PREFIX" ":" =
                     (,#$(this-package-input "mlt"))))))))))
     (native-inputs
-     (list extra-cmake-modules kdoctools pkg-config qttools))
+     (list extra-cmake-modules frei0r-api kdoctools pkg-config qttools))
     (inputs
      (list bash-minimal
            breeze                       ; make dark theme available easily
            breeze-icons                 ; recommended icon set
            ffmpeg
-           frei0r-plugins
            imath
            karchive
            kcrash
@@ -640,6 +636,10 @@ This package is part of the KDE multimedia module.")
            qtsvg
            qtwayland
            shared-mime-info))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "FREI0R_PATH")
+            (files (list "lib/frei0r-1")))))
     (home-page "https://kdenlive.org")
     (synopsis "Non-linear video editor")
     (description "Kdenlive is an acronym for KDE Non-Linear Video Editor.
