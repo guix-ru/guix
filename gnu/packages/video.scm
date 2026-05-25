@@ -6238,6 +6238,49 @@ It counts more than 100 plugins.")
                    ;; src/filter/facedetect/facedetect.cpp
                    license:lgpl2.1+))))
 
+(define-public frei0r-api
+  (package
+    (name "frei0r-api")
+    (version "1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (file-name (git-file-name name version))
+       (uri (git-reference
+             (url "https://github.com/dyne/frei0r")
+             ;; This release contains the latest version of the headers.
+             ;; It should only be updated if the headers change.
+             (commit "v3.0.0")))
+       (sha256
+        (base32 "1wgsja14b4ihcakm5w7ndn0dflsp8xyv7r90hi4x2yipc7gf46iy"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan
+      #~'(("include/frei0r.h" "include/")
+           ("include/frei0r.hpp" "include/")
+           ("frei0r.pc" "lib/pkgconfig/"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'write-pkg-config-file
+            (lambda _
+              (with-output-to-file "frei0r.pc"
+                (lambda _
+                  (format #t
+                   "Name: frei0r
+Description: minimalistic plugin API for video effects
+Version: ~a
+Libs:
+Cflags: -I~a~%"
+                   #$(package-version this-package)
+                   (string-append #$output "/include")))))))))
+    (home-page "https://frei0r.dyne.org/codedoc/html/")
+    (synopsis "Public API of frei0r")
+    (description
+     "Public header files of frei0r, a large collection of free and portable
+video plugins.")
+    (license license:gpl2+)))
+
 (define-public motion
   (package
     (name "motion")
