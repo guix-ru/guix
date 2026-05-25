@@ -6614,14 +6614,11 @@ transitions, and effects and then export your film to many common formats.")
                   (("\"melt-7\"") (string-append "\"" mlt "/bin/melt-7\""))))))
           (add-after 'install 'wrap-executable
             (lambda _
-             (let ((frei0r #$(this-package-input "frei0r-plugins"))
-                    (jack #$(this-package-input "jack"))
+              (let ((jack #$(this-package-input "jack"))
                     (ladspa #$(this-package-input "ladspa"))
                     (mlt #$(this-package-input "mlt"))
                     (sdl2 #$(this-package-input "sdl2")))
                (wrap-program (string-append #$output "/bin/shotcut")
-                 `("FREI0R_PATH" ":" =
-                   (,(string-append frei0r "/lib/frei0r-1")))
                  `("LADSPA_PATH" ":" =
                    (,(string-append ladspa "/lib/ladspa")))
                  `("LD_LIBRARY_PATH" ":" prefix
@@ -6629,12 +6626,11 @@ transitions, and effects and then export your film to many common formats.")
                  `("PATH" ":" prefix
                    ,(list (string-append mlt "/bin"))))))))))
     (native-inputs
-     (list pkg-config python-wrapper qttools vulkan-headers))
+     (list frei0r-api pkg-config python-wrapper qttools vulkan-headers))
     (inputs
      (list bash-minimal
            ffmpeg
            fftw
-           frei0r-plugins
            jack-1
            ladspa
            libxkbcommon
@@ -6647,6 +6643,10 @@ transitions, and effects and then export your film to many common formats.")
            qtwebsockets
            sdl2
            vulkan-loader))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "FREI0R_PATH")
+            (files (list "lib/frei0r-1")))))
     (home-page "https://www.shotcut.org/")
     (synopsis "Video editor built on the MLT framework")
     (description
