@@ -6093,52 +6093,71 @@ alpha blending etc).")
 (define-public frei0r-plugins
   (package
     (name "frei0r-plugins")
-    (version "1.7.0")
+    (version "3.2.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "https://files.dyne.org/frei0r"
-                           "/old-releases/frei0r-plugins-"
-                           version
-                           ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dyne/frei0r")
+             (commit (string-append "v" version))))
        (sha256
-        (base32
-         "0fjji3060r4fwr7vn91lwfzl80lg3my9lkp94kbyw8xwz7qgh7qv"))))
-    (build-system gnu-build-system)
+        (base32 "1kc26ywv4n5i4k2pa3kw8pl891pz29x555shwlmsd65q9w89l5kq"))
+       (file-name (git-file-name name version))
+       (modules (list '(guix build utils)))
+       (snippet
+        #~(begin
+            ;; Delete public api headers, as they are provided by frei0r-api.
+            (delete-file "include/frei0r.h")
+            (delete-file "include/frei0r.hpp")
+            ;; Prevent installation of pkg-config file.
+            (substitute* "CMakeLists.txt"
+              (("^install .*/frei0r\\.pc.*/pkgconfig.*") ""))))))
+    (build-system cmake-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-Makefile
-           (lambda _
-             ;; XXX: The 1.7.0 Makefile looks for files that have slightly different
-             ;; names in the tarball.  Try removing this for future versions.
-             (substitute* "Makefile.in"
-               (("README\\.md ChangeLog TODO AUTHORS")
-                "README.txt ChangeLog.txt TODO.txt AUTHORS.txt"))
-             #t)))))
-    ;; TODO: opencv for additional face detection filters.
-    (inputs
-     (list gavl cairo))
-    (native-inputs
-     (list pkg-config))
-    (home-page "https://www.dyne.org/software/frei0r/")
-    (synopsis "Minimalistic plugin API for video effects")
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'substitute-opencv-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* (list "src/filter/facebl0r/facebl0r.cpp"
+                                 "src/filter/facedetect/facedetect.cpp")
+                (("/usr/share/opencv")
+                 (string-append (assoc-ref inputs "opencv") "/share/opencv4"))))))))
+    (inputs (list cairo gavl opencv))
+    (native-inputs (list frei0r-api pkg-config))
+    (home-page "https://dyne.org/software/frei0r/")
+    (synopsis "Collection of free and portable video plugins")
     (description
-     "Frei0r is a minimalistic plugin API for video effects.
-The main emphasis is on simplicity for an API that will round up
-the most common video effects into simple filters, sources and
-mixers that can be controlled by parameters.  Frei0r wants to
-provide a way to share these simple effects between many
-applications, avoiding their reimplementation by different projects.
-It counts more than 100 plugins.")
+     "Frei0r is a minimalistic plugin API and collection of video effects.  The
+main emphasis is on simplicity for an API that will round up the most common
+video effects into simple filters, sources and mixers that can be controlled by
+parameters.  Frei0r wants to provide a way to share these simple effects between
+many applications, avoiding their reimplementation by different projects.  It
+counts more than 100 plugins.")
     (license (list license:gpl2+
                    ;; The following files are licensed as LGPL2.1+:
-                   ;; src/generator/ising0r/ising0r.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-up.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-right.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-rect.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-left.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-down.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-circle.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-barn-door-v.c
+                   ;; src/mixer2/sleid0r/sleid0r_wipe-barn-door-h.c
+                   ;; src/mixer2/sleid0r/sleid0r_push-up.c
+                   ;; src/mixer2/sleid0r/sleid0r_slide-up.c
+                   ;; src/mixer2/sleid0r/sleid0r_push-right.c
+                   ;; src/mixer2/sleid0r/sleid0r_slide-right.c
+                   ;; src/mixer2/sleid0r/sleid0r_push-left.c
+                   ;; src/mixer2/sleid0r/sleid0r_slide-left.c
+                   ;; src/mixer2/sleid0r/sleid0r_push-down.c
+                   ;; src/mixer2/sleid0r/sleid0r_slide-down.c
                    ;; src/generator/onecol0r/onecol0r.cpp
                    ;; src/generator/nois0r/nois0r.cpp
                    ;; src/generator/lissajous0r/lissajous0r.cpp
-                   ;; src/filter/ndvi/gradientlut.hpp
+                   ;; src/generator/ising0r/ising0r.c
                    ;; src/filter/ndvi/ndvi.cpp
+                   ;; src/filter/ndvi/gradientlut.hpp
                    ;; src/filter/facedetect/facedetect.cpp
                    license:lgpl2.1+))))
 
