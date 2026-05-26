@@ -1881,6 +1881,34 @@ GID."
     (('gnu rest ...) #t)
     (rest #f)))
 
+(define (guix-configuration-file-installation name file)
+  "Return a gexp that create a symlink '/etc/guix/NAME' to FILE."
+  (with-imported-modules '((guix build utils))
+    #~(begin
+        (use-modules (guix build utils))
+
+        (let* ((target #$(string-append "/etc/guix/" name))
+               (install (lambda ()
+                          ;; Installed the declared channels.
+                          (symlink #+file target))))
+          (catch 'system-error
+            install
+            (lambda args
+              (cond ((= (system-error-errno args) EEXIST)
+                     ;; If NAME already exists, move it out of the way.
+                     ;; Create a backup if it's a regular file: it's likely
+                     ;; that the user manually defined it.
+                     (if (and (symbolic-link? target)
+                              (store-file-name? (readlink target)))
+                         (delete-file target)
+                         (rename-file target (string-append target ".bak")))
+                     (install))                   ;retry
+                    ((= (system-error-errno args) ENOENT)
+                     (mkdir-p "/etc/guix")
+                     (install))                   ;retry
+                    (else
+                     (apply throw args)))))))))
+
 (define (substitute-key-authorization keys guix)
   "Return a gexp with code to register KEYS, a list of files containing 'guix
 archive' public keys, with GUIX."
@@ -1907,27 +1935,7 @@ archive' public keys, with GUIX."
                                (write-acl (public-keys->acl keys)
                                           port))))))))
 
-  (with-imported-modules '((guix build utils))
-    #~(begin
-        (use-modules (guix build utils)
-                     (ice-9 match))
-        (define acl-file #$%acl-file)
-        ;; If the ACL already exists, move it out of the way.  Create a backup
-        ;; if it's a regular file: it's likely that the user manually updated
-        ;; it with 'guix archive --authorize'.
-        (match (and=> (false-if-exception (lstat acl-file)) stat:type)
-          (#f #f) ;file doesn't exist
-          ('symlink ;delete symlink pointing to store, backup otherwise.
-           (if (or (store-file-name? (readlink acl-file)) ;store symlink
-                   (not (file-exists? acl-file)))         ;dangling symlink
-               (delete-file acl-file)
-               (rename-file acl-file (string-append acl-file ".bak"))))
-          (_ ;backup
-           (rename-file acl-file (string-append acl-file ".bak"))))
-        (mkdir-p (dirname acl-file))
-
-        ;; Installed the declared ACL.
-        (symlink #+default-acl acl-file))))
+  (guix-configuration-file-installation "acl" default-acl))
 
 (define (install-channels-file channels)
   "Return a gexp with code to install CHANNELS, a list of channels, in
@@ -1940,23 +1948,7 @@ archive' public keys, with GUIX."
            `(list ,@(map channel->code channels))
            port)))))
 
-  (with-imported-modules '((guix build utils))
-    #~(begin
-        (use-modules (guix build utils))
-
-        ;; If channels.scm already exists, move it out of the way. Create a
-        ;; backup if it's a regular file: it's likely that the user
-        ;; manually defined it.
-        (if (file-exists? "/etc/guix/channels.scm")
-            (if (and (symbolic-link? "/etc/guix/channels.scm")
-                     (store-file-name? (readlink "/etc/guix/channels.scm")))
-                (delete-file "/etc/guix/channels.scm")
-                (rename-file "/etc/guix/channels.scm"
-                             "/etc/guix/channels.scm.bak"))
-            (mkdir-p "/etc/guix"))
-
-        ;; Installed the declared channels.
-        (symlink #+channels-file "/etc/guix/channels.scm"))))
+  (guix-configuration-file-installation "channels.scm" channels-file))
 
 (define %default-authorized-guix-keys
   ;; List of authorized substitute keys.
@@ -1966,34 +1958,15 @@ archive' public keys, with GUIX."
 (define (guix-machines-files-installation machines)
   "Return a gexp to install MACHINES, a list of gexps, as
 /etc/guix/machines.scm, which is used for offloading."
-  (with-imported-modules '((guix build utils))
-    #~(begin
-        (use-modules (guix build utils))
-
-        (define machines-file
-          "/etc/guix/machines.scm")
-
-        ;; If MACHINES-FILE already exists, move it out of the way.
-        ;; Create a backup if it's a regular file: it's likely that the
-        ;; user manually updated it.
-        (let ((stat (false-if-exception (lstat machines-file))))
-          (if stat
-              (if (and (eq? 'symlink (stat:type stat))
-                       (store-file-name? (readlink machines-file)))
-                  (delete-file machines-file)
-                  (rename-file machines-file
-                               (string-append machines-file ".bak")))
-              (mkdir-p (dirname machines-file))))
-
-        ;; Installed the declared machines file.
-        (symlink #+(scheme-file "machines.scm"
-                                #~((@ (srfi srfi-1) append-map)
-                                   (lambda (entry)
-                                     (if (build-machine? entry)
-                                         (list entry)
-                                         entry))
-                                   #$machines))
-                 machines-file))))
+  (guix-configuration-file-installation
+   "machines.scm"
+   (scheme-file "machines.scm"
+                #~((@ (srfi srfi-1) append-map)
+                   (lambda (entry)
+                     (if (build-machine? entry)
+                         (list entry)
+                         entry))
+                   #$machines))))
 
 (define (run-with-writable-store)
   "Return a wrapper that runs the given command under the specified UID and
