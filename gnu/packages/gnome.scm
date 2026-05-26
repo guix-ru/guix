@@ -8588,6 +8588,9 @@ users.")
          (string-append "-Dc_link_args=-Wl,-rpath="
                         #$output "/lib:"
                         #$output "/lib/NetworkManager/" #$version)
+         ;; This is needed since openresolv 3.17, which validates the file is
+         ;; owned/managed by itself via a comment in /etc/resolv.conf.
+         "-Dconfig_dns_rc_manager_default=resolvconf"
          "-Dsystemd_journal=false"
          "-Dsession_tracking=elogind"
          "-Dsuspend_resume=elogind"
