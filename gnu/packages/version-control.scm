@@ -331,7 +331,7 @@ Python 3.3 and later, rather than on Python 2.")
 ;; The size of the closure of 'git-minimal' is two thirds that of 'git'.
 ;; Its test suite runs slightly faster and most importantly it doesn't
 ;; depend on packages that are expensive to build such as Subversion.
-(define-public git-minimal
+(define-public git-minimal/pinned
   (package
     (name "git-minimal")
     (version "2.54.0")
@@ -604,10 +604,17 @@ Python 3.3 and later, rather than on Python 2.")
     (description
      "Git is a free distributed version control system designed to handle
 everything from small to very large projects with speed and efficiency.")
-    (properties '((lint-hidden-cpe-vendors . ("jenkins"))
+    (properties '((hidden? . #t)        ;pinned variant for Graphene/GTK+
+                  (lint-hidden-cpe-vendors . ("jenkins"))
                   (upstream-name . "git")))
     (license license:gpl2)
     (home-page "https://git-scm.com/")))
+
+(define-public git-minimal
+  (package
+    (inherit git-minimal/pinned)
+    (properties (alist-delete 'hidden?
+                              (package-properties git-minimal/pinned)))))
 
 (define-public git
   (package/inherit git-minimal
@@ -822,23 +829,6 @@ everything from small to very large projects with speed and efficiency.")
 ;;; The symbol git-minimal/fixed should be used when git-minimal needs fixes
 ;;; (security or else) and this deprecation could be removed.
 (define-deprecated/public-alias git-minimal/fixed git-minimal/pinned)
-
-(define-public git-minimal/pinned
-  ;; Version that rarely changes, depended on by Graphene/GTK+.
-  (package/inherit git-minimal
-    (version "2.50.0")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://kernel.org/software/scm/git/git-"
-                                  version ".tar.xz"))
-              (sha256
-               (base32
-                "0if0vqn3fj22p95a0125zpgwz3mqfqxqnvwa7fkf7b00wh0c1wyz"))))
-    ;; Temporary measure to prevent unnecessary package rebuilds.
-    (arguments
-      (substitute-keyword-arguments arguments
-        ((#:configure-flags flags #~'())
-         (if (%current-target-system) git-cross-configure-flags #~(list)))))))
 
 (define-public mergiraf
   (package
