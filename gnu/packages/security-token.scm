@@ -546,6 +546,32 @@ and other operations.  It includes a library and a command-line tool.")
     ;; majority of files are licensed under bsd-2.
     (license license:bsd-2)))
 
+(define-public python-nkdfu
+  (package
+    (name "python-nkdfu")
+    (version "0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Nitrokey/nkdfu")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1252gdpbfxd4bfzr6wqzcfvc0lyr8kkx1293s4b1cwqfxv1gbp0c"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f)) ;No tests
+    (propagated-inputs (list python-fire python-intelhex python-libusb1
+                             python-tqdm))
+    (native-inputs (list python-flit-core))
+    (home-page "https://github.com/Nitrokey/nkdfu")
+    (synopsis "Firmware upgrade tool")
+    (description "@acronym{DFU, Device Firmware Upgrade} tool for updating
+Nitrokey token firmware.")
+    (license license:gpl2)))
+
 (define-public python-yubico
   (package
     (name "python-yubico")
