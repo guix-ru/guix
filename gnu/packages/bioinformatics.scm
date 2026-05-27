@@ -20686,53 +20686,6 @@ and intra-cell population structure.\" Baron et al. Cell Systems (2016)
 @url{https://www.ncbi.nlm.nih.gov/pubmed/27667365}.")
       (license license:gpl2+))))
 
-(define-public porechop
-  ;; The recommended way to install is to clone the git repository
-  ;; https://github.com/rrwick/Porechop#installation
-  (let ((commit "109e437280436d1ec27e5a5b7a34ffb752176390")
-        (revision "2"))
-    (package
-      (name "porechop")
-      (version (git-version "0.2.3" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-                (url "https://github.com/rrwick/Porechop")
-                (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "0m7bsgvknv0cbkrpc0qi7b39jaws38dcdih4hi2ppg6z7byxip0k"))))
-      (build-system pyproject-build-system)
-      (arguments
-       (list
-        #:test-flags
-        ;; Tests fail with errors: "SyntaxWarning: invalid escape sequence"
-        ;; and "AssertionError: Lists differ".
-        #~(list "-k" (string-join
-                      (list "not test_albacore_directory_all"
-                            "test_albacore_directory_unclassified"
-                            "test_verbosity_0_output"
-                            "test_albacore_directory_3"
-                            "test_verbosity_1_output"
-                            "test_verbosity_2_output")
-                      " and not "))))
-      (native-inputs
-       (list python-pytest
-             python-setuptools))
-      (home-page "https://github.com/rrwick/porechop")
-      (synopsis
-       "Finding, trimming or splitting adapters, in Oxford Nanopore reads")
-      (description
-       "The porechop package is a tool for finding and removing adapters from Oxford
-Nanopore reads.  Adapters on the ends of reads are trimmed off, and when a read
-has an adapter in its middle, it is treated as chimeric and chopped into
-separate reads.  Porechop performs thorough alignments to effectively find
-adapters, even at low sequence identity.  Porechop also supports demultiplexing
-of Nanopore reads that were barcoded with the Native Barcoding Kit, PCR
-Barcoding Kit or Rapid Barcoding Kit.")
-      (license license:gpl3+))))
-
 (define-public jamm
   (package
     (name "jamm")
