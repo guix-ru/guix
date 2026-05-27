@@ -4235,25 +4235,6 @@ with window management.  It tries hard to respect the Extended Window Manager
 Hints specification (EWMH).")
     (license license:lgpl2.0+)))
 
-;; stable version for gtk2, required by xfwm4.
-(define-public libwnck-2
-  (package (inherit libwnck)
-    (name "libwnck")
-    (version "2.30.7")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://gnome/sources/" name "/"
-                                  (version-major+minor version) "/"
-                                  name "-" version ".tar.xz"))
-              (sha256
-               (base32
-                "15713yl0f8f3p99jzqqfmbicrdswd3vwpx7r3bkf1bgh6d9lvs4b"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config intltool))
-    (propagated-inputs
-     (list gtk+-2 libxres startup-notification))))
-
 (define-public goffice
   (package
     (name "goffice")
