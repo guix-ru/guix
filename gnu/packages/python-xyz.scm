@@ -18337,7 +18337,6 @@ is binding LibSass.")
 
 ;; It may be removed after 2026-01-24.
 (define-deprecated/public-alias python-path-bootstrap python-path)
-(define-deprecated/public-alias python-pathpy python-path)
 
 (define-public python-pip-run
   (package
