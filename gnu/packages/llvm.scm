@@ -2096,9 +2096,6 @@ generator targetting AMD hardware.")
                      (append python-setuptools)))
     (synopsis "Python bindings to libclang")))
 
-(define-public python-clang-12
-  (clang-python-bindings clang-12))
-
 (define-public python-clang-13
   (clang-python-bindings clang-13))
 
