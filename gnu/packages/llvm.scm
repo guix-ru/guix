@@ -1051,9 +1051,6 @@ Library.")
        (replace "clang" clang-12)
        (replace "llvm" llvm-12)))))
 
-(define-public clang-toolchain-12
-  (make-clang-toolchain clang-12 libomp-12))
-
 (define-public llvm-16
   (make-llvm "16.0.6"))
 
