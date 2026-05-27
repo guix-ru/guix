@@ -1031,26 +1031,6 @@ Library.")
                       (base32
                        "1r9a4fdz9ci58b5z2inwvm4z4cdp6scrivnaw05dggkxz7yrwrb5")))))
 
-(define-public libomp-12
-  (package
-    (inherit libomp-13)
-    (version (package-version llvm-12))
-    (source (origin
-              (method url-fetch)
-              (uri (llvm-uri "openmp" version))
-              (sha256
-               (base32
-                "14dh0r6h2xh747ffgnsl4z08h0ri04azi9vf79cbz7ma1r27kzk0"))
-              (file-name (string-append "libomp-" version ".tar.xz"))))
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:configure-flags flags)
-        #~`(,@(delete "-DLIBOMPTARGET_BUILD_AMDGCN_BCLIB=OFF" #$flags)))))
-    (native-inputs
-     (modify-inputs native-inputs
-       (replace "clang" clang-12)
-       (replace "llvm" llvm-12)))))
-
 (define-public llvm-16
   (make-llvm "16.0.6"))
 
