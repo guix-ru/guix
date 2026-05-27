@@ -38650,6 +38650,29 @@ of complexity; for example, a byte stream of identical bytes will not generate
 a hash value.")
     (license license:asl2.0)))
 
+(define-public python-tlv8
+  (package
+    (name "python-tlv8")
+    (version "0.10.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jlusiardi/tlv8_python")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0q25y5lz7cigfk7l30rdm2z8as8662pzd8ki5vvs1c0saqq72zhv"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools python-pytest))
+    (home-page "https://github.com/jlusiardi/tlv8_python")
+    (synopsis
+     "Python library for @acronym{TLV, type-length-value} encoded data")
+    (description
+     "Python library for @acronym{TLV, type-length-value} encoding and decoding.
+Represents type and length by one byte each, hence the name @code{tlv8}.")
+    (license license:asl2.0)))
+
 (define-public python-tokenize-rt
   (package
     (name "python-tokenize-rt")
