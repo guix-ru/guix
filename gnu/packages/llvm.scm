@@ -1719,19 +1719,6 @@ components which highly leverage existing libraries in the larger LLVM Project."
        #:tests? #f))
     (properties `((release-monitoring-url . ,%llvm-release-monitoring-url)))))
 
-(define-public lld-12
-  (package
-    (inherit lld-13)
-    (version "12.0.1")
-    (source (origin
-              (method url-fetch)
-              (uri (llvm-uri "lld" version))
-              (sha256
-               (base32
-                "0qg3fgc7wj34hdkqn21y03zcmsdd01szhhm1hfki63iifrm3y2v9"))))
-    (inputs (modify-inputs inputs
-              (replace "llvm" llvm-12)))))
-
 (define-public lld-16
   (package
     (inherit lld-15)
