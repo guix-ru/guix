@@ -2941,9 +2941,6 @@ CPython implementation of Python) and Common Lisp.")
       (home-page "https://github.com/snmsts/burgled-batteries3")
       (license license:expat))))
 
-(define-public cl-burgled-batteries3
-  (sbcl-package->cl-source-package sbcl-burgled-batteries3))
-
 (define-public sbcl-cache-while
   (let ((commit "38e9ffbdb2c894670c366c1e5802ffcc8cfd43a7")
         (revision "1"))
