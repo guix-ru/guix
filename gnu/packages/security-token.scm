@@ -85,6 +85,7 @@
   #:use-module (gnu packages readline)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages serialization)
+  #:use-module (gnu packages time)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages tex)
   #:use-module (gnu packages perl)
@@ -545,6 +546,52 @@ and other operations.  It includes a library and a command-line tool.")
     ;; license for that one file.  Please see it for details.  The vast
     ;; majority of files are licensed under bsd-2.
     (license license:bsd-2)))
+
+(define-public python-nethsm
+  (package
+    (name "python-nethsm")
+    (version "2.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Nitrokey/nethsm-sdk-py")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0v3jqz8dkwcrpp6h9zvm5wy9bpcbkd3b0ah23plv04k5qw5kgdfm"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list
+         ;; These tests need a running docker daemon.
+         "--ignore" "tests/test_nethsm_config.py"
+         "--ignore" "tests/test_nethsm_keys.py"
+         "--ignore" "tests/test_nethsm_namespaces.py"
+         "--ignore" "tests/test_nethsm_other.py"
+         "--ignore" "tests/test_nethsm_system.py"
+         "--ignore" "tests/test_nethsm_users.py")
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Remove test-only dependency on python-docker and python-podman
+          ;; (which is not packaged). These tests are disabled anyway.
+          (add-after 'unpack 'remove-unused-imports
+            (lambda _
+              (substitute* "tests/utilities.py"
+                (("import (docker|podman).*") "")))))))
+    (propagated-inputs (list python-certifi
+                             python-cryptography
+                             python-pycryptodome
+                             python-dateutil
+                             python-typing-extensions
+                             python-urllib3))
+    (native-inputs (list python-poetry-core python-pytest python-requests))
+    (home-page "https://github.com/Nitrokey/nethsm-sdk-py")
+    (synopsis "SDK for NetHSM")
+    (description "Client-side Python library for managing Nitrokey
+NetHSM @acronym{HSM, Hardware Security Modules}s.")
+    (license license:asl2.0)))
 
 (define-public python-nkdfu
   (package
