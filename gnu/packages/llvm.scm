@@ -1017,20 +1017,6 @@ Library.")
    "1950rg294izdwkaasi7yjrmadc9mzdd5paf0q63jjcq2m3rdbj5l"
    '("clang-runtime-13-glibc-2.36-compat.patch" "clang-runtime-12-remove-crypt-interceptors.patch")))
 
-(define-public clang-12
-  (clang-from-llvm llvm-12 clang-runtime-12
-                   "0px4gl27az6cdz6adds89qzdwb1cqpjsfvrldbz9qvpmphrj34bf"
-                   #:legacy-build-shared-libs? #t
-                   #:patches '("clang-12.0-libc-search-path.patch")
-                   #:tools-extra
-                   (origin
-                     (method url-fetch)
-                     (uri (llvm-uri "clang-tools-extra"
-                                    (package-version llvm-12)))
-                     (sha256
-                      (base32
-                       "1r9a4fdz9ci58b5z2inwvm4z4cdp6scrivnaw05dggkxz7yrwrb5")))))
-
 (define-public llvm-16
   (make-llvm "16.0.6"))
 
