@@ -1011,12 +1011,6 @@ Library.")
              (setenv "LD_LIBRARY_PATH"
                      (string-append (getcwd) "/lib"))))))))))
 
-(define-public clang-runtime-12
-  (clang-runtime-from-llvm
-   llvm-12
-   "1950rg294izdwkaasi7yjrmadc9mzdd5paf0q63jjcq2m3rdbj5l"
-   '("clang-runtime-13-glibc-2.36-compat.patch" "clang-runtime-12-remove-crypt-interceptors.patch")))
-
 (define-public llvm-16
   (make-llvm "16.0.6"))
 
