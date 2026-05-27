@@ -75,6 +75,7 @@
   #:use-module (gnu packages gnupg)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages libusb)
+  #:use-module (gnu packages libffi)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages lua)
   #:use-module (gnu packages man)
@@ -649,6 +650,44 @@ NetHSM @acronym{HSM, Hardware Security Modules}s.")
     (description "@acronym{DFU, Device Firmware Upgrade} tool for updating
 Nitrokey token firmware.")
     (license license:gpl2)))
+
+(define-public python-pynitrokey
+  (package
+    (name "python-pynitrokey")
+    (version "0.12.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Nitrokey/pynitrokey")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09a7cf7pz4qmm806b6grx8mxxnnbbzamywx46mpi1axbmnxrw4wq"))))
+    (build-system pyproject-build-system)
+    (propagated-inputs (list python-cffi
+                             python-click
+                             python-cryptography
+                             python-fido2
+                             python-hidapi
+                             python-intelhex
+                             python-libusb1
+                             python-nethsm
+                             python-nitrokey
+                             python-nkdfu
+                             python-pyscard
+                             python-pyserial
+                             python-pyusb
+                             python-requests
+                             python-semver
+                             python-tlv8
+                             python-tqdm))
+    (native-inputs (list python-poetry-core python-pytest))
+    (home-page "https://github.com/Nitrokey/pynitrokey")
+    (synopsis "Python client for Nitrokey devices")
+    (description "Python client application for managing Nitrokey devices
+with the @code{nitropy} CLI application.")
+    (license (list license:gpl3+ license:lgpl3 license:asl2.0))))
 
 (define-public python-yubico
   (package
