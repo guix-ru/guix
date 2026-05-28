@@ -1452,13 +1452,13 @@ Companion to Applied Regression, Third Edition, Sage.")
 (define-public r-cards
   (package
     (name "r-cards")
-    (version "0.7.1")
+    (version "0.8.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "cards" version))
        (sha256
-        (base32 "1fd5g5pvasxfg49fs6khrlaj19z56xsf4m4yjh2vwwm86f87ksff"))))
+        (base32 "06r9n0cf884z22xflbcxrvmfil4xym13fa3kx0sh7jqkk4232vh7"))))
     (properties
      `((upstream-name . "cards")
        ;; Do not create dependency cycle.
