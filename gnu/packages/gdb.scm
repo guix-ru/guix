@@ -246,18 +246,6 @@ written in C, C++, Ada, Objective-C, Pascal and more.")
                (base32
                 "1i940b04404xr44xc66c4r4nk091czqz7zzrmhbpk64aaaax1z5w"))))))
 
-(define-public gdb-14
-  (package
-    (inherit gdb-17)
-    (version "14.2")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://gnu/gdb/gdb-"
-                                  version ".tar.xz"))
-              (sha256
-               (base32
-                "0wkprsjyyh204fdjlkaz20k847l88i9y8m9zqsv15vcd3l3dhk9d"))))))
-
 (define-public gdb
   ;; The "default" version.
   gdb-17)
