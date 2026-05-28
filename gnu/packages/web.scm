@@ -7776,7 +7776,7 @@ command-line arguments or read from stdin.")
 (define-public python-internetarchive
   (package
     (name "python-internetarchive")
-    (version "5.8.0")
+    (version "5.9.0")
     (source
      (origin
        (method git-fetch)
@@ -7786,7 +7786,7 @@ command-line arguments or read from stdin.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "05gmxdnmdykafk4xl105kznn8zcr03kp17jsdwxb61ffmsf8narn"))))
+         "0v2yr8cjkki2gwv9v6561bwssng1wrknm898qhgl4v11rl6l3hib"))))
     (build-system pyproject-build-system)
     (arguments
      (list
