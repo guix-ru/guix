@@ -255,9 +255,7 @@ case-folding, and other operations for data in the UTF-8 encoding.")
                      "1gfsq4vdmzi803i2s8ih7mm4fgs907kvkg88kvv9fi4my9hm3lrr")))
                  ;; For tests.
                  julia
-                 perl
-                 ;; TODO Move to ruby@3 on the next rebuild cycle.
-                 ruby-2.7)
+                 perl)
            '())))
     (arguments
      (if (this-package-native-input "julia")
