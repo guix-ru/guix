@@ -34168,14 +34168,14 @@ This package provides an R interface.")
 (define-public r-rcpphnsw
   (package
     (name "r-rcpphnsw")
-    (version "0.6.0")
+    (version "0.7.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "RcppHNSW" version))
        (sha256
         (base32
-         "03sqzz1993jsjm5vpyd1n1fpsrdfrky6dpv7m9ialhs1m00fv9m5"))))
+         "0k5czg85sb4wda0l39b7r2nsvsyr0xvhpz1maynzbrzrk5c7hr41"))))
     (properties `((upstream-name . "RcppHNSW")))
     (build-system r-build-system)
     (propagated-inputs (list r-rcpp))
