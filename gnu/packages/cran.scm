@@ -52274,16 +52274,20 @@ for spatial data on a linear network.")
 (define-public r-spatstat-random
   (package
     (name "r-spatstat-random")
-    (version "3.4-5")
+    (version "3.5-0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "spatstat.random" version))
        (sha256
-        (base32 "0lky2h15n8zbrz5m7m4ik8gkp0fhdgyr17ys4vnn6xa6f3gibr89"))))
+        (base32 "1k8y1pxf2f7h06akyia0my4q4ici4q5rmh89vj1k0n345ca0x0xk"))))
     (properties `((upstream-name . "spatstat.random")))
     (build-system r-build-system)
-    (propagated-inputs (list r-spatstat-data r-spatstat-geom r-spatstat-univar
+    (propagated-inputs (list r-matrix
+                             r-spatstat-data
+                             r-spatstat-geom
+                             r-spatstat-sparse
+                             r-spatstat-univar
                              r-spatstat-utils))
     (home-page "https://spatstat.org/")
     (synopsis "Random Generation Functionality for the 'spatstat' Family")
