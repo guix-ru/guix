@@ -165,7 +165,7 @@ Mix.CLI.main()"
                    programs))))))))
     (outputs '("out" "src"))
     (inputs (list bash-minimal erlang rebar3))
-    (native-inputs (list git-minimal))
+    (native-inputs (list git-minimal/pinned))
     (native-search-paths
      (list (search-path-specification
             (variable "GUIX_ELIXIR_LIBS")
