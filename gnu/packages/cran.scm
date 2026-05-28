@@ -746,13 +746,13 @@ distribution).")
 (define-public r-bigassertr
   (package
     (name "r-bigassertr")
-    (version "0.1.7")
+    (version "0.2.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "bigassertr" version))
        (sha256
-        (base32 "0py8nr937ddi6c7r2bcqrpvqkh1mhmk5ylnrmqlahawnwmpksm6g"))))
+        (base32 "037shjim8syqfc563i6fs0slkdrmfp3pjfy15kfxr5jdk8yvyka3"))))
     (properties `((upstream-name . "bigassertr")))
     (build-system r-build-system)
     (native-inputs (list r-testthat))
