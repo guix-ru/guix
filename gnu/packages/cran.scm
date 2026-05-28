@@ -9992,14 +9992,14 @@ wind-roses and Walter&Lieth climate diagrams are included.")
 (define-public r-clipr
   (package
     (name "r-clipr")
-    (version "0.8.0")
+    (version "0.8.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "clipr" version))
        (sha256
         (base32
-         "1s9vvv3cxnz8w11gsi8z9ddv9jzib5qf5qqxnwqrrv7vj8cr7hij"))))
+         "1dpiqga6nl67q39qgx2zkdl29fchq0vx14fyx163z8vx72f7ms06"))))
     (build-system r-build-system)
     (native-inputs
      (list r-knitr r-testthat))
