@@ -13578,14 +13578,16 @@ effect (co)variances, and residual variance.")
 (define-public r-mets
   (package
     (name "r-mets")
-    (version "1.3.9")
+    (version "1.3.10")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "mets" version))
        (sha256
-        (base32 "0albfa5njy20iv59s5a90csm2sgrhbjl58mjhmf4c1mr476r9w02"))))
-    (properties `((upstream-name . "mets")))
+        (base32 "1j7zkyik4dlfgvjr5a4hh58vmx77w34g0d77n68isa83j84l3lhb"))))
+    (properties
+     '((upstream-name . "mets")
+       (updater-extra-native-inputs . ("r-prodlim"))))
     (build-system r-build-system)
     (arguments
      (list
