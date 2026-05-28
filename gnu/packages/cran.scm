@@ -8436,13 +8436,13 @@ estimation and robust multivariate analysis with high breakdown point.")
 (define-public r-rsqlite
   (package
     (name "r-rsqlite")
-    (version "3.52.0")
+    (version "3.53.1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "RSQLite" version))
               (sha256
                (base32
-                "02cqx38nayr0qkbbnvmcfaxgz2clr7jb0c8zskd0k7zvsafsqqyz"))))
+                "0ykbl94n1k61kqmdr1dfj1sq4sy8igzq95hrll7yhp4kdl7j8wqg"))))
     (properties
      '((upstream-name . "RSQLite")
        ;; These are not strictly necessary for running tests and adding them
