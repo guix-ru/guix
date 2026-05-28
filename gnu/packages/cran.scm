@@ -38085,18 +38085,19 @@ algorithms) can be computed and partitioned matrices can be plotted.")
 (define-public r-upsetr
   (package
     (name "r-upsetr")
-    (version "1.4.0")
+    (version "1.4.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "UpSetR" version))
        (sha256
         (base32
-         "007i0njnjjy7vbrxabwav7a1kk2n0hn2mkvqsdzzfk10ckp5y7im"))))
+         "17jliva42j2gyr1ga18flh0kvxs6m19dfngiaygg5jnwnpxzvhci"))))
     (properties `((upstream-name . "UpSetR")))
     (build-system r-build-system)
     (propagated-inputs
      (list r-ggplot2 r-gridextra r-plyr r-scales))
+    (native-inputs (list r-knitr))
     (home-page "https://github.com/hms-dbmi/UpSetR")
     (synopsis "Visualize intersecting sets")
     (description
