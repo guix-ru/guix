@@ -1937,6 +1937,37 @@ data is given, then a Gaussian process is fit to the data and used to create
 the contour plot.")
     (license license:gpl3)))
 
+(define-public r-corrr
+  (package
+    (name "r-corrr")
+    (version "0.4.5")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "corrr" version))
+       (sha256
+        (base32 "06pi4an3a5d66rqxvmk859scpq6m4yrhy9q5icbh95fvhpaqfr1q"))))
+    (properties `((upstream-name . "corrr")))
+    (build-system r-build-system)
+    (propagated-inputs (list r-dplyr
+                             r-ggplot2
+                             r-ggrepel
+                             r-glue
+                             r-purrr
+                             r-rlang
+                             r-seriation
+                             r-tibble))
+    (native-inputs (list r-knitr r-testthat))
+    (home-page "https://github.com/tidymodels/corrr")
+    (synopsis "Correlations in R")
+    (description
+     "This package provides a tool for exploring correlations.  It makes it
+possible to easily perform routine tasks when exploring correlation matrices
+such as ignoring the diagonal, focusing on the correlations of certain
+variables against others, or rearranging and visualizing the matrix in terms
+of the strength of the correlations.")
+    (license license:expat)))
+
 (define-public r-celestial
   (package
     (name "r-celestial")
