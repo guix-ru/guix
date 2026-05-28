@@ -32886,14 +32886,14 @@ data using:
 (define-public r-bayestestr
   (package
     (name "r-bayestestr")
-    (version "0.18.0")
+    (version "0.18.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "bayestestR" version))
        (sha256
         (base32
-         "1zw28k10jawrp1yvvcm89v7qgv86l6xka74dg2lhw1lq3mmrgy0l"))))
+         "1zcbppwlzbibyjv4n4vx8c3k6hqk05bdl46fai3zslv8g5a9asfy"))))
     (properties
      '((upstream-name . "bayestestR")
        (updater-extra-native-inputs . ("r-logspline"))
