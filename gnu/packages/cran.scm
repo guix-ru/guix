@@ -12929,13 +12929,13 @@ master-slave parallelisation or a coarse-grain islands approach.")
 (define-public r-gap
   (package
     (name "r-gap")
-    (version "1.14")
+    (version "1.15.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "gap" version))
        (sha256
-        (base32 "17ryk3x4286ddws8kr18br1ff5bi7w9v0rd6kpyxxyl3ysgny44v"))))
+        (base32 "1xhpcvljzyd62iqchsh8z4n9vv7pdzh9rr7cz7s3cffl492mbbia"))))
     (properties `((upstream-name . "gap")))
     (build-system r-build-system)
     (propagated-inputs (list r-dplyr r-gap-datasets r-ggplot2 r-plotly
