@@ -11550,6 +11550,42 @@ server address by means of rules (@code{Rule} class).  The
 cases and the content.")
     (license license:agpl3)))
 
+(define-public r-scrutiny
+  (package
+    (name "r-scrutiny")
+    (version "0.6.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "scrutiny" version))
+       (sha256
+        (base32 "0wqrbzkm4fw556ds8bzpgimy2xs1v7da54cam5bmcvp0yhglx8h6"))))
+    (properties `((upstream-name . "scrutiny")))
+    (build-system r-build-system)
+    (propagated-inputs (list r-cli
+                             r-corrr
+                             r-dplyr
+                             r-ggplot2
+                             r-ggrepel
+                             r-glue
+                             r-lifecycle
+                             r-magrittr
+                             r-purrr
+                             r-rlang
+                             r-stringr
+                             r-tibble
+                             r-tidyr
+                             r-tidyselect))
+    (native-inputs (list r-knitr r-testthat))
+    (home-page "https://lhdjung.github.io/scrutiny/")
+    (synopsis "Error detection in science")
+    (description
+     "The goal of scrutiny is to test published summary statistics for
+consistency using techniques like GRIM and to check their plausibility.  The
+package makes these methods easy to use in a tidyverse-friendly way.  It hopes
+to help the new field of error detection go mainstream.")
+    (license license:expat)))
+
 (define-public r-sendmailr
   (package
     (name "r-sendmailr")
