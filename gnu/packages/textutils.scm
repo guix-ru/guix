@@ -192,7 +192,7 @@ libenca and several charset conversion libraries and tools.")
   (hidden-package
    (package
      (name "utf8proc-bootstrap")
-     (version "2.10.0")
+     (version "2.11.3")
      (source
       (origin
         (method git-fetch)
@@ -201,7 +201,7 @@ libenca and several charset conversion libraries and tools.")
               (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "1n1k67x39sk8xnza4w1xkbgbvgb1g7w2a7j2qrqzqaw1lyilqsy2"))))
+         (base32 "1ssix4zf3lac1afzlw2gbfg3n52gmggip8lv224gywqf3zyvyp8c"))))
      (build-system gnu-build-system)
      (arguments
       (list #:tests? #f                 ;To break dependency cycle.
@@ -224,7 +224,7 @@ case-folding, and other operations for data in the UTF-8 encoding.")
     (inherit utf8proc-bootstrap)
     (name "utf8proc")
     (native-inputs
-     (let ((UNICODE_VERSION "16.0.0"))  ; defined in data/Makefile
+     (let ((UNICODE_VERSION "17.0.0"))  ; defined in data/Makefile
        ;; Only if the tests will be run should these be added.
        (if (and (%current-system)
                 (supported-package? julia))
