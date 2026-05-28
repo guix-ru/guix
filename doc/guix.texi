@@ -8633,8 +8633,84 @@ syntax.
 
 @item @code{license}
 @cindex license, of packages
-The license of the package; a value from @code{(guix licenses)},
-or a list of such values.
+The @emph{published} and effective license of the package; a value from
+@code{(guix licenses)}, or a list of such values.
+
+@cindex package license field, guidance
+@cindex GNU FSDG, acceptable licenses
+The purpose of the @code{license} field is to let users know what
+license the upstream project is using rather than exhaustively listing
+all the licenses used in its source files.  When a project is published
+under multiple licenses, the licenses should ideally appear in
+decreasing order of usage in the project.  Only free software licenses
+should be listed in the Guix project, which, as a GNU project, adheres
+to the
+@url{https://www.gnu.org/distros/free-system-distribution-guidelines.html,
+@acronym{GNU FSDG, Free System Distribution Guidelines}}.  Below are
+some examples:
+
+@lisp
+(license gpl3+)                 ;GPL 3.0 or later
+@end lisp
+
+@lisp
+(license (list gpl3+ asl2.0))   ;dual-licensed
+@end lisp
+
+@lisp
+(license (non-copyleft "file:///NOTICE"
+                       "Variant of the Expat license"))
+@end lisp
+
+The variables such as @code{gpl3+} are instances of the @code{license}
+data type, documented below:
+
+@deftp {Data Type} license name uri comment
+
+@table @code
+@item name
+The name of the license
+@item uri
+The URI of the license, preferably an @samp{https://} link to its home
+page, else a @samp{file://} URI of the license file, relative to the
+root of the package source tree.
+@item comment
+A comment or URI providing further details about the license.
+@end table
+
+As an example, the @code{gpl3+} license is defined this way:
+
+@lisp
+(define gpl3+
+  (license "GPL 3+"
+           "https://www.gnu.org/licenses/gpl.html"
+           "https://www.gnu.org/licenses/license-list#GNUGPLv3"))
+@end lisp
+@end deftp
+
+@code{non-copyleft} is a procedure that is used when encountering a
+non-copyleft license that is not common enough to deserve its own entry
+in the @code{(guix licenses)} module.  Its usage is documented below:
+
+@deffn {Procedure} non-copyleft uri [comment]
+Return a @code{license} object specialized with a name and comment
+appropriate for a non-copyleft license.  The URI is as documented for
+the @code{license} record, and may be a @samp{file://} URI referring to
+a file relative to the root of the source tree of the package.
+@end deffn
+
+Below are other license-generating procedures found in the @code{(guix
+licenses)} module.  Please refer to their documentation strings for more
+details.
+
+@deffn {Procedure} x11-style uri [comment]
+@end deffn
+
+@deffn {Procedure} fsf-free uri [comment]
+@end deffn
+
+@deffn {Procedure} fsdg-compatible uri [comment]
+@end deffn
 
 @item @code{home-page}
 The URL to the home-page of the package, as a string.
