@@ -5031,14 +5031,14 @@ including:
 (define-public r-gdtools
   (package
     (name "r-gdtools")
-    (version "0.5.0")
+    (version "0.5.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "gdtools" version))
        (sha256
         (base32
-         "15gklyln0260q1jbpx5n2kr472dv3ij3qw7298hciflf0q80isdf"))))
+         "1rs18kf34iihiypmdc6w56wqqnm0k056jz9vhvg86ypszha51hcl"))))
     (build-system r-build-system)
     (arguments
      (list
