@@ -7131,7 +7131,7 @@ the server and cleaning up before returning the exit status of the command.")
 (define-public xwayland-run
   (package
     (name "xwayland-run")
-    (version "0.0.4")
+    (version "0.0.6")
     (source
      (origin
        (method git-fetch)
@@ -7140,7 +7140,7 @@ the server and cleaning up before returning the exit status of the command.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1nhrdjk1zbxfxkqwsz992g6xg04gankprzks543931fysclgdzql"))))
+        (base32 "13fdjjimipcin31rdpkb8q9301k6lyy1xsgsc27dn3dv9jwbrfff"))))
     (build-system meson-build-system)
     (arguments
      (list
