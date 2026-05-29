@@ -3474,7 +3474,7 @@ encountered in PDB files prior to simulation tasks.")
      (list python-asgiref
            python-gffutils
            python-importlib-resources
-           macs-3
+           macs
            python-numpy
            python-psutil
            python-pybedtools
@@ -9778,7 +9778,7 @@ of high-throughput sequencing reads from metagenomic whole genome sequencing
 experiments.")
     (license license:gpl3+)))
 
-(define-public macs-3
+(define-public macs
   (package
     (name "macs")
     (version "3.0.4")
@@ -9824,6 +9824,9 @@ the significance of enriched ChIP regions and it improves the spatial
 resolution of binding sites through combining the information of both
 sequencing tag position and orientation.")
     (license license:bsd-3)))
+
+;; 2026-05-29
+(define-deprecated/public-alias macs-3 macs)
 
 (define-public maffilter
   (package
@@ -17951,7 +17954,7 @@ expression report comparing samples in an easily configurable manner.")
            python-magic
            python-xlrd
            trim-galore
-           macs-3
+           macs
            multiqc
            perl
            pandoc
