@@ -1048,8 +1048,8 @@ screens and scanners.")))
              (shepherd-service
                (provision (list (string->symbol name)))
                (requirement '(user-processes udev))
-               (documentation #~#$(string-append "Run a kmonad process for `"
-                                                 (computed-file-name keymap) "'."))
+               (documentation (string-append "Run kmonad process "
+                                             (number->string index) "."))
                (start #~(make-forkexec-constructor
                          (list #$kmonad "-l" "info" #$keymap)
                          #:log-file #$(string-append "/var/log/" name ".log")))
