@@ -962,36 +962,6 @@ client.")
      "This package is an implementation of @code{psycopg2} using CFFI.")
     (license license:lgpl3)))
 
-(define-public python-pylibmc
-  (package
-    (name "python-pylibmc")
-    (version "1.6.3")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (pypi-uri "pylibmc" version))
-       (sha256
-        (base32 "1q06696lxpqn155sydg3z6dksimks6n35q72zdjsvarpal8ldypf"))))
-    (build-system pyproject-build-system)
-    (arguments
-     '(#:phases
-       (modify-phases %standard-phases
-         (add-before 'check 'start-memcached-daemon
-           ;; The test suite requires a memcached server.
-           (lambda _
-             (invoke "memcached" "-d"))))))
-    (native-inputs
-     (list memcached python-pytest python-setuptools))
-    (inputs
-     (list libmemcached zlib cyrus-sasl))
-    (home-page "https://sendapatch.se/projects/pylibmc/")
-    (synopsis "Python client for memcached")
-    (description
-     "@code{pylibmc} is a client in Python for memcached.  It is a wrapper
-around TangentOrg’s libmemcached library, and can be used as a drop-in
-replacement for the @code{python-memcached} library.")
-    (license license:bsd-3)))
-
 (define-public litecli
  (package
   (name "litecli")
