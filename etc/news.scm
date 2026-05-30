@@ -44,6 +44,34 @@
 (channel-news
  (version 0)
 
+ (entry (commit "b6c35016845f04f5e3a2f5eaf2064b9861f8707c")
+        (title
+         (en "Frei0r plugins have to be installed explicitly")
+         (de "Frei0r-Plugins müssen explizit installiert werden")
+         (fr "Les greffons de Frei0r doivent être installés explicitement"))
+        (body
+         (en "The @code{frei0r-plugins} package has been renamed to
+@code{frei0r} to match the project name. When installing the applications
+@code{ffmpeg}, @code{shotcut}, @code{kdenlive} or @code{mlt}, the
+frei0r-video-plugins are no longer installed automatically. If they are
+required, the package @code{frei0r} can be added to the profile. This allows
+the applications to detect and use the plugins at runtime. @code{frei0r} now
+contains OpenCV dependent plugins.")
+         (de "Das Paket @code{frei0r-plugins} wurde, um dem Projektnamen zu
+entsprechen, in @code{frei0r} umbenannt. Bei der Installation der Anwendungen
+@code{ffmpeg}, @code{shotcut}, @code{kdenlive} oder @code{mlt} werden die
+Frei0r-Video-Plugins nicht länger mitinstalliert. Bei Bedarf kann das Paket
+@code{frei0r} dem Profil hinzugefügt werden, wodurch die Plugins zur Laufzeit
+geladen und genutzt werden können. Plugins, die auf OpenCV basieren, sind nun im
+Paket @code{frei0r} enthalten.")
+         (fr "Le paquet @code{frei0r-plugins} a été renommé en @code{frei0r}
+pour correspondre au nom du projet. Si vous installez les applications
+@code{ffmpeg}, @code{shotcut}, @code{kdenlive} ou @code{mlt}, les greffons
+frei0r-video-plugins ne sont plus installés automatiquement. Si vous en avez
+besoin, vous pouvez ajouter le paquet @code{frei0r} à votre profil. Cela
+permet aux applications de détecter et d'utiliser les greffons à l'exécution.
+@code{frei0r} contient maintenant les greffons qui dépendent d'OpenCV.")))
+
  (entry (commit "7a9d01dce758b0916bf8b0ac8a972f849f4bf31d")
         (title
          (en "SDDM display manager defaults to the Qt5 variant")
