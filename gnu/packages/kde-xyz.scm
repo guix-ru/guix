@@ -313,3 +313,36 @@ for KDE Plasma panels.")
      "This package provides a widget for KDE Plasma that shows window
 buttons of the active window.")
     (license license:gpl2+)))
+
+(define-public plasma-applet-window-title
+  (package
+    (name "plasma-applet-window-title")
+    (version "0.21")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/dhruv8sh/plasma6-window-title-applet")
+          (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vrm5v09gpnd0l1ik7hj2x1980z9x0qss70rw17vivvv5iidaqnq"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan
+      #~'(("." "/share/plasma/plasmoids/org.kde.windowtitle"
+           #:include-regexp ("/contents/" "metadata.json")))))
+    (propagated-inputs
+     (list kirigami
+           libplasma
+           plasma-activities
+           plasma-workspace
+           qtdeclarative))
+    (home-page "https://github.com/dhruv8sh/plasma6-window-title-applet")
+    (synopsis "Window title widget for KDE Plasma")
+    (description
+     "This package provides a widget for KDE Plasma that shows the application
+title and the icon of the active window.")
+    (license license:gpl2+)))
