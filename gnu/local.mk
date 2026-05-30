@@ -427,6 +427,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/kde-sdk.scm			\
   %D%/packages/kde-systemtools.scm		\
   %D%/packages/kde-utils.scm			\
+  %D%/packages/kde-xyz.scm			\
   %D%/packages/kerberos.scm			\
   %D%/packages/kodi.scm				\
   %D%/packages/kubernetes.scm	        	\
