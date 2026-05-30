@@ -385,3 +385,60 @@ title and the icon of the active window.")
      "This package provides a wallpaper plugin for KDE Plasma that blurs the
 wallpaper when a window is active.")
     (license license:gpl2+)))
+
+(define-public plasma-wallpaper-smart-video-wallpaper-reborn
+  (package
+    (name "plasma-wallpaper-smart-video-wallpaper-reborn")
+    (version "2.10.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url (string-append "https://github.com/luisbocanegra/"
+                              "plasma-smart-video-wallpaper-reborn"))
+          (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1fscmvn3xg491fmm5iyy2q07lvwqggmh7wnn23h5v5dnnzhbm6h1"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (with-directory-excursion "package/contents/ui"
+                (substitute* "tools/gdbus_get_signal.sh"
+                  (("gdbus") (which "gdbus"))))))
+          (add-after 'install 'make-tools-executable
+            (lambda _
+              (for-each (lambda (file)
+                          (chmod file #o755))
+                        (find-files (string-append #$output
+                                                   "/share/plasma/plasmoids/"
+                                                   "luisbocanegra.smart.video."
+                                                   "wallpaper.reborn"
+                                                   "/contents/ui/tools"))))))))
+    (propagated-inputs
+     (list kdeclarative
+           ki18n
+           kirigami
+           libplasma
+           plasma-workspace
+           plasma5support
+           qtbase
+           qtdeclarative
+           qtmultimedia))
+    (native-inputs
+     (list extra-cmake-modules))
+    (inputs
+     (list bash-minimal
+           `(,glib "bin"))) ;for gdbus
+    (home-page "https://store.kde.org/p/2139746")
+    (synopsis "Video wallpaper plugin for KDE Plasma")
+    (description
+     "This package provides a wallpaper plugin for KDE Plasma to play videos on
+your desktop or lock screen.")
+    (license license:gpl2+)))
