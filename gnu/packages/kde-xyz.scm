@@ -442,3 +442,44 @@ wallpaper when a window is active.")
      "This package provides a wallpaper plugin for KDE Plasma to play videos on
 your desktop or lock screen.")
     (license license:gpl2+)))
+
+(define-public plasma-wallpaper-wallhaven-reborn
+  (package
+    (name "plasma-wallpaper-wallhaven-reborn")
+    ;; No tags are available. This commit is taken from the master branch.
+    (properties '((commit . "7f0220af0e6d4600be19e62bf5757b426787dfc8")
+                  (revision . "0")))
+    ;; Version is taken from file:///package/metadata.json.
+    (version (git-version "1.1.1"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url (string-append "https://github.com/Blacksuan19/"
+                              "plasma-wallpaper-wallhaven-reborn"))
+          (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ccqps83x4k241z17zk6rhc034bh6dirqjcw219sq40gm35ix56s"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan
+      #~'(("package"
+           "share/plasma/wallpapers/com.plasma.wallpaper.wallhaven"))))
+    (propagated-inputs
+     (list kdeclarative
+           kirigami
+           knotifications
+           libplasma
+           qtbase
+           qtdeclarative))
+    (home-page "https://store.kde.org/p/2193590")
+    (synopsis "Wallhaven wallpaper plugin for KDE Plasma")
+    (description
+     "This package provides a wallpaper plugin for KDE Plasma that loads
+images from @uref{https://wallhaven.cc/, Wallhaven}.")
+    (license license:gpl2+)))
