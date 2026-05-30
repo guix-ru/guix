@@ -346,3 +346,42 @@ buttons of the active window.")
      "This package provides a widget for KDE Plasma that shows the application
 title and the icon of the active window.")
     (license license:gpl2+)))
+
+(define-public plasma-wallpaper-active-blur
+  (package
+    (name "plasma-wallpaper-active-blur")
+    (version "3.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/bouteillerAlan/blurredwallpaper")
+          (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "066jbvg51zwsmhk67wnlbirgb6ynjkbr5fi230dm5pmhkb8c8isg"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan
+      #~'(("a2n.blur" "/share/plasma/wallpapers/a2n.blur"))))
+    (propagated-inputs
+     (list kcmutils
+           kirigami
+           kdeclarative
+           knewstuff
+           kwindowsystem
+           libplasma
+           plasma-activities
+           plasma5support
+           plasma-workspace
+           qt5compat
+           qtbase
+           qtdeclarative))
+    (home-page "https://github.com/bouteillerAlan/blurredwallpaper")
+    (synopsis "Blurred wallpaper plugin for KDE Plasma")
+    (description
+     "This package provides a wallpaper plugin for KDE Plasma that blurs the
+wallpaper when a window is active.")
+    (license license:gpl2+)))
