@@ -253,3 +253,63 @@ for KDE Plasma.")
      "This package provides Latte-Dock and WM status bar customization features
 for KDE Plasma panels.")
     (license (list license:lgpl2.1+ license:gpl2+))))
+
+(define-public plasma-applet-window-buttons
+  (package
+    (name "plasma-applet-window-buttons")
+    (properties '((revision . "0")
+                  ;; The latest tagged version does not support KDecoration3.
+                  ;; So this commit is picked from the master branch.
+                  (commit . "b114cf23da4411d19c1f1600a98bfab5369fd950")))
+    (version (git-version "0.14.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/moodyhunter/applet-window-buttons6")
+          (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "165prymhrfk6nqq357qcq8yzvb5lakwaf1zs53krl1q4jgvizamf"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-cmake
+            (lambda _
+              ;; kdecoration headers include C++20 spaceship operator.
+              (substitute* "CMakeLists.txt"
+                (("CMAKE_CXX_STANDARD 14") "CMAKE_CXX_STANDARD 20"))
+              (substitute* "libappletdecoration/CMakeLists.txt"
+                (("(kwin_xml )\\/usr" _ keep)
+                 (string-append keep #$(this-package-input "kwin")))))))))
+    (native-inputs
+     (list extra-cmake-modules))
+    (propagated-inputs
+     (list kcmutils
+           kconfigwidgets
+           kcoreaddons
+           kdeclarative
+           kdecoration
+           ki18n
+           kirigami
+           kitemmodels
+           kpackage
+           kservice
+           ksvg
+           kwin
+           libplasma
+           plasma-workspace
+           qtbase
+           qtdeclarative))
+    (home-page "https://github.com/moodyhunter/applet-window-buttons6")
+    (synopsis "Window buttons widget for KDE Plasma")
+    (description
+     "This package provides a widget for KDE Plasma that shows window
+buttons of the active window.")
+    (license license:gpl2+)))
