@@ -7255,6 +7255,45 @@ warzone2100's high quality mode.")
      (base32
       "1liyhzasgbpjdy8w3m9906clm6kvq7x3dz45cg7ibjwq6xaqn4v1"))))
 
+(define-public warzone2100-reclamation
+  ;; 1.3.1. is old and does not show up in Warzone's in-game menu.
+  ;; Newest commit appears compatible.
+  (let ((commit "1b67c44e31bca191d6220b9356a500745086f1d0")
+        (revision "0"))
+    (package
+      (name "warzone2100-reclamation")
+      (version (git-version "1.3.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/Warzone2100/reclamation")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "11kg7p6qprfxcdnl7v7rxkkqg30pxnpa484fs9m7lym1jabk4qw3"))))
+      (build-system copy-build-system)
+      (arguments
+       (list
+        #:install-plan
+        #~'(("reclamation.wz" "/share/warzone2100/mods/campaign/"))
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'install 'build
+              (lambda _
+                (invoke "zip" "-r" "-9" "reclamation.wz" "."))))))
+      (native-inputs (list zip))
+      (home-page "https://github.com/Warzone2100/reclamation")
+      (synopsis "Custom game campaign for Warzone2100")
+      (description "warzone2100-reclamation is a modification for Warzone2100
+featuring an original story taking place before the events of the main game.
+Set out under the command of renowned General Edmund Clayde with the goal of
+laying the foundations of a new world.")
+      (properties '((hidden? . #t)))    ;game assets only
+      (license (list license:gpl2+
+                     license:cc-by-sa3.0))))) ;mod-banner.png
+
 (define-public warzone2100
   (package
     (name "warzone2100")
