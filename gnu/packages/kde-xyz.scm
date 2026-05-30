@@ -25,10 +25,14 @@
   #:use-module (guix utils)
   #:use-module (guix packages)
   #:use-module (gnu packages)
+  #:use-module (gnu packages audio)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages kde-frameworks)
   #:use-module (gnu packages kde-plasma)
+  #:use-module (gnu packages python)
+  #:use-module (gnu packages python-web)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages xorg))
 
@@ -105,3 +109,66 @@ the performance.")
      "This package provides a widget for KDE Plasma that provides a range of
 chatbots such as @uref{https://duck.ai/, Duck.ai}.")
     (license license:gpl2+)))
+
+(define-public plasma-applet-kurve
+  (package
+    (name "plasma-applet-kurve")
+    (version "3.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/luisbocanegra/kurve")
+          (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0vghdlrrdc2fc8qrph9annmjcg2ibyfy2mp3xqvvn4f3y3vgscl3"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests
+      #:configure-flags
+      #~(list "-DBUILD_PLUGIN=ON"
+              "-DINSTALL_PLASMOID=ON")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (with-directory-excursion "package/contents/ui"
+                (substitute* "Cava.qml"
+                  (("(exec )cava" _ keep)
+                   (string-append keep (which "cava"))))
+                (substitute* "components/ProcessMonitorPrimary.qml"
+                  (("\"sh\"")
+                   (string-append "\"" (which "sh") "\""))))))
+          (add-after 'install 'make-tools-executable
+            (lambda _
+              (for-each (lambda (file)
+                          (chmod file #o755))
+                        (find-files (string-append #$output
+                                                   "/share/plasma/plasmoids/"
+                                                   "luisbocanegra."
+                                                   "audio.visualizer"
+                                                   "/contents/ui/tools"))))))))
+    (propagated-inputs
+     (list kcmutils
+           ki18n
+           kirigami
+           libplasma
+           plasma5support
+           python-websockets
+           plasma-workspace
+           qtbase
+           qtdeclarative
+           qtwebsockets))
+    (native-inputs
+     (list extra-cmake-modules))
+    (inputs
+     (list bash-minimal cava python-minimal))
+    (home-page "https://store.kde.org/p/2299506")
+    (synopsis "Audio visualizer widget for KDE Plasma")
+    (description
+     "This package provides an audio visualizer widget, powered by @code{cava},
+for KDE Plasma.")
+    (license license:gpl3+)))
