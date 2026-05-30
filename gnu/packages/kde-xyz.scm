@@ -18,6 +18,7 @@
 
 (define-module (gnu packages kde-xyz)
   #:use-module (guix build-system cmake)
+  #:use-module (guix build-system copy)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module ((guix licenses) #:prefix license:)
@@ -68,3 +69,39 @@
 corners of your windows and adds an outline around them without much affecting
 the performance.")
     (license license:gpl3+)))
+
+(define-public plasma-applet-chatai
+  (package
+    (name "plasma-applet-chatai")
+    (version "2.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/DenysMb/ChatAI-Plasmoid")
+          (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wbqwngwczzdivrz5yp6jwwskskh6fhsz9gld51q0qwg98zfpg5q"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan
+      #~'(("." "share/plasma/plasmoids/ChatAI-Plasmoid"
+           #:include-regexp ("metadata\\.json" "contents/")))))
+    (propagated-inputs
+     (list kdeclarative
+           kcmutils
+           kirigami
+           libplasma
+           knotifications
+           qtbase
+           qtdeclarative
+           qtwebengine))
+    (home-page "https://store.kde.org/p/2163340")
+    (synopsis "Range of chatbots for KDE Plasma")
+    (description
+     "This package provides a widget for KDE Plasma that provides a range of
+chatbots such as @uref{https://duck.ai/, Duck.ai}.")
+    (license license:gpl2+)))
