@@ -7294,6 +7294,45 @@ laying the foundations of a new world.")
       (license (list license:gpl2+
                      license:cc-by-sa3.0))))) ;mod-banner.png
 
+(define-public warzone2100-fractured-kingdom
+  ;; Commit pinned by warzone2100, radically different versions are
+  ;; wont to break.
+  (let ((commit "a27fe970a6f52e7b6a6d6264cf32ecec163799ec")
+        (revision "0"))
+    (package
+      (name "warzone2100-fractured-kingdom")
+      (version (git-version "1.3.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/Warzone2100/fractured-kingdom")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1px3k54z2h3svhswr6x8asyq62aixj633ifw3jnhmf1zwcfrs2vx"))))
+      (build-system copy-build-system)
+      (arguments
+       (list
+        #:install-plan
+        #~'(("fractured_kingdom.wz"
+             "/share/warzone2100/mods/campaign/"))
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'install 'build
+              (lambda _
+                (invoke "zip" "-r" "-9" "fractured_kingdom.wz" "."))))))
+      (native-inputs (list zip))
+      (home-page "https://github.com/Warzone2100/fractured-kingdom")
+      (synopsis "Custom game campaign for Warzone2100")
+      (description "warzone2100-fractured-kingdom is a modification for
+Warzone2100 featuring an original story.  After crash-landing in the territory
+of a once powerful kingdom, you must navigate your way through various factions
+fighting over what remains.")
+      (properties '((hidden? . #t)))    ;game assets only
+      (license license:gpl2+))))
+
 (define-public warzone2100
   (package
     (name "warzone2100")
