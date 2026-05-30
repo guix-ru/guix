@@ -26,13 +26,16 @@
   #:use-module (guix packages)
   #:use-module (gnu packages)
   #:use-module (gnu packages audio)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gl)
+  #:use-module (gnu packages glib)
   #:use-module (gnu packages kde-frameworks)
   #:use-module (gnu packages kde-plasma)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-web)
+  #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages xorg))
 
@@ -172,3 +175,81 @@ chatbots such as @uref{https://duck.ai/, Duck.ai}.")
      "This package provides an audio visualizer widget, powered by @code{cava},
 for KDE Plasma.")
     (license license:gpl3+)))
+
+(define-public plasma-applet-panel-colorizer
+  (package
+    (name "plasma-applet-panel-colorizer")
+    (version "6.8.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/luisbocanegra/plasma-panel-colorizer")
+          (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "00fpmpgzifbkjjg0r7yksmgmhj0a72x3kkiird6k2yipxr1kvxkq"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests
+      #:configure-flags
+      #~(list "-DBUILD_PLUGIN=ON"
+              "-DINSTALL_PLASMOID=ON")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'make-tools-executable
+            (lambda _
+              (for-each (lambda (file)
+                          (chmod file #o755))
+                        (find-files (string-append #$output
+                                                   "/share/plasma/plasmoids/"
+                                                   "luisbocanegra."
+                                                   "panel.colorizer"
+                                                   "/contents/ui/tools")))))
+          (add-after 'install 'wrap-tools
+            (lambda _
+              (for-each (lambda (file)
+                          (wrap-program file
+                            `("PATH" ":" prefix
+                              (,#$(file-append (this-package-input
+                                                "coreutils-minimal")
+                                               "/bin")
+                               ,#$(file-append (gexp-input (this-package-input
+                                                            "glib")
+                                                           "bin")
+                                               "/bin")))))
+                        (find-files (string-append #$output
+                                                   "/share/plasma/plasmoids/"
+                                                   "luisbocanegra."
+                                                   "panel.colorizer"
+                                                   "/contents/ui/tools")
+                                    "\\.sh$")))))))
+    (native-inputs
+     (list extra-cmake-modules))
+    (propagated-inputs
+     (list kcmutils
+           ki18n
+           kirigami
+           ksvg
+           libplasma
+           plasma5support
+           plasma-activities
+           plasma-workspace
+           python-dbus
+           python-pygobject
+           qtbase
+           qt5compat
+           qtdeclarative))
+    (inputs
+     (list bash-minimal
+           coreutils-minimal
+           `(,glib "bin")    ;for gdbus
+           python-minimal-wrapper))
+    (home-page "https://store.kde.org/p/2130967")
+    (synopsis "Panel customizer for KDE Plasma")
+    (description
+     "This package provides Latte-Dock and WM status bar customization features
+for KDE Plasma panels.")
+    (license (list license:lgpl2.1+ license:gpl2+))))
