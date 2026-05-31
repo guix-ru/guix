@@ -5564,13 +5564,13 @@ variant.")
 (define-public r-assorthead
   (package
     (name "r-assorthead")
-    (version "1.6.1")
+    (version "1.6.3")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "assorthead" version))
        (sha256
-        (base32 "1j3c29d0j9612ayjy18q3clqdq85lym1y0gfq0vnl72jcwpzdynh"))))
+        (base32 "0vh175mpwmdjw30if09ddzlnvrh8r8lr2gxi5l0bjhwxc2xhdhvm"))))
     (properties `((upstream-name . "assorthead")))
     (build-system r-build-system)
     (native-inputs (list r-knitr))
