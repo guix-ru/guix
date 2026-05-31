@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013, 2014, 2015, 2016, 2018, 2020, 2021 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2016, 2018-2021 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2015 Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.com>
 ;;; Copyright © 2015, 2016 Federico Beffa <beffa@fbengineering.ch>
 ;;; Copyright © 2016 Ricardo Wurmus <rekado@elephly.net>
@@ -8,9 +8,10 @@
 ;;; Copyright © 2016, 2017 Nikita <nikita@n0.is>
 ;;; Copyright © 2017 John Darrington <jmd@gnu.org>
 ;;; Copyright © 2017 Clément Lassieur <clement@lassieur.org>
-;;; Copyright © 2017, 2018, 2019, 2020 Tobias Geerinckx-Rice <me@tobias.gr>
+;;; Copyright © 2017-2020 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2018 Adam Massmann <massmannak@gmail.com>
 ;;; Copyright © 2018 Gabriel Hondet <gabrielhondet@gmail.com>
+;;; Copyright © 2019 Carlo Zancanaro <carlo@zancanaro.id.au>
 ;;; Copyright © 2020 Pierre Neidhardt <mail@ambrevar.xyz>
 ;;; Copyright © 2020 Brett Gilio <brettg@gnu.org>
 ;;; Copyright © 2020 Edouard Klein <edk@beaver-labs.com>
@@ -67,6 +68,7 @@
   #:use-module (gnu packages guile-xyz)
   #:use-module (gnu packages haskell-xyz)
   #:use-module (gnu packages image)
+  #:use-module (gnu packages java)
   #:use-module (gnu packages libedit)
   #:use-module (gnu packages libevent)
   #:use-module (gnu packages libffi)
@@ -1378,6 +1380,42 @@ as well as light.  The implementation is based on an ad-hoc Virtual
 Machine.  STklos can also be compiled as a library and embedded in an
 application.")
     (license license:gpl2+)))
+
+(define-public kawa
+  (package
+    (name "kawa")
+    (version "3.1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://gnu/kawa/kawa-" version ".tar.gz"))
+       (sha256
+        (base32 "06g015zjlfgsx0n4lb326czkbf1grlx0n6dx074m808hdg6m16lc"))))
+    (build-system gnu-build-system)
+    (arguments
+     `(#:parallel-build? #f
+       #:parallel-tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'install 'wrap-kawa
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((out (assoc-ref outputs "out")))
+               (wrap-program (string-append out "/share/kawa/bin/kawa")
+                 `("JAVA_HOME" ":" = (,(assoc-ref inputs "icedtea"))))))))))
+    (inputs
+     (list bash-minimal
+           `(,icedtea-8 "jdk")))
+    (home-page "https://www.gnu.org/software/kawa/")
+    (synopsis "Java framework and implementation of Scheme, Elisp, and more")
+    (description
+     "GNU Kawa is an implementation of the Scheme programming language that is
+built on top of the Java platform.  It is thus conveniently integrated with
+Java and benefits from this by having a compiler, optional static typing, and
+so on.  Kawa also serves as a framework for implementing other programming
+languages on the Java platform.
+
+Included in Kawa is qexo, a partial implementation of XQuery in Java.")
+    (license license:expat)))
 
 (define-public loko-scheme
   (package
