@@ -273,13 +273,13 @@ kinematics to varying flight conditions.")
 (define-public r-aisdk
   (package
     (name "r-aisdk")
-    (version "1.1.0")
+    (version "1.4.10")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "aisdk" version))
        (sha256
-        (base32 "17c45bad45ldanmkjx2naxc5d1rq5qllyrb9cxgkz6rvfxzbgv67"))))
+        (base32 "052r06z6apppmal29c11wgn1k2nvg5v2dg8g6p864dxsv7c08wv0"))))
     (properties `((upstream-name . "aisdk")))
     (build-system r-build-system)
     (propagated-inputs (list r-base64enc
@@ -289,7 +289,6 @@ kinematics to varying flight conditions.")
                              r-httr2
                              r-jsonlite
                              r-memoise
-                             r-openssl
                              r-processx
                              r-r6
                              r-rlang
