@@ -53330,14 +53330,14 @@ model.")
 (define-public r-igraph
   (package
     (name "r-igraph")
-    (version "2.3.1")
+    (version "2.3.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "igraph" version))
        (sha256
         (base32
-         "1fjvlsr5kwfv5mvm62fz3cvdf6afm4w84hgd185sxn7sbz3c2078"))))
+         "1mhbxpig427x37yckxrfxrpags42rx3czn3wa7i7ak7g6cllwfaa"))))
     (properties
      `((upstream-name . "igraph")
        (updater-extra-native-inputs . ("which"))
