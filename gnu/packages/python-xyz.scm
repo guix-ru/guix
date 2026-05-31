@@ -14987,7 +14987,6 @@ wraps Python's standard library threading and multiprocessing objects.")
            man-db
            python-pytest
            python-setuptools
-           python-wheel
            which))
     (propagated-inputs
      (list python-ptyprocess))
