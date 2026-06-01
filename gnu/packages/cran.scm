@@ -58569,13 +58569,13 @@ deployment, and more.")
 (define-public r-paws-end-user-computing
   (package
     (name "r-paws-end-user-computing")
-    (version "0.9.0")
+    (version "0.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "paws.end.user.computing" version))
        (sha256
-        (base32 "1ijzdlsbj15kgk0m8xkpmjbb2wgpkzb1i6kiz109h6h6fr6lmwjv"))))
+        (base32 "0lhn7195gfwxskb5q7yp7jkrf5jcgngr8hrdn9xad2j23wjb3j2m"))))
     (properties
      '((upstream-name . "paws.end.user.computing")
        (updater-ignored-native-inputs . ("r-paws"))))
