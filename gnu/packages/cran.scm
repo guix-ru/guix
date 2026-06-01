@@ -37115,13 +37115,15 @@ This makes it a convenient and fast interface to C/C++ and Fortran code.")
 (define-public r-spam
   (package
     (name "r-spam")
-    (version "2.11-3")
+    (version "2.11-4")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "spam" version))
        (sha256
-        (base32 "15drn1n871acn9szfxc99rpa6nfwp0s5pq6dg0ih90bi563lz9m2"))))
+        (base32 "11lqd0xdkqajfkwl1y26a05950q48lxllra9vipp3w10896421p2"))))
+    (properties
+     '((updater-ignored-native-inputs . ("r-fields"))))
     (build-system r-build-system)
     (arguments
      (list
