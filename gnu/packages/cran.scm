@@ -7562,13 +7562,13 @@ designed by Cynthia Brewer as described at http://colorbrewer2.org")
 (define-public r-rcpparmadillo
   (package
     (name "r-rcpparmadillo")
-    (version "15.2.6-1")
+    (version "15.2.7-1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "RcppArmadillo" version))
               (sha256
                (base32
-                "07wf1rmlm7hp06vcykmxwbzy01ri28zx20vz39j1sk3w1pck5h7r"))))
+                "0vln8w0x1vnpa3js8n617f5d8419jfzasmracdmmjjrnn5k0z8pp"))))
     (properties `((upstream-name . "RcppArmadillo")))
     (build-system r-build-system)
     (arguments
