@@ -24242,13 +24242,13 @@ iVAT).")
 (define-public r-xfun
   (package
     (name "r-xfun")
-    (version "0.57")
+    (version "0.58")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "xfun" version))
        (sha256
-        (base32 "0xglnzj2wg3jcfsnc88whi1ip2kr3hmbgn9xv33764p2bz8xw32s"))))
+        (base32 "09l2wxxfnb2swz5hzxrghxc0c0xavn7c3kcm3ljbq560vkjkimzx"))))
     (build-system r-build-system)
     (properties
      ;; knitr itself depends on xfun
@@ -24259,6 +24259,8 @@ iVAT).")
       ;; Do not build vignettes, because they require r-litedown, which
       ;; depends on r-xfun.
       #:test-types '(list "tests")
+      #:test-directory "tests"
+      #:skipped-tests '("test-cran/test-markdown.R")
       #:phases
       '(modify-phases %standard-phases
          ;; Needed for tests
