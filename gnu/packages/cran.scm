@@ -58545,13 +58545,13 @@ more.")
 (define-public r-paws-developer-tools
   (package
     (name "r-paws-developer-tools")
-    (version "0.9.0")
+    (version "0.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "paws.developer.tools" version))
        (sha256
-        (base32 "1b2df0pby3fjbsjz6xw1x6h74jvnpjvdpkww8a9d7va76fgbn8lp"))))
+        (base32 "1ikm82gnk9aajc20bvgkxyms5q4mgb7lxqy94siv0k80mkg8hdph"))))
     (properties
      '((upstream-name . "paws.developer.tools")
        (updater-ignored-native-inputs . ("r-paws"))))
