@@ -58719,14 +58719,14 @@ monitoring, Auto Scaling for automatically scaling resources, and more.")
 (define-public r-paws-networking
   (package
     (name "r-paws-networking")
-    (version "0.9.0")
+    (version "0.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "paws.networking" version))
        (sha256
         (base32
-         "1nl0dg0saigqkv5qq2mqbxcb1552qyizfa3j0lpsfarhz61x90jd"))))
+         "04frlk0azygy03nyvy23gi78kljys118q5fbbhb0g8cngxv1mn18"))))
     (properties
      '((upstream-name . "paws.networking")
        (updater-ignored-native-inputs . ("r-paws"))))
