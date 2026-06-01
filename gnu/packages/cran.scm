@@ -58618,14 +58618,14 @@ Simple Notification Service (SNS) publish/subscribe messaging, and more.")
 (define-public r-paws-security-identity
   (package
     (name "r-paws-security-identity")
-    (version "0.9.0")
+    (version "0.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "paws.security.identity" version))
        (sha256
         (base32
-         "1v93ybjlbnkpw2rknsq8fr7iqj9yk4f8ixij0h7sxnwq6xn3jyzl"))))
+         "1jrwis8ylkpd3c7afdfc5xfxdb96xzq81hy0krq208ff7qci5csg"))))
     (properties
      '((upstream-name . "paws.security.identity")
        (updater-ignored-native-inputs . ("r-paws"))))
