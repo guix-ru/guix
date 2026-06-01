@@ -21989,8 +21989,7 @@ are synchronized with data exchanges on \"channels\".")
     (native-inputs
      (list graphviz
            python-pytest
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (propagated-inputs
      (list python-graphviz))
     (home-page "https://mg.pov.lt/objgraph/")
