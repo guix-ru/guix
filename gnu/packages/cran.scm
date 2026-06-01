@@ -37542,13 +37542,13 @@ profiling R code.")
 (define-public r-prospectr
   (package
     (name "r-prospectr")
-    (version "0.2.8")
+    (version "0.2.9")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "prospectr" version))
               (sha256
                (base32
-                "0hwiwlhz994mrhxr8billcrrpg79zl7b8hijfkxlb0sx2rvidy0l"))))
+                "1ddqgs9lldfairwzcd7bavr94g62r390fqk5fa084n9qggyy5a8i"))))
     (properties `((upstream-name . "prospectr")))
     (build-system r-build-system)
     (propagated-inputs
@@ -37559,7 +37559,7 @@ profiling R code.")
            r-rcpp
            r-rcpparmadillo))
     (native-inputs
-     (list r-knitr r-testthat))
+     (list r-quarto r-testthat))
     (home-page "https://github.com/l-ramirez-lopez/prospectr")
     (synopsis "Functions for processing and sample selection of spectroscopic data")
     (description
