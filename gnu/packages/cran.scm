@@ -53186,14 +53186,14 @@ assumptions.")
 (define-public r-forge
   (package
     (name "r-forge")
-    (version "0.2.0")
+    (version "0.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "forge" version))
        (sha256
         (base32
-         "0pjfzsc35agkh0zfw2czwajkbsyn6liys5irl5bhz5r1vim3jmwa"))))
+         "1g5rl5a5hmgdaj3lq5xjwlpzqy7d8ib6k99i7rj6c9dk1wikd9lm"))))
     (properties `((upstream-name . "forge")))
     (build-system r-build-system)
     (propagated-inputs
