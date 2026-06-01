@@ -24710,13 +24710,13 @@ explored with minimal deviation from the common work patterns of
 (define-public r-nanonext
   (package
     (name "r-nanonext")
-    (version "1.9.0")
+    (version "1.9.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "nanonext" version))
        (sha256
-        (base32 "17v1rryf6dbp45g3m5hx4hcqwp8rl4dvq8qkhhqckj3089b33196"))
+        (base32 "0rakw94r6vg8dxg60zgxv6fxx26i9mp2gnfgvgapjjwz0jnhhjkw"))
        (modules '((guix build utils)))
        (snippet
         '(begin (delete-file-recursively "src/mbedtls")
