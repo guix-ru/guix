@@ -33219,14 +33219,14 @@ repositories.")
 (define-public r-gh
   (package
     (name "r-gh")
-    (version "1.5.0")
+    (version "1.6.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "gh" version))
        (sha256
         (base32
-         "13lv6bh3g28s9z4v4y8h8hin2gb5igdy2xbd2n8cf3wnhhq0cni9"))))
+         "1r1vxxjk6wzdxa51x3hhadaw4mpbdpxgxcvlkc5ysd88s5gy3lwi"))))
     (properties
      '((updater-ignored-native-inputs . ("r-connectcreds"))))
     (build-system r-build-system)
@@ -33244,6 +33244,8 @@ repositories.")
            r-rprojroot
            r-spelling
            r-testthat
+           r-vctrs
+           r-webfakes
            r-withr))
     (home-page "https://github.com/r-lib/gh#readme")
     (synopsis "Access the GitHub API via R")
