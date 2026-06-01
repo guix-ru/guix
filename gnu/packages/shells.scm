@@ -29,6 +29,7 @@
 ;;; Copyright © 2024 Luís Henriques <henrix@camandro.org>
 ;;; Copyright © 2024 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;; Copyright © 2026 Untrusem <mysticmoksh@riseup.net>
+;;; Copyright © 2026 Ashish SHUKLA <ashish.is@lostca.se>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -543,7 +544,7 @@ history mechanism, job control and a C-like syntax.")
 (define-public zsh
   (package
     (name "zsh")
-    (version "5.9")
+    (version "5.9.1")
     (source (origin
               (method url-fetch)
               (uri (list (string-append
@@ -554,8 +555,7 @@ history mechanism, job control and a C-like syntax.")
                            ".tar.xz")))
               (sha256
                (base32
-                "1mdc8lnq8qxq1ahxp8610n799pd7a9kqg3liy7xq2pjvvp71x3cv"))
-              (patches (search-patches "zsh-egrep-failing-test.patch"))))
+                "0398v1c2w15m2v2cbibr3xjgz22k87klbhlyl3lw87cq7z0bw82x"))))
     (build-system gnu-build-system)
     (arguments `(#:configure-flags
                  `(,(string-append "CFLAGS=-g -O2"
