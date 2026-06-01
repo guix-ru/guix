@@ -57971,13 +57971,13 @@ reading and writing arbitrary protocol-buffer data in R.")
 (define-public r-opencpu
   (package
     (name "r-opencpu")
-    (version "2.2.14")
+    (version "2.2.15")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "opencpu" version))
        (sha256
-        (base32 "0gq97fcjwycnxkn73fiwp2qs6pnbs81qsjk93vq3s9mj22rk7l04"))
+        (base32 "05bpamfdr63ywlpkva8a62iyfqdwgwz6v8j6gr66p5mdcj5l6g83"))
        (snippet
         '(for-each delete-file
                    '("inst/test/jquery-1.10.2.min.js"
@@ -58000,7 +58000,7 @@ reading and writing arbitrary protocol-buffer data in R.")
                 (call-with-values
                     (lambda ()
                       (unzip2
-                       `((,(assoc-ref inputs "js-jquery")
+                       `((,(assoc-ref inputs "jquery-1.10.2.js")
                           "jquery-1.10.2.min.js")
                          ("bootstrap/js/bootstrap.js"
                           "bootstrap/js/bootstrap.min.js"))))
@@ -58031,16 +58031,13 @@ reading and writing arbitrary protocol-buffer data in R.")
            r-webutils
            r-zip))
     (native-inputs
-     `(("esbuild" ,esbuild)
-       ("r-knitr" ,r-knitr)
-       ("r-r-rsp" ,r-r-rsp)
-       ("js-jquery"
-        ,(origin
-           (method url-fetch)
-           (uri "https://code.jquery.com/jquery-1.10.2.js")
-           (sha256
-            (base32
-             "0ah5ivczcv62rj8bxwam7ar0f4il544jbn983vwfvkykl506gpla"))))))
+     (list esbuild
+           (origin
+             (method url-fetch)
+             (uri "https://code.jquery.com/jquery-1.10.2.js")
+             (sha256
+              (base32
+               "0ah5ivczcv62rj8bxwam7ar0f4il544jbn983vwfvkykl506gpla")))))
     (home-page "https://www.opencpu.org")
     (synopsis "API for embedded scientific computing")
     (description
