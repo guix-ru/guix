@@ -1387,24 +1387,42 @@ application.")
     (version "3.1.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://gnu/kawa/kawa-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitlab.com/kashell/Kawa")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "06g015zjlfgsx0n4lb326czkbf1grlx0n6dx074m808hdg6m16lc"))))
+        (base32 "1qfd0dk4l4dccdhi6lmgv74g98m6mpdiif1qrzgwbj8awbb8x1jy"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; autogen.sh lacks shebang.  Let's delete it, the default action
+            ;; of Guix is equivalent.
+            (delete-file "autogen.sh")
+            ;; This duplication of AM_INIT_AUTOMAKE was solved on commit
+            ;; 85f8e85cb50e79c163951c3d823bbbc7df3cee03 from kawa git repo,
+            ;; but it was not tagged yet.
+            (substitute* "bin/configure.ac"
+              (("AM_INIT_AUTOMAKE\n") ""))))))
     (build-system gnu-build-system)
     (arguments
-     `(#:parallel-build? #f
-       #:parallel-tests? #f
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'wrap-kawa
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (wrap-program (string-append out "/share/kawa/bin/kawa")
-                 `("JAVA_HOME" ":" = (,(assoc-ref inputs "icedtea"))))))))))
+     (list
+      #:parallel-build? #f
+      #:parallel-tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'wrap-kawa
+            (lambda* (#:key inputs #:allow-other-keys)
+              (wrap-program (string-append #$output "/share/kawa/bin/kawa")
+                  `("JAVA_HOME" ":" = (,#$(this-package-input "icedtea")))))))))
     (inputs
      (list bash-minimal
            `(,icedtea-8 "jdk")))
+    (native-inputs
+     (list autoconf
+           automake
+           texinfo))
     (home-page "https://www.gnu.org/software/kawa/")
     (synopsis "Java framework and implementation of Scheme, Elisp, and more")
     (description
