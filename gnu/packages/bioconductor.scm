@@ -9804,13 +9804,13 @@ analysis using other methods.")
 (define-public r-gcptools
   (package
     (name "r-gcptools")
-    (version "1.2.0")
+    (version "1.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "GCPtools" version))
        (sha256
-        (base32 "1ajb8awl6l6af37dpn2zn8yi6wgc5kg61i3vx59jq2s8xvxwnf5r"))))
+        (base32 "035fii0lrzqardv3dnb68vr5gnhx21xciqnigldm8wz0a41c71wq"))))
     (properties `((upstream-name . "GCPtools")))
     (build-system r-build-system)
     (propagated-inputs (list r-anvilbase
@@ -9820,7 +9820,7 @@ analysis using other methods.")
                              r-rlang
                              r-tibble
                              r-tidyr))
-    (native-inputs (list r-knitr r-withr))
+    (native-inputs (list r-knitr r-testthat r-withr))
     (home-page "https://github.com/Bioconductor/GCPtools")
     (synopsis "Tools for working with @code{gcloud} and @code{gsutil}")
     (description
