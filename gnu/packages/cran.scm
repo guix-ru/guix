@@ -10092,16 +10092,20 @@ Hubert, based on Kaufman and Rousseeuw (1990) \"Finding Groups in Data\".")
 (define-public r-clustmixtype
   (package
     (name "r-clustmixtype")
-    (version "0.4-2")
+    (version "0.5-1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "clustMixType" version))
        (sha256
-        (base32 "1clby7x9jz0jpzmzni6g8zicysnf7ccxliglxr6ljigvkf747bg1"))))
+        (base32 "0pfg6k3dg4dgr94845yjhki7xl9rb58i37ywpd5l9w9mdbhg266s"))))
     (properties `((upstream-name . "clustMixType")))
     (build-system r-build-system)
-    (propagated-inputs (list r-combinat r-dplyr r-rcolorbrewer r-rlang
+    (propagated-inputs (list r-cluster
+                             r-combinat
+                             r-dplyr
+                             r-rcolorbrewer
+                             r-rlang
                              r-tibble))
     (native-inputs (list r-testthat))
     (home-page "https://cran.r-project.org/package=clustMixType")
