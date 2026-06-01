@@ -2529,13 +2529,13 @@ New styles can also be created easily.  This package was inspired by the
 (define-public r-crew
   (package
     (name "r-crew")
-    (version "1.3.0")
+    (version "1.3.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "crew" version))
        (sha256
-        (base32 "0jff352yidgabw2p5qn2bqqvbinnanxz5b4450xxqda53mfw2afj"))))
+        (base32 "18hm57mrrng1jx0aah5dl9x16h465w1l1ksswx48s9l9i96sgn21"))))
     (properties `((upstream-name . "crew")))
     (build-system r-build-system)
     (arguments
