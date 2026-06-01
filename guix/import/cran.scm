@@ -641,7 +641,7 @@ statements in files in the directory DIR."
                                                                                 default-r-packages))))))))))
                        (set)
                        (append-map (lambda (directory)
-                                     (find-files directory "\\.(R|Rmd)"))
+                                     (find-files directory "\\.(R|Rmd)$"))
                                    test-directories))))
 
            ;; Special case for BiocGenerics + RUnit.
