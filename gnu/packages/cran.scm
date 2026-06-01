@@ -13939,16 +13939,14 @@ Munsell colour system.")
 (define-public r-mvtnorm
   (package
     (name "r-mvtnorm")
-    (version "1.3-7")
+    (version "1.4-0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "mvtnorm" version))
               (sha256
                (base32
-                "144fzrksgg12z7pvc0mh1kk75i2sng36j2d6py6q7msb41pfk4y3"))))
+                "11zwf6w670h42ci4vnd7cfc7h8ymbqhh697wzm2ncybswghhs0ic"))))
     (build-system r-build-system)
-    ;; Do not build vignettes because there are weave errors in lmvnorm_src.R.
-    (arguments (list #:test-types '(list "tests")))
     (native-inputs
      (list gfortran r-numderiv r-qrng))
     (home-page "https://mvtnorm.R-forge.R-project.org")
