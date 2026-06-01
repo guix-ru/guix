@@ -9152,17 +9152,18 @@ Shiny with spinners, progress bars, and notifications.")
 (define-public r-wheatmap
   (package
     (name "r-wheatmap")
-    (version "0.2.0")
+    (version "0.2.4")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "wheatmap" version))
               (sha256
                (base32
-                "064idlrnb85xxav39gp3n854fic6514khvazrf5d0x48crpzyvdp"))))
+                "06y5inrfr3wwgri815hq7rrkshm91qk51dghzmabqhdli89vci8k"))))
     (properties `((upstream-name . "wheatmap")))
     (build-system r-build-system)
-    (propagated-inputs (list r-colorspace r-rcolorbrewer))
-    (native-inputs (list r-knitr))
+    (propagated-inputs (list r-colorspace r-gtable r-pals r-rcolorbrewer))
+    (native-inputs (list poppler-qt6 ;for pdfinfo
+                         r-knitr r-testthat))
     (home-page "https://github.com/zwdzwd/wheatmap")
     (synopsis "Incrementally build complex plots using natural semantics")
     (description
