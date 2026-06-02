@@ -3293,14 +3293,16 @@ column which contains two indexes, with potentially a nesting structure.")
 (define-public r-dharma
   (package
     (name "r-dharma")
-    (version "0.4.7")
+    (version "0.5.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "DHARMa" version))
        (sha256
-        (base32 "0mfywr4pshnd13xs2zdhd8xvbc43qxaj075jhy8lrlg1agmc6gya"))))
-    (properties `((upstream-name . "DHARMa")))
+        (base32 "05h3gd33vhg72wdknhwsjv5fhjlc69pyj6rzpbrc7cwixv291s0q"))))
+    (properties
+     '((upstream-name . "DHARMa")
+       (updater-extra-native-inputs . ("r-mgcviz"))))
     (build-system r-build-system)
     (propagated-inputs (list r-ape
                              r-gap
@@ -3308,16 +3310,20 @@ column which contains two indexes, with potentially a nesting structure.")
                              r-lmtest
                              r-matrix
                              r-qgam))
-    (native-inputs (list r-devtools
+    (native-inputs (list r-brms
+                         r-devtools
+                         r-ggeffects
                          r-glmmadaptive
                          r-glmmtmb
                          r-knitr
                          r-mass
                          r-mgcv
+                         r-mgcviz
                          r-phylolm
                          r-rhub
                          r-spamm
-                         r-testthat))
+                         r-testthat
+                         r-tidyverse))
     (home-page "https://florianhartig.github.io/DHARMa/")
     (synopsis "Residual diagnostics for hierarchical regression models")
     (description
