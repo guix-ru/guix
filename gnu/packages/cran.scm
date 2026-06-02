@@ -2575,13 +2575,13 @@ with a unifying interface for third-party worker launchers.")
 (define-public r-crs
   (package
     (name "r-crs")
-    (version "0.15-43")
+    (version "0.15-44")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "crs" version))
        (sha256
-        (base32 "0h35rak6ngkagjhx6qra3rm6spxv1cqblxs51sxllhbny221q3p5"))))
+        (base32 "024230f2m35b2a2gwcaqdhw1pam2c54gn67k4z6a7j0cl2kg9pss"))))
     (properties `((upstream-name . "crs")))
     (build-system r-build-system)
     (propagated-inputs (list r-boot r-quantreg))
