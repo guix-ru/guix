@@ -13641,6 +13641,42 @@ parameter estimation by GCV, REML or UBRE/AIC.  The library includes a
 distributions beyond the exponential family.")
     (license license:gpl2+)))
 
+(define-public r-micsr
+  (package
+    (name "r-micsr")
+    (version "0.1-5")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "micsr" version))
+       (sha256
+        (base32 "15h742f7gacmixz14b1w3kzndi5p769zk18vl2ckc78qrjpl2mg4"))))
+    (properties
+     '((upstream-name . "micsr")
+       (updater-extra-native-inputs . ("r-aer" "r-dplyr" "r-mass" "r-vgam"))))
+    (build-system r-build-system)
+    (propagated-inputs (list r-compquadform
+                             r-dfidx
+                             r-formula
+                             r-generics
+                             r-numderiv
+                             r-rcpp
+                             r-rdpack
+                             r-sandwich
+                             r-survival))
+    (native-inputs (list r-aer r-dplyr r-mass r-quarto r-tinytest r-vgam))
+    (home-page "https://www.r-project.org")
+    (synopsis "Microeconometrics with R")
+    (description
+     "This package contains functions, data sets and examples for the book:
+Yves Croissant (2025) \"Microeconometrics with R\", Chapman and Hall/CRC The R
+Series <doi:10.1201/9781003100263>.  The package includes a set of estimators
+for models used in microeconometrics, especially for count data and limited
+dependent variables.  Test functions include score test, Hausman test, Vuong
+test, Sargan test and conditional moment test.  A small subset of the data set
+used in the book is also included.")
+    (license license:gpl2+)))
+
 (define-public r-microbenchmark
   (package
     (name "r-microbenchmark")
