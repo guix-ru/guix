@@ -1,38 +1,44 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2014 John Darrington <jmd@gnu.org>
-;;; Copyright © 2015 Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.com>
 ;;; Copyright © 2015 Mark H Weaver <mhw@netris.org>
+;;; Copyright © 2015 Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.com>
 ;;; Copyright © 2016 Federico Beffa <beffa@fbengineering.ch>
-;;; Copyright © 2016, 2017 Nikita <nikita@n0.is>
 ;;; Copyright © 2016, 2017 Andy Patterson <ajpatter@uwaterloo.ca>
+;;; Copyright © 2016, 2017 Nikita <nikita@n0.is>
 ;;; Copyright © 2017, 2019, 2020 Ricardo Wurmus <rekado@elephly.net>
-;;; Copyright © 2017-2019, 2022, 2023 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2017, 2019–2022 Tobias Geerinckx-Rice <me@tobias.gr>
-;;; Copyright © 2018 Benjamin Slade <slade@jnanam.net>
+;;; Copyright © 2017-2019, 2022, 2023 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2018 Alex Vong <alexvong1995@gmail.com>
-;;; Copyright © 2018, 2019, 2020 Pierre Neidhardt <mail@ambrevar.xyz>
+;;; Copyright © 2018 Benjamin Slade <slade@jnanam.net>
 ;;; Copyright © 2018, 2019 Pierre Langlois <pierre.langlois@gmx.com>
-;;; Copyright © 2019, 2020 Katherine Cox-Buday <cox.katherine.e@gmail.com>
+;;; Copyright © 2018, 2019, 2020, 2022 Pierre Neidhardt <mail@ambrevar.xyz>
+;;; Copyright © 2019 Carlo Zancanaro <carlo@zancanaro.id.au>
 ;;; Copyright © 2019 Jesse Gildersleve <jessejohngildersleve@protonmail.com>
+;;; Copyright © 2019, 2020 Katherine Cox-Buday <cox.katherine.e@gmail.com>
 ;;; Copyright © 2019-2025 Guillaume Le Vaillant <glv@posteo.net>
 ;;; Copyright © 2020 Marius Bakke <mbakke@fastmail.com>
 ;;; Copyright © 2020 Zhu Zihao <all_but_last@163.com>
-;;; Copyright © 2021, 2023 Sharlatan Hellseher <sharlatanus@gmail.com>
-;;; Copyright © 2021 Paul A. Patience <paul@apatience.com>
 ;;; Copyright © 2021 Charles Jackson <charles.b.jackson@protonmail.com>
-;;; Copyright © 2022 Joeke de Graaf <joeke@posteo.net>
+;;; Copyright © 2021 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2021 Vincent Legoll <vincent.legoll@gmail.com>
 ;;; Copyright © 2021, 2022, 2025 jgart <jgart@dismail.de>
+;;; Copyright © 2021, 2023 Sharlatan Hellseher <sharlatanus@gmail.com>
+;;; Copyright © 2021, 2024 Paul A. Patience <paul@apatience.com>
 ;;; Copyright © 2022 ( <paren@disroot.org>
-;;; Copyright © 2023 Zheng Junjie <873216071@qq.com>
-;;; Copyright © 2023 Yovan Naumovski <yovan@gorski.stream>
+;;; Copyright © 2022 Joeke de Graaf <joeke@posteo.net>
+;;; Copyright © 2022 Pierre Neidhardt <mail@ambrevar.xyz>
 ;;; Copyright © 2023 Andrew Kravchuk <awkravchuk@gmail.com>
+;;; Copyright © 2023 Artyom Bologov <mail@aartaka.me>
+;;; Copyright © 2023 Yovan Naumovski <yovan@gorski.stream>
+;;; Copyright © 2023 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2024 Andreas Enge <andreas@enge.fr>
-;;; Copyright © 2024 bigbug <bigbookofbug@proton.me>
-;;; Copyright © 2024, 2025 Ashish SHUKLA <ashish.is@lostca.se>
-;;; Copyright © 2024 Omar Bassam <omar.bassam88@gmail.com>
-;;; Copyright © 2024 Suhail Singh <suhail@bayesians.ca>
+;;; Copyright © 2024 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;; Copyright © 2024 David Pflug <david@pflug.io>
 ;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright © 2024 Omar Bassam <omar.bassam88@gmail.com>
+;;; Copyright © 2024 Suhail Singh <suhail@bayesians.ca>
+;;; Copyright © 2024 bigbug <bigbookofbug@proton.me>
+;;; Copyright © 2024, 2025 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2026 Igorj Gorjaĉev <igor@goryachev.org>
 ;;; Copyright © 2026 Simen Endsjø <contact@simendsjo.me>
 ;;;
@@ -81,6 +87,7 @@
   #:use-module (gnu packages haskell-check)
   #:use-module (gnu packages haskell-web)
   #:use-module (gnu packages haskell-xyz)
+  #:use-module (gnu packages java)
   #:use-module (gnu packages libffcall)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages libsigsegv)
@@ -107,6 +114,7 @@
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages)
+  #:use-module (guix build-system ant)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system haskell)
@@ -120,6 +128,73 @@
   #:use-module (guix utils)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1))
+
+(define-public abcl
+  (package
+    (name "abcl")
+    (version "1.9.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://abcl.org/releases/"
+                           version "/abcl-src-" version ".tar.gz"))
+       (sha256
+        (base32
+         "1zxjpwv98bq2yd5qg08sbkajj17m7b8xmzqhw296161s7lia215v"))
+       (patches
+        (search-patches
+         "abcl-fix-build-xml.patch"))))
+    (build-system ant-build-system)
+    (native-inputs
+     (list java-junit))
+    (arguments
+     `(#:build-target "abcl.jar"
+       #:test-target "abcl.test"
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let ((share (string-append (assoc-ref outputs "out")
+                                         "/share/java/"))
+                   (bin (string-append (assoc-ref outputs "out")
+                                       "/bin/")))
+               (mkdir-p share)
+               (install-file "dist/abcl.jar" share)
+               (install-file "dist/abcl-contrib.jar" share)
+               (mkdir-p bin)
+               (with-output-to-file (string-append bin "abcl")
+                 (lambda _
+                   (let ((classpath (string-append
+                                     share "abcl.jar"
+                                     ":"
+                                     share "abcl-contrib.jar")))
+                     (display (string-append
+                               "#!" (which "bash") "\n"
+                               "if [[ -z $CLASSPATH ]]; then\n"
+                               "  cp=\"" classpath "\"\n"
+                               "else\n"
+                               "  cp=\"" classpath ":$CLASSPATH\"\n"
+                               "fi\n"
+                               "exec " (which "java")
+                               " -cp \"$cp\" org.armedbear.lisp.Main \"$@\"\n")))))
+               (chmod (string-append bin "abcl") #o755)
+               #t))))))
+    (home-page "https://abcl.org/")
+    (synopsis "Common Lisp Implementation on the JVM")
+    (description
+     "@acronym{ABCL,Armed Bear Common Lisp} is a full implementation of the
+Common Lisp language featuring both an interpreter and a compiler, running in
+the JVM.  It supports JSR-223 (Java scripting API): it can be a scripting
+engine in any Java application.  Additionally, it can be used to
+implement (parts of) the application using Java to Lisp integration APIs.")
+    (native-search-paths
+     (list (search-path-specification
+             (variable "XDG_DATA_DIRS")
+             (files '("share")))))
+    (license
+     (list license:gpl2+
+           license:bsd-3                ; named-readtables
+           license:cpl1.0))))           ; jfli
 
 (define-public buildapp
   (package

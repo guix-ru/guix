@@ -95,6 +95,7 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system maven)
   #:use-module (guix build-system pyproject)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -15998,74 +15999,6 @@ using the JSch library.")
 JGit using the Bouncy Castle cryptographic library.")
     (license license:edl1.0)))
 
-(define-public abcl
-  (package
-    (name "abcl")
-    (version "1.9.3")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://abcl.org/releases/"
-                           version "/abcl-src-" version ".tar.gz"))
-       (sha256
-        (base32
-         "1zxjpwv98bq2yd5qg08sbkajj17m7b8xmzqhw296161s7lia215v"))
-       (patches
-        (search-patches
-         "abcl-fix-build-xml.patch"))))
-    (build-system ant-build-system)
-    (native-inputs
-     (list java-junit))
-    (arguments
-     `(#:build-target "abcl.jar"
-       #:test-target "abcl.test"
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((share (string-append (assoc-ref outputs "out")
-                                         "/share/java/"))
-                   (bin (string-append (assoc-ref outputs "out")
-                                       "/bin/")))
-               (mkdir-p share)
-               (install-file "dist/abcl.jar" share)
-               (install-file "dist/abcl-contrib.jar" share)
-               (mkdir-p bin)
-               (with-output-to-file (string-append bin "abcl")
-                 (lambda _
-                   (let ((classpath (string-append
-                                     share "abcl.jar"
-                                     ":"
-                                     share "abcl-contrib.jar")))
-                     (display (string-append
-                               "#!" (which "bash") "\n"
-                               "if [[ -z $CLASSPATH ]]; then\n"
-                               "  cp=\"" classpath "\"\n"
-                               "else\n"
-                               "  cp=\"" classpath ":$CLASSPATH\"\n"
-                               "fi\n"
-                               "exec " (which "java")
-                               " -cp \"$cp\" org.armedbear.lisp.Main \"$@\"\n")))))
-               (chmod (string-append bin "abcl") #o755)
-               #t))))))
-    (home-page "https://abcl.org/")
-    (synopsis "Common Lisp Implementation on the JVM")
-    (description
-     "@dfn{Armed Bear Common Lisp} (ABCL) is a full implementation of the Common
-Lisp language featuring both an interpreter and a compiler, running in the
-JVM.  It supports JSR-223 (Java scripting API): it can be a scripting engine
-in any Java application.  Additionally, it can be used to implement (parts of)
-the application using Java to Lisp integration APIs.")
-    (native-search-paths
-     (list (search-path-specification
-            (variable "XDG_DATA_DIRS")
-            (files '("share")))))
-    (license (list license:gpl2+
-                   ;; named-readtables is released under 3 clause BSD
-                   license:bsd-3
-                   ;; jfli is released under CPL 1.0
-                   license:cpl1.0))))
-
 (define-public java-jsonp-api
   (package
     (name "java-jsonp-api")
@@ -16819,6 +16752,10 @@ The following TLA+ tools are available in this distribution:
 @item The PlusCal translator.
 @end itemize")
       (license license:expat))))
+
+;; Deprecated at 2026-06-01
+(define-deprecated/public-alias abcl
+  (@ (gnu packages lisp) abcl))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
