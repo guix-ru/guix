@@ -1615,6 +1615,7 @@ interactive environment for the functional language Haskell.")
     (inherit ghc-8.10)
     (name "ghc")
     (version "9.0.2")
+    (supported-systems '("i686-linux" "x86_64-linux" "aarch64-linux"))
     (source (origin
               (method url-fetch)
               (uri (string-append "https://www.haskell.org/ghc/dist/" version
@@ -1623,9 +1624,44 @@ interactive environment for the functional language Haskell.")
                (base32
                 "15wii8can2r3dcl6jjmd50h2jvn7rlmn05zb74d2scj6cfwl43hl"))
               (patches (search-patches "ghc-9-StgCRunAsm-only-when-needed.patch"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'skip-more-tests 'skip-T21694-i686
+              (lambda _
+                (substitute* '("testsuite/tests/simplCore/should_compile/all.T")
+                  (("^test\\('T21694', \\[ " all)
+                   (string-append all "when(arch('i386'), skip), ")))))
+            #$@(if (target-aarch64?)
+                   ;; Eats up all memory then fail
+                   #~((add-after 'skip-more-tests 'skip-T16992-aarch64
+                        (lambda _
+                          (substitute* "libraries/ghc-compact/tests/all.T"
+                            (("^test\\('T16992', \\[" all)
+                             (string-append all "when(arch('aarch64'), skip), ")))))
+                      ;; The RTS linker does not find __aarch64_*_sync symbols,
+                      ;; Fixed in 9.12 :
+                      ;; https://gitlab.haskell.org/ghc/ghc/-/commit/7db8c9927fae3369fc4ecff68f80c4cb32eea757
+                      (add-before 'configure 'no-outline-atomics
+                        (lambda _
+                          (with-output-to-file "mk/build.mk"
+                            (lambda ()
+                              (display "
+SRC_HC_OPTS += -optc-mno-outline-atomics
+            "))))))
+                   '())))
+        ;; Increase verbosity, so running the test suite does not time out on CI.
+        ((#:make-flags make-flags ''())
+         #~(cons "VERBOSE=4" #$make-flags))))
+    ;; We need llvm until 9.2 which introduce aarch64 native code generation.
+    ;; Make sure you have installed LLVM between [9 and 13)
+    (inputs (list llvm-12 gmp ncurses libffi))
     (native-inputs
      `(;; GHC 9.0.2 must be built with GHC >= 8.8
-       ("ghc-bootstrap" ,ghc-8.10)
+       ("ghc-bootstrap" ,(if (target-aarch64?)
+                           binary-ghc-8.10.7
+                           ghc-8.10))
        ("ghc-testsuite"
         ,(origin
            (method url-fetch)
@@ -1648,6 +1684,7 @@ interactive environment for the functional language Haskell.")
                    (("ghc-testsuite" . _) #f)
                    (_ #t))
                  (package-native-inputs ghc-8.10))))
+    (properties '((max-silent-time . 36000))) ; 10 hours, for i686.
     (native-search-paths
      (list (search-path-specification
             (variable "GHC_PACKAGE_PATH")
