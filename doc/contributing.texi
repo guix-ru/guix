@@ -1128,20 +1128,21 @@ needed is to review and apply the patch.
 
 
 @menu
-* Software Freedom::            What may go into the distribution.
-* Package Naming::              What's in a name?
-* Version Numbers::             When the name is not enough.
-* Synopses and Descriptions::   Helping users find the right package.
-* Snippets versus Phases::      Whether to use a snippet, or a build phase.
-* Cyclic Module Dependencies::  Going full circle.
-* Bulk Updates::                This Little Maneuver's Gonna Cost Us 51 Years.
-* Emacs Packages::              Your Elisp fix.
-* Python Modules::              A touch of British comedy.
-* Perl Modules::                Little pearls.
-* Java Packages::               Coffee break.
-* Rust Crates::                 Beware of oxidation.
-* Elm Packages::                Trees of browser code
-* Fonts::                       Fond of fonts.
+* Software Freedom::                 What may go into the distribution.
+* Extracting Bundled Dependencies::  Why do we unbundle dependencies.
+* Package Naming::                   What's in a name?
+* Version Numbers::                  When the name is not enough.
+* Synopses and Descriptions::        Helping users find the right package.
+* Snippets versus Phases::           Whether to use a snippet, or a build phase.
+* Cyclic Module Dependencies::       Going full circle.
+* Bulk Updates::                     This Little Maneuver's Gonna Cost Us 51 Years.
+* Emacs Packages::                   Your Elisp fix.
+* Python Modules::                   A touch of British comedy.
+* Perl Modules::                     Little pearls.
+* Java Packages::                    Coffee break.
+* Rust Crates::                      Beware of oxidation.
+* Elm Packages::                     Trees of browser code
+* Fonts::                            Fond of fonts.
 @end menu
 
 @node Software Freedom
@@ -1171,6 +1172,68 @@ package (@pxref{Defining Packages}).  This way, @code{guix
 build --source} returns the ``freed'' source rather than the unmodified
 upstream source.
 
+@node Extracting Bundled Dependencies
+@subsection Extracting Bundled Dependencies
+@cindex bundling
+@cindex vendoring
+@cindex bundled dependencies
+@cindex vendored dependencies
+
+In Guix every package is supposed to be fully built from source
+(@pxref{Bootstrapping}).  This is at the heart of the security and user
+freedom guarantees provided by the distribution, and it is what allows
+Guix to correctly reason about the package graph, to apply transversal
+changes (say, a security update on a single library) and have them
+propagate to every dependent package.
+
+Some projects have the habit of distributing the source code of their
+dependencies inside their release tarball or version controlled source
+tree. This practice is called @dfn{bundling} and the dependencies
+shipped this way are called @dfn{bundled dependencies} or in some cases
+@dfn{vendored dependencies}.  Common manifestations are a @file{vendor/}
+directory in Go projects, a checked in @file{node_modules/} for
+JavaScript, a populated @file{.cargo/vendor/} for Rust, or copies of
+small C libraries shipped inside another project's tree.
+
+Bundling dependencies conflicts with several Guix invariants:
+
+@itemize
+@item When a change must be made in a library---e.g., applying a security fix
+or removing pre-generated code---that change would need to be repeated
+in every single package that bundles it.
+@item Guix mainline ships only free software: bundled trees frequently contain
+minified blobs whose preferred form for modification is missing
+(@pxref{Software Freedom}).
+@item Duplicated source code inflates the closure size and makes
+@command{guix size} (@pxref{Invoking guix size}) and @command{guix
+graph} (@pxref{Invoking guix graph}) less useful as auditing tools.
+@end itemize
+
+For these reasons, we do our best to remove bundled dependencies before
+submitting a package.
+
+@subsubheading Removing Bundled Code
+
+Bundled dependencies should be removed in the package's @code{origin}
+record, typically using a snippet or a patch, so that the source
+returned by @command{guix build --source} corresponds to truly free,
+unbundled sources (@pxref{Snippets versus Phases}).  When the removal is
+more involved, for example because it requires regenerating build files
+or rewriting import paths, it is acceptable to do it in a build phase
+instead.
+
+Once the bundled tree is gone, the package must be built against
+existing Guix packages of the same dependencies.  When such packages do
+not yet exist, they must be added.
+
+@subsubheading Exceptions
+
+Removing bundled code is the rule, but in case a bundled dependency has
+been changed up to the point that it isn't possible to build a package
+with the unbundled version of the dependency, it can be considered as
+part of the source tree it lives in. In general we don't care about
+upstream's reason for bundling, only the practicality of the unbundling
+job.
 
 @node Package Naming
 @subsection Package Naming
