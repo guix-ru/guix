@@ -145,40 +145,53 @@
         (search-patches
          "abcl-fix-build-xml.patch"))))
     (build-system ant-build-system)
+    (arguments
+     (list
+      #:build-target "abcl.jar"
+      #:test-target "abcl.test"
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'install
+            (lambda* (#:key inputs native-inputs #:allow-other-keys)
+              (let ((share (string-append #$output "/share/java/"))
+                    (bin (string-append #$output "/bin/")))
+                (mkdir-p share)
+                (install-file "dist/abcl.jar" share)
+                (install-file "dist/abcl-contrib.jar" share)
+                (mkdir-p bin)
+                (with-output-to-file (string-append bin "abcl")
+                  (lambda _
+                    (let ((bin-bash
+                           (search-input-file (or inputs native-inputs) "/bin/bash"))
+                          (bin-java
+                           (search-input-file (or inputs native-inputs) "/bin/java"))
+                          (classpath (string-append
+                                      share "abcl.jar"
+                                      ":"
+                                      share "abcl-contrib.jar")))
+
+                      (format #t
+                              "\
+#!~a
+if [[ -z ${CLASSPATH} ]];
+then
+  classpath=\"~a\"
+else
+  classpath=\"~a:${CLASSPATH}\"
+fi
+exec ~a -cp ${classpath} org.armedbear.lisp.Main \"$@\"
+"
+                              bin-bash
+                              classpath
+                              classpath
+                              bin-java))))
+                (chmod (string-append bin "abcl") #o755)))))))
     (native-inputs
      (list java-junit))
-    (arguments
-     `(#:build-target "abcl.jar"
-       #:test-target "abcl.test"
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((share (string-append (assoc-ref outputs "out")
-                                         "/share/java/"))
-                   (bin (string-append (assoc-ref outputs "out")
-                                       "/bin/")))
-               (mkdir-p share)
-               (install-file "dist/abcl.jar" share)
-               (install-file "dist/abcl-contrib.jar" share)
-               (mkdir-p bin)
-               (with-output-to-file (string-append bin "abcl")
-                 (lambda _
-                   (let ((classpath (string-append
-                                     share "abcl.jar"
-                                     ":"
-                                     share "abcl-contrib.jar")))
-                     (display (string-append
-                               "#!" (which "bash") "\n"
-                               "if [[ -z $CLASSPATH ]]; then\n"
-                               "  cp=\"" classpath "\"\n"
-                               "else\n"
-                               "  cp=\"" classpath ":$CLASSPATH\"\n"
-                               "fi\n"
-                               "exec " (which "java")
-                               " -cp \"$cp\" org.armedbear.lisp.Main \"$@\"\n")))))
-               (chmod (string-append bin "abcl") #o755)
-               #t))))))
+    (native-search-paths
+     (list (search-path-specification
+             (variable "XDG_DATA_DIRS")
+             (files '("share")))))
     (home-page "https://abcl.org/")
     (synopsis "Common Lisp Implementation on the JVM")
     (description
@@ -187,10 +200,6 @@ Common Lisp language featuring both an interpreter and a compiler, running in
 the JVM.  It supports JSR-223 (Java scripting API): it can be a scripting
 engine in any Java application.  Additionally, it can be used to
 implement (parts of) the application using Java to Lisp integration APIs.")
-    (native-search-paths
-     (list (search-path-specification
-             (variable "XDG_DATA_DIRS")
-             (files '("share")))))
     (license
      (list license:gpl2+
            license:bsd-3                ; named-readtables
