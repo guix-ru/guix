@@ -60201,20 +60201,20 @@ calculate a dimension's unknown value from other dimensions' measurements.")
 (define-public r-sungeo
   (package
     (name "r-sungeo")
-    (version "1.3.0")
+    (version "1.4.0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "SUNGEO" version))
               (sha256
                (base32
-                "0ydwsrgqknngx7567xwfhwj1jdmi4ip1jxkb5jdy41f7ysy1myd0"))))
+                "061p72x8hig5vnjyiphwxdbfjmvf8q26447lcrg9qcb6qdk2fwq6"))))
     (properties `((upstream-name . "SUNGEO")))
     (build-system r-build-system)
     (native-inputs
      (list r-codetools)) ;recommended package for checking field assignments
     (propagated-inputs
-     (list r-automap
-           r-cartogram
+     (list r-cartogram
+           r-curl
            r-data-table
            r-dplyr
            r-httr
@@ -60223,9 +60223,7 @@ calculate a dimension's unknown value from other dimensions' measurements.")
            r-packcircles
            r-purrr
            r-rann
-           r-raster
            r-rcpp
-           r-rcurl
            r-rlang
            r-rmapshaper
            r-sf
