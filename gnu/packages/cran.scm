@@ -13641,6 +13641,41 @@ parameter estimation by GCV, REML or UBRE/AIC.  The library includes a
 distributions beyond the exponential family.")
     (license license:gpl2+)))
 
+(define-public r-mgcviz
+  (package
+    (name "r-mgcviz")
+    (version "0.2.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "mgcViz" version))
+       (sha256
+        (base32 "0wr9nch5yd6ygcpqn4zx49v52i2qv4d9p7c8aykkafj5sbn73v42"))))
+    (properties `((upstream-name . "mgcViz")))
+    (build-system r-build-system)
+    (propagated-inputs (list r-gamm4
+                             r-ggally
+                             r-ggplot2
+                             r-gridextra
+                             r-kernsmooth
+                             r-matrixstats
+                             r-mgcv
+                             r-plyr
+                             r-qgam
+                             r-viridis))
+    (native-inputs (list r-knitr r-mass r-testthat))
+    (home-page "https://github.com/mfasiolo/mgcViz")
+    (synopsis "Visualizations for generalized additive models")
+    (description
+     "This is an extension of the mgcv package, providing visual tools for
+Generalized Additive Models that exploit the additive structure of such
+models, scale to large data sets and can be used in conjunction with a wide
+range of response distributions.  The focus is providing visual methods for
+better understanding the model output and for aiding model checking and
+development beyond simple exponential family regression.  The graphical
+framework is based on the layering system provided by ggplot2'.")
+    (license license:gpl3)))
+
 (define-public r-micsr
   (package
     (name "r-micsr")
