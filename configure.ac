@@ -14,7 +14,7 @@
 # Copyright © 2018 nikita <nikita@n0.is>
 # Copyright © 2018, 2021 Julien Lepiller <julien@lepiller.eu>
 # Copyright © 2017-2018 Eric Bavier <bavier@posteo.net>
-# Copyright © 2020-2021, 2023-204 Maxim Cournoyer <maxim@guixotic.coop>
+# Copyright © 2020-2021, 2023-2024 Maxim Cournoyer <maxim@guixotic.coop>
 # Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
 # Copyright © 2024 gemmaro <gemmaro.dev@gmail.com>
 
@@ -331,5 +331,10 @@ AC_CONFIG_FILES([etc/committer.scm], [chmod +x etc/committer.scm])
 AC_CONFIG_FILES([test-env:build-aux/test-env.in], [chmod +x test-env])
 AC_CONFIG_FILES([pre-inst-env:build-aux/pre-inst-env.in],
   [chmod +x pre-inst-env])
+
+dnl Automake trips on Make conditionals (see:
+dnl <https://lists.gnu.org/archive/html/bug-automake/2001-11/msg00015.html>)
+ENDIF=endif
+AC_SUBST(ENDIF)
 
 AC_OUTPUT

@@ -14,7 +14,7 @@
 # Copyright © 2018 Oleg Pykhalov <go.wigust@gmail.com>
 # Copyright © 2018 Alex Vong <alexvong1995@gmail.com>
 # Copyright © 2019, 2023 Efraim Flashner <efraim@flashner.co.il>
-# Copyright © 2020, 2021, 2023, 2025, 2026 Maxim Cournoyer <maxim@guixotic.coop>
+# Copyright © 2020, 2021, 2023, 2025-2026 Maxim Cournoyer <maxim@guixotic.coop>
 # Copyright © 2021 Chris Marusich <cmmarusich@gmail.com>
 # Copyright © 2021 Andrew Tropin <andrew@trop.in>
 # Copyright © 2023 Clément Lassieur <clement@lassieur.org>
@@ -1269,22 +1269,48 @@ cuirass-jobs: $(GOBJECTS)
 
 if in_git_p
 # Git auto-configuration.
-
-# Note: the following git commands may fail and produce empty variables,
-# e.g. when working on a work tree in a container.
+GIT_CORE_HOOKS_PATH := $(shell git config --global core.hooksPath 2>/dev/null)
 GIT_HOOKS_DIR := $(shell git rev-parse --git-path hooks 2>/dev/null)
 GIT_CONFIG_FILE := $(shell git rev-parse --git-path config 2>/dev/null)
+
+# Produce a warning/hint in cases where the Guix-provided hooks won't be
+# installed.  Need some empty variable trickery as Automake strips extra blank
+# lines for some reason.
+override EMPTY :=
+define NL
+
+$(EMPTY)
+endef
+
+ifneq ($(GIT_CORE_HOOKS_PATH),)
+$(warning Not installing Guix-provided git hooks; global hooks path set$(NL)$\
+	  Hint: unset global git hooks path)
+@ENDIF@
+
+ifeq ($(GIT_HOOKS_DIR),)
+$(warning Not installing Guix-provided git hooks; hooks dir not found$(NL)$\
+          Hint: avoid containerized environment when using a git worktree)
+@ENDIF@
+
+ifeq ($(GIT_CONFIG_FILE),)
+$(warning Not installing Guix-provided git configurations; \
+          git config file not found$(NL)$\
+          Hint: avoid containerized environment when using a git worktree)
+@ENDIF@
+
 $(GIT_HOOKS_DIR):
 	if [ -n "$(GIT_HOOKS_DIR)" ]; then mkdir -p "$@"; fi
 
 $(GIT_HOOKS_DIR)/%: etc/git/% | $(GIT_HOOKS_DIR)/
 	if [ -n "$(GIT_HOOKS_DIR)" ]; then cp "$<" "$@"; fi
 
+git_hooks_checks = [ -n "$(GIT_HOOKS_DIR)" ] && [ -z "$(GIT_CORE_HOOKS_PATH)" ]
+
 # Special-case the pre-push hook installation, to ensure it is always
 # up-to-date with its source.
 .PHONY: $(GIT_HOOKS_DIR)/pre-push
 $(GIT_HOOKS_DIR)/pre-push: etc/git/pre-push | $(GIT_HOOKS_DIR)
-	@if [ -n "$(GIT_HOOKS_DIR)" ]; then \
+	@if $(git_hooks_checks); then \
 	  cmp "--silent" "$<" "$@" || cp "$<" "$@"; \
 	fi
 
