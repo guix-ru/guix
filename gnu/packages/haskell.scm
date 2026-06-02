@@ -1888,6 +1888,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
     (package
       (name "ghc")
       (version "9.8.1")
+      (supported-systems '("i686-linux" "x86_64-linux" "aarch64-linux"))
       (source (origin
                 (method url-fetch)
                 (uri (string-append "https://downloads.haskell.org/~ghc/" version
