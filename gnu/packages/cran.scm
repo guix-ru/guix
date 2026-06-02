@@ -13413,17 +13413,17 @@ high-dimensional data.")
 (define-public r-mc2d
   (package
     (name "r-mc2d")
-    (version "0.2.1")
+    (version "0.2.2")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "mc2d" version))
               (sha256
                (base32
-                "06kva55vm2cldd95caw5hfx0xjadyhgkqi0y9pyz7hs3zg0zq9xy"))))
+                "019as95dz6l1h3qq4smaaax99mwy4f6l49w44sg0iw59i8p5r96y"))))
     (properties `((upstream-name . "mc2d")))
     (build-system r-build-system)
     (propagated-inputs (list r-ggplot2 r-ggpubr r-mvtnorm))
-    (native-inputs (list r-testthat))
+    (native-inputs (list r-knitr r-testthat))
     (home-page "https://cran.r-project.org/package=mc2d")
     (synopsis "Tools for two-dimensional monte-carlo simulations")
     (description
