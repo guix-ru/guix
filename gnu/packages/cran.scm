@@ -4174,13 +4174,13 @@ various statistical models with linear predictors.")
 (define-public r-eha
   (package
     (name "r-eha")
-    (version "2.11.5")
+    (version "2.12.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "eha" version))
        (sha256
-        (base32 "0ps8a5q47m2yd67hap7886dwanlqlsdx1v2nh3immq61ym9zbrpv"))))
+        (base32 "0b763637rnxynmscwkq8hbpwgv6jivv1m5am2ybd1a4xk06gqcpa"))))
     (properties `((upstream-name . "eha")))
     (build-system r-build-system)
     (propagated-inputs (list r-survival))
