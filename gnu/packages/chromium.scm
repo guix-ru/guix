@@ -99,7 +99,6 @@
     "third_party/boringssl" ;OpenSSL/ISC (Google additions are ISC)
     "third_party/boringssl/src/third_party/fiat" ;Expat
     "third_party/breakpad" ;BSD-3
-    "third_party/brotli" ;Expat
     "third_party/catapult" ;BSD-3
     "third_party/catapult/common/py_vulcanize/third_party/rcssmin" ;ASL2.0
     "third_party/catapult/common/py_vulcanize/third_party/rjsmin" ;ASL2.0
@@ -130,7 +129,6 @@
     "third_party/crashpad/crashpad/third_party/zlib" ;Zlib
     "third_party/crc32c" ;BSD-3
     "third_party/cros_system_api" ;BSD-3
-    "third_party/dav1d" ;BSD-2
     "third_party/dawn" ;ASL2.0
     ;; TODO: can likely be unbundled when Vulkan is updated.
     "third_party/dawn/third_party/EGL-Registry/src/sdk" ; ASL2.0
@@ -550,8 +548,8 @@
             (("#if defined\\(OFFICIAL_BUILD\\)")
              "#if 0"))
           (invoke "python" "build/linux/unbundle/replace_gn_files.py"
-                  "--system-libraries" "flac" "fontconfig" "freetype"
-                  "harfbuzz" "libdrm" "libjpeg" "libpng" "libwebp"
+                  "--system-libraries" "brotli" "dav1d" "flac" "fontconfig"
+                  "freetype" "harfbuzz" "libdrm" "libjpeg" "libpng" "libwebp"
                   "libxml" "libxslt" "openh264" "opus" "zlib" "zstd")))))
 
 (define opus+custom
@@ -724,7 +722,9 @@
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-stuff
             (lambda* (#:key inputs native-inputs #:allow-other-keys)
-              (let* ((libopenjp2 (search-input-file inputs "lib/libopenjp2.so"))
+              (let* ((brotli (search-input-file inputs
+                                                "/bin/brotli"))
+                     (libopenjp2 (search-input-file inputs "lib/libopenjp2.so"))
                      (openjpeg (dirname (dirname libopenjp2)))
                      (gperf (search-input-file (or native-inputs inputs)
                                                "/bin/gperf"))
@@ -732,6 +732,10 @@
                                         (dirname
                                          (search-input-file (or native-inputs inputs)
                                                             "/bin/hwasan_symbolize")))))
+                (substitute* "third_party/brotli/BUILD.gn"
+                  (("/usr/bin/brotli")
+                   brotli))
+
                 ;; This works on top of debian's 'rust-clanglib.patch'.
                 (substitute* "build/config/clang/BUILD.gn"
                   (("\\$clang_base_path/lib/clang/\\$clang_version")
@@ -1009,8 +1013,10 @@
      (list alsa-lib
            at-spi2-core
            bash-minimal
+           brotli
            cups
            curl
+           dav1d
            dbus
            expat
            flac
