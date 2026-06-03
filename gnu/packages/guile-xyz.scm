@@ -7885,6 +7885,67 @@ when using Guile Fibers.  This includes higher level concurrency utilities,
 support for timeouts and a web server.")
     (license license:gpl3+))))
 
+(define-public guile-kdl
+  (package
+    (name "guile-kdl")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/coopi/scheme-kdl")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "10kdvkif5scp0lriw0vlqhcq7hch6cvxccg41qz9rxg5s4gmrvyk"))))
+    (build-system guile-build-system)
+    (arguments
+     (list
+      #:scheme-file-regexp "^kdl\\.scm$" ;the library, not the tests
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Guile only loads and compiles ".scm"; rename the lone R7RS
+          ;; library so the build system picks it up.
+          (add-after 'unpack 'rename-library
+            (lambda _
+              (rename-file "kdl.sld" "kdl.scm")))
+          ;; guile-build-system drops the 'check phase; run the SRFI-64 suite
+          ;; ourselves.
+          (add-before 'install-documentation 'check
+            (lambda* (#:key inputs tests? #:allow-other-keys)
+              (when tests?
+                (let* ((effective (target-guile-effective-version))
+                       (go-dir    (string-append #$output "/lib/guile/"
+                                                 effective "/site-ccache"))
+                       (scm-dir   (string-append #$output "/share/guile/site/"
+                                                 effective)))
+                  (invoke "guile"
+                          "--no-auto-compile"
+                          "-L" scm-dir
+                          "-C" go-dir
+                          ;; SRFI-64 exits 0 even on failure, so report
+                          ;; failures through the exit status explicitly.
+                          "-c"
+                          (object->string
+                           `(begin
+                              (use-modules (srfi srfi-64))
+                              (let ((runner (test-runner-create)))
+                                (test-runner-factory (lambda () runner))
+                                (load ,(string-append (getcwd) "/kdl-tests.scm"))
+                                (exit (and (zero? (test-runner-fail-count runner))
+                                           (zero? (test-runner-xpass-count runner)))))))))))))))
+    (inputs (list guile-3.0))
+    (home-page "https://codeberg.org/coopi/scheme-kdl")
+    (synopsis "R7RS Scheme serialization library for the KDL document language")
+    (description
+     "This package provides an R7RS Scheme library that serializes Scheme data
+to the @uref{https://kdl.dev, KDL document language}, supporting both version
+1 and version 2 of the specification.  It models the KDL data model—nodes with
+ordered arguments, unordered properties, and nested children—as plain Scheme
+records and renders them to text.  KDL v2 is the default output dialect; KDL
+v1 output is available on request.")
+    (license license:agpl3+)))
+
 (define-public guile-kolam
   (package
     (name "guile-kolam")
