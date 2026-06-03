@@ -2555,6 +2555,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/tinyxml-CVE-2023-34194.patch		\
   %D%/packages/patches/tinyxml-use-stl.patch			\
   %D%/packages/patches/tk-find-library.patch			\
+  %D%/packages/patches/texmacs-fix-plugins-wrong-init.patch	\
   %D%/packages/patches/tla2tools-build-xml.patch		\
   %D%/packages/patches/tlf-support-hamlib-4.2+.patch		\
   %D%/packages/patches/tofi-32bit-compat.patch			\

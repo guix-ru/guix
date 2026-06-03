@@ -1,0 +1,184 @@
+Index: TeXmacs/progs/kernel/library/base.scm
+===================================================================
+--- TeXmacs/progs/kernel/library/base.scm	(revision 15487)
++++ TeXmacs/progs/kernel/library/base.scm	(working copy)
+@@ -325,7 +325,7 @@
+   (url->unix u))
+ 
+ (define-public (first-in-path . l)
+-  (cond ((null? l) "")
++  (cond ((null? l) #f)
+         ((url-exists-in-path? (car l)) (car l))
+         (else (apply first-in-path (cdr l)))))
+ 
+Index: plugins/asymptote/progs/init-asymptote.scm
+===================================================================
+--- plugins/asymptote/progs/init-asymptote.scm	(revision 15487)
++++ plugins/asymptote/progs/init-asymptote.scm	(working copy)
+@@ -29,7 +29,7 @@
+   (:winpath "Asymptote" ".")
+   (:require (url-exists-in-path? "asy"))
+   (:require (python-command))
+-  (:launch ,(asy-launcher))
++  (:launch ,(and (python-command) (asy-launcher)))
+   (:serializer ,asy-serialize)
+   (:session "Asymptote")
+   (:scripts "Asymptote"))
+Index: plugins/dratex/progs/init-dratex.scm
+===================================================================
+--- plugins/dratex/progs/init-dratex.scm	(revision 15487)
++++ plugins/dratex/progs/init-dratex.scm	(working copy)
+@@ -29,6 +29,6 @@
+ (plugin-configure dratex
+   (:require (python-command))
+   (:require (url-exists-in-path? "latex"))
+-  (:launch ,(dratex-launcher))
++  (:launch ,(and (python-command) (dratex-launcher)))
+   (:serializer ,dratex-serialize)
+   (:session "DraTex"))
+Index: plugins/eukleides/progs/init-eukleides.scm
+===================================================================
+--- plugins/eukleides/progs/init-eukleides.scm	(revision 15487)
++++ plugins/eukleides/progs/init-eukleides.scm	(working copy)
+@@ -26,7 +26,7 @@
+ 
+ (plugin-configure eukleides
+   (:require (url-exists-in-path? "eukleides"))
+-  ,@(eukleides-launcher)
++  ,@(if (python-command) (eukleides-launcher) '())
+   (:serializer ,eukleides-serialize)
+   (:session "Eukleides")
+   (:scripts "Eukleides"))
+Index: plugins/gnuplot/progs/init-gnuplot.scm
+===================================================================
+--- plugins/gnuplot/progs/init-gnuplot.scm	(revision 15487)
++++ plugins/gnuplot/progs/init-gnuplot.scm	(working copy)
+@@ -31,8 +31,8 @@
+   (:winpath "gnuplot" "bin") ;; the first winpath has the highest priority
+   (:winpath "GNU Octave/Octave*/mingw64" "bin")
+   (:require (url-exists-in-path? "gnuplot"))
+-  (:require (url-exists-in-path? (python-command)))
+-  ,@(gnuplot-launcher)
++  (:require (and (python-command) (url-exists-in-path? (python-command))))
++  ,@(if (python-command) (gnuplot-launcher) '())
+   (:serializer ,gnuplot-serialize)
+   (:session "Gnuplot")
+   (:scripts "Gnuplot"))
+Index: plugins/graph/progs/init-graph.scm
+===================================================================
+--- plugins/graph/progs/init-graph.scm	(revision 15487)
++++ plugins/graph/progs/init-graph.scm	(working copy)
+@@ -26,6 +26,6 @@
+ 
+ (plugin-configure graph
+   (:require (python-command))
+-  (:launch ,(graph-launcher))
++  (:launch ,(and (python-command) (graph-launcher)))
+   (:serializer ,graph-serialize)
+   (:session "Graph"))
+Index: plugins/graphviz/progs/init-graphviz.scm
+===================================================================
+--- plugins/graphviz/progs/init-graphviz.scm	(revision 15487)
++++ plugins/graphviz/progs/init-graphviz.scm	(working copy)
+@@ -31,6 +31,6 @@
+   (:winpath "Graphviz" "bin")
+   (:require (url-exists-in-path? "dot"))
+   (:require (python-command))
+-  (:launch ,(graphviz-launcher))
++  (:launch ,(and (python-command) (graphviz-launcher)))
+   (:serializer ,graphviz-serialize)
+   (:session "Graphviz"))
+Index: plugins/jupyter/progs/init-jupyter.scm
+===================================================================
+--- plugins/jupyter/progs/init-jupyter.scm	(revision 15487)
++++ plugins/jupyter/progs/init-jupyter.scm	(working copy)
+@@ -18,8 +18,9 @@
+ ;; Communication with Jupyter
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
++
+ (tm-define (check-jupyter?)
+-  (and (url-exists-in-path? (python-command))
++  (and (python-command) (url-exists-in-path? (python-command))
+        (with cmd (string-append (python-command)
+                                 " -m pip show jupyter_client 2> /dev/null")
+          (> (string-length (var-eval-system cmd)) 10))))
+@@ -27,6 +28,8 @@
+ (plugin-configure jupyter  ;; defines supports-jupyter?
+   (:require (check-jupyter?)))
+ 
++(when (python-command)
++
+ (define (jupyter-find-kernels)
+   (let* ((u "$TEXMACS_PATH/plugins/jupyter/tm_jupyter/kernels.py")
+          (cmd (string-append (python-command) " " (system-url->string u)))
+@@ -129,3 +132,5 @@
+ 
+ (when (supports-jupyter?)
+   (import-from (jupyter-kernels)))
++
++)
+Index: plugins/plantuml/progs/init-plantuml.scm
+===================================================================
+--- plugins/plantuml/progs/init-plantuml.scm	(revision 15487)
++++ plugins/plantuml/progs/init-plantuml.scm	(working copy)
+@@ -30,7 +30,7 @@
+ (plugin-configure plantuml
+   (:require (url-exists-in-path? "plantuml"))
+   (:require (python-command))
+-  (:launch ,(plantuml-launcher))
++  (:launch ,(and (python-command) (plantuml-launcher)))
+   (:serializer ,plantuml-serialize)
+   (:session "PlantUML"))
+ 
+Index: plugins/python/progs/init-python.scm
+===================================================================
+--- plugins/python/progs/init-python.scm	(revision 15487)
++++ plugins/python/progs/init-python.scm	(working copy)
+@@ -54,7 +54,7 @@
+   (:winpath "Python*" ".")
+   (:winpath "Python/Python*" ".")
+   (:require (python-command))
+-  (:launch ,(python-launcher))
++  (:launch ,(and (python-command) (python-launcher)))
+   (:preferences (supports-jupyter?))
+   (:tab-completion #t)
+   (:serializer ,python-serialize)
+Index: plugins/sympy/progs/init-sympy.scm
+===================================================================
+--- plugins/sympy/progs/init-sympy.scm	(revision 15487)
++++ plugins/sympy/progs/init-sympy.scm	(working copy)
+@@ -27,7 +27,7 @@
+ 
+ (plugin-configure sympy
+   (:require (python-command))
+-  (:launch ,(sympy-launcher))
++  (:launch ,(and (python-command) (sympy-launcher)))
+   (:serializer ,sympy-serialize)
+   (:tab-completion #t)
+   (:session "SymPy"))
+Index: plugins/tikz/progs/init-tikz.scm
+===================================================================
+--- plugins/tikz/progs/init-tikz.scm	(revision 15487)
++++ plugins/tikz/progs/init-tikz.scm	(working copy)
+@@ -28,7 +28,7 @@
+ (plugin-configure tikz
+   (:require (python-command))
+   (:require (url-exists-in-path? "latex"))
+-  (:launch ,(tikz-launcher))
++  (:launch ,(and (python-command) (tikz-launcher)))
+   (:serializer ,tikz-serialize)
+   (:session "TikZ"))
+ 
+Index: plugins/xypic/progs/init-xypic.scm
+===================================================================
+--- plugins/xypic/progs/init-xypic.scm	(revision 15487)
++++ plugins/xypic/progs/init-xypic.scm	(working copy)
+@@ -34,6 +34,6 @@
+ (plugin-configure xypic
+   (:require (python-command))
+   (:require (xypic-exists?))
+-  (:launch ,(xypic-launcher))
++  (:launch ,(and (python-command) (xypic-launcher)))
+   (:serializer ,xypic-serialize)
+   (:session "XYpic"))

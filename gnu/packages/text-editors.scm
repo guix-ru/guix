@@ -1388,7 +1388,10 @@ interface with CI pipeline UIs.")
        (uri (string-append "https://www.texmacs.org/Download/ftp/tmftp/"
                            "source/TeXmacs-" version "-src.tar.gz"))
        (sha256
-        (base32 "0q3k0asf31mm2jl7fi7244sk6c9lprf434cj4c5h2ycfpayjg8dk"))))
+        (base32 "0q3k0asf31mm2jl7fi7244sk6c9lprf434cj4c5h2ycfpayjg8dk"))
+       (patches
+        (search-patches "texmacs-fix-plugins-wrong-init.patch"))
+       (patch-flags '("-p0"))))
     (build-system qt-build-system)
     (native-inputs
      (list pkg-config xdg-utils))       ;for xdg-icon-resource
