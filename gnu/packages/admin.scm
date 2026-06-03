@@ -3211,15 +3211,13 @@ specified directories.")
 (define-public ansible-core
   (package
     (name "ansible-core")
-    ;; XXX: Starting from 2.18.1, Ansible requires Python 3.11 or newer on the
-    ;; controller, this is the latest version supporting 3.10.
-    (version "2.17.7")
+    (version "2.21.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "ansible_core" version))
        (sha256
-        (base32 "1kysajyc0kh885dlba6aj0a2mnpcq06q09n3kcixdqn4sqsvgais"))))
+        (base32 "0m7lhxdahzm5bkx5hiiia4ykzj55m1s9mhyff9r1r7w4s7id1k18"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -3233,44 +3231,15 @@ specified directories.")
               "--num-workers" (number->string (parallel-job-count)))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'relax-requirements
-            (lambda _
-              (substitute* "requirements.txt"
-                ;; resolvelib >= 0.5.3, < 1.1.0
-                ((">= 0.5.3, < 1.1.0") ""))))
-          ;; Several ansible commands (ansible-config, ansible-console, etc.)
-          ;; are just symlinks to a single ansible executable.  The ansible
-          ;; executable behaves differently based on the value of sys.argv[0].
-          ;; This does not work well with our wrap phase, and therefore the
-          ;; following two phases are required as a workaround.
-          (add-after 'unpack 'hide-wrapping
-            (lambda _
-              ;; Overwrite sys.argv[0] to hide the wrapper script from it.
-              (substitute* "bin/ansible"
-                (("import traceback" all)
-                 (string-append all "
-import re
-sys.argv[0] = re.sub(r'\\.([^/]*)-real$', r'\\1', sys.argv[0])
-")))))
           (add-before 'build 'set-HOME
             (lambda _
               ;; Otherwise Ansible fails to create its config directory.
               (setenv "HOME" "/tmp")))
-          (add-after 'install 'replace-symlinks
-            (lambda _
-              ;; Replace symlinks with duplicate copies of the ansible
-              ;; executable so that sys.argv[0] has the correct value.
-              (with-directory-excursion (string-append #$output "/bin")
-                (for-each
-                 (lambda (ansible-symlink)
-                   (delete-file ansible-symlink)
-                   (copy-file "ansible" ansible-symlink))
-                 (scandir "." (lambda (x)
-                                (and (eq? 'symlink (stat:type (lstat x)))
-                                     (string-prefix? "ansible-" x)
-                                     (string=? "ansible" (readlink x)))))))))
           (add-after 'unpack 'patch-paths
             (lambda _
+              (substitute* "lib/ansible/_internal/_encryption/_crypt.py"
+                (("lib_so = ctypes\\.util\\.find_library\\(lib_config\\.name\\)")
+                 (string-append "lib_so = \"" #$(this-package-input "libxcrypt") "/lib/libcrypt.so.1\"")))
               (substitute* "lib/ansible/module_utils/compat/selinux.py"
                 (("libselinux.so.1" name)
                  (string-append #$(this-package-input "libselinux")
@@ -3287,11 +3256,12 @@ sys.argv[0] = re.sub(r'\\.([^/]*)-real$', r'\\1', sys.argv[0])
          (replace 'check
            (lambda* (#:key inputs outputs tests? test-flags #:allow-other-keys)
              (when tests?
+               (setenv "PYTHONPATH" (string-append "lib:test/lib:" (getenv "GUIX_PYTHONPATH")))
                ;; The test suite needs to be run with 'ansible-test', which
                ;; does some extra environment setup.  Taken from
                ;; https://raw.githubusercontent.com/ansible/ansible/\
                ;; devel/test/utils/shippable/shippable.sh.
-               (apply invoke "python" "bin/ansible-test" test-flags)))))))
+               (apply invoke "python" "test/lib/ansible_test/_util/target/cli/ansible_test_cli_stub.py" test-flags)))))))
     (native-inputs
      (list openssh
            openssl
@@ -3303,9 +3273,10 @@ sys.argv[0] = re.sub(r'\\.([^/]*)-real$', r'\\1', sys.argv[0])
            python-pytest-xdist
            python-pytz
            python-setuptools
-           python-wheel))
+           util-linux))
     (inputs                    ;optional dependencies captured in wrap scripts
      (list libselinux
+           libxcrypt
            sshpass))
     (propagated-inputs      ;core dependencies listed in egg-info/requires.txt
      (list python-cryptography
