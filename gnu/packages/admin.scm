@@ -3316,13 +3316,13 @@ provides the following commands:
 (define-public ansible
   (package
     (name "ansible")
-    (version "10.1.0")
+    (version "14.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "ansible" version))
        (sha256
-        (base32 "0apj783acx4jzkf3bnibn4y5jc6jd8ly7l0rdqq8f1jpgxal933x"))))
+        (base32 "10y0dy3xg33v2l4lfl3whyqldkf74q4jv88jj8697ghygd3vkk83"))))
     (build-system pyproject-build-system)
     (arguments
      (list
