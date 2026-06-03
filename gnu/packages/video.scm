@@ -2004,17 +2004,16 @@ audio/video codec library.")
 (define-public ffmpeg-6
   (package
     (inherit ffmpeg)
-    (version "6.1.4")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://ffmpeg.org/releases/ffmpeg-"
-                                  version ".tar.xz"))
-              (sha256
-               (base32
-                "061s10n1z2f5wbhvjv8b7rv14390nvbqmfdzmv6v2i1cfkay6cd2"))
-              (patches
-               (search-patches
-                "ffmpeg-add-av_stream_get_first_dts-for-chromium.patch"))))
+    (version "6.1.5")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
+                           ".tar.xz"))
+       (sha256
+        (base32 "04ll214qrdbjy7j945l9ca0v0jwxva8vzndibdha6ljl3zdykyq5"))
+       (patches (search-patches
+                 "ffmpeg-add-av_stream_get_first_dts-for-chromium.patch"))))
     (arguments
      (if (target-x86-32?)
          (substitute-keyword-arguments arguments
@@ -2022,11 +2021,10 @@ audio/video codec library.")
             #~(modify-phases #$phases
                 (add-before 'configure 'relax-gcc-14-strictness
                   (lambda _
-                    (setenv
-                     "CFLAGS"
-                     (string-append "-g -O2"
-                                    " -Wno-error=incompatible-pointer-types"
-                                    " -Wno-error=int-conversion")))))))
+                    (setenv "CFLAGS"
+                            (string-append "-g -O2"
+                             " -Wno-error=incompatible-pointer-types"
+                             " -Wno-error=int-conversion")))))))
          (package-arguments ffmpeg)))))
 
 (define-public ffmpeg-5
