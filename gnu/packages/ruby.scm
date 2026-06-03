@@ -271,7 +271,7 @@ a focus on simplicity and productivity.")
                  '())
              (list autoconf libyaml)))
     (inputs
-     (list readline openssl-1.1 libffi gdbm))
+     (list readline openssl-3.0 libffi gdbm))
     (propagated-inputs
      (list zlib))
     (native-search-paths
