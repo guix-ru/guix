@@ -10670,13 +10670,13 @@ rectangular dataset.")
 (define-public r-rarr
   (package
     (name "r-rarr")
-    (version "2.0.0")
+    (version "2.0.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "Rarr" version))
        (sha256
-        (base32 "1mygyari0xinmw7kiwb258z4f3qjkm4bvhjqm9hl89jc7qx356s0"))))
+        (base32 "1m8sgy7pfqpyf5ipjdzc1zgxsnz9k5jzxvhawk84csyz9azgy2wf"))))
     (properties `((upstream-name . "Rarr")))
     (build-system r-build-system)
     (arguments
