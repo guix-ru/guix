@@ -345,8 +345,8 @@ programs and other files depend.")
     (license license:bsd-3)))
 
 (define-public gn
-  (let ((commit "6e8dcdebbadf4f8aa75e6a4b6e0bdf89dce1513a")
-        (revision "2354"))            ;as returned by `git describe`, used below
+  (let ((commit "6f8c0328ee29c76e3566a216f2f0cf2992daa6ed")
+        (revision "2409"))            ;as returned by `git describe`, used below
     (package
       (name "gn")
       (version (git-version "0.0" revision commit))
@@ -356,7 +356,7 @@ programs and other files depend.")
                 (uri (git-reference (url home-page) (commit commit)))
                 (sha256
                  (base32
-                  "0yz38czmbc72q1hkiv3cwxqh2i8ji2vkkvvk5ws2cjplmn2vj0x9"))
+                  "1qc9d0q33p64q28vhpkl1v1fs712g5c9a5a9rz3gqil0xb8qmpim"))
                 (file-name (git-file-name name version))))
       (build-system gnu-build-system)
       (arguments
