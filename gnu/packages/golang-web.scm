@@ -68,6 +68,19 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;;
+;;; Golang modules (libraries) for Web related projects: HTML, CSS, SCSS,
+;;; JavaScript, JSON, Web-framework, REST-API or similar functionality; for
+;;; Network related projects: OSI layers implementation algorithms, MIME,
+;;; Email protocols implementations, and similar.  They may provide
+;;; executables and libraries, for which there are marked sections.
+
+;;;
+;;; Please: Try to add new module packages in alphabetic order.
+;;;
+;;; Code:
+
 (define-module (gnu packages golang-web)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
@@ -91,18 +104,6 @@
   #:use-module (gnu packages tls)
   #:use-module (gnu packages web))
 
-;;; Commentary:
-;;;
-;;; Golang modules (libraries) for Web related projects: HTML, CSS, SCSS,
-;;; JavaScript, JSON, Web-framework, REST-API or similar functionality; for
-;;; Network related projects: OSI layers implementation algorithms, MIME,
-;;; Email protocols implementations, and similar.  They may provide
-;;; executables and libraries, for which there are marked sections.
-
-;;;
-;;; Please: Try to add new module packages in alphabetic order.
-;;;
-;;; Code:
 
 ;;;
 ;;; Libraries:

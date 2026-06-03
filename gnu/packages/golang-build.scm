@@ -37,18 +37,6 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (gnu packages golang-build)
-  #:use-module ((guix licenses) #:prefix license:)
-  #:use-module (guix build-system go)
-  #:use-module (guix gexp)
-  #:use-module (guix git-download)
-  #:use-module (guix packages)
-  #:use-module (guix utils)
-  #:use-module (gnu packages)
-  #:use-module (gnu packages audio)
-  #:use-module (gnu packages gl)
-  #:use-module (gnu packages golang))
-
 ;;; Commentary:
 ;;;
 ;;; Modules (libraries) which are part of the Golang project but outside the
@@ -61,6 +49,19 @@
 ;;; Please: Try to add new module packages in alphabetic order.
 ;;;
 ;;; Code:
+
+(define-module (gnu packages golang-build)
+  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix build-system go)
+  #:use-module (guix gexp)
+  #:use-module (guix git-download)
+  #:use-module (guix packages)
+  #:use-module (guix utils)
+  #:use-module (gnu packages)
+  #:use-module (gnu packages audio)
+  #:use-module (gnu packages gl)
+  #:use-module (gnu packages golang))
+
 
 (define-public go-cel-dev-expr
   (package
