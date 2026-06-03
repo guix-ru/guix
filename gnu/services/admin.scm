@@ -21,6 +21,13 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;;
+;;; This module provides basic system administration tools: log rotation,
+;;; unattended upgrades, etc.
+;;;
+;;; Code:
+
 (define-module (gnu services admin)
   #:use-module (gnu system file-systems)
   #:use-module (gnu packages admin)
@@ -101,13 +108,6 @@
             resize-file-system-configuration-e2fsprogs
             resize-file-system-configuration-btrfs-progs
             resize-file-system-configuration-bcachefs-tools))
-
-;;; Commentary:
-;;;
-;;; This module provides basic system administration tools: log rotation,
-;;; unattended upgrades, etc.
-;;;
-;;; Code:
 
 
 ;;;

@@ -22,6 +22,12 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;;
+;;; Tools to evaluate build expressions within virtual machines.
+;;;
+;;; Code:
+
 (define-module (gnu system vm)
   #:use-module (guix config)
   #:use-module (guix store)
@@ -91,12 +97,6 @@
             common-qemu-options))
 
 
-;;; Commentary:
-;;;
-;;; Tools to evaluate build expressions within virtual machines.
-;;;
-;;; Code:
-
 ;; By default, the msize value is 8 KiB, which according to QEMU is
 ;; insufficient and would degrade performance.  The msize value should roughly
 ;; match the bandwidth of the system's IO (see:
