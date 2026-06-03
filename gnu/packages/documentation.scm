@@ -399,39 +399,6 @@ can generate rich and plain representations of docstrings, alongside
 additional metadata about the object to which the docstring belongs.")
     (license license:bsd-3)))
 
-(define-public scrollkeeper
-  (package
-    (name "scrollkeeper")
-    (version "0.3.14")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "mirror://sourceforge/scrollkeeper/scrollkeeper/"
-                           version "/scrollkeeper-" version ".tar.gz"))
-       (sha256
-        (base32 "1bfxwxc1ngh11v36z899sz9qam366r050fhkyb5adv65lb1x62sa"))))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:configure-flags
-       (list (string-append "--with-xml-catalog="
-                            (assoc-ref %build-inputs "docbook-xml")
-                            "/xml/dtd/docbook/catalog.xml"))))
-    (inputs
-     (list perl libxml2 libxslt
-           ;; The configure script checks for either version 4.2 or 4.1.2.
-           docbook-xml-4.2))
-    (native-inputs
-     (list intltool))
-    (home-page "https://scrollkeeper.sourceforge.net/")
-    (synopsis "Open Documentation Cataloging Project")
-    (description
-     "ScrollKeeper is a cataloging system for documentation.  It manages
-documentation metadata as specified by the Open Source Metadata Framework and
-provides a simple API to allow help browsers to find, sort, and search the
-document catalog.  It will also be able to communicate with catalog servers on
-the Net to search for documents which are not on the local system.")
-    (license license:lgpl2.1+)))
-
 (define-public zeal
   (package
     (name "zeal")
