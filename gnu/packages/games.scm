@@ -5935,22 +5935,31 @@ on the screen and keyboard to display letters.")
   (package
     (name "manaplus")
     (version "2.1.3.17")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append
-                    "https://repo.manaplus.org/manaplus/download/"
-                    version "/manaplus-" version ".tar.xz"))
-              (sha256
-               (base32
-                "0ggswsa3xq7lss3j4k7fyzn56sw7hlrwk744i3d9w0n4932nmlg8"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://repo.manaplus.org/manaplus/download/"
+             version "/manaplus-" version ".tar.xz"))
+       (sha256
+        (base32 "0ggswsa3xq7lss3j4k7fyzn56sw7hlrwk744i3d9w0n4932nmlg8"))))
     (build-system gnu-build-system)
     (arguments
-     (list #:configure-flags #~'("--with-sdl2")))
+     (list
+      #:configure-flags
+      #~(list "--with-sdl2")))
     (native-inputs
      (list pkg-config))
     (inputs
-     (list glu curl libxml2 mesa
-           sdl2 sdl2-image sdl2-mixer sdl2-net sdl2-ttf))
+     (list curl
+           glu
+           libxml2
+           mesa
+           sdl2
+           sdl2-image
+           sdl2-mixer
+           sdl2-net
+           sdl2-ttf))
     (home-page "https://manaplus.org")
     (synopsis "Client for 'The Mana World' and similar games")
     (description
