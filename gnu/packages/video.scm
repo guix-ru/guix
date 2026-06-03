@@ -1767,14 +1767,14 @@ operate properly.")
 (define-public ffmpeg
   (package
     (name "ffmpeg")
-    (version "8.0")
+    (version "8.1.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://ffmpeg.org/releases/ffmpeg-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "13kvs9rh5mp21gx64hdj0jlnz6q5c6spik8kh5q7fk6cnv61yxdj"))))
+                "1wzdaaf66233gbfkz07cbbk36qsz3f3n4x0108kg9648x7fkm1mn"))))
     (outputs '("out" "debug"))
     (build-system gnu-build-system)
     (inputs
@@ -1876,12 +1876,22 @@ operate properly.")
       ;;   --enable-libzvbi         enable teletext support via libzvbi [no]
       ;;   --enable-opencl          enable OpenCL code
       #~(list
-         #$@(if (target-powerpc?)
-                ;; These tests fail on powerpc64-le (see:
-                ;; https://trac.ffmpeg.org/ticket/9604).
-                '("--ignore-tests=checkasm-sw_scale,\
-filter-scale2ref_keep_aspect,sws-floatimg-cmp")
-                '())
+         #$(let ((ignored-tests
+                  ;; Ignore frei0r tests, because frei0r is an optional
+                  ;; runtime dependency and therefore not present at build
+                  ;; time.
+                  (append
+                   (list "filter-frei0r-filter"
+                         "filter-frei0r-filter-unaligned")
+                   (if (target-powerpc?)
+                       ;; These tests fail on powerpc64-le (see:
+                       ;; https://trac.ffmpeg.org/ticket/9604).
+                       '("checkasm-sw_scale"
+                         "filter-scale2ref_keep_aspect"
+                         "sws-floatimg-cmp")
+                       '()))))
+             (string-append "--ignore-tests="
+                            (string-join ignored-tests ",")))
          "--enable-gpl"                 ;enable optional gpl licensed parts
          "--enable-shared"
          "--enable-frei0r"
