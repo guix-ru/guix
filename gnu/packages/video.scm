@@ -3942,6 +3942,32 @@ capabilities.")
        (sha256
         (base32 "1gckysv75dq5vd6q40wzlb269lfdil2h3p5dvzqck9k63w36j5m7"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-to-standard-directories
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let ((vapoursynth (string-append (site-packages inputs outputs)
+                                                "/vapoursynth")))
+
+                ;; Add a copy of the headers to the standard location.
+                (mkdir-p (string-append #$output "/include"))
+                (for-each (lambda (file)
+                            (link file
+                                  (string-append #$output "/include/"
+                                                 (basename file))))
+                          (find-files (string-append vapoursynth "/include")))
+
+                ;; Install a second pkgconfig file at the standard location
+                ;; pointing to the location where the files were installed.
+                (install-file (string-append vapoursynth
+                                             "/pkgconfig/vapoursynth.pc")
+                              (string-append #$output "/lib/pkgconfig"))
+                (substitute* (string-append #$output
+                                            "/lib/pkgconfig/vapoursynth.pc")
+                  (("prefix=.*")
+                   (string-append "prefix=" vapoursynth "\n")))))))))
     (native-inputs
      (list python-meson python-pytest pkg-config))
     (inputs
