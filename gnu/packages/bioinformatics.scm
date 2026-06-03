@@ -15863,42 +15863,6 @@ adapter trimming as well as quality control, with some added functionality to
 remove biased methylation positions for RRBS sequence files.")
     (license license:gpl3+)))
 
-(define-public phylip
-  (package
-    (name "phylip")
-    (version "3.697")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "http://evolution.gs.washington.edu/phylip/"
-                           "download/phylip-" version ".tar.gz"))
-       (sha256
-        (base32
-         "1h8h0nafnlbqryswxgplx80k2044yhfz97jh13vsgzlaifqdh9ls"))))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:tests? #f                      ; no check target
-       #:make-flags (list "-f" "Makefile.unx" "CFLAGS=-fcommon" "install")
-       #:parallel-build? #f             ; not supported
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'enter-dir
-           (lambda _ (chdir "src")))
-         (delete 'configure)
-         (replace 'install
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((target (string-append (assoc-ref outputs "out")
-                                          "/bin")))
-               (mkdir-p target)
-               (for-each (lambda (file)
-                           (install-file file target))
-                         (find-files "../exe" ".*"))))))))
-    (home-page "https://evolution.genetics.washington.edu/phylip/")
-    (synopsis "Tools for inferring phylogenies")
-    (description "PHYLIP (the PHYLogeny Inference Package) is a package of
-programs for inferring phylogenies (evolutionary trees).")
-    (license license:bsd-2)))
-
 (define-public phyml
   (package
     (name "phyml")
