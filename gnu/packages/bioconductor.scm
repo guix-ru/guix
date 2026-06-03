@@ -14023,13 +14023,13 @@ single-cell RNA-seq.")
 (define-public r-seqarray
   (package
     (name "r-seqarray")
-    (version "1.52.0")
+    (version "1.52.1")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "SeqArray" version))
               (sha256
                (base32
-                "1nk1xbm10057abm3x5f1z8p0pylr1rhcjbkjvrj0ks85m627i2wf"))))
+                "00sdj7xr8rlb22c51c1dbb0hfh1fza729ngmzhsdxi032asi10b0"))))
     (properties
      '((upstream-name . "SeqArray")
        (updater-extra-native-inputs . ("r-digest"))))
