@@ -124,9 +124,11 @@
 
             colord-service-type
 
-            kmonad-service-type
             kmonad-configuration
+            kmonad-configuration-keymaps
+            kmonad-configuration-kmonad
             kmonad-configuration?
+            kmonad-service-type
 
             geoclue-application
             geoclue-configuration

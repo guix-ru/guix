@@ -27657,22 +27657,28 @@ This is the type of the service that runs
 @uref{https://github.com/kmonad/kmonad, KMonad}.  Its value is a
 @code{kmonad-configuration} object.  This service allows spawning
 @command{kmonad} configurations to manage keyboards.
+@end defvar
+
+@c %start of fragment
 
 @deftp {Data Type} kmonad-configuration
-Configuration record for the KMonad service.
+Available @code{kmonad-configuration} fields are:
 
 @table @asis
-@item @code{kmonad} (default: @code{kmonad})
+@item @code{kmonad} (default: @code{kmonad}) (type: package)
 The KMonad package to use.
 
-@item @code{keymaps}
-A list of files with KMonad configurations. One shepherd service will be
-created to control each configuration. Each configuration should target
-a distinct input device as KMonad operates on a per-input basis.
+@item @code{keymaps} (default: @code{()}) (type: list-of-file-likes)
+A list of KMonad configurations (file-like objects).  See
+@uref{https://github.com/kmonad/kmonad/blob/master/keymap/tutorial.kbd,KMonad
+- Keymap Tutorial}
 
 @end table
+
 @end deftp
-@end defvar
+
+
+@c %end of fragment
 
 @defvar colord-service-type
 This is the type of the service that runs @command{colord}, a system
