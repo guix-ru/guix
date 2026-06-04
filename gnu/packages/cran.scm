@@ -15261,13 +15261,13 @@ efficiency.")
 (define-public r-depmixs4
   (package
     (name "r-depmixs4")
-    (version "1.5-1")
+    (version "1.5-2")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "depmixS4" version))
               (sha256
                (base32
-                "0dim05r9q97gamr2kviz2q4f67fhpvw5j8gf0prcg8nn64d3nw8j"))))
+                "0k8xbcsyygz9nsp3am066dz3dhfbl0ipfc1rgdzs1klcxv72nzdl"))))
     (propagated-inputs
      (list r-mass r-nlme r-nnet r-rsolnp))
     (native-inputs (list r-gamlss r-gamlss-dist))
