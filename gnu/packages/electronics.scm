@@ -58,6 +58,7 @@
 
 (define-module (gnu packages electronics)
   #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix build-system cargo)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system glib-or-gtk)
@@ -144,6 +145,8 @@
   #:use-module (gnu packages regex)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages ruby-xyz)
+  #:use-module (gnu packages rust-crates)
+  #:use-module (gnu packages rust-sources)
   #:use-module (gnu packages sdl)
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages shells)
@@ -4951,6 +4954,68 @@ Universal Hardware Data Model} compiler.  It provides IEEE design, a C/C++
 @acronym{VPI, Verilog Procedural Interface} and a Python @acronym{AST,
 Abstract Syntax Trees} API.")
     (license license:asl2.0)))
+
+(define-public surfer
+  (package
+    (name "surfer")
+    (version "0.7.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.com/surfer-project/surfer")
+             (commit (string-append "v" version))
+             ;; needed for f128 which seems bundled in later rust versions
+             ;; and instruction-decoder
+             (recursive? #t)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "146dah9j3rgwwkc331srvibphv3by5xf9yraz0hsaahscmd17vaq"))
+       (modules '((guix build utils)))
+       (snippet
+        '(begin
+           ;; The dependency is not available through crates.io.
+           ;; Add it manually.
+           (substitute* "libsurfer/Cargo.toml"
+             (("^egui_skia_renderer = .*$")
+              ""))))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:tests? #f ;No tests.
+      #:cargo-package-crates ''("surfer" "surver")
+      #:cargo-install-paths ''("surfer" "surver")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'wrap-graphical-libraries
+            (lambda* (#:key inputs #:allow-other-keys)
+              (for-each (lambda (lib)
+                          (wrap-program (string-append #$output "/bin/surfer")
+                            `("LD_LIBRARY_PATH" ":" prefix
+                              (,lib))))
+                        (map (lambda (pkg)
+                               (string-append (assoc-ref inputs pkg) "/lib"))
+                             '("libx11" "libxcursor" "libxi" "libxkbcommon"
+                               "mesa" "wayland"))))))))
+    (native-inputs (list pkg-config
+                         (list zstd "lib")))
+    (inputs (cons* bash-minimal
+                   libx11
+                   libxcursor
+                   libxi
+                   libxkbcommon
+                   mesa
+                   rust-egui-skia-renderer-source
+                   python
+                   wayland
+                   (cargo-inputs 'surfer)))
+    (home-page "https://surfer-project.org")
+    (synopsis "Waveform viewer")
+    (description
+     "Surfer is a waveform viewer used in @acronym{EDA, Electronic Design
+Automation} with a focus on usability and extensibility.")
+    (license license:eupl1.2)))
 
 (define-deprecated-package symbiyosys
   sby)

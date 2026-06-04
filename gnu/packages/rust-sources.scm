@@ -1636,3 +1636,13 @@ thumbnails to display untrusted content safely.")
      (description
       "This package provides a library for @code{xim}, the X input method.")
      (license license:expat))))
+
+(define-public rust-egui-skia-renderer-source
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://gitlab.com/oscargus/egui_skia_renderer.git")
+          (commit "36fe7b49a59a87f9d4b62533bd81e6e37139e9cd")))
+    (file-name "egui-skia-renderer-checkout")
+    (sha256
+     (base32 "0amn342y45ixnhkfh5vzl31drmz0dj5jairfmx2zdp3xznqbx1lv"))))
