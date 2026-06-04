@@ -208,6 +208,17 @@
       (($ <versioned-package> name version)
        (resolve-package name (string->semver-range version)))))
 
+  (define (github-hosted? url)
+    (let ((uri (string->uri url)))
+      (string=? "github.com" (uri-host uri))))
+
+  (define (sanitize-home-page-url url)
+    ;; Strip #readme from a github home page URL if any.
+    (if (and (github-hosted? url)
+             (string-suffix? "#readme" url))
+        (string-drop-right url 7)
+        url))
+
   (match npm-package
     (($ <package-revision>
         name version home-page dependencies dev-dependencies
@@ -215,7 +226,7 @@
      (let* ((name (npm-name->name name))
             (url (dist-tarball dist))
             (home-page (if (string? home-page)
-                           home-page
+                           (sanitize-home-page-url home-page)
                            (string-append %default-page "/" (uri-encode name))))
             (synopsis description)
             (resolved-deps (map resolve-spec
