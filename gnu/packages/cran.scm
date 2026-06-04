@@ -7678,13 +7678,13 @@ computations even in multithreaded code, typically using OpenMP.")
 (define-public r-rcurl
   (package
     (name "r-rcurl")
-    (version "1.98-1.18")
+    (version "1.98-1.19")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "RCurl" version))
               (sha256
                (base32
-                "0s6vxg26izfjly8jrd4xyvjk629riladlpwpk10s7ydq95x9wjsw"))))
+                "018j8dysq5pznnpyan984rh4x0wlg952pwcla3pxw8fsy0i06c2p"))))
     (properties `((upstream-name . "RCurl")))
     (build-system r-build-system)
     (arguments
