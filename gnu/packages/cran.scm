@@ -26226,19 +26226,19 @@ creation and manipulation of WAVE audio files.")
 (define-public r-np
   (package
     (name "r-np")
-    (version "0.70-2")
+    (version "0.70-3")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "np" version))
        (sha256
         (base32
-         "1w5hkp6nfbanp87v2dkpbx36mnd0pfqf8zr95krjrzxnmy2diq14"))))
+         "147s3v70pyw6sbay5ida8fzfx7829bhkym4xlk45nycg0wrkipqx"))))
     (build-system r-build-system)
     (propagated-inputs
-     (list r-boot r-cubature r-quadprog r-quantreg))
+     (list r-boot r-crs r-cubature r-quadprog r-quantreg))
     (native-inputs
-     (list r-crs r-knitr r-pkgload r-testthat r-withr))
+     (list r-knitr r-pkgload r-testthat r-withr))
     (home-page "https://github.com/JeffreyRacine/R-Package-np")
     (synopsis "Non-parametric kernel smoothing methods for mixed data types")
     (description "This package provides non-parametric (and semi-parametric)
