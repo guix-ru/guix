@@ -251,3 +251,31 @@ symbolic link to the @command{oyacc} command from the same-named package.")))
 Instead of using traditional table-driven approaches, it encodes a finite
 state machine directly in the code in the form of jumps and comparisons.")
     (license license:public-domain)))
+
+(define-public reflex
+  (package
+    (name "reflex")
+    (version "20260131")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://invisible-island.net/archives/reflex/reflex-"
+             version ".tgz"))
+       (sha256
+        (base32 "1ga82ycrfmfq6g3r8b8ixlhj82wnlwf9kibzhyivjfv26dgscldb"))
+       (snippet
+        #~(begin
+            (delete-file "configure")))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (list autoconf
+           automake
+           ;; Works with any POSIX yacc, but let's use a non-self-hosted one.
+           oyacc-as-yacc-wrapper))
+    (home-page "https://invisible-island.net/reflex/reflex.html")
+    (synopsis "Variant of flex lexical scanner")
+    (description
+     "Reflex is a POSIX-compatible variant of the @command{flex} lexical scanner
+generator.")
+    (license license:bsd-2)))
