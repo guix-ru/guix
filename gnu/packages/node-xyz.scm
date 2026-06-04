@@ -4089,49 +4089,54 @@ tablets.
 @end enumerate")
     (license license:bsd-3)))
 
-(define (node-types type version commit hash inputs)
+(define* (node-types type #:key
+                     ;; Note: Keep the default version/commit in sync with
+                     ;; that of our `node' package.
+                     (version "22.14.0")
+                     (commit "1f6ca6ff73af20b951f5ea6ecbea6668eff1750f")
+                     (inputs (delay '())))
   (package
     (name (string-append "node-types-" type))
     (version version)
-    (source (origin
-      (method git-fetch)
-      (uri (git-reference
-        (url "https://github.com/DefinitelyTyped/DefinitelyTyped")
-        (commit commit)))
-      (file-name (git-file-name name version))
-      (sha256 (base32 hash))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/DefinitelyTyped/DefinitelyTyped")
+              (commit commit)))
+       ;; Keep same name to avoid multiplying checkouts in store.
+       (file-name (git-file-name "node-definitelytyped" version))
+       (sha256
+        (base32 "05q0cj2b35z27fv1b00kr8ja5hj2dzl4shx1mwk0jg44z1cwkp0j"))))
     (build-system node-build-system)
     (inputs (force inputs))
-    (arguments (list
-      #:tests? #f ; Static files, no tests.
-      #:phases #~(modify-phases %standard-phases
-        (add-after 'unpack 'setup (lambda _
-          (chdir (string-append "types/" #$type))
-          (modify-json
-            (delete-dev-dependencies)
-            (replace-fields (list
-              (cons "version" #$version)))))))))
+    (arguments
+     (list
+      #:tests? #f                     ; Static files, no tests.
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'setup
+            (lambda _
+              (chdir (string-append "types/" #$type))
+              (modify-json
+               (delete-dev-dependencies)
+               (replace-fields (list
+                                (cons "version" #$version)))))))))
     (synopsis (string-append "TypeScript definitions for " type))
-    (description (string-append "Typescript definition files (*.d.ts) for '" type "'."))
+    (description (string-append "Typescript definition files (*.d.ts) for '"
+                                type "'."))
     (home-page (string-append
-      (git-reference-url (origin-uri source)) "/tree/master/types/" type))
+                (git-reference-url (origin-uri source))
+                "/tree/master/types/" type))
     (license license:expat)))
 
 (define-public node-types-node
-  (node-types
-    "node"
-    "22.14.0" ; Match with version of node used
-    "1f6ca6ff73af20b951f5ea6ecbea6668eff1750f"
-    "05q0cj2b35z27fv1b00kr8ja5hj2dzl4shx1mwk0jg44z1cwkp0j"
-    (delay (list node-undici-types))))
+  (node-types "node"
+              #:inputs (delay (list node-undici-types))))
 
 (define-public node-types-source-map-support
-  (node-types
-    "source-map-support"
-    "0.5.10"
-    "05766ab10a4987e93fdee7627f9fe9e7bc6d1a65"
-    "1p2kakd1mhcps5c19wl65w9gkafd13qdy9hszriak4xpad8a2nz7"
-    (delay (list node-source-map))))
+  (node-types "source-map-support"
+              #:inputs (delay (list node-source-map))))
 
 (define-public node-typescript
   (package
