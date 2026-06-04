@@ -298,8 +298,8 @@
                 `((inputs
                    (list ,@(map package-revision->symbol resolved-deps))))))
            (home-page ,home-page)
-           (synopsis ,synopsis)
-           (description ,description)
+           (synopsis ,(beautify-synopsis synopsis))
+           (description ,(beautify-description description))
            (license ,(if (list? license)
                          `(list ,@license)
                          license)))
