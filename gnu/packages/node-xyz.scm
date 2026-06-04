@@ -4137,6 +4137,9 @@ tablets.
   (node-types "node"
               #:inputs (delay (list node-undici-types))))
 
+(define-public node-types-json-schema
+  (node-types "json-schema"))
+
 (define-public node-types-source-map-support
   (node-types "source-map-support"
               #:inputs (delay (list node-source-map))))
