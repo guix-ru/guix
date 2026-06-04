@@ -7637,7 +7637,7 @@ after Andy Lester’s Perl module WWW::Mechanize.")
 (define-public python-mediapy
   (package
     (name "python-mediapy")
-    (version "1.2.2")
+    (version "1.2.6")
     (source
      (origin
        (method git-fetch)
@@ -7646,7 +7646,7 @@ after Andy Lester’s Perl module WWW::Mechanize.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "08dj0h7xkpaj552pzjln1chshxsfxbwhv29p2npsmscy907s322l"))))
+        (base32 "0gpbn1bqm6sp692fg7acs3l46xjr70frh3jv4cp3lbixfqmfb3lc"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -7657,7 +7657,7 @@ after Andy Lester’s Perl module WWW::Mechanize.")
              (substitute* "mediapy_test.py"
                (("'/bin/bash")
                 (string-append "'" (which "bash")))))))))
-    (inputs (list ffmpeg-5))
+    (inputs (list ffmpeg-6))
     (propagated-inputs (list python-absl-py
                              python-ipython
                              python-matplotlib
