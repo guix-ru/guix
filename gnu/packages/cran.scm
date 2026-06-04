@@ -38919,17 +38919,18 @@ parameters.")
 (define-public r-zim
   (package
     (name "r-zim")
-    (version "1.1.0")
+    (version "1.1.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "ZIM" version))
        (sha256
         (base32
-         "0scyfjn4ilsvha3x41c3b8bcfi31hlhwm77wn2a8hj5dsvnnmzig"))))
+         "0121y9gyp1dhgpx720kiy2fm6pgj8nqyc3sc9p5hkcxl0z9pn66j"))))
     (properties `((upstream-name . "ZIM")))
     (build-system r-build-system)
     (propagated-inputs (list r-mass))
+    (native-inputs (list r-knitr r-testthat))
     (home-page "https://github.com/biostatstudio/ZIM")
     (synopsis "Zero-inflated models (ZIM) for count time series with excess zeros")
     (description
