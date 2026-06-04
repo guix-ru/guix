@@ -1,5 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2024 Roman Scherer <roman@burningswell.com>
+;;; Copyright © 2026 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -17,7 +18,6 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (tests machine hetzner http)
-  #:use-module (debugging assert)
   #:use-module (gnu machine hetzner http)
   #:use-module (guix build utils)
   #:use-module (guix tests)
@@ -321,20 +321,21 @@
   (let ((actions (list action-create-server-alist action-delete-server-alist)))
     (mock ((gnu machine hetzner http) hetzner-api-request-send
            (lambda* (request #:key expected)
-             (assert (equal? 'GET (hetzner-api-request-method request)))
-             (assert (equal? "https://api.hetzner.cloud/v1/actions"
-                             (hetzner-api-request-url request)))
-             (assert (unspecified? (hetzner-api-request-body request)))
-             (assert (equal? `(("page" . 1)
+             (match (list (hetzner-api-request-method request)
+                          (hetzner-api-request-url request))
+               (('GET "https://api.hetzner.cloud/v1/actions")
+                (and (unspecified? (hetzner-api-request-body request))
+                     (equal? `(("page" . 1)
                                ("id" . ,(string-join
                                          (map (lambda (action)
                                                 (number->string (assoc-ref action "id")))
                                               actions)
                                          ",")))
-                             (hetzner-api-request-params request)))
-             (hetzner-api-response
-              (body `(("meta" . ,meta-page-alist)
-                      ("actions" . #(,action-create-server-alist ,action-delete-server-alist)))))))
+                             (hetzner-api-request-params request))
+                     (hetzner-api-response
+                      (body `(("meta" . ,meta-page-alist)
+                              ("actions" . #(,action-create-server-alist
+                                             ,action-delete-server-alist))))))))))
           (hetzner-api-actions (hetzner-api)
                                (map (lambda (action)
                                       (assoc-ref action "id"))
@@ -344,28 +345,30 @@
   (list location-falkenstein)
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (assert (equal? 'GET (hetzner-api-request-method request)))
-           (assert (equal? "https://api.hetzner.cloud/v1/locations"
-                           (hetzner-api-request-url request)))
-           (assert (unspecified? (hetzner-api-request-body request)))
-           (assert (equal? '(("page" . 1)) (hetzner-api-request-params request)))
-           (hetzner-api-response
-            (body `(("meta" . ,meta-page-alist)
-                    ("locations" . #(,location-falkenstein-alist)))))))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('GET "https://api.hetzner.cloud/v1/locations")
+              (and (unspecified? (hetzner-api-request-body request))
+                   (equal? '(("page" . 1))
+                           (hetzner-api-request-params request))
+                   (hetzner-api-response
+                    (body `(("meta" . ,meta-page-alist)
+                            ("locations" . #(,location-falkenstein-alist))))))))))
         (hetzner-api-locations (hetzner-api))))
 
 (test-equal "hetzner-api-server-types-unit"
   (list server-type-cpx-11)
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (assert (equal? 'GET (hetzner-api-request-method request)))
-           (assert (equal? "https://api.hetzner.cloud/v1/server_types"
-                           (hetzner-api-request-url request)))
-           (assert (unspecified? (hetzner-api-request-body request)))
-           (assert (equal? '(("page" . 1)) (hetzner-api-request-params request)))
-           (hetzner-api-response
-            (body `(("meta" . ,meta-page-alist)
-                    ("server_types" . #(,server-type-cpx-11-alist)))))))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('GET "https://api.hetzner.cloud/v1/server_types")
+              (and (unspecified? (hetzner-api-request-body request))
+                   (equal? '(("page" . 1))
+                           (hetzner-api-request-params request))
+                   (hetzner-api-response
+                    (body `(("meta" . ,meta-page-alist)
+                            ("server_types" . #(,server-type-cpx-11-alist))))))))))
         (hetzner-api-server-types (hetzner-api))))
 
 (test-equal "hetzner-api-server-create-unit"
@@ -400,15 +403,12 @@
    #(10 17 11 2 1 125 0 32 -1 0 #f) "success")
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (cond
-            ((equal? "https://api.hetzner.cloud/v1/servers/59570198"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'DELETE (hetzner-api-request-method request)))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+            (('DELETE "https://api.hetzner.cloud/v1/servers/59570198")
              (hetzner-api-response
               (body `(("action" . ,action-delete-server-alist)))))
-            ((equal? "https://api.hetzner.cloud/v1/actions"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'GET (hetzner-api-request-method request)))
+            (('GET "https://api.hetzner.cloud/v1/actions")
              (hetzner-api-response
               (body `(("actions" . ,(vector (cons `("status" . "success")
                                                   action-delete-server-alist)))
@@ -419,15 +419,13 @@
   action-enable-rescue
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (cond
-            ((equal? "https://api.hetzner.cloud/v1/servers/59570198/actions/enable_rescue"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'POST (hetzner-api-request-method request)))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+            (('POST
+              "https://api.hetzner.cloud/v1/servers/59570198/actions/enable_rescue")
              (hetzner-api-response
               (body `(("action" . ,action-enable-rescue-alist)))))
-            ((equal? "https://api.hetzner.cloud/v1/actions"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'GET (hetzner-api-request-method request)))
+            (('GET "https://api.hetzner.cloud/v1/actions")
              (hetzner-api-response
               (body `(("actions" . ,(vector (cons `("status" . "success")
                                                   action-enable-rescue-alist)))
@@ -439,15 +437,13 @@
   action-power-on
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (cond
-            ((equal? "https://api.hetzner.cloud/v1/servers/59570198/actions/poweron"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'POST (hetzner-api-request-method request)))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+            (('POST
+              "https://api.hetzner.cloud/v1/servers/59570198/actions/poweron")
              (hetzner-api-response
               (body `(("action" . ,action-power-on-alist)))))
-            ((equal? "https://api.hetzner.cloud/v1/actions"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'GET (hetzner-api-request-method request)))
+            (('GET "https://api.hetzner.cloud/v1/actions")
              (hetzner-api-response
               (body `(("actions" . ,(vector (cons `("status" . "success")
                                                   action-power-on-alist)))
@@ -458,15 +454,13 @@
   action-power-off
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (cond
-            ((equal? "https://api.hetzner.cloud/v1/servers/59570198/actions/poweroff"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'POST (hetzner-api-request-method request)))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+            (('POST
+              "https://api.hetzner.cloud/v1/servers/59570198/actions/poweroff")
              (hetzner-api-response
               (body `(("action" . ,action-power-off-alist)))))
-            ((equal? "https://api.hetzner.cloud/v1/actions"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'GET (hetzner-api-request-method request)))
+            (('GET "https://api.hetzner.cloud/v1/actions")
              (hetzner-api-response
               (body `(("actions" . ,(vector (cons `("status" . "success")
                                                   action-power-off-alist)))
@@ -477,15 +471,13 @@
   action-reboot
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (cond
-            ((equal? "https://api.hetzner.cloud/v1/servers/59570198/actions/reboot"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'POST (hetzner-api-request-method request)))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+            (('POST
+              "https://api.hetzner.cloud/v1/servers/59570198/actions/reboot")
              (hetzner-api-response
               (body `(("action" . ,action-reboot-alist)))))
-            ((equal? "https://api.hetzner.cloud/v1/actions"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'GET (hetzner-api-request-method request)))
+            (('GET "https://api.hetzner.cloud/v1/actions")
              (hetzner-api-response
               (body `(("actions" . ,(vector (cons `("status" . "success")
                                                   action-reboot-alist)))
@@ -505,16 +497,16 @@
   ssh-key-root
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (assert (equal? 'POST (hetzner-api-request-method request)))
-           (assert (equal? "https://api.hetzner.cloud/v1/ssh_keys"
-                           (hetzner-api-request-url request)))
-           (assert (equal? `(("name" . "guix-hetzner-api-test-key")
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('POST "https://api.hetzner.cloud/v1/ssh_keys")
+              (and (equal? `(("name" . "guix-hetzner-api-test-key")
                              ("public_key" . "ssh-ed25519 ABCAC3NzaC1lZDI1NTE5AAAAIBT3lLYPfOZV9NNrNk0jGCufWmXbFSz+ORxowJdHoSIM")
                              ("labels" . (("a" . "1"))))
-                           (hetzner-api-request-body request)))
-           (assert (equal? `() (hetzner-api-request-params request)))
-           (hetzner-api-response
-            (body `(("ssh_key" . ,ssh-key-root-alist))))))
+                           (hetzner-api-request-body request))
+                   (null? (hetzner-api-request-params request))
+                   (hetzner-api-response
+                    (body `(("ssh_key" . ,ssh-key-root-alist)))))))))
         (hetzner-api-ssh-key-create
          (hetzner-api)
          "guix-hetzner-api-test-key"
@@ -524,38 +516,40 @@
 (test-assert "hetzner-api-ssh-key-delete-unit"
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (assert (equal? "https://api.hetzner.cloud/v1/ssh_keys/16510983"
-                           (hetzner-api-request-url request)))
-           (assert (equal? 'DELETE (hetzner-api-request-method request)))
-           (hetzner-api-response)))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('DELETE "https://api.hetzner.cloud/v1/ssh_keys/16510983")
+              (hetzner-api-response)))))
         (hetzner-api-ssh-key-delete (hetzner-api) ssh-key-root)))
 
 (test-equal "hetzner-api-ssh-keys-unit"
   (list ssh-key-root)
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (assert (equal? 'GET (hetzner-api-request-method request)))
-           (assert (equal? "https://api.hetzner.cloud/v1/ssh_keys"
-                           (hetzner-api-request-url request)))
-           (assert (unspecified? (hetzner-api-request-body request)))
-           (assert (equal? '(("page" . 1)) (hetzner-api-request-params request)))
-           (hetzner-api-response
-            (body `(("meta" . ,meta-page-alist)
-                    ("ssh_keys" . #(,ssh-key-root-alist)))))))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('GET "https://api.hetzner.cloud/v1/ssh_keys")
+              (and (unspecified? (hetzner-api-request-body request))
+                   (equal? '(("page" . 1))
+                           (hetzner-api-request-params request))
+                   (hetzner-api-response
+                    (body `(("meta" . ,meta-page-alist)
+                            ("ssh_keys" . #(,ssh-key-root-alist))))))))))
         (hetzner-api-ssh-keys (hetzner-api))))
 
 (test-equal "hetzner-api-primary-ips-unit"
   (list primary-ip)
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (assert (equal? 'GET (hetzner-api-request-method request)))
-           (assert (equal? "https://api.hetzner.cloud/v1/primary_ips"
-                           (hetzner-api-request-url request)))
-           (assert (unspecified? (hetzner-api-request-body request)))
-           (assert (equal? '(("page" . 1)) (hetzner-api-request-params request)))
-           (hetzner-api-response
-            (body `(("meta" . ,meta-page-alist)
-                    ("primary_ips" . #(,primary-ip-alist)))))))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('GET "https://api.hetzner.cloud/v1/primary_ips")
+              (and (unspecified? (hetzner-api-request-body request))
+                   (equal? '(("page" . 1))
+                           (hetzner-api-request-params request))
+                   (hetzner-api-response
+                    (body `(("meta" . ,meta-page-alist)
+                            ("primary_ips" . #(,primary-ip-alist))))))))))
         (hetzner-api-primary-ips (hetzner-api))))
 
 ;; Integration tests
