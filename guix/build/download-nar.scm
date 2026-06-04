@@ -57,9 +57,11 @@ ITEM."
       (restore-file decompressed-port
                     item))))
 
-(define* (download-nar item #:optional (output item))
+(define* (download-nar item #:optional (output item)
+                       #:key (verify-certificate? #t))
   "Download and extract to OUTPUT the normalized archive for ITEM, a store
-item.  Return #t on success, #f otherwise."
+item.  Return #t on success, #f otherwise.  HTTPS certificates are verified
+when (and only when) VERIFY-CERTIFICATE? is true."
   ;; Let progress reports go through.
   (setvbuf (current-error-port) 'none)
   (setvbuf (current-output-port) 'none)
@@ -72,7 +74,8 @@ item.  Return #t on success, #f otherwise."
        (let-values (((port size)
                      (catch #t
                        (lambda ()
-                         (http-fetch (string->uri url)))
+                         (http-fetch (string->uri url)
+                                     #:verify-certificate? verify-certificate?))
                        (lambda (key . args)
                          (format #t "Unable to fetch from ~a, ~a: ~a~%"
                                  (uri-host (string->uri url))
