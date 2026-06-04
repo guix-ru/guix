@@ -117,7 +117,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                             #+(file-append fossil "/bin/fossil"))
                            (try other-download-methods)))
                       (('nar other-download-methods ...)
-                       (or (download-nar #$output)
+                       (or (download-nar #$output #:verify-certificate? #f)
                            (try other-download-methods)))
                       ((archive other-download-methods ...)
                        (or (fossil-fetch-url #$uri #$check-in #$output

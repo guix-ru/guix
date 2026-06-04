@@ -109,11 +109,11 @@
                              (getenv "hg ref changeset")
                              #$output
                              #:hg-command (string-append #+hg "/bin/hg")))
-              (and (download-method-enabled? 'nar)
-                   (download-nar #$output))
-              ;; As a last resort, attempt to download from Software Heritage.
               ;; Disable X.509 certificate verification to avoid depending
               ;; on nss-certs--we're authenticating the checkout anyway.
+              (and (download-method-enabled? 'nar)
+                   (download-nar #$output #:verify-certificate? #f))
+              ;; As a last resort, attempt to download from Software Heritage.
               (and (download-method-enabled? 'swh)
                    (parameterize ((%verify-swh-certificate? #f))
                      (format (current-error-port)

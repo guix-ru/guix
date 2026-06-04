@@ -91,7 +91,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                                   #:bzr-command
                                   (string-append #+bzr "/bin/brz"))))
                 (and (download-method-enabled? 'nar)
-                     (download-nar #$output)))))))
+                     (download-nar #$output #:verify-certificate? #f)))))))
 
   (mlet %store-monad ((guile (package->derivation guile system)))
     (gexp->derivation (or name "bzr-branch") build

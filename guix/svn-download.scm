@@ -123,7 +123,7 @@
                               #:user-name (getenv "svn user name")
                               #:password (getenv "svn password")))
               (and (download-method-enabled? 'nar)
-                   (download-nar #$output))
+                   (download-nar #$output #:verify-certificate? #f))
               (and (download-method-enabled? 'swh)
                    (parameterize ((%verify-swh-certificate? #f))
                      (swh-download-directory-by-nar-hash
@@ -257,7 +257,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                 (when (file-exists? #$output)
                   (delete-file-recursively #$output))
                 (or (and (download-method-enabled? 'nar)
-                         (download-nar #$output))
+                         (download-nar #$output #:verify-certificate? #f))
                     (and (download-method-enabled? 'swh)
                          ;; SWH keeps HASH as an ExtID for the combination
                          ;; of files/directories, which allows us to

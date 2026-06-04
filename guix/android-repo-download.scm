@@ -125,7 +125,7 @@ generic name if unset."
                                     #$output
                                     #:git-repo-command
                                     (string-append #+git-repo "/bin/repo"))
-                (download-nar #$output))))))
+                (download-nar #$output #:verify-certificate? #f))))))
 
   (mlet %store-monad ((guile (package->derivation guile system)))
     (gexp->derivation (or name "android-repo-checkout") build
