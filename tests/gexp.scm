@@ -282,9 +282,8 @@
                  port)))
 
     (let* ((interned (add-to-store %store "t.scm" #f "sha256" file)))
-      (module-use! module (resolve-interface '(guix gexp)))
       (equal? `(this file is ,interned)
-              (gexp->sexp* (load* file '()))))))
+              (gexp->sexp* (load* file '((guix gexp))))))))
 
 (test-assertm "local-file, #:select?"
   (mlet* %store-monad ((select? -> (lambda (file stat)
