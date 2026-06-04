@@ -24,7 +24,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-64)
-  #:use-module (ssh key))
+  #:use-module (ssh key)
+  #:use-module (ice-9 match))
 
 ;; Unit and integration tests the (gnu machine hetzner http) module.
 
@@ -371,20 +372,24 @@
   server-x86
   (mock ((gnu machine hetzner http) hetzner-api-request-send
          (lambda* (request #:key expected)
-           (cond
-            ((equal? "https://api.hetzner.cloud/v1/servers"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'POST (hetzner-api-request-method request)))
-             (hetzner-api-response
-              (body `(("action" . ,action-create-server-alist)
-                      ("server" . ,server-x86-alist)))))
-            ((equal? "https://api.hetzner.cloud/v1/actions"
-                     (hetzner-api-request-url request))
-             (assert (equal? 'GET (hetzner-api-request-method request)))
-             (hetzner-api-response
-              (body `(("actions" . ,(vector (cons `("status" . "success")
-                                                  action-create-server-alist)))
-                      ("meta" . ,meta-page-alist))))))))
+           (match (list (hetzner-api-request-method request)
+                        (hetzner-api-request-url request))
+             (('GET "https://api.hetzner.cloud/v1/images")
+              (hetzner-api-response
+               (body `(("images"
+                        . #((("id" . 123)
+                             ("created_from" . null)
+                             ("protection" . (("delete" . #t)))
+                             ("os_flavor" . "debian"))))))))
+             (('POST "https://api.hetzner.cloud/v1/servers")
+              (hetzner-api-response
+               (body `(("action" . ,action-create-server-alist)
+                       ("server" . ,server-x86-alist)))))
+             (('GET "https://api.hetzner.cloud/v1/actions")
+              (hetzner-api-response
+               (body `(("actions" . ,(vector (cons `("status" . "success")
+                                                   action-create-server-alist)))
+                       ("meta" . ,meta-page-alist))))))))
         (hetzner-api-server-create (hetzner-api) %server-name
                                    #:ssh-keys (list ssh-key-root))))
 
