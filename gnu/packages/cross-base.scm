@@ -31,6 +31,7 @@
   #:use-module (gnu packages avr)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages hurd)
   #:use-module (gnu packages mingw)
@@ -670,6 +671,7 @@ the base compiler.  Use XBINUTILS as the associated cross-Binutils."
                       (xgcc (cross-gcc target))
                       (xbinutils (cross-binutils target))
                       (xheaders (cross-kernel-headers target))
+                      (static-bash (static-bash-for-glibc target))
                       (with-winpthreads? #t))
   "Return LIBC cross-built for TARGET, a GNU triplet. Use XGCC and XBINUTILS
 and the cross tool chain.  If TARGET doesn't have a standard C library #f is
@@ -684,7 +686,8 @@ returned."
    ((or (? target-linux?) (? target-hurd?))
     (package
       (inherit libc)
-      (name (string-append "glibc-cross-" target))
+      (name (string-append "glibc-cross-" target
+                           (if static-bash "" "-intermediate")))
       (arguments
        (parameterize ((%current-target-system target))
          (substitute-keyword-arguments
@@ -725,7 +728,9 @@ returned."
       ;; Shadow the native "kernel-headers" because glibc's recipe expects the
       ;; "kernel-headers" input to point to the right thing.
       (propagated-inputs `(("kernel-headers" ,xheaders)))
-      (inputs '())
+      (inputs (if static-bash
+                  `(("static-bash" ,static-bash))
+                  '()))
       (native-inputs `(("cross-gcc" ,xgcc)
                        ("cross-binutils" ,xbinutils)
                        ,@(if (target-hurd? target)
@@ -734,12 +739,44 @@ returned."
                                             #:xgcc xgcc
                                             #:xbinutils xbinutils)))
                              '())
-                       ,@(package-inputs libc)
+                       ,@(if static-bash '() (package-inputs libc))
                        ,@(alist-delete "mig" (package-native-inputs libc))))))
    ((? target-avr?)
     (make-avr-libc #:xbinutils xbinutils
                    #:xgcc xgcc))
    (else #f)))
+
+(define* (static-bash-for-glibc target
+                                #:key
+                                (xbinutils (cross-binutils target))
+                                (xlibc (cross-libc* target
+                                                    #:static-bash #f))
+                                (xgcc (cross-gcc target
+                                                 #:xbinutils xbinutils
+                                                 #:libc xlibc)))
+  ;; Return a statically-linked Bash to be used by the cross libc in system(3) & co.
+  ;; Only for targets that use glibc.
+  (and (or (target-linux? target)
+           (target-hurd? target))
+       (package
+         (inherit static-bash)
+         (name (string-append "bash-static-cross-" target))
+         (native-inputs '())
+         (inputs '())
+         (native-inputs
+          `(("cross-gcc" ,xgcc)
+            ("cross-binutils" ,xbinutils)))
+         (inputs
+          `(("cross-libc" ,xlibc)
+            ("cross-libc:static" ,xlibc "static")))
+         (arguments
+          `(#:target ,target
+
+            ;; This package is used as a target input, but it should not have
+            ;; the usual cross-compilation inputs since that would include
+            ;; itself.
+            #:implicit-cross-inputs? #f
+            ,@arguments)))))
 
 (define* (cross-gcc-toolchain/implementation target
                                              #:key
