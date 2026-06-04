@@ -3,6 +3,7 @@
 ;;; Copyright © 2021 Lars-Dominik Braun <lars@6xq.net>
 ;;; Copyright © 2020, 2023, 2024 Jelle Licht <jlicht@fsfe.org>
 ;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -37,6 +38,7 @@
   #:use-module (srfi srfi-2)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-41)
+  #:use-module (srfi srfi-71)
   #:use-module (srfi srfi-9)
   #:use-module (web client)
   #:use-module (web response)
@@ -219,12 +221,39 @@
         (string-drop-right url 7)
         url))
 
+  (define (sexpify-url/maybe dist-url name version)
+    ;; Return a S-exp for the package URL, which is computed using the package
+    ;; version, if it matches the distribution tarball DIST-URL.
+
+    ;; The newer "scoped" packages use a different scheme for their dist URL
+    ;; (see: <https://docs.npmjs.com/about-scopes>).
+    (let* ((scope name (if (and (string-prefix? "@" name)
+                                (string-contains name "/"))
+                           (apply values (string-split name #\/))
+                           (values #f name)))
+           (versioned-url (string-append (%npm-registry)
+                                         (if scope
+                                             (string-append "/" scope "/")
+                                             "/")
+                                         name "/-/" name "-" version ".tgz")))
+      (if (string=? dist-url versioned-url)
+          `(string-append ,(string-append (%npm-registry)
+                                          (if scope
+                                             (string-append "/" scope "/")
+                                             "/")
+                                          name)
+                          ,(string-append "/-/" name "-")  version ".tgz")
+          dist-url)))
+
   (match npm-package
     (($ <package-revision>
         name version home-page dependencies dev-dependencies
         peer-dependencies license description dist)
-     (let* ((name (npm-name->name name))
-            (url (dist-tarball dist))
+     (let* ((version-string (semver->string
+                             (package-revision-version npm-package)))
+            (dist-url (dist-tarball dist))
+            (url (sexpify-url/maybe dist-url name version-string))
+            (name (npm-name->name name))
             (home-page (if (string? home-page)
                            (sanitize-home-page-url home-page)
                            (string-append %default-page "/" (uri-encode name))))
@@ -250,11 +279,11 @@
        (values
         `(package
            (name ,name)
-           (version ,(semver->string (package-revision-version npm-package)))
+           (version ,version-string)
            (source (origin
                      (method url-fetch)
                      (uri ,url)
-                     (sha256 (base32 ,(hash-url url)))))
+                     (sha256 (base32 ,(hash-url dist-url)))))
            (build-system node-build-system)
            (arguments
             (list
