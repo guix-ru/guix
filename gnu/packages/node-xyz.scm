@@ -4130,6 +4130,9 @@ tablets.
                 "/tree/master/types/" type))
     (license license:expat)))
 
+(define-public node-types-estree
+  (node-types "estree"))
+
 (define-public node-types-node
   (node-types "node"
               #:inputs (delay (list node-undici-types))))
