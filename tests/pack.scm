@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2017-2021, 2023, 2024 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2017-2021, 2023-2024, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2018 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2021, 2023, 2025 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2023 Oleg Pykhalov <go.wigust@gmail.com>
@@ -386,12 +386,17 @@
          (check   (gexp->derivation
                    "check-appimage-with-localstatedir"
                    #~(begin
+                       ;; Create a file in $PWD and only then copy it to
+                       ;; #$output, because #$output within the image's
+                       ;; execution environment refers to its temporary store,
+                       ;; not to the "real one".
                        (system* #$image "--appimage-extract-and-run" "-c"
                                 (object->string
-                                 `(call-with-output-file #$output
+                                 `(call-with-output-file "OUTPUT"
                                     (lambda (port)
                                       (display "Hello from Guile!\n"
                                                port)))))
+                       (copy-file "OUTPUT" #$output)
                        (system* #$image "--appimage-extract")
                        (exit (file-exists? "squashfs-root/var/guix/db/db.sqlite"))))))
       (mbegin %store-monad
