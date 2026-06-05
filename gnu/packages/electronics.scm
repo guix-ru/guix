@@ -801,48 +801,39 @@ as well as pick-place files.")
 (define-public gnucap
   (package
     (name "gnucap")
-    (version "20240220")
+    (version "20260329")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://git.git.savannah.gnu.org/git/gnucap.git")
-              (commit version)))
+              (commit (string-append version "-dev"))))
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "11l5h1zvyab8zms0c6v0i379q4i6m3hzyi8r0ccy9s88mhs254v9"))))
+         "0lgsjpi158kdvc3mq20i120d71ql4qdsz4pcm732d9babc84jq8y"))))
     (build-system gnu-build-system)
     (arguments
      (list
+      #:validate-runpath? #f
       #:phases
       #~(modify-phases %standard-phases
-          (replace 'configure
+          (add-after 'unpack 'fixes
             (lambda _
-              (substitute* (list "lib/configure" "lib/Make1")
-                (("-ltermcap") ""))
-              (setenv "LDFLAGS"
-                      (string-append "-Wl,-rpath=" #$output "/lib"))
-              (invoke "./configure" (string-append "--prefix=" #$output))))
-          (replace 'check
-            ;; Attention: As discussed, a failing test in gnucap does not mean
-            ;; the build process has failed.  Therefor we ignore, but still
-            ;; display the result of gnucap's test evaluation.
-            ;; https://codeberg.org/guix/guix/issues/5469#issuecomment-9695825
-            (lambda* (#:key tests? #:allow-other-keys)
-              (when tests?
-                (let ((libpath "../lib/O:../apps/O"))
-                  (with-directory-excursion "tests"
-                    ;; Fix expected plugin search path for test c_attach.1.gc
-                    (substitute* "==out/c_attach.1.gc.out"
-                      (("/usr/local/lib/gnucap")
-                       (string-append libpath ":" #$output "/lib/gnucap")))
-                    ;; Set library path so that gnucap can find libgnucap.so
-                    ;; while running the tests.
-                    (setenv "LD_LIBRARY_PATH" libpath)
-                    (invoke "./test"
-                            "../main/O/gnucap" "" "test-output"
-                            "==out")))))))))
+              (substitute* "configure"
+                (("force_in_tree=no") "force_in_tree=yes"))
+              (substitute* "tests/Make.test"
+                (("SHELL=/bin/bash")
+                 (string-append "SHELL=" (which "sh"))))))
+          (add-before 'validate-runpath 'wrap
+            (lambda _
+              (for-each
+               (lambda (program)
+                 (wrap-program (string-append #$output "/bin/" program)
+                   `("LD_LIBRARY_PATH" ":" prefix
+                     (,(string-append #$output "/lib")))))
+               (list "gnucap" "gnucap-modelgen")))))))
+    (native-inputs (list which))
     (inputs (list readline))
     (home-page "https://www.gnu.org/software/gnucap/")
     (synopsis "Mixed analog and digital circuit simulator")
