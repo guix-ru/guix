@@ -1264,6 +1264,10 @@ interactive environment for the functional language Haskell.")
                                 (file-pattern ".*\\.conf\\.d$")
                                 (file-type 'directory))))))
 
+(define (ghc-testsuite-name ghc)
+  (string-append
+   (package-name ghc) "-" (package-version ghc) "-testsuite.tar.xz"))
+
 (define-public ghc-8.6
   (let ((ghc-bootstrap ghc-8.4))
     (package
@@ -1281,7 +1285,7 @@ interactive environment for the functional language Haskell.")
        ;; It's not possible to set this using modify-inputs because it's
        ;; necessary to also modify the label for further inheritance issues.
        (cons* (list
-               (string-append name "-" version "-testsuite.tar.xz")
+               (ghc-testsuite-name this-package)
                (origin
                  (method url-fetch)
                  (uri (string-append
@@ -1301,8 +1305,7 @@ interactive environment for the functional language Haskell.")
               (modify-inputs (package-native-inputs ghc-bootstrap)
                 ;; GHC 8.6.5 must be built with GHC >= 8.2.
                 (replace "ghc" ghc-bootstrap)
-                (delete (string-append name "-" (package-version ghc-bootstrap)
-                                       "-testsuite.tar.xz")))))
+                (delete (ghc-testsuite-name ghc-bootstrap)))))
       (arguments
        (substitute-keyword-arguments (package-arguments ghc-8.4)
          ((#:make-flags make-flags ''())
@@ -1377,9 +1380,7 @@ interactive environment for the functional language Haskell.")
        (modify-inputs (package-native-inputs ghc-bootstrap)
          ;; GHC 8.6.5 must be built with GHC >= 8.2.
          (replace "ghc" ghc-bootstrap)
-         (replace (string-append name "-"
-                                 (package-version ghc-bootstrap)
-                                 "-testsuite.tar.xz")
+         (replace (ghc-testsuite-name ghc-bootstrap)
            (origin
              (method url-fetch)
              (uri (string-append
@@ -1433,7 +1434,7 @@ interactive environment for the functional language Haskell.")
           (base32 "179ws2q0dinl1a39wm9j37xzwm84zfz3c5543vz8v479khigdvp3"))))
       (native-inputs
        (cons* (list
-               (string-append name "-" version "-testsuite.tar.xz")
+               (ghc-testsuite-name this-package)
                (origin
                  (method url-fetch)
                  (uri (string-append
@@ -1453,9 +1454,7 @@ interactive environment for the functional language Haskell.")
               (modify-inputs (package-native-inputs ghc-bootstrap)
                 ;; GHC 8.10.7 must be built with GHC >= 8.6.
                 (replace "ghc" ghc-bootstrap)
-                (delete (string-append name "-"
-                                       (package-version ghc-bootstrap)
-                                       "-testsuite.tar.xz"))
+                (delete (ghc-testsuite-name ghc-bootstrap))
                 (append git-minimal/pinned)))) ; invoked during tests
       (arguments
        (substitute-keyword-arguments (package-arguments ghc-8.8)
@@ -1746,7 +1745,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
           #~(cons "VERBOSE=4" #$make-flags))))
       (native-inputs
        (cons* (list
-               (string-append name "-" version "-testsuite.tar.xz")
+               (ghc-testsuite-name this-package)
                (origin
                  (method url-fetch)
                  (uri (string-append
@@ -1761,9 +1760,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
                 (replace "ghc" (if (target-aarch64?)
                                    binary-ghc-8.10.7
                                    base))
-                (delete (string-append name "-"
-                                       (package-version base)
-                                       "-testsuite.tar.xz")))))
+                (delete (ghc-testsuite-name base)))))
       (properties '((max-silent-time . 36000))) ; 10 hours, for i686.
       (native-search-paths
        (list (search-path-specification
