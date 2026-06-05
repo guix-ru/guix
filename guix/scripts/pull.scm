@@ -203,7 +203,7 @@ Download and deploy the latest version of Guix.\n"))
                  (lambda (opt name arg result)
                    (alist-cons 'require-trusted-channels
                                (match (and arg (string-downcase arg))
-                                 ("yes" #f)
+                                 ((or "yes" #f) #f)
                                  ("no" #t)
                                  (_ 'default))
                                result)))

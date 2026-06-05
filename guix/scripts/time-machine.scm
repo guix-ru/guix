@@ -118,7 +118,7 @@ If COMMAND is not provided, print path to the time-machine profile.\n"))
                  (lambda (opt name arg result)
                    (alist-cons 'require-trusted-channels
                                (match (and arg (string-downcase arg))
-                                 ("yes" #f)
+                                 ((or "yes" #f) #f)
                                  ("no" #t)
                                  (_ 'default))
                                result)))
