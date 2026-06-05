@@ -73,6 +73,7 @@
 ;;; Copyright © 2025 Jared Klingenberger <jkling@noreply.codeberg.org>
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
 ;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
+;;; Copyright © 2026 Douglas Deslauriers <Douglas.Deslauriers@vector.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -588,6 +589,50 @@ Android, and ChromeOS.")
     (inputs
      (modify-inputs (package-inputs libcamera-minimal)
        (append libevent libtiff qtbase)))))
+
+(define-public libdnet
+  (package
+    (name "libdnet")
+    (version "1.18.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ofalk/libdnet")
+              (commit (string-append "libdnet-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0pbr0lrqp57zdbqxs52myi3ri07jp7nl84v6n1nzc6q11f94iwrh"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'bootstrap 'clean-repo
+            (lambda _
+              ;; Clean out GPL files and let bootstrap phase run.
+              (delete-file-recursively "./config")
+              (delete-file "./configure")))
+          (add-before 'check 'set-up-environment
+            (lambda _
+              ;; Discard results of tests for Minix and BSD systems.
+              (setenv "XFAIL_TESTS" "check_ip check_fw"))))))
+    (native-inputs
+     (list autoconf-2.71
+           automake
+           check
+           libtool
+           pkg-config
+           python-wrapper))
+    (home-page "https://github.com/ofalk/libdnet")
+    (synopsis "Low-level networking interface library")
+    (description
+     "@code{libdnet} provides a simplified, portable interface to several
+low-level networking routines, including network address manipulation,kernel
+arp(4) cache and route(4) table lookup and manipulation, network firewalling,
+network interface lookup and manipulation, IP tunnelling, and raw IP packet
+and Ethernet frame transmission.")
+    (license license:bsd-3)))
 
 (define-public libnice
   (package
