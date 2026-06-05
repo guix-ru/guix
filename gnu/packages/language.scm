@@ -85,6 +85,7 @@
   #:use-module (guix build-system perl)
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system qt)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -1257,35 +1258,6 @@ forms, and about 300,000 distinct lemmas.")
 tokenizer, detokenizer, truecaser and punctuation normalizer.")
     (license license:expat)))
 
-(define-public dparser
-  (package
-    (name "dparser")
-    (version "1.33a")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/jplevyak/dparser/")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0vzfi7d573qsmfxkgnzqkalhv06i2zc8hm0pwcgrgj8382g01zg1"))))
-    (build-system gnu-build-system)
-    (arguments
-     (list #:make-flags #~(list
-                           (string-append "CC=" #$(cc-for-target))
-                           (string-append "PREFIX=" #$output))
-           #:phases #~(modify-phases %standard-phases
-                        (delete 'configure))
-           #:test-target "test"))
-    (synopsis "Scannerless GLR parser generator")
-    (description
-     "DParser is scannerless GLR parser generator.  The form of the text to be
-parsed can be specified using a combination of regular expressions and grammar
-productions.  Because of the parsing technique, a scannerless GLR parser based
-on the Tomita algorithm the grammar can be ambiguous, right or left recursive,
-have any number of null productions, and because there is no separate
-tokenizer, can include whitespace in terminals and have terminals which are
-prefixes of other terminals.")
-    (home-page "https://dparser.sourceforge.net/")
-    (license (list license:bsd-3))))
+;; Deprecated on 2026-06-05.
+(define-deprecated/public-alias dparser
+  (@ (gnu packages compiler-tools) dparser))

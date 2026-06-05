@@ -4,7 +4,7 @@
 ;;; Copyright © 2017, 2020, 2021 Sergei Trofimovich <slyfox@inbox.ru>
 ;;; Copyright © 2018, 2022 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2021 Foo Chuan Wei <chuanwei.foo@hotmail.com>
-;;; Copyright © 2024 Janneke Nieuwenhuizen <janneke@gnu.org>
+;;; Copyright © 2024-2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2025 Alexey Abramov <levenson@mmer.org>
 ;;; Copyright © 2025 Anderson Torres <anderson.torres.8519@gmail.com>
 ;;;
@@ -74,6 +74,43 @@ specification from a file and generates an LALR(1) parser for it.  The parsers
 consist of a set of LALR(1) parsing tables and a driver routine written in the
 C programming language.")
     (license license:public-domain)))
+
+(define-public dparser
+  (package
+    (name "dparser")
+    (version "1.33a")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jplevyak/dparser/")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0vzfi7d573qsmfxkgnzqkalhv06i2zc8hm0pwcgrgj8382g01zg1"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:test-target "test"
+      #:make-flags
+      #~(list
+         (string-append "CC=" #$(cc-for-target))
+         (string-append "PREFIX=" #$output))
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure))))
+    (home-page "https://dparser.sourceforge.net/")
+    (synopsis "Scannerless GLR parser generator")
+    (description
+     "DParser is scannerless GLR parser generator.  The form of the text to be
+parsed can be specified using a combination of regular expressions and grammar
+productions.  Because of the parsing technique, a scannerless GLR parser based
+on the Tomita algorithm the grammar can be ambiguous, right or left recursive,
+have any number of null productions, and because there is no separate
+tokenizer, can include whitespace in terminals and have terminals which are
+prefixes of other terminals.")
+    (license (list license:bsd-3))))
 
 (define-public flex
   (package
