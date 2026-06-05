@@ -1657,32 +1657,30 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
     ;; Make sure you have installed LLVM between [9 and 13)
     (inputs (list llvm-12 gmp ncurses libffi))
     (native-inputs
-     `(;; GHC 9.0.2 must be built with GHC >= 8.8
-       ("ghc-bootstrap" ,(if (target-aarch64?)
-                           binary-ghc-8.10.7
-                           ghc-8.10))
-       ("ghc-testsuite"
-        ,(origin
-           (method url-fetch)
-           (uri (string-append
-                  "https://www.haskell.org/ghc/dist/"
-                  version "/ghc-" version "-testsuite.tar.xz"))
-           (sha256
-            (base32
-             "1m5fzhr4gjn9ni8gxx7ag3fkbw1rspjzgv39mnfb0nkm5mw70v3s"))
-           (patches (search-patches "ghc-9.2-grep-warnings.patch"
-                                    "ghc-testsuite-recomp015-execstack.patch"))
-           (modules '((guix build utils)))
-           (snippet
-            ;; collections.Iterable was moved to collections.abc in Python 3.10.
-            '(substitute* "testsuite/driver/testlib.py"
-               (("collections\\.Iterable")
-                "collections.abc.Iterable")))))
-       ,@(filter (match-lambda
-                   (("ghc-bootstrap" . _) #f)
-                   (("ghc-testsuite" . _) #f)
-                   (_ #t))
-                 (package-native-inputs ghc-8.10))))
+     (cons*
+      (list (ghc-testsuite-name this-package)
+            (origin
+              (method url-fetch)
+              (uri (string-append
+                     "https://www.haskell.org/ghc/dist/"
+                     version "/ghc-" version "-testsuite.tar.xz"))
+              (sha256
+               (base32
+                "1m5fzhr4gjn9ni8gxx7ag3fkbw1rspjzgv39mnfb0nkm5mw70v3s"))
+              (patches (search-patches "ghc-9.2-grep-warnings.patch"
+                                       "ghc-testsuite-recomp015-execstack.patch"))
+              (modules '((guix build utils)))
+              (snippet
+               ;; collections.Iterable was moved to collections.abc in Python 3.10.
+               '(substitute* "testsuite/driver/testlib.py"
+                  (("collections\\.Iterable")
+                    "collections.abc.Iterable")))))
+       (modify-inputs (package-native-inputs ghc-8.10)
+         ;; GHC 9.0.2 must be built with GHC >= 8.8
+         (replace "ghc" (if (target-aarch64?)
+                          binary-ghc-8.10.7
+                          ghc-8.10))
+         (delete (ghc-testsuite-name ghc-8.10)))))
     (properties '((max-silent-time . 36000))) ; 10 hours, for i686.
     (native-search-paths
      (list (search-path-specification
