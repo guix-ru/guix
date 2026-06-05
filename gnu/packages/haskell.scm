@@ -1826,8 +1826,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
      (license license:bsd-3))))
 
 (define-public ghc-9.4
-  ;; Inherit from 9.2, which added a few fixes, but boot from 9.0 (see above).
-  (let ((base ghc-9.2))
+  (let ((base ghc-bootstrap-for-9.4))
     (package
       (inherit base)
       (name "ghc")
@@ -1845,12 +1844,17 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
              ;; Files don’t exist any more.
-             (delete 'skip-tests)))
+             (delete 'skip-tests)
+             ;; File Common.hs has been moved to src/ in the 9.2 release.
+             (replace 'fix-cc-reference
+               (lambda _
+                 (substitute* "utils/hsc2hs/src/Common.hs"
+                   (("\"cc\"") "\"gcc\""))))))
          ((#:tests? _ #f)
           #f)))
       (native-inputs
        `(;; GHC 9.4 must be built with GHC >= 9.0.
-         ("ghc-bootstrap" ,ghc-bootstrap-for-9.4)
+         ("ghc-bootstrap" ,base)
          ("ghc-testsuite"
           ,(origin
              (method url-fetch)
