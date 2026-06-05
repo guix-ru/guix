@@ -1939,7 +1939,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
             (add-after 'unpack 'unpack-testsuite
               (lambda* (#:key inputs #:allow-other-keys)
                 (with-directory-excursion ".."
-                  (invoke "tar" "xvf" (assoc-ref inputs "ghc-testsuite")))))
+                  (invoke "tar" "xvf" (assoc-ref inputs "ghc-testsuite.tar.xz")))))
             (add-after 'unpack-testsuite 'fix-/bin/sh-references
               (lambda* (#:key inputs #:allow-other-keys)
                 (substitute*
@@ -1980,7 +1980,7 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
             (add-before 'build 'build-hadrian
               (lambda* (#:key (inputs '()) #:allow-other-keys)
                 (invoke "./hadrian/bootstrap/bootstrap.py"
-                        "-s" (assoc-ref inputs "hadrian-bootstrap")
+                        "-s" (assoc-ref inputs "hadrian-bootstrap-sources.tar.gz")
                         "-w" (which "ghc"))))
             (add-before 'build-hadrian 'fix-environment
               (lambda _
@@ -2072,37 +2072,37 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
       (build-system gnu-build-system)
       (inputs (list bash-minimal gmp ncurses libffi))
       (native-inputs
-       `(("perl" ,perl)
-         ("python" ,python)
-         ("git" ,git-minimal/pinned)
-         ("which" ,which)
-         ("ghostscript" ,ghostscript)
-         ("autoconf" ,autoconf)
-         ("automake" ,automake)
+       (list perl
+             python
+             git-minimal/pinned
+             which
+             ghostscript
+             autoconf
+             automake
 
-         ("ghc-bootstrap" ,ghc-bootstrap)
-         ("ghc-alex" ,ghc-alex-bootstrap-for-9.4)
-         ("ghc-happy" ,ghc-happy-bootstrap-for-9.4)
-         ("ghc-testsuite"
-          ,(origin
-             (method url-fetch)
-             (uri (string-append
-                   "https://www.haskell.org/ghc/dist/"
-                   version "/ghc-" version "-testsuite.tar.xz"))
-             (sha256
-              (base32
-               "1hxylm3nhxzl7yidarlavvcg1240w4bk0hy5jnvwna24jyxz69i6"))
-             (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
-         ("hadrian-bootstrap"
-          ,(origin
-             (method url-fetch)
-             (uri (string-append "https://downloads.haskell.org/~ghc/"
-                                 version "/hadrian-bootstrap-sources/"
-                                 "hadrian-bootstrap-sources-"
-                                 (package-version ghc-bootstrap) ".tar.gz"))
-             (sha256
-               (base32
-                 "14dkxif9x4hy85phcj3j0glf95k04g4ab6hfchpw9vxgvk97syi1"))))))
+             ghc-bootstrap
+             ghc-alex-bootstrap-for-9.4
+             ghc-happy-bootstrap-for-9.4
+             (origin
+               (method url-fetch)
+               (uri (string-append
+                     "https://www.haskell.org/ghc/dist/"
+                     version "/ghc-" version "-testsuite.tar.xz"))
+               (file-name "ghc-testsuite.tar.xz")
+               (sha256
+                (base32
+                 "1hxylm3nhxzl7yidarlavvcg1240w4bk0hy5jnvwna24jyxz69i6"))
+               (patches (search-patches "ghc-testsuite-recomp015-execstack.patch")))
+             (origin
+               (method url-fetch)
+               (uri (string-append "https://downloads.haskell.org/~ghc/"
+                                   version "/hadrian-bootstrap-sources/"
+                                   "hadrian-bootstrap-sources-"
+                                   (package-version ghc-bootstrap) ".tar.gz"))
+               (file-name "hadrian-bootstrap-sources.tar.gz")
+               (sha256
+                 (base32
+                   "14dkxif9x4hy85phcj3j0glf95k04g4ab6hfchpw9vxgvk97syi1")))))
       (native-search-paths
        (list (search-path-specification
               (variable "GHC_PACKAGE_PATH")
