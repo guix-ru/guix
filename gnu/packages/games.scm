@@ -5937,19 +5937,51 @@ on the screen and keyboard to display letters.")
     (version "2.1.3.17")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append
-             "https://repo.manaplus.org/manaplus/download/"
-             version "/manaplus-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitlab.com/manaplus/manaplus.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0ggswsa3xq7lss3j4k7fyzn56sw7hlrwk744i3d9w0n4932nmlg8"))))
+        (base32 "1b1mgj6pdccjhb3hvlag3ia1phkzndd7cmw053aqs2480bcpswsm"))))
     (build-system gnu-build-system)
     (arguments
      (list
       #:configure-flags
-      #~(list "--with-sdl2")))
+      #~(list "--with-sdl2"
+              "--enable-unittests"
+              ;; Standards c++0x or greater set GXX_EXPERIMENTAL_CXX0X which
+              ;; causes stdint.h not to be included.
+              "CXXFLAGS=-std=c++98")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'fix-libxml-and-time
+            (lambda _
+              ;; Fix libxml2 migration.
+              ;; See <https://gitlab.com/manaplus/manaplus/-/work_items/33>.
+              (substitute* (list "src/utils/dumplibs.cpp"
+                                 "src/unittests/utils/dumplibs.cc")
+                (("const char \\*\\*xmlVersion")
+                 "const char * const *xmlVersion")
+                (("__xmlParserVersion\\(\\)")
+                 "&xmlParserVersion"))
+              (substitute* "src/utils/xml/libxml.inc"
+                (("ifdef ENABLE_LIBXML")
+                 "ifdef ENABLE_LIBXML\n#include <libxml/parser.h>"))
+              ;; Include ctime when necessary.
+              ;; See  <https://gitlab.com/manaplus/manaplus/-/work_items/32>.
+              (substitute* (list "src/resources/wallpaper.cpp"
+                                 "src/progs/dyecmd/client.cpp")
+                (("include \"debug.h\"")
+                 "include \"debug.h\"\n#include <ctime>"))))
+          (add-before 'check 'set-home
+            (lambda _
+              (setenv "HOME" (getcwd)))))))
     (native-inputs
-     (list pkg-config))
+     (list autoconf
+           automake
+           gettext-minimal
+           pkg-config))
     (inputs
      (list curl
            glu
@@ -5970,7 +6002,7 @@ world}, @uref{http://evolonline.org, Evol Online} and
     ;; "src/debug/*" and "src/sdl2gfx/*" are under Zlib.
     ;; "data/themes/{golden-delicious,jewelry}/*" are under CC-BY-SA.
     ;; The rest is under GPL2+.
-    (license (list license:gpl2+ license:zlib license:cc-by-sa4.0))))
+    (license (list license:gpl2+ license:zlib license:cc-by-sa3.0))))
 
 (define-public openttd-engine
   (package
