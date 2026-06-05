@@ -1576,13 +1576,16 @@ AMDGPU code objects.")
           (add-after 'unpack 'chdir
             (lambda _
               (chdir "amd/hipcc")))
-          (add-after 'chdir 'patch-rocm-path
+          (add-after 'chdir 'patch-paths
             (lambda* (#:key inputs #:allow-other-keys)
               (substitute* (find-files "src" "\\.h$")
                 (("roccmPath \\+ \"/bin/rocm_agent_enumerator\"")
                  (format #f "~s" (search-input-file
                                   inputs
-                                  "/bin/rocm_agent_enumerator"))))))
+                                  "/bin/rocm_agent_enumerator"))))
+              (substitute* "src/hipBin_amd.h"
+                (("which hipconfig")
+                 (string-append #$(file-append which "/bin/which") " hipconfig")))))
           ;; This version file very important, as it is parsed under
           ;; $#{llvm-rocm}/clang/lib/Driver/ToolChains/AMDGPU.cpp and its
           ;; contents decides on some includes for hipcc.
