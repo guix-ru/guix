@@ -1,0 +1,51 @@
+Unbundles utfcpp dependency.
+
+patch by Lilah Tascheter <lilah@lunabee.space>
+
+diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
+index 46c0c26e1..8317e3248 100644
+--- a/3rdparty/CMakeLists.txt
++++ b/3rdparty/CMakeLists.txt
+@@ -3,19 +3,12 @@
+
+ include(CheckCompilerFlagsOutput)
+ 
+-SET(UTF8PROC_INSTALL OFF CACHE BOOL "Enable installation of utf8proc" FORCE)
+-add_subdirectory(utf8proc EXCLUDE_FROM_ALL)
+-set_property(TARGET utf8proc PROPERTY FOLDER "3rdparty")
+-if(NOT MSVC)
+-	set(_supported_utf8proc_cxx_compiler_flags "")
+-
+-	# -Wassign-enum
+-	check_compiler_flags_output("-Werror -Wno-assign-enum -Wno-error=cpp" COMPILER_TYPE CXX   OUTPUT_FLAGS "-Wno-assign-enum" OUTPUT_VARIABLE _supported_utf8proc_cxx_compiler_flags APPEND)
+-
+-	if (NOT _supported_utf8proc_cxx_compiler_flags STREQUAL "")
+-		string(REPLACE " " ";" _supported_utf8proc_cxx_compiler_flags "${_supported_utf8proc_cxx_compiler_flags}")
+-		target_compile_options(utf8proc PRIVATE ${_supported_utf8proc_cxx_compiler_flags})
+-	endif()
+-endif()
++pkg_check_modules(UTF8PROC REQUIRED libutf8proc)
++add_library(utf8proc UNKNOWN IMPORTED)
++set_target_properties(utf8proc PROPERTIES
++	IMPORTED_LOCATION ${UTF8PROC_LIBRARIES}
++	INTERFACE_INCLUDE_DIRECTORIES ${UTF8PROC_INCLUDE_DIRS}
++	INTERFACE_LINK_LIBRARIES ${UTF8PROC_LINK_LIBRARIES}
++)
+ 
+ add_subdirectory(launchinfo EXCLUDE_FROM_ALL)
+ set_property(TARGET launchinfo PROPERTY FOLDER "3rdparty")
+diff --git a/lib/framework/wzstring.cpp b/lib/framework/wzstring.cpp
+index 8bad73540..139daaf0d 100644
+--- a/lib/framework/wzstring.cpp
++++ b/lib/framework/wzstring.cpp
+@@ -29,8 +29,8 @@
+ // "By default, Visual Studio always returns the value 199711L for the __cplusplus preprocessor macro."
+ #define UTF_CPP_CPLUSPLUS 201703L
+ #endif
+-#include <utfcpp/source/utf8.h>
+-#include <utf8proc/utf8proc.h>
++#include <utf8cpp/utf8.h>
++#include <utf8proc.h>
+ 
+ WzUniCodepoint WzUniCodepoint::fromASCII(unsigned char charLiteral)
+ {

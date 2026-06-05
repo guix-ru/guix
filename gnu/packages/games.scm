@@ -7398,7 +7398,10 @@ fighting over what remains.")
                                   "re2"
                                   "utf8proc"
                                   "utfcpp")))))
-       (patches (search-patches "warzone2100-unbundle-libs.patch"))
+       (patches (search-patches "warzone2100-unbundle-basis-universal.patch"
+                                "warzone2100-unbundle-libs.patch"
+                                "warzone2100-unbundle-inih.patch"
+                                "warzone2100-unbundle-utfcpp.patch"))
        (sha256
         (base32
          "0fmiy0pm56yy69c0nhynjdiaslwlfg8cdvfl5s78g5pzdi1y47s3"))))

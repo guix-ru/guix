@@ -1,0 +1,45 @@
+Unbundles inih dependency.
+
+patch by Lilah Tascheter <lilah@lunabee.space>
+
+diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
+index 46c0c26e1..462bced09 100644
+--- a/3rdparty/CMakeLists.txt
++++ b/3rdparty/CMakeLists.txt
+@@ -30,17 +30,12 @@ target_compile_definitions(fmt PUBLIC "FMT_END_NAMESPACE=}}")
+ 
+ 
+ # inih library
+-add_library(inih STATIC "inih/ini.h" "inih/ini.c")
+-set_property(TARGET inih PROPERTY FOLDER "3rdparty")
+-target_include_directories(inih PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+-target_compile_definitions(inih PRIVATE
+-	"-DINI_API="
+-	"-DINI_ALLOW_MULTILINE=0"
+-	"-DINI_ALLOW_BOM=1"
+-	"-DINI_ALLOW_INLINE_COMMENTS=0"
+-	"-DINI_MAX_LINE=1024"
+-	"-DINI_ALLOW_REALLOC=1"
+-	"-DINI_INITIAL_ALLOC=1024"
++pkg_check_modules(INIH REQUIRED inih)
++add_library(inih UNKNOWN IMPORTED)
++set_target_properties(inih PROPERTIES
++	IMPORTED_LOCATION ${INIH_LIBRARIES}
++	INTERFACE_INCLUDE_DIRECTORIES ${INIH_INCLUDE_DIRS}
++	INTERFACE_LINK_LIBRARIES ${INIH_LINK_LIBRARIES}
+ )
+ 
+ # re2
+diff --git a/src/3rdparty/INIReaderWriter.cpp b/src/3rdparty/INIReaderWriter.cpp
+index 542166fee..5c118c887 100644
+--- a/src/3rdparty/INIReaderWriter.cpp
++++ b/src/3rdparty/INIReaderWriter.cpp
+@@ -13,7 +13,7 @@
+ #ifndef INI_API
+ # define INI_API
+ #endif
+-#include <inih/ini.h>
++#include <ini.h>
+ #include "INIReaderWriter.h"
+ 
+ using std::string;
