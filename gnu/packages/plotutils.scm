@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013-2021, 2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2021, 2025-2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2015 Eric Bavier <bavier@member.fsf.org>
 ;;; Copyright © 2016-2026 Nicolas Goaziou <mail@nicolasgoaziou.fr>
 ;;; Copyright © 2018 Tobias Geerinckx-Rice <me@tobias.gr>
@@ -252,17 +252,15 @@ using the Cairo drawing library.")
   (package
     (name "guile-plotutils")
     (version "1.0.1")
+    (home-page "https://github.com/spk121/guile-plotutils")
     (source (origin
-              (method url-fetch)
-              (uri (list (string-append "https://lonelycactus.com/tarball/"
-                                        "guile_plotutils-" version ".tar.gz")
-                         (string-append
-                          "https://github.com/spk121/guile-plotutils/releases/download/v"
-                          version "/guile_plotutils-" version
-                          ".tar.gz")))
+              (method git-fetch)
+              (uri (git-reference (url home-page)
+                                  (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
               (sha256
                (base32
-                "0r245z75cdzgzi57fpz84mnyrjq44793zzaaxxrszyxm1d06hc6r"))))
+                "1ksy6gg9n17ivs4bkspz7qzll12fq9chhj1clcp0lr2f2qy6sxz0"))))
     (build-system gnu-build-system)
     (arguments
      `(#:imported-modules ((guix build guile-build-system)
@@ -286,9 +284,8 @@ using the Cairo drawing library.")
                  (("\"libguile-plotutils\"")
                   (string-append "\"" out "/lib/guile/" version
                                  "/extensions/libguile-plotutils\"")))))))))
-    (native-inputs (list pkg-config texinfo))
+    (native-inputs (list autoconf automake libtool pkg-config texinfo))
     (inputs (list plotutils guile-3.0 zlib))
-    (home-page "https://lonelycactus.com/guile-plotutils.html")
     (synopsis "Guile bindings to the GNU Plotutils plotting libraries")
     (description
      "Guile-Plotutils is a Guile binding to the venerable GNU Plotutils
