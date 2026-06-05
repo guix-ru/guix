@@ -1619,19 +1619,31 @@ AMDGPU code objects.")
 
                      ;;(list "HIP_ROCCLR_HOME" '= (list #$rocm-hip-runtime))
 
-                     ;; HACK: allow `rocm-hip-runtime' to wrap this program
-                     ;; with its own `HIP_PATH'.
+                     ;; HACK: allow other packages (eg: `rocm-hip-runtime' or
+                     ;; `rocm-toolchain') to wrap this program with its own
+                     ;; paths.
                      (list "HIP_PATH" '= (list (string-append "${HIP_PATH:-" #$output "}")))
+                     ;; XXX: `hipconfig' searches for `llc' which is provided
+                     ;; by `llvm-rocm', we cannot wrap that here since it
+                     ;; searches it from the `HIP_CLANG_PATH'.  At this level
+                     ;; we don't have the complete `rocm-toolchain' which will
+                     ;; have the union of `llvm-rocm' and `clang-rocm', the
+                     ;; contents of both derivation outputs are expected to
+                     ;; live under `HIP_CLANG_PATH'.
                      (list "HIP_CLANG_PATH"
                            '=
-                           (list (string-append
-                                  #$(this-package-input "clang-rocm")
-                                  "/bin")))
+                           (list
+                            (string-append "${HIP_CLANG_PATH:-"
+                                           #$(file-append (this-package-input "clang-rocm")
+                                                          "/bin")
+                                           "}")))
                      (list "DEVICE_LIB_PATH"
                            '=
-                           (list (string-append
-                                  #$(this-package-input "rocm-device-libs")
-                                  "/amdgcn/bitcode")))
+                           (list
+                            (string-append "${DEVICE_LIB_PATH:-"
+                                           #$(file-append (this-package-input "rocm-device-libs")
+                                                          "/amdgcn/bitcode")
+                                           "}")))
 
                      ;; This is done in order to please check_config, which
                      ;; checks that HSA_PATH is in LD_LIBRARY_PATH
