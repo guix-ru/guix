@@ -2160,9 +2160,10 @@ interactive environment for the functional language Haskell.")
                               "--skip-perf"))
                      (format #t "test suite not run~%"))))))))
       (native-inputs
-       `(("ghc-bootstrap" ,base)
-         ("ghc-testsuite"
-          ,(origin
+       (modify-inputs (package-native-inputs base)
+         (replace "ghc" base)
+         (replace "ghc-testsuite.tar.xz"
+           (origin
              (method url-fetch)
              (uri (string-append
                     "https://downloads.haskell.org/~ghc/"
@@ -2171,8 +2172,8 @@ interactive environment for the functional language Haskell.")
               (base32
                "143ifc4g3jc6s9hcry5qha913rzwg4hpsvk6pqvxk5r0qigfxjwx"))
              (patches (search-patches "ghc-testsuite-recomp015-execstack.patch"))))
-         ("hadrian-bootstrap"
-          ,(origin
+         (replace "hadrian-bootstrap-sources.tar.gz"
+           (origin
              (method url-fetch)
              (uri (string-append "https://downloads.haskell.org/~ghc/" version
                                  "/hadrian-bootstrap-sources/"
@@ -2180,13 +2181,7 @@ interactive environment for the functional language Haskell.")
                                  (package-version base) ".tar.gz"))
              (sha256
                (base32
-                 "162lbafvdamfhx1jldax3shgk8jbbqn4an97ny363lxbdjgdn708"))))
-         ,@(filter (match-lambda
-                     (("ghc-bootstrap" . _) #f)
-                     (("ghc-testsuite" . _) #f)
-                     (("hadrian-bootstrap" . _) #f)
-                     (_ #t))
-                   (package-native-inputs base))))
+                 "162lbafvdamfhx1jldax3shgk8jbbqn4an97ny363lxbdjgdn708"))))))
       (native-search-paths
        (list (search-path-specification
               (variable "GHC_PACKAGE_PATH")
