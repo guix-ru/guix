@@ -2041,7 +2041,7 @@ domains, their live performance and resource utilization statistics.")
 (define-public vmware-open-vm-tools
   (package
     (name "vmware-open-vm-tools")
-    (version "13.0.10")
+    (version "13.1.0")
     (source
      (origin
        (method git-fetch)
@@ -2050,12 +2050,13 @@ domains, their live performance and resource utilization statistics.")
              (commit (string-append "stable-" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0rjqrmypfv6llqsc4bzjw7fl8i8bslis4ki15r9ikzn8w7l4wmcl"))))
+        (base32 "0dzzj240nh0f0fjsnh0kd622h7ia2dvh4hw7mr2nb652krd20cjw"))))
     (build-system gnu-build-system)
     (arguments
      (list
       #:configure-flags
       #~(list "--with-fuse=fuse3"
+              "--with-dnet"
               "--without-kernel-modules"
               "--without-x"
               (string-append
@@ -2124,7 +2125,7 @@ domains, their live performance and resource utilization statistics.")
            glib
            xmlsec-openssl
            libmspack
-           ;; libdnet ; Not packed
+           libdnet
            libtirpc
            libxcrypt
            libxml2
@@ -2175,7 +2176,7 @@ client desktops.
      (modify-inputs inputs
        (prepend gdk-pixbuf-xlib
                 gtk+
-                gtkmm-3
+                gtkmm
                 libdrm
                 libx11
                 libxext
