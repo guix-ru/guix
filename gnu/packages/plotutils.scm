@@ -263,29 +263,29 @@ using the Cairo drawing library.")
                 "1d0dq3is7j2grg806ql6y105zv3k0md5ndlpn1xgfshq6fi9yngr"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:imported-modules ((guix build guile-build-system)
-                           ,@%default-gnu-imported-modules)
-       #:modules (((guix build guile-build-system)
-                   #:select (target-guile-effective-version))
-                  (guix build gnu-build-system)
-                  (guix build utils))
-       #:configure-flags (list "--with-gnu-filesystem-hierarchy")
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'install 'set-library-file-name
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out"))
-                   (version (target-guile-effective-version)))
-               ;; First install libguile-plotutils.so.
-               (invoke "make" "install-guileextensionLTLIBRARIES"
-                       "-C" "src")
+     (list #:imported-modules `((guix build guile-build-system)
+                                ,@%default-gnu-imported-modules)
+           #:modules `(((guix build guile-build-system)
+                        #:select (target-guile-effective-version))
+                       (guix build gnu-build-system)
+                       (guix build utils))
+           #:configure-flags #~(list "--with-gnu-filesystem-hierarchy")
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'install 'set-library-file-name
+                 (lambda* (#:key outputs #:allow-other-keys)
+                   (let ((out (assoc-ref outputs "out"))
+                         (version (target-guile-effective-version)))
+                     ;; First install libguile-plotutils.so.
+                     (invoke "make" "install-guileextensionLTLIBRARIES"
+                             "-C" "src")
 
-               ;; Then change source files to refer to it.
-               (substitute* '("module/plotutils/graph.scm"
-                              "module/plotutils/plot.scm")
-                 (("\"libguile-plotutils\"")
-                  (string-append "\"" out "/lib/guile/" version
-                                 "/extensions/libguile-plotutils\"")))))))))
+                     ;; Then change source files to refer to it.
+                     (substitute* '("module/plotutils/graph.scm"
+                                    "module/plotutils/plot.scm")
+                       (("\"libguile-plotutils\"")
+                        (string-append "\"" out "/lib/guile/" version
+                                       "/extensions/libguile-plotutils\"")))))))))
     (native-inputs (list autoconf-2.71 automake libtool pkg-config texinfo))
     (inputs (list plotutils guile-3.0 zlib))
     (synopsis "Guile bindings to the GNU Plotutils plotting libraries")
