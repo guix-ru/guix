@@ -251,7 +251,7 @@ using the Cairo drawing library.")
 (define-public guile-plotutils
   (package
     (name "guile-plotutils")
-    (version "1.0.1")
+    (version "1.0.2")
     (home-page "https://github.com/spk121/guile-plotutils")
     (source (origin
               (method git-fetch)
@@ -260,7 +260,7 @@ using the Cairo drawing library.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1ksy6gg9n17ivs4bkspz7qzll12fq9chhj1clcp0lr2f2qy6sxz0"))))
+                "1d0dq3is7j2grg806ql6y105zv3k0md5ndlpn1xgfshq6fi9yngr"))))
     (build-system gnu-build-system)
     (arguments
      `(#:imported-modules ((guix build guile-build-system)
@@ -269,6 +269,7 @@ using the Cairo drawing library.")
                    #:select (target-guile-effective-version))
                   (guix build gnu-build-system)
                   (guix build utils))
+       #:configure-flags (list "--with-gnu-filesystem-hierarchy")
        #:phases
        (modify-phases %standard-phases
          (add-before 'install 'set-library-file-name
@@ -276,7 +277,8 @@ using the Cairo drawing library.")
              (let ((out (assoc-ref outputs "out"))
                    (version (target-guile-effective-version)))
                ;; First install libguile-plotutils.so.
-               (invoke "make" "install-guileextensionLTLIBRARIES")
+               (invoke "make" "install-guileextensionLTLIBRARIES"
+                       "-C" "src")
 
                ;; Then change source files to refer to it.
                (substitute* '("module/plotutils/graph.scm"
@@ -284,7 +286,7 @@ using the Cairo drawing library.")
                  (("\"libguile-plotutils\"")
                   (string-append "\"" out "/lib/guile/" version
                                  "/extensions/libguile-plotutils\"")))))))))
-    (native-inputs (list autoconf automake libtool pkg-config texinfo))
+    (native-inputs (list autoconf-2.71 automake libtool pkg-config texinfo))
     (inputs (list plotutils guile-3.0 zlib))
     (synopsis "Guile bindings to the GNU Plotutils plotting libraries")
     (description
