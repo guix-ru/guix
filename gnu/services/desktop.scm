@@ -81,6 +81,7 @@
   #:use-module (gnu packages nfs)
   #:use-module (gnu packages enlightenment)
   #:use-module (gnu packages haskell-apps)
+  #:use-module (gnu packages rust-apps)
   #:use-module (guix deprecation)
   #:use-module (guix i18n)
   #:use-module (guix records)
@@ -129,6 +130,12 @@
             kmonad-configuration-kmonad
             kmonad-configuration?
             kmonad-service-type
+
+            kanata-service-type
+            kanata-configuration
+            kanata-configuration?
+            kanata-configuration-kanata
+            kanata-configuration-keymaps
 
             geoclue-application
             geoclue-configuration
@@ -1107,6 +1114,85 @@ screens and scanners.")))
                               (const (list %kmonad-udev-rule)))))
     (description "Run the @command{kmonad} daemon, which allows customizing
 and extending the functionalities of different keyboards.")))
+
+
+;;;
+;;; Kanata.
+;;;
+
+(define-configuration/no-serialization kanata-configuration
+  (kanata
+   (package kanata)
+   "The @code{kanata} package to use.")
+  (keymaps
+   (list-of-file-likes '())
+   "List of @command{kanata} configuration files (file-like objects).  See
+@uref{https://jtroo.github.io/config.html#linux-only-linux-dev, Kanata's
+device specification documentation}."))
+
+(define %kanata-group
+  (user-group
+    (name "kanata")
+    (system? #t)))
+
+(define %kanata-user
+  (user-account
+    (name "kanata")
+    (group "kanata")
+    (supplementary-groups '("input" "uinput"))
+    (system? #t)
+    (comment "Kanata daemon user")
+    (home-directory "/var/empty")
+    (create-home-directory? #f)
+    (shell (file-append shadow "/sbin/nologin"))))
+
+(define %kanata-accounts
+  (list %uinput-group %kanata-group %kanata-user))
+
+;; OPTIONS+="static_node=uinput" triggers kmod to load the uinput module on
+;; boot.
+(define %kanata-udev-rule
+  (udev-rule
+   "99-kanata.rules"
+   "KERNEL==\"uinput\", MODE=\"0660\", GROUP=\"uinput\", OPTIONS+=\"static_node=uinput\"\n"))
+
+(define (kanata-shepherd-services config)
+  "Return a shepherd service for each @command{kanata} configuration."
+  (let* ((kanata  (file-append (kanata-configuration-kanata config)
+                               "/bin/kanata"))
+         (keymaps (kanata-configuration-keymaps config)))
+    (map (lambda (index keymap)
+           (let ((name (string-append "kanata-" (number->string index))))
+             (shepherd-service
+               (provision     (list (string->symbol name)))
+               (requirement   '(user-processes udev))
+               (documentation (string-append "Run kanata process "
+                                             (number->string index) "."))
+               (start         #~(make-forkexec-constructor
+                                 ;; '--no-wait' prevents pausing on exit so
+                                 ;; Shepherd can reliably restart the daemon.
+                                 (list #$kanata "-c" #$keymap "--no-wait")
+                                 #:user "kanata"
+                                 #:group "kanata"
+                                 #:supplementary-groups '("input" "uinput")
+                                 #:log-file #$(string-append "/var/log/" name ".log")))
+               (stop          #~(make-kill-destructor)))))
+         (iota (length keymaps))
+         keymaps)))
+
+(define kanata-service-type
+  (service-type
+    (name 'kanata)
+    (extensions
+     (list (service-extension account-service-type
+                              (const %kanata-accounts))
+           (service-extension shepherd-root-service-type
+                              kanata-shepherd-services)
+           (service-extension udev-service-type
+                              (const (list %kanata-udev-rule)))))
+    (description
+     "Run the @command{kanata} daemon, which allows customizing and extending
+the functionalities of different keyboards.")))
 
 
 ;;;

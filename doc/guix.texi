@@ -27888,6 +27888,29 @@ Package object for GVfs.
 @end table
 @end deftp
 
+@defvar kanata-service-type
+This is the type of the service that runs
+@uref{https://github.com/jtroo/kanata, Kanata}, a keyboard layout
+re-mapper.  Its value is a @code{kanata-configuration} object.  This
+service allows spawning @command{kanata} configurations to manage
+keyboards.
+@end defvar
+
+@deftp {Data Type} kanata-configuration
+Configuration record for the Kanata service.
+
+@table @asis
+@item @code{kanata} (default: @code{kanata}) (type: package)
+The Kanata package to use.
+
+@item @code{keymaps} (default: @code{()}) (type: list-of-file-likes)
+List of @command{kanata} configuration files (file-like objects).  See
+@uref{https://jtroo.github.io/config.html#linux-only-linux-dev, Kanata's
+device specification documentation}.
+
+@end table
+@end deftp
+
 @defvar kmonad-service-type
 This is the type of the service that runs
 @uref{https://github.com/kmonad/kmonad, KMonad}.  Its value is a
