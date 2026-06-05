@@ -2215,26 +2215,58 @@ the host.")
     (name "rocm-toolchain")
     (inputs
      (modify-inputs inputs
-       (append lld-wrapper-rocm
+       (append bash-minimal
+               lld-wrapper-rocm
                offload-rocm
                rocr-runtime
                rocm-hipcc
                rocm-device-libs)))
     (arguments
      (substitute-keyword-arguments arguments
+       ((#:modules modules)
+        `(,@modules
+          (guix build utils)))
        ((#:builder _)
         #~(begin
             (use-modules (ice-9 match)
-                         (guix build union))
+                         (guix build union)
+                         (guix build utils))
+
+            ;; Required for `wrap-program'.
+            (setenv "PATH" #$(file-append (this-package-input "bash-minimal")
+                                          "/bin"))
 
             (match %build-inputs
               (((names . directories) ...)
-               (union-build #$output directories)))
+               (union-build #$output directories
+                            #:symlink (lambda (old new)
+                                        (unless (wrapped-program? old)
+                                          (symlink old new)))
+                            #:create-all-directories? #t)))
 
             (union-build #$output:debug
-                         (list #$(this-package-input "libc-debug")))
+                         (list #$(this-package-input "libc-debug"))
+                         #:symlink (lambda (old new)
+                                     (unless (wrapped-program? old)
+                                       (symlink old new)))
+                         #:create-all-directories? #t)
             (union-build #$output:static
-                         (list #$(this-package-input "libc-static")))))))
+                         (list #$(this-package-input "libc-static"))
+                         #:symlink (lambda (old new)
+                                     (unless (wrapped-program? old)
+                                       (symlink old new)))
+                         #:create-all-directories? #t)
+
+            ;; Wrap-programs.
+            (let ((output-bindir (string-append #$output "/bin")))
+              (for-each
+               (lambda (file)
+                 (wrap-program file
+                   `("HIP_PATH" = ,(list #$output))
+                   `("HIP_CLANG_PATH" = ,(list output-bindir))))
+               (find-files output-bindir
+                           (lambda (file stat)
+                             (not (string-prefix? "." (basename file)))))))))))
     (native-search-paths
      (append (package-native-search-paths clang-rocm-toolchain)
              (list (search-path-specification
