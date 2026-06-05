@@ -1888,25 +1888,25 @@ substituted by matching images.")
           (base32
            "0kixwjb2x457dq7927hkh34c803p7yh1pmn6n61rk9shqrcg492h"))))
       (build-system qt-build-system)
+      (arguments
+       (list
+        #:phases
+        #~(modify-phases %standard-phases
+            ;; Some tests require a display and fail with offscreen mode.
+            (add-after 'unpack 'disable-failing-tests
+              (lambda _
+                (setenv "ARGS" "--exclude-regex \"imageproc_.*\""))))))
       (native-inputs
        (list qttools-5))
       (inputs
-       `(("boost" ,boost)
-         ("libjpeg" ,libjpeg-turbo)
-         ("libpng" ,libpng)
-         ("libtiff" ,libtiff)
-         ("qtbase" ,qtbase-5)
-         ("qtsvg-5" ,qtsvg-5)
-         ("qtwayland-5" ,qtwayland-5)
-         ("zlib" ,zlib)))
-      (arguments
-       `(#:phases
-         (modify-phases %standard-phases
-           ;; Some tests require a display and fail with offscreen mode.
-           (add-after 'unpack 'disable-failing-tests
-             (lambda _
-               (setenv "ARGS" "--exclude-regex \"imageproc_.*\"")
-               #t)))))
+       (list boost
+             libjpeg-turbo
+             libpng
+             libtiff
+             qtbase-5
+             qtsvg-5
+             qtwayland-5
+             zlib))
       (home-page "https://github.com/4lex4/scantailor-advanced")
       (synopsis "Clean up scanned pages")
       (description "Scan Tailor is an interactive post-processing tool for
