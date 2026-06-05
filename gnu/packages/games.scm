@@ -7378,63 +7378,75 @@ fighting over what remains.")
   (package
     (name "warzone2100")
     (version "4.6.3")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://sourceforge/warzone2100/releases/"
-                                  version "/warzone2100_src.tar.xz"))
-              (patches (search-patches "warzone2100-unbundle-libs.patch"))
-              (modules '((guix build utils)))
-              (snippet #~(for-each delete-file-recursively
-                           (cons* "lib/netplay/3rdparty/miniupnp"
-                                  "lib/sound/3rdparty/opusfile"
-                             (map (lambda (s) (string-append "3rdparty/" s))
-                               '("basis_universal" "basis_universal_host_build"
-                                 "discord-rpc" "fmt" "GameNetworkingSockets"
-                                 "inih" "re2" "utf8proc" "utfcpp")))))
-              (sha256
-                (base32
-                  "0fmiy0pm56yy69c0nhynjdiaslwlfg8cdvfl5s78g5pzdi1y47s3"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://sourceforge/warzone2100/releases/"
+                           version "/warzone2100_src.tar.xz"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(for-each delete-file-recursively
+                    (cons* "lib/netplay/3rdparty/miniupnp"
+                           "lib/sound/3rdparty/opusfile"
+                           (map (lambda (s) (string-append "3rdparty/" s))
+                                '("basis_universal"
+                                  "basis_universal_host_build"
+                                  "discord-rpc"
+                                  "fmt"
+                                  "GameNetworkingSockets"
+                                  "inih"
+                                  "re2"
+                                  "utf8proc"
+                                  "utfcpp")))))
+       (patches (search-patches "warzone2100-unbundle-libs.patch"))
+       (sha256
+        (base32
+         "0fmiy0pm56yy69c0nhynjdiaslwlfg8cdvfl5s78g5pzdi1y47s3"))))
     (build-system cmake-build-system)
-    (arguments (list #:configure-flags #~'("-GNinja"
-                                           "-DWZ_DISTRIBUTOR=Guix"
-                                           "-DWZ_DOWNLOAD_PREBUILT_PACKAGES=off"
-                                           "-DWZ_INCLUDE_VIDEOS=off"
-                                           "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
-                                           "-DENABLE_GNS_NETWORK_BACKEND=off")
-                     ;; TODO: Tests seem to be broken, configure.ac is missing.
-                     #:tests? #f))
-    (native-inputs (list basis-universal
-                         gettext-minimal
-                         ninja
-                         p7zip
-                         pkg-config
-                         ruby-asciidoctor/minimal
-                         shaderc))
-    (inputs (list basis-universal
-                  curl
-                  fmt
-                  freetype
-                  fribidi
-                  gnutls
-                  harfbuzz
-                  libinih
-                  libogg
-                  libpng
-                  libsodium
-                  libtheora
-                  libvorbis
-                  libzip
-                  miniupnpc
-                  openal
-                  opus
-                  opusfile
-                  physfs
-                  re2
-                  sdl3
-                  sqlite
-                  utf8proc
-                  utfcpp
-                  vulkan-headers))
+    (arguments
+     (list
+      ;; TODO: Tests seem to be broken, configure.ac is missing.
+      #:tests? #f
+      #:configure-flags #~'("-GNinja"
+                            "-DWZ_DISTRIBUTOR=GNU Guix"
+                            "-DWZ_DOWNLOAD_PREBUILT_PACKAGES=off"
+                            "-DWZ_INCLUDE_VIDEOS=off"
+                            "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
+                            "-DENABLE_GNS_NETWORK_BACKEND=off")))
+    (native-inputs
+     (list basis-universal
+           gettext-minimal
+           ninja
+           p7zip
+           pkg-config
+           ruby-asciidoctor/minimal
+           shaderc))
+    (inputs
+     (list basis-universal
+           curl
+           fmt
+           freetype
+           fribidi
+           gnutls
+           harfbuzz
+           libinih
+           libogg
+           libpng
+           libsodium
+           libtheora
+           libvorbis
+           libzip
+           miniupnpc
+           openal
+           opus
+           opusfile
+           physfs
+           re2
+           sdl3
+           sqlite
+           utf8proc
+           utfcpp
+           vulkan-headers))
     (home-page "https://wz2100.net")
     (synopsis "3D Real-time strategy and real-time tactics game")
     (description
