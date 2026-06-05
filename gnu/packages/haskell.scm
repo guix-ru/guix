@@ -1853,24 +1853,23 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
          ((#:tests? _ #f)
           #f)))
       (native-inputs
-       `(;; GHC 9.4 must be built with GHC >= 9.0.
-         ("ghc-bootstrap" ,base)
-         ("ghc-testsuite"
-          ,(origin
-             (method url-fetch)
-             (uri (string-append
-                    "https://www.haskell.org/ghc/dist/"
-                    version "/ghc-" version "-testsuite.tar.xz"))
-             (sha256
-              (base32
-               "1xbps33pq6mg2bwp5gvmc4qhgdq52yng5993if99b9s3fylqk86l"))))
-         ("ghc-alex" ,ghc-alex-bootstrap-for-9.4)
-         ("ghc-happy" ,ghc-happy-bootstrap-for-9.4)
-         ,@(filter (match-lambda
-                     (("ghc-bootstrap" . _) #f)
-                     (("ghc-testsuite" . _) #f)
-                     (_ #t))
-                   (package-native-inputs base))))
+       (cons*
+        (list
+         (ghc-testsuite-name this-package)
+         (origin
+           (method url-fetch)
+           (uri (string-append
+                  "https://www.haskell.org/ghc/dist/"
+                  version "/ghc-" version "-testsuite.tar.xz"))
+           (sha256
+            (base32
+             "1xbps33pq6mg2bwp5gvmc4qhgdq52yng5993if99b9s3fylqk86l"))))
+        (modify-inputs (package-native-inputs base)
+          ;; GHC 9.4 must be built with GHC >= 9.0.
+          (replace "ghc" base)
+          (append ghc-alex-bootstrap-for-9.4)
+          (append ghc-happy-bootstrap-for-9.4)
+          (delete (ghc-testsuite-name base)))))
       (native-search-paths
        (list (search-path-specification
               (variable "GHC_PACKAGE_PATH")
