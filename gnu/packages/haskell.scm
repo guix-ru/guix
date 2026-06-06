@@ -1099,8 +1099,6 @@ interactive environment for the functional language Haskell.")
       ;; is difficult
       gcc-13
       perl
-      python-2                          ; for tests (fails with python-3)
-      ghostscript                       ; for tests
       ;; GHC is built with GHC.
       ghc-7
       (origin
@@ -1112,10 +1110,7 @@ interactive environment for the functional language Haskell.")
          (base32 "1wjc3x68l305bl1h1ijd3yhqp2vqj83lkp3kqbr94qmmkqlms8sj")))))
     (arguments
      (list
-       #:test-target "test"
-       ;; We get a smaller number of test failures by disabling parallel test
-       ;; execution.
-       #:parallel-tests? #f
+       #:tests? #f ;require python@2
 
        ;; Don't pass --build=<triplet>, because the configure script
        ;; auto-detects slightly different triplets for --host and --target and
