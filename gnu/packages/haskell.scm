@@ -933,8 +933,6 @@ interactive environment for the functional language Haskell.")
       ;; is difficult
       gcc-13
       perl
-      python-2                          ; for tests (fails with python-3)
-      ghostscript                       ; for tests
       patchelf
       ;; GHC is built with GHC. Therefore we need bootstrap binaries.
       (if (string-match "x86_64" (or (%current-target-system) (%current-system)))
@@ -942,10 +940,7 @@ interactive environment for the functional language Haskell.")
           ghc-bootstrap-i686-7.8.4)))
     (arguments
      (list
-       #:test-target "test"
-       ;; We get a smaller number of test failures by disabling parallel test
-       ;; execution.
-       #:parallel-tests? #f
+       #:tests? #f ;require python@2
 
        ;; Don't pass --build=<triplet>, because the configure script
        ;; auto-detects slightly different triplets for --host and --target and
