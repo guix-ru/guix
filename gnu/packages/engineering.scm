@@ -1887,14 +1887,8 @@ it suitable for security research and analysis.")
                   (("(sleigh-install D=\")\\$\\(DD\\)" _ f)
                    (string-append f sleighhome)))))))))
     (inputs
-     (list capstone
-           libuv
-           libzip
-           lz4
-           openssl
-           pugixml-next
+     (list pugixml-next
            radare2
-           sdb
            zlib))
     (native-inputs
      (list ghidra-native
