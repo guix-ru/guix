@@ -11747,19 +11747,23 @@ SunPy.")
 (define-public python-sunpy
   (package
     (name "python-sunpy")
-    (version "7.0.4")   ; higher versions require NumPy 2+
+    (version "7.1.2")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "sunpy" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sunpy/sunpy")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0ylzxb52ii8s7i9imc0mpj3pgsa1lz4b8dmjk3kwnf8hrdzzd1ry"))))
+        (base32 "0v6h67j0p9ppxlv47l5mlbvw8acmdbxryjhw90bqhajchayvgami"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2465 passed, 1 skipped, 3 xfailed, 36 warnings
+      ;; tests: 2674 passed, 14 skipped, 3 xfailed, 2722 warnings
       #:test-flags
       #~(list "-m" "not remote_data"
+              "--pyargs" "sunpy"
               "--numprocesses" (number->string (min 8 (parallel-job-count)))
               ;; Test introduces a time bomb and fails with error: ValueError:
               ;; interpolating from IERS_Auto using predictive values that are
@@ -11767,21 +11771,26 @@ SunPy.")
               "-k" "not test_print_params")
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-manifest.in
+            ;; See: <https://codeberg.org/guix/guix/issues/4393>.
+            (lambda* (#:key name source inputs #:allow-other-keys)
+              (let ((port (open-file "MANIFEST.in" "w")))
+                (for-each
+                 (lambda (file)
+                   (display "include " port)
+                   (display file port)
+                   (display "\n" port))
+                 (find-files "sunpy"))
+                (close port))))
           (add-before 'build 'set-HOME
             ;; It requires during sanity check as well to prevent error like:
             ;; PermissionError: [Errno 13] Permission denied:
             ;; '/homeless-shelter'
             (lambda _
               (setenv "HOME" "/tmp")))
-          (replace 'check
-            (lambda* (#:key tests? test-flags #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion #$output
-                  (apply invoke "pytest" "-vv" test-flags)))))
-          (add-before 'check 'post-check
+          (add-before 'check 'remove-local-source
             (lambda _
-              (for-each delete-file-recursively
-                        (find-files #$output "__pycache__" #:directories? #t)))))))
+              (delete-file-recursively "sunpy"))))))
     (native-inputs
      (list nss-certs-for-test
            python-aiohttp
@@ -11809,9 +11818,11 @@ SunPy.")
            python-asdf
            python-asdf-astropy
            python-beautifulsoup4
+           python-boto3
            python-cdflib
            python-contourpy
            python-dask
+           python-dateutil
            python-drms
            python-fsspec
            python-glymur
@@ -11821,11 +11832,10 @@ SunPy.")
            python-matplotlib
            python-mpl-animators
            python-pandas
-           python-beautifulsoup4
            python-reproject
            python-scikit-image
            python-scipy
-           ;; python-spiceypy ; Not packed yet in Guix, long journey.
+           ;; python-spiceypy   ;not packaged yet in Guix
            python-tqdm
            python-zeep))
     (home-page "https://sunpy.org")
@@ -11841,18 +11851,18 @@ coordinate frames and associated transformations, as well as other
 functionality needed for solar data analysis.")
     (license license:bsd-2)))
 
-;; A bare minimal package, mainly to use in tests and reduce closure
-;; size. Tests are left out in the main package to slim down native-inputs.
+;; A bare minimal package, mainly to use in tests and reduce closure size.
+;; Tests are left out in the main package to slim down native-inputs and
+;; propagated-inputs.
 (define-public python-sunpy-minimal
   (package/inherit python-sunpy
     (name "python-sunpy-minimal")
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:tests? _ #t) #f)))
+     (arguments
+      (substitute-keyword-arguments arguments
+        ((#:tests? #t #t) #f)))
     (native-inputs
      (list python-setuptools
-           python-setuptools-scm
-           python-wheel))
+           python-setuptools-scm))
     (propagated-inputs
      (list python-astropy-minimal
            python-fsspec
