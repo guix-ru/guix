@@ -1,0 +1,26 @@
+From 4cb81d779d1d3e1d5db0c76bffe71b9c91b3aa1d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20Lled=C3=B3?= <jlledom@member.fsf.org>
+Date: Sun, 19 Apr 2026 11:16:50 +0200
+Subject: [PATCH] pfinet: recv: fix control block size handling
+
+Message-ID: <20260419095010.13390-2-jlledom@mailfence.com>
+---
+ pfinet/socket-ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pfinet/socket-ops.c b/pfinet/socket-ops.c
+index 0cd3ebebb..ce10682b2 100644
+--- a/pfinet/socket-ops.c
++++ b/pfinet/socket-ops.c
+@@ -541,7 +541,7 @@ S_socket_recv (struct sock_user *user,
+       *outflags = m.msg_flags;
+       *nports = 0;
+       *portstype = MACH_MSG_TYPE_COPY_SEND;
+-      *controllen = m.msg_controllen;
++      *controllen -= m.msg_controllen;
+     }
+ 
+   return err;
+-- 
+2.54.0
+
