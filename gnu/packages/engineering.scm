@@ -1823,10 +1823,11 @@ like relocation symbols.  It is able to deal with malformed binaries, making
 it suitable for security research and analysis.")
     (license license:lgpl3)))
 
+;; TODO: Keep in sync with radare2.
 (define-public r2ghidra
   (package
     (name "r2ghidra")
-    (version "6.1.4")
+    (version "6.1.6")
     (source
      (origin
        (method git-fetch)
@@ -1835,7 +1836,7 @@ it suitable for security research and analysis.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "04x7vmg67zz0llkz3r3nmcky5z8c4ha31z8jzkm19dnyslw2qlxr"))
+        (base32 "0y52707s78rr5vzdylmwyx2rywmz8i5j2a3rz977wbzcz685n0pz"))
        (modules '((guix build utils)))
        (snippet
         ;; Delete bundled libs and remove their references.
@@ -1844,24 +1845,19 @@ it suitable for security research and analysis.")
                    (("ZLIB_LDFLAGS=.*") "")
                    (("ZLIB_CFLAGS=.*") ""))
                  (substitute* "src/Makefile"
-                   (("(all:) subprojects-zlib" _ f) f)
-                   (("PUGIXML_OBJS=.*") "")
-                   (("PUGIXML_SRCS=.*") "")
-                   (("PUGIXML_CFLAGS=.*") ""))))))
+                   (("(all:) subprojects-zlib" _ f) f))))))
     (build-system gnu-build-system)
     (arguments
      (list
       #:make-flags
-      #~(let* ((zlib #$(this-package-input "zlib"))
-               (pugixml #$(this-package-input "pugixml-next")))
+      #~(let* ((zlib #$(this-package-input "zlib")))
           (list (string-append "CC=" #$(cc-for-target))
                 (format #f "ZLIB_LDFLAGS=-L~a/lib/ -lz" zlib)
-                (format #f "LDFLAGS=-L~a/lib/ -lpugixml" pugixml)
                 (format #f "ZLIB_CFLAGS=-I~a/include/" zlib)
-                (format #f "PUGIXML_CFLAGS=-I~a/include/" pugixml)
                 ;; Ensure this matches R2_LIBR_PLUGINS as exported
                 ;; by radare2 & iaito.
-                (format #f "PLUGDIR=~a/lib/radare2" #$output)))
+                (format #f "PLUGDIR=~a/lib/radare2" #$output)
+                "R2GHIDRA_USE_RXML=1")) ;use r2 xml parser instead of pugixml
       #:tests? #f    ;no 'check' rule, test dir may require 3rd-party binaries
       #:phases
       #~(modify-phases %standard-phases
@@ -1889,10 +1885,7 @@ it suitable for security research and analysis.")
                 (substitute* "ghidra/Makefile"
                   (("(sleigh-install D=\")\\$\\(DD\\)" _ f)
                    (string-append f sleighhome)))))))))
-    (inputs
-     (list pugixml-next
-           radare2
-           zlib))
+    (inputs (list radare2 zlib))
     (native-inputs
      (list ghidra-native
            pkg-config
