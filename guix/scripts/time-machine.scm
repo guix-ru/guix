@@ -62,6 +62,10 @@ If COMMAND is not provided, print path to the time-machine profile.\n"))
   -q, --no-channel-files
                          inhibit loading of user and system 'channels.scm'"))
   (display (G_ "
+  -e, --select=CHANNEL   select CHANNEL to update"))
+  (display (G_ "
+  -x, --exclude=CHANNEL  exclude CHANNEL from being updated"))
+  (display (G_ "
       --url=URL          use the Git repository at URL"))
   (display (G_ "
       --commit=COMMIT    use the specified COMMIT"))
@@ -98,6 +102,12 @@ If COMMAND is not provided, print path to the time-machine profile.\n"))
          (option '(#\q "no-channel-files") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'ignore-channel-files? #t result)))
+         (option '(#\e "select") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'select (string->symbol arg) result)))
+         (option '(#\x "exclude") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'exclude (string->symbol arg) result)))
          (option '("url") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'repository-url arg

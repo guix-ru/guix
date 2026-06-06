@@ -140,7 +140,7 @@ Copyright @copyright{} 2024 Greg Hogan@*
 Copyright @copyright{} 2025 Sören Tempel@*
 Copyright @copyright{} 2025 Rostislav Svoboda@*
 Copyright @copyright{} 2025 Zacchaeus@*
-Copyright @copyright{} 2025 Sergio Pastor Pérez@*
+Copyright @copyright{} 2025, 2026 Sergio Pastor Pérez@*
 Copyright @copyright{} 2024 Evgeny Pisemsky@*
 Copyright @copyright{} 2025 jgart@*
 Copyright @copyright{} 2025 Artur Wroblewski@*
@@ -5014,6 +5014,21 @@ understand the code of the channel files you use!
 Inhibit loading of the user and system channel files,
 @file{~/.config/guix/channels.scm} and @file{/etc/guix/channels.scm}.
 
+@cindex pinning channels, with @command{guix pull}
+@anchor{pull-select}
+@item --select=@var{channel}
+@itemx -e
+Update only @var{channel}, keeping the commit of any other non-selected
+channel unchanged.  In other words, any channel not selected with this
+option is effectively @dfn{pinned} to its current commit.  This option
+can be repeated.
+
+@item --exclude=@var{channel}
+@itemx -x
+Prevent @var{channel} from being updated, effectively @dfn{pinning} it
+to its current commit as shown by @command{guix describe}.  All the
+other channels will be updated.  This option can be repeated.
+
 @cindex channel news
 @item --news
 @itemx -N
@@ -5324,6 +5339,13 @@ Substitution,,, bash, The GNU Bash Reference Manual}):
 @example
 guix time-machine -C <(echo %default-channels) @dots{}
 @end example
+
+@item --select
+@itemx -e
+@itemx --exclude
+@itemx -x
+Select or exclude channels that need to be updated.  @xref{pull-select}, for
+more info.
 
 @end table
 

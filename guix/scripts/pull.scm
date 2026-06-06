@@ -2,6 +2,7 @@
 ;;; Copyright © 2013-2015, 2017-2024, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2017 Marius Bakke <mbakke@fastmail.com>
 ;;; Copyright © 2020, 2021 Tobias Geerinckx-Rice <me@tobias.gr>
+;;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -94,6 +95,10 @@ Download and deploy the latest version of Guix.\n"))
   -q, --no-channel-files
                          inhibit loading of user and system 'channels.scm'"))
   (display (G_ "
+  -e, --select=CHANNEL   select CHANNEL to update"))
+  (display (G_ "
+  -x, --exclude=CHANNEL  exclude CHANNEL from being updated"))
+  (display (G_ "
       --url=URL          download \"guix\" channel from the Git repository at URL"))
   (display (G_ "
       --commit=COMMIT    download the specified \"guix\" channel COMMIT"))
@@ -155,6 +160,12 @@ Download and deploy the latest version of Guix.\n"))
          (option '(#\q "no-channel-files") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'ignore-channel-files? #t result)))
+         (option '(#\e "select") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'select (string->symbol arg) result)))
+         (option '(#\x "exclude") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'exclude (string->symbol arg) result)))
          (option '(#\l "list-generations") #f #t
                  (lambda (opt name arg result)
                    (cons `(query list-generations ,arg)
@@ -807,6 +818,69 @@ identifier."
     (#f (leave (G_ "~a: invalid content SWHID~%") swhid))
     (port port)))
 
+(define (collect-alist-values key alist)
+  "Return a list of all values from ALIST that matches KEY."
+  (filter-map (match-lambda
+                ((k . value)
+                 (and (eq? k key) value)))
+              alist))
+
+(define (options->channel-transformation opts)
+  "Return a procedure that, when passed a channel, applies the transformations
+specified by OPTS and returns the resulting channel.  OPTS must be a list of
+symbol/string pairs such as:
+
+  ((select . \"channelA\")
+   (exclude . \"channelB\"))
+
+Each symbol names a transformation and the corresponding string is an argument
+to that transformation."
+  (define selected-channels
+    (collect-alist-values 'select opts))
+
+  (define excluded-channels
+    (collect-alist-values 'exclude opts))
+
+  (define current-channels
+    (let ((profile (or (assoc-ref opts 'profile) %current-profile)))
+      (profile-channels profile)))
+
+  (define (find-channel name lst)
+    (find (lambda (c)
+            (eq? (channel-name c) name))
+          lst))
+
+  (when (and (not (null? selected-channels))
+             (not (null? excluded-channels)))
+    (raise
+     (condition
+      (&message
+       (message (G_ "mixing incompatible '--select' and '--exclude' options"))))))
+
+  (lambda (c)
+    (let* ((name (channel-name c))
+           (raise-unknown (lambda ()
+                            (raise
+                             (make-exception
+                              (formatted-message
+                               (G_ "unknown channel '~a': cannot \
+select/exclude a channel that has never been pulled")
+                               name))))))
+      (cond
+       ;; Selection.
+       ((not (null? selected-channels))
+        (if (member name selected-channels)
+            (channel (inherit c) (commit #f))        ;unpin selected.
+            (or (find-channel name current-channels) ;pin others.
+                (raise-unknown))))
+       ;; Exclusion.
+       ((not (null? excluded-channels))
+        (if (member name excluded-channels)
+            (or (find-channel name current-channels) ;pin excluded.
+                (raise-unknown))
+            (channel (inherit c) (commit #f))))      ;unpin others.
+       (else c)))))                                  ;do nothing.
+
 (define (channel-list opts)
   "Return the list of channels to use.  If OPTS specify a channel file,
 channels are read from there; otherwise, if ~/.config/guix/channels.scm
@@ -856,17 +930,40 @@ transformations specified in OPTS (resulting from '--url', '--commit', or
             result)
           (leave (G_ "'~a' did not return a list of channels~%") file))))
 
+  (define selected-channels
+    (collect-alist-values 'select opts))
+
+  (define excluded-channels
+    (collect-alist-values 'exclude opts))
+
   (define channels
-    (cond (file
-           (load-channels file))
-          ((and (not ignore-channel-files?)
-                (file-exists? default-file))
-           (load-channels default-file))
-          ((and (not ignore-channel-files?)
-                (file-exists? global-file))
-           (load-channels global-file))
-          (else
-           %default-channels)))
+    (let* ((channels (cond (file
+                            (load-channels file))
+                           ((and (not ignore-channel-files?)
+                                 (file-exists? default-file))
+                            (load-channels default-file))
+                           ((and (not ignore-channel-files?)
+                                 (file-exists? global-file))
+                            (load-channels global-file))
+                           (else
+                            %default-channels))))
+      ;; Validate options.
+      (let ((names (cond
+                    ((not (null? selected-channels))
+                     selected-channels)
+                    ((not (null? excluded-channels))
+                     excluded-channels)
+                    (else '())))
+            (valid-names (map channel-name channels)))
+        (unless (null? names)
+          (for-each
+           (lambda (name)
+             (unless (member name valid-names)
+               (leave (G_ "channel '~a' is missing from channel list~%")
+                      name)))
+           names)))
+
+      (map (options->channel-transformation opts) channels)))
 
   (define (environment-variable)
     (match (getenv "GUIX_PULL_URL")
