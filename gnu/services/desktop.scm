@@ -1245,26 +1245,36 @@ and many other) available for GIO applications.")
   (prefix elogind-))
 
 ;;; Elogind serializers.
+(define elogind-name->string
+  (compose (lambda (name)
+             ;; Configuration file is case sensitive, so special case those
+             ;; few cases where pascal-case gets it wrong.
+             (cond ((equal? name "RemoveIpc")
+                    "RemoveIPC")
+                   (else
+                    name)))
+           pascal-case
+           (lambda (name)
+             (cond ((string-suffix? "?" name)
+                    (string-drop-right name 1))
+                   ((string-suffix? "seconds" name)
+                    (string-drop-right name 4))
+                   (else
+                    name)))
+           symbol->string))
+
 (define (elogind-serialize-boolean name value)
-  (let* ((name-str (symbol->string name))
-         (name (if (string-suffix? "?" name-str)
-                   (string-drop-right name-str 1)
-                   name-str)))
-    (format #f "~a=~:[no~;yes~]~%" (pascal-case name) value)))
+  (format #f "~a=~:[no~;yes~]~%" (elogind-name->string name) value))
 
 (define (elogind-base-serializer name value)
-  (let* ((name-str (symbol->string name))
-         (name (if (string-suffix? "seconds" name-str)
-                   (string-drop-right name-str 4) ;seconds -> sec
-                   name-str)))
-    (format #f "~a=~a~%" (pascal-case name) value)))
+  (format #f "~a=~a~%" (elogind-name->string name) value))
 
 (define elogind-serialize-action elogind-base-serializer)
 (define elogind-serialize-non-negative-integer elogind-base-serializer)
 (define elogind-serialize-percent elogind-base-serializer)
 
 (define (elogind-list-serializer name value)
-  (format #f "~a=~{~a~^ ~}~%" (pascal-case name) value))
+  (format #f "~a=~{~a~^ ~}~%" (elogind-name->string name) value))
 
 (define elogind-serialize-list-of-strings elogind-list-serializer)
 (define elogind-serialize-list-of-user-names elogind-list-serializer)
@@ -1279,7 +1289,9 @@ and many other) available for GIO applications.")
 (define %elogind-configuration-sleep-fields
   '( suspend-state suspend-mode suspend-estimation-seconds
      hibernate-mode hibernate-delay-seconds hibernate-state
-     hybrid-sleep-state hybrid-sleep-mode))
+     hybrid-sleep-state hybrid-sleep-mode
+     allow-power-off-interrupts? allow-suspend-interrupts?
+     broadcast-power-off-interrupts? broadcast-suspend-interrupts?))
 
 (define-configuration elogind-configuration
   (elogind
