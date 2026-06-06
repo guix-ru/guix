@@ -5299,16 +5299,16 @@ point types:
 (define-public python-glymur
   (package
     (name "python-glymur")
-    (version "0.14.3")
+    (version "0.14.8")
     (source
      (origin
-       (method git-fetch)   ; no tests data in PyPi package
+       (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/quintusdias/glymur")
-             (commit (string-append "v" version))))
+              (url "https://github.com/quintusdias/glymur")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0266gj8a2p8jkbgb34lgk8dwin7ib2g38vdh04b2p6yhqx8w3xg8"))))
+        (base32 "0jhnr5p8lrycf9bn9p429rkc82aayc0bjf0pivk870a954br268h"))))
     (build-system pyproject-build-system)
     (arguments
      (list
