@@ -32543,6 +32543,31 @@ fundamentally just glue between the @code{setuptools} Python module and
 CMake.")
     (license license:expat)))
 
+(define-public python-screeninfo
+  (package
+    (name "python-screeninfo")
+    (version "0.8.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/rr-/screeninfo")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0q0nvj2ghbyjfymsbsl6dr7ggpg177fjncnzbxj18yglyz0vhk2c"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list libdrm
+           python-poetry-core
+           python-pytest))
+    (home-page "https://github.com/rr-/screeninfo")
+    (synopsis "Fetch location and size of physical screens")
+    (description
+     "Fetch location and size of physical screens.  GNU/Linux has support on
+following enviroments: X11 (thought Xinerama) and DRM (experimental).")
+    (license license:expat)))
+
 (define-public python-screenkey
   (package
     (name "python-screenkey")
