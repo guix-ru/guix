@@ -950,16 +950,10 @@ user-level language.")
                                     #:inputs inputs
                                     #:qtbase (assoc-ref inputs "qtbase")))))))
     (inputs
-     (list capstone
-           libuv
-           libzip
-           lz4
-           openssl
-           qtbase
+     (list qtbase
            qtsvg
            qtwayland
-           radare2
-           sdb))
+           radare2))
     (native-inputs
      (list pkg-config python-minimal-wrapper))
     (native-search-paths (list (search-path-specification
