@@ -2030,14 +2030,14 @@ audio/video codec library.")
 (define-public ffmpeg-5
   (package
     (inherit ffmpeg-6)
-    (version "5.1.6")
+    (version "5.1.9")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://ffmpeg.org/releases/ffmpeg-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "1g8116rp4fgq82br8lclb2dmw3fvyh2zkzhnngm7z97pg1i0dypl"))))
+                "0xni3nklh0y3s3p7sdlnhmq7wx21rp6y0xs1yx84ngd95fxr7dfr"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:modules modules %default-gnu-modules)
