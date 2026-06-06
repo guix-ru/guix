@@ -1772,16 +1772,24 @@ bootloader in Espressif ESP8266 & ESP32 series chips.")
                              ;; TODO: add r2pipe and enable this test.
                              "../source/test/unit/test_r2pipe.c")
                 (("(^| )main *\\(.*" all)
-                 (string-append all " exit (77);\n"))))))))
+                 (string-append all " exit (77);\n")))))
+          (add-after 'install 'fixup-pc-files
+            (lambda _
+              (with-directory-excursion (in-vicinity #$output "lib/pkgconfig")
+                ;; Avoids many unnecessary propagated inputs.
+                (substitute* (find-files "." ".*\\.pc")
+                  (("^Requires.private:.*") ""))
+                ;; XXX: Nonexistent after unbundling sdb, but still propagate.
+                (substitute* "r_util.pc"
+                  (("-I\\$\\{includedir\\}/libr/sdb") ""))))))))
     (inputs
      (list capstone
            gmp
            libuv
            libzip
            lz4
-           openssl
            quickjs-ng
-           sdb
+           xxhash
            zlib))
     (native-inputs
      (list node
@@ -1789,8 +1797,8 @@ bootloader in Espressif ESP8266 & ESP32 series chips.")
            pkg-config
            python-minimal-wrapper))
     (propagated-inputs
-     ;; In the Libs: section of r_hash.pc.
-     (list xxhash))
+     (list openssl                      ;needed by r_util's public headers
+           sdb))                        ;r_regex.h, r_util.h, r_getopt.h...
     (native-search-paths (list (search-path-specification
                                  (variable "R2_LIBR_PLUGINS")
                                  (files (list "lib/radare2"))
