@@ -229,6 +229,37 @@ ModernGL on multiple platforms.")
 GLFW} OpenGL application development library.")
     (license license:expat)))
 
+(define-public python-isosurfaces
+  (package
+    (name "python-isosurfaces")
+    (version "0.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jared-hughes/isosurfaces")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11rmbx6hfjz14sykcmqasg4akqm31b67v95sxaxcnkpmqqq8kqzz"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f)) ;no tests provided.
+    (native-inputs
+     (list python-setuptools))
+    (propagated-inputs
+     (list python-numpy))
+    (home-page "https://github.com/jared-hughes/isosurfaces")
+    (synopsis "Construct isolines/isosurfaces over a 2D/3D scalar field")
+    (description
+     "Construct isolines/isosurfaces of a 2D/3D scalar field defined by a
+function, i.e. curves over which @code{f(x,y)=0} or surfaces over which
+@code{f(x,y,z)=0}.  Most similar libraries use marching squares or similar
+over a uniform grid, but this uses a quadtree to avoid wasting time sampling
+many far from the implicit surface.")
+    (license license:expat)))
+
 (define-public python-kivy
   (package
     (name "python-kivy")
