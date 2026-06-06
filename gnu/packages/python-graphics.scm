@@ -860,6 +860,47 @@ ctypes module to interface with SDL2, and provides simple Python classes and
 wrappers for common SDL2 functionality.")
     (license license:cc0)))
 
+(define-public python-pywavefront
+  (package
+    (name "python-pywavefront")
+    (version "1.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pywavefront/PyWavefront")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "07r9z0dzz5xq9qlmp855mxsf9776b1ypk06nc9cf69r9d8pk8bkj"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-mock
+           python-pytest
+           python-setuptools))
+    (home-page "https://github.com/pywavefront/PyWavefront")
+    (synopsis "Python library for loading Wavefront @code{.obj} files")
+    (description
+     "PyWavefront reads Wavefront 3D object files (@code{something.obj},
+@code{something.obj.gz} and @code{something.mtl}) and generates interleaved
+vertex data for each material ready for rendering.
+
+A simple (optional) visualization module is also provided for rendering the
+object(s).  The interleaved data can also be used by more modern renderers
+thought VBOs or VAOs.
+
+Currently the most commonly used features in the specification has been
+implemented:
+@itemize
+@item positions;
+@item texture coordinates;
+@item normals;
+@item vertex color;
+@item material parsing;
+@item texture and texture parameters.
+@end itemize")
+    (license license:bsd-3)))
+
 (define-public python-qtawesome
   (package
     (name "python-qtawesome")
