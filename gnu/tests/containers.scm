@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2024, 2025 Giacomo Leidi <therewasa@fishinthecalculator.me>
+;;; Copyright © 2024-2026 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -22,16 +22,19 @@
   #:use-module (guix build-system trivial)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages containers)
+  #:use-module (gnu packages databases)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages guile-xyz)
   #:use-module (gnu services)
   #:use-module (gnu services containers)
+  #:use-module (gnu services databases)
   #:use-module (gnu services desktop)
   #:use-module ((gnu services docker)
                 #:select (containerd-service-type
                           docker-service-type))
   #:use-module (gnu services dbus)
   #:use-module (gnu services networking)
+  #:use-module (gnu services web)
   #:use-module (gnu system)
   #:use-module (gnu system accounts)
   #:use-module (gnu system vm)
@@ -43,6 +46,7 @@
   #:use-module ((guix scripts pack) #:prefix pack:)
   #:use-module (guix store)
   #:export (%test-rootless-podman
+            %test-rootless-podman-with-least-authority-wrapper
             %test-oci-service-rootless-podman
             %test-oci-service-docker))
 
@@ -68,6 +72,42 @@
                           (group "users")
                           (supplementary-groups '("wheel" "netdev" "cgroup"
                                                   "audio" "video")))))))
+
+(define %miniflux-create-admin-credentials
+  #~(begin
+      (mkdir "/var/miniflux")
+      (call-with-output-file "/var/miniflux/admin-username"
+        (lambda (port)
+          (display "test" port)))
+      (call-with-output-file "/var/miniflux/admin-password"
+        (lambda (port)
+          (display "testpassword" port)))))
+
+;; A separate operating-system definition is necessary to test the interactions
+;; between rootless podman and least-authority-wrapper backed services, miniflux
+;; in this case. For the purpose of the test, any service using it should be
+;; fine though.
+(define %rootless-podman-os-with-least-authority-wrapper
+  (simple-operating-system
+   (service rootless-podman-service-type
+           (rootless-podman-configuration
+            (subgids
+             (list (subid-range (name "alice"))))
+            (subuids
+             (list (subid-range (name "alice"))))))
+   (service dhcpcd-service-type)
+   (service dbus-root-service-type)
+   (service polkit-service-type)
+   (service elogind-service-type)
+   (simple-service 'create-miniflux-admin-credentials
+                    activation-service-type
+                    %miniflux-create-admin-credentials)
+   (service postgresql-service-type
+            (postgresql-configuration
+             (postgresql postgresql)))
+   (service miniflux-service-type
+            (miniflux-configuration
+             (listen-address "/var/run/miniflux/miniflux.sock")))))
 
 (define (run-rootless-podman-test oci-tarball)
 
@@ -345,11 +385,66 @@ standard output device and then enters a new line.")
                  #:localstatedir? #t)))
     (run-rootless-podman-test tarball)))
 
+(define (run-rootless-podman-test-with-least-authority-wrapper)
+
+  (define os
+    (marionette-operating-system
+     %rootless-podman-os-with-least-authority-wrapper
+     #:imported-modules '((gnu services herd)
+                          (guix combinators))))
+
+  (define vm
+    (virtual-machine
+      (operating-system os)
+      (volatile? #t)
+      (memory-size 1024)
+      (disk-image-size (* 3000 (expt 2 20)))
+      (port-forwardings '())))
+
+  (define test
+    (with-imported-modules '((gnu build marionette)
+                             (gnu services herd))
+      #~(begin
+          (use-modules (srfi srfi-11) (srfi srfi-64)
+                       (gnu build marionette))
+
+          (define marionette
+            ;; Relax timeout to accommodate older systems and
+            ;; allow for pulling the image.
+            (make-marionette (list #$vm) #:timeout 60))
+
+          (test-runner-current (system-test-runner #$output))
+
+          (test-begin "rootless-podman-with-least-authority-wrapper")
+
+          (test-assert "services start correctly"
+            (marionette-eval
+             '(begin
+                (use-modules (gnu services herd))
+                (wait-for-service 'file-system-/sys/fs/cgroup)
+                (wait-for-service 'miniflux))
+             marionette))
+
+          (test-assert "Check miniflux socket file is created"
+            (wait-for-unix-socket "/var/run/miniflux/miniflux.sock" marionette))
+
+          (test-end))))
+  (gexp->derivation "rootless-podman-with-least-authority-wrapper-test" test))
+
 (define %test-rootless-podman
   (system-test
    (name "rootless-podman")
    (description "Test rootless Podman service.")
    (value (build-tarball&run-rootless-podman-test))))
+
+(define %test-rootless-podman-with-least-authority-wrapper
+  (system-test
+   (name "rootless-podman-with-least-authority-wrapper")
+   (description "Test rootless Podman service, making sure services based on
+least-authority-wrapper keep working. See
+https://codeberg.org/guix/guix/issues/3233 for an example of how it has broken
+in the past.")
+   (value (run-rootless-podman-test-with-least-authority-wrapper))))
 
 (define %guile-oci-image
   (oci-image

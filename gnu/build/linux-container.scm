@@ -1,6 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
 ;;; Copyright © 2017-2019, 2022-2023, 2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2026 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -103,6 +104,16 @@ for the process."
                    #:key (update-mtab? #f))
     (mkdir-p target)
     (mount source target type flags options #:update-mtab? update-mtab?))
+
+  ;; Detach our mount namespace from the host's propagation peer
+  ;; group.  Without this, when the host's / is MS_SHARED - as it
+  ;; is on a system running rootless-podman-service-type, and as it
+  ;; is by default on systemd hosts - 'pivot_root' below fails
+  ;; with EINVAL because the new root and its parent must not have
+  ;; propagation type MS_SHARED (pivot_root(2)).  This is the same
+  ;; remount that runc, crun and buildah perform immediately after
+  ;; unshare(CLONE_NEWNS).
+  (mount #f "/" #f (logior MS_REC MS_PRIVATE))
 
   ;; The container's file system is completely ephemeral, sans directories
   ;; bind-mounted from the host.

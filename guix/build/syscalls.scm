@@ -55,6 +55,7 @@
             MS_BIND
             MS_MOVE
             MS_REC
+            MS_PRIVATE
             MS_SHARED
             MS_LAZYTIME
             MNT_FORCE
@@ -564,6 +565,7 @@ the last argument of `mknod'."
 (define MS_BIND            4096)
 (define MS_MOVE            8192)
 (define MS_REC            16384)
+(define MS_PRIVATE       262144)
 (define MS_SHARED       1048576)
 (define MS_RELATIME     2097152)
 (define MS_STRICTATIME 16777216)
