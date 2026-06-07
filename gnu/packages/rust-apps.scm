@@ -1216,6 +1216,29 @@ similar to lsusb.")
 in rust.")
     (license license:expat)))
 
+(define-public popsicle-gtk
+  (package/inherit popsicle
+    (name "popsicle-gtk")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:cargo-build-flags _ '())
+        ''("--release" "-p" "popsicle_gtk"))
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (replace 'install
+              (lambda _
+                (install-file "target/release/popsicle-gtk"
+                              (string-append #$output "/bin"))
+                (install-file "gtk/assets/com.system76.Popsicle.desktop"
+                              (string-append #$output "/share/applications"))
+                (install-file "gtk/assets/com.system76.Popsicle.appdata.xml"
+                              (string-append #$output "/share/metainfo"))
+                (copy-recursively "gtk/assets/icons"
+                                  (string-append #$output
+                                                 "/share/icons/hicolor"))))))))
+    (native-inputs (list clang `(,glib "bin") pkg-config))
+    (inputs (modify-inputs inputs (append gtk+)))))
+
 (define-public diffr
   (package
     (name "diffr")
