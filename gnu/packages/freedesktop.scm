@@ -3373,7 +3373,7 @@ interfaces.")
 (define-public xdg-desktop-portal-hyprland
   (package
     (name "xdg-desktop-portal-hyprland")
-    (version "1.3.11")
+    (version "1.3.12")
     (source
      (origin
        (method git-fetch)
@@ -3382,7 +3382,7 @@ interfaces.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1qxl9csqhhflwbg7n1p80xn9sxkn5srmnvx9vf7gpizndjbdwxg4"))))
+        (base32 "0w0c7i3b5x0n91nnwg8xm0dl3dq3dl1bnvgnsxla1l648dgz1f87"))))
     (build-system qt-build-system)
     (arguments
      (list #:tests? #f                  ;No tests.
