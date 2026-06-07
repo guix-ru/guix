@@ -4572,6 +4572,30 @@ python-prompt-toolkit}, making it easier to build cross-platform command line
 tools using Go.")
     (license license:expat)))
 
+(define-public go-github-com-c2h5oh-datasize
+  (package
+    (name "go-github-com-c2h5oh-datasize")
+    (version "0.0.0-20231215233829-aa82cc1e6500")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/c2h5oh/datasize")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0x0cfs7cf4779jvfwbk49qwgbcv84hydmwx9ip4af4xg23pqpjph"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/c2h5oh/datasize"))
+    (home-page "https://github.com/c2h5oh/datasize")
+    (synopsis "Golang helpers for data sizes")
+    (description
+     "This package provides Go helpers for data sizes (kilobytes, petabytes),
+human readable sizes, parsing.")
+    (license license:expat)))
+
 (define-public go-github-com-c9s-goprocinfo
   (package
     (name "go-github-com-c9s-goprocinfo")
