@@ -1242,6 +1242,31 @@ corresponds to the highest supported version of the gitea API, but
 backwards-compatibility is mostly given.")
     (license license:expat)))
 
+(define-public go-codeberg-org-git-pages-go-headers
+  (package
+    (name "go-codeberg-org-git-pages-go-headers")
+    (version "1.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/git-pages/go-headers.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0mnxq1r02i5cjkqbnzpyldvhs8fk12qh8rqhb80ifps7a6bzn0ma"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "codeberg.org/git-pages/go-headers"))
+    (home-page "https://codeberg.org/git-pages/go-headers")
+    (synopsis "Netlify's _redirects file format parser")
+    (description
+     "This package provides a Go redirect format parser to match Netlify's
+@code{https://www.netlify.com/docs/redirects/, format} plus a compatible
+unparser.")
+    (license license:bsd-0)))
+
 (define-public go-codeberg-org-tslocum-gmitohtml
   (package
     (name "go-codeberg-org-tslocum-gmitohtml")
