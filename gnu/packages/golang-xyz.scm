@@ -19601,6 +19601,48 @@ other directories.  It is optimized for filewalking.")
 optimized for UTF-16.")
     (license license:expat)))
 
+(define-public go-github-com-maypok86-otter-v2
+  (package
+    (name "go-github-com-maypok86-otter-v2")
+    (version "2.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/maypok86/otter")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0bb6gz4mh0fywkq55hffqp0y8brrqccf3wxpxzdrgr88ig0hjbbj"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "benchmarks")
+            (delete-file-recursively "docs")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/maypok86/otter/v2"
+      #:test-flags #~(list "-timeout=30m" "-shuffle=on")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'go-generate
+            (lambda* (#:key import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (invoke "go" "run" "./cmd/generator"
+                        "./internal/generated/node")))))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://maypok86.github.io/otter/")
+    (synopsis "High performance caching library for Go")
+    (description
+     "Package otter contains in-memory caching functionality.  It aims to
+address the shortcomings of its predecessors and incorporates design
+principles from high-performance libraries in other languages (such as
+@url{https://github.com/ben-manes/caffeine, Caffeine}).")
+    (license license:asl2.0)))
+
 (define-public go-github-com-mdlayher-sdnotify
   (package
     (name "go-github-com-mdlayher-sdnotify")
