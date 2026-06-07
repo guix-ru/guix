@@ -63,6 +63,7 @@
   #:use-module (gnu packages sdl)
   #:use-module (gnu packages simulation)
   #:use-module (gnu packages swig)
+  #:use-module (gnu packages tex)
   #:use-module (gnu packages video)
   #:use-module (gnu packages xorg))
 
@@ -387,6 +388,91 @@ multitouch applications.")
     (description
      "This package provides Kivy widgets that approximate Google's Material
 Design spec without sacrificing ease of use or application performance.")
+    (license license:expat)))
+
+;; XXX: The package was placed here to prevent adding (gnu packages video) to
+;; (gnu packages maths) module, it fits more there.
+(define-public python-manim
+  (package
+    (name "python-manim")
+    (version "0.20.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ManimCommunity/manim")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ifgcsz9dhb7qyqsi60q840wqcqfmqxf19r8qlncakziyqlfmwxd"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list "--numprocesses" (number->string (parallel-job-count))
+              ;; OpenGL tests skipped: require GPU/EGL acceleration
+              ;; unavailable in build environment. These tests pass on systems
+              ;; with proper GPU drivers.
+              ;;
+              ;; command/logging tests skipped: expected failures due to Guix
+              ;; build environment specifics (PATH wrapping, offline mode).
+              "-k" "not (opengl or OpenGL)"
+              "--ignore=tests/interface/test_commands.py"
+              "--ignore=tests/test_logging/test_logging.py")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-x-server
+            (lambda _
+              (system "Xvfb :1 -screen 0 1024x768x24 &")
+              (setenv "DISPLAY" ":1")))
+          (add-after 'unpack 'fix-pytest-config
+            (lambda _
+              (substitute* "pyproject.toml"
+                ((" -n auto ") " ")))))))
+    (native-inputs
+     (list python-hatchling
+           python-pytest
+           python-pytest-xdist
+           (texlive-local-tree
+            (list texlive-dvisvgm
+                  texlive-fontspec
+                  texlive-preview
+                  texlive-standalone
+                  texlive-xcolor))
+           xorg-server))
+    (propagated-inputs
+     (list ffmpeg
+           python-av
+           python-beautifulsoup4
+           python-click
+           python-cloup
+           python-decorator
+           python-isosurfaces
+           python-manimpango
+           python-mapbox-earcut
+           python-moderngl
+           python-moderngl-window
+           python-networkx
+           python-numpy
+           python-pillow
+           python-pycairo
+           python-pydub
+           python-pygments
+           python-rich
+           python-screeninfo
+           python-skia-pathops
+           python-srt
+           python-svgelements
+           python-tqdm
+           python-typing-extensions
+           python-watchdog))
+    (home-page "https://www.manim.community/")
+    (synopsis "Python animation engine for explanatory math videos")
+    (description
+     "Manim is a Python library for creating mathematical animations.  The
+animations are written as Python code which is based on predefined objects.
+You can make animations with maths formulas (LaTeX-based), simple shapes, 3D
+objects, function graphs and more.")
     (license license:expat)))
 
 (define-public python-mapbox-earcut
