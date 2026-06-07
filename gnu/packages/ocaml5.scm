@@ -1010,6 +1010,34 @@ structure, and it can process text without a complete in-memory
 representation.")
     (license license:isc)))
 
+(define-public ocaml-easy-format
+  (package
+    (name "ocaml5-easy-format")
+    (version "1.3.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mjambon/easy-format")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0xap6az4yyb60vb1jfs640wl3cf4njv78p538x9ihhf9f6ij3nh8"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "easy-format"
+       #:phases (modify-phases %standard-phases
+                  (add-before 'build 'make-writable
+                    (lambda _
+                      (for-each (lambda (file)
+                                  (chmod file #o644))
+                                (find-files "." ".")))))))
+    (home-page "https://github.com/mjambon/easy-format")
+    (synopsis "Interface to the Format module")
+    (description "Easy-format is a high-level and functional interface to the
+Format module of the OCaml standard library.")
+    (license license:bsd-3)))
+
 (define-public ocaml-ocplib-endian
   (package
     (name "ocaml5-ocplib-endian")
