@@ -4214,7 +4214,7 @@ GPU-accelerated screen locking utility.")
 (define-public hyprpaper
   (package
    (name "hyprpaper")
-   (version "0.8.1")
+   (version "0.8.4")
    (source (origin
             (method git-fetch)
             (uri (git-reference
@@ -4223,7 +4223,7 @@ GPU-accelerated screen locking utility.")
             (file-name (git-file-name name version))
             (sha256
              (base32
-              "0yy9cp54dy3knkyg22pfn6xbvaswx65j59cn5227jci6306q6ds4"))))
+              "1dki39irswyz0p21l6rpin5br35nrx2m7gbhqgry3d2pvrp9d1zz"))))
    (build-system cmake-build-system)
    (arguments '(#:tests? #f)) ;; no test
    (native-inputs (list gcc-15 pkg-config))
