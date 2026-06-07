@@ -18101,6 +18101,39 @@ Invisible, Underlined, Strikethrough
 @end itemize")
     (license license:expat)))
 
+(define-public go-github-com-leodido-go-syslog-v4
+  (package
+    (name "go-github-com-leodido-go-syslog-v4")
+    (version "4.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/leodido/go-syslog")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "08s59yn4vriiji9nlw65g2z989nfgf5pql3b6zrsy6cnr4964nlv"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/leodido/go-syslog/v4"
+      ;; Timestamps are not equal.
+      #:test-flags #~(list "-skip" "Example_withtimezone")))
+    (native-inputs
+     (list go-github-com-davecgh-go-spew
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-leodido-ragel-machinery
+           go-golang-org-x-text))
+    (home-page "https://github.com/leodido/go-syslog")
+    (synopsis "Syslog parsers for Golang")
+    (description
+     "Package syslog provides generic interfaces and structs for syslog
+messages and transport.  Subpackages contains various parsers or scanners for
+different syslog formats.")
+    (license license:expat)))
+
 (define-public go-github-com-leodido-go-urn
   (package
     (name "go-github-com-leodido-go-urn")
