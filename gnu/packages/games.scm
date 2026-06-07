@@ -7169,6 +7169,7 @@ in-window at 640x480 resolution or fullscreen.")
     ;; released under Public Domain terms.
     (license (list license:gpl2+ license:public-domain))))
 
+;; Keep in sync with warzone2100.
 (define-public launchinfo
   ;; No releases, use latest commit.
   (let ((commit "cfdd12564ab6cc30dc70a28571f6e8adfb5caeed")
@@ -7210,6 +7211,7 @@ in-window at 640x480 resolution or fullscreen.")
 use in the video game warzone2100.")
       (license license:expat))))       ;launchinfo, whereami
 
+;; Keep in sync with warzone2100.
 (define-public warzone2100-texpages
   ;; Commit pinned by warzone2100 v4.7.0; latest release is 7 years old.
   (let ((commit "009ec2f652a6230d8315cc3db4eadb5690f18fbd")
@@ -7247,6 +7249,7 @@ warzone2100.")
                 ;; everything else
                 license:gpl2+)))))
 
+;; Keep in sync with warzone2100.
 (define-public warzone2100-terrain-classic
   (origin
     (method git-fetch)
@@ -7259,6 +7262,7 @@ warzone2100.")
      (base32
       "0jjyy9rbkla7rdjl62r5pf2b565rk1054wf2qinlw72bgr12lb2j"))))
 
+;; Keep in sync with warzone2100.
 (define-public warzone2100-terrain-high
   (package
     (name "warzone2100-terrain-high")
@@ -7284,6 +7288,7 @@ warzone2100's high quality mode.")
     (license (list license:cc-by-sa3.0  ;either
                    license:gpl2+))))
 
+;; Keep in sync with warzone2100.
 (define-public warzone2100-data-music-opus
   (origin
     (method git-fetch)
@@ -7296,6 +7301,7 @@ warzone2100's high quality mode.")
      (base32
       "1liyhzasgbpjdy8w3m9906clm6kvq7x3dz45cg7ibjwq6xaqn4v1"))))
 
+;; Keep in sync with warzone2100.
 (define-public warzone2100-reclamation
   ;; 1.3.1. is old and does not show up in Warzone's in-game menu.
   ;; Newest commit appears compatible.
@@ -7335,6 +7341,7 @@ laying the foundations of a new world.")
       (license (list license:gpl2+
                      license:cc-by-sa3.0))))) ;mod-banner.png
 
+;; Keep in sync with warzone2100.
 (define-public warzone2100-fractured-kingdom
   ;; Commit pinned by warzone2100, radically different versions are
   ;; wont to break.
@@ -7377,6 +7384,8 @@ fighting over what remains.")
 (define-public warzone2100
   (package
     (name "warzone2100")
+    ;; Always keep in sync with warzone2100-* family
+    ;; of packages and launchinfo.
     (version "4.7.0")
     (source
      (origin
@@ -7385,19 +7394,30 @@ fighting over what remains.")
                            version "/warzone2100_src.tar.xz"))
        (modules '((guix build utils)))
        (snippet
-        #~(for-each delete-file-recursively
-                    (cons* "lib/netplay/3rdparty/miniupnp"
-                           "lib/sound/3rdparty/opusfile"
-                           (map (lambda (s) (string-append "3rdparty/" s))
-                                '("basis_universal"
-                                  "basis_universal_host_build"
-                                  "discord-rpc"
-                                  "fmt"
-                                  "GameNetworkingSockets"
-                                  "inih"
-                                  "re2"
-                                  "utf8proc"
-                                  "utfcpp")))))
+        #~(begin (with-directory-excursion "lib"
+                   (for-each delete-file-recursively
+                             '("netplay/3rdparty/miniupnp"
+                               "sound/3rdparty/opusfile")))
+                 (with-directory-excursion "data"
+                   (for-each delete-file-recursively
+                             '("fonts"
+                               "base/texpages"
+                               "terrain_overrides/classic"
+                               "terrain_overrides/high"
+                               "music"
+                               "mods/campaign/reclamation"
+                               "mods/campaign/fractured-kingdom")))
+                 (with-directory-excursion "3rdparty"
+                   (for-each delete-file-recursively
+                             '("basis_universal"
+                               "basis_universal_host_build"
+                               "discord-rpc"
+                               "fmt"
+                               "GameNetworkingSockets"
+                               "inih"
+                               "re2"
+                               "utf8proc"
+                               "utfcpp")))))
        (patches (search-patches "warzone2100-unbundle-basis-universal.patch"
                                 "warzone2100-unbundle-libs.patch"
                                 "warzone2100-unbundle-inih.patch"
@@ -7416,9 +7436,52 @@ fighting over what remains.")
                             "-DWZ_INCLUDE_VIDEOS=off"
                             "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
                             "-DENABLE_GNS_NETWORK_BACKEND=off"
+                            ;; Do not automatically install
+                            ;; additional campaigns.
+                            "-DWZ_BUILTIN_MODS_RECLAMATION=off"
+                            "-DWZ_BUILTIN_MODS_FRACTUREDKINGDOM=off"
                             ;; otherwise, installs a debug
                             ;; ELF which fails validate-runpath
-                            "-DWZ_SKIP_ELF_SEPARATE_DEBUG=on")))
+                            "-DWZ_SKIP_ELF_SEPARATE_DEBUG=on")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'unbundle-fonts
+            (lambda* (#:key inputs #:allow-other-keys)
+              (define (find-truetype file)
+                (search-input-file inputs
+                                   (in-vicinity "share/fonts/truetype" file)))
+              (substitute* "data/CMakeLists.txt"
+                (("add_subdirectory\\(fonts[^\\)]+")
+                 (string-join (list "set(wz2100_fonts_FILES"
+                                    (find-truetype "DejaVuSans.ttf")
+                                    (find-truetype "DejaVuSans-Bold.ttf")
+                                    (find-truetype "NotoSansCJK-VF.otf.ttc"))
+                              " ")))))
+          (add-after 'unpack 'copy-static-data
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((music       #$(this-package-input
+                                    "warzone2100-data-music-opus"))
+                    (classic     #$(this-package-input
+                                    "warzone2100-terrain-classic"))
+                    (texpages    (search-input-directory
+                                  inputs "/share/data/base/texpages"))
+                    (high        (search-input-directory
+                                  inputs "/share/data/terrain_overrides/high")))
+                (with-directory-excursion "data"
+                  (copy-recursively texpages "base/texpages")
+                  (copy-recursively music "music")
+                  (with-directory-excursion "terrain_overrides"
+                    (copy-recursively classic "classic")
+                    (copy-recursively high "high"))))))
+          (add-after 'install 'install-campaigns
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((outdir "/share/warzone2100/mods/campaign"))
+                (for-each
+                 (lambda (campaign-name)
+                   (install-file (search-input-file
+                                  inputs (in-vicinity outdir campaign-name))
+                                 (string-append #$output outdir)))
+                 '("reclamation.wz" "fractured_kingdom.wz"))))))))
     (native-inputs
      (list basis-universal
            gettext-minimal
@@ -7431,6 +7494,8 @@ fighting over what remains.")
      (list basis-universal
            curl
            fmt
+           font-dejavu
+           font-google-noto-sans-cjk
            freetype
            fribidi
            gnutls
@@ -7452,7 +7517,13 @@ fighting over what remains.")
            sqlite
            utf8proc
            utfcpp
-           vulkan-headers))
+           vulkan-headers
+           warzone2100-data-music-opus
+           warzone2100-fractured-kingdom
+           warzone2100-reclamation
+           warzone2100-terrain-classic
+           warzone2100-terrain-high
+           warzone2100-texpages))
     (home-page "https://wz2100.net")
     (synopsis "3D Real-time strategy and real-time tactics game")
     (description
