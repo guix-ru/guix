@@ -1190,7 +1190,7 @@ ecosystem.")
 (define-public hyprtoolkit
   (package
     (name "hyprtoolkit")
-    (version "0.5.3")
+    (version "0.5.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1199,10 +1199,10 @@ ecosystem.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0jjb1bf55270r3qc3fzxd1l3ahqsbgs948z46qi9niapa3gx1zli"))))
+                "1gihwav0k1jb4f7gq1d15njwr80ylbxa62hh25kyzqfxhf7q3540"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f)) ; No tests in Release build type
-    (native-inputs (list pkg-config hyprwayland-scanner))
+    (native-inputs (list pkg-config hyprwayland-scanner gcc-15))
     (inputs
       (list aquamarine
             cairo
@@ -1211,9 +1211,9 @@ ecosystem.")
             hyprlang
             hyprutils
             iniparser
-            mesa
             libglvnd
             libxkbcommon
+            mesa
             pango
             pixman
             wayland
