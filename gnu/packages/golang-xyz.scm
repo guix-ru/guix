@@ -17782,6 +17782,32 @@ allocation.  @code{fastime} is returning the approximate time.")
      "This package provides a pretty printer for Go values.")
     (license license:expat)))
 
+(define-public go-github-com-kr-pty
+  (package
+    (name "go-github-com-kr-pty")
+    (version "1.1.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kr/pty")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vcl6f90n0f8s8b4fyh0832ilybjqcypqyj233lqj1hx62fvgdbk"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/kr/pty"))
+    (propagated-inputs
+     (list go-github-com-creack-pty))
+    (home-page "https://github.com/kr/pty")
+    (synopsis "PTY interface for Go")
+    (description
+     "Package pty is a wrapper for @url{github.com/creack/pty}, which provides
+functions for working with Unix terminals.")
+    (license license:expat)))
+
 (define-public go-github-com-kr-text
   (package
     (name "go-github-com-kr-text")
