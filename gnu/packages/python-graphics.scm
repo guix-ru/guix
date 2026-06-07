@@ -389,6 +389,43 @@ multitouch applications.")
 Design spec without sacrificing ease of use or application performance.")
     (license license:expat)))
 
+(define-public python-moderngl
+  (package
+    (name "python-moderngl")
+    (version "5.12.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/moderngl/moderngl")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0gf8cam9m6sz73ndlwz8a5vd0qz06lbww3lgfjcdmla6bwyxjxd5"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list "-k" "not (test_local or test_compute_shader)")))
+    (native-inputs
+     (list python-numpy
+           python-pyopengl
+           python-pytest
+           python-scipy-minimal
+           python-setuptools))
+    (propagated-inputs
+     (list python-glcontext))
+    (home-page "https://github.com/moderngl/moderngl")
+    (synopsis "Modern OpenGL binding for Python")
+    (description
+     "ModernGL is a Python wrapper over OpenGL Core.  ModernGL simplifies the
+creation of graphics applications like scientific simulations, games or user
+interfaces.  Usually, acquiring in-depth knowledge of OpenGL requires a steep
+learning curve.  In contrast, ModernGL is easy to learn and use.  ModernGL is
+capable of rendering with high performance and quality, with less code
+written.")
+    (license license:expat)))
+
 (define-public python-moderngl-window
   (package
     (name "python-moderngl-window")
