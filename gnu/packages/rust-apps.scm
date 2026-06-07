@@ -1175,6 +1175,47 @@ from a single, concise, @code{EBNF}-like grammar.")
 similar to lsusb.")
     (license license:gpl3+)))
 
+(define-public popsicle
+  (package
+    (name "popsicle")
+    (version "1.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/pop-os/popsicle")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1hf1pdid2nhr5i0x2xdr36zfd6pcvnqr9q70lpzgaxp8zrm0sr5i"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:cargo-build-flags
+      ''("--release" "-p" "popsicle_cli")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'use-guix-vendored-dependencies
+            (lambda _
+              (substitute* "cli/Cargo.toml"
+                (("git =.*pb\", branch = \"write\"")
+                 "version = \"*\""))
+              (substitute* "gtk/Cargo.toml"
+                (("git = .*dbus-udisks2\"") "version = \"*\"")
+                (("git = .*iso9660-rs\"") "version = \"*\""))))
+          (replace 'install
+            (lambda _
+              (install-file "target/release/popsicle"
+                            (string-append #$output "/bin")))))))
+    (inputs (cargo-inputs 'popsicle))
+    (home-page "https://github.com/pop-os/popsicle")
+    (synopsis "Multiple USB file flasher")
+    (description
+     "Popsicle is a utility for flashing multiple devices in parallel, written
+in rust.")
+    (license license:expat)))
+
 (define-public diffr
   (package
     (name "diffr")
