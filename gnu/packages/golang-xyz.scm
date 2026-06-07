@@ -25260,6 +25260,31 @@ channels etc. and heavily inspired by @url{https://github.com/lodash/lodash,
 Lodash}.")
     (license license:expat)))
 
+(define-public go-github-com-samber-slog-common
+  (package
+    (name "go-github-com-samber-slog-common")
+    (version "0.22.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/samber/slog-common")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0z1cfyb28rwd537g7wh3z6zabzgf99pbb2w1mcdw1msjb43hc7zm"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/samber/slog-common"))
+    (propagated-inputs (list go-github-com-samber-lo))
+    (home-page "https://github.com/samber/slog-common")
+    (synopsis "Common toolchain for slog")
+    (description
+     "This package provides a toolchain for @url{https://pkg.go.dev/log/slog,
+slog} Go library.")
+    (license license:expat)))
+
 (define-public go-github-com-sap-go-hdb
   (package
     (name "go-github-com-sap-go-hdb")
