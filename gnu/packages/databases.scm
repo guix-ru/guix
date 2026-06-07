@@ -67,7 +67,7 @@
 ;;; Copyright © 2025 Ashvith Shetty <ashvithshetty0010@zohomail.in>
 ;;; Copyright © 2025 Philippe Swartvagher <phil.swart@gmx.fr>
 ;;; Copyright © 2025 Simen Endsjø <contact@simendsjo.me>
-;;; Copyright © 2025 bdunahu <bdunahu@operationnull.com>
+;;; Copyright © 2025-2026 bdunahu <bdunahu@operationnull.com>
 ;;; Copyright © 2026 Spencer King <spencer.king@wustl.edu>
 ;;; Copyright © 2026 Peter Polidoro <peter@polidoro.io>
 ;;; Copyright © 2026 Josep Bigorra <jjbigorra@gmail.com>
@@ -6175,6 +6175,38 @@ compatible with SQLite using a graphical user interface.")
      ;; dual license
      (list license:gpl3+
            license:mpl2.0))))
+
+(define-public sqlitecpp
+  (package
+    (name "sqlitecpp")
+    (version "3.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/SRombauts/SQLiteCpp")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "10gliycmzd16ydbpwwsn1r6byf5l78fwwc7hzgjdgg68zcclj8s5"))
+       (modules '((guix build utils)))
+       (snippet #~(delete-file-recursively "sqlite3"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:configure-flags #~'("-DSQLITECPP_INTERNAL_SQLITE=OFF"
+                            "-DSQLITECPP_INCLUDE_SCRIPT=OFF"
+                            "-DSQLITECPP_BUILD_TESTS=ON"
+                            "-DBUILD_SHARED_LIBS=ON")))
+    (inputs (list sqlite))
+    (native-inputs (list googletest))
+    (home-page "https://srombauts.github.io/SQLiteCpp/")
+    (synopsis "C++ SQLite3 wrapper")
+    (description "SQLiteC++ offers a intuitive C++ wrapper around the native C
+APIs of SQLite, prioritizing speed, minimal dependencies, and portability.")
+    ;; Complementary cmake and code-linter 3-clause BSD.
+    (license license:expat)))
 
 (define-public sqlitestudio
   (package
