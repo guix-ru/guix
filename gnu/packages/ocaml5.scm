@@ -4438,6 +4438,27 @@ qcheck library.  The possibilities range from trivial tests -- extremely simple
 to use -- to sophisticated random generation of test cases.")
     (license license:lgpl3+)))
 
+(define-public ocaml-trie
+  (package
+    (name "ocaml5-trie")
+    (version "1.0.0")
+    (home-page "https://github.com/kandu/trie/")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url home-page)
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0s7p9swjqjsqddylmgid6cv263ggq7pmb734z4k84yfcrgb6kg4g"))))
+    (build-system dune-build-system)
+    (synopsis "Strict impure trie data structure")
+    (description
+     "This module implements a strict impure trie data structure for
+OCaml.")
+    (license license:expat)))
+
 (define-public ocaml-afl-persistent
   (package
     (name "ocaml5-afl-persistent")
