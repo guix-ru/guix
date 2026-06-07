@@ -2520,6 +2520,29 @@ also create your own representation and use it to instantiate a new set of
 combinators.")
     (license license:lgpl2.1)))
 
+(define-public ocaml-xml-light
+  (package
+    (name "ocaml5-xml-light")
+    (version "2.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ncannasse/xml-light")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0bic3bw4srbnahxn0fhb6lklid8xwdscpbsvv9gy9ip1bivk6am6"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/ncannasse/xml-light")
+    (synopsis "Minimal XML parser & printer for OCaml")
+    (description
+     "Xml-Light provides functions to parse an XML document into an OCaml data
+structure, work with it, and print it back to an XML document.  It also
+supports DTD parsing and checking, and is entirely written in OCaml, hence it
+does not require additional C libraries.")
+    (license license:lgpl2.1+)))
+
 (define-public ocaml-yojson
   (package
     (name "ocaml5-yojson")
