@@ -25285,6 +25285,35 @@ Lodash}.")
 slog} Go library.")
     (license license:expat)))
 
+(define-public go-github-com-samber-slog-multi
+  (package
+    (name "go-github-com-samber-slog-multi")
+    (version "1.8.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/samber/slog-multi")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0fl37bqyy4bck3rkw8dbw192mmqsx7ms2n49hby3lc2hzws71h9a"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/samber/slog-multi"))
+    (propagated-inputs
+     (list go-github-com-samber-lo
+           go-github-com-samber-slog-common))
+    (home-page "https://github.com/samber/slog-multi")
+    (synopsis "Design workflows of slog handlers")
+    (description
+     "@strong{slog-multi} provides advanced composition patterns for Go's
+structured logging (@code{slog}).  It enables you to build sophisticated
+logging workflows by combining multiple handlers with different strategies for
+distribution, routing, transformation, and error handling.")
+    (license license:expat)))
+
 (define-public go-github-com-sap-go-hdb
   (package
     (name "go-github-com-sap-go-hdb")
