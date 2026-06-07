@@ -389,6 +389,39 @@ multitouch applications.")
 Design spec without sacrificing ease of use or application performance.")
     (license license:expat)))
 
+(define-public python-mapbox-earcut
+  (package
+    (name "python-mapbox-earcut")
+    (version "2.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/skogler/mapbox_earcut_python")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "18mpr453wbfdaa95xsvhqy5vmb311ja59dzi0aizwdf3nwjh75j7"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-nanobind
+           python-pytest
+           python-scikit-build-core))
+    (propagated-inputs
+     (list python-numpy))
+    (home-page "https://github.com/skogler/mapbox_earcut_python")
+    (synopsis "Python bindings to the mapbox earcut C++ library")
+    (description
+     "Python bindings for the C++ implementation of the Mapbox Earcut library,
+which provides very fast and quite robust triangulation of 2D polygons.
+
+The library implements a modified ear slicing algorithm, optimized by z-order
+curve hashing and extended to handle holes, twisted polygons, degeneracies and
+self-intersections in a way that doesn't guarantee correctness of
+triangulation, but attempts to always produce acceptable results for practical
+data like geographical shapes.")
+    (license license:isc)))
+
 (define-public python-moderngl
   (package
     (name "python-moderngl")
