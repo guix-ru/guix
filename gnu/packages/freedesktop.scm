@@ -1439,7 +1439,7 @@ Python.")
 (define-public hyprwayland-scanner
   (package
     (name "hyprwayland-scanner")
-    (version "0.4.5")
+    (version "0.4.6")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1448,7 +1448,7 @@ Python.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "02p42pdbx3g8w7bdrndzf1swzkgkpfrvvqfljpcq9132vh842y0n"))))
+                "0n5g8yrd4scnfxv1qc6hbqpj89v1jkic9n3iz8lib9hrmk1v2617"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f))      ;No tests.
     (inputs (list pugixml))
