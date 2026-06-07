@@ -18127,6 +18127,33 @@ Invisible, Underlined, Strikethrough
 specified by @uref{https://tools.ietf.org/html/rfc2141, IETF RFC 2141}.")
     (license license:expat)))
 
+(define-public go-github-com-leodido-ragel-machinery
+  (package
+    (name "go-github-com-leodido-ragel-machinery")
+    (version "0.0.0-20190525184631-5f46317e436b")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/leodido/ragel-machinery")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0j1gb030hb7cfh4g43sh0s1jcx6g5c2l7fzkwsy2j3wbfcsd3g4g"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/leodido/ragel-machinery"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (home-page "https://github.com/leodido/ragel-machinery")
+   (synopsis "Ragel machinery in Go")
+    (description
+     "This package provides machineries to speed up and facilitate the
+development of @url{https://en.wikipedia.org/wiki/Ragel, ragel} parsers able
+to accept streaming inputs.")
+    (license license:expat)))
+
 (define-public go-github-com-leonelquinteros-gotext
   (package
     (name "go-github-com-leonelquinteros-gotext")
