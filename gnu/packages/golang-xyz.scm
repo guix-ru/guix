@@ -677,6 +677,33 @@ go-sqlite3}, that provides full-text search functionality to database
 applications.")
     (license license:expat)))
 
+(define-public go-codeberg-org-git-pages-go-slog-syslog
+  (package
+    (name "go-codeberg-org-git-pages-go-slog-syslog")
+    (version "0.0.0-20251207093707-892f654e80b7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/git-pages/go-slog-syslog.git")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0cwbryh9dvcn3zq20adjp5l44qn8sq1ss496aq733adiih287vy9"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "codeberg.org/git-pages/go-slog-syslog"))
+    (propagated-inputs
+     (list go-github-com-leodido-go-syslog-v4))
+    (home-page "https://codeberg.org/git-pages/go-slog-syslog")
+    (synopsis "Syslog handler for the Go slog module")
+    (description
+     "Package syslog provides a slog handler for transmitting logs locally or
+over the network using the syslog protocol described in
+@url{https://rfc-editor.org/rfc/rfc5424.html, RFC 5424}.")
+    (license license:bsd-0)))
+
 (define-public go-dario-cat-mergo
   (package
     (name "go-dario-cat-mergo")
