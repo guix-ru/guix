@@ -54,6 +54,7 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages gtk)
   #:use-module (gnu packages libevent)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages m4)
@@ -5901,6 +5902,34 @@ for the RNG.")
 terminals.")
     ;; With static-linking exception
     (license license:lgpl3)))
+
+(define-public ocaml-cairo2
+  (package
+    (name "ocaml5-cairo2")
+    (version "0.6.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Chris00/ocaml-cairo")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zh9638vl9sp1k745qnzjmycsbkb9kya7qsh3yrxs48zn0hwznqn"))))
+    (build-system dune-build-system)
+    (arguments
+     (list
+      #:package "cairo2"))
+    (inputs (list cairo))
+    (native-inputs (list pkg-config))
+    (home-page "https://github.com/Chris00/ocaml-cairo")
+    (synopsis "Bindings for Cairo, a 2D Vector Graphics Library")
+    (description
+     "Ocaml-cairo2 is a set of bindings to Cairo, a 2D graphics library
+with support for multiple output devices.  Currently supported output targets
+include the X Window System, Quartz, Win32, image buffers, PostScript, PDF,
+and SVG file output.")
+    (license license:lgpl3+)))
 
 (define-public ocaml-ppx-stable-witness
   (package
