@@ -297,7 +297,7 @@ command line, without displaying a keyboard at all.")
 (define-public aquamarine
   (package
     (name "aquamarine")
-    (version "0.10.0")
+    (version "0.12.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -306,7 +306,7 @@ command line, without displaying a keyboard at all.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "082pkm8lj7gi9940fxmy787c2g6k3fyp966syslzhpay5a61cyay"))))
+                "13qq2yzsbpslch3wj19yxhcwdxpqp5knlmyvab8g3l37n8sh8i3i"))))
     (build-system cmake-build-system)
     (arguments
      (list ;; TODO: Figure out what's expected in the test environment.
