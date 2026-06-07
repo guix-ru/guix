@@ -56,6 +56,7 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-check)
+  #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-web)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
@@ -386,6 +387,65 @@ multitouch applications.")
     (description
      "This package provides Kivy widgets that approximate Google's Material
 Design spec without sacrificing ease of use or application performance.")
+    (license license:expat)))
+
+(define-public python-moderngl-window
+  (package
+    (name "python-moderngl-window")
+    (version "3.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/moderngl/moderngl-window")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1f5mnm1c92ssn7hww40k5yyz4r6b1d5xb2i9y99mcrjv6g1m4jd4"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-x-server
+            (lambda _
+              (system "Xvfb :1 &")
+              (setenv "DISPLAY" ":1"))))))
+    (native-inputs
+     (list python-pytest
+           python-pywavefront
+           python-setuptools
+           python-trimesh
+           xorg-server-for-tests))
+    (propagated-inputs
+     (list python-moderngl
+           python-numpy
+           python-pillow
+           python-pyglet
+           python-pyglm))
+    (home-page "https://github.com/moderngl/moderngl_window")
+    (synopsis "Helper library for ModernGL making window simple")
+    (description
+     "Cross platform utility library for ModernGL making window creation and
+resource loading simple.  It can also be used with PyOpenGL for rendering with
+the programmable pipeline.
+
+Features:
+
+@itemize
+@item Cross platform support.
+@item Easily create a window for ModernGL using pyglet, pygame, PySide2, GLFW,
+SDL2, PyQt5 or tkinter supporting a wide range of window, keyboard and mouse
+events.  These events are unified into a single system so your project can
+work with any window.
+@item Load 2D textures, texture arrays and cube maps using Pillow.
+@item Load shaders as single or multiple @code{glsl} files.
+@item Load objects/scenes from wavefront/obj, GLTF 2.0 or STL.
+@item Resource finder system supporting multiple resource directories.
+@item A highly plugable library supporting custom loaders, resource finders
+and windows.
+@item Type hints everywhere making code completion and linting a breeze.
+@end itemize")
     (license license:expat)))
 
 (define-public python-pivy
