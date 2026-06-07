@@ -5931,6 +5931,33 @@ include the X Window System, Quartz, Win32, image buffers, PostScript, PDF,
 and SVG file output.")
     (license license:lgpl3+)))
 
+(define-public ocaml-csv
+  (package
+    (name "ocaml5-csv")
+    (version "2.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Chris00/ocaml-csv")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0y2hlqlmqs7r4y5mfzc5qdv7gdp3wxbwpz458vf7fj4593vg94cf"))))
+    (build-system dune-build-system)
+    (arguments
+     `(#:package "csv"))
+    (home-page "https://github.com/Chris00/ocaml-csv")
+    (synopsis "Pure OCaml functions to read and write CSV")
+    (description
+     "@dfn{Comma separated values} (CSV) is a simple tabular format supported
+by all major spreadsheets.  This library implements pure OCaml functions to
+read and write files in this format as well as some convenience functions to
+manipulate such data.")
+    ;; This is LGPLv2.1 with an exception that allows packages statically-linked
+    ;; against the library to be released under any terms.
+    (license license:lgpl2.1)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
