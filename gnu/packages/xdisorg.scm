@@ -4164,7 +4164,7 @@ reduce perceived brightness below the monitor's minimum.")
 (define-public hyprlock
   (package
    (name "hyprlock")
-   (version "0.9.2")
+   (version "0.9.5")
    (source
     (origin
      (method git-fetch)
@@ -4173,7 +4173,7 @@ reduce perceived brightness below the monitor's minimum.")
            (commit (string-append "v" version))))
      (file-name (git-file-name name version))
      (sha256
-      (base32 "1mf8587f83kpip0sv3r7niv30mw5zprgh67g2hbjy9z1rl5pkhmr"))))
+      (base32 "0rxbrm0i4fcrm8m4ap52v4vq1gxw7gl6v6grdl06b3kqqgalqnal"))))
    (build-system cmake-build-system)
    (arguments
     `(#:phases
