@@ -19631,6 +19631,34 @@ AWS SDK.")
      (list go-github-com-aws-aws-sdk-go
            go-github-com-jpillora-backoff)))))
 
+(define-public go-github-com-tj-go-redirects
+  (package
+    (name "go-github-com-tj-go-redirects")
+    (version "0.0.0-20200911105812-fd1ba1020b37")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/tj/go-redirects")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0fg9bfsgkishnj3w5mnxphk13hjm32vs7jv5q3jb65zqsk2jk5hs"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/tj/go-redirects"))
+    (native-inputs
+     (list go-github-com-tj-assert))
+    (propagated-inputs
+     (list go-github-com-pkg-errors))
+    (home-page "https://github.com/tj/go-redirects")
+    (synopsis "Netlify's _redirects file format parser")
+    (description
+     "This package provides a Go redirect format parser to match Netlify's
+@code{https://www.netlify.com/docs/redirects/, format}.")
+    (license license:expat)))
+
 (define-public go-github-com-tmc-grpc-websocket-proxy
   (package
     (name "go-github-com-tmc-grpc-websocket-proxy")
