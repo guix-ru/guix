@@ -158,6 +158,7 @@
   #:use-module (gnu packages perl-check)
   #:use-module (gnu packages php)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages prometheus)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-check)
@@ -1027,6 +1028,61 @@ changelog template} can be customized with a
 @url{https://git-cliff.org/docs/configuration, configuration file} to match the
 desired format.")
     (license (list license:expat license:asl2.0))))
+
+(define-public git-pages
+  (package
+    (name "git-pages")
+    (version "0.9.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/git-pages/git-pages.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "029zas5pfky6qkbw4j9whrlyxd1pa4jfhj9jm8dg6fav292kf973"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:build-flags
+      #~(list (string-append "-ldflags=-X main.versionOverride=" #$version))
+      #:embed-files #~(list "children" "nodes" "text")
+      #:import-path "codeberg.org/git-pages/git-pages"
+      #:install-source? #f))
+    (native-inputs
+     (list go-codeberg-org-git-pages-go-headers
+           go-codeberg-org-git-pages-go-slog-syslog
+           go-github-com-bits-and-blooms-bloom-v3
+           go-github-com-burntsushi-toml
+           go-github-com-c2h5oh-datasize
+           go-github-com-creasty-defaults
+           go-github-com-fatih-color
+           go-github-com-go-git-go-billy-v6
+           go-github-com-go-git-go-git-v6
+           go-github-com-jpillora-backoff
+           go-github-com-kankanreno-go-snowflake
+           go-github-com-kimmachinegun-automemlimit
+           go-github-com-klauspost-compress
+           go-github-com-maypok86-otter-v2
+           go-github-com-minio-minio-go-v7
+           go-github-com-pquerna-cachecontrol
+           go-github-com-prometheus-client-golang
+           go-github-com-samber-slog-multi
+           go-github-com-stretchr-testify
+           go-github-com-tj-go-redirects
+           go-github-com-valyala-fasttemplate
+           go-golang-org-x-net
+           go-google-golang-org-protobuf))
+    (home-page "https://codeberg.org/git-pages/git-pages")
+    (synopsis "Scalable static site server for Git forges")
+    (description
+     "is a static site server for use with Git forges (i.e.  a @code{GitHub}
+Pages replacement).  It is written with efficiency in mind, scaling
+horizontally to any number of machines and serving sites up to multiple
+gigabytes in size, while being equally suitable for small single-user
+deployments.")
+    (license license:bsd-0)))
 
 (define-public git-pages-cli
   (package
