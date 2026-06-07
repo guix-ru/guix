@@ -5828,6 +5828,31 @@ unix submodule also provides an implementation based on @code{getrandom()} and
 for the RNG.")
     (license license:bsd-2)))
 
+(define-public ocaml-ansiterminal
+  (package
+    (name "ocaml5-ansiterminal")
+    (version "0.8.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Chris00/ANSITerminal")
+             (commit version)
+             (recursive? #t)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "052qnc23vmxp90yympjz9q6lhqw98gs1yvb3r15kcbi1j678l51h"))))
+    (build-system dune-build-system)
+    (properties `((upstream-name . "ANSITerminal")))
+    (home-page "https://github.com/Chris00/ANSITerminal")
+    (synopsis
+     "Basic control of ANSI-compliant terminals and the windows shell")
+    (description
+     "ANSITerminal is a module allowing use of color and cursor movement on ANSI
+terminals.")
+    ;; With static-linking exception
+    (license license:lgpl3)))
+
 (define-public ocaml-ppx-stable-witness
   (package
     (name "ocaml5-ppx-stable-witness")
