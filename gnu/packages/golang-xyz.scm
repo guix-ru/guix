@@ -11543,6 +11543,26 @@ operations.")
      (list
       #:import-path "github.com/go-git/go-git-fixtures/v5"))))
 
+(define-public go-github-com-go-git-go-git-fixtures-v6
+  (package
+    (inherit go-github-com-go-git-go-git-fixtures-v5)
+    (name "go-github-com-go-git-go-git-fixtures-v6")
+    (version "6.0.0-alpha.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-git/go-git-fixtures")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gf056176j779ihxh3zill3mjvw2lp17xpwdv9x6rqkdjrzbpdyy"))))
+    (arguments
+     (list
+      #:import-path "github.com/go-git/go-git-fixtures/v6"))
+    (propagated-inputs
+     (list go-github-com-go-git-go-billy-v6))))
+
 (define-public go-github-com-go-ini-ini
   (package
     (name "go-github-com-go-ini-ini")
