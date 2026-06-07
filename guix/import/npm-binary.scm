@@ -239,8 +239,8 @@
       (if (string=? dist-url versioned-url)
           `(string-append ,(string-append (%npm-registry)
                                           (if scope
-                                             (string-append "/" scope "/")
-                                             "/")
+                                              (string-append "/" scope "/")
+                                              "/")
                                           name)
                           ,(string-append "/-/" name "-")  version ".tgz")
           dist-url)))
@@ -261,21 +261,15 @@
             (resolved-deps (map resolve-spec
                                 (append dependencies peer-dependencies)))
             (peer-names (map versioned-package-name peer-dependencies))
-            ;; lset-difference for treating peer-dependencies as dependencies,
-            ;; which leads to dependency cycles.  lset-union for treating them as
-            ;; (ignored) dev-dependencies, which leads to broken packages.
-            (dev-names
-             (lset-union string=
-                         (map versioned-package-name dev-dependencies)
-                         peer-names))
+            (dev-names (append (map versioned-package-name dev-dependencies)
+                               peer-names))
             (extra-phases
              (match dev-names
                (() '())
                ((dev-names ...)
                 `((add-after 'patch-dependencies 'delete-dev-dependencies
                     (lambda _
-                      (modify-json
-                       (delete-dependencies '(,@(reverse dev-names)))))))))))
+                      (modify-json (delete-dev-dependencies)))))))))
        (values
         `(package
            (name ,name)

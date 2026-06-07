@@ -15715,6 +15715,8 @@ in Guix.
 @end table
 
 @item npm-binary
+@cindex npm-binary, importer
+@cindex importer for node packages
 @cindex npm
 @cindex Node.js
 Import metadata from the @uref{https://registry.npmjs.org, npm
@@ -15735,6 +15737,15 @@ Generated package expressions skip the build step of the
 @code{node-build-system}. As such, generated package expressions often
 refer to transpiled or generated files, instead of being built from
 source.
+@end quotation
+
+@quotation Note
+Currently, the generated package definition contains a phase to delete
+the development dependencies (@code{devDependencies}) from the
+@file{package.json} file, if there are such dependencies, to reduce the
+occurrences of circular dependencies.  Also note that
+@code{peerDependencies} are treated as development dependencies and
+removed for the same reason.
 @end quotation
 
 Additional options include:

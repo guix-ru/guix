@@ -221,7 +221,8 @@ only after the 'patch-dependencies' phase."
     #:strict? strict?))
 
 (define (delete-dev-dependencies)
-  (delete-fields (list "devDependencies") #:strict? #f))
+  (delete-fields (list "devDependencies" "peerDependencies")
+                 #:strict? #f))
 
 ;;;
 ;;; Phases.
