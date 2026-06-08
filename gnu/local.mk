@@ -1239,7 +1239,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/efitools-riscv64-support.patch		\
   %D%/packages/patches/efivar-fix-fprint-format.patch		\
   %D%/packages/patches/elastix-1404.patch			\
-  %D%/packages/patches/eigen-fix-strict-aliasing-bug.patch	\
   %D%/packages/patches/einstein-build.patch			\
   %D%/packages/patches/elfutils-tests-ptrace.patch		\
   %D%/packages/patches/elixir-path-length.patch			\
