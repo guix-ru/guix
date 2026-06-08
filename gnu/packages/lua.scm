@@ -873,9 +873,9 @@ interfaces.")
   (lua-5.2 lua5.2-ossl)
   (lua-5.1 lua5.1-ossl))
 
-(define (make-lua-sec name lua lua-socket)
+(define-public lua-sec
   (package
-    (name name)
+    (name "lua-sec")
     (version "1.3.2")
     (source (origin
               (method git-fetch)
@@ -891,7 +891,7 @@ interfaces.")
      (list
       #:tests? #f                       ;no tests
       #:make-flags
-      #~(let* ((lua-api-version #$(version-major+minor (package-version lua)))
+      #~(let* ((lua-api-version #$(this-lua-version))
                (lua-path (string-append #$output "/share/lua/" lua-api-version))
                (lua-cpath (string-append #$output "/lib/lua/" lua-api-version)))
           (list "linux"
@@ -911,20 +911,12 @@ It takes an already established TCP connection and creates a secure session
 between the peers.")
     (license license:expat)))
 
-(define-public lua5.1-sec
-  (make-lua-sec "lua5.1-sec" lua-5.1 lua5.1-socket))
-
-(define-public lua5.2-sec
-  (make-lua-sec "lua5.2-sec" lua-5.2 lua5.2-socket))
-
-(define-public lua-sec
-  (make-lua-sec "lua-sec" lua lua-socket))
-
-(define-public lua5.4-sec
-  (make-lua-sec "lua5.4-sec" lua-5.4 lua5.4-socket))
-
-(define-public lua5.5-sec
-  (make-lua-sec "lua5.5-sec" lua-5.5 lua5.5-socket))
+(define-public-lua-variants lua-sec
+  (lua-5.5 lua5.5-sec)
+  (lua-5.4 lua5.4-sec)
+  (lua-5.3 lua5.3-sec)
+  (lua-5.2 lua5.2-sec)
+  (lua-5.1 lua5.1-sec))
 
 (define (make-lua-cqueues name lua lua-ossl)
   (package
