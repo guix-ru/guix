@@ -118,18 +118,6 @@ return its MAX-LENGTH first elements and its tail."
            (values (reverse result) lst)
            (loop (+ 1 len) tail (cons head result)))))))
 
-(define (narinfo-from-file file url)
-  "Attempt to read a narinfo from FILE, using URL as the cache URL.  Return #f
-if file doesn't exist, and the narinfo otherwise."
-  (catch 'system-error
-    (lambda ()
-      (call-with-input-file file
-        (cut read-narinfo <> url)))
-    (lambda args
-      (if (= ENOENT (system-error-errno args))
-          #f
-          (apply throw args)))))
-
 (define (lookup-narinfo caches path authorized?)
   "Return the narinfo for PATH in CACHES, or #f when no substitute for PATH
 was found."
