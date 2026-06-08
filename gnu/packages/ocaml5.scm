@@ -4812,6 +4812,29 @@ for OCaml.  It is able to generate self-extensible parsers (also called
 adaptive parsers) as well as extensible lexers for the parsers it produces.")
     (license license:cecill-b)))
 
+(define-public ocaml-timed
+  (package
+    (name "ocaml5-timed")
+    (version "1.1")
+    (home-page "https://github.com/rlepigre/ocaml-timed")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url (string-append home-page ".git"))
+             (commit version)))
+       (sha256
+        (base32 "1aqmkpjv5jk95lc2m3qyyrhw8ra7n9wj8pv3bfc83l737zv0hjn1"))
+       (file-name (git-file-name name version))))
+    (build-system dune-build-system)
+    (synopsis "Timed references for imperative OCaml state")
+    (description
+     "This module provides an alternative type for references (or mutable cells)
+supporting undo/redo operations.  An abstract notion of time is used to
+capture the state of a reference at any given point so that it can be
+restored.")
+    (license license:expat)))
+
 (define-public ocaml-sedlex
   (package
     (name "ocaml5-sedlex")
