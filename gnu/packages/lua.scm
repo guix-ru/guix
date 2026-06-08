@@ -424,16 +424,16 @@ with the appropriate luaX.X- prefix for this package."
        (string-append "lua" (this-lua-version) "-" (substring name 4))
        name)))
 
-(define (make-lua-expat name lua)
+(define-public lua-expat
   (package
-    (name name)
+    (name "lua-expat")
     (version "1.5.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/lunarmodules/luaexpat")
-             (commit version)))
+              (url "https://github.com/lunarmodules/luaexpat")
+              (commit version)))
        (file-name (git-file-name name version))
        (sha256
         (base32
@@ -443,7 +443,7 @@ with the appropriate luaX.X- prefix for this package."
      (list
       #:tests? #f                       ;tests require "busted"
       #:make-flags
-      #~(let ((lua-version #$(version-major+minor (package-version lua))))
+      #~(let ((lua-version #$(this-lua-version)))
           (list (string-append "CC=" #$(cc-for-target))
                 (string-append "LUA_LDIR=" #$output "/share/lua/" lua-version)
                 (string-append "LUA_CDIR=" #$output "/lib/lua/" lua-version)))
@@ -457,20 +457,12 @@ with the appropriate luaX.X- prefix for this package."
     (description "LuaExpat is a SAX XML parser based on the Expat library.")
     (license (package-license lua-5.1))))
 
-(define-public lua5.1-expat
-  (make-lua-expat "lua5.1-expat" lua-5.1))
-
-(define-public lua5.2-expat
-  (make-lua-expat "lua5.2-expat" lua-5.2))
-
-(define-public lua-expat
-  (make-lua-expat "lua-expat" lua))
-
-(define-public lua5.4-expat
-  (make-lua-expat "lua5.4-expat" lua-5.4))
-
-(define-public lua5.5-expat
-  (make-lua-expat "lua5.5-expat" lua-5.5))
+(define-public-lua-variants lua-expat
+  (lua-5.5 lua5.5-expat)
+  (lua-5.4 lua5.4-expat)
+  (lua-5.3 lua5.3-expat)
+  (lua-5.2 lua5.2-expat)
+  (lua-5.1 lua5.1-expat))
 
 (define (make-lua-socket name lua)
   ;; The 3.1.0 tag still has 3.0.0 in a bunch of places.
