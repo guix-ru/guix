@@ -168,8 +168,8 @@ Compression: none
 NarHash: sha256:" (bytevector->nix-base32-string
                    (plain-file-nar-sha256 "Substitutable data.")) "
 NarSize: 42
-References: bar baz
-Deriver: " (%store-prefix) "/foo.drv
+References: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-baz
+Deriver: cccccccccccccccccccccccccccccccc-foo.drv
 System: mips64el-linux\n"))
 
 (define* (call-with-narinfo narinfo thunk
@@ -299,8 +299,8 @@ Compression: none\n")))
                                  "Signature: " (signature-field prefix) "
 NarHash: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 NarSize: 42
-References: bar baz
-Deriver: " (%store-prefix) "/foo.drv
+References: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-baz
+Deriver: cccccccccccccccccccccccccccccccc-foo.drv
 System: mips64el-linux\n")
       (string-trim-both
        (with-output-to-string
@@ -318,13 +318,13 @@ System: mips64el-linux\n")
   (let ((prefix (string-append "StorePath: " (%store-prefix)
                                "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo
 NarHash: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-References: bar baz\n")))
+References: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-baz\n")))
     (with-narinfo (string-append prefix
                                  "Signature: " (signature-field prefix) "
 URL: example.nar
 Compression: none
 NarSize: 42
-Deriver: " (%store-prefix) "/foo.drv")
+Deriver: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo.drv")
       (string-trim-both
        (with-output-to-string
          (lambda ()
@@ -434,7 +434,7 @@ Compression: none
 NarHash: sha256:" (bytevector->nix-base32-string (sha256 #vu8())) "
 NarSize: 42
 References: 
-Deriver: " (%store-prefix) "/foo.drv
+Deriver: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo.drv
 System: mips64el-linux\n")))
         (with-narinfo (string-append narinfo "Signature: "
                                      (signature-field narinfo) "\n")
@@ -837,8 +837,8 @@ Compression: none
 NarHash: sha256:" (bytevector->nix-base32-string
                    (plain-file-nar-sha256 "Substitutable data.")) "
 NarSize: 42
-References: bar baz
-Deriver: " (%store-prefix) "/foo.drv
+References: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-baz
+Deriver: cccccccccccccccccccccccccccccccc-foo.drv
 System: mips64el-linux\n")))
     (with-narinfo (string-append narinfo "Signature: "
                                  (signature-field narinfo))

@@ -1,5 +1,5 @@
 # GNU Guix --- Functional package management for GNU
-# Copyright © 2012, 2014, 2015, 2016, 2017, 2018, 2019 Ludovic Courtès <ludo@gnu.org>
+# Copyright © 2012, 2014-2019, 2026 Ludovic Courtès <ludo@gnu.org>
 #
 # This file is part of GNU Guix.
 #
@@ -48,7 +48,7 @@ Compression: none
 NarSize: 1234
 References: 
 System: `guile -c '(use-modules (guix)) (display (%current-system))'`
-Deriver: $drv
+Deriver: $(basename $drv)
 EOF
 
 # Remove the cached narinfo.
