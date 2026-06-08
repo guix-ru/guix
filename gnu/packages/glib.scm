@@ -1422,29 +1422,31 @@ to the host system, optionally with filters applied.")
                 "0xnbay58xn0hav208mdsg8dd176w57dcpw1q2k0g5fh9v7xk4nk4"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'fix-test-paths
-           ;; add missing space
-           (lambda* (#:key outputs #:allow-other-keys)
-             (substitute* "Makefile.in"
-               (("#!/bin/bash") (string-append "#!" (which "bash"))))
-             (substitute* "tests/Makefile.in"
-               (("/bin/sh") (which "sh"))
-               (("#!/bin/bash") (string-append "#!" (which "bash")))
-               (("echo cat") (string-append "echo " (which "cat")))
-               (("/bin/true") (which "true")))
-             #t)))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'fix-test-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "Makefile.in"
+                (("#!/bin/bah")
+                 (string-append "#!" (search-input-file inputs "bin/bash"))))
+              (substitute* "tests/Makefile.in"
+                (("/bin/sh") (search-input-file inputs "bin/sh"))
+                (("#!/bin/bash")
+                 (string-append "#!" (search-input-file inputs "bin/bash")))
+                (("echo cat")
+                 (string-append "echo " (search-input-file inputs "bin/cat")))
+                (("/bin/true") (search-input-file inputs "bin/true"))))))))
     (inputs
      (list gtk+ glib dbus-glib))
     (native-inputs
-     `(("glib:bin" ,glib "bin")
-       ("intltool" ,intltool)
-       ("pkg-config" ,pkg-config)
-       ;; following used for tests
-       ("python" ,python)
-       ("python-dbusmock" ,python-dbusmock)
-       ("xvfb" ,xorg-server-for-tests)))
+     (list `(,glib "bin")
+           intltool
+           pkg-config
+           ;; following used for tests
+           python
+           python-dbusmock
+           xorg-server-for-tests))
     (home-page "https://launchpad.net/dbus-test-runner")
     (synopsis "Run a executables under a new DBus session for testing")
     (description "A small little utility to run a couple of executables under a
