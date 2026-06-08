@@ -537,10 +537,17 @@ When present, Poppler is able to correctly render CJK and Cyrillic text.")
    (synopsis "Qt5 frontend for the Poppler PDF rendering library")))
 
 (define-public poppler-qt6
-  (package/inherit poppler
+  (package/inherit poppler-next
     (name "poppler-qt6")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:configure-flags flags)
+        #~((@ (srfi srfi-1) lset-difference) equal?
+                                             #$flags
+                                             '("-DENABLE_GPGME=OFF"
+                                               "-DENABLE_QT6=OFF")))))
     (inputs (modify-inputs inputs
-              (append qtbase)))
+              (append gpgme-2 qtbase)))
     (synopsis "Qt6 frontend for the Poppler PDF rendering library")))
 
 (define-public python-poppler-qt5
