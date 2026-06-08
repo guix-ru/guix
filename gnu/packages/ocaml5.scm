@@ -4813,6 +4813,34 @@ for OCaml.  It is able to generate self-extensible parsers (also called
 adaptive parsers) as well as extensible lexers for the parsers it produces.")
     (license license:cecill-b)))
 
+(define-public ocaml-bitstring
+  (let ((commit
+         ;; Restores correct compiler flags for recent versions of dune.
+         "c74a424c43be6c500a8466d823221436bc79598f")
+        (revision "0"))
+    (package
+      (name "ocaml5-bitstring")
+      (version (git-version "5.0.2" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/xguerin/bitstring")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "128nhgd3cv7g8lvs6h9qg502ivbzcxr6xd0w6ln118ijrsk8nsda"))))
+      (build-system dune-build-system)
+      (propagated-inputs (list ocaml-stdlib-shims))
+      (arguments
+       `(#:package "bitstring"))
+      (home-page "https://github.com/xguerin/bitstring")
+      (synopsis "Bitstrings and bitstring matching for OCaml")
+      (description
+       "This library provides Erlang-style bitstrings for OCaml.  It can be used to
+parse and generate binary formats, files and protocols.")
+      (license license:isc))))
+
 (define-public ocaml-timed
   (package
     (name "ocaml5-timed")
