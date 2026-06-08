@@ -5958,6 +5958,28 @@ manipulate such data.")
     ;; against the library to be released under any terms.
     (license license:lgpl2.1)))
 
+(define-public ocaml-benchmark
+  (package
+    (name "ocaml5-benchmark")
+    (version "1.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Chris00/ocaml-benchmark")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "14grmnlv51pw7d093hk8wfj3nb8kp6lm1b7m3x7myxk87g16aig2"))))
+    (build-system dune-build-system)
+    (home-page "https://github.com/Chris00/ocaml-benchmark")
+    (synopsis "Benchmark run times of OCaml code")
+    (description
+     "This OCaml module provides a set of tools to measure the run times of
+your functions and to easily compare the results.  A statistical test
+is used to determine whether differences across results are significant.")
+    (license license:lgpl3+)))
+
 (define-public ocaml-mparser
   (package
     (name "ocaml5-mparser")
