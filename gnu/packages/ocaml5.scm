@@ -63,6 +63,7 @@
   #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages node)
   #:use-module (gnu packages parallel)
+  #:use-module (gnu packages pcre)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
@@ -3996,6 +3997,31 @@ exposed the intrinsics properly, the compiler doesn't have any fast blits
 between Bigstrings and other string-like types.  @code{bigstringaf} provides
 these missing pieces.")
     (license license:bsd-3)))
+
+(define-public ocaml-pcre
+  (package
+    (name "ocaml5-pcre")
+    (version "8.0.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mmottl/pcre-ocaml")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "13i57fyrk9a782xpfz04ah5gpn4y1h803n682gzvkhz76yna8h9p"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list dune-configurator pcre))
+    (native-inputs `(("pcre:bin" ,pcre "bin")
+                     ("ocaml-ounit2" ,ocaml-ounit2)))
+    (home-page "https://mmottl.github.io/pcre-ocaml")
+    (synopsis "Bindings to the Perl Compatibility Regular Expressions library")
+    (description
+     "Pcre-ocaml offers library functions for string pattern matching and
+substitution, similar to the functionality offered by the Perl language.")
+    ;; With static linking exception
+    (license license:lgpl2.1+)))
 
 (define-public ocaml-cstruct
   (package
