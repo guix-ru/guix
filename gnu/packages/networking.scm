@@ -72,6 +72,7 @@
 ;;; Copyright © 2025, 2026 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2025 Jared Klingenberger <jkling@noreply.codeberg.org>
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
+;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -663,6 +664,42 @@ GLib-based library, libnice, as well as GStreamer elements to use it.")
      (list
       license:lgpl2.1+
       license:mpl1.1))))
+
+(define-public libplum
+  (package
+    (name "libplum")
+    (version "0.6.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/paullouisageneau/libplum")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "156088n8x4qh6wsz5jb2mhsxv1sxn5i4f2axiqqs3agb29h5sp2q"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            ;; No tests, use the example as a test.
+            (lambda* (#:key tests? #:allow-other-keys)
+              ;; Binds ports and simulates network magic.
+              (when tests? (invoke "../build/example")))))))
+    (home-page "https://github.com/paullouisageneau/libplum")
+    (synopsis "Multi-protocol Port Mapping client library")
+    (description "libplum (Port Lightweight and Universal Mapping) is a
+high-level library which allows forwarding ports on Network Address
+Translators (NAT).  Under the hood, it implements multiple protocols and
+automatically detects which one to use:
+@itemize
+@item Port Control Protocol (PCP)
+@item NAT Port Mapping Protocol (NAT-PMP)
+@item UPnP Internet Gateway Device Protocol (UPnP-IGD)
+@end itemize")
+    (license license:mpl2.0)))
 
 (define-public librecast
   (package
