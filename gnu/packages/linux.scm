@@ -4158,37 +4158,30 @@ topology configuration files that can be used for specific audio hardware.")
         (base32 "0khz38l87zm81q7dllv8gr4j9bj9c1jj69vnw03i3xvichjhwwxn"))))
     (build-system gnu-build-system)
     (arguments
-     '(#:configure-flags (list (string-append "LDFLAGS=-Wl,-rpath="
-                                              (assoc-ref %outputs "out")
-                                              "/lib"))
+     (list
+      #:configure-flags
+      #~(list (string-append "LDFLAGS=-Wl,-rpath=" #$output "/lib"))
        #:phases
-       (modify-phases %standard-phases
-         (replace 'bootstrap
-           (lambda _
-             (invoke "libtoolize" "--force" "--copy" "--automake")
-             (invoke "aclocal")
-             (invoke "autoheader")
-	     (invoke "automake" "--foreign" "--copy" "--add-missing")
-             (invoke "autoconf")))
-         (add-before 'install 'pre-install
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((ucm
-                     (string-append (assoc-ref inputs "alsa-ucm-conf")))
-                    (topology
-                     (string-append (assoc-ref inputs "alsa-topology-conf")))
-                    (alsa
-                     (string-append (assoc-ref outputs "out") "/share/alsa"))
-                    (ucm-share
-                     (string-append ucm "/share/alsa/ucm"))
-                    (ucm2-share
-                     (string-append ucm "/share/alsa/ucm2"))
-                    (topology-share
-                     (string-append topology "/share/alsa/topology")))
-               (mkdir-p alsa)
-               (symlink ucm-share (string-append alsa "/ucm"))
-               (symlink ucm2-share (string-append alsa "/ucm2"))
-               (symlink topology-share (string-append alsa "/topology")))
-             #t)))))
+       #~(modify-phases %standard-phases
+           (replace 'bootstrap
+             (lambda _
+               (invoke "libtoolize" "--force" "--copy" "--automake")
+               (invoke "aclocal")
+               (invoke "autoheader")
+               (invoke "automake" "--foreign" "--copy" "--add-missing")
+               (invoke "autoconf")))
+           (add-before 'install 'pre-install
+             (lambda* _
+               (let* ((ucm #$(this-package-input "alsa-ucm-conf"))
+                      (topology #$(this-package-input "alsa-topology-conf"))
+                      (alsa (string-append #$output "/share/alsa"))
+                      (ucm-share (string-append ucm "/share/alsa/ucm"))
+                      (ucm2-share (string-append ucm "/share/alsa/ucm2"))
+                      (topology-share (string-append topology "/share/alsa/topology")))
+                 (mkdir-p alsa)
+                 (symlink ucm-share (string-append alsa "/ucm"))
+                 (symlink ucm2-share (string-append alsa "/ucm2"))
+                 (symlink topology-share (string-append alsa "/topology"))))))))
     (inputs
      (list autoconf-2.72
            automake
