@@ -1,3 +1,9 @@
+[diff]
+        # This does wonder to avoid fragmenting the hunks of package additions
+        # that would confuse the diff and make individually staging the added
+        # packages troublesome.
+        algorithm = histogram
+
 [diff "scheme"]
 	xfuncname = "^(\\(define.*)$"
 
