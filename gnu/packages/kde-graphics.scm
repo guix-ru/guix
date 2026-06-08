@@ -679,7 +679,7 @@ features include brush stabilizers, brush engines and wrap-around mode.")
 (define-public kseexpr
   (package
     (name "kseexpr")
-    (version "4.0.4.0")
+    (version "6.0.0.0")
     (source
      (origin
        (method git-fetch)
@@ -688,15 +688,23 @@ features include brush stabilizers, brush engines and wrap-around mode.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "888q3kkv2wq426w000iq14wy3a45rrnn0bmsdks6caz4vq04ccay"))))
+        (base32 "0jk81vv6rz4h4ifzkgrw5z9nihcg21bajdzf3px9yyc7s90s6w37"))))
     (build-system qt-build-system)
     (arguments
-     `(#:tests? #f
-       #:configure-flags (list "-DBUILD_TESTS=ON"))) ; disabled by default
+     (list
+      #:qtbase qtbase
+      #:configure-flags
+      #~(list "-DBUILD_TESTS=ON"))) ; disabled by default
     (native-inputs
-     (list bison doxygen extra-cmake-modules flex googletest))
+     (list bison
+           doxygen
+           extra-cmake-modules
+           flex
+           googletest
+           python-minimal
+           qttools))
     (inputs
-     (list ki18n libpng qtbase-5))
+     (list ki18n libpng))
     (home-page "https://invent.kde.org/graphics/kseexpr")
     (synopsis "Embeddable expression evaluation engine")
     (description "This package contains the fork of Disney Animation's SeExpr
