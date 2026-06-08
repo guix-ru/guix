@@ -464,12 +464,12 @@ with the appropriate luaX.X- prefix for this package."
   (lua-5.2 lua5.2-expat)
   (lua-5.1 lua5.1-expat))
 
-(define (make-lua-socket name lua)
+(define-public lua-socket
   ;; The 3.1.0 tag still has 3.0.0 in a bunch of places.
   (let ((commit "de359ea4083ac6d944216229e4104dc36537c29c")
         (revision "1"))
     (package
-      (name name)
+      (name "lua-socket")
       (version (git-version "3.1.0" revision commit))
       (source
        (origin
@@ -483,36 +483,35 @@ with the appropriate luaX.X- prefix for this package."
           (base32 "1bdcdad8fq2p193jcvsv59wm5mifb07alvrxm8qq31qmgs1q4mpw"))))
       (build-system gnu-build-system)
       (arguments
-       (let ((luav (version-major+minor (package-version lua))))
-         (list
-          #:make-flags
-          #~(list (string-append "INSTALL_TOP=" #$output)
-                  (string-append "LUAV=" #$luav)
-                  "MYCFLAGS=-DLUASOCKET_DEBUG")
-          #:modules
-          (cons '(ice-9 threads) %default-gnu-modules)
-          #:phases
-          #~(modify-phases %standard-phases
-              (delete 'configure)
-              (delete 'check)
-              (add-after 'install 'install-unix
-                (lambda* (#:key make-flags #:allow-other-keys)
-                  (apply invoke "make" "install-unix" make-flags)))
-              (add-after 'install-unix 'check
-                (lambda _
-                  (setenv "GUIX_LUA_CPATH"
-                          (string-append #$output "/lib/lua/" #$luav))
-                  (setenv "GUIX_LUA_PATH"
-                          (string-append #$output "/share/lua/" #$luav))
-                  (with-directory-excursion "test"
-                    (make-thread invoke "lua" "testsrvr.lua")
-                    (make-thread invoke "lua" "utestsrvr.lua")
-                    (for-each
-                     (lambda (test)
-                       (invoke "lua" (string-append test ".lua")))
-                     '("hello" "stufftest" "excepttest" "test_bind"
-                       "test_getaddrinfo" "ltn12test" "mimetest" "urltest"
-                       "test_socket_error" "testclnt" "utestclnt")))))))))
+       (list
+        #:make-flags
+        #~(list (string-append "INSTALL_TOP=" #$output)
+                (string-append "LUAV=" #$(this-lua-version))
+                "MYCFLAGS=-DLUASOCKET_DEBUG")
+        #:modules
+        (cons '(ice-9 threads) %default-gnu-modules)
+        #:phases
+        #~(modify-phases %standard-phases
+            (delete 'configure)
+            (delete 'check)
+            (add-after 'install 'install-unix
+              (lambda* (#:key make-flags #:allow-other-keys)
+                (apply invoke "make" "install-unix" make-flags)))
+            (add-after 'install-unix 'check
+              (lambda _
+                (setenv "GUIX_LUA_CPATH"
+                        (string-append #$output "/lib/lua/" #$(this-lua-version)))
+                (setenv "GUIX_LUA_PATH"
+                        (string-append #$output "/share/lua/" #$(this-lua-version)))
+                (with-directory-excursion "test"
+                  (make-thread invoke "lua" "testsrvr.lua")
+                  (make-thread invoke "lua" "utestsrvr.lua")
+                  (for-each
+                   (lambda (test)
+                     (invoke "lua" (string-append test ".lua")))
+                   '("hello" "stufftest" "excepttest" "test_bind"
+                     "test_getaddrinfo" "ltn12test" "mimetest" "urltest"
+                     "test_socket_error" "testclnt" "utestclnt"))))))))
       (inputs (list lua))
       (home-page "https://lunarmodules.github.io/luasocket")
       (synopsis "Network support for the Lua language")
@@ -531,20 +530,12 @@ with one) and LTN12 (filters, sinks, sources and pumps) modules can be very
 handy.")
       (license (package-license lua-5.1)))))
 
-(define-public lua5.1-socket
-  (make-lua-socket "lua5.1-socket" lua-5.1))
-
-(define-public lua5.2-socket
-  (make-lua-socket "lua5.2-socket" lua-5.2))
-
-(define-public lua-socket
-  (make-lua-socket "lua-socket" lua))
-
-(define-public lua5.4-socket
-  (make-lua-socket "lua5.4-socket" lua-5.4))
-
-(define-public lua5.5-socket
-  (make-lua-socket "lua5.5-socket" lua-5.5))
+(define-public-lua-variants lua-socket
+  (lua-5.5 lua5.5-socket)
+  (lua-5.4 lua5.4-socket)
+  (lua-5.3 lua5.3-socket)
+  (lua-5.2 lua5.2-socket)
+  (lua-5.1 lua5.1-socket))
 
 (define (make-lua-filesystem name lua)
   (package
