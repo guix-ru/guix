@@ -4789,6 +4789,29 @@ compatibility.")
      "This package implements restartable and consumable iterators for OCaml.")
     (license license:bsd-2)))
 
+(define-public ocaml-grain-dypgen
+  (package
+    (name "ocaml5-grain-dypgen")
+    (version "0.2.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/recoules/dypgen")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0d4yzvb1xpwvjj5n4vfpqhy6vjxyz0i6m2vh9vhjdwb164iv37bh"))))
+    (build-system dune-build-system)
+    (properties `((upstream-name . "dypgen")))
+    (home-page "https://github.com/recoules/dypgen")
+    (synopsis "Self-extensible parsers and lexers for OCaml")
+    (description
+     "This package provides a @acronym{GLR, generalized LR} parser generator
+for OCaml.  It is able to generate self-extensible parsers (also called
+adaptive parsers) as well as extensible lexers for the parsers it produces.")
+    (license license:cecill-b)))
+
 (define-public ocaml-sedlex
   (package
     (name "ocaml5-sedlex")
