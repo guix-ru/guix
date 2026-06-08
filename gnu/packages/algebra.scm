@@ -22,6 +22,7 @@
 ;;; Copyright © 2025 Skylar Hill <stellarskylark@posteo.net>
 ;;; Copyright © 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2025 Andy Tai <atai@atai.org>
+;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1291,76 +1292,71 @@ Python.")
 (define-public eigen
   (package
     (name "eigen")
-    (version "3.4.0")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://gitlab.com/libeigen/eigen.git")
-                    (commit version)))
-              (sha256
-               (base32
-                "0k1c4qnymwwvm68rv6s0cyk08xbw65ixvwqccsh36c2axcqk3znp"))
-              (file-name (git-file-name name version))
-              (patches (search-patches "eigen-fix-strict-aliasing-bug.patch"))
-              (modules '((guix build utils)))
-              (snippet
-               ;; There are 3 test failures in the "unsupported" directory,
-               ;; but maintainers say it's a known issue and it's unsupported
-               ;; anyway, so just skip them.
-               '(begin
-                  (substitute* "unsupported/CMakeLists.txt"
-                    (("add_subdirectory\\(test.*")
-                     "# Do not build the tests for unsupported features.\n"))
-                  #t))))
+    (version "5.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.com/libeigen/eigen.git")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1aksb7jmxxhp45q8aa3z483cvz3nl52nsn7fka4hbnpd8lqvadgi"))
+       (modules '((guix build utils)))
+       (snippet
+        ;; There are 3 test failures in the "unsupported" directory, but maintainers
+        ;; say it's a known issue and it's unsupported anyway, so just skip them.
+        '(begin
+           (substitute* "unsupported/CMakeLists.txt"
+             (("add_subdirectory\\(test.*")
+              "# Do not build the tests for unsupported features.\n"))))))
     (build-system cmake-build-system)
     (arguments
-     `(;; Turn off debugging symbols to save space.
-       #:build-type "Release"
-
-       #:modules ((ice-9 match)
-                  (guix build utils)
-                  (guix build cmake-build-system))
-
-       #:phases
-       (modify-phases %standard-phases
-                  (add-after 'unpack 'disable-some-tests
-                    ;; Not all platforms are well supported by the test suite.
-                    (lambda _
-                      ,@(match (%current-system)
-                          ("i686-linux"
-                           `((substitute* "test/CMakeLists.txt"
-                               ((".*packetmath.*") ""))))
-                          ("aarch64-linux"
-                           `((substitute* "test/CMakeLists.txt"
-                               ((".*array_cwise.*") "")
-                               ((".*vectorization_logic.*") ""))))
-                          ("armhf-linux"
-                           `((substitute* "test/CMakeLists.txt"
-                               ((".*geo_quaternion.*") "")
-                               ((".*jacobisvd.*") "")
-                               ((".*packetmath.*") "")
-                               ((".*prec_inverse.*") "")
-                               ((".*qr_colpivoting.*") "")
-                               ((".*vectorization_logic.*") ""))))
-                          ("riscv64-linux"
-                           `((substitute* "test/CMakeLists.txt"
-                               ((".*array_cwise.*") "")
-                               ((".*geo_quaternion.*") ""))))
-                          (_
-                            '((display "No tests to disable on this architecture.\n"))))))
-                  (replace 'check
-                    (lambda* (#:key tests? #:allow-other-keys)
-                      (let* ((cores  (parallel-job-count))
-                             (dash-j (format #f "-j~a" cores)))
-                        (when tests?
-                          (setenv "EIGEN_SEED" "1") ;for reproducibility
-                          ;; First build the tests, in parallel.  See
-                          ;; <http://eigen.tuxfamily.org/index.php?title=Tests>.
-                          (invoke "make" "buildtests" dash-j)
-
-                          ;; Then run 'CTest' with -V so we get more
-                          ;; details upon failure.
-                          (invoke "ctest" "-V" dash-j))))))))
+     (list
+      ;; Turn off debugging symbols to save space.
+      #:build-type "Release"
+      #:modules '((guix build utils)
+                  (guix build cmake-build-system)
+                  (ice-9 match))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'disable-some-tests
+            ;; Not all platforms are well supported by the test suite.
+            (lambda _
+              (match #$(%current-system)
+                ("i686-linux"
+                 `((substitute* "test/CMakeLists.txt"
+                     ((".*packetmath.*") ""))))
+                ("aarch64-linux"
+                 `((substitute* "test/CMakeLists.txt"
+                     ((".*array_cwise.*") "")
+                     ((".*vectorization_logic.*") ""))))
+                ("armhf-linux"
+                 `((substitute* "test/CMakeLists.txt"
+                     ((".*geo_quaternion.*") "")
+                     ((".*jacobisvd.*") "")
+                     ((".*packetmath.*") "")
+                     ((".*prec_inverse.*") "")
+                     ((".*qr_colpivoting.*") "")
+                     ((".*vectorization_logic.*") ""))))
+                ("riscv64-linux"
+                 `((substitute* "test/CMakeLists.txt"
+                     ((".*array_cwise.*") "")
+                     ((".*geo_quaternion.*") ""))))
+                (_
+                 '((display "No tests to disable on this architecture.\n"))))))
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (let* ((cores  (parallel-job-count))
+                     (dash-j (format #f "-j~a" cores)))
+                (when tests?
+                  (setenv "EIGEN_SEED" "1") ;for reproducibility
+                  ;; First build the tests, in parallel.  See
+                  ;; <http://eigen.tuxfamily.org/index.php?title=Tests>.
+                  (invoke "make" "buildtests" dash-j)
+                  ;; Then run 'CTest' with -V so we get more
+                  ;; details upon failure.
+                  (invoke "ctest" "-V" dash-j))))))))
     (home-page "https://eigen.tuxfamily.org/index.php?title=Main_Page")
     (synopsis "C++ template library for linear algebra")
     (description
@@ -1369,7 +1365,6 @@ numerical solvers, and related algorithms.  It provides an elegant API based
 on \"expression templates\".  It is versatile: it supports all matrix sizes,
 all standard numeric types, various matrix decompositions and geometry
 features, and more.")
-
     ;; Most of the code is MPLv2, with a few files under LGPLv2.1+ or BSD-3.
     ;; See 'COPYING.README' for details.
     (license license:mpl2.0)))
