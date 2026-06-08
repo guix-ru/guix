@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2012-2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2012-2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2018 Jan Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2019, 2020 Mathieu Othacehe <m.othacehe@gmail.com>
 ;;; Copyright © 2020 Florian Pelz <pelzflorian@pelzflorian.de>
@@ -204,6 +204,9 @@
             output-path
             fixed-output-path
             store-path?
+            valid-path-syntax?
+            valid-path-basename-syntax?
+            valid-store-name?
             direct-store-path?
             derivation-path?
             store-path-base
@@ -1962,7 +1965,10 @@ HASH-ALGO, of the derivation NAME.  RECURSIVE? has the same meaning as for
                          name))))
 
 (define (store-path? path)
-  "Return #t if PATH is a store path."
+  "Return #t if PATH is a store path.
+
+This is a lightweight check.  Use 'valid-path-syntax?' to validate untrusted
+input."
   ;; This is a lightweight check, compared to using a regexp, but this has to
   ;; be fast as it's called often in `derivation', for instance.
   ;; `isStorePath' in Nix does something similar.
@@ -1997,6 +2003,42 @@ valid inputs."
          (and (> (string-length base) 33)
               (not (string-index base #\/))
               base))))
+
+(define %store-item-charset
+  ;; Valid characters for the name of a store item.
+  (string->char-set (string-append "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                   "abcdefghijklmnopqrstuvwxyz"
+                                   "0123456789" "+-._?=")))
+
+(define (valid-store-name? name)
+  "Return true if NAME is syntactically a valid store file name--i.e., a name
+that would be accepted by 'add-to-store' & co."
+  ;; Like 'checkStoreName'.
+  (and (not (string-null? name))
+       (not (string-prefix? "." name))
+       (string-every %store-item-charset name)))
+
+(define (valid-path-basename-syntax? item)
+  "Return true if ITEM has a valid syntax as the basename of a store item."
+  (define hash-len 32)
+
+  (and (> (string-length item) (+ hash-len 1))
+       (string-every %nix-base32-charset item 0 hash-len)
+       (eqv? (string-ref item hash-len) #\-)
+       (valid-store-name? (string-drop item (+ hash-len 1)))))
+
+(define (valid-path-syntax? path)
+  "Return true if PATH is syntactically a valid store path.  Unlike
+'store-path?', this can be used to validate untrusted input.
+
+This must not be confused with 'valid-path?'."
+  (define prefix-len
+    (string-length (%store-prefix)))
+
+  (and (> (string-length path) (+ prefix-len 1))
+       (string-prefix? (%store-prefix) path)
+       (eq? (string-ref path prefix-len) #\/)
+       (valid-path-basename-syntax? (string-drop path (+ prefix-len 1)))))
 
 (define (store-path-package-name path)
   "Return the package name part of PATH, a file name in the store."

@@ -78,6 +78,30 @@
       (open-connection #f #:port port)
       'broken)))
 
+(test-assert "valid-path-syntax?"
+  (valid-path-syntax? (string-append (%store-prefix)
+                                     "/yp8mg1rwaw3y1p09bc8dx4l6rx4qx961-coreutils-9.1")))
+
+(test-assert "valid-path-syntax? truncated hash"
+  (not (valid-path-syntax?
+        (string-append (%store-prefix)
+                       "/p8mg1rwaw3y1p09bc8dx4l6rx4qx961-coreutils-9.1"))))
+
+(test-assert "valid-path-syntax? slash"
+  (not (valid-path-syntax?
+        (string-append (%store-prefix)
+                       "/yp8mg1rwaw3y1p09bc8dx4l6rx4qx961-coreutils-9.1/../../../etc/passwd"))))
+
+(test-assert "valid-path-syntax? leading dot"
+  (not (valid-path-syntax? (string-append (%store-prefix)
+                                          "/yp8mg1rwaw3y1p09bc8dx4l6rx4qx961-.leading-dot"))))
+
+(test-assert "valid-path-syntax? prefix"
+  (not (valid-path-syntax? (%store-prefix))))
+
+(test-assert "valid-path-syntax? truncated"
+  (not (valid-path-syntax? (string-append (%store-prefix) "/aaaaaaaaaaa"))))
+
 (test-equal "store-path-hash-part"
   "283gqy39v3g9dxjy26rynl0zls82fmcg"
   (store-path-hash-part
