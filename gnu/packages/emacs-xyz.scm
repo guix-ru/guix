@@ -48458,6 +48458,34 @@ current buffer, it displays a list of known projects.  One can then pick
 a file from the selected project.")
       (license license:gpl3+))))
 
+(define-public emacs-consult-git-log-grep
+  ;; No release commit, version from consult-git-log-grep.el.
+  (let ((commit "5b1669ebaff9a91000ea185264cfcb850885d21f")
+        (revision "0"))
+    (package
+      (name "emacs-consult-git-log-grep")
+      (version (git-version "1.3.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/ghosty141/consult-git-log-grep/")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "12vbgl90m3jp1m5f9amsqa7aa9kxlayf02rzii30mgfi02y7ypl4"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list
+        #:tests? #f)) ;No tests.
+      (propagated-inputs (list emacs-consult))
+      (home-page "https://github.com/ghosty141/consult-git-log-grep/")
+      (synopsis "Emacs consult interface to @code{git log --grep}")
+      (description
+       "@code{consult-git-log-grep} provides an interactive way to search
+the git log using @code{consult}.")
+      (license license:expat))))
+
 (define-public emacs-consult-recoll
   (package
     (name "emacs-consult-recoll")
