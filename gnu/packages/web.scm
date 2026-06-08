@@ -8112,6 +8112,42 @@ Interface} and @acronym{SSL, Secure Sockets Layer} support.  It can be
 embedded into C/C++ applications or used as a standalone web server.")
     (license license:expat)))
 
+(define-public copyparty
+  (package
+    (name "copyparty")
+    (version "1.20.16")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/9001/copyparty")
+              (commit (string-append "v" version))))
+       (sha256
+        (base32 "01jhj8kb6xh50401qfrcgbyvq6xyngjnqxaj0f6hi1vmy78kq9j4"))
+       (modules '((guix build utils)))
+       (snippet
+        ;; The modules in this directory are meant to be de-vendorable.
+        #~(delete-file-recursively "copyparty/stolen"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:test-backend #~'unittest))
+    (native-inputs
+     (list python-setuptools))
+    (propagated-inputs
+     (list python-dnslib
+           python-ifaddr
+           python-jinja2
+           python-mfusepy
+           python-qrcodegen))
+    (home-page "https://github.com/9001/copyparty")
+    (synopsis "Portable file server")
+    (description
+     "@code{copyparty} is a file server featuring fast, resumable uploads,
+deduplication, WebDAV, FTP/TFTP, SMP/CIFS, upnp/zeroconf/mdns, video
+thumbnails, audio streaming with transcoding, search, and account-based access
+control.")
+    (license license:expat)))
+
 (define-public python-py-ubjson
   (package
     (name "python-py-ubjson")
