@@ -52,6 +52,7 @@
 (define-module (gnu packages ocaml5)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages curl)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gtk)
@@ -4885,6 +4886,30 @@ supports Unicode.  Unlike ocamllex, sedlex allows lexer specifications within
 regular OCaml source files.  Lexing specific constructs are provided via a ppx
 syntax extension.")
     (license license:expat)))
+
+(define-public ocaml-curl
+  (package
+    (name "ocaml5-curl")
+    (version "0.10.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ygrek/ocurl")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0a032aljqz798560d752p1vla6129cd9g1f00kvnif118ncls5kl"))))
+    (build-system dune-build-system)
+    (inputs (list curl ocaml-lwt))
+    (home-page "https://github.com/ygrek/ocurl")
+    (synopsis "OCaml bindings for libcurl")
+    (description "This Client-side URL transfer library supports HTTP and a
+multitude of other network protocols (FTP/SMTP/RTSP/etc).")
+    (license license:isc)))
+
+;; Upstream changed the package name to "curl" in v0.10.0.
+(define-deprecated-package ocaml-ocurl ocaml-curl)
 
 (define %js-of-ocaml-base
   (package
