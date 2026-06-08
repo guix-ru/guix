@@ -567,7 +567,7 @@ painting, image manipulating and icon editing.")
 (define-public krita
   (package
     (name "krita")
-    (version "5.2.16")
+    (version "6.0.2")
     (source
      (origin
        (method url-fetch)
@@ -575,27 +575,28 @@ painting, image manipulating and icon editing.")
              "mirror://kde/stable/krita/" version "/krita-" version
              ".tar.gz"))
        (sha256
-        (base32 "1d9wl7hzwip2zzgcff2gfmj6rg534dmidnqphfswjvgq46j80a1w"))
-       (patches (search-patches "krita-bump-sip-abi-version-to-12.8.patch"))))
+        (base32 "0bfncd40kpcj6abpgx4vhczy8yyz9bsp7wmcmz4knr77fx4hmw34"))))
     (build-system qt-build-system)
     (arguments
-     `(#:tests? #f
-       #:configure-flags (list "-DCMAKE_CXX_FLAGS=-fPIC")
-       #:phases (modify-phases %standard-phases
-                  (add-after 'install 'wrap-bin
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let* ((out (assoc-ref outputs "out"))
-                             (python-path (getenv "GUIX_PYTHONPATH")))
-                        (wrap-program (string-append out "/bin/krita")
-                          `("GUIX_PYTHONPATH" ":" prefix (,python-path)))))))))
+     (list
+      #:qtbase qtbase
+      #:configure-flags
+      #~(list "-DBUILD_WITH_QT6=ON"
+              "-DALLOW_UNSTABLE=QT6")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'wrap-bin
+            (lambda _
+              (let* ((python-path (getenv "GUIX_PYTHONPATH")))
+                (wrap-program (string-append #$output "/bin/krita")
+                  `("GUIX_PYTHONPATH" ":" prefix (,python-path)))))))))
     (native-inputs
      (list curl
            eigen
            extra-cmake-modules
            gettext-minimal
            kitemmodels
-           pkg-config
-           qwt))
+           pkg-config))
     (inputs
      (list bash-minimal
            boost-1.83
@@ -613,26 +614,26 @@ painting, image manipulating and icon editing.")
            harfbuzz
            imath
            immer
-           karchive-5
-           kcompletion-5
-           kconfig-5
-           kcoreaddons-5
-           kcrash-5
-           kguiaddons-5
-           ki18n-5
-           kiconthemes-5
-           kio-5
-           kitemviews-5
+           karchive
+           kcompletion
+           kconfig
+           kcoreaddons
+           kcrash
+           kguiaddons
+           ki18n
+           kiconthemes
+           kio
+           kitemviews
            kseexpr
-           kwidgetsaddons-5
-           kwindowsystem-5
-           kxmlgui-5
+           kwidgetsaddons
+           kwindowsystem
+           kxmlgui
            lager
            lcms
            libheif
            libjpeg-turbo
            libjxl
-           libkdcraw-qt5
+           libkdcraw
            libmypaint
            libpng
            ;; libraqm
@@ -651,17 +652,18 @@ painting, image manipulating and icon editing.")
            openexr
            openjpeg
            perl
-           poppler-qt5
-           python-pyqt
-           python-pyqt5-sip
-           qtbase-5
-           qtdeclarative-5
-           qtmultimedia-5
-           qtsvg-5
-           qtwayland-5
-           qtx11extras
-           quazip-5
+           poppler-qt6
+           python
+           python-pyqt-6
+           python-pyqt6-sip
+           qt5compat
+           qtdeclarative
+           qtmultimedia
+           qtsvg
+           qtwayland
+           quazip
            sdl2
+           wayland
            xsimd
            zlib
            zug))
