@@ -1516,8 +1516,7 @@ time.")
                         "TestRewrites")
                        "|"))))
     (native-inputs
-     (list gccgo-14
-           go-github-com-google-go-cmp))
+     (list go-github-com-google-go-cmp))
     (propagated-inputs
      (list go-github-com-yuin-goldmark
            go-golang-org-x-mod
