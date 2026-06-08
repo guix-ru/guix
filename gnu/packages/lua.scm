@@ -327,6 +327,103 @@ considered a fork, since changes are regularly synchronized from the upstream
 LuaJIT project.  This package also enables the Lua 5.2 compat mode needed by
 some projects.")))
 
+(define (make-lua-rewriter lua-package old-prefix new-prefix)
+  "Define a procedure that replaces lua inputs with LUA-PACKAGE.  This only
+operates on packages with a name starting with OLD-PREFIX, which is rewritten to
+NEW-PREFIX."
+  (define (transform-name name)
+    (if (string-prefix? old-prefix name)
+        (string-append new-prefix
+                       (substring name (string-length old-prefix)))
+        name))
+
+  (define (rewrite-input-labels inputs)
+    (map (lambda (input)
+           (match input
+             ((label (? package? package) outputs ...)
+              (cons* (transform-name label) package outputs))
+             (_
+              input)))
+         inputs))
+
+  (define (transform package)
+    (if (eq? package lua)
+        lua-package
+        (let* ((old-name (package-name package))
+               (new-name (transform-name old-name)))
+          (if (string= old-name new-name)
+              package
+              (package/inherit package
+                (location (package-location package))
+                (name new-name)
+                (source
+                 (cond
+                  ;; If we're using {git,hg}-fetch, then rewrite the file-name
+                  ;; of the resulting package.  This avoids causing rebuilds
+                  ;; when migrating from the older method of defining Lua
+                  ;; packages.
+                  ((eq? (origin-method (package-source package)) git-fetch)
+                   (origin
+                     (inherit (package-source package))
+                     (file-name (git-file-name name (package-version package)))))
+                  ((eq? (origin-method (package-source package)) hg-fetch)
+                   (origin
+                     (inherit (package-source package))
+                     (file-name (hg-file-name name (package-version package)))))
+                  (else
+                   (package-source package))))
+                ;; We also need to rewrite the input labels, otherwise the
+                ;; differences cause rebuilds.
+                (inputs            (rewrite-input-labels (package-inputs package)))
+                (native-inputs     (rewrite-input-labels (package-native-inputs package)))
+                (propagated-inputs (rewrite-input-labels (package-propagated-inputs package))))))))
+
+  (define (cut? package)
+    (or (eq? package lua)
+        (eq? package lua-package)))
+
+  (package-mapping transform cut?))
+
+(define package-with-lua-5.5 (make-lua-rewriter lua-5.5 "lua-" "lua5.5-"))
+(define package-with-lua-5.4 (make-lua-rewriter lua-5.4 "lua-" "lua5.4-"))
+(define package-with-lua-5.3 (make-lua-rewriter lua     "lua-" "lua5.3-"))
+(define package-with-lua-5.2 (make-lua-rewriter lua-5.2 "lua-" "lua5.2-"))
+(define package-with-lua-5.1 (make-lua-rewriter lua-5.1 "lua-" "lua5.1-"))
+
+(define-syntax define-public-lua-variant
+  (syntax-rules (lua-5.5 lua-5.4 lua-5.3 lua-5.2 lua-5.1)
+    "Helper to define a single variant for PACKAGE, called NEW-PACKAGE, for the
+specified lua version.  We explicitly match the lua package name as a symbol, so
+we can pick the rewriting function to rewrite package names appropriately."
+    ((_ package (lua-5.5 new-package))
+     (define-public new-package (package-with-lua-5.5 package)))
+    ((_ package (lua-5.4 new-package))
+     (define-public new-package (package-with-lua-5.4 package)))
+    ((_ package (lua-5.3 new-package))
+     (define-public new-package (package-with-lua-5.3 package)))
+    ((_ package (lua-5.2 new-package))
+     (define-public new-package (package-with-lua-5.2 package)))
+    ((_ package (lua-5.1 new-package))
+     (define-public new-package (package-with-lua-5.1 package)))))
+
+(define-syntax-rule (define-public-lua-variants package (lua-version new-package) ...)
+  "Define variants of PACKAGE for each LUA-VERSION, naming the corresponding
+package NEW-PACKAGE."
+  (begin (define-public-lua-variant package (lua-version new-package)) ...))
+
+(define-syntax-rule (this-lua-version)
+  "Return the major+minor version string of the current package's lua input."
+  (version-major+minor (package-version (or (this-package-input "lua")
+                                            (this-package-native-input "lua")))))
+
+(define-syntax-rule (this-lua-input name)
+  "Return the package input which matches NAME, after replacing any lua- prefix
+with the appropriate luaX.X- prefix for this package."
+  (this-package-input
+   (if (string-prefix? "lua-" name)
+       (string-append "lua" (this-lua-version) "-" (substring name 4))
+       name)))
+
 (define (make-lua-expat name lua)
   (package
     (name name)
