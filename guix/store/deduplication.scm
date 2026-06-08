@@ -310,17 +310,30 @@ OUTPUT as it goes."
 
   (make-custom-binary-input-port "tee input port" read! #f #f #f))
 
+(define (call-with-fresh-output-file file proc)
+  "Like call-with-output-file, but ensure FILE is newly-created and does not
+follow symlinks.  Throw to key 'system-error with errno EEXIST if FILE already
+exists."
+  (let ((port (open file (logior O_WRONLY O_CREAT O_EXCL
+                                 O_NOFOLLOW O_CLOEXEC))))
+    (dynamic-wind (const #t)
+                  (lambda ()
+                    (proc port))
+                  (lambda ()
+                    (close-port port)))))
+
 (define* (dump-file/deduplicate file input size type
                                 #:key (store (%store-directory)))
-  "Write SIZE bytes read from INPUT to FILE.  TYPE is a symbol, either
-'regular or 'executable.
+  "Write SIZE bytes read from INPUT to FILE, throwing system-error with an
+errno of EEXIST if FILE already exists.  TYPE is a symbol, either 'regular or
+'executable.
 
 This procedure is suitable as a #:dump-file argument to 'restore-file'.  When
 used that way, it deduplicates files on the fly as they are restored, thereby
 removing the need for a deduplication pass that would re-read all the files
 down the road."
   (define (dump-and-compute-hash)
-    (call-with-output-file file
+    (call-with-fresh-output-file file
       (lambda (output)
         (let-values (((hash-port get-hash)
                       (open-hash-port (hash-algorithm sha256))))
@@ -333,7 +346,7 @@ down the road."
 
   (if (>= size %deduplication-minimum-size)
       (deduplicate file (dump-and-compute-hash) #:store store)
-      (call-with-output-file file
+      (call-with-fresh-output-file file
         (lambda (output)
           (if (file-port? input)
               (sendfile output input size 0)
@@ -352,3 +365,7 @@ down the road."
                                    'regular
                                    'executable)
                                #:store store)))))
+
+;;; Local Variables:
+;;; eval: (put 'call-with-fresh-output-file 'scheme-indent-function 1)
+;;; End:

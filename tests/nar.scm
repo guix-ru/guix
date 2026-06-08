@@ -35,6 +35,7 @@
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-35)
   #:use-module (srfi srfi-64)
+  #:use-module (ice-9 binary-ports)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 regex)
   #:use-module ((ice-9 control) #:select (let/ec))
@@ -267,6 +268,84 @@
                    '()
                    (open-bytevector-input-port (get-bytevector))
                    "R"))))
+
+(define (call-with-tree-port tree proc)
+      (let ((bv (call-with-output-bytevector
+                 (lambda (port)
+                   (apply write-file-tree "root" port tree)))))
+        (call-with-input-bytevector bv proc)))
+
+(define (port-bad-nar? port)
+  (guard (c ((nar-error? c)
+             (pk 'nar-error c)
+             #t))
+    (dynamic-wind
+      (const #t)
+      (lambda ()
+        (rm-rf %test-dir)
+        (mkdir %test-dir)
+        (restore-file port (string-append %test-dir "/foo")))
+      (lambda ()
+        (false-if-exception (rm-rf %test-dir))))))
+
+(test-assert "write-file-tree + fold-archive, unsorted directory entries"
+  (let* ((unsorted-tree (list #:file-type+size
+                              (match-lambda
+                                ("root" (values 'directory 0))
+                                ("root/c" (values 'regular 1))
+                                ("root/b" (values 'regular 1))
+                                ("root/a" (values 'regular 1)))
+                              #:file-port
+                              (match-lambda
+                                ("root/c" (open-input-string "c"))
+                                ("root/b" (open-input-string "b"))
+                                ("root/a" (open-input-string "a")))
+                              #:directory-entries
+                              (match-lambda
+                                ("root" '("c" "b" "a")))
+                              ;; We wish to deliberately create invalid
+                              ;; entries
+                              #:postprocess-entries identity)))
+    (call-with-tree-port unsorted-tree port-bad-nar?)))
+
+(test-assert "write-file-tree + fold-archive, duplicate directory entries"
+  (let* ((duplicates-tree (list #:file-type+size
+                                (match-lambda
+                                  ("root" (values 'directory 0))
+                                  ("root/a" (values 'regular 1)))
+                                #:file-port
+                                (match-lambda
+                                  ("root/a" (open-input-string "a")))
+                                #:directory-entries
+                                (match-lambda
+                                  ("root" '("a" "a" "a")))
+                                ;; We wish to deliberately create invalid
+                                ;; entries
+                                #:postprocess-entries identity)))
+    (call-with-tree-port duplicates-tree port-bad-nar?)))
+
+(test-assert "write-file-tree + fold-archive, invalid directory entries"
+  (let* ((invalid-names (list "." ".." "" "../" "./"
+                              "/" "/bin/shh" "../../etc/passwwwd"
+                              (string #\nul) (string #\. #\/ #\nul)))
+         (invalid-name-trees (map (lambda (name)
+                                    (list #:file-type+size
+                                          (match-lambda
+                                            ("root" (values 'directory 0))
+                                            (_ (values 'regular 1)))
+                                          #:file-port
+                                          (lambda (_)
+                                            (open-input-string "a"))
+                                          #:directory-entries
+                                          (match-lambda
+                                            ("root" (list name)))
+                                          ;; We wish to deliberately create
+                                          ;; invalid entries
+                                          #:postprocess-entries identity))
+                                  invalid-names)))
+    (every (lambda (tree)
+             (call-with-tree-port tree port-bad-nar?))
+           invalid-name-trees)))
 
 (test-equal "write-file-tree + fold-archive, flat file"
   '(("R" regular "abcdefg"))

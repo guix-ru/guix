@@ -96,6 +96,14 @@
         (lambda ()
           exp ...)))))
 
+;; 'call-with-temporary-output-file' produces a filename for a file that
+;; already exists, whereas this produces a filename for which no file exists
+;; inside a temporary directory.
+(define (call-with-temporary-output-filename proc)
+  (call-with-temporary-directory
+   (lambda (directory)
+     (proc (string-append directory "/output")))))
+
 ;; guix-publish uses (current-processor-count) as the default number of
 ;; workers, however on a system with a large number of cores, that large
 ;; number of worker threads being used in the course of these tests can end up
@@ -238,8 +246,8 @@ FileSize: ~a~%"
 
 (test-equal "/nar/*"
   "bar"
-  (call-with-temporary-output-file
-   (lambda (temp port)
+  (call-with-temporary-output-filename
+   (lambda (temp)
      (let ((nar (utf8->string
                  (http-get-body
                   (publish-uri
@@ -249,8 +257,8 @@ FileSize: ~a~%"
 
 (test-equal "/nar/gzip/*"
   "bar"
-  (call-with-temporary-output-file
-   (lambda (temp port)
+  (call-with-temporary-output-filename
+   (lambda (temp)
      (let ((nar (http-get-port
                  (publish-uri
                   (string-append "/nar/gzip/" (basename %item))))))
@@ -270,8 +278,8 @@ FileSize: ~a~%"
 
 (test-equal "/nar/lzip/*"
   "bar"
-  (call-with-temporary-output-file
-   (lambda (temp port)
+  (call-with-temporary-output-filename
+   (lambda (temp)
      (let ((nar (http-get-port
                  (publish-uri
                   (string-append "/nar/lzip/" (basename %item))))))
@@ -282,8 +290,8 @@ FileSize: ~a~%"
 (unless (zstd-supported?) (test-skip 1))
 (test-equal "/nar/zstd/*"
   "bar"
-  (call-with-temporary-output-file
-   (lambda (temp port)
+  (call-with-temporary-output-filename
+   (lambda (temp)
      (let ((nar (http-get-port
                  (publish-uri
                   (string-append "/nar/zstd/" (basename %item))))))
@@ -408,8 +416,8 @@ FileSize: ~a~%"
 (test-equal "/nar/ with properly encoded '+' sign"
   "Congrats!"
   (let ((item (add-text-to-store %store "fake-gtk+" "Congrats!")))
-    (call-with-temporary-output-file
-     (lambda (temp port)
+    (call-with-temporary-output-filename
+     (lambda (temp)
        (let ((nar (utf8->string
                    (http-get-body
                     (publish-uri
@@ -798,3 +806,7 @@ FileSize: ~a~%"
                (http-post (publish-uri path))))))
 
 (test-end "publish")
+
+;;; Local Variables:
+;;; eval: (put 'call-with-temporary-output-filename 'scheme-indent-function 0)
+;;; End:

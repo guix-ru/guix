@@ -550,6 +550,13 @@ which case you can use 'identity'."
 (define port-conversion-strategy
   (fluid->parameter %default-port-conversion-strategy))
 
+(define (valid-nar-file-name? name)
+  (not (or (string-null? name)
+           (string-index name #\/)
+           (string-index name #\nul)
+           (string=? name "..")
+           (string=? name "."))))
+
 (define (fold-archive proc seed port file)
   "Read a file (possibly a directory structure) in Nar format from PORT.  Call
 PROC on each file or directory read from PORT using:
@@ -610,6 +617,7 @@ depends on TYPE."
         (("(" "type" "directory")
          (let ((dir file))
            (let loop ((prefix (read-string port))
+                      (previous #f) ; for verifying ordering and uniqueness
                       (result (proc file 'directory #f result)))
              (match prefix
                ("entry"
@@ -617,6 +625,23 @@ depends on TYPE."
                              (read-string port) (read-string port)
                              (read-string port))
                   (("(" "name" file "node")
+                   (unless (valid-nar-file-name? file)
+                     (raise
+                      (condition
+                       (&message (message "invalid filename"))
+                       (&nar-read-error (port port)
+                                        (file dir)
+                                        (token file)))))
+                   (when (and previous
+                              (string>=? previous file))
+                     (raise
+                      (condition
+                       (&message
+                        ;; This also catches duplicate entries.
+                        (message "directory entry not in strictly ascending order"))
+                       (&nar-read-error (port port)
+                                        (file dir)
+                                        (token file)))))
                    (let ((result (read (string-append dir "/" file) result)))
                      (match (read-string port)
                        (")" #f)
@@ -628,7 +653,7 @@ depends on TYPE."
                           (&nar-read-error (port port)
                                            (file file)
                                            (token x))))))
-                     (loop (read-string port) result)))))
+                     (loop (read-string port) file result)))))
                (")"                               ;done with DIR
                 (proc file 'directory-complete #f result))
                (x
@@ -642,12 +667,25 @@ depends on TYPE."
            (&message (message "unsupported nar entry type"))
            (&nar-read-error (port port) (file file) (token x)))))))))
 
+
+(define (call-with-port* port proc)
+  "Like call-with-port, but closes PORT unconditionally when PROC's dynamic
+extent is left instead of only when PROC finishes normally."
+  (dynamic-wind
+    (const #t)
+    (lambda ()
+      (proc port))
+    (lambda ()
+      (close-port port))))
+
 (define (dump-file file input size type)
-  "Dump SIZE bytes from INPUT to FILE.
+  "Dump SIZE bytes from INPUT to FILE, throwing system-error with an errno of
+EEXIST if FILE already exists.
 
 This procedure is suitable for use as the #:dump-file argument to
 'restore-file'."
-  (call-with-output-file file
+  (call-with-port* (open file (logior O_WRONLY O_CREAT O_EXCL
+                                      O_NOFOLLOW O_CLOEXEC))
     (lambda (output)
       (dump input output size))))
 
@@ -685,6 +723,7 @@ a custom procedure, for instance to deduplicate FILE on the fly."
 
 ;;; Local Variables:
 ;;; eval: (put 'call-with-binary-input-file 'scheme-indent-function 1)
+;;; eval: (put 'call-with-port* 'scheme-indent-function 1)
 ;;; End:
 
 ;;; serialization.scm ends here
