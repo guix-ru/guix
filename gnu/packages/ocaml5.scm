@@ -4841,6 +4841,20 @@ adaptive parsers) as well as extensible lexers for the parsers it produces.")
 parse and generate binary formats, files and protocols.")
       (license license:isc))))
 
+(define-public ocaml-ppx-bitstring
+  (package
+    (inherit ocaml-bitstring)
+    (name "ocaml5-ppx-bitstring")
+    (arguments
+     `(#:package "ppx_bitstring"))
+    (propagated-inputs (list ocaml-bitstring ocaml-ppxlib))
+    (native-inputs (list ocaml-ounit))
+    (properties `((upstream-name . "ppx_bitstring")))
+    (synopsis "PPX extension for bitstrings and bitstring matching")
+    (description
+     "This package adds a syntax extension for generating and matching Erlang-style
+bitstrings in OCaml.")))
+
 (define-public ocaml-timed
   (package
     (name "ocaml5-timed")
