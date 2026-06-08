@@ -814,9 +814,9 @@ exec ~a --logpath=\"/tmp/runtime-$USER/lua-language-server/log\" \
 @end itemize")
     (license license:expat)))
 
-(define (make-lua-ossl name lua)
+(define-public lua-ossl
   (package
-    (name name)
+    (name "lua-ossl")
     (version "20220711")
     (source (origin
               (method git-fetch)
@@ -831,7 +831,7 @@ exec ~a --logpath=\"/tmp/runtime-$USER/lua-language-server/log\" \
     (arguments
      (list
       #:make-flags
-      #~(let ((lua-api-version #$(version-major+minor (package-version lua))))
+      #~(let ((lua-api-version #$(this-lua-version)))
           (list (string-append "CC=" #$(cc-for-target))
                 "CFLAGS='-D HAVE_SYS_SYSCTL_H=0'" ; sys/sysctl.h is deprecated
                 (string-append "prefix=" #$output)
@@ -842,7 +842,7 @@ exec ~a --logpath=\"/tmp/runtime-$USER/lua-language-server/log\" \
            (delete 'check)
            (add-after 'install 'check
              (lambda _
-               (let ((lua-version #$(version-major+minor (package-version lua))))
+               (let ((lua-version #$(this-lua-version)))
                  (setenv "LUA_CPATH"
                          (string-append #$output "/lib/lua/" lua-version "/?.so;;"))
                  (setenv "LUA_PATH"
@@ -868,14 +868,10 @@ It also binds OpenSSL's bignum, message digest, HMAC, cipher, and CSPRNG
 interfaces.")
     (license license:expat)))
 
-(define-public lua-ossl
-  (make-lua-ossl "lua-ossl" lua))
-
-(define-public lua5.1-ossl
-  (make-lua-ossl "lua5.1-ossl" lua-5.1))
-
-(define-public lua5.2-ossl
-  (make-lua-ossl "lua5.2-ossl" lua-5.2))
+(define-public-lua-variants lua-ossl
+  (lua-5.3 lua5.3-ossl)
+  (lua-5.2 lua5.2-ossl)
+  (lua-5.1 lua5.1-ossl))
 
 (define (make-lua-sec name lua lua-socket)
   (package
