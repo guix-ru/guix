@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013-2022 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2022, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2014 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2018 Kyle Meyer <kyle@kyleam.com>
 ;;;
@@ -25,6 +25,8 @@
   #:use-module (guix base64)
   #:use-module (guix records)
   #:use-module (guix diagnostics)
+  #:autoload   (guix store) (valid-path-syntax?
+                             valid-path-basename-syntax?)
   #:use-module (gcrypt hash)
   #:use-module (gcrypt pk-crypto)
   #:use-module (rnrs bytevectors)
@@ -140,32 +142,39 @@ must contain the original contents of a narinfo file."
                 signature)
     "Return a new <narinfo> object."
     (define len (length urls))
-    (%make-narinfo path cache-url
-                   ;; Handle the case where URL is a relative URL.
-                   (map (lambda (url)
-                          (or (string->uri url)
-                              (string->uri
-                               (if (string-suffix? "/" cache-url)
-                                   (string-append cache-url url)
-                                   (string-append cache-url "/" url)))))
-                        urls)
-                   compressions
-                   (match file-sizes
-                     (()        (make-list len #f))
-                     ((lst ...) (map string->number lst)))
-                   (match file-hashes
-                     (()        (make-list len #f))
-                     ((lst ...) (map string->number lst)))
-                   nar-hash
-                   (and=> nar-size string->number)
-                   (string-tokenize references)
-                   (match deriver
+    (let ((references (string-tokenize references))
+          (deriver (match deriver
                      ((or #f "") #f)
-                     (_ deriver))
-                   system
-                   (false-if-exception
-                    (and=> signature narinfo-signature->canonical-sexp))
-                   str)))
+                     (_ deriver))))
+      ;; Return #f if PATH, REFERENCES, or DERIVER is malformed.
+      (and (valid-path-syntax? path)
+           (every valid-path-basename-syntax? references)
+           (or (not deriver)
+               (valid-path-basename-syntax? deriver))
+           (%make-narinfo path cache-url
+                          ;; Handle the case where URL is a relative URL.
+                          (map (lambda (url)
+                                 (or (string->uri url)
+                                     (string->uri
+                                      (if (string-suffix? "/" cache-url)
+                                          (string-append cache-url url)
+                                          (string-append cache-url "/" url)))))
+                               urls)
+                          compressions
+                          (match file-sizes
+                            (()        (make-list len #f))
+                            ((lst ...) (map string->number lst)))
+                          (match file-hashes
+                            (()        (make-list len #f))
+                            ((lst ...) (map string->number lst)))
+                          nar-hash
+                          (and=> nar-size string->number)
+                          references
+                          deriver
+                          system
+                          (false-if-exception
+                           (and=> signature narinfo-signature->canonical-sexp))
+                          str)))))
 
 (define fields->alist
   ;; The narinfo format is really just like recutils.
@@ -176,6 +185,8 @@ must contain the original contents of a narinfo file."
   "Read a narinfo from PORT.  If URL is true, it must be a string used to
 build full URIs from relative URIs found while reading PORT.  When SIZE is
 true, read at most SIZE bytes from PORT; otherwise, read as much as possible.
+Return #f if the narinfo that was read is not syntactically valid, for
+instance if it contains invalid store file names.
 
 No authentication and authorization checks are performed here!"
   (let ((str (utf8->string (if size
@@ -253,8 +264,8 @@ unauthorized party~%"
   (call-with-output-string (cut write-narinfo narinfo <>)))
 
 (define (string->narinfo str cache-uri)
-  "Return the narinfo represented by STR.  Assume CACHE-URI as the base URI of
-the cache STR originates form."
+  "Return the narinfo represented by STR or #f if it is not syntactically
+valid.  Assume CACHE-URI as the base URI of the cache STR originates form."
   (call-with-input-string str (cut read-narinfo <> cache-uri)))
 
 (define (equivalent-narinfo? narinfo1 narinfo2)

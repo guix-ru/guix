@@ -193,7 +193,8 @@ indicates that PATH is unavailable at CACHE-URL."
 
 (define (narinfo-from-file file url)
   "Attempt to read a narinfo from FILE, using URL as the cache URL.  Return #f
-if file doesn't exist, and the narinfo otherwise."
+if file doesn't exist or if the narinfo read is not syntactically valid--e.g.,
+it contains invalid store file names--and return the narinfo otherwise."
   (catch 'system-error
     (lambda ()
       (call-with-input-file file
@@ -239,8 +240,7 @@ if file doesn't exist, and the narinfo otherwise."
       ;; belong to the next response.
       (if (= code 200)                            ; hit
           (let ((narinfo (read-narinfo port url #:size len)))
-            (if (string=? (dirname (narinfo-path narinfo))
-                          (%store-prefix))
+            (if narinfo
                 (begin
                   (cache-narinfo! url (narinfo-path narinfo) narinfo ttl)
                   (cons narinfo result))
@@ -324,7 +324,10 @@ for PATH."
              ;; A cached positive lookup
              (if (obsolete? date now ttl)
                  (values #f #f)
-                 (values #t (string->narinfo value cache-uri))))
+                 (let ((narinfo (string->narinfo value cache-uri)))
+                   (if narinfo
+                       (values #t narinfo)
+                       (values #f #f)))))
             (('narinfo ('version v) _ ...)
              (values #f #f))
             ((? eof-object?)                      ;corrupt file

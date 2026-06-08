@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2014 Nikita Karetnikov <nikita@karetnikov.org>
-;;; Copyright © 2014-2015, 2017-2019, 2021-2023 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2014-2015, 2017-2019, 2021-2023, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -325,6 +325,30 @@ URL: example.nar
 Compression: none
 NarSize: 42
 Deriver: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo.drv")
+      (string-trim-both
+       (with-output-to-string
+         (lambda ()
+           (with-input-from-string (string-append "have " (%store-prefix)
+                                                  "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo")
+             (lambda ()
+               (guix-substitute "--query")))))))))
+
+(test-equal "query narinfo that contains invalid store path"
+  ;; The signature covers the StorePath/NarHash/References tuple, so it is
+  ;; valid, but the 'StorePath' field is invalid (contains forbidden
+  ;; characters).
+  ""
+
+  (let ((prefix (string-append "StorePath: " (%store-prefix)
+                               "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo/../../../etc/passwd
+NarHash: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+References: bar baz\n")))
+    (with-narinfo (string-append prefix
+                                 "Signature: " (signature-field prefix) "
+URL: example.nar
+Compression: none
+NarSize: 42
+Deriver: foo.drv")
       (string-trim-both
        (with-output-to-string
          (lambda ()
