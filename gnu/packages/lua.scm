@@ -537,9 +537,9 @@ handy.")
   (lua-5.2 lua5.2-socket)
   (lua-5.1 lua5.1-socket))
 
-(define (make-lua-filesystem name lua)
+(define-public lua-filesystem
   (package
-    (name name)
+    (name "lua-filesystem")
     (version "1.9.0")
     (source (origin
               (method git-fetch)
@@ -556,7 +556,7 @@ handy.")
     (arguments
      `(#:make-flags
        (let ((out (assoc-ref %outputs "out"))
-             (lua-version ,(version-major+minor (package-version lua))))
+             (lua-version ,(this-lua-version)))
          (list (string-append "PREFIX=" out)
                (string-append "LUA_LIBDIR=" out "/lib/lua/" lua-version)))
        #:test-target "test"
@@ -573,17 +573,11 @@ distribution.  LuaFileSystem offers a portable way to access the underlying
 directory structure and file attributes.")
     (license (package-license lua-5.1))))
 
-(define-public lua-filesystem
-  (make-lua-filesystem "lua-filesystem" lua))
-
-(define-public lua5.1-filesystem
-  (make-lua-filesystem "lua5.1-filesystem" lua-5.1))
-
-(define-public lua5.2-filesystem
-  (make-lua-filesystem "lua5.2-filesystem" lua-5.2))
-
-(define-public lua5.4-filesystem
-  (make-lua-filesystem "lua5.4-filesystem" lua-5.4))
+(define-public-lua-variants lua-filesystem
+  (lua-5.4 lua5.4-filesystem)
+  (lua-5.3 lua5.3-filesystem)
+  (lua-5.2 lua5.2-filesystem)
+  (lua-5.1 lua5.1-filesystem))
 
 (define-public lua-bee
   ;; There are no releases; use the commit known to work with the packaged
