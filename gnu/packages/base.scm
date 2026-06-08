@@ -1031,11 +1031,23 @@ the store.")
              ;; 'device_write_inband' among other things.  Ignore them.
              #$@(if (target-hurd?)
                     #~("--disable-werror")
+                    #~())
+             #$@(if (target-hurd?)
+                    #~("--enable-pt_chown") ; build pt_chown for openpty/grantpt
                     #~()))
 
      #:tests? #f ; XXX
      #:phases
      #~(modify-phases %standard-phases
+         #$@(if (target-hurd?)
+                #~((add-before 'configure 'pt-chown
+                     (lambda _
+                       (substitute* "login/Makefile"
+                         (("-o root") ""))
+                       ;; Adjust the file name to the 'pt_chown' setuid program.
+                       (substitute* "sysdeps/generic/pty-private.h"
+                         (("LIBEXECDIR") "\"/run/privileged/bin\"")))))
+                #~())
          (add-before 'configure 'pre-configure
            (lambda* (#:key inputs native-inputs #:allow-other-keys)
              (let* ((bin (string-append #$output "/bin"))
