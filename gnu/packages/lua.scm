@@ -1232,9 +1232,9 @@ Grammars (PEGs).")
   (lua-5.2 lua5.2-lpeg)
   (lua-5.1 lua5.1-lpeg))
 
-(define (make-lua-luv name lua)
+(define-public lua-luv
   (package
-    (name name)
+    (name "lua-luv")
     (version "1.52.1-0")
     (source (origin
               ;; The release tarball includes the sources of libuv but does
@@ -1285,14 +1285,10 @@ Grammars (PEGs).")
      "This library makes libuv available to Lua scripts.")
     (license license:asl2.0)))
 
-(define-public lua-luv
-  (make-lua-luv "lua-luv" lua))
-
-(define-public lua5.1-luv
-  (make-lua-luv "lua5.1-luv" lua-5.1))
-
-(define-public lua5.2-luv
-  (make-lua-luv "lua5.2-luv" lua-5.2))
+(define-public-lua-variants lua-luv
+  (lua-5.3 lua5.3-luv)
+  (lua-5.2 lua5.2-luv)
+  (lua-5.1 lua5.1-luv))
 
 ;; Lua 5.3 is not supported.
 (define (make-lua-bitop name lua)
