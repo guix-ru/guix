@@ -1824,9 +1824,9 @@ signals to Linux processes.")
 shell command executions.")
     (license license:bsd-3)))
 
-(define-public (make-luarocks name lua)
+(define-public luarocks
   (package
-    (name name)
+    (name "luarocks")
     (version "3.9.2")
     (home-page "https://luarocks.org/")
     (source (origin
@@ -1857,7 +1857,7 @@ shell command executions.")
              (substitute*
                  (string-append
                   (assoc-ref outputs "out") "/etc/luarocks/config-"
-                  ,(substring (package-version lua) 0 3) ".lua") ;e.g. "5.2"
+                  ,(this-lua-version) ".lua") ;e.g. "5.2"
                (("variables = \\{")
                 (string-append
                  "variables = {\n"
@@ -1929,11 +1929,13 @@ is loaded.  LuaRocks supports both local and
 multiple local rocks trees.")
     (license license:expat)))
 
-(define-public lua5.2-luarocks
-  (make-luarocks "lua5.2-luarocks" lua-5.2))
+;; Luarocks doesn't use the usual "lua-" prefix, so it doesn't play nicely with
+;; our standard rewriter. Make a custom one just for this case for now.
+(define luarocks-5.2-rewriter
+  (make-lua-rewriter lua-5.2 "luarocks" "lua5.2-luarocks"))
 
-(define-public luarocks
-  (make-luarocks "luarocks" lua))
+(define-public lua5.2-luarocks
+  (luarocks-5.2-rewriter luarocks))
 
 (define-public dkjson
   (package
