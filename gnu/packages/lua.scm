@@ -1191,9 +1191,9 @@ Notable examples are GTK+, GStreamer and Webkit.")
   (lua-5.2 lua5.2-lgi)
   (lua-5.1 lua5.1-lgi))
 
-(define (make-lua-lpeg name lua)
+(define-public lua-lpeg
   (package
-    (name name)
+    (name "lua-lpeg")
     (version "1.1.0")
     (source (origin
               (method url-fetch)
@@ -1211,7 +1211,7 @@ Notable examples are GTK+, GStreamer and Webkit.")
          (replace 'install
            (lambda* (#:key outputs #:allow-other-keys)
              (let ((out (assoc-ref outputs "out"))
-                   (lua-version ,(version-major+minor (package-version lua))))
+                   (lua-version ,(this-lua-version)))
                (install-file "lpeg.so"
                              (string-append out "/lib/lua/" lua-version))
                (install-file "re.lua"
@@ -1226,17 +1226,11 @@ Grammars (PEGs).")
     (home-page "https://www.inf.puc-rio.br/~roberto/lpeg")
     (license license:expat)))
 
-(define-public lua-lpeg
-  (make-lua-lpeg "lua-lpeg" lua))
-
-(define-public lua5.1-lpeg
-  (make-lua-lpeg "lua5.1-lpeg" lua-5.1))
-
-(define-public lua5.2-lpeg
-  (make-lua-lpeg "lua5.2-lpeg" lua-5.2))
-
-(define-public lua5.4-lpeg
-  (make-lua-lpeg "lua5.4-lpeg" lua-5.4))
+(define-public-lua-variants lua-lpeg
+  (lua-5.4 lua5.4-lpeg)
+  (lua-5.3 lua5.3-lpeg)
+  (lua-5.2 lua5.2-lpeg)
+  (lua-5.1 lua5.1-lpeg))
 
 (define (make-lua-luv name lua)
   (package
