@@ -139,6 +139,7 @@
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages cyrus-sasl)
+  #:use-module (gnu packages databases)
   #:use-module (gnu packages dns)
   #:use-module (gnu packages docbook)
   #:use-module (gnu packages documentation)
@@ -7420,6 +7421,7 @@ fighting over what remains.")
                                "inih"
                                "re2"
                                "readerwriterqueue"
+                               "SQLiteCpp"
                                "utf8proc"
                                "utfcpp")))
                  (substitute* (list "src/stdinreader.cpp"
@@ -7429,6 +7431,7 @@ fighting over what remains.")
        (patches (search-patches "warzone2100-unbundle-basis-universal.patch"
                                 "warzone2100-unbundle-libs.patch"
                                 "warzone2100-unbundle-inih.patch"
+                                "warzone2100-unbundle-sqlitecpp.patch"
                                 "warzone2100-unbundle-utfcpp.patch"))
        (sha256
         (base32
@@ -7527,6 +7530,7 @@ fighting over what remains.")
            re2
            sdl3
            sqlite
+           sqlitecpp
            utf8proc
            utfcpp
            vulkan-headers
