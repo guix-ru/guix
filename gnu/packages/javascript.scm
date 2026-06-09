@@ -9,6 +9,7 @@
 ;;; Copyright © 2022 Frank Pursel <frank.pursel@gmail.com>
 ;;; Copyright © 2023 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2025 Ashvith Shetty <ashvithshetty0010@zohomail.in>
+;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1081,6 +1082,63 @@ dependency.  It includes a command line interpreter with contextual colorization
 implemented in Javascript and a small built-in standard library with C library
 wrappers.")
     (license license:expat)))
+
+(define-public quickjs-wz
+  ;; No releases, use latest commit.
+  (let ((commit "a57c62729bc40809b84fb83db38c0d048992533c")
+        (revision "0"))
+    (package
+      (inherit quickjs)
+      (name "quickjs-wz")
+      ;; Use quickjs version at quickjs/VERSION.txt.
+      (version (git-version "2025-09-13" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/Warzone2100/quickjs-wz")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1kc7vhdqmhkhhqh553m5ml4ibh2yip7i3gsf154y4hfc1ri34ab2"))))
+      (build-system cmake-build-system)
+      (arguments
+       (list
+        #:tests? #f                     ;no tests for patched version
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'do-shared
+              (lambda _
+                (substitute* "CMakeLists.txt"
+                  (("(qjs )STATIC" _ f) (string-append f "SHARED")))))
+            ;; XXX: Needed from parent package?
+            ;; Custom CMake compiles without this phase/directory.
+            ;; (add-after 'unpack 'prepare-unicode)
+            (replace 'install           ;no install instructions
+              (lambda _
+                (let ((lib (in-vicinity #$output "lib"))
+                      (inc (in-vicinity #$output "include")))
+                  (install-file "libqjs.so" lib)
+                  (for-each (lambda (f)
+                              (install-file (in-vicinity "../source" f) inc))
+                            ;; Warzone2100's favorite headers.
+                            '("quickjs/quickjs.h"
+                              "quickjs/quickjs-libc.h"
+                              "quickjs-wz-extensions/quickjs-debugger.h"
+                              "quickjs-wz-extensions/quickjs-limitedcontext.h")))))
+            (replace 'install-license-files
+              (lambda _
+                (install-file "../source/quickjs/LICENSE"
+                              (string-append #$output "/share/doc/"
+                                             #$name "-" #$version)))))))
+      (description "QuickJS supports the ES2023 specification including modules,
+asynchronous generators, proxies, BigInt, BigDecimal, BigFloat and operator
+overloading.  It can compile Javascript sources to executables with no external
+dependency.  It includes a command line interpreter with contextual colorization
+implemented in Javascript and a small built-in standard library with C library
+wrappers.
+This version contains custom patches with the intention to be used in the video
+game Warzone2100."))))
 
 (define-public test262-source
   (origin
