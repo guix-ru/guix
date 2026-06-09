@@ -47,7 +47,7 @@
 ;;;
 
 (define* (with-atomic-json-file-replacement proc
-  #:optional (file "package.json"))
+                                            #:optional (file "package.json"))
   "Like 'with-atomic-file-replacement', but PROC is called with a single
 argument---the result of parsing FILE's contents as json---and should a value
 to be written as json to the replacement FILE."
@@ -57,22 +57,19 @@ to be written as json to the replacement FILE."
 
 (define* (modify-json #:key (file "package.json") #:rest all-arguments)
   "Provide package.json modifying callbacks such as (delete-dependencies ...)"
-  (let
-    (
-      (modifications
-        (let loop ((arguments all-arguments))
-          (cond
+  (let ((modifications
+         (let loop ((arguments all-arguments))
+           (cond
             ((null? arguments) '())
             ((keyword? (car arguments)) (loop (cddr arguments)))
             (else (cons (car arguments) (loop (cdr arguments))))))))
     (with-atomic-json-file-replacement
-      (lambda (package)
-        (fold
-          (lambda (modification package)
-            (modification package))
-          package
-          modifications))
-      file)))
+     (lambda (package)
+       (fold (lambda (modification package)
+               (modification package))
+             package
+             modifications))
+     file)))
 
 (define (delete-dependencies dependencies-to-remove)
   "Rewrite 'package.json' to allow the build to proceed without packages
@@ -94,13 +91,12 @@ only after the 'patch-dependencies' phase."
               otherwise))
            pkg-meta))))
 
-(define* (modify-json-fields
-    fields
-    field-modifier
-    #:key
-      (field-path-mapper (lambda (field) field))
-      (insert? #f)
-      (strict? #t))
+(define* (modify-json-fields fields field-modifier
+                             #:key
+                             (field-path-mapper (lambda (field)
+                                                  field))
+                             (insert? #f)
+                             (strict? #t))
   "Provides a lambda to supply to modify-json which modifies the specified
  json file.
 - `fields` is a list procedure-specific data structures which should include
@@ -118,49 +114,39 @@ only after the 'patch-dependencies' phase."
  in the data"
   (lambda (package)
     (fold
-      (lambda (field package)
-        (let*
-          (
-            (field-path (field-path-mapper field))
-            (
-              field-path
-              (cond
+     (lambda (field package)
+       (let* ((field-path (field-path-mapper field))
+              (field-path
+               (cond
                 ((string? field-path)
-                  (string-split field-path #\.))
+                 (string-split field-path #\.))
                 ((and (list? field-path) (every string? field-path))
-                  field-path)
+                 field-path)
                 (else
-                  (error
-                    (string-append
-                      "Invalid field value provided, expecting a string or a "
-                      "list of string but instead got: "
-                      (with-output-to-string (lambda _ (display field-path))))))
-              )))
-          (let loop
-            (
-              (data package)
-              (field-path field-path))
-            (let*
-              (
-                (key (car field-path))
-                (data
-                  (if (and (not (assoc key data)) insert?)
-                    (acons key '() data)
-                    data)))
-              (if (not (assoc key data))
-                (if strict?
-                  (error (string-append
-                    "Key '" key "' was not found in data: "
-                    (with-output-to-string (lambda _ (display data)))))
-                  data)
-                (if (= (length field-path) 1)
-                  (field-modifier field data key)
-                  (assoc-set!
-                    data
-                    key
-                    (loop (assoc-ref data key) (cdr field-path)))))))))
-      package
-      fields)))
+                 (error
+                  (string-append
+                   "Invalid field value provided, expecting a string or a "
+                   "list of string but instead got: "
+                   (with-output-to-string (lambda _ (display field-path)))))))))
+         (let loop ((data package)
+                    (field-path field-path))
+           (let* ((key (car field-path))
+                  (data (if (and (not (assoc key data)) insert?)
+                            (acons key '() data)
+                            data)))
+             (if (not (assoc key data))
+                 (if strict?
+                     (error (string-append
+                             "Key '" key "' was not found in data: "
+                             (with-output-to-string (lambda _ (display data)))))
+                     data)
+                 (if (= (length field-path) 1)
+                     (field-modifier field data key)
+                     (assoc-set! data key
+                                 (loop (assoc-ref data key)
+                                       (cdr field-path)))))))))
+     package
+     fields)))
 
 (define* (delete-fields fields #:key (strict? #t))
   "Provides a lambda to supply to modify-json which deletes the specified
@@ -170,10 +156,10 @@ only after the 'patch-dependencies' phase."
     (\"path\" \"to\" \"field\")
     \"path.to.other.field\"))"
   (modify-json-fields
-    fields
-    (lambda (_ data key)
-      (assoc-remove! data key))
-    #:strict? strict?))
+   fields
+   (lambda (_ data key)
+     (assoc-remove! data key))
+   #:strict? strict?))
 
 (define* (replace-fields fields #:key (strict? #t))
   "Provides a lambda to supply to modify-json which replaces the value of the
@@ -184,11 +170,11 @@ only after the 'patch-dependencies' phase."
     ((\"path\" \"to\" \"field\") \"new field value\")
     (\"path.to.other.field\" \"new field value\")))"
   (modify-json-fields
-    fields
-    (lambda (field data key)
-      (assoc-set! data key (cdr field)))
-    #:field-path-mapper (lambda (field) (car field))
-    #:strict? strict?))
+   fields
+   (lambda (field data key)
+     (assoc-set! data key (cdr field)))
+   #:field-path-mapper (lambda (field) (car field))
+   #:strict? strict?))
 
 (define (delete-dev-dependencies)
   (delete-fields (list "devDependencies" "peerDependencies")
