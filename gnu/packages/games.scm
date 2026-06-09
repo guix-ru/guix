@@ -7420,6 +7420,7 @@ fighting over what remains.")
                                "fmt"
                                "GameNetworkingSockets"
                                "inih"
+                               "libplum"
                                "re2"
                                "readerwriterqueue"
                                "SQLiteCpp"
@@ -7520,6 +7521,7 @@ fighting over what remains.")
            libinih
            libjpeg-turbo
            libogg
+           libplum
            libpng
            libsodium
            libtheora

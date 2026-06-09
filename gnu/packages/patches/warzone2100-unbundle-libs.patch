@@ -1,9 +1,9 @@
-Unbundles fmt and re2 dependencies.
+Unbundles fmt, re2, libplum dependencies.
 
-patch by Lilah Tascheter <lilah@lunabee.space>
+patch by Lilah Tascheter <lilah@lunabee.space> and bdunahu <bdunahu@operationnull.com>.
 
 diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
-index 46c0c26e1..0afbdf480 100644
+index 46c0c26e1..04aff5355 100644
 --- a/3rdparty/CMakeLists.txt
 +++ b/3rdparty/CMakeLists.txt
 @@ -20,13 +20,13 @@ endif()
@@ -49,6 +49,29 @@ index 46c0c26e1..0afbdf480 100644
  
  add_subdirectory(EmbeddedJSONSignature EXCLUDE_FROM_ALL)
  set_property(TARGET EmbeddedJSONSignature PROPERTY FOLDER "3rdparty")
+@@ -268,22 +266,6 @@ if (WZ_PROFILING_NVTX)
+ 
+ endif ()
+ 
+-set(PLUM_NO_EXAMPLE ON CACHE BOOL "Disable example build" FORCE)
+-add_subdirectory(libplum EXCLUDE_FROM_ALL)
+-set_target_properties(plum plum-static PROPERTIES FOLDER "3rdparty")
+-if(NOT MSVC)
+-	set(_supported_libplum_c_compiler_flags "")
+-
+-	# -Wshadow
+-	check_compiler_flags_output("-Werror -Wno-shadow -Wno-error=cpp" COMPILER_TYPE C   OUTPUT_FLAGS "-Wno-shadow" OUTPUT_VARIABLE _supported_libplum_c_compiler_flags APPEND)
+-
+-	if (NOT _supported_libplum_c_compiler_flags STREQUAL "")
+-		string(REPLACE " " ";" _supported_libplum_c_compiler_flags "${_supported_libplum_c_compiler_flags}")
+-		target_compile_options(plum PRIVATE ${_supported_libplum_c_compiler_flags})
+-		target_compile_options(plum-static PRIVATE ${_supported_libplum_c_compiler_flags})
+-	endif()
+-endif()
+-
+ set(EXPECTED_BUILD_TESTS OFF)
+ add_subdirectory(expected EXCLUDE_FROM_ALL)
+ # There isn't any release note or established CMake policy about this behavior,
 diff --git a/lib/ivis_opengl/CMakeLists.txt b/lib/ivis_opengl/CMakeLists.txt
 index fd2d62a2c..72e9c7544 100644
 --- a/lib/ivis_opengl/CMakeLists.txt
@@ -63,15 +86,23 @@ index fd2d62a2c..72e9c7544 100644
  	# We should be using the Emscripten port linker flags for FreeType & Harfbuzz
  else()
 diff --git a/lib/netplay/CMakeLists.txt b/lib/netplay/CMakeLists.txt
-index 511ac7b89..9379143a3 100644
+index 511ac7b89..7b56e1b9d 100644
 --- a/lib/netplay/CMakeLists.txt
 +++ b/lib/netplay/CMakeLists.txt
-@@ -113,7 +113,7 @@ set_property(TARGET netplay PROPERTY FOLDER "lib")
+@@ -84,6 +84,7 @@ if(MSVC AND CMAKE_VERSION VERSION_GREATER 3.7)
+ 	source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" PREFIX "Headers" FILES ${HEADERS})
+ endif()
+ 
++find_package (LibPlum REQUIRED)
+ find_package (Threads REQUIRED)
+ find_package (ZLIB REQUIRED)
+ 
+@@ -113,7 +114,7 @@ set_property(TARGET netplay PROPERTY FOLDER "lib")
  include(WZTargetConfiguration)
  WZ_TARGET_CONFIGURATION(netplay)
  target_link_libraries(netplay
 -	PRIVATE framework re2::re2 nlohmann_json plum-static Threads::Threads ZLIB::ZLIB fmt::fmt
-+	PRIVATE framework re2 nlohmann_json plum-static Threads::Threads ZLIB::ZLIB fmt
++	PRIVATE framework re2 nlohmann_json plum Threads::Threads ZLIB::ZLIB fmt
  	PUBLIC tl::expected)
  
  if(WZ_USE_IMPORTED_MINIUPNPC)
