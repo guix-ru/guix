@@ -49,11 +49,11 @@
 (define* (with-atomic-json-file-replacement proc
                                             #:optional (file "package.json"))
   "Like 'with-atomic-file-replacement', but PROC is called with a single
-argument---the result of parsing FILE's contents as json---and should a value
-to be written as json to the replacement FILE."
+argument---the result of parsing FILE's contents as JSON---and should produce
+a value to be written as JSON to the replacement FILE."
   (with-atomic-file-replacement file
     (lambda (in out)
-      (scm->json (proc (json->scm in)) out))))
+      (scm->json (proc (json->scm in)) out #:pretty #t))))
 
 (define* (modify-json #:key (file "package.json") #:rest all-arguments)
   "Provide package.json modifying callbacks such as (delete-dependencies ...)"
@@ -346,7 +346,8 @@ would try to run 'node-gyp rebuild'."
                        (assoc-set! scripts
                                    "install"
                                    "echo Guix: avoiding node-gyp rebuild"))
-           out))))))
+           out
+           #:pretty #t))))))
 
 (define %standard-phases
   (modify-phases gnu:%standard-phases
