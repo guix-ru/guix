@@ -7417,6 +7417,7 @@ fighting over what remains.")
                                "date"
                                "discord-rpc"
                                "EmbeddedJSONSignature"
+                               "expected"
                                "fmt"
                                "GameNetworkingSockets"
                                "inih"
@@ -7518,6 +7519,7 @@ fighting over what remains.")
            fribidi
            gnutls
            harfbuzz
+           libexpected
            libinih
            libjpeg-turbo
            libogg

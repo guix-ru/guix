@@ -1,9 +1,9 @@
-Unbundles fmt, re2, libplum dependencies.
+Unbundles fmt, re2, expected, libplum dependencies.
 
 patch by Lilah Tascheter <lilah@lunabee.space> and bdunahu <bdunahu@operationnull.com>.
 
 diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
-index 46c0c26e1..04aff5355 100644
+index 46c0c26e1..dcebb5326 100644
 --- a/3rdparty/CMakeLists.txt
 +++ b/3rdparty/CMakeLists.txt
 @@ -20,13 +20,13 @@ endif()
@@ -49,7 +49,7 @@ index 46c0c26e1..04aff5355 100644
  
  add_subdirectory(EmbeddedJSONSignature EXCLUDE_FROM_ALL)
  set_property(TARGET EmbeddedJSONSignature PROPERTY FOLDER "3rdparty")
-@@ -268,22 +266,6 @@ if (WZ_PROFILING_NVTX)
+@@ -268,35 +266,6 @@ if (WZ_PROFILING_NVTX)
  
  endif ()
  
@@ -69,9 +69,22 @@ index 46c0c26e1..04aff5355 100644
 -	endif()
 -endif()
 -
- set(EXPECTED_BUILD_TESTS OFF)
- add_subdirectory(expected EXCLUDE_FROM_ALL)
- # There isn't any release note or established CMake policy about this behavior,
+-set(EXPECTED_BUILD_TESTS OFF)
+-add_subdirectory(expected EXCLUDE_FROM_ALL)
+-# There isn't any release note or established CMake policy about this behavior,
+-# but looks like prior to CMake 3.19 only a handful of `INTERFACE_*` properties
+-# were allowed for INTERFACE libraries (which is our case). This restriction
+-# seems to be lifted in CMake 3.19 and later.
+-#
+-# See https://discourse.cmake.org/t/how-to-find-current-interface-library-property-whitelist/4784/2
+-# for some clarification about this.
+-if (CMAKE_VERSION VERSION_GREATER "3.18")
+-	set_target_properties(expected PROPERTIES FOLDER "3rdparty")
+-endif()
+-
+ set(_default_enable_gns_network_backend_value ON)
+ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+ 	set(_default_enable_gns_network_backend_value OFF)
 diff --git a/lib/ivis_opengl/CMakeLists.txt b/lib/ivis_opengl/CMakeLists.txt
 index fd2d62a2c..72e9c7544 100644
 --- a/lib/ivis_opengl/CMakeLists.txt
@@ -86,18 +99,19 @@ index fd2d62a2c..72e9c7544 100644
  	# We should be using the Emscripten port linker flags for FreeType & Harfbuzz
  else()
 diff --git a/lib/netplay/CMakeLists.txt b/lib/netplay/CMakeLists.txt
-index 511ac7b89..7b56e1b9d 100644
+index 511ac7b89..82efbe6f4 100644
 --- a/lib/netplay/CMakeLists.txt
 +++ b/lib/netplay/CMakeLists.txt
-@@ -84,6 +84,7 @@ if(MSVC AND CMAKE_VERSION VERSION_GREATER 3.7)
+@@ -84,6 +84,8 @@ if(MSVC AND CMAKE_VERSION VERSION_GREATER 3.7)
  	source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" PREFIX "Headers" FILES ${HEADERS})
  endif()
  
++find_package (tl-expected REQUIRED)
 +find_package (LibPlum REQUIRED)
  find_package (Threads REQUIRED)
  find_package (ZLIB REQUIRED)
  
-@@ -113,7 +114,7 @@ set_property(TARGET netplay PROPERTY FOLDER "lib")
+@@ -113,7 +115,7 @@ set_property(TARGET netplay PROPERTY FOLDER "lib")
  include(WZTargetConfiguration)
  WZ_TARGET_CONFIGURATION(netplay)
  target_link_libraries(netplay
