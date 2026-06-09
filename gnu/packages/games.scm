@@ -7422,6 +7422,7 @@ fighting over what remains.")
                                "GameNetworkingSockets"
                                "inih"
                                "libplum"
+                               "quickjs-wz"
                                "re2"
                                "readerwriterqueue"
                                "SQLiteCpp"
@@ -7435,6 +7436,7 @@ fighting over what remains.")
                                 "warzone2100-unbundle-embedded-json-signature.patch"
                                 "warzone2100-unbundle-libs.patch"
                                 "warzone2100-unbundle-inih.patch"
+                                "warzone2100-unbundle-quickjs-wz.patch"
                                 "warzone2100-unbundle-sqlitecpp.patch"
                                 "warzone2100-unbundle-utfcpp.patch"))
        (sha256
@@ -7534,6 +7536,7 @@ fighting over what remains.")
            opus
            opusfile
            physfs
+           quickjs-wz
            re2
            sdl3
            sqlite

@@ -1,0 +1,58 @@
+Unbundles quickjs-wz dependency.
+
+patch by bdunahu <bdunahu@operationnull.com>
+
+diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
+index 46c0c26e1..cc9d446c1 100644
+--- a/3rdparty/CMakeLists.txt
++++ b/3rdparty/CMakeLists.txt
+@@ -105,10 +105,6 @@ target_compile_definitions(nlohmann_json INTERFACE "NLOHMANN_JSON_NAMESPACE=nloh
+ 
+ add_subdirectory(optional-lite EXCLUDE_FROM_ALL)
+ 
+-add_subdirectory(quickjs-wz EXCLUDE_FROM_ALL)
+-set_property(TARGET qjs PROPERTY FOLDER "3rdparty")
+-
+-
+ if (WZ_ENABLE_BASIS_UNIVERSAL AND NOT WZ_CI_DISABLE_BASIS_COMPRESS_TEXTURES)
+ 
+ 	# basis-universal
+diff --git a/lib/wzmaplib/CMakeLists.txt b/lib/wzmaplib/CMakeLists.txt
+index c3ed3ac22..0a4f94a4f 100644
+--- a/lib/wzmaplib/CMakeLists.txt
++++ b/lib/wzmaplib/CMakeLists.txt
+@@ -129,10 +129,12 @@ if(NOT TARGET optional-lite)
+ 	WZMAPLIB_ADD_3RDPARTY_DIR("../../3rdparty/optional-lite" "3rdparty/optional-lite" FALSE)
+ endif()
+ target_link_libraries(wzmaplib PUBLIC optional-lite)
+-if(NOT TARGET quickjs)
+-	message(STATUS "wzmaplib: Fetching Warzone2100/quickjs-wz")
+-	WZMAPLIB_ADD_3RDPARTY_DIR("../../3rdparty/quickjs-wz" "3rdparty/quickjs-wz" TRUE)
+-endif()
++find_library(QJS_LIB NAMES qjs REQUIRED)
++add_library(quickjs UNKNOWN IMPORTED)
++set_target_properties(quickjs PROPERTIES
++	IMPORTED_LOCATION "${QJS_LIB}"
++	INTERFACE_INCLUDE_DIRECTORIES "${QJS_INC}"
++)
+ target_link_libraries(wzmaplib PRIVATE quickjs)
+ 
+ ############
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 4f07f0edb..71c44463f 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -137,6 +137,13 @@ endif()
+ 
+ target_link_libraries(warzone2100 nlohmann_json)
+ target_link_libraries(warzone2100 optional-lite)
++find_path(QJS_INC NAMES quickjs.h REQUIRED)
++find_library(QJS_LIB NAMES qjs REQUIRED)
++add_library(quickjs UNKNOWN IMPORTED)
++set_target_properties(quickjs PROPERTIES
++	IMPORTED_LOCATION "${QJS_LIB}"
++	INTERFACE_INCLUDE_DIRECTORIES "${QJS_INC}"
++)
+ target_link_libraries(warzone2100 quickjs)
+ target_link_libraries(warzone2100 inih)
+ 

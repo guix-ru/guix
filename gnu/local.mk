@@ -2651,6 +2651,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/warzone2100-unbundle-basis-universal.patch	\
   %D%/packages/patches/warzone2100-unbundle-embedded-json-signature.patch	\
   %D%/packages/patches/warzone2100-unbundle-libs.patch		\
+  %D%/packages/patches/warzone2100-unbundle-quickjs-wz.patch	\
   %D%/packages/patches/warzone2100-unbundle-sqlitecpp.patch	\
   %D%/packages/patches/warzone2100-unbundle-inih.patch		\
   %D%/packages/patches/warzone2100-unbundle-utfcpp.patch	\
