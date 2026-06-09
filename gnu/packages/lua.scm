@@ -918,9 +918,9 @@ between the peers.")
   (lua-5.2 lua5.2-sec)
   (lua-5.1 lua5.1-sec))
 
-(define (make-lua-cqueues name lua lua-ossl)
+(define-public lua-cqueues
   (package
-    (name name)
+    (name "lua-cqueues")
     (version "20200726")
     (source (origin
               (method git-fetch)
@@ -938,7 +938,7 @@ between the peers.")
                   (guix build utils)
                   (ice-9 string-fun))
       #:make-flags
-      #~(let ((lua-api-version #$(version-major+minor (package-version lua))))
+      #~(let ((lua-api-version #$(this-lua-version)))
           (list (string-append "CC=" #$(cc-for-target))
                 (string-append "LUA_APIS=" lua-api-version)))
       #:phases
@@ -954,7 +954,7 @@ between the peers.")
           (add-after 'install 'check
             (lambda* (#:key make-flags #:allow-other-keys)
               (let*
-                  ((lua-version #$(version-major+minor (package-version lua)))
+                  ((lua-version #$(this-lua-version))
                    (env-suffix (if (equal? lua-version "5.1")
                                    ""
                                    (string-append
@@ -970,11 +970,11 @@ between the peers.")
                 ;; precedence over the generic "LUA_CPATH" and "LUA_PATH"
                 (setenv (string-append "LUA_CPATH" env-suffix)
                         (string-append
-                         (string-join (map lua-cpath (list #$output #$lua-ossl)) ";")
+                         (string-join (map lua-cpath (list #$output #$(this-lua-input "lua-ossl"))) ";")
                          ";;"))
                 (setenv (string-append "LUA_PATH" env-suffix)
                         (string-append
-                         (string-join (map lua-path (list #$output #$lua-ossl)) ";")
+                         (string-join (map lua-path (list #$output #$(this-lua-input "lua-ossl"))) ";")
                          ";;"))
 
                 ;; Skip regression tests we expect to fail
@@ -1015,14 +1015,10 @@ that operates through the yielding and resumption of coroutines.  It is designed
 to be non-intrusive, composable, and embeddable within existing applications.")
     (license license:expat)))
 
-(define-public lua-cqueues
-  (make-lua-cqueues "lua-cqueues" lua lua-ossl))
-
-(define-public lua5.1-cqueues
-  (make-lua-cqueues "lua5.1-cqueues" lua-5.1 lua5.1-ossl))
-
-(define-public lua5.2-cqueues
-  (make-lua-cqueues "lua5.2-cqueues" lua-5.2 lua5.2-ossl))
+(define-public-lua-variants lua-cqueues
+  (lua-5.3 lua5.3-cqueues)
+  (lua-5.2 lua5.2-cqueues)
+  (lua-5.1 lua5.1-cqueues))
 
 (define-public lua-penlight
   (package
