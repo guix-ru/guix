@@ -34,7 +34,8 @@
   #:use-module (srfi srfi-34)
   #:use-module (srfi srfi-35)
   #:use-module (srfi srfi-71)
-  #:export (%generic-git-updater))
+  #:export (%generic-git-updater
+            get-tags))
 
 ;;; Commentary:
 ;;;

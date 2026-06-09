@@ -26,6 +26,7 @@
   #:use-module (gnu packages)
   #:use-module (guix base32)
   #:use-module (guix http-client)
+  #:use-module ((guix import git) #:select (get-tags))
   #:use-module (guix import json)
   #:use-module (guix import utils)
   #:use-module (guix memoization)
@@ -83,6 +84,14 @@
   json->dist
   (tarball dist-tarball))
 
+(define (string-or-#f s)
+  (and (string? s) s))
+
+(define-json-mapping <repository> make-repository repository?
+  json->repository
+  (type repository-type "type" string-or-#f)
+  (url repository-url "url" string-or-#f))
+
 (define (empty-or-string s)
   (if (string? s) s ""))
 
@@ -120,7 +129,18 @@
                  license)))))
   (description package-revision-description             ;string
                "description" empty-or-string)
-  (dist package-revision-dist "dist" json->dist))       ;dist
+  (dist package-revision-dist "dist" json->dist)
+  (repository package-revision-repository "repository" ;<repository>
+              (lambda (value)
+                ;; Guard against historical values such as strings or anything
+                ;; else.
+                (match value
+                  ((? alist?)
+                   (json->repository value))
+                  ((? unspecified?) #f)
+                  ((? string? url)
+                   (make-repository "git" url))
+                  (_ #f)))))
 
 (define (versions->package-revisions versions)
   (match versions
@@ -203,8 +223,10 @@
          (name (npm-name->name npm-name)))
     (name+version->symbol name version)))
 
-(define (npm-package->package-sexp npm-package)
-  "Return the `package' s-expression for an NPM-PACKAGE."
+(define* (npm-package->package-sexp npm-package #:key binary?)
+  "Return the `package' s-expression for an NPM-PACKAGE.  Prefer the binary
+distribution URL as the source origin when BINARY? is #t, otherwise use the
+associated Git repository, if available."
   (define resolve-spec
     (match-lambda
       (($ <versioned-package> name version)
@@ -220,6 +242,20 @@
              (string-suffix? "#readme" url))
         (string-drop-right url 7)
         url))
+
+  (define (normalize-git-url url)
+    (let ((url (cond
+                ((string-prefix? "git+https://" url)
+                 (string-replace-substring url "git+https://" "https://"))
+                ((string-prefix? "git+ssh://" url)
+                 (string-replace-substring url "git+ssh://" "https://"))
+                ((string-prefix? "git://" url)
+                 (string-replace-substring url "git://" "https://"))
+                (else url))))
+      (if (and (github-hosted? url)
+               (string-suffix? ".git" url))
+          (string-drop-right url 4)
+          url)))
 
   (define (sexpify-url/maybe dist-url name version)
     ;; Return a S-exp for the package URL, which is computed using the package
@@ -245,14 +281,51 @@
                           ,(string-append "/-/" name "-")  version ".tgz")
           dist-url)))
 
+  (define (sexpify-git-tag/maybe tag version)
+    ;; Try to find a string-append pattern to build TAG from VERSION.  For example,
+    ;;
+    ;; (sexpify-git-tag/maybe "3.0.0v3.0.0v3.0.0" "3.0.0")
+    ;;   => '(string-append version "v" version "v" version)
+    (match (string-split (string-replace-substring
+                          tag version ":")
+                         #\:)
+      (("" "")                          ;tag == version
+       'version)
+      ((prefix "")
+       `(string-append ,prefix version))
+      (("" suffix)
+       `(string-append version ,suffix))
+      ((component components* ..1)
+       ;; Intersperse 'version between each component.
+       (let ((interspersed (append
+                            (append-map
+                             (lambda (x)
+                               (list x 'version))
+                             (drop-right `(,component ,@components*) 1))
+                            (list (last components*)))))
+         `(string-append ,@(remove (lambda (x)
+                                     (and (string? x)
+                                          (string-null? x)))
+                                   interspersed))))
+      (_ tag)))
+
   (match npm-package
     (($ <package-revision>
         name version home-page dependencies dev-dependencies
-        peer-dependencies license description dist)
+        peer-dependencies license description dist repository)
      (let* ((version-string (semver->string
                              (package-revision-version npm-package)))
             (dist-url (dist-tarball dist))
             (url (sexpify-url/maybe dist-url name version-string))
+            (git-url? (and (not binary?) repository
+                           (and=> (repository-type repository)
+                                  (cut string=? "git" <>))))
+            (git-url (and git-url? (and=> (repository-url repository)
+                                          normalize-git-url)))
+            (git-tag (and git-url
+                          (and=> (false-if-exception (get-tags git-url))
+                                 (cut assoc-ref <> version-string))))
+            (use-git-url? (and git-url git-tag))
             (name (npm-name->name name))
             (home-page (if (string? home-page)
                            (sanitize-home-page-url home-page)
@@ -264,28 +337,39 @@
             (dev-names (append (map versioned-package-name dev-dependencies)
                                peer-names))
             (extra-phases
-             (match dev-names
-               (() '())
-               ((dev-names ...)
-                `((add-after 'patch-dependencies 'delete-dev-dependencies
-                    (lambda _
-                      (modify-json (delete-dev-dependencies)))))))))
+             (append
+              (if binary?
+                  '((delete 'build))
+                  '())
+              (match dev-names
+                (() '())
+                ((dev-names ...)
+                 `((add-after 'patch-dependencies 'delete-dev-dependencies
+                     (lambda _
+                       (modify-json (delete-dev-dependencies))))))))))
        (values
         `(package
            (name ,name)
            (version ,version-string)
-           (source (origin
-                     (method url-fetch)
-                     (uri ,url)
-                     (sha256 (base32 ,(hash-url dist-url)))))
+           (source ,(if use-git-url?
+                        (git->origin git-url sexpify-git-tag/maybe
+                                     #:ref (cons 'tag git-tag)
+                                     #:eager? #t
+                                     git-tag version-string)
+                        `(origin
+                           (method url-fetch)
+                           (uri ,url)
+                           (sha256 (base32 ,(hash-url dist-url))))))
            (build-system node-build-system)
            (arguments
             (list
              #:tests? #f
-             #:phases
-             #~(modify-phases %standard-phases
-                 (delete 'build)
-                 ,@extra-phases)))
+             ,@(match extra-phases
+                 (() '())
+                 ((phase ..1)
+                  `(#:phases
+                    #~(modify-phases %standard-phases
+                        ,@extra-phases))))))
            ,@(match dependencies
                (() '())
                ((dependencies ...)
@@ -309,15 +393,16 @@
 ;;;
 
 (define npm-binary->guix-package
-  (lambda* (name #:key (version *semver-range-any*) #:allow-other-keys)
+  (lambda* (name #:key (version *semver-range-any*) binary? #:allow-other-keys)
     (let* ((svr (match version
                   ((? string?) (string->semver-range version))
                   (_ version)))
            (pkg (resolve-package name svr)))
-      (npm-package->package-sexp pkg))))
+      (npm-package->package-sexp pkg #:binary? binary?))))
 
-(define* (npm-binary-recursive-import package-name #:key version)
+(define* (npm-binary-recursive-import package-name #:key version binary?)
   (recursive-import package-name
                     #:repo->guix-package (memoize npm-binary->guix-package)
                     #:version version
-                    #:guix-name npm-name->name))
+                    #:guix-name npm-name->name
+                    #:binary? binary?))

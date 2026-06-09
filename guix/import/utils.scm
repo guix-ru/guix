@@ -7,7 +7,7 @@
 ;;; Copyright © 2019 Robert Vollmert <rob@vllmrt.net>
 ;;; Copyright © 2020 Helio Machado <0x2b3bfa0+guix@googlemail.com>
 ;;; Copyright © 2020 Martin Becze <mjbecze@riseup.net>
-;;; Copyright © 2021, 2024 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2021, 2024, 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2021 Sarah Morgensen <iskarian@mgsn.dev>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;; Copyright © 2022 Alice Brenon <alice.brenon@ens-lyon.fr>
@@ -265,22 +265,26 @@ the commit hash, the downloaded directory and its content hash."
      (sha256
       (base32 ,hash))))
 
-(define* (git->origin url proc #:key ref #:rest rest)
+(define* (git->origin url proc #:key ref eager? #:rest rest)
   "Return a generated `origin' block of a package depending on the Git version
 control system, and the directory in the store where the package has been
 downloaded, in case further processing is necessary.
 
-Unless overwritten with REF, the ref (as defined by the (guix git) module)
-is calculated from the evaluation of PROC with trailing arguments.  PROC must
-be a procedure with a 'body property, used to generate the origin sexp."
-  (let* ((args (strip-keyword-arguments '(#:ref) rest))
+Unless overwritten with REF, the ref (as defined by the (guix git) module) is
+calculated from the evaluation of PROC with trailing arguments.  If EAGER? is
+#t, the same computation (PROC applied to the trailing arguments) is used as
+value of the `commit' field of the generated `git-reference' S-expression.
+Otherwise, PROC must be a procedure with a 'body property, which is used as
+the `commit' field S-expression."
+  (let* ((args (strip-keyword-arguments '(#:ref #:eager?) rest))
          (commit (apply proc args))
          (ref (or ref (and commit `(tag-or-commit . ,commit))))
          (_ directory hash
             (if (or ref commit)
                 (download-git-repository url ref)
                 (values #f #f #f))))
-    (values (git-origin url (peek-body proc) hash) directory)))
+    (values (git-origin url (if eager? commit (peek-body proc)) hash)
+            directory)))
 
 (define* (default-git-error home-page #:optional location)
   "Return a procedure to be passed to a `git-error' `catch' for HOME-PAGE at

@@ -50,6 +50,8 @@ Import and convert the npm package PACKAGE-NAME using the
   -r, --recursive        import packages recursively"))
   (display (G_ "
   -V, --version          display version information and exit"))
+  (display (G_ "
+  -b, --binary           prefer pre-built sources and skip building"))
   (newline)
   (show-bug-report-information))
 
@@ -65,6 +67,9 @@ Import and convert the npm package PACKAGE-NAME using the
          (option '(#\r "recursive") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'recursive #t result)))
+         (option '(#\b "binary") #f #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'binary #t result)))
          %standard-import-options))
 
 (define* (package-name->name+version* spec)
@@ -94,16 +99,19 @@ contain '@'."
                              (('argument . value)
                               value)
                              (_ #f))
-                           (reverse opts))))
+                           (reverse opts)))
+         (binary? (assoc-ref opts 'binary)))
     (match args
       ((spec)
        (define-values (package-name version)
          (package-name->name+version* spec))
        (match (if (assoc-ref opts 'recursive)
                   ;; Recursive import
-                  (npm-binary-recursive-import package-name #:version version)
+                  (npm-binary-recursive-import package-name #:version version
+                                               #:binary? binary?)
                   ;; Single import
-                  (npm-binary->guix-package package-name #:version version))
+                  (npm-binary->guix-package package-name #:version version
+                                            #:binary? binary?))
          ((or #f '())
           (leave (G_ "failed to download meta-data for package '~a@~a'~%")
                  package-name version))
