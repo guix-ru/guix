@@ -1109,9 +1109,9 @@ in a set of Lua source files and produces a set of XHTML pages
 describing the commented declarations and functions.")
     (license license:expat)))
 
-(define (make-lua-lgi name lua)
+(define-public lua-lgi
   (package
-    (name name)
+    (name "lua-lgi")
     (version "0.9.2")
     (source
      (origin
@@ -1145,7 +1145,7 @@ describing the commented declarations and functions.")
                (("LUA_VERSION=5.1")
                 (format #f
                         "LUA_VERSION=~a"
-                        ,(version-major+minor (package-version lua)))))
+                        ,(this-lua-version))))
              #t))
          (add-before 'check 'skip-test-gtk
            (lambda _
@@ -1186,14 +1186,10 @@ libraries.  It allows using GObject-based libraries directly from Lua.
 Notable examples are GTK+, GStreamer and Webkit.")
     (license license:expat)))
 
-(define-public lua-lgi
-  (make-lua-lgi "lua-lgi" lua))
-
-(define-public lua5.1-lgi
-  (make-lua-lgi "lua5.1-lgi" lua-5.1))
-
-(define-public lua5.2-lgi
-  (make-lua-lgi "lua5.2-lgi" lua-5.2))
+(define-public-lua-variants lua-lgi
+  (lua-5.3 lua5.3-lgi)
+  (lua-5.2 lua5.2-lgi)
+  (lua-5.1 lua5.1-lgi))
 
 (define (make-lua-lpeg name lua)
   (package
