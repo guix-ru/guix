@@ -32,6 +32,7 @@
 ;;; Copyright © 2025 Robin Templeton <robin@guixotic.coop>
 ;;; Copyright © 2026 Hennadii Stepanov <hebasto@gmail.com>
 ;;; Copyright © 2026 Noé Lopez <noelopez@free.fr>
+;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1127,6 +1128,49 @@ encrypting using public-key cryptography.  Asignify is designed to be portable
 and self-contained with zero external dependencies.  Asignify can verify
 OpenBSD signatures, but it cannot sign messages in OpenBSD format yet.")
       (license license:bsd-2))))
+
+(define-public embedded-json-signature
+  ;; No releases, use latest commit.
+  (let ((commit "2a571b0cbe8f8bdeacb02361fcf8be7c687f7778")
+        (revision "0"))
+    (package
+      (name "embedded-json-signature")
+      ;; For version, see top of EmbeddedJSONSignature.h.
+      (version (git-version "1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/past-due/EmbeddedJSONSignature")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1ixwymz6sngf378djh0yw5dg8v6iwcqyw68clnvnij8bl6a876f8"))))
+      (build-system cmake-build-system)
+      (arguments
+       (list
+        #:tests? #f                     ;no tests
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'do-shared
+              (lambda _
+                (substitute* "CMakeLists.txt" (("STATIC") "SHARED"))))
+            (replace 'install           ;no install phase
+              (lambda _
+                (let ((inc (in-vicinity #$output "include"))
+                      (lib (in-vicinity #$output "lib")))
+                  (install-file "../source/include/EmbeddedJSONSignature.h" inc)
+                  (install-file "libEmbeddedJSONSignature.so" lib)))))))
+      (inputs (list libsodium))
+      (home-page "https://github.com/past-due/EmbeddedJSONSignature")
+      (synopsis "Simple embedded JSON signature algorithm for C++11 or later")
+      (description "This package provides an @code{EmbeddedJSONSignature} C++
+class for signing and verifying the integrity of JSON objects using
+@code{libsodium}’s public-key signature system.  Signatures are embedded into
+the JSON object itself as a key/value pair, while verification methods allow
+easy extraction of the unmodified object.")
+      (license license:expat))))
 
 (define-public enchive
   (package
