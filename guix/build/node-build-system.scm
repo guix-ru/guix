@@ -38,6 +38,7 @@
             delete-dependencies
             delete-dev-dependencies
             delete-fields
+            add-fields
             modify-json
             modify-json-fields
             node-build
@@ -157,10 +158,12 @@ invalid field value provided, expected string or list of strings, got ~s~%"
   (modify-json-fields
    fields
    (lambda (_ data key)
+     (format #t "deleting field ~s, of value: ~y~%"
+             key (assoc-ref data key))
      (assoc-remove! data key))
    #:strict? strict?))
 
-(define* (replace-fields fields #:key (strict? #t))
+(define* (replace-fields fields #:key (strict? #t) insert?)
   "Provides a lambda to supply to modify-json which replaces the value of the
  supplied field. `fields` is a list of pairs, where the first element is the
  field-path and the second element is the value to replace the target with.
@@ -171,9 +174,16 @@ invalid field value provided, expected string or list of strings, got ~s~%"
   (modify-json-fields
    fields
    (lambda (field data key)
-     (assoc-set! data key (cdr field)))
+     (let ((value (cdr field)))
+       (format #t "setting field ~s to value ~s%" key value)
+       (assoc-set! data key value)))
    #:field-path-mapper (lambda (field) (car field))
+   #:insert? insert?
    #:strict? strict?))
+
+(define* (add-fields fields)
+  "Like `replace-fields', but can insert new fields as well."
+  (replace-fields fields #:insert? #t))
 
 (define (delete-dev-dependencies)
   (delete-fields (list "devDependencies" "peerDependencies")
