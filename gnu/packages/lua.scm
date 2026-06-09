@@ -1327,9 +1327,9 @@ on numbers.")
   (lua-5.2 lua5.2-bitop)
   (lua-5.1 lua5.1-bitop))
 
-(define (make-lua-djot name lua)
+(define-public lua-djot
   (package
-    (name name)
+    (name "lua-djot")
     (version "0.2.1")
     (source
      (origin
@@ -1364,7 +1364,7 @@ on numbers.")
                      (string-append
                       #$output
                       "/share/lua/"
-                      #$(version-major+minor (package-version lua)))))
+                      #$(this-lua-version))))
                 (install-file "djot.lua" lua-path)
                 (copy-recursively "djot" (string-append lua-path "/djot"))))))))
     (native-inputs (list lua))
@@ -1377,17 +1377,11 @@ that identify elements by source position, which could be used
 for syntax highlighting or a linting tool.")
     (license license:expat)))
 
-(define-public lua5.4-djot
-  (make-lua-djot "lua5.4-djot" lua-5.4))
-
-(define-public lua-djot
-  (make-lua-djot "lua-djot" lua))
-
-(define-public lua5.2-djot
-  (make-lua-djot "lua5.2-djot" lua-5.2))
-
-(define-public lua5.1-djot
-  (make-lua-djot "lua5.1-djot" lua-5.1))
+(define-public-lua-variants lua-djot
+  (lua-5.4 lua5.4-djot)
+  (lua-5.3 lua5.3-djot)
+  (lua-5.2 lua5.2-djot)
+  (lua-5.1 lua5.1-djot))
 
 (define-public djot
   (package
