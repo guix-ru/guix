@@ -5652,6 +5652,15 @@ WireGuard peer, and exposes a SOCKS5/HTTP proxy or tunnels on the machine.")
                 (("^MDIG=.*")
                  (string-append "MDIG="
                                 #$output "/libexec/zapret2/nfq2/mdig\n")))))
+          (add-after 'fix-blockcheck-file 'fix-zapret2-script
+            (lambda _
+              (substitute* "init.d/sysv/zapret2"
+                (("^ZAPRET_BASE=.*")
+                 (string-append "ZAPRET_BASE="
+                                #$output "/libexec/zapret2\n"
+                                "ZAPRET_CONFIG=/etc/zapret2/config\n"))
+                (("\\$EXEDIR/functions")
+                 (string-append #$output "/libexec/zapret2/functions")))))
           (replace 'install
             (lambda _
               (let ((bin (string-append #$output "/bin"))
@@ -5670,19 +5679,28 @@ WireGuard peer, and exposes a SOCKS5/HTTP proxy or tunnels on the machine.")
                            (string-append bin "/zapret2-blockcheck")))))
           (add-after 'install 'wrap-scripts
             (lambda* (#:key inputs #:allow-other-keys)
-              (wrap-program (string-append #$output "/bin/zapret2")
-                `("PATH" ":" prefix
-                  (,(dirname (search-input-file inputs "/sbin/nft")))))
-              (wrap-program (string-append #$output "/bin/zapret2-blockcheck")
-                `("PATH" ":" prefix
-                  (,(dirname (search-input-file inputs "/bin/curl"))
-                   ,(dirname (search-input-file inputs "/sbin/nft"))
-                   ,(dirname (search-input-file inputs "/bin/nslookup"))))))))))
+              ;; Tools expected at runtime.
+              (let* ((dir (lambda (f) (dirname (search-input-file inputs f))))
+                     (utils (list (dir "/bin/sed")
+                                  (dir "/bin/grep")
+                                  (dir "/bin/awk")
+                                  (dir "/bin/cut")
+                                  (dir "/sbin/nft"))))
+                (wrap-program (string-append #$output "/bin/zapret2")
+                  `("PATH" ":" prefix ,utils))
+                (wrap-program (string-append #$output "/bin/zapret2-blockcheck")
+                  `("PATH" ":" prefix
+                    (,(dir "/bin/curl")
+                     ,(dir "/bin/nslookup")
+                     ,@utils)))))))))
     (native-inputs
      (list pkg-config))
     (inputs
      (list bash-minimal
+           coreutils
            curl
+           gawk
+           grep
            `(,isc-bind "utils")
            libcap
            libmnl
@@ -5690,6 +5708,7 @@ WireGuard peer, and exposes a SOCKS5/HTTP proxy or tunnels on the machine.")
            libnfnetlink
            luajit
            nftables
+           sed
            zlib))
     (home-page "https://github.com/bol-van/zapret2")
     (synopsis "DPI bypass platform configured in Lua")
