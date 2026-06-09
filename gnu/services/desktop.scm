@@ -1040,6 +1040,39 @@ screens and scanners.")))
 @uref{https://github.com/kmonad/kmonad/blob/master/keymap/tutorial.kbd, KMonad
 - Keymap Tutorial}"))
 
+;; Isolate write access to /dev/uinput to prevent privilege escalation for
+;; users/processes that only need read access to the 'input' group.
+(define %uinput-group
+  (user-group
+    (name "uinput")
+    (system? #t)))
+
+(define %kmonad-group
+  (user-group
+    (name "kmonad")
+    (system? #t)))
+
+;; OPTIONS+="static_node=uinput" triggers kmod to load the uinput module on
+;; boot.
+(define %kmonad-udev-rule
+  (udev-rule
+   "99-kmonad.rules"
+   "KERNEL==\"uinput\", MODE=\"0660\", GROUP=\"uinput\", OPTIONS+=\"static_node=uinput\"\n"))
+
+(define %kmonad-user
+  (user-account
+    (name "kmonad")
+    (group "kmonad")
+    (supplementary-groups '("input" "uinput"))
+    (system? #t)
+    (comment "KMonad daemon user")
+    (home-directory "/var/empty")
+    (create-home-directory? #f)
+    (shell (file-append shadow "/sbin/nologin"))))
+
+(define %kmonad-accounts
+  (list %uinput-group %kmonad-group %kmonad-user))
+
 (define (kmonad-shepherd-services config)
   "Return a shepherd service for each @command{kmonad} configuration."
   (let* ((kmonad (file-append (kmonad-configuration-kmonad config)
@@ -1054,6 +1087,9 @@ screens and scanners.")))
                                              (number->string index) "."))
                (start #~(make-forkexec-constructor
                          (list #$kmonad "-l" "info" #$keymap)
+                         #:user "kmonad"
+                         #:group "kmonad"
+                         #:supplementary-groups '("input" "uinput")
                          #:log-file #$(string-append "/var/log/" name ".log")))
                (stop #~(make-kill-destructor)))))
          (iota (length keymaps))
@@ -1063,8 +1099,12 @@ screens and scanners.")))
   (service-type
     (name 'kmonad)
     (extensions
-     (list (service-extension shepherd-root-service-type
-                              kmonad-shepherd-services)))
+     (list (service-extension account-service-type
+                              (const %kmonad-accounts))
+           (service-extension shepherd-root-service-type
+                              kmonad-shepherd-services)
+           (service-extension udev-service-type
+                              (const (list %kmonad-udev-rule)))))
     (description "Run the @command{kmonad} daemon, which allows customizing
 and extending the functionalities of different keyboards.")))
 
