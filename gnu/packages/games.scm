@@ -130,6 +130,7 @@
   #:use-module (gnu packages boost)
   #:use-module (gnu packages build-tools)
   #:use-module (gnu packages c)
+  #:use-module (gnu packages calendar)
   #:use-module (gnu packages check)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages code)
@@ -7411,6 +7412,7 @@ fighting over what remains.")
                    (for-each delete-file-recursively
                              '("basis_universal"
                                "basis_universal_host_build"
+                               "date"
                                "discord-rpc"
                                "fmt"
                                "GameNetworkingSockets"
@@ -7484,6 +7486,7 @@ fighting over what remains.")
                  '("reclamation.wz" "fractured_kingdom.wz"))))))))
     (native-inputs
      (list basis-universal
+           date
            gettext-minimal
            ninja
            p7zip
