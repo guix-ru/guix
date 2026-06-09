@@ -30,6 +30,7 @@
   #:use-module (guix import json)
   #:use-module (guix import utils)
   #:use-module (guix memoization)
+  #:use-module (guix ui)
   #:use-module (guix utils)
   #:use-module (ice-9 match)
   #:use-module (ice-9 receive)
@@ -226,7 +227,10 @@ associated Git repository, if available."
   (define resolve-spec
     (match-lambda
       (($ <versioned-package> name version)
-       (resolve-package name (string->semver-range version)))))
+       (let ((pkg (resolve-package name (string->semver-range version))))
+         (unless pkg
+           (warning (G_ "failed to resolve dependency ~a~%") name))
+         pkg))))
 
   (define (github-hosted? url)
     (let ((uri (string->uri url)))
@@ -327,8 +331,8 @@ associated Git repository, if available."
                            (sanitize-home-page-url home-page)
                            (string-append %default-page "/" (uri-encode name))))
             (synopsis description)
-            (resolved-deps (map resolve-spec
-                                (append dependencies peer-dependencies)))
+            (resolved-deps (filter-map resolve-spec
+                                       (append dependencies peer-dependencies)))
             (peer-names (map versioned-package-name peer-dependencies))
             (dev-names (append (map versioned-package-name dev-dependencies)
                                peer-names))
