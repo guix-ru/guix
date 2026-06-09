@@ -1290,10 +1290,10 @@ Grammars (PEGs).")
   (lua-5.2 lua5.2-luv)
   (lua-5.1 lua5.1-luv))
 
-;; Lua 5.3 is not supported.
-(define (make-lua-bitop name lua)
+;; Lua 5.3 is not supported, so this package is not exported.
+(define lua-bitop
   (package
-    (name name)
+    (name "lua-bitop")
     (version "1.0.2")
     (source (origin
               (method url-fetch)
@@ -1310,7 +1310,7 @@ Grammars (PEGs).")
              (string-append "INSTALLPATH=printf "
                             (assoc-ref %outputs "out")
                             "/lib/lua/"
-                            ,(version-major+minor (package-version lua))
+                            ,(this-lua-version)
                             "/bit/bit.so"))
        #:phases
        (modify-phases %standard-phases
@@ -1323,11 +1323,9 @@ Grammars (PEGs).")
 on numbers.")
     (license license:expat)))
 
-(define-public lua5.2-bitop
-  (make-lua-bitop "lua5.2-bitop" lua-5.2))
-
-(define-public lua5.1-bitop
-  (make-lua-bitop "lua5.1-bitop" lua-5.1))
+(define-public-lua-variants lua-bitop
+  (lua-5.2 lua5.2-bitop)
+  (lua-5.1 lua5.1-bitop))
 
 (define (make-lua-djot name lua)
   (package
