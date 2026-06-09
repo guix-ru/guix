@@ -1,0 +1,26 @@
+Add missing header needed for 'memset'.
+
+Lack of this include would lead to misdiagnostics by libfabric's 'configure' script:
+
+  checking whether cxil_svc_get_vni_range is declared... no
+
+... where the real problem is lack of a 'memset' declaration:
+
+  configure:37208: checking whether cxil_svc_get_vni_range is declared
+  configure:37208: gcc -c -O2 -DNDEBUG -pipe -fvisibility=hidden -Wall -Wundef -Wpointer-arith -I/include    conftest.c >&5
+  In file included from /gnu/store/…-libcxi-14.0.0/include/libcxi/libcxi.h:22,
+		   from conftest.c:134:
+  /gnu/store/…-cassini-headers-14.0.0/include/cxi_prov_hw.h: In function 'cxi_cq_update_wp':
+  /gnu/store/…-cassini-headers-14.0.0/include/cxi_prov_hw.h:638:17: error: implicit declaration of function 'memset' [-Wimplicit-function-declaration]
+
+--- a/include/cxi_prov_hw.h
++++ b/include/cxi_prov_hw.h
+@@ -11,6 +11,7 @@
+ #ifndef __KERNEL__
+ #include <stdbool.h>
+ #include <errno.h>
++#include <string.h>
+ #endif
+ 
+ /*
+

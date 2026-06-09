@@ -10164,7 +10164,8 @@ comparing system environments.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "074r1snc682f1b6vgswyz55n8zjf5rhqnsl31xsswih7q9q38jda"))))
+                "074r1snc682f1b6vgswyz55n8zjf5rhqnsl31xsswih7q9q38jda"))
+              (patches (search-patches "cassini-headers-memset.patch"))))
     (build-system copy-build-system)
     (arguments
      (list #:install-plan
