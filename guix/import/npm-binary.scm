@@ -35,6 +35,10 @@
   #:use-module (ice-9 receive)
   #:use-module (ice-9 regex)
   #:use-module (json)
+  ;; Autoload Guile-Semver so we only have a soft dependency.
+  #:autoload (semver) (string->semver semver? semver->string semver=? semver>?)
+  #:autoload (semver ranges) ( *semver-range-any* string->semver-range
+                               semver-range-contains?)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-2)
   #:use-module (srfi srfi-26)
@@ -49,14 +53,6 @@
             %npm-registry
             make-versioned-package
             name+version->symbol))
-
-;; Autoload Guile-Semver so we only have a soft dependency.
-(module-autoload! (current-module)
-		  '(semver)
-                  '(string->semver semver? semver->string semver=? semver>?))
-(module-autoload! (current-module)
-		  '(semver ranges)
-                  '(*semver-range-any* string->semver-range semver-range-contains?))
 
 ;; Dist-tags
 (define-json-mapping <dist-tags> make-dist-tags dist-tags?
