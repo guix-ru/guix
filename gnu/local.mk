@@ -1255,7 +1255,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/emacs-disable-jit-compilation.patch			\
   %D%/packages/patches/emacs-doc-toc-shell-commands.patch	\
   %D%/packages/patches/emacs-elisp-autofmt-fix-region-send.patch	\
-  %D%/packages/patches/emacs-exec-path.patch			\
   %D%/packages/patches/emacs-fix-scheme-indent-function.patch	\
   %D%/packages/patches/emacs-gnus-alias-reference-signature.patch	\
   %D%/packages/patches/emacs-helpful-fix-signature.patch	\
@@ -1268,7 +1267,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/emacs-native-comp-fix-filenames.patch   \
   %D%/packages/patches/emacs-native-comp-pin-packages.patch   \
   %D%/packages/patches/emacs-next-disable-jit-compilation.patch			\
-  %D%/packages/patches/emacs-next-exec-path.patch   \
   %D%/packages/patches/emacs-next-native-comp-fix-filenames.patch   \
   %D%/packages/patches/emacs-pasp-mode-quote-file-names.patch  \
   %D%/packages/patches/emacs-polymode-fix-lexical-variable-error.patch  \
