@@ -26,7 +26,7 @@
 ;;; Copyright © 2022 Clément Lassieur <clement@lassieur.org>
 ;;; Copyright © 2022 Zhu Zihao <all_but_last@163.com>
 ;;; Copyright © 2023 Hilton Chain <hako@ultrarare.space>
-;;; Copyright © 2023-2025 Zheng Junjie <z572@z572.online>
+;;; Copyright © 2023-2026 Zheng Junjie <z572@z572.online>
 ;;; Copyright © 2024, 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2025 Andreas Enge <andreas@enge.fr>
 ;;; Copyright © 2025 Liam Hupfer <liam@hpfr.net>
@@ -255,11 +255,13 @@ compiler.  In LLVM this library is called \"compiler-rt\".")
                                    (clang-properties (package-version llvm))))
                           (legacy-build-shared-libs? #f))
   "Produce Clang with dependencies on LLVM and CLANG-RUNTIME, and applying the
-given PATCHES.  When TOOLS-EXTRA is given, it must point to the
-'clang-tools-extra' tarball, which contains code for 'clang-tidy', 'pp-trace',
-'modularize', and other tools.  LEGACY-BUILD-SHARED-LIBS? is used to configure
-the package to use the legacy BUILD_SHARED_LIBS CMake option, which was used
-until LLVM/Clang 14."
+given PATCHES.  When TOOLS-EXTRA is given, And the version is less than 22, it
+must point to the 'clang-tools-extra' tarball, which contains code for
+'clang-tidy', 'pp-trace', 'modularize', and other tools, when the LLVM version
+is greater than 22, if TOOLS-EXTRA exists, the build process will use
+clang-tools-extra from the monorepo.
+LEGACY-BUILD-SHARED-LIBS? is used to configure the package to use the legacy
+BUILD_SHARED_LIBS CMake option, which was used until LLVM/Clang 14."
   (package
     (name "clang")
     (version (package-version llvm))
@@ -290,7 +292,7 @@ until LLVM/Clang 14."
      `(("libxml2" ,libxml2)
        ("gcc-lib" ,gcc "lib")
        ,@(package-inputs llvm)
-       ,@(if tools-extra
+       ,@(if (and tools-extra (not (version>=? version "22")))
              `(("clang-tools-extra" ,tools-extra))
              '())))
     (propagated-inputs
@@ -332,24 +334,28 @@ until LLVM/Clang 14."
 
        #:phases (modify-phases %standard-phases
                   ,@(if tools-extra
-                        `((add-after 'unpack 'add-tools-extra
-                            (lambda* (#:key inputs #:allow-other-keys)
-                              ;; Unpack the 'clang-tools-extra' tarball under
-                              ;; tools/.
-                              (let ((extra (assoc-ref inputs
-                                                      "clang-tools-extra")))
-                                (invoke "tar" "xf" extra)
-                                (rename-file ,(string-append
-                                               "clang-tools-extra-"
-                                               (string-delete #\- (package-version llvm))
-                                               ".src")
-                                             "tools/extra")
-                                ,@(if legacy-build-shared-libs?
-                                      ;; Build and link to shared libraries.
-                                      '((substitute* "cmake/modules/AddClang.cmake"
-                                          (("BUILD_SHARED_LIBS") "True")))
-                                      '())
-                                #t))))
+                        (if (version>=? version "22")
+                            `((add-after 'unpack 'add-tools-extra
+                                (lambda* (#:key inputs #:allow-other-keys)
+                                  (copy-recursively "../clang-tools-extra" "tools/extra"))))
+                            `((add-after 'unpack 'add-tools-extra
+                                (lambda* (#:key inputs #:allow-other-keys)
+                                  ;; Unpack the 'clang-tools-extra' tarball under
+                                  ;; tools/.
+                                  (let ((extra (assoc-ref inputs
+                                                          "clang-tools-extra")))
+                                    (invoke "tar" "xf" extra)
+                                    (rename-file ,(string-append
+                                                   "clang-tools-extra-"
+                                                   (string-delete #\- (package-version llvm))
+                                                   ".src")
+                                                 "tools/extra")
+                                    ,@(if legacy-build-shared-libs?
+                                          ;; Build and link to shared libraries.
+                                          '((substitute* "cmake/modules/AddClang.cmake"
+                                              (("BUILD_SHARED_LIBS") "True")))
+                                          '())
+                                    #t)))))
                         '())
                   (add-after 'unpack 'add-missing-triplets
                     (lambda _
@@ -601,7 +607,8 @@ output), and Binutils.")
     ("18.1.8" . "1l9wm0g9jrpdf309kxjx7xrzf13h81kz8bbp0md14nrz38qll9la")
     ("19.1.7" . "18hkfhsm88bh3vnj21q7f118vrcnf7z6q1ylnwbknyb3yvk0343i")
     ("20.1.8" . "0v0lwf58i96vcwsql3hlgy72z3ncfvqwgyghyn26m2ri8vy83k6a")
-    ("21.1.8" . "0v99a90546lrd3cxgam32c0jcnwzi0ljk0ihdvd9xghzss1pq1x6")))
+    ("21.1.8" . "0v99a90546lrd3cxgam32c0jcnwzi0ljk0ihdvd9xghzss1pq1x6")
+    ("22.1.8" . "1rww5cs3rw2yyjnz84ywlpkcvh46p1m9ac1nkhwprjbjw2vwv20q")))
 
 (define %llvm-patches
   '(("14.0.6" . ("clang-14.0-libc-search-path.patch"
@@ -620,6 +627,8 @@ output), and Binutils.")
     ("20.1.8" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))
     ("21.1.8" . ("clang-18.0-libc-search-path.patch"
+                 "clang-17.0-link-dsymutil-latomic.patch"))
+    ("22.1.8" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))))
 
 (define (llvm-monorepo version)
@@ -1238,6 +1247,33 @@ Library.")
 (define-public clang-toolchain-21
   (make-clang-toolchain clang-21 libomp-21))
 
+(define-public llvm-22
+  (make-llvm "22.1.8"))
+
+(define-public clang-runtime-22
+  (clang-runtime-from-llvm llvm-22))
+
+(define-public clang-22
+  (clang-from-llvm
+   llvm-22 clang-runtime-22
+   ;; The upstream no longer releases clang-tools-extra, but instead recommends
+   ;; using the version in the monorepo.
+   ;; See https://discourse.llvm.org/t/rfc-do-something-with-the-subproject-tarballs-in-the-release-page/75024
+   #:tools-extra #t))
+
+(define-public libomp-22
+  (package
+    (inherit libomp-15)
+    (version (package-version llvm-22))
+    (source (llvm-monorepo version))
+    (native-inputs
+     (modify-inputs (package-native-inputs libomp-15)
+       (replace "clang" clang-22)
+       (replace "llvm" llvm-22)))))
+
+(define-public clang-toolchain-22
+  (make-clang-toolchain clang-22 libomp-22))
+
 ;; Default LLVM and Clang version.
 (define-public libomp libomp-13)
 (define-public llvm llvm-13)
@@ -1740,6 +1776,13 @@ components which highly leverage existing libraries in the larger LLVM Project."
     (version (package-version llvm-21))
     (source (llvm-monorepo version))
     (inputs (list llvm-21))))
+
+(define-public lld-22
+  (package
+    (inherit lld-15)
+    (version (package-version llvm-22))
+    (source (llvm-monorepo version))
+    (inputs (list llvm-22))))
 
 (define-public lld lld-14)
 
