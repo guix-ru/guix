@@ -7419,8 +7419,13 @@ fighting over what remains.")
                                "GameNetworkingSockets"
                                "inih"
                                "re2"
+                               "readerwriterqueue"
                                "utf8proc"
-                               "utfcpp")))))
+                               "utfcpp")))
+                 (substitute* (list "src/stdinreader.cpp"
+                                    "lib/netplay/netreplay.cpp")
+                   ;; Trivially unbundles readerwriterqueue.
+                   (("3rdparty/(readerwriterqueue)" _ f) f))))
        (patches (search-patches "warzone2100-unbundle-basis-universal.patch"
                                 "warzone2100-unbundle-libs.patch"
                                 "warzone2100-unbundle-inih.patch"
@@ -7493,6 +7498,7 @@ fighting over what remains.")
            ninja
            p7zip
            pkg-config
+           readerwriterqueue
            ruby-asciidoctor/minimal
            shaderc))
     (inputs
