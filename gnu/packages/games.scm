@@ -7421,6 +7421,7 @@ fighting over what remains.")
                                "fmt"
                                "GameNetworkingSockets"
                                "inih"
+                               "launchinfo"
                                "libplum"
                                "quickjs-wz"
                                "re2"
@@ -7436,6 +7437,7 @@ fighting over what remains.")
                                 "warzone2100-unbundle-embedded-json-signature.patch"
                                 "warzone2100-unbundle-libs.patch"
                                 "warzone2100-unbundle-inih.patch"
+                                "warzone2100-unbundle-launchinfo.patch"
                                 "warzone2100-unbundle-quickjs-wz.patch"
                                 "warzone2100-unbundle-sqlitecpp.patch"
                                 "warzone2100-unbundle-utfcpp.patch"))
@@ -7521,6 +7523,7 @@ fighting over what remains.")
            fribidi
            gnutls
            harfbuzz
+           launchinfo
            libexpected
            libinih
            libjpeg-turbo

@@ -2650,6 +2650,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/warsow-qfusion-fix-bool-return-type.patch	\
   %D%/packages/patches/warzone2100-unbundle-basis-universal.patch	\
   %D%/packages/patches/warzone2100-unbundle-embedded-json-signature.patch	\
+  %D%/packages/patches/warzone2100-unbundle-launchinfo.patch	\
   %D%/packages/patches/warzone2100-unbundle-libs.patch		\
   %D%/packages/patches/warzone2100-unbundle-quickjs-wz.patch	\
   %D%/packages/patches/warzone2100-unbundle-sqlitecpp.patch	\

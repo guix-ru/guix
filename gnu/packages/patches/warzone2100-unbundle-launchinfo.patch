@@ -1,0 +1,20 @@
+diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
+index 46c0c26e1..dc7a79e0d 100644
+--- a/3rdparty/CMakeLists.txt
++++ b/3rdparty/CMakeLists.txt
+@@ -17,8 +17,13 @@ if(NOT MSVC)
+ 	endif()
+ endif()
+ 
+-add_subdirectory(launchinfo EXCLUDE_FROM_ALL)
+-set_property(TARGET launchinfo PROPERTY FOLDER "3rdparty")
++find_path(LI_INC NAMES LaunchInfo.h REQUIRED)
++find_library(LI_LIB NAMES launchinfo REQUIRED)
++add_library(launchinfo UNKNOWN IMPORTED)
++set_target_properties(launchinfo PROPERTIES
++	IMPORTED_LOCATION "${LI_LIB}"
++	INTERFACE_INCLUDE_DIRECTORIES "${LI_INC}"
++)
+ 
+ SET(FMT_INSTALL OFF CACHE BOOL "Generate the install target" FORCE)
+ SET(FMT_SYSTEM_HEADERS ON CACHE BOOL "Expose headers with marking them as system." FORCE)
