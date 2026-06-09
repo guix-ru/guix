@@ -2202,9 +2202,9 @@ the @code{lunitx} module for running tests automatically at program exit.")
   (lua-5.2 lua5.2-lunitx)
   (lua-5.1 lua5.1-lunitx))
 
-(define (make-lua-lsqlite3 name lua lua-lunitx)
+(define-public lua-lsqlite3
   (package
-    (name name)
+    (name "lua-lsqlite3")
     (version "0.9.6")
     (source (origin
               (method url-fetch)
@@ -2229,8 +2229,7 @@ the @code{lunitx} module for running tests automatically at program exit.")
           (replace 'install
             (lambda* (#:key outputs #:allow-other-keys)
               (let* ((out (assoc-ref outputs "out"))
-                     (lua-version
-                      #$(version-major+minor (package-version lua)))
+                     (lua-version #$(this-lua-version))
                      (cmod-dir (string-append out "/lib/lua/" lua-version)))
                 (install-file "lsqlite3.so" cmod-dir))))
           (delete 'check)
@@ -2256,17 +2255,11 @@ SQLite3 database engine.  It provides a complete binding to the SQLite3 C API
 from within Lua programs.")
     (license license:expat)))
 
-(define-public lua-lsqlite3
-  (make-lua-lsqlite3 "lua-lsqlite3" lua lua-lunitx))
-
-(define-public lua5.1-lsqlite3
-  (make-lua-lsqlite3 "lua5.1-lsqlite3" lua-5.1 lua5.1-lunitx))
-
-(define-public lua5.2-lsqlite3
-  (make-lua-lsqlite3 "lua5.2-lsqlite3" lua-5.2 lua5.2-lunitx))
-
-(define-public lua5.4-lsqlite3
-  (make-lua-lsqlite3 "lua5.4-lsqlite3" lua-5.4 lua5.4-lunitx))
+(define-public-lua-variants lua-lsqlite3
+  (lua-5.4 lua5.4-lsqlite3)
+  (lua-5.3 lua5.3-lsqlite3)
+  (lua-5.2 lua5.2-lsqlite3)
+  (lua-5.1 lua5.1-lsqlite3))
 
 (define (make-lua-unbound name lua)
   (package
