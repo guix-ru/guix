@@ -7169,6 +7169,47 @@ in-window at 640x480 resolution or fullscreen.")
     ;; released under Public Domain terms.
     (license (list license:gpl2+ license:public-domain))))
 
+(define-public launchinfo
+  ;; No releases, use latest commit.
+  (let ((commit "cfdd12564ab6cc30dc70a28571f6e8adfb5caeed")
+        (revision "0"))
+    (package
+      (name "launchinfo")
+      ;; See include/LaunchInfo.h for version.
+      (version (git-version "1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/past-due/launchinfo")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0i7xmf6jgs7rrgjjwh3kdzaqq0249xqmncaprjrf77dxhrm53wsx"))))
+      (build-system cmake-build-system)
+      (arguments
+       (list
+        #:tests? #f                     ;no tests
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'do-shared
+              (lambda _
+                (substitute* "CMakeLists.txt"
+                  (("(launchinfo )STATIC" _ f) (string-append f "SHARED")))))
+            (replace 'install           ;no install instructions
+              (lambda _
+                (let ((lib (in-vicinity #$output "lib"))
+                      (inc (in-vicinity #$output "include")))
+                  (install-file "liblaunchinfo.so" lib)
+                  (install-file "../source/include/LaunchInfo.h" inc)))))))
+      (home-page "https://wz2100.net")
+      (synopsis "Helper library for warzone2100")
+      ;; No form of documentation. :(
+      (description "This package provides the @code{LaunchInfo} class for
+use in the video game warzone2100.")
+      (license license:expat))))       ;launchinfo, whereami
+
 (define-public warzone2100-texpages
   ;; Commit pinned by warzone2100 v4.7.0; latest release is 7 years old.
   (let ((commit "009ec2f652a6230d8315cc3db4eadb5690f18fbd")
