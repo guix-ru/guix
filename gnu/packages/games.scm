@@ -7420,6 +7420,7 @@ fighting over what remains.")
                                "expected"
                                "fmt"
                                "GameNetworkingSockets"
+                               "glm"
                                "inih"
                                "launchinfo"
                                "libplum"
@@ -7506,6 +7507,7 @@ fighting over what remains.")
      (list basis-universal
            date
            gettext-minimal
+           glm
            ninja
            p7zip
            pkg-config
