@@ -2261,9 +2261,9 @@ from within Lua programs.")
   (lua-5.2 lua5.2-lsqlite3)
   (lua-5.1 lua5.1-lsqlite3))
 
-(define (make-lua-unbound name lua)
+(define-public lua-unbound
   (package
-    (name name)
+    (name "lua-unbound")
     (version "1.1.0")
     (source
      (origin
@@ -2279,7 +2279,7 @@ from within Lua programs.")
      (list
       #:tests? #f                     ;no test
       #:make-flags
-      #~(let ((lua-version #$(version-major+minor (package-version lua))))
+      #~(let ((lua-version #$(this-lua-version)))
           (list
            (string-append "CC=" #$(cc-for-target))
            (string-append "LUA_VERSION=" lua-version)
@@ -2307,14 +2307,8 @@ async-capable resolver library supporting SRV records, as well as a desire to
 experiment with DNSSEC and new DNS records.")
     (license license:expat)))
 
-(define-public lua5.2-unbound
-  (make-lua-unbound "lua5.2-unbound" lua-5.2))
-
-(define-public lua-unbound
-  (make-lua-unbound "lua-unbound" lua))
-
-(define-public lua5.4-unbound
-  (make-lua-unbound "lua5.4-unbound" lua-5.4))
-
-(define-public lua5.5-unbound
-  (make-lua-unbound "lua5.5-unbound" lua-5.5))
+(define-public-lua-variants lua-unbound
+  (lua-5.5 lua5.5-unbound)
+  (lua-5.4 lua5.4-unbound)
+  (lua-5.3 lua5.3-unbound)
+  (lua-5.2 lua5.2-unbound))
