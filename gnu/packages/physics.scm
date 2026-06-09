@@ -43,11 +43,13 @@
   #:use-module (gnu packages documentation)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages gl)
+  #:use-module (gnu packages graphviz)
   #:use-module (gnu packages haskell-xyz)
   #:use-module (gnu packages image)
   #:use-module (gnu packages image-processing)
   #:use-module (gnu packages jemalloc)
   #:use-module (gnu packages jupyter)
+  #:use-module (gnu packages llvm)
   #:use-module (gnu packages machine-learning)
   #:use-module (gnu packages maths)
   #:use-module (gnu packages mpi)
@@ -200,6 +202,79 @@ Crystallography) core CIF dictionary and supplementary dictionaries which
 COMCIFS manages.  Dictionary definitions are described using DDLm attributes,
 which are themselves described in 'ddl.dic'.")
     (license license:cc-by4.0)))
+
+(define-public cytnx
+  (package
+    (name "cytnx")
+    (version "1.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Cytnx-dev/Cytnx")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ml6a4f8zj36zlx0dry4mv5q2y130fv2qk579rqrnf42m8ndfack"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "-DRUN_TESTS=ON"
+              "-DBUILD_PYTHON=ON")
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; TODO: Enable Python tests.
+          (add-after 'install 'install-python-module
+            (lambda _
+              (let* ((py-version #$(version-major+minor
+                                   (package-version python)))
+                     (src (string-append #$output "/cytnx"))
+                     (dst (string-append #$output "/lib/python" py-version
+                                         "/site-packages/cytnx")))
+                (copy-recursively src dst)
+                (delete-file-recursively src)))))))
+    (native-inputs
+     (list googletest
+           pybind11))
+    (inputs
+     (list boost
+           openblas
+           python
+           libomp))
+    (propagated-inputs
+     (list python-beartype
+           python-graphviz
+           python-numpy))
+    (home-page "https://github.com/cytnx-dev/cytnx")
+    (synopsis "Quantum physics simulations using tensor network algorithms")
+    (description
+     "Cytnx is a tensor network library designed for quantum physics
+simulations using tensor network algorithms, offering the following features:
+
+@itemize
+@item Most of the APIs are identical in C++ and Python, enabling seamless
+transitions between the two for prototyping and production.
+
+@item Cytnx APIs share very similar interfaces with popular libraries such as
+NumPy, SciPy, and PyTorch, minimizing the learning curve for new users.
+
+@item Cytnx supports multi-device operations (CPUs/GPUs) directly at the base
+container level.  Both the containers and linear algebra functions share
+consistent APIs regardless of the devices on which the input tensors are
+stored, similar to PyTorch.
+
+@item For algorithms in physics, Cytnx provides powerful tools such as
+UniTensor, Network, Symmetry etc.  These objects are built on top of Tensor
+objects, specifically aiming to reduce the developing work of Tensor network
+algorithms by simplifying the user interfaces.
+@end itemize
+
+This library is based on papaer - The Cytnx library for tensor networks;
+Kai-Hsin Wu, Chang-Teng Lin, Ke Hsu, Hao-Ti Hung, Manuel Schneider, Chia-Min
+Chung, Ying-Jer Kao, Pochung Chen;
+@url{https://doi.org/10.21468/SciPostPhysCodeb.53-r1.0}.")
+    (license license:lgpl3+)))
 
 (define-public python-brille
   (package
