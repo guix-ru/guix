@@ -358,6 +358,12 @@ NEW-PREFIX."
                 (name new-name)
                 (source
                  (cond
+                  ;; List of packages that shouldn't have their sources
+                  ;; rewritten.  Eventually we would like to remove this
+                  ;; source rewriting, but we'll do so progressively to avoid
+                  ;; the rebuilds.
+                  ((member (package-name package) '("lua-lunitx"))
+                   (package-source package))
                   ;; If we're using {git,hg}-fetch, then rewrite the file-name
                   ;; of the resulting package.  This avoids causing rebuilds
                   ;; when migrating from the older method of defining Lua
@@ -2152,9 +2158,9 @@ way, following established lisp conventions.")
     (home-page "https://git.sr.ht/~xerool/fennel-ls")
     (license license:expat)))
 
-(define (make-lua-lunitx name lua)
+(define-public lua-lunitx
   (package
-    (name name)
+    (name "lua-lunitx")
     (version "0.8.2")
     (source (origin
               (method git-fetch)
@@ -2163,7 +2169,7 @@ way, following established lisp conventions.")
                      ;; both lunit and lunitx modules.
                      (url "https://github.com/dcurrie/lunit")
                      (commit version)))
-              (file-name (git-file-name "lua-lunitx" version))
+              (file-name (git-file-name name version))
               (sha256
                (base32
                 "0y9szbd2g8xk63s8781bjmw8sv3s5m6rnv47kh1sk21ml3mxi69y"))))
@@ -2174,8 +2180,8 @@ way, following established lisp conventions.")
        #:builder
        #~(begin
             (use-modules (guix build utils))
-            (let* ((lua (string-append #$lua "/bin/lua"))
-                   (lua-version #$(version-major+minor (package-version lua)))
+            (let* ((lua (string-append #$(this-package-native-input "lua") "/bin/lua"))
+                   (lua-version #$(this-lua-version))
                    (lua-dir (string-append #$output "/share/lua/" lua-version)))
               (when #$(not (%current-target-system))
                 (with-directory-excursion (string-append #$source "/lua")
@@ -2190,17 +2196,11 @@ lunitx extensions adding Lua 5.2 compatibility via @code{lunit.module} and
 the @code{lunitx} module for running tests automatically at program exit.")
     (license license:expat)))
 
-(define-public lua-lunitx
-  (make-lua-lunitx "lua-lunitx" lua))
-
-(define-public lua5.1-lunitx
-  (make-lua-lunitx "lua5.1-lunitx" lua-5.1))
-
-(define-public lua5.2-lunitx
-  (make-lua-lunitx "lua5.2-lunitx" lua-5.2))
-
-(define-public lua5.4-lunitx
-  (make-lua-lunitx "lua5.4-lunitx" lua-5.4))
+(define-public-lua-variants lua-lunitx
+  (lua-5.4 lua5.4-lunitx)
+  (lua-5.3 lua5.3-lunitx)
+  (lua-5.2 lua5.2-lunitx)
+  (lua-5.1 lua5.1-lunitx))
 
 (define (make-lua-lsqlite3 name lua lua-lunitx)
   (package
