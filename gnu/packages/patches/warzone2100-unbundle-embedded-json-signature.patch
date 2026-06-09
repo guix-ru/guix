@@ -1,0 +1,24 @@
+Unbundles embedded-json-signature dependency.
+
+patch bdunahu <bdunahu@operationnull.com>.
+
+diff --git a/3rdparty/CMakeLists.txt b/3rdparty/CMakeLists.txt
+index 46c0c26e1..98caaf676 100644
+--- a/3rdparty/CMakeLists.txt
++++ b/3rdparty/CMakeLists.txt
+@@ -54,8 +54,13 @@ set_property(TARGET re2 PROPERTY XCODE_ATTRIBUTE_GCC_WARN_ABOUT_MISSING_FIELD_IN
+ set_property(TARGET re2 PROPERTY XCODE_ATTRIBUTE_GCC_WARN_SHADOW NO)	# -Wshadow
+ set_property(TARGET re2 PROPERTY XCODE_ATTRIBUTE_WARNING_CFLAGS "-Wno-missing-field-initializers -Wno-shadow")
+ 
+-add_subdirectory(EmbeddedJSONSignature EXCLUDE_FROM_ALL)
+-set_property(TARGET EmbeddedJSONSignature PROPERTY FOLDER "3rdparty")
++find_path(EJS_INC NAMES EmbeddedJSONSignature.h)
++find_library(EJS_LIB NAMES EmbeddedJSONSignature)
++add_library(EmbeddedJSONSignature UNKNOWN IMPORTED)
++set_target_properties(EmbeddedJSONSignature PROPERTIES
++	IMPORTED_LOCATION "${EJS_LIB}"
++	INTERFACE_INCLUDE_DIRECTORIES "${EJS_INC}"
++)
+ 
+ if(ENABLE_DISCORD)
+ 	add_subdirectory(discord-rpc EXCLUDE_FROM_ALL)

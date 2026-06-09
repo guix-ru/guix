@@ -2649,6 +2649,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/vulkan-tools-wayland-1.24.patch          \
   %D%/packages/patches/warsow-qfusion-fix-bool-return-type.patch	\
   %D%/packages/patches/warzone2100-unbundle-basis-universal.patch	\
+  %D%/packages/patches/warzone2100-unbundle-embedded-json-signature.patch	\
   %D%/packages/patches/warzone2100-unbundle-libs.patch		\
   %D%/packages/patches/warzone2100-unbundle-sqlitecpp.patch	\
   %D%/packages/patches/warzone2100-unbundle-inih.patch		\

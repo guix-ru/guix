@@ -7416,6 +7416,7 @@ fighting over what remains.")
                                "basis_universal_host_build"
                                "date"
                                "discord-rpc"
+                               "EmbeddedJSONSignature"
                                "fmt"
                                "GameNetworkingSockets"
                                "inih"
@@ -7429,6 +7430,7 @@ fighting over what remains.")
                    ;; Trivially unbundles readerwriterqueue.
                    (("3rdparty/(readerwriterqueue)" _ f) f))))
        (patches (search-patches "warzone2100-unbundle-basis-universal.patch"
+                                "warzone2100-unbundle-embedded-json-signature.patch"
                                 "warzone2100-unbundle-libs.patch"
                                 "warzone2100-unbundle-inih.patch"
                                 "warzone2100-unbundle-sqlitecpp.patch"
@@ -7508,6 +7510,7 @@ fighting over what remains.")
      (list basis-universal
            curl
            fmt
+           embedded-json-signature
            font-dejavu
            font-google-noto-sans-cjk
            freetype
