@@ -970,7 +970,8 @@ It also includes runtime support libraries for these languages.")
                                        "gcc-5.0-libvtv-runpath.patch"
                                        "gcc-13-libsanitizer-no-crypt.patch"
                                        "gcc-libstdc++-newer-gcc.patch"
-                                       "gcc-mangle-guix-store.patch"))
+                                       "gcc-mangle-guix-store.patch"
+                                       "gcc-hurd-split-stack.patch"))
               (modules '((guix build utils)))
               (snippet gcc-canadian-cross-objdump-snippet)))
     (properties
