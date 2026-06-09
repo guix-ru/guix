@@ -1479,9 +1479,9 @@ and readline's custom completion.")
   (lua-5.2 lua5.2-readline)
   (lua-5.1 lua5.1-readline))
 
-(define (make-lua-scintillua name lua lua-lpeg lua-filesystem)
+(define-public lua-scintillua
   (package
-    (name name)
+    (name "lua-scintillua")
     (version "6.6")
     (source
      (origin
@@ -1496,7 +1496,7 @@ and readline's custom completion.")
     (arguments
      (list
       #:phases
-      #~(let* ((lua-api-version #$(version-major+minor (package-version lua)))
+      #~(let* ((lua-api-version #$(this-lua-version))
                (lua-cpath (string-append "/lib/lua/" lua-api-version))
                (lua-path (string-append "/share/lua/" lua-api-version))
                (scintillua (string-append #$output lua-path "/scintillua"))
@@ -1550,13 +1550,8 @@ highlighting.  It can either be used by itself or as a drop-in replacement
 for Scintilla lexers.")
       (license license:expat)))
 
-(define-public lua-scintillua
-  (make-lua-scintillua "lua-scintillua" lua
-                       lua-lpeg lua-filesystem))
-
-(define-public lua5.4-scintillua
-  (make-lua-scintillua "lua5.4-scintillua" lua-5.4
-                       lua5.4-lpeg lua5.4-filesystem))
+(define-public-lua-variants lua-scintillua
+  (lua-5.4 lua5.4-scintillua))
 
 (define-public lutok
   (package
