@@ -7398,7 +7398,8 @@ fighting over what remains.")
         #~(begin (with-directory-excursion "lib"
                    (for-each delete-file-recursively
                              '("netplay/3rdparty/miniupnp"
-                               "sound/3rdparty/opusfile")))
+                               "sound/3rdparty/opusfile"
+                               "ivis_opengl/3rdparty/libjpeg-turbo")))
                  (with-directory-excursion "data"
                    (for-each delete-file-recursively
                              '("fonts"
@@ -7438,6 +7439,7 @@ fighting over what remains.")
                             "-DWZ_INCLUDE_VIDEOS=off"
                             "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
                             "-DENABLE_GNS_NETWORK_BACKEND=off"
+                            "-DWZ_USE_SYSTEM_LIBJPEG_TURBO=on"
                             ;; Do not automatically install
                             ;; additional campaigns.
                             "-DWZ_BUILTIN_MODS_RECLAMATION=off"
@@ -7504,6 +7506,7 @@ fighting over what remains.")
            gnutls
            harfbuzz
            libinih
+           libjpeg-turbo
            libogg
            libpng
            libsodium
