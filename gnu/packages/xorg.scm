@@ -286,31 +286,6 @@ which can be read by any architecture.")
 the core protocol and (many) extensions for the X Window System.")
     (license license:x11)))
 
-(define-public dmxproto
-  (package
-    (name "dmxproto")
-    (version "2.3.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/dmxproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "02b5x9dkgajizm8dqyx2w6hmqx3v25l67mgf35nj6sz0lgk52877"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg DMXProto protocol headers")
-    (description
-     "DMX (Distributed Multihead X) Extension defines a protocol for clients
-to access a front-end proxy X server that controls multiple back-end X
-servers making up a large display.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public dri2proto
   (package
     (name "dri2proto")
