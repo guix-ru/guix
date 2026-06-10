@@ -9141,12 +9141,6 @@ Crowther & Woods, its original authors, in 1995.  It has been known as
 ``adventure 2.5'' and ``430-point adventure''.")
     (license license:bsd-2)))
 
-(define-public open-adventure-2.5
-  (package
-    (inherit open-adventure)
-    (version "2.5")
-    (properties `((superseded . ,open-adventure)))))
-
 (define-public tome4
   (package
     (name "tome4")
