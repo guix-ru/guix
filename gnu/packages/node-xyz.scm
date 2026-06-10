@@ -996,6 +996,35 @@ environment variables from a @code{.env} file into @code{process.env}.")
 when a readable/writable/duplex stream has completed or failed.")
     (license license:expat)))
 
+(define-public node-entities
+  (package
+    (name "node-entities")
+    (version "8.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/fb55/entities")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "098nx7pf8v5fmr96ri3winqdszkqyzl3cmpvkx66l6qhb087ipja"))))
+    (build-system node-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;requires vitest
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'patch-dependencies 'delete-dev-dependencies
+            (lambda _
+              (modify-json (delete-dev-dependencies)))))))
+    (native-inputs (list node-typescript))
+    (home-page "https://github.com/fb55/entities")
+    (synopsis "Encode and decode XML and HTML entities")
+    (description "Entities is a Node.js module to encode and decode XML and
+HTML entities.")
+    (license license:bsd-2)))
+
 (define-public node-env-variable
   (package
     (name "node-env-variable")
