@@ -1543,30 +1543,6 @@ generate code for the @code{python-xcbffib} package.")
 support for Python 3 and PyPy.  It is based on cffi.")
     (license license:expat)))
 
-(define-public recordproto
-  (package
-    (name "recordproto")
-    (version "1.14.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/recordproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0w3kgr1zabwf79bpc28dcnj0fpni6r53rpi82ngjbalj5s6m8xx7"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg RecordProto protocol headers")
-    (description
-     "Record Extension defines a protocol for the recording and playback
-of user actions in the X Window System.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public renderproto
   (package
     (name "renderproto")
