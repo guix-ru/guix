@@ -10366,7 +10366,7 @@ include:
 (define-public qalculate-gtk
   (package
     (name "qalculate-gtk")
-    (version "3.19.0")
+    (version "5.11.0")
     (source
      (origin
        (method git-fetch)
@@ -10375,7 +10375,7 @@ include:
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1nrx7gp6f1yalbdda1gb97azhbr4xclq2xf08vvbvsk8jfd6fd2v"))))
+        (base32 "03ppnhkzbvr8xzl2b6lsxd3i0lrhvch3blzp5g54pr6k9yjdnl0i"))))
     (build-system glib-or-gtk-build-system)
     (native-inputs
      (list pkg-config
@@ -10391,24 +10391,10 @@ include:
            libxml2
            glib
            gtk+))
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'bootstrap 'setenv
-           ;; Prevent the autogen.sh script to carry out the configure
-           ;; script, which has not yet been patched to replace /bin/sh.
-           (lambda _
-             (setenv "NOCONFIGURE" "TRUE")
-             #t)))))
     (home-page "https://qalculate.github.io/")
-    (synopsis "Multi-purpose graphical desktop calculator")
-    (description
-     "Qalculate-gtk is the GTK frontend for libqalculate.  It is a
-multi-purpose GUI desktop calculator.  It provides basic and advanced
-functionality.  Features include customizable functions, unit calculations,
-and conversions, physical constants, symbolic calculations (including
-integrals and equations), arbitrary precision, uncertainty propagation,
-interval arithmetic, plotting.")
+    (synopsis "Qalculate! desktop calculator (GTK interface)")
+    (description "@code{qalculate-gtk} is the GTK frontend for the Qalculate!
+multi-purpose calculator.")
     (license license:gpl2+)))
 
 (define-public numdiff
