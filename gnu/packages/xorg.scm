@@ -831,30 +831,6 @@ operates very much like the xauth program for X11 connection
 authentication records.")
     (license license:x11)))
 
-(define-public inputproto
-  (package
-    (name "inputproto")
-    (version "2.3.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/inputproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "07gk7v006zqn3dcfh16l06gnccy7xnqywf3vl9c209ikazsnlfl9"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg InputProto protocol headers")
-    (description
-     "Input Extension defines a protocol to provide additional input
-devices management such as graphic tablets.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public kbproto
   (package
     (name "kbproto")
