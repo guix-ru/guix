@@ -326,6 +326,34 @@ regular expressions as well!")
 addons in a wide array of potential locations.")
     (license license:expat)))
 
+(define-public node-boolbase
+  (package
+    (name "node-boolbase")
+    (version "2.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/fb55/boolbase")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1g19jwrqv5vwy9vbviw5pkaic3kd1v98b3agwz27r4wlma4afl5y"))))
+    (build-system node-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'neuter-prepare-script
+            (lambda _
+              (modify-json (delete-fields '("scripts.prepare"))))))))
+    (native-inputs (list node-typescript))
+    (home-page "https://github.com/fb55/boolbase")
+    (synopsis "Two functions: One that returns true, one that returns false")
+    (description "This Node.js module provides two functions: one that returns
+true, one that returns false.")
+    (license license:isc)))
+
 (define-public node-brace-expansion-1
   (package
     (name "node-brace-expansion")
