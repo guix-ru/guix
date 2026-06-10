@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2012-2022, 2024 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2012-2022, 2024, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2015 Mark H Weaver <mhw@netris.org>
 ;;; Copyright © 2017 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2021 Timothy Sample <samplet@ngyro.com>
@@ -187,14 +187,17 @@ DIRECTORY.  Those authority certificates are checked when
 'peer-certificate-status' is later called."
     ;; Memoize the result to avoid scanning all the certificates every time a
     ;; connection is made.
+    ;;
+    ;; Some distros provide nothing but bundles (*.crt) under /etc/ssl/certs;
+    ;; others provide 'ca-bundle.crt' plus individual .pem files; others like
+    ;; Guix System provide *.pem plus 'ca-certificates.crt' as an aggregation
+    ;; of all of these.  Do like wget, which is to load everything.
     (let ((cred  (make-certificate-credentials))
-          (files (match (scandir directory (cut string-suffix? ".pem" <>))
-                   ((or #f ())
-                    ;; Some distros provide nothing but bundles (*.crt) under
-                    ;; /etc/ssl/certs, so look for them.
-                    (or (scandir directory (cut string-suffix? ".crt" <>))
-                        '()))
-                   (pem pem))))
+          (files (or (scandir directory
+                              (lambda (file)
+                                (or (string-suffix? ".pem" file)
+                                    (string-suffix? ".crt" file))))
+                     '())))
       (for-each (lambda (file)
                   (let ((file (string-append directory "/" file)))
                     ;; Protect against dangling symlinks.
