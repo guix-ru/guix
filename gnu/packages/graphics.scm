@@ -615,7 +615,7 @@ with the @command{autotrace} utility or as a C library, @code{libautotrace}.")
     (source (origin
               (method git-fetch)
               (uri (git-reference
-                    (url "https://github.com/embree/embree")
+                    (url "https://github.com/RenderKit/embree")
                     (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
