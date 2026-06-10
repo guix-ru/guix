@@ -14025,13 +14025,13 @@ Munsell colour system.")
 (define-public r-mvtnorm
   (package
     (name "r-mvtnorm")
-    (version "1.4-0")
+    (version "1.4-1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "mvtnorm" version))
               (sha256
                (base32
-                "11zwf6w670h42ci4vnd7cfc7h8ymbqhh697wzm2ncybswghhs0ic"))))
+                "0dn20wp8kwyqpracq4jzhi1blzv4rbd7pspr83nhp7prpfr7za6d"))))
     (build-system r-build-system)
     (native-inputs
      (list gfortran r-numderiv r-qrng))
