@@ -6498,13 +6498,13 @@ Jacobi symbols, some divisor functions, Euler's Phi function, etc.")
 (define-public r-pak
   (package
     (name "r-pak")
-    (version "0.9.5")
+    (version "0.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "pak" version))
        (sha256
-        (base32 "170kg74ndj79m80i2x1h10yb2fwn6kxqsw2bgjv45f5arxy9ky7m"))))
+        (base32 "0nnsmnzhwkl20yxj68g3z2qwns170w4lrp88nxi04nr6m9xiz423"))))
     (properties `((upstream-name . "pak")))
     (build-system r-build-system)
     (inputs (list curl))
@@ -6515,6 +6515,7 @@ Jacobi symbols, some divisor functions, Euler's Phi function, etc.")
                          r-pingr
                          r-pkgload
                          r-testthat
+                         r-webfakes
                          r-withr))
     (home-page "https://pak.r-lib.org/")
     (synopsis "Another approach to package installation")
