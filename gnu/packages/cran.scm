@@ -3083,14 +3083,14 @@ who is not comfortable with using R.")
 (define-public r-deoptimr
   (package
     (name "r-deoptimr")
-    (version "1.1-4")
+    (version "1.2-0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "DEoptimR" version))
        (sha256
         (base32
-         "18h2wqk1d9w07hmwmcm0jqlxs24zpvknh1gd3glpfpppsq8ds6ss"))))
+         "1a0s3hgw6jzqi9jdjm0m7azcz4m0xxvb6zdmvvvn7zi4j6jgj9g7"))))
     (properties `((upstream-name . "DEoptimR")))
     (build-system r-build-system)
     (home-page "https://cran.r-project.org/web/packages/DEoptimR")
