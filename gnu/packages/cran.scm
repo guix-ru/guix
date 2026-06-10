@@ -11472,13 +11472,9 @@ available as companion packages.")
         (base32 "05yxv2yafgp4bsigp7v2mkwa2j7kkrlk8hd8p2z4n1y83ddgx2pg"))))
     (properties `((upstream-name . "otel")))
     (build-system r-build-system)
-    (native-inputs (list r-callr
-                         r-cli
-                         r-jsonlite
-                         r-processx
-                         r-spelling
-                         r-testthat
-                         r-withr))
+    ;; Since r-callr now depends on this package we cannot run tests here as
+    ;; including r-testthat would result in a dependency cycle.
+    (arguments (list #:tests? #false))
     (home-page "https://otel.r-lib.org")
     (synopsis "OpenTelemetry R API")
     (description
