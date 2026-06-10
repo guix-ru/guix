@@ -46431,13 +46431,13 @@ classes into dummy/indicator variables.")
 (define-public r-dunn-test
   (package
     (name "r-dunn-test")
-    (version "1.4.0")
+    (version "1.4.1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "dunn.test" version))
               (sha256
                (base32
-                "1jqsz4dbmdkqrgxpv5d9l7caj2qsvhpbc41h5l4ggqn8qprs7xvh"))))
+                "030gi2fbq9r251054h2wlyjanpahibc4hdv0zbpnd949vm2dhhz6"))))
     (properties `((upstream-name . "dunn.test")))
     (build-system r-build-system)
     (propagated-inputs (list r-rlang r-scrutiny))
