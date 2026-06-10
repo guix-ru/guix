@@ -16338,17 +16338,18 @@ rectangular layout tree built by ggtree with the grammar of ggplot2.")
 (define-public r-ggpicrust2
   (package
     (name "r-ggpicrust2")
-    (version "2.5.16")
+    (version "2.5.17")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "ggpicrust2" version))
               (sha256
                (base32
-                "1xysjd7i99s8llrfq143ismzb1hx6li2skljpgcwzf6ka0mnlras"))))
+                "1fhidxk54a8jjk4rqrvgg3jz91hcs1iyv8nr62c3awrpf4j5s66k"))))
     (properties
      '((upstream-name . "ggpicrust2")
        (updater-extra-native-inputs
-        . ("r-aldex2" "r-fgsea" "r-ggally" "r-limma"))))
+        . ("r-aldex2" "r-circlize" "r-complexheatmap"
+           "r-fgsea" "r-ggally" "r-limma"))))
     (build-system r-build-system)
     (propagated-inputs (list r-aplot
                              r-dplyr
