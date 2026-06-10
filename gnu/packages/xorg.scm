@@ -286,30 +286,6 @@ which can be read by any architecture.")
 the core protocol and (many) extensions for the X Window System.")
     (license license:x11)))
 
-(define-public bigreqsproto
-  (package
-    (name "bigreqsproto")
-    (version "1.1.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/bigreqsproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "07hvfm84scz8zjw14riiln2v4w03jlhp756ypwhq27g48jmic8a6"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg BigReqsProto protocol headers")
-    (description
-     "Big Requests Extension defines a protocol to enable the use of
-requests that exceed 262140 bytes in length.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public compositeproto
   (package
     (name "compositeproto")
