@@ -167,6 +167,7 @@
 ;;; Copyright © 2026 Kenny Ballou <kb@devnulllabs.io>
 ;;; Copyright © 2026 Adrien 'neox' Bourmault <neox@gnu.org>
 ;;; Copyright © 2026 Jiyu Software <info@jiyu.dev>
+;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -14121,6 +14122,35 @@ libraries from Swagger specs.")
     (description
      "This package provides completion in Python buffers and also helps find
 the locations of docstrings, arguments, and functions.")
+    (license license:gpl3+)))
+
+(define-public emacs-jeison
+  (package
+    (name "emacs-jeison")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/SavchenkoValeriy/jeison")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ixr51wmq0w89430070bb05dmd9ip29f6bpry05hs0pc6qzh8wj9"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      #:test-command
+      #~(list "emacs" "--no-init-file" "--batch"
+              "-l" "test/jeison-test.el"
+              "-f" "ert-run-tests-batch-and-exit")))
+    (propagated-inputs (list emacs-dash))
+    (home-page "https://github.com/SavchenkoValeriy/jeison")
+    (synopsis "Library for declarative JSON parsing")
+    (description
+     "emacs-jeison is a library for transforming JSON objects into EIEIO
+objects.  It is designed to ease parsing of nested JSON objects by providing
+efficient syntax for traversal.")
     (license license:gpl3+)))
 
 (define-public emacs-jira
