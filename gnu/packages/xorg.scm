@@ -784,30 +784,6 @@ For example: @code{6x10}, @code{9x15bold}, etc.")
     (description "Xorg xfree86-type1 font.")
     (license license:x11)))
 
-(define-public glproto
-  (package
-    (name "glproto")
-    (version "1.4.17")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/glproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0h5ykmcddwid5qj6sbrszgkcypwn3mslvswxpgy2n2iixnyr9amd"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg GLProto protocol headers")
-    (description
-     "OpenGL Extension defines a protocol for the client to send 3D
-rendering commands to the X server.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public ghc-xcb-types
   (package
     (name "ghc-xcb-types")
