@@ -3143,29 +3143,6 @@ server driver works.")
 ;; Only relevant for the frame buffer on BSD systems.
 ;; (define-public xf86-video-wsfb
 
-(define-public xf86dgaproto
-  (package
-    (name "xf86dgaproto")
-    (version "2.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xf86dgaproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0l4hx48207mx0hp09026r6gy9nl3asbq0c75hri19wp1118zcpmc"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XF86DGAProto protocol headers")
-    (description
-     "XFree86 Direct Graphic Access Extension defines a protocol for
-direct linear framebuffer access.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public xf86driproto
   (package
     (name "xf86driproto")
