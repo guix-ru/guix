@@ -2166,35 +2166,6 @@ favorite search engine or bug tracker right from the Xfce panel.")
     (license gpl2+)
     (properties `((release-tag-prefix . ,(string-append name "-"))))))
 
-(define-public xfce4-statusnotifier-plugin
-  (package
-   (name "xfce4-statusnotifier-plugin")
-   (version "0.2.3")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://archive.xfce.org/src/panel-plugins/"
-                                  "xfce4-statusnotifier-plugin/"
-                                  (version-major+minor version)
-                                  "/xfce4-statusnotifier-plugin-" version ".tar.bz2"))
-              (sha256
-               (base32
-                "1d2n56g12dhnjznrq7xvr6d3brpp0lmm080xmgjb7ybc1yygpxrc"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     (list intltool pkg-config
-           `(,glib "bin")))
-    (inputs
-     (list libxfce4ui libdbusmenu xfce4-panel))
-    (home-page "https://docs.xfce.org/panel-plugins/xfce4-statusnotifier-plugin/")
-    (synopsis "Xfce panel plugin for status notifier items")
-    (description "This plugin provides a panel area for status
-notifier items (application indicators).  Applications may use these
-items to display their status and interact with the user.  This
-technology is a modern alternative to systray and follows the
-freedesktop.org specification.")
-    (license gpl2+)
-    (properties `((superseded . ,xfce4-panel)))))
-
 (define-public xfce4-stopwatch-plugin
   (package
     (name "xfce4-stopwatch-plugin")
