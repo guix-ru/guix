@@ -49833,14 +49833,14 @@ and reproducible way.")
 (define-public r-rsconnect
   (package
     (name "r-rsconnect")
-    (version "1.8.0")
+    (version "1.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "rsconnect" version))
        (sha256
         (base32
-         "04gc3r9l60qsvpzi6p9v7cj9nv3prbsh1qg8q1k3y6121a373iad"))))
+         "13rlnw86srn0f0glinb65q3wm184vc9bisbraa5mjz82fda4pwh5"))))
     (properties
      '((upstream-name . "rsconnect")
        (updater-extra-native-inputs . ("tzdata-for-tests"))
@@ -49851,7 +49851,9 @@ and reproducible way.")
       #:skipped-tests
       '(("test-linters.R"
          ;; This test fails for unknown reasons.
-         "linter warns about absolute paths and relative paths"))))
+         "linter warns about absolute paths and relative paths")
+        ;; This test attempts to install withr with renv.
+        "test-bundlePackageRenv.R")))
     (propagated-inputs
      (list r-cli
            r-curl
