@@ -286,30 +286,6 @@ which can be read by any architecture.")
 the core protocol and (many) extensions for the X Window System.")
     (license license:x11)))
 
-(define-public damageproto
-  (package
-    (name "damageproto")
-    (version "1.2.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/damageproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0nzwr5pv9hg7c21n995pdiv0zqhs91yz3r8rn3aska4ykcp12z2w"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg DamageProto protocol headers")
-    (description
-     "Damage Extension contains header files and documentation for
-the damage protocol.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public dmxproto
   (package
     (name "dmxproto")
