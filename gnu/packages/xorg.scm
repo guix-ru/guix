@@ -1543,30 +1543,6 @@ generate code for the @code{python-xcbffib} package.")
 support for Python 3 and PyPy.  It is based on cffi.")
     (license license:expat)))
 
-(define-public renderproto
-  (package
-    (name "renderproto")
-    (version "0.11.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/renderproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0dr5xw6s0qmqg0q5pdkb4jkdhaja0vbfqla79qh5j1xjj9dmlwq6"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg RenderProto protocol headers")
-    (description
-     "Rendering Extension defines a protocol for a digital image composition
-as the foundation of a new rendering model within the X Window System.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public resourceproto
   (package
     (name "resourceproto")
