@@ -10233,7 +10233,9 @@ Currently the Linux driver itself is missing from this package.")
 (define-public libcxi
   (package
     (name "libcxi")
-    (version "14.0.0")
+    ;; Note: Do not upgrade until
+    ;; <https://github.com/HewlettPackard/shs-libcxi/issues/18> is resolved.
+    (version "13.0.0")
     (home-page "https://github.com/HewlettPackard/shs-libcxi")
     (source
      (origin
@@ -10242,7 +10244,7 @@ Currently the Linux driver itself is missing from this package.")
                            (commit (string-append "release/shs-" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "03czzz6h9jbmfikd85mx93bn84icnia08h69afw40flmpqidp5kh"))))
+        (base32 "1m8mds1h8plhfn2ja9br31xaiy82ky69685cp1rznanl18inaiff"))))
     (build-system gnu-build-system)
     (arguments
      (list #:configure-flags
