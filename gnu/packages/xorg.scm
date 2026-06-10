@@ -2051,32 +2051,6 @@ debugging and development tool, and should not be needed in normal
 usage.")
     (license license:x11)))
 
-(define-public xextproto
-  (package
-    (name "xextproto")
-    (version "7.3.0")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xextproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "1c2vma9gqgc2v06rfxdiqgwhxmzk2cbmknwf1ng3m76vr0xb5x7k"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XExtProto protocol headers")
-    (description
-     "XExtProto provides the following extensions: DOUBLE-BUFFER, DPMS,
-Extended-Visual-Information, Generic Event Extension, LBX, MIT-SHM,
-MIT-SUNDRY-NONSTANDARD, Multi-Buffering, SECURITY, SHAPE, SYNC, TOG-CUP,
-XC-APPGROUP, XTEST.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public libevdev
   (package
     (name "libevdev")
