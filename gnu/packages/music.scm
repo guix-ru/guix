@@ -1767,27 +1767,6 @@ save, start/stop, hide/show all programs at once, or individually.  The
 session can be interrupted and easily resumed at a later time.")
     (license license:gpl3+)))
 
-(define-public non-session-manager
-  (package (inherit non-sequencer)
-    (name "non-session-manager")
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:configure-flags flags)
-        `(cons "--project=session-manager"
-               (delete "--project=sequencer" ,flags)))))
-    (inputs
-     (list jack-1 liblo ntk))
-    (native-inputs
-     (list waf pkg-config))
-    (home-page "https://non.tuxfamily.org/nsm/")
-    (synopsis "Audio session management")
-    (description
-     "The Non Session Manager is an API and an implementation for audio
-session management.  NSM clients use a well-specified OSC protocol to
-communicate with the session management daemon.")
-    (license license:gpl2+)
-    (properties `((superseded . ,new-session-manager)))))
-
 (define-public non-mixer
   (package (inherit non-sequencer)
     (name "non-mixer")
