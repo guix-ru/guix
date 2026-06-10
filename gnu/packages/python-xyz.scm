@@ -7760,7 +7760,6 @@ Python.")
      (list python-attrs
            python-pydantic
            python-pytest
-           python-pytest-subtests
            python-requests
            python-responses
            python-setuptools
