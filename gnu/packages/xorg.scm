@@ -1543,30 +1543,6 @@ generate code for the @code{python-xcbffib} package.")
 support for Python 3 and PyPy.  It is based on cffi.")
     (license license:expat)))
 
-(define-public resourceproto
-  (package
-    (name "resourceproto")
-    (version "1.2.0")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/resourceproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0638iyfiiyjw1hg3139pai0j6m65gkskrvd9684zgc6ydcx00riw"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg ResourceProto protocol headers")
-    (description
-     "Resource Extension defines a protocol that allows a client to
-query the X server about its usage of various resources.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public scrnsaverproto
   (package
     (name "scrnsaverproto")
