@@ -1431,32 +1431,6 @@ input from UTF-8 into the locale's encoding.")
 files used by the legacy X11 font system.")
     (license license:x11)))
 
-(define-public presentproto
-  (package
-    (name "presentproto")
-    (version "1.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/presentproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "1f96dlgfwhsd0834z8ydjzjnb0cwha5r6lxgia4say4zhsl276zn"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg PresentProto protocol headers")
-    (description
-     "Present Extension provides a way for applications to update their
-window contents from a pixmap in a well defined fashion, synchronizing
-with the display refresh and potentially using a more efficient
-mechanism than copying the contents of the source pixmap.")
-    (license (license:x11-style "file://presentproto.h"
-                                "See 'presentproto.h' in the distribution."))
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public printproto
   (package
     (name "printproto")
