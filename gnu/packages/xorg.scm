@@ -1663,30 +1663,6 @@ configure.ac scripts in other Xorg modular packages, and is needed to
 generate new versions of their configure scripts with autoconf.")
     (license license:x11)))
 
-(define-public videoproto
-  (package
-    (name "videoproto")
-    (version "2.3.3")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/videoproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "00m7rh3pwmsld4d5fpii3xfk5ciqn17kkk38gfpzrrh8zn4ki067"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg VideoProto protocol headers")
-    (description
-     "Video Extension provides a protocol for a video output mechanism,
-mainly to rescale video playback in the video controller hardware.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public windowswmproto
   (package
     (name "windowswmproto")
