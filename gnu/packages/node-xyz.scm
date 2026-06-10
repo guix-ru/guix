@@ -2373,6 +2373,34 @@ This is not a through or through2 stream. It doesn't transform the data, it just
               (list "LICENSE" "package.json" "README.md"))
             (chdir output))))))))
 
+(define-public node-mkdirp
+  (package
+    (name "node-mkdirp")
+    (version "3.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/isaacs/node-mkdirp")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1f3f8prf5zppnsp526bwf72yrq0g2vkz5b9hlkrda9ypg3a6cs85"))))
+    (build-system node-build-system)
+    (arguments
+     (list
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'patch-dependencies 'delete-dev-dependencies
+            (lambda _
+              (modify-json (delete-dev-dependencies)))))))
+    (home-page "https://github.com/isaacs/node-mkdirp")
+    (synopsis "mkdir command implementation in Node.js")
+    (description "This package provides a recursive @command{mkdir} command
+implemented in JavaScript.")
+    (license license:expat)))
+
 (define-public node-ms
   (package
     (name "node-ms")
