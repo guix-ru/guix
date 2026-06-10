@@ -3143,30 +3143,6 @@ server driver works.")
 ;; Only relevant for the frame buffer on BSD systems.
 ;; (define-public xf86-video-wsfb
 
-(define-public xf86driproto
-  (package
-    (name "xf86driproto")
-    (version "2.1.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xf86driproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "07v69m0g2dfzb653jni4x656jlr7l84c1k39j8qc8vfb45r8sjww"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XF86DRIProto protocol headers")
-    (description
-     "XFree86 Direct Rendering Infrastructure Extension defines a
-protocol to allow user applications to access the video hardware without
-requiring data to be passed through the X server.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public xf86vidmodeproto
   (package
     (name "xf86vidmodeproto")
