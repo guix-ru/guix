@@ -10286,7 +10286,7 @@ known as Slingshot.")
 (define-public libfabric
   (package
     (name "libfabric")
-    (version "2.5.0")
+    (version "2.5.1")
     (source
      (origin
        (method git-fetch)
@@ -10294,7 +10294,7 @@ known as Slingshot.")
              (url "https://github.com/ofiwg/libfabric")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
-       (sha256 (base32 "14yhvywbz98yajffq5pmpphhpdr0g8m8a5579dfy56fpxar441an"))))
+       (sha256 (base32 "15z0g1z62hv6kkiksvpxl6xv07wdmnvqhm5vnh0vq4ipr8f5vikp"))))
     (build-system gnu-build-system)
     (native-inputs
      (list autoconf
