@@ -2011,6 +2011,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/nginx-socket-cloexec.patch		\
   %D%/packages/patches/nlopt_CMake-Assume-working-c-compiler-597.patch \
   %D%/packages/patches/nnpack-system-libraries.patch		\
+  %D%/packages/patches/node-fix-eventloopdelay-test.patch       \
   %D%/packages/patches/nsis-env-passthru.patch			\
   %D%/packages/patches/nss-getcwd-nonnull.patch			\
   %D%/packages/patches/nss-increase-test-timeout.patch		\

@@ -774,7 +774,8 @@ source files.")
                               "deps/llhttp"
                               "deps/uv"
                               "deps/zlib"
-                              "deps/zstd"))))))
+                              "deps/zstd"))))
+              (patches (search-patches "node-fix-eventloopdelay-test.patch"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags configure-flags)
