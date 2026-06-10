@@ -25683,14 +25683,14 @@ Cambridge University Press, 1993.")
 (define-public r-aggregation
   (package
     (name "r-aggregation")
-    (version "1.0.1")
+    (version "1.0.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "aggregation" version))
        (sha256
         (base32
-         "0j9g604m2ccc7hcy02539yja9cf3xcbl25gvp838bp4x8w18my46"))))
+         "1g6b49jkgpi5nn5knbhrxhl4x8iz4hqrngymc2dsxagpjli0q6x8"))))
     (build-system r-build-system)
     (home-page "https://cran.r-project.org/web/packages/aggregation/")
     (synopsis "Methods for p-value aggregation")
