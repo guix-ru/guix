@@ -3945,34 +3945,6 @@ formatted dump file, such as produced by xwd.")
 
 ;; packages of height 1 in the propagated-inputs tree
 
-(define-public fixesproto
-  (package
-    (name "fixesproto")
-    (version "5.0")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/fixesproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "1ki4wiq2iivx5g4w5ckzbjbap759kfqd72yg18m3zpbb4hqkybxs"))))
-    (build-system gnu-build-system)
-    (propagated-inputs
-      (list xorgproto))
-    (native-inputs
-      (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg FixesProto protocol headers")
-    (description
-     "Fixes Extension makes changes to many areas of the protocol to resolve
-issues raised by application interaction with core protocol mechanisms that
-cannot be adequately worked around on the client side of the wire.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public libxdamage
   (package
     (name "libxdamage")
