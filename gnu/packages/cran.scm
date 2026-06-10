@@ -14218,13 +14218,13 @@ data types as well.")
 (define-public r-tables
   (package
     (name "r-tables")
-    (version "0.9.33")
+    (version "0.9.35")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "tables" version))
        (sha256
-        (base32 "0vzja9g5w8afr68q0nx8szl7zx3f8z7dwzf6zhc0lzysrsm8g4kv"))))
+        (base32 "1p6d7v2vichpz416gfyfds0d3pi7s62glz09qmv94jjlvg0qz5lb"))))
     (properties `((upstream-name . "tables")))
     (build-system r-build-system)
     (propagated-inputs (list r-htmltools r-knitr))
