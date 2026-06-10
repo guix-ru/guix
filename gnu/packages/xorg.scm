@@ -286,30 +286,6 @@ which can be read by any architecture.")
 the core protocol and (many) extensions for the X Window System.")
     (license license:x11)))
 
-(define-public dri2proto
-  (package
-    (name "dri2proto")
-    (version "2.8")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/dri2proto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "015az1vfdqmil1yay5nlsmpf6cf7vcbpslxjb72cfkzlvrv59dgr"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg DRI2Proto protocol headers")
-    (description
-     "Direct Rendering Infrastructure 2 Extension defines a protocol to
-securely allow user applications to access the video hardware without
-requiring data to be passed through the X server.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public dri3proto
   (package
     (name "dri3proto")
