@@ -1543,30 +1543,6 @@ generate code for the @code{python-xcbffib} package.")
 support for Python 3 and PyPy.  It is based on cffi.")
     (license license:expat)))
 
-(define-public scrnsaverproto
-  (package
-    (name "scrnsaverproto")
-    (version "1.2.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/scrnsaverproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0rfdbfwd35d761xkfifcscx56q0n56043ixlmv70r4v4l66hmdwb"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg ScrnSaverProto protocol headers")
-    (description
-     "Screen Saver Extension defines a protocol to control screensaver
-features and to query screensaver info on specific windows.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public sessreg
   (package
     (name "sessreg")
