@@ -3143,29 +3143,6 @@ server driver works.")
 ;; Only relevant for the frame buffer on BSD systems.
 ;; (define-public xf86-video-wsfb
 
-(define-public xf86vidmodeproto
-  (package
-    (name "xf86vidmodeproto")
-    (version "2.3.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xf86vidmodeproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0w47d7gfa8zizh2bshdr2rffvbr4jqjv019mdgyh6cmplyd4kna5"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XF86VidModeProto protocol headers")
-    (description
-     "XFree86 Video Mode Extension defines a protocol for dynamically
-configuring modelines and gamma.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public xgamma
   (package
     (name "xgamma")
