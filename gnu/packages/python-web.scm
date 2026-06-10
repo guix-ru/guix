@@ -470,7 +470,7 @@ JSON APIs with Behave.")
 (define-public python-blacksheep
   (package
     (name "python-blacksheep")
-    (version "2.4.6")
+    (version "2.6.3")
     (source
      (origin
        (method git-fetch)
@@ -479,7 +479,7 @@ JSON APIs with Behave.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "120q6hrhfjxdsqav8h5z8yqfi0iiacwxbkryjk7kb20ic2879vqh"))))
+        (base32 "1k6yqsqnh6nnhi8z5v2yqpxs7qsk35zwd7gcr7cdh825f2vrl7js"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -500,13 +500,15 @@ JSON APIs with Behave.")
     (native-inputs
      (list nss-certs-for-test
            python-cython
+           python-defusedxml
            python-flask
            python-jinja2
            python-pydantic
            python-pyjwt
            python-pytest
            python-pytest-asyncio
-           python-setuptools))
+           python-setuptools
+           python-starlette))
     (propagated-inputs
      (list python-certifi
            python-essentials
