@@ -58,6 +58,7 @@
   #:use-module (web response)
   #:use-module (guix http-client)
   #:export (%allow-unauthenticated-substitutes?
+            %allow-unsafe-substitute-uris?
             %reply-file-descriptor
 
             substitute-urls
@@ -89,6 +90,19 @@ disabled!~%"))
   (make-parameter
    (and=> (getenv "GUIX_ALLOW_UNAUTHENTICATED_SUBSTITUTES")
           (cut string-ci=? <> "yes"))))
+
+(define %allow-unsafe-substitute-uris?
+  ;; Whether to allow substitutes with a "file://" URI.  These are useful for
+  ;; testing purposes but should never be allowed otherwise, as the URIs
+  ;; contained in narinfos are not signed and could point to any
+  ;; attacker-controlled location.  Use GUIX_ALLOW_UNAUTHENTICATED_SUBSTITUTES
+  ;; as a way to tell when we're testing.
+  (make-parameter (%allow-unauthenticated-substitutes?)))
+
+(define %allow-unsafe-narinfo-uris?
+  ;; Like %allow-unsafe-substitute-uris?, but affecting the urls used to fetch
+  ;; narinfos.
+  (make-parameter (%allow-unauthenticated-substitutes?)))
 
 (define (at-most max-length lst)
   "If LST is shorter than MAX-LENGTH, return it and the empty list; otherwise
@@ -368,6 +382,21 @@ server certificates."
                     (drain-input socket)
                     socket))))))))
 
+(define (uri-safe? uri)
+  "Return a boolean indicating whether URI, which is either a uri or its
+string representation, is generally safe to use without requiring any trust."
+  (let ((uri (if (uri? uri)
+                 uri
+                 (string->uri uri))))
+    (and uri
+         (case (uri-scheme uri)
+           ((#f file) #f)
+           (else #t)))))
+
+(define (narinfo-uris-safe? narinfo)
+  (or (%allow-unsafe-substitute-uris?)
+      (every uri-safe? (narinfo-uris narinfo))))
+
 (define* (process-substitution/fallback narinfo destination
                                         #:key cache-urls acl
                                         deduplicate? print-build-trace?
@@ -391,9 +420,10 @@ way to download the nar."
                                #:open-connection
                                open-connection-for-uri/cached)
          ((alternate)
-          (if (or (equivalent-narinfo? narinfo alternate)
-                  (valid-narinfo? alternate acl)
-                  (%allow-unauthenticated-substitutes?))
+          (if (and (narinfo-uris-safe? alternate)
+                   (or (equivalent-narinfo? narinfo alternate)
+                       (valid-narinfo? alternate acl)
+                       (%allow-unauthenticated-substitutes?)))
               (guard (c ((or (http-get-error? c)
                              (network-error? c))
                          (when (http-get-error? c)
@@ -429,6 +459,16 @@ PORT."
                         (const #t)
                         (cut valid-narinfo? <> acl))))
 
+  (define (fallback)
+    (process-substitution/fallback narinfo destination
+                                   #:cache-urls cache-urls
+                                   #:acl acl
+                                   #:deduplicate? deduplicate?
+                                   #:print-build-trace?
+                                   print-build-trace?
+                                   #:fast-decompression?
+                                   fast-decompression?))
+
   (unless narinfo
     (raise
      (formatted-message
@@ -437,33 +477,30 @@ PORT."
 
   (let ((expected-hash
          actual-hash
-         (guard
-             (c ((or (http-get-error? c)
-                     (network-error? c))
-                 (when (http-get-error? c)
-                   (warning (G_ "download from '~a' failed: ~a, ~s~%")
-                            (uri->string (http-get-error-uri c))
-                            (http-get-error-code c)
-                            (http-get-error-reason c)))
-                 (format
-                  (current-error-port)
-                  (G_ "retrying download of '~a' with other substitute URLs...~%")
-                  store-item)
-                 (process-substitution/fallback narinfo destination
-                                                #:cache-urls cache-urls
-                                                #:acl acl
-                                                #:deduplicate? deduplicate?
-                                                #:print-build-trace?
-                                                print-build-trace?
-                                                #:fast-decompression?
-                                                fast-decompression?)))
-           (download-nar narinfo destination
-                         #:deduplicate? deduplicate?
-                         #:print-build-trace? print-build-trace?
-                         #:fast-decompression? fast-decompression?
-                         #:open-connection-for-uri
-                         open-connection-for-uri/cached
-                         #:keep-alive? #t))))
+         (cond
+          ((narinfo-uris-safe? narinfo)
+           (guard
+               (c ((or (http-get-error? c)
+                       (network-error? c))
+                   (when (http-get-error? c)
+                     (warning (G_ "download from '~a' failed: ~a, ~s~%")
+                              (uri->string (http-get-error-uri c))
+                              (http-get-error-code c)
+                              (http-get-error-reason c)))
+                   (format
+                    (current-error-port)
+                    (G_ "retrying download of '~a' with other substitute URLs...~%")
+                    store-item)
+                   (fallback)))
+             (download-nar narinfo destination
+                           #:deduplicate? deduplicate?
+                           #:print-build-trace? print-build-trace?
+                           #:fast-decompression? fast-decompression?
+                           #:open-connection-for-uri
+                           open-connection-for-uri/cached
+                           #:keep-alive? #t)))
+          (else
+           (fallback)))))
     (values narinfo
             expected-hash
             actual-hash)))
@@ -519,10 +556,17 @@ substitutes may be unavailable\n")))))
 found."
       (assoc-ref (force options) option))))
 
+(define (assert-safe-uris uris)
+  (unless (or (%allow-unsafe-narinfo-uris?)
+              (every uri-safe? uris))
+    (leave (G_ "unsafe or invalid URI in ~S~%") uris))
+  uris)
+
 (define %default-substitute-urls
-  (match (and=> (or (find-daemon-option "untrusted-substitute-urls") ;client
-                    (find-daemon-option "substitute-urls"))          ;admin
-                string-tokenize)
+  (match (or (and=> (find-daemon-option "untrusted-substitute-urls") ;client
+                    (compose assert-safe-uris string-tokenize))
+             (and=> (find-daemon-option "substitute-urls") ;admin
+                    string-tokenize))
     ((urls ...)
      urls)
     (#f
@@ -558,8 +602,9 @@ is shorter than MAX elements, then it is directly returned."
   (let* ((option (find-daemon-option "discover"))
          (discover? (and option (string=? option "true"))))
     (if discover?
-     (randomize-substitute-urls (read-substitute-urls))
-     '())))
+        (randomize-substitute-urls (filter uri-safe?
+                                           (read-substitute-urls)))
+        '())))
 
 (define substitute-urls
   ;; List of substitute URLs.

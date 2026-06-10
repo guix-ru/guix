@@ -206,6 +206,26 @@ a file for NARINFO."
 ;; daemon.
 (%reply-file-descriptor #f)
 
+(test-equal "file:// URI prohibited by default"
+  "not-found\n"
+  (with-output-to-string
+    (lambda ()
+      (%allow-unsafe-substitute-uris? #f)
+      (let ((narinfo %narinfo))
+        (with-narinfo (string-append narinfo "Signature: "
+                                     (signature-field narinfo) "\n")
+          (call-with-temporary-directory
+           (lambda (directory)
+             (with-input-from-string (string-append
+                                      "substitute " (%store-prefix)
+                                      "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo "
+                                      directory "/shouldnotbewritten\n")
+               (lambda ()
+                 (guix-substitute "--substitute"))))))))))
+
+;; Allow these for ease of testing for the rest of the tests
+(%allow-unsafe-substitute-uris? #t)
+
 
 (test-equal "query narinfo without signature"
   ""                                              ; not substitutable
