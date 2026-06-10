@@ -286,33 +286,6 @@ which can be read by any architecture.")
 the core protocol and (many) extensions for the X Window System.")
     (license license:x11)))
 
-(define-public compositeproto
-  (package
-    (name "compositeproto")
-    (version "0.4.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/compositeproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "1z0crmf669hirw4s7972mmp8xig80kfndja9h559haqbpvq5k4q4"))))
-    (build-system gnu-build-system)
-    (inputs
-      (list xorgproto))
-    (native-inputs
-      (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg CompositeProto protocol headers")
-    (description
-     "Composite Extension contains header files and documentation for
-the damage protocol.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public damageproto
   (package
     (name "damageproto")
