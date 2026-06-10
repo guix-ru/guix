@@ -9140,7 +9140,7 @@ this it tries to be opinion-free and very extendable.")
     (version "1.1.4")
     (source
      (origin
-       (method git-fetch)       ;no tests in PyPI archive
+       (method git-fetch)
        (uri (git-reference
               (url "https://github.com/Yelp/ephemeral-port-reserve")
               (commit (string-append "v" version))))
@@ -9150,8 +9150,7 @@ this it tries to be opinion-free and very extendable.")
     (build-system pyproject-build-system)
     (native-inputs
      (list python-pytest
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (home-page "https://github.com/Yelp/ephemeral-port-reserve/")
     (synopsis "Find an unused port, reliably")
     (description
