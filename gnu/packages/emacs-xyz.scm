@@ -20905,6 +20905,40 @@ replaces its completion with a function which is better suited for systems
 using package inferred style.")
       (license license:gpl3+))))
 
+(define-public emacs-reduce-ide
+  (package
+    (name "emacs-reduce-ide")
+    (version "1.14")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/fjwright/REDUCE-IDE")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "089hvyg110vbl82wfipqhl07309fsd1a6i48mixlpvniaqys3zc4"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ; no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'make-info
+            (lambda _
+              (invoke "makeinfo" "reduce-ide.texinfo"))))))
+    (native-inputs (list texinfo))
+    (home-page "https://reduce-algebra.sourceforge.io/reduce-ide/")
+    (synopsis "Major modes for editing and running REDUCE source code")
+    (description
+     "REDUCE IDE is an Emacs package that provides an Integrated Development
+Environment for the REDUCE computer algebra system within the GNU Emacs
+editor.  Its two major components are Emacs Lisp libraries that provide major
+modes for editing REDUCE source code and running a command-line version of
+REDUCE in an Emacs window.")
+    (license license:gpl3+)))
+
 (define-public emacs-lua-mode
   (let ((commit "2f6b8d7a6317e42c953c5119b0119ddb337e0a5f")
         (revision "2"))
