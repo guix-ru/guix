@@ -267,6 +267,54 @@
          (and (string=? commit head)
               (string=? tag    head)))))))
 
+(test-assert "update-cached-checkout, recursive submodules follow ref"
+  (call-with-temporary-directory
+   (lambda (cache)
+     (define (git-output . args)
+       (let* ((pipe (apply open-pipe* OPEN_READ (git-command) args))
+              (str  (string-trim-right (get-string-all pipe))))
+         (close-pipe pipe)
+         str))
+
+     (with-temporary-git-repository sub
+         '((add "file.txt" "v1\n")
+           (commit "submodule v1")
+           (add "file.txt" "v2\n")
+           (commit "submodule v2"))
+       (let ((sub-v1 (git-output "-C" sub "rev-parse" "HEAD~1"))
+             (sub-v2 (git-output "-C" sub "rev-parse" "HEAD")))
+         (with-temporary-git-repository main
+             `((add "root.txt" "root\n")
+               (commit "root")
+               (branch "primary")
+               (checkout "primary")
+               (submodule ,sub "modules/sub")
+               (submodule-checkout "modules/sub" ,sub-v1)
+               (commit "primary uses submodule v1")
+               (branch "release")
+               (checkout "release")
+               (submodule-checkout "modules/sub" ,sub-v2)
+               (commit "release uses submodule v2")
+               (checkout "primary"))
+           (let ((checkout1 commit1 relation1
+                             (update-cached-checkout main
+                                                     #:recursive? #t
+                                                     #:cache-directory cache)))
+             (and
+              (string=? sub-v1
+                        (git-output "-C"
+                                    (in-vicinity checkout1 "modules/sub")
+                                    "rev-parse" "HEAD"))
+              (let ((checkout2 commit2 relation2
+                                (update-cached-checkout main
+                                                        #:recursive? #t
+                                                        #:ref '(branch . "release")
+                                                        #:cache-directory cache)))
+                (string=? sub-v2
+                          (git-output "-C"
+                                      (in-vicinity checkout2 "modules/sub")
+                                      "rev-parse" "HEAD")))))))))))
+
 (test-assert "update-cached-checkout, untracked files removed"
   (call-with-temporary-directory
    (lambda (cache)

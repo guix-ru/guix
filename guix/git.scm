@@ -624,13 +624,6 @@ current settings unchanged."
                      ;; Build refspecs from symbolic references so they are
                      ;; created locally and updated if necessary.
                      #:refspecs (ref->refspecs ref)))
-     (when recursive?
-       (update-submodules repository #:log-port log-port
-                          #:fetch-options
-                          (make-default-fetch-options
-                           #:verify-certificate?
-                           verify-certificate?)))
-
      ;; Note: call 'commit-relation' from here because it's more efficient
      ;; than letting users re-open the checkout later on.
      (let* ((oid      (if check-out?
@@ -647,6 +640,13 @@ current settings unchanged."
                            (if old
                                (commit-relation old new)
                                'unrelated))))
+
+       (when recursive?
+         (update-submodules repository #:log-port log-port
+                            #:fetch-options
+                            (make-default-fetch-options
+                             #:verify-certificate?
+                             verify-certificate?)))
 
        ;; Reclaim file descriptors and memory mappings associated with
        ;; REPOSITORY as soon as possible.
