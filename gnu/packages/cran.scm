@@ -33528,14 +33528,14 @@ Rcpp, RStudio projects, and more.")
 (define-public r-sessioninfo
   (package
     (name "r-sessioninfo")
-    (version "1.2.3")
+    (version "1.2.4")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "sessioninfo" version))
        (sha256
         (base32
-         "0l66w40lfhb8n5n5201d4fdp4kmlbahwbsrcjyflk6n4lsl90ax0"))))
+         "1m0vssvm5m49fdibxmshcl3xg4hw9yqkkbm0smrc49hijj25x1gy"))))
     (build-system r-build-system)
     (arguments
      (list
