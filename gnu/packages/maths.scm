@@ -10397,6 +10397,51 @@ include:
 multi-purpose calculator.")
     (license license:gpl2+)))
 
+(define-public qalculate-qt
+  (package
+    (name "qalculate-qt")
+    (version "5.11.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Qalculate/qalculate-qt")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gy344widrbmvfk9v8yx349afiqqyfmm12cajhf99v74kw1xivz6"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list #:tests? #f                  ; There are no tests.
+           #:imported-modules
+           `(,@%default-gnu-imported-modules ,@%qt-build-system-modules)
+           #:phases
+           #~(modify-phases %standard-phases
+               (replace 'configure
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (substitute* "qalculate-qt.pro"
+                     (("/usr/local") #$output)
+                     (("\\$\\$LRELEASE")
+                      (string-append
+                       (search-input-file inputs "bin/lrelease"))))
+                   (invoke "qmake")))
+               (add-after 'install 'qt-wrap
+                 (lambda args
+                   (apply (assoc-ref
+                           (@ (guix build qt-build-system) %standard-phases)
+                           'qt-wrap)
+                          #:qtbase #$(this-package-input "qtbase") args))))))
+    (native-inputs (list pkg-config qttools))
+    (inputs (list gmp
+                  libqalculate
+                  mpfr
+                  qtbase))
+    (home-page "https://qalculate.github.io")
+    (synopsis "Qalculate! desktop calculator (Qt interface)")
+    (description "@code{qalculate-qt} is the Qt frontend for the Qalculate!
+multi-purpose calculator.")
+    (license license:gpl2+)))
+
 (define-public numdiff
   (package
     (name "numdiff")
