@@ -286,32 +286,6 @@ which can be read by any architecture.")
 the core protocol and (many) extensions for the X Window System.")
     (license license:x11)))
 
-(define-public dri3proto
-  (package
-    (name "dri3proto")
-    (version "1.0")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/dri3proto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0x609xvnl8jky5m8jdklw4nymx3irkv32w99dfd8nl800bblkgh1"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg DRI3Proto protocol headers")
-    (description
-     "Direct Rendering Infrastructure 3 Extension provides mechanisms to
-translate between direct rendered buffers and X pixmaps.  When combined with
-the Present extension, a complete direct rendering solution for OpenGL is
-provided.")
-    (license (license:x11-style "file://dri3proto.h"
-                                "See 'dri3proto.h' in the distribution."))
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public %app-defaults-dir "/lib/X11/app-defaults")
 
 (define-public editres
