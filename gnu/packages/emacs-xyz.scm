@@ -35719,12 +35719,6 @@ customisation options to control its behaviour.")
        "This package provides a method to open entries in external programs from dired.")
       (license license:gpl3+))))
 
-(define-public emacs-dired-launch-superseded-version
-  (package
-    (inherit emacs-dired-launch)
-    (version "20240809.1910")
-    (properties (list (cons 'superseded emacs-dired-launch)))))
-
 (define-public emacs-dired-rsync
   (package
     (name "emacs-dired-rsync")
