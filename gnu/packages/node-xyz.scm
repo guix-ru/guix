@@ -885,6 +885,38 @@ on an object.")
 text differences, similar to Unix diff.")
     (license license:bsd-3)))
 
+(define-public node-domelementtype
+  (package
+    (name "node-domelementtype")
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/fb55/domelementtype")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0d3dvkrs5ckvbdmw7d8p6kfklggqczhwambrgi9g7wkircszp0hs"))))
+    (build-system node-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;avoid test dependencies
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'neuter-prepare-script
+            (lambda _
+              (modify-json (delete-fields '("scripts.prepare")))))
+          (add-after 'patch-dependencies 'delete-dev-dependencies
+            (lambda _
+              (modify-json (delete-dev-dependencies)))))))
+    (native-inputs (list node-typescript))
+    (home-page "https://github.com/fb55/domelementtype")
+    (synopsis "Node.js types for htmlparser2's DOM")
+    (description "This package contains the Node.js types for the Document
+Object Type (DOM) of htmlparser2.")
+    (license license:bsd-2)))
+
 (define-public node-dprint-formatter
   (package
     (name "node-dprint-formatter")
