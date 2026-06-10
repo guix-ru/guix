@@ -5348,11 +5348,6 @@ up: on the server side there's nothing to do; on the client side mounting the
 file system is as easy as logging into the server with an SSH client.")
     (license license:gpl2+)))
 
-(define-public sshfs-fuse
-  (package (inherit sshfs)
-    (name "sshfs-fuse")
-    (properties `((superseded . ,sshfs)))))
-
 (define-public archivemount
   (package
     (name "archivemount")
