@@ -814,7 +814,7 @@ source files.")
                    (((string-append "'target_name': '("
                                     (string-join host-binaries "|")
                                     ")',")
-                      target)
+                     target)
                     (string-append target
                                    "'ldflags': ['-Wl,-rpath="
                                    c-ares "/lib:"
@@ -826,7 +826,7 @@ source files.")
                                    zlib "/lib"
                                    "'],"))))))
            (add-after 'patch-hardcoded-program-references
-                      'patch-additional-hardcoded-program-references
+               'patch-additional-hardcoded-program-references
              (lambda* (#:key inputs #:allow-other-keys)
                (substitute* "test/parallel/test-stdin-from-file-spawn.js"
                  (("'/bin/sh'") (string-append
@@ -949,21 +949,21 @@ source files.")
                     "/bin/npx")))))))))
     (native-inputs
      (list ;; Runtime dependencies for binaries used as a bootstrap.
-           c-ares-for-node-lts
-           brotli
-           icu4c-76
-           libuv-for-node-lts
-           `(,nghttp2 "lib")
-           openssl-3.0
-           zlib
-           ; ngtcp2? nghttp3?
-           ;; Regular build-time dependencies.
-           perl
-           pkg-config
-           procps
-           python
-           util-linux
-           gcc-14))
+      c-ares-for-node-lts
+      brotli
+      icu4c-76
+      libuv-for-node-lts
+      `(,nghttp2 "lib")
+      openssl-3.0
+      zlib
+                                        ; ngtcp2? nghttp3?
+      ;; Regular build-time dependencies.
+      perl
+      pkg-config
+      procps
+      python
+      util-linux
+      gcc-14))
     (inputs
      (list bash-minimal
            coreutils
@@ -979,7 +979,7 @@ source files.")
            zlib
            `(,zstd-1.5.7 "lib")))
     (supported-systems
-      (cons "riscv64-linux" (package-supported-systems node-bootstrap)))
+     (cons "riscv64-linux" (package-supported-systems node-bootstrap)))
     (properties (alist-delete 'hidden? (package-properties node-bootstrap)))))
 
 (define-public node node-lts)
