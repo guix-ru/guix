@@ -39,6 +39,64 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages xorg))
 
+(define-public kwin-effects-better-blur-dx
+  (package
+    (name "kwin-effects-better-blur-dx")
+    (version "2.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/xarblu/kwin-effects-better-blur-dx")
+          (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11rn887ll3p3cnjbqlvwnaqb0drfc1a6h4f224j7wk0dzq6ymqvw"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f)) ;no tests
+    (native-inputs
+     (list extra-cmake-modules))
+    (inputs
+     (list kcmutils
+           kcolorscheme
+           kconfig
+           kcoreaddons
+           kdecoration
+           ki18n
+           kwidgetsaddons
+           kwin
+           kwindowsystem
+           libepoxy
+           libx11
+           libxcb
+           qtbase
+           qtdeclarative
+           wayland))
+    (home-page "https://github.com/xarblu/kwin-effects-better-blur-dx")
+    (synopsis "Fork of the KDE Plasma 6 blur effect")
+    (description
+     "Better Blur DX is a fork of the KDE Plasma 6 blur effect with additional
+features and bug fixes that haven't been patched yet.
+
+Features:
+@itemize
+@item Force blur
+@item Adjustable blur brightness, contrast and satuarion
+@item Adjustable corner radius
+@item Refraction
+@end itemize
+
+Bug fixes:
+@itemize
+@item Fix for blur that may sometimes disappear during animations
+@item Fix for transparent color schemes not working properly with the Breeze
+ application style
+@end itemize")
+    (license license:gpl2+)))
+
 (define-public kwin-effects-rounded-corners
   (package
     (name "kwin-effects-rounded-corners")
