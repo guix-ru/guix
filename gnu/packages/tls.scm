@@ -918,11 +918,6 @@ certificates for free.")
     (home-page "https://certbot.eff.org/")
     (license license:asl2.0)))
 
-(define-public letsencrypt
-  (package (inherit certbot)
-    (name "letsencrypt")
-    (properties `((superseded . ,certbot)))))
-
 (define-public uacme
   (package
     (name "uacme")
