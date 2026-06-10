@@ -8069,7 +8069,7 @@ file links.")
             cairo
             gdk-pixbuf
             gtk+
-            openssl-3.0
+            openssl
             pango
             (cargo-inputs 'castor)))
     (home-page "https://git.sr.ht/~julienxx/castor")
