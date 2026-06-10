@@ -1,0 +1,35 @@
+Passes all configure flags starting with VCS to autorevision.cmake.
+
+Patch by bdunahu <bdunahu@operationnull.com>.
+
+diff --git a/build_tools/CMakeLists.txt b/build_tools/CMakeLists.txt
+index ea714977a..07d5742bd 100644
+--- a/build_tools/CMakeLists.txt
++++ b/build_tools/CMakeLists.txt
+@@ -10,6 +10,17 @@ add_custom_target(autorevision ALL
+ )
+ set_property(TARGET autorevision PROPERTY FOLDER "_WZBuildProcessTargets")
+ 
++get_cmake_property(_cache_vars CACHE_VARIABLES)
++
++set(_autorevision_vcs_args "")
++foreach(_var IN LISTS _cache_vars)
++    # just collect the VCS ones
++    if(_var MATCHES "^VCS_")
++        list(APPEND _autorevision_vcs_args "-D${_var}=${${_var}}")
++        message( STATUS "Collected ${_var}=${${_var}}" )
++    endif()
++endforeach()
++
+ # Autorevision command that will run *every* build
+ set(_autorevision_cache_tarball_src_input "${CMAKE_CURRENT_SOURCE_DIR}/autorevision.cache")
+ set(_autorevision_cache_file "${CMAKE_CURRENT_BINARY_DIR}/autorevision.cache")
+@@ -24,7 +35,7 @@ add_custom_command(
+ 	COMMAND ${CMAKE_COMMAND} -DINPUT_FILE=${_autorevision_cache_tarball_src_input} -DOUTPUT_FILE=${_autorevision_cache_file} -DSKIP_IF_INPUT_MISSING=ON -DSKIP_IF_OUTPUT_EXISTS=ON -P ${CMAKE_SOURCE_DIR}/cmake/CopyFileHelper.cmake
+ 	# Autorevision.cmake
+ 	# this command must generate: ${CMAKE_CURRENT_BINARY_DIR}/autorevision.h
+-	COMMAND ${CMAKE_COMMAND} -DCACHEFILE=${_autorevision_cache_file} -DOUTPUT_TYPE=h -DOUTPUT_FILE=${_autorevision_h_file} -P ${CMAKE_SOURCE_DIR}/build_tools/autorevision.cmake
++	COMMAND ${CMAKE_COMMAND} -DCACHEFILE=${_autorevision_cache_file} -DOUTPUT_TYPE=h ${_autorevision_vcs_args} -DOUTPUT_FILE=${_autorevision_h_file} -P ${CMAKE_SOURCE_DIR}/build_tools/autorevision.cmake
+ 	WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+ 	VERBATIM
+ )

@@ -7391,49 +7391,17 @@ fighting over what remains.")
     (version "4.7.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://sourceforge/warzone2100/releases/"
-                           version "/warzone2100_src.tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Warzone2100/warzone2100")
+              (commit version)))
+       (file-name (git-file-name name version))
        (modules '((guix build utils)))
        (snippet
-        #~(begin (with-directory-excursion "lib"
-                   (for-each delete-file-recursively
-                             '("netplay/3rdparty/miniupnp"
-                               "sound/3rdparty/opusfile"
-                               "ivis_opengl/3rdparty/libjpeg-turbo")))
-                 (with-directory-excursion "data"
-                   (for-each delete-file-recursively
-                             '("fonts"
-                               "base/texpages"
-                               "terrain_overrides/classic"
-                               "terrain_overrides/high"
-                               "music"
-                               "mods/campaign/reclamation"
-                               "mods/campaign/fractured-kingdom")))
-                 (with-directory-excursion "3rdparty"
-                   (for-each delete-file-recursively
-                             '("basis_universal"
-                               "basis_universal_host_build"
-                               "date"
-                               "discord-rpc"
-                               "EmbeddedJSONSignature"
-                               "expected"
-                               "fmt"
-                               "GameNetworkingSockets"
-                               "glm"
-                               "inih"
-                               "launchinfo"
-                               "libplum"
-                               "quickjs-wz"
-                               "re2"
-                               "readerwriterqueue"
-                               "SQLiteCpp"
-                               "utf8proc"
-                               "utfcpp")))
-                 (substitute* (list "src/stdinreader.cpp"
-                                    "lib/netplay/netreplay.cpp")
-                   ;; Trivially unbundles readerwriterqueue.
-                   (("3rdparty/(readerwriterqueue)" _ f) f))))
+        #~(substitute* (list "src/stdinreader.cpp"
+                             "lib/netplay/netreplay.cpp")
+            ;; Trivially unbundles readerwriterqueue.
+            (("3rdparty/(readerwriterqueue)" _ f) f)))
        (patches (search-patches "warzone2100-unbundle-basis-universal.patch"
                                 "warzone2100-unbundle-embedded-json-signature.patch"
                                 "warzone2100-unbundle-libs.patch"
@@ -7441,29 +7409,42 @@ fighting over what remains.")
                                 "warzone2100-unbundle-launchinfo.patch"
                                 "warzone2100-unbundle-quickjs-wz.patch"
                                 "warzone2100-unbundle-sqlitecpp.patch"
-                                "warzone2100-unbundle-utfcpp.patch"))
+                                "warzone2100-unbundle-utfcpp.patch"
+                                ;; Makes autorevision work with configure flags.
+                                "warzone2100-pass-vcs-configure-flags-to-autorevision.patch"))
        (sha256
         (base32
-         "0dsfgjwrxyzpr5d6114b8ni0i3h2hkm6f2r3ryqs23k8i1dlvvlm"))))
+         "04vdqfmxav0cls3jn5jjpjq514r27kj5pc63pwlsszx00wfz9a4r"))))
     (build-system cmake-build-system)
     (arguments
      (list
       ;; TODO: Tests seem to be broken, configure.ac is missing.
       #:tests? #f
-      #:configure-flags #~'("-GNinja"
-                            "-DWZ_DISTRIBUTOR=GNU Guix"
-                            "-DWZ_DOWNLOAD_PREBUILT_PACKAGES=off"
-                            "-DWZ_INCLUDE_VIDEOS=off"
-                            "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
-                            "-DENABLE_GNS_NETWORK_BACKEND=off"
-                            "-DWZ_USE_SYSTEM_LIBJPEG_TURBO=on"
-                            ;; Do not automatically install
-                            ;; additional campaigns.
-                            "-DWZ_BUILTIN_MODS_RECLAMATION=off"
-                            "-DWZ_BUILTIN_MODS_FRACTUREDKINGDOM=off"
-                            ;; otherwise, installs a debug
-                            ;; ELF which fails validate-runpath
-                            "-DWZ_SKIP_ELF_SEPARATE_DEBUG=on")
+      #:configure-flags
+      #~(list "-GNinja"
+              "-DWZ_DISTRIBUTOR=GNU Guix"
+              "-DWZ_DOWNLOAD_PREBUILT_PACKAGES=off"
+              "-DWZ_INCLUDE_VIDEOS=off"
+              "-DWZ_FORCE_MINIMAL_OPUSFILE=off"
+              "-DENABLE_GNS_NETWORK_BACKEND=off"
+              "-DWZ_USE_SYSTEM_LIBJPEG_TURBO=on"
+              ;; Do not automatically install
+              ;; additional campaigns.
+              "-DWZ_BUILTIN_MODS_RECLAMATION=off"
+              "-DWZ_BUILTIN_MODS_FRACTUREDKINGDOM=off"
+              ;; otherwise, installs a debug
+              ;; ELF which fails validate-runpath
+              "-DWZ_SKIP_ELF_SEPARATE_DEBUG=on"
+              ;; XXX: Autorevision stuff. Passes to the same autorevision
+              ;; in phase 'make-autorevision-cache'. If another is desperately
+              ;; needed to to be defined later, we'll probably know.
+              "-DVCS_WC_MODIFIED=0"
+              "-DVCS_MOST_RECENT_COMMIT_DATE=1970-01-01"
+              (format #f "-DVCS_FULL_HASH=~a" (make-string 40 #\a))
+              (format #f "-DVCS_SHORT_HASH=~a" (make-string 6 #\a))
+              (format #f "-DVCS_TAG=~a" #$version)
+              (format #f "-DVCS_EXTRA=~a" #$version)
+              (format #f "-DVCS_MOST_RECENT_TAGGED_VERSION=~a" #$version))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'unbundle-fonts
@@ -7494,6 +7475,14 @@ fighting over what remains.")
                   (with-directory-excursion "terrain_overrides"
                     (copy-recursively classic "classic")
                     (copy-recursively high "high"))))))
+          (add-before 'build 'make-autorevision-cache
+            (lambda _
+              ;; An autorevision script outputs a header file defining
+              ;; preprocessor variables originating from either git metadata or
+              ;; cmake variables present in this cache file. Missing cache file
+              ;; and no git is an error, so we'll avoid that state.
+              (call-with-output-file "../source/build_tools/autorevision.cache"
+                (const #t))))
           (add-after 'install 'install-campaigns
             (lambda* (#:key inputs #:allow-other-keys)
               (let ((outdir "/share/warzone2100/mods/campaign"))
