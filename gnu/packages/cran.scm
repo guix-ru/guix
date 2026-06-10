@@ -15187,21 +15187,21 @@ imputation by chained equations).")
 (define-public r-callr
   (package
     (name "r-callr")
-    (version "3.7.6")
+    (version "3.8.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "callr" version))
        (sha256
         (base32
-         "1y2ildc0ni01lkcircbr648f5knq6ch6smh5xap2xr39x1ky7g74"))))
+         "01hb014lqlkr1j2czxgsi1mwgyafikkf6wk54fn2pgyv3pj50sx1"))))
     (properties
      ;; Avoid dependency cycle.
      '((updater-ignored-native-inputs . ("r-testthat"))))
     (build-system r-build-system)
     (arguments (list #:tests? #false))
     (propagated-inputs
-     (list r-processx r-r6))
+     (list r-otel r-processx r-r6))
     (home-page "https://github.com/r-lib/callr#readme")
     (synopsis "Call R from R")
     (description
