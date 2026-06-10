@@ -10318,7 +10318,7 @@ allow incremental solving, including assumptions.")
 (define-public libqalculate
   (package
     (name "libqalculate")
-    (version "3.19.0")
+    (version "5.11.0")
     (source
      (origin
        (method git-fetch)
@@ -10327,19 +10327,15 @@ allow incremental solving, including assumptions.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1w44407wb552q21dz4m2nwwdi8b9hzjb2w1l3ffsikzqckc7wbyj"))
-       (patches
-        (search-patches "libqalculate-3.8.0-libcurl-ssl-fix.patch"))))
+        (base32 "0kmjgssrwm9djn8pb44vyajzrzxsmxzkjrdz2hvbslfql9ykc04p"))))
     (build-system gnu-build-system)
     (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("gettext" ,gettext-minimal)
-       ("intltool" ,intltool)
-       ("automake" ,automake)
-       ("autoconf" ,autoconf)
-       ("libtool" ,libtool)
-       ("doxygen" ,doxygen)
-       ("file" ,file)))
+     (list autoconf
+           automake
+           doxygen
+           gettext-minimal
+           libtool
+           pkg-config))
     (inputs
      (list gmp
            mpfr
@@ -10347,25 +10343,24 @@ allow incremental solving, including assumptions.")
            curl
            icu4c
            gnuplot
+           libiconv
            readline))
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'bootstrap 'setenv
-           ;; Prevent the autogen.sh script to carry out the configure
-           ;; script, which has not yet been patched to replace /bin/sh.
-           (lambda _
-             (setenv "NOCONFIGURE" "TRUE")
-             #t)))))
     (home-page "https://qalculate.github.io/")
-    (synopsis "Multi-purpose cli desktop calculator and library")
+    (synopsis "Multi-purpose calculator CLI and library")
     (description
-     "Libqalculate is a multi-purpose cli desktop calculator and library.
-It provides basic and advanced functionality.  Features include customizable
-functions, unit calculations, and conversions, physical constants, symbolic
-calculations (including integrals and equations), arbitrary precision,
-uncertainty propagation, interval arithmetic, plotting and a user-friendly
-cli.")
+     "Qalculate! is a multi-purpose calculator; this package contains its
+command line interface @code{qalc} and library @code{libqalculate}.  Features
+include:
+@itemize
+@item arbitrary precision and interval arithmetic
+@item currency conversion
+@item physical constants
+@item plotting via gnuplot
+@item symbolic calculations (including integrals and equations)
+@item uncertainty propagation
+@item unit calculations and conversions
+@item user-defined functions
+@end itemize")
     (license license:gpl2+)))
 
 (define-public qalculate-gtk
