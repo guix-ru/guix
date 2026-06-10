@@ -784,30 +784,6 @@ For example: @code{6x10}, @code{9x15bold}, etc.")
     (description "Xorg xfree86-type1 font.")
     (license license:x11)))
 
-(define-public fontsproto
-  (package
-    (name "fontsproto")
-    (version "2.1.3")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/fontsproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "1f2sdsd74y34nnaf4m1zlcbhyv8xb6irnisc99f84c4ivnq4d415"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg FontsProto protocol headers")
-    (description
-     "Fonts Extension contains header files and documentation for
-the fonts protocol.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public glproto
   (package
     (name "glproto")
