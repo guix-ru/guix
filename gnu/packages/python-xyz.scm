@@ -9099,7 +9099,7 @@ and convert DDL to BigQuery JSON schema.")
     (propagated-inputs
      (list python-attrs
            python-jsonschema-specifications
-           python-referencing-bootstrap
+           python-referencing
            python-rpds-py
            ;; [optional]
            python-fqdn
