@@ -1823,30 +1823,6 @@ used to parse an XML description and create objects used by Python code
 generators in individual language bindings.")
     (license license:x11)))
 
-(define-public xcmiscproto
-  (package
-    (name "xcmiscproto")
-    (version "1.2.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xcmiscproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "1pyjv45wivnwap2wvsbrzdvjc5ql8bakkbkrvcv6q9bjjf33ccmi"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XCMiscProto protocol headers")
-    (description
-     "XC-MISC Extension defines a protocol that provides Xlib two ways
-to query the server for available resource IDs.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public xcmsdb
   (package
     (name "xcmsdb")
