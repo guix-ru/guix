@@ -50248,18 +50248,16 @@ trend test.")
        (sha256
         (base32
          "116fad7zhhrcbmfmxih11q18x9a9prkln9i503y98i6dr0glb8pv"))))
-    (properties
-     '((upstream-name . "keyring")
-       (updater-extra-native-inputs . ("r-mockery"))))
+    (properties '((upstream-name . "keyring")))
     (build-system r-build-system)
     (propagated-inputs
      (list r-askpass r-filelock r-r6 r-yaml))
     (native-inputs (list pkg-config
-                         r-callr
-                         r-mockery
+                         which
                          r-openssl
                          r-testthat
                          r-withr))
+    (inputs (list libsecret))
     (home-page "https://github.com/r-lib/keyring")
     (synopsis "Access the system credential store from R")
     (description
