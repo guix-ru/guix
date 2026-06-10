@@ -3143,29 +3143,6 @@ server driver works.")
 ;; Only relevant for the frame buffer on BSD systems.
 ;; (define-public xf86-video-wsfb
 
-(define-public xf86bigfontproto
-  (package
-    (name "xf86bigfontproto")
-    (version "1.2.0")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xf86bigfontproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0j0n7sj5xfjpmmgx6n5x556rw21hdd18fwmavp95wps7qki214ms"))))
-    (build-system gnu-build-system)
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XF86BigFontProto protocol headers")
-    (description
-     "XFree86 Bigfont Extension contains header files and documentation
-for the XF86BigFontProto protocol.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public xf86dgaproto
   (package
     (name "xf86dgaproto")
