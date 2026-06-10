@@ -3824,14 +3824,14 @@ rules is done with the @code{auditctl} utility.")
 (define-public nmap
   (package
     (name "nmap")
-    (version "7.98")
+    (version "7.99")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nmap.org/dist/nmap-" version
                                   ".tar.bz2"))
               (sha256
                (base32
-                "1rlpv238ixcj62d740w8xghcfmkvmg9453kh46gmr7mfx89p716f"))
+                "1cjibl1qq1ggzz45sib9wph8kgjvcgc2cvx04wxfa26izy928lfz"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -3916,7 +3916,7 @@ importlib.util.spec_from_file_location(\"ndiff\", \"ndiff.py\")"
      (list bash-minimal                 ;for wrap-program
            libpcap
            lua-5.4
-           openssl-3.0
+           openssl
            pcre2
            zlib                         ; for NSE compression
            perl
