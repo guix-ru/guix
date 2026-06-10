@@ -3196,36 +3196,6 @@ monitor via the X video mode extension.")
 allowed to make connections to the X server.")
     (license license:x11)))
 
-(define-public xineramaproto
-  (package
-    (name "xineramaproto")
-    (version "1.2.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xineramaproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0ns8abd27x7gbp4r44z3wc5k9zqxxj8zjnazqpcyr4n17nxp8xcp"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg XineramaProto protocol headers")
-    (description
-     "Xinerama Extension allows clients to query information about multiple
-physical screens controlled by a single X server that appear as a single
-screen to core X11 protocol operations.
-
-This extension provides a common network protocol for querying information
-which may be provided by different underlying screen combination
-technologies in the X server, such as the original Xinerama multiplexer, or
-alternative implementations like XRandR or TwinView.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 (define-public xinput
   (package
     (name "xinput")
