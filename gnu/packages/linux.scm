@@ -6753,35 +6753,6 @@ for NVM-Express drives.  It was made specifically for Linux as it relies on the
 IOCTLs defined by the mainline kernel driver.")
     (license license:gpl2+)))
 
-(define-public rfkill
-  (package
-    (name "rfkill")
-    (version "0.5")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://kernel.org/software/network/"
-                                  name "/" name "-" version ".tar.xz"))
-              (sha256
-               (base32
-                "0snqj5h0y991lszbigbyyqb8swj0hxajc1vfqg2scfay44231bp0"))))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:make-flags (list "CC=gcc"
-                          (string-append "PREFIX=" %output))
-       #:phases (modify-phases %standard-phases
-                  (delete 'configure))
-       #:tests? #f))
-    (home-page "https://wireless.wiki.kernel.org/en/users/Documentation/rfkill")
-    (synopsis "Tool for enabling and disabling wireless devices")
-    (description
-     "rfkill is a simple tool for accessing the rfkill device interface,
-which is used to enable and disable wireless networking devices, typically
-WLAN, Bluetooth and mobile broadband.")
-    (license (license:non-copyleft "file://COPYING"
-                                   "See COPYING in the distribution."))
-    ;; rfkill is part of util-linux as of 2.31.
-    (properties `((superseded . ,util-linux)))))
-
 (define-public acpi
   (package
     (name "acpi")
@@ -9338,7 +9309,6 @@ interface in sysfs, which can be accomplished with the included udev rules.")
        ("kmod" ,kmod)
        ("pciutils" ,pciutils)
        ("perl" ,perl)
-       ("rfkill" ,rfkill)
        ("sed" ,sed)
        ("usbutils" ,usbutils)
        ("util-linux" ,util-linux)
@@ -9423,7 +9393,7 @@ interface in sysfs, which can be accomplished with the included udev rules.")
                                                 "hdparm"
                                                 "iw"
                                                 "pciutils"
-                                                "rfkill"
+                                                "util-linux"
                                                 "wireless-tools"))))))
                           (append bin-files sbin-files))))))))
     (home-page "https://linrunner.de/en/tlp/tlp.html")
