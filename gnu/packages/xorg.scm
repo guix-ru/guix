@@ -1079,7 +1079,7 @@ hit when running single-threaded.")
             "1p0flwb67xawyv6yhri9w17m1i4lji5qnd0gq8v1vsfb8zw7rw15"))))
     (build-system gnu-build-system)
     (inputs
-      (list xorgproto libxext libx11 windowswmproto))
+      (list xorgproto libxext libx11 xorgproto))
     (native-inputs
       (list pkg-config))
     (home-page "https://www.x.org/wiki/")
@@ -1662,32 +1662,6 @@ management to participate in an X11R6 session.")
 configure.ac scripts in other Xorg modular packages, and is needed to
 generate new versions of their configure scripts with autoconf.")
     (license license:x11)))
-
-(define-public windowswmproto
-  (package
-    (name "windowswmproto")
-    (version "1.0.4")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/windowswmproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0syjxgy4m8l94qrm03nvn5k6bkxc8knnlld1gbllym97nvnv0ny0"))))
-    (build-system gnu-build-system)
-    (native-inputs (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg WindowsWMProto protocol headers")
-    (description
-     "WindowsWM Extension defines a protocol, used for coordination between
-an X11 server and the Microsoft Windows native window manager.  WindowsWM
-is only intended to be used on Cygwin when running a rootless XWin
-server.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
 
 (define-public x11perf
   (package
