@@ -602,6 +602,7 @@ SCM_TESTS =					\
   tests/monads.scm				\
   tests/nar.scm				\
   tests/networking.scm				\
+  tests/node.scm				\
   tests/openpgp.scm				\
   tests/packages.scm				\
   tests/pack.scm				\

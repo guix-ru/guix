@@ -36,7 +36,9 @@
   #:use-module (srfi srfi-71)
   #:export (%standard-phases
             delete-dependencies
+            delete-dependencies/except
             delete-dev-dependencies
+            delete-dev-dependencies/except
             delete-fields
             add-fields
             modify-json
@@ -74,25 +76,54 @@ a value to be written as JSON to the replacement FILE."
              modifications))
      file)))
 
-(define (delete-dependencies dependencies-to-remove)
+(define %dependency-keys
+  '("devDependencies"
+    "dependencies"
+    "peerDependencies"
+    "optionalDependencies"))
+
+(define %dev-dependency-keys
+  '("devDependencies"
+    "peerDependencies"))
+
+(define* (delete-dependencies dependencies-to-remove
+                              #:key negate?
+                              (dependency-keys %dependency-keys))
   "Rewrite 'package.json' to allow the build to proceed without packages
-listed in 'dependencies-to-remove', a list of strings naming npm packages.
+listed in 'dependencies-to-remove', a list of strings naming npm packages.  To
+negate its effect, and keep DEPENDENCIES-TO-REMOVE instead of removing them,
+set NEGATE? to #t.  DEPENDENCY-KEYS can be used to adjust which dependency
+fields are targeted.
 
 To prevent the deleted dependencies from being reintroduced, use this function
 only after the 'patch-dependencies' phase."
   (let ((predicate (lambda (dependency)
                      (member (car dependency) dependencies-to-remove)))
-        (dependency? (cut member <> (list "devDependencies"
-                                          "dependencies"
-                                          "peerDependencies"
-                                          "optionalDependencies"))))
+        (dependency? (cut member <> %dependency-keys)))
     (lambda (pkg-meta)
       (map (match-lambda
              (((? dependency? key) . dependencies)
-              (cons key (remove predicate dependencies)))
-             (otherwise
-              otherwise))
+              (let* (((values removed kept)
+                      (partition ((if negate? negate identity)
+                                  predicate)
+                                 dependencies)))
+                (format #t "deleting ~s dependencies: ~y~%" key removed)
+                (cons key kept)))
+             (otherwise otherwise))
            pkg-meta))))
+
+(define* (delete-dependencies/except dependencies-to-preserve
+                                     #:key (dependency-keys %dependency-keys))
+  "Like `delete-dependencies', but deleting all dependencies except those
+listed in DEPENDENCIES-TO-PRESERVE."
+  (delete-dependencies dependencies-to-preserve #:negate? #t
+                       #:dependency-keys dependency-keys))
+
+(define* (delete-dev-dependencies/except dependencies-to-preserve)
+  "Like `delete-dependencies/except' but only acting on development
+dependencies."
+  (delete-dependencies/except dependencies-to-preserve
+                              #:dependency-keys %dev-dependency-keys))
 
 (define* (modify-json-fields fields field-modifier
                              #:key
@@ -175,7 +206,7 @@ invalid field value provided, expected string or list of strings, got ~s~%"
    fields
    (lambda (field data key)
      (let ((value (cdr field)))
-       (format #t "setting field ~s to value ~s%" key value)
+       (format #t "setting field ~s to value: ~y~%" key value)
        (assoc-set! data key value)))
    #:field-path-mapper (lambda (field) (car field))
    #:insert? insert?
