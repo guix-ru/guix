@@ -4234,37 +4234,6 @@ server core font system.  The current implementation is a simple wrapper
 script around the mkfontscale program.")
     (license license:x11)))
 
-(define-public xproto
-  (package
-    (name "xproto")
-    (version "7.0.31")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/proto/xproto-"
-               version
-               ".tar.bz2"))
-        (sha256
-          (base32
-            "0ivpxz0rx2a7nahkpkhfgymz7j0pwzaqvyqpdgw9afmxl1yp9yf6"))))
-    (build-system gnu-build-system)
-    (propagated-inputs
-      (list util-macros)) ; to get util-macros in (almost?) all package inputs
-    (native-inputs
-      (list pkg-config))
-    (home-page "https://www.x.org/wiki/")
-    (synopsis "Xorg X11Proto protocol headers")
-    (description
-     "XProto provides the headers and specification documents defining
-the X Window System Core Protocol, Version 11.
-
-It also includes a number of headers that aren't purely protocol related,
-but are depended upon by many other X Window System packages to provide
-common definitions and porting layer.")
-    (license license:x11)
-    (properties `((superseded . ,xorgproto)))))
-
 ;; packages of height 2 in the propagated-inputs tree
 
 (define-public libice
