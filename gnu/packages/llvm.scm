@@ -1585,7 +1585,12 @@ AMDGPU code objects.")
                                   "/bin/rocm_agent_enumerator"))))
               (substitute* "src/hipBin_amd.h"
                 (("which hipconfig")
-                 (string-append #$(file-append which "/bin/which") " hipconfig")))))
+                 (string-append (search-input-file inputs "/bin/which")
+                                " hipconfig"))
+                ;; Ensure the construction of the `HSA_PATH' from the
+                ;; environment.
+                (("constructHipPath\\(\\);\n" all)
+                 (string-append all "  constructHsaPath();\n")))))
           ;; This version file very important, as it is parsed under
           ;; $#{llvm-rocm}/clang/lib/Driver/ToolChains/AMDGPU.cpp and its
           ;; contents decides on some includes for hipcc.
@@ -1658,7 +1663,8 @@ AMDGPU code objects.")
                   rocr-runtime
                   rocminfo
                   perl
-                  bash-minimal))
+                  bash-minimal
+                  which))
     (home-page "https://github.com/ROCm/llvm-project/")
     (synopsis "ROCm HIP compiler driver (@command{hipcc})")
     (description "The HIP compiler driver (@command{hipcc}) is a compiler utility that will
@@ -2215,7 +2221,7 @@ the host.")
     (name "rocm-toolchain")
     (inputs
      (modify-inputs inputs
-       (append bash-minimal
+       (append bash-minimal             ;for 'wrap-program'.
                lld-wrapper-rocm
                offload-rocm
                rocr-runtime
@@ -2232,41 +2238,46 @@ the host.")
                          (guix build union)
                          (guix build utils))
 
-            ;; Required for `wrap-program'.
+            (define (unionize output inputs)
+              (union-build output inputs
+                           #:symlink (lambda (old new)
+                                       ;; Ignoring wrappers since
+                                       ;; 'wrap-program' will not be able to
+                                       ;; create the wrapper if it already
+                                       ;; exits.
+                                       (unless (wrapped-program? old)
+                                         (symlink old new)))
+                           ;; Make sure directories are created instead of
+                           ;; symlinks so after creating the union
+                           ;; 'wrap-program' can create new files.
+                           #:create-all-directories? #t))
+
+            ;; Required for 'wrap-program'.
             (setenv "PATH" #$(file-append (this-package-input "bash-minimal")
                                           "/bin"))
 
             (match %build-inputs
               (((names . directories) ...)
-               (union-build #$output directories
-                            #:symlink (lambda (old new)
-                                        (unless (wrapped-program? old)
-                                          (symlink old new)))
-                            #:create-all-directories? #t)))
+               (unionize #$output directories)))
 
-            (union-build #$output:debug
-                         (list #$(this-package-input "libc-debug"))
-                         #:symlink (lambda (old new)
-                                     (unless (wrapped-program? old)
-                                       (symlink old new)))
-                         #:create-all-directories? #t)
-            (union-build #$output:static
-                         (list #$(this-package-input "libc-static"))
-                         #:symlink (lambda (old new)
-                                     (unless (wrapped-program? old)
-                                       (symlink old new)))
-                         #:create-all-directories? #t)
+            (unionize #$output:debug
+                      (list #$(this-package-input "libc-debug")))
+            (unionize #$output:static
+                      (list #$(this-package-input "libc-static")))
 
-            ;; Wrap-programs.
-            (let ((output-bindir (string-append #$output "/bin")))
+            ;; Wrap programs.
+            (let ((bin (string-append #$output "/bin")))
               (for-each
                (lambda (file)
                  (wrap-program file
+                   ;; 'hipconfig' check that the 'LD_LIBRARY_PATH' of some
+                   ;; binaries contains 'HSA_PATH'. Since that path is set
+                   ;; during compilation, this 'rocm-toolchain' meta package
+                   ;; needs to point to 'rocr-runtime' rather than '#$output'.
+                   `("HSA_PATH" = ,(list #$(this-package-input "rocr-runtime")))
                    `("HIP_PATH" = ,(list #$output))
-                   `("HIP_CLANG_PATH" = ,(list output-bindir))))
-               (find-files output-bindir
-                           (lambda (file stat)
-                             (not (string-prefix? "." (basename file)))))))))))
+                   `("HIP_CLANG_PATH" = ,(list bin))))
+               (find-files bin ".")))))))
     (native-search-paths
      (append (package-native-search-paths clang-rocm-toolchain)
              (list (search-path-specification
