@@ -58,7 +58,7 @@ argument---the result of parsing FILE's contents as JSON---and should produce
 a value to be written as JSON to the replacement FILE."
   (with-atomic-file-replacement file
     (lambda (in out)
-      (scm->json (proc (json->scm in)) out #:pretty #t))))
+      (scm->json (proc (json->scm in #:ordered #t)) out #:pretty #t))))
 
 (define* (modify-json #:key (file "package.json") #:rest all-arguments)
   "Provide package.json modifying callbacks such as (delete-dependencies ...)"
