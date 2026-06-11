@@ -19926,6 +19926,12 @@ any subsequent lookup as it keeps the hash table in memory.")
         (base32
          "0b1mqs98vqr67zxnf36vhzk9frd9ndq9ajsvv0z5zc67ziygal85"))))
     (build-system r-build-system)
+    (arguments
+     (list
+      #:skipped-tests
+      '(("test-zero_lengths.R"
+         ;; XXX The expected file does not exist.
+         "file size is correct  when creating ff integer from scratch"))))
     (propagated-inputs (list r-bit))
     (native-inputs (list r-testthat))
     (home-page "https://ff.r-forge.r-project.org/")
