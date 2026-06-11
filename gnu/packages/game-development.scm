@@ -3765,7 +3765,7 @@ utilities frequently used in roguelikes.")
 (define-public dhewm3
   (package
     (name "dhewm3")
-    (version "1.5.4")
+    (version "1.5.5")
     (source (origin
               (method git-fetch)
               (uri (git-reference (url "https://github.com/dhewm/dhewm3")
@@ -3773,7 +3773,7 @@ utilities frequently used in roguelikes.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "16cvf78a7q00bkf74waj6gss09y4iqn3zl9srsfg6i7336gjm2wn"))))
+                "0lxl3mlrikm4zzjs0rfvsn1pybcrnyn9z3rgyyw50k1a8qs9fbmh"))))
     (build-system cmake-build-system)
     (arguments
      (list #:tests? #f                  ; No tests.
