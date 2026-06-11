@@ -1618,6 +1618,18 @@ interactive environment for the functional language Haskell.")
      (substitute-keyword-arguments arguments
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
+            ;; Add store path references instead of plain program names...
+            (add-before 'configure 'set-target-llvm-programs
+              (lambda* (#:key inputs #:allow-other-keys)
+                (setenv "LLC" (search-input-file inputs "/bin/llc"))
+                (setenv "OPT" (search-input-file inputs "/bin/opt"))))
+            ;; ... and preserve them while pruning build tool references
+            (replace 'remove-unnecessary-program-references
+              (lambda* (#:key outputs #:allow-other-keys)
+                (substitute* (find-files (string-append (assoc-ref outputs "out") "/lib/")
+                                         "settings")
+                  (("/gnu/store/.*/bin/([^\"]*)" m program)
+                   (if (member program '("llc" "opt")) m program)))))
             (add-after 'skip-more-tests 'skip-T21694-i686
               (lambda _
                 (substitute* '("testsuite/tests/simplCore/should_compile/all.T")
