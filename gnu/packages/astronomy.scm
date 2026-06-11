@@ -1495,7 +1495,7 @@ floating-point (no compression, LZW- or ZIP-compressed), FITS 8-bit, 16-bit,
 (define-public indi
   (package
     (name "indi")
-    (version "2.2.1.1")
+    (version "2.2.3.1")
     (source
      (origin
        (method git-fetch)
@@ -1504,7 +1504,7 @@ floating-point (no compression, LZW- or ZIP-compressed), FITS 8-bit, 16-bit,
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "06p1hdvbs63nmrkzhp9mqw4ayvhx1wbh1w80ikq896k30i9sx5g0"))))
+        (base32 "027znsgk21qj6cgsbhgjyd86g7pz795kicaw4y90npq5wvp9la2r"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -1513,8 +1513,11 @@ floating-point (no compression, LZW- or ZIP-compressed), FITS 8-bit, 16-bit,
       #~(list "-DINDI_BUILD_UNITTESTS=ON"
               "-DINDI_BUILD_INTEGTESTS=ON"
               "-DCMAKE_INSTALL_LIBDIR=lib"
+              ;; See: <https://github.com/indilib/indi/issues/2422>.
+              "-DFIX_WARNINGS=OFF"
               (string-append "-DCMAKE_INSTALL_PREFIX=" #$output)
-              (string-append "-DUDEVRULES_INSTALL_DIR=" #$output "/lib/udev/rules.d"))
+              (string-append "-DUDEVRULES_INSTALL_DIR=" #$output
+                             "/lib/udev/rules.d"))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-udev-rules
@@ -1523,7 +1526,8 @@ floating-point (no compression, LZW- or ZIP-compressed), FITS 8-bit, 16-bit,
                                  "drivers/video/80-dbk21-camera.rules")
                 (("/bin/sh") (which "sh"))
                 (("/sbin/modprobe")
-                 (string-append #$(this-package-input "kmod") "/bin/modprobe")))))
+                 (string-append #$(this-package-input "kmod")
+                                "/bin/modprobe")))))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
@@ -1532,7 +1536,8 @@ floating-point (no compression, LZW- or ZIP-compressed), FITS 8-bit, 16-bit,
                 (with-directory-excursion "test"
                   (invoke "ctest" "-V"))))))))
     (native-inputs
-     (list googletest))
+     (list googletest
+           pkg-config))
     (inputs
      (list cfitsio
            curl
