@@ -42,6 +42,7 @@
 ;;; Copyright © 2025 John Khoo <johnkhootf@gmail.com>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 Wilko Meyer <w@wmeyer.eu>
+;;; Copyright © 2026 gemmaro <gemmaro.dev@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -817,6 +818,35 @@ Consequently, the computation has a flat performance characteristic,
 correlated with data variation rather than file size.  pfff can be as reliable
 as existing hashing techniques, with provably negligible risk of collisions.")
     (license license:bsd-3)))
+
+(define-public onigmo
+  (package
+    (name "onigmo")
+    (version "6.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/k-takata/Onigmo")
+             (commit (string-append "Onigmo-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0m6z61w8b4y8yk63sj9q8jm8a2v4ncrx258k96bn71nmji7rjnq3"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'check 'check-python
+            (lambda _
+              (invoke "make" "pytest"))))))
+    (native-inputs (list autoconf automake libtool ruby python))
+    (home-page "https://github.com/k-takata/Onigmo")
+    (synopsis "Regular expression library forked from Oniguruma")
+    (description
+     "Onigmo is a regular expression library forked from Oniguruma.  It
+focuses on supporting new expressions.")
+    (license license:bsd-2)))
 
 (define-public oniguruma
   (package
