@@ -55771,13 +55771,13 @@ are.")
 (define-public r-mlr3misc
   (package
     (name "r-mlr3misc")
-    (version "0.21.0")
+    (version "0.22.0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "mlr3misc" version))
               (sha256
                (base32
-                "0k17gi5l8cw8afi4lb5mqblmwhr7mbn7imqfziam014i45n9b55h"))))
+                "1x8fwihcvrz0gn3c2ylh877dqq53maw5aq35chvz8bvxl7hj77kk"))))
     (build-system r-build-system)
     (properties
      ;; Avoid dependency cycle.
