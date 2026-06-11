@@ -638,6 +638,30 @@ accurately in real time at any rate desired.")
 (define-deprecated-package celestia-gtk
   celestia)
 
+(define-public cext
+  (package
+    (name "cext")
+    (version "1.3.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://ftp.eso.org/pub/dfs/pipelines/libraries/cext/"
+             "cext-" version ".tar.gz"))
+       (sha256
+        (base32 "0790f8h5mczbc6whr8rcfajbr5jwh70m25xmdrsjdbb3191k49b2"))))
+    (build-system gnu-build-system)
+    ;; I could not find actual homepage of the project on
+    ;; <https://www.eso.org/public/about-eso/>.
+    (home-page "https://www.eso.org/public/")
+    (synopsis "ESO's C Library Extensions")
+    (description
+     "This package provdies @code{libcext} - ESO's C Library Extensions.  It
+is a C utility library,which is used to implement ESO's Common Pipeline
+Library (CPL).  This package provides the libcext library including the
+on-line reference manual.")
+    (license license:gpl2+)))
+
 (define-public cfitsio
   (package
     (name "cfitsio")
