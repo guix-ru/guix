@@ -2809,6 +2809,36 @@ manages pending callbacks and signals completion when all have finished.")
     (home-page (git-reference-url (origin-uri source)))
     (license license:isc)))
 
+(define-public node-picomatch
+  (package
+    (name "node-picomatch")
+    (version "4.0.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/micromatch/picomatch")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0nw33ky773d66x74ycsik420bm6j1yh4f8qzm89if4az48kpbsm5"))))
+    (build-system node-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;requires mocha
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'patch-dependencies 'delete-dev-dependencies
+            (lambda _
+              (modify-json (delete-dev-dependencies)))))))
+    (home-page "https://github.com/micromatch/picomatch")
+    (synopsis "Fast and accurate matcher written in JavaScript")
+    (description "Picomatch is a very fast and accurate glob matcher written
+in @code{JavaScript}, with no external dependencies and full support for
+standard and extended Bash glob features, including braces, extglobs, POSIX
+brackets, and regular expressions.")
+    (license license:expat)))
+
 (define-public node-pretty-ms
   (package
     (name "node-pretty-ms")
