@@ -4540,6 +4540,37 @@ use with WebSocket implementations.")
 function with browser support.")
     (license license:expat)))
 
+(define-public node-vscode-l10n
+  (package
+    (name "node-vscode-l10n")
+    (version "0.0.18")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/microsoft/vscode-l10n")
+              (commit (string-append "l10n/v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1jya3ifid52vbq4xw10jjkym3rcxc9xivzas3m42i31sh9wma1xc"))))
+    (build-system node-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;requires jest
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'patch-dependencies 'delete-dev-dependencies
+            (lambda _
+              (modify-json (delete-dev-dependencies)
+                           (replace-fields
+                            '(("scripts.install:l10n-dev" . "true")))))))))
+    (home-page "https://github.com/Microsoft/vscode-l10n")
+    (synopsis "Helper library to assist in localizing VS Code subprocesses")
+    (description"This package provides a helper library to assist in
+localizing sub-processes spawned by VS Code extensions.")
+    (license license:expat)))
+
 (define-public node-which
   (package
     (name "node-which")
