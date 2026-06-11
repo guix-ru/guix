@@ -27496,15 +27496,17 @@ misclassification probabilities of different models.")
 (define-public r-zip
   (package
     (name "r-zip")
-    (version "2.3.3")
+    (version "3.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "zip" version))
        (sha256
         (base32
-         "0lls4hllimjnl9bhr31y9x3fj8vdszxbaj6p781kgfdpz0j0nifh"))))
+         "0zvy69bjlph1dpdxh2mizmzj4hsl59nbqlzfr2a8q9xwg6cw14jz"))))
     (build-system r-build-system)
+    ;; These tests require r-webfakes, which depends on r-zip for a test.
+    (arguments (list #:skipped-tests '("test-http.R")))
     (native-inputs (list r-testthat r-withr))
     (home-page "https://github.com/gaborcsardi/zip")
     (synopsis "Cross-platform Zip compression")
