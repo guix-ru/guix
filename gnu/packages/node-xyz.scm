@@ -4158,6 +4158,9 @@ tablets.
                 "/tree/master/types/" type))
     (license license:expat)))
 
+(define-public node-types-boolbase
+  (node-types "boolbase"))
+
 (define-public node-types-estree
   (node-types "estree"))
 
