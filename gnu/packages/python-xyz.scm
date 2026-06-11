@@ -36331,6 +36331,30 @@ instance in spelling correction, predictive typing, to help disabled people
 write text fast, and for various text generation, statistics, and modeling tasks.")
     (license license:expat)))
 
+(define-public python-sbsv
+  (package
+    (name "python-sbsv")
+    (version "0.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/hsh814/sbsv")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1xzx0xhikwqvmzdbhprzljfvnxznr3an3jf0v07hwkixvh80s4f5"))
+       (modules '((guix build utils)))
+       (snippet #~(delete-file-recursively "libsbsv")))) ;separate C library
+    (build-system pyproject-build-system)
+    (native-inputs (list python-hatchling python-pytest))
+    (home-page "https://github.com/hsh814/sbsv")
+    (synopsis "Square bracket separated values")
+    (description
+     "This Python package provides a schema-driven structured log data format
+for the ease of writing and parsing.")
+    (license license:expat)))
+
 (define-public python-sqlglot
   (package
     (name "python-sqlglot")
