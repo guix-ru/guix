@@ -6,6 +6,7 @@
 ;;; Copyright © 2022 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2024 Daniel Khodabakhsh <d.khodabakhsh@gmail.com>
 ;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -25,6 +26,7 @@
 (define-module (guix build node-build-system)
   #:use-module ((guix build gnu-build-system) #:prefix gnu:)
   #:use-module (guix build utils)
+  #:use-module (ice-9 format)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 match)
@@ -93,52 +95,49 @@ only after the 'patch-dependencies' phase."
 
 (define* (modify-json-fields fields field-modifier
                              #:key
-                             (field-path-mapper (lambda (field)
-                                                  field))
+                             (field-path-mapper identity)
                              (insert? #f)
                              (strict? #t))
-  "Provides a lambda to supply to modify-json which modifies the specified
- json file.
-- `fields` is a list procedure-specific data structures which should include
- the definition of a `field-path` in one of two syntaxes: dot-syntax string
- such as `\"devDependencies.esbuild\"`, or a list of strings such as
- `(list \"devDependencies\" \"esbuild\")`.
-- `field-modifier` is a lambda which is invoked at the position of the field.
- It is supplied with the current field definition, the association list (alist)
- at the field location in the json file, and the field name, also called `key`.
-- `field-path-mapper` is a lambda which instructs where the field-path is
- located within the field structure.
-- `insert?` allows the creation of the field and any missing intermediate
- fields.
-- `strict?` causes an error to be thrown if the exact field-path is not found
- in the data"
+  "Return a procedure to supply to `modify-json' which modifies the specified
+JSON file.  FIELDS is a list procedure-specific data structures which should
+include the definition of a ``field-path'' in one of two syntaxes: dot-syntax
+string such as @code{\"devDependencies.esbuild\"}, or a list of strings such
+as @code{(list \"devDependencies\" \"esbuild\")}.
+
+FIELD-MODIFIER is a procedure called with three arguments: 1) the original
+field-path, e.g. \"dependencies.typescript\", 2) the field's
+surrounding (parent) JSON data, as an association list, and 3) the field
+name (key), e.g. \"typescript\".  The value it returns should be the modified
+JSON data associated with the field; in other words, returning the second
+argument without changing it is a no-op.
+
+FIELD-PATH-MAPPER is a procedure which instructs where the field-path is
+located within the field structure.  INSERT? allows the creation of the field
+and any missing intermediate fields, while STRICT? causes an error to be
+thrown if the exact field-path is not found in the data."
   (lambda (package)
     (fold
      (lambda (field package)
        (let* ((field-path (field-path-mapper field))
-              (field-path
-               (cond
-                ((string? field-path)
-                 (string-split field-path #\.))
-                ((and (list? field-path) (every string? field-path))
-                 field-path)
-                (else
-                 (error
-                  (string-append
-                   "Invalid field value provided, expecting a string or a "
-                   "list of string but instead got: "
-                   (with-output-to-string (lambda _ (display field-path)))))))))
+              (field-path (cond
+                           ((string? field-path)
+                            (string-split field-path #\.))
+                           ((and (list? field-path) (every string? field-path))
+                            field-path)
+                           (else (error (format #f "\
+invalid field value provided, expected string or list of strings, got ~s~%"
+                                                field-path))))))
          (let loop ((data package)
                     (field-path field-path))
            (let* ((key (car field-path))
-                  (data (if (and (not (assoc key data)) insert?)
+                  (field-missing? (not (assoc key data)))
+                  (data (if (and field-missing? insert?)
                             (acons key '() data)
                             data)))
-             (if (not (assoc key data))
+             (if field-missing?
                  (if strict?
-                     (error (string-append
-                             "Key '" key "' was not found in data: "
-                             (with-output-to-string (lambda _ (display data)))))
+                     (error (format #f "key ~s was not found in data: ~y~%"
+                                    key data))
                      data)
                  (if (= (length field-path) 1)
                      (field-modifier field data key)
