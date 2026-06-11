@@ -1303,12 +1303,13 @@ interactive environment for the functional language Haskell.")
                   #$make-flags))
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
-              (add-after 'install 'remove-unnecessary-references
+              (add-after 'install 'remove-unnecessary-program-references
                 (lambda* (#:key outputs #:allow-other-keys)
                   (substitute* (find-files (string-append #$output "/lib/")
                                            "settings")
-                    (("/gnu/store/.*/bin/(.*)" m program) program))
-
+                    (("/gnu/store/.*/bin/(.*)" m program) program))))
+              (add-after 'install 'remove-unnecessary-haddock-references
+                (lambda* (#:key outputs #:allow-other-keys)
                   ;; Remove references to "doc" output from "out" by rewriting
                   ;; the "haddock-interfaces" fields and removing the optional
                   ;; "haddock-html" field in the generated .conf files.
