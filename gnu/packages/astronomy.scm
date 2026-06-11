@@ -2314,7 +2314,7 @@ Main features:
 (define-public python-asdf
   (package
     (name "python-asdf")
-    (version "5.3.0")
+    (version "5.3.1")
     (source
      (origin
        (method git-fetch)
@@ -2323,22 +2323,26 @@ Main features:
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1pbycdkc9958rjsg6yfi0qs1q46lamrcqf4q4cw104l3ipankdbc"))))
+        (base32 "0dbzpqmi38z6iab52f3mlsx4xq1kld6dag5l6msq9z5m7lr4kcnb"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2145 passed, 1 skipped, 2 xfailed
+      ;; tests: 2150 passed, 2 xfailed
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count))))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'include-package-data
-            ;; XXX: Check why schemas stoped coppied with setuptools in 5.3.0
-            ;; version.
-            (lambda* (#:key inputs outputs #:allow-other-keys)
-              (copy-recursively "asdf/_jsonschema/schemas"
-                                (string-append (site-packages inputs outputs)
-                                               "/asdf/_jsonschema/schemas")))))))
+          (add-after 'unpack 'patch-manifest.in
+            ;; See: <https://codeberg.org/guix/guix/issues/4393>.
+            (lambda* (#:key name source inputs #:allow-other-keys)
+              (let ((port (open-file "MANIFEST.in" "w")))
+                (for-each
+                 (lambda (file)
+                   (display "include " port)
+                   (display file port)
+                   (display "\n" port))
+                 (find-files "."))
+                (close port)))))))
     (native-inputs
      (list python-psutil
            python-pytest
@@ -2349,7 +2353,7 @@ Main features:
            python-syrupy))
     (propagated-inputs
      (list python-asdf-standard
-           python-attrs ;; for vendorized jsonschema
+           python-attrs                 ;for vendorized jsonschema
            python-importlib-metadata
            python-jmespath
            python-numpy
