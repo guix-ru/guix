@@ -4272,6 +4272,9 @@ tablets.
 (define-public node-types-estree
   (node-types "estree"))
 
+(define-public node-types-he
+  (node-types "he"))
+
 (define-public node-types-node
   (node-types "node"
               #:inputs (delay (list node-undici-types))))
