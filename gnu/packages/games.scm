@@ -5770,6 +5770,85 @@ pkg_search_module(game-music-emu REQUIRED libgme)")
 system for UZDoom and other Doom-related projects.")
     (license license:gpl3)))
 
+(define-public uzdoom
+  (let ((commit "1458bf021f939e28c71ddd0e92e2ea66bfa64a0e")
+        (revision "0"))
+    (package
+      (name "uzdoom")
+      (version (git-version "4.14.3" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/UZDoom/UZDoom")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0nl76c3j728vwz4n91f4jhla4z9wpx0g93bq4987ix82fxm51b5r"))
+         (modules '((guix build utils)))
+         (snippet
+          #~(begin
+              (for-each delete-file-recursively
+                        '("bin" "unused"  ;Self-explanatory
+                          "libraries/bzip2" "libraries/miniz"
+                          "libraries/ZMusic" ;De-vendored.
+                          "wadsrc_widepix/static")) ;Non-commercial license.
+              (substitute* "CMakeLists.txt"
+                (("add_subdirectory\\( libraries/miniz \\)")
+                 "find_package(miniz REQUIRED)"))
+              (substitute* (find-files "." ".*\\.(c(pp)?|h)")
+                (("miniz.h") "miniz/miniz.h"))
+              ;; Add store prefix to search paths.
+              (substitute* "src/gameconfigfile.cpp"
+                (("DefaultSearchPaths\\.Push.+/usr/share.+;" line)
+                 (string-append
+                  "DefaultSearchPaths.Push(\"$GUIX_UZDOOM_PREFIX/share\""
+                  " + GameDirs[i]); " line)))
+              ;; Embed correct version.
+              (substitute* "tools/updaterevision/gitinfo.h.in"
+                (("@Tag@") (string-append #$version "-guix")))))))
+      (build-system cmake-build-system)
+      (arguments
+       (list #:tests? #f                       ;No tests.
+             #:configure-flags
+             #~(list "-DBUILD_NONFREE=OFF"
+                     "-DFORCE_CROSSCOMPILE=OFF"
+                     "-DFORCE_INTERNAL_ASMJIT=OFF"
+                     "-DFORCE_INTERNAL_ZMUSIC=OFF"
+                     "-DDYN_OPENAL=OFF")
+             #:phases
+             #~(modify-phases %standard-phases
+                 (add-after 'install 'wrap-uzdoom
+                   (lambda _
+                     (wrap-program (string-append #$output "/bin/uzdoom")
+                       `("GUIX_UZDOOM_PREFIX" = (,#$output))))))))
+      (inputs (list (module-ref
+                     (resolve-interface '(gnu packages debug)) 'cppdap)
+                    asmjit
+                    bzip2
+                    dbus
+                    gtk+
+                    libomp
+                    libvpx
+                    libxkbcommon
+                    miniz
+                    openal
+                    sdl2
+                    zmusic))
+      (native-inputs (list pkg-config python))
+      (home-page "https://zdoom.org/")
+      (synopsis "Doom source port with advanced rendering and scripting")
+      (description "UZDoom is a ``modder-friendly'' Doom source port with
+advanced rendering and scripting features, derived from GZDoom and ZDoom.")
+      (license (list license:apsl2       ;zvulkan/vulkan
+                     license:bsd-0       ;zvulkan/src/{vk_mem_alloc,volk},
+                                         ;discordrpc
+                     license:bsd-3       ;zvulkan{,/src/glslang}, zwidget, sfmt,
+                                         ;utf8proc, zscript
+                     license:cc-by-sa4.0 ;branding
+                     license:expat       ;utf8proc_data.c
+                     license:gpl3+)))))  ;base license
+
 (define-public gnujump
   (package
     (name "gnujump")
