@@ -29,6 +29,7 @@
 ;;; Copyright © 2025 Noé Lopez <noelopez@free.fr>
 ;;; Copyright © 2025 Trevor Arjeski <tmarjeski@gmail.com>
 ;;; Copyright © 2026 Luis Guilherme Coelho <lgcoelho@disroot.org>
+;;; Copyright © 2026 Douglas Deslauriers <Douglas.Deslauriers@vector.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -87,6 +88,7 @@
   #:use-module (gnu packages python-graphics)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages ssh)
+  #:use-module (gnu packages sqlite)
   #:use-module (gnu packages textutils)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages ruby-xyz)
@@ -1993,6 +1995,51 @@ on desktop environments supported by postmarketOS.")
     (description "Eiciel is a plugin for nautilus to graphically edit ACL and
 extended file attributes.  It also functions as a standalone command.")
     (license license:gpl2+)))
+
+(define-public focus-timer
+  (package
+    (name "focus-timer")
+    (version "1.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/focustimerhq/FocusTimer")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "13661a5rf2qm5pzq9pqx1szjkar5g7jg3cfkr6njxjv59sr0nanx"))))
+    (build-system meson-build-system)
+    (native-inputs
+     (list desktop-file-utils           ;for update-desktop-database
+           gettext-minimal              ;for msgfmt
+           `(,glib "bin")               ;for glib-compile-schemas, etc.
+           gobject-introspection
+           `(,gtk "bin")                ;for gtk-update-icon-cache
+           pkg-config
+           tzdata                       ;for tests
+           vala))
+    (inputs
+     (list bash-completion
+           bash-minimal
+           cairo
+           coreutils-minimal
+           gom
+           graphene
+           gstreamer
+           gtk
+           json-glib
+           libadwaita
+           libpeas-2
+           pango
+           sqlite))
+    (synopsis "Time management built around the Pomodoro Technique")
+    (description "Focus Timer is a time-management application built around the
+Pomodoro Technique, helping you maintain focus and prevent burnout through
+structured work and break intervals.")
+    (home-page "https://github.com/focustimerhq/FocusTimer")
+    (license license:gpl3+)))
 
 (define-public markets
   (package
