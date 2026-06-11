@@ -354,6 +354,25 @@ addons in a wide array of potential locations.")
 true, one that returns false.")
     (license license:isc)))
 
+(define-public node-boolbase-1
+  ;; No tag in git.
+  (let ((commit "458ff2476b307fd69ef0097984686c62852b432c")
+        (revision "0"))
+    (package
+      (inherit node-boolbase)
+      (name "node-boolbase")
+      (version (git-version "1.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/fb55/boolbase")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1bkh1fljmkrsd4ifk0jnshykqlvmn97c54dj6bcyahpmwx4dmsq4"))))
+      (arguments '()))))
+
 (define-public node-brace-expansion-1
   (package
     (name "node-brace-expansion")
