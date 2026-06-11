@@ -2528,8 +2528,10 @@ UTS#46.")
       #:import-path "github.com/evanw/esbuild/cmd/esbuild"
       #:unpack-path "github.com/evanw/esbuild"
       #:test-flags #~(list #$(if (and (target-64bit?)
-                                      ;; The -race option is not supported on riscv64
-                                      (not (target-riscv64?)))
+                                      ;; The -race option is not supported on
+                                      ;; riscv64 and is not present in gccgo.
+                                      (not (target-riscv64?))
+                                      (supported-package? go))
                                  "-race" "-short"))
       ;; Test subdirectories are compiled from #:import-path.
       #:test-subdirs #~(list "../../internal/..." "../../pkg/..." )))
