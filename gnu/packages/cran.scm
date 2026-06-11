@@ -9240,13 +9240,13 @@ and more.")
 (define-public r-rtdists
   (package
     (name "r-rtdists")
-    (version "0.11-5")
+    (version "0.11-6")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "rtdists" version))
        (sha256
-        (base32 "1v8yhyvliw3dm3ciwxxaa9spfw05wp334l7gmvgv20mab2kjxkwp"))))
+        (base32 "0sqwvlnarjhc1h5vv7xw9vmlid7raq50ff71kbz8ffwvxjij71kc"))))
     (properties `((upstream-name . "rtdists")))
     (build-system r-build-system)
     (propagated-inputs (list r-evd r-gsl r-msm r-rcpp))
