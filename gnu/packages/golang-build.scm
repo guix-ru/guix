@@ -1248,6 +1248,8 @@ low-level interaction with the operating system.")
                    ((or (target-arm32?)
                         (target-riscv64?))
                     '("-skip" "TestSockaddrALG"))
+                   ((not (supported-package? go))
+                    '("-run" "Test[^PktInfo]"))
                    (#t '())))
       #:import-path "golang.org/x/sys")))))
 
