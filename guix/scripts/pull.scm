@@ -989,7 +989,7 @@ Use '~/.config/guix/channels.scm' instead."))
                                (let ((channel
                                       (channel-instance-channel instance)))
                                  (format (current-error-port)
-                                         "  ~10a~a\t~a~%"
+                                         "  ~10a ~a\t~a~%"
                                          (channel-name channel)
                                          (channel-url channel)
                                          (string-take
