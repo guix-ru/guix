@@ -27581,6 +27581,34 @@ contexts.
 @end itemize\n")
       (license license:gpl3+))))
 
+(define-public emacs-powerthesaurus
+  ;; No release for version 0.4.1, fixes library deprecations (cl).
+  (let ((commit "4b97797cf789aaba411c61a85fe23474ebc5bedc")
+        (revision "0"))
+    (package
+      (name "emacs-powerthesaurus")
+      (version (git-version "0.4.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/SavchenkoValeriy/emacs-powerthesaurus")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "19bd8rwjwprxp54vy1a53m2gv138ybda5ybxvm6q7msqhxmphf3g"))))
+      (build-system emacs-build-system)
+      (arguments (list #:tests? #f))    ;connects to api.powerthesaurus.org
+      (propagated-inputs (list emacs-jeison emacs-s))
+      (home-page "https://github.com/SavchenkoValeriy/emacs-powerthesaurus")
+      (synopsis "Powerthesaurus integration for Emacs")
+      (description "emacs-powerthesaurus integrates Emacs with the
+remote @url{https://www.powerthesaurus.org/,powerthesaurus.org} service for
+finding definitions, synonyms, antonyms, example sentences, and related terms.
+It provides both interactive commands and a transient menu for efficient
+in-buffer word replacement.")
+      (license license:gpl3+))))
+
 (define-public emacs-polymode
   (package
     (name "emacs-polymode")
