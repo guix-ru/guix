@@ -2256,19 +2256,33 @@ Dynamics Observatory} spacecraft.")
 (define-public python-aplpy
   (package
     (name "python-aplpy")
-    (version "2.2.0")
+    (version "2.2.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "aplpy" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/aplpy/aplpy")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "03c8k7y75f5bwm8d08fr5xfaay4d9jzr5sas4j2frs7zrr8aak51"))))
+        (base32 "181718r5pjzvsw66hn0aq2q1lxpj0fvcp1jyb5cqldq2yhkjk863"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags #~(list "--pyargs" "aplpy")
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-manifest.in
+            ;; See: <https://codeberg.org/guix/guix/issues/4393>.
+            (lambda* (#:key name source inputs #:allow-other-keys)
+              (let ((port (open-file "MANIFEST.in" "w")))
+                (for-each
+                 (lambda (file)
+                   (display "include " port)
+                   (display file port)
+                   (display "\n" port))
+                 (find-files "."))
+                (close port))))
           (add-after 'unpack 'set-env
             (lambda _
               (setenv "HOME" "/tmp"))))))
@@ -2276,8 +2290,7 @@ Dynamics Observatory} spacecraft.")
      (list python-pytest-astropy
            python-pytest-mpl
            python-setuptools
-           python-setuptools-scm
-           python-wheel))
+           python-setuptools-scm))
     (propagated-inputs
      (list python-astropy
            python-matplotlib
@@ -2292,10 +2305,10 @@ Dynamics Observatory} spacecraft.")
     (synopsis "Astronomical Plotting Library in Python")
     (description
      "@acronym{APLpy, the Astronomical Plotting Library in Python} is a Python
-module aimed at producing publication-quality plots of astronomical imaging data
-in FITS format.  The module uses @code{matplotlib}, a powerful and interactive
-plotting package.  It is capable of creating output files in several graphical
-formats, including EPS, PDF, PS, PNG, and SVG.
+module aimed at producing publication-quality plots of astronomical imaging
+data in FITS format.  The module uses @code{matplotlib}, a powerful and
+interactive plotting package.  It is capable of creating output files in
+several graphical formats, including EPS, PDF, PS, PNG, and SVG.
 
 Main features:
 @itemize
