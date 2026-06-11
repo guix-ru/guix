@@ -849,6 +849,35 @@ intellihide and multimonitor support.")
     (home-page "https://github.com/ochi12/dock-ng")
     (license license:gpl3+)))
 
+(define-public gnome-shell-extension-focus-timer
+  (package
+    (name "gnome-shell-extension-focus-timer")
+    (version "2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url
+              "https://github.com/focustimerhq/gnome-shell-extension-focus-timer")
+             (commit version)))
+       (sha256
+        (base32 "0a8r4d37xncjrfjgp47fg275ris1pm26nvlpzg9x1g52kqxizggw"))
+       (file-name (git-file-name name version))))
+    (build-system meson-build-system)
+    (native-inputs
+      (list gettext-minimal             ;for msgfmt
+            `(,glib "bin")              ;for glib-compile-schemas
+            pkg-config))
+    (inputs
+     (list gtk))
+    (synopsis "Focus Timer GNOME shell extension")
+    (description
+     "Displays a timer indicator in the top bar, provides notifications,
+screen overlays, automatic Do-Not-Disturb, and a lock screen widget in GNOME.
+Requires the focus-timer application to be installed.")
+    (home-page "https://github.com/focustimerhq/gnome-shell-extension-focus-timer")
+    (license license:gpl3+)))
+
 (define-public gnome-shell-extension-gsconnect
   (package
     (name "gnome-shell-extension-gsconnect")
