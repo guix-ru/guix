@@ -103,7 +103,7 @@
           (separator ";")
           (files (list (string-append "lib/lua/" version))))))
 
-(define-public lua
+(define-public lua-5.3
   (package
     (name "lua")
     (version "5.3.5")
@@ -151,6 +151,8 @@ runs by interpreting bytecode for a register-based virtual machine, and has
 automatic memory management with incremental garbage collection, making it ideal
 for configuration, scripting, and rapid prototyping.")
     (license license:x11)))
+
+(define-public lua lua-5.3)
 
 (define-public lua-5.5
   (package (inherit lua)
