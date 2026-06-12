@@ -28944,7 +28944,7 @@ results to the user.")
          "0r7z2gf6406f88s9ipsp2x1kf3ia3ksbprri7sn1dx9pd2v3drz2"))))
     (build-system r-build-system)
     (inputs
-     (list hdf5 zlib))
+     (list hdf5-1.10 zlib))
     (propagated-inputs
      (list r-bit64 r-r6))
     (native-inputs
