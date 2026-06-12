@@ -954,6 +954,31 @@ files (.Z), such as the ones created by Unix's shell tool compress.")
 Python.")
     (license license:bsd-3)))
 
+(define-public python-unlzw3
+  (package
+    (name "python-unlzw3")
+    (version "0.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/scivision/unlzw3")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ddsk9gs4yzvca80r0q6spvfvw31miwmp2dy93w4lcadr54sh6mc"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (home-page "https://github.com/scivision/unlzw3")
+    (synopsis "Decompression module for .Z files")
+    (description
+     "This package provides a pure Python decompression module for @code{.Z}
+files compressed using Unix compress utility.  It's a maintained fork of
+@url{https://github.com/umeat/unlzw}.")
+    (license license:expat)))
+
 (define-public python-zipfile2
   (package
     (name "python-zipfile2")
