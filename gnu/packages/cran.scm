@@ -51199,14 +51199,14 @@ vignette for more information and examples.")
 (define-public r-distributional
   (package
     (name "r-distributional")
-    (version "0.7.0")
+    (version "0.7.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "distributional" version))
        (sha256
         (base32
-         "19wmg3dha3p7kclhg7j2ipg9rbgcli451bsk7aljnlyyi31hpw8m"))))
+         "17ji3ax4agn0avypxq7asbhlhgpv8k4pg5di97fhajm209mn380x"))))
     (properties
      '((upstream-name . "distributional")
        (updater-extra-native-inputs . ("r-evd" "r-mvtnorm"))))
