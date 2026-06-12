@@ -26504,13 +26504,13 @@ environment within Shiny.")
 (define-public r-raceid
   (package
     (name "r-raceid")
-    (version "0.4.0")
+    (version "0.4.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "RaceID" version))
        (sha256
-        (base32 "051gs80b9h9np2p61ggp8jf8akk1b1wf3c972cryy1dja4avkwry"))))
+        (base32 "00h6nl4rq2k8sww7mxdycyj9g0vb4vlqg67lz0xpyf5fqxpp6a8l"))))
     (properties `((upstream-name . "RaceID")))
     (build-system r-build-system)
     (propagated-inputs (list r-cluster
@@ -26519,7 +26519,6 @@ environment within Shiny.")
                              r-fnn
                              r-fpc
                              r-ggplot2
-                             r-harmony
                              r-ica
                              r-igraph
                              r-irlba
