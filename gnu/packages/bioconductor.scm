@@ -13389,14 +13389,14 @@ tab-delimited (tabix) files.")
 (define-public r-restfulr
   (package
     (name "r-restfulr")
-    (version "0.0.16")
+    (version "0.0.17")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "restfulr" version))
        (sha256
         (base32
-         "099px4r866xpdz97lq8dc2ck77glczbq9kllivzr9x137wdd2ksp"))))
+         "0ms06268iki490zdqsapghp2d5yyshj9zy0hjrm7bww6k159q2z5"))))
     (properties `((upstream-name . "restfulr")))
     (build-system r-build-system)
     (propagated-inputs
