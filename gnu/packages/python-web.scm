@@ -418,6 +418,43 @@ SNS, Gotify, etc.")
     (description "Python wrapper for the @code{arXiv} API.")
     (license license:expat)))
 
+(define-public python-asyncer
+  (package
+    (name "python-asyncer")
+    (version "0.0.17")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/fastapi/asyncer")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1f4ids6sxwmz89yj98z0qc4qvfkklh0psbxv5px39k807g9aq7p2"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-pdm-backend))
+    (propagated-inputs
+     (list python-anyio
+           python-sniffio
+           python-typing-extensions))
+    (home-page "https://asyncer.tiangolo.com/")
+    (synopsis "Asyncer, async and await, focused on developer experience")
+    (description
+     "Asyncer is a small library built on top of
+@url{https://anyio.readthedocs.io/en/stable/, AnyIO}.
+
+The main goal of Asyncer is to improve developer experience by providing
+better support for autocompletion and inline errors in the editor, and more
+certainty that the code is bug-free by providing better support for type
+checking tools like mypy.
+
+Asyncer also tries to improve convenience and simplicity when working with
+async code mixed with regular blocking code, allowing to use them together in
+a simpler way... again, under my very subjective point of view.")
+    (license license:expat)))
+
 (define-public python-asyncudp
   (package
     (name "python-asyncudp")
