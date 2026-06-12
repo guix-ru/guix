@@ -1818,9 +1818,10 @@ exploration and optimization.")
                             "type_safe")))
        (sha256
         (base32 "1g3k2g2p5yy7zk971bg7qh4k38p30aydp27c5bfb02gn7djknz7w"))))
-    (build-system cmake-build-system)
+    (build-system qt-build-system)
     (arguments
      (list
+      #:qtbase qtbase                   ;for Qt 6
       #:configure-flags
       #~(list "-DUNBUNDLE_FONTOBENE_QT=ON"
               "-DUNBUNDLE_GTEST=ON"
@@ -1882,11 +1883,13 @@ exploration and optimization.")
            hoedown
            muparser
            opencascade-occt
-           qtbase-5
-           qtdeclarative-5
-           qtquickcontrols2-5
-           qtsvg-5
-           quazip-5
+           qt5compat
+           qtbase
+           qtdeclarative
+           qtsvg
+           qttools
+           qtwayland
+           quazip
            zlib))
     (native-inputs
      (list googletest
