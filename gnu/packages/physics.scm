@@ -390,7 +390,7 @@ scattering simulations.")
        "The name Cyten is pronounced like sci-ten, and refers to scientific
 tensor networks implmented in C++ with a focus on the provided Python
 bindings, and the python-style library in modern C++.")
-      (license license:bsd-3))))
+      (license license:asl2.0))))
 
 (define-public python-gofit
   (package
