@@ -1783,6 +1783,95 @@ Some things HTTP Core does do:
 @code{fakeweb}.")
     (license license:expat)))
 
+(define-public python-httpx2
+  (package
+    (name "python-httpx2")
+    (version "2.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/pydantic/httpx2")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "05mql79icxigldzw01hs77jpgihvzjahvniwncb7ji2rqzhjr42g"))))
+    (arguments
+     (list
+      ;; tests: 1227 passed, 200 deselected
+      #:test-flags
+      ;; Networking tests.
+      #~(list "-k" (string-join
+                    (list "not test_async_proxy_close[asyncio]"
+                          "test_async_proxy_close[trio]"
+                          "test_auth"
+                          "test_binary"
+                          "test_client_decode_text_using_autodetect"
+                          "test_client_decode_text_using_explicit_encoding"
+                          "test_follow_redirects"
+                          "test_get"
+                          "test_idna_url[http_with_custom_port]"
+                          "test_idna_url[http_with_port]"
+                          "test_idna_url[https_with_custom_port]"
+                          "test_idna_url[https_with_port]"
+                          "test_idna_url[https_without_port]"
+                          "test_idna_url[idna_label_after_ascii_label]"
+                          "test_idna_url[unicode_tr46_compat]"
+                          "test_json"
+                          "test_post"
+                          "test_redirects"
+                          "test_response_decode_text_using_autodetect"
+                          "test_sync_proxy_close"
+                          "test_url_malformed_idna_label_after_ascii_label"
+                          "test_url_mixed_valid_and_malformed_idna_labels"
+                          "test_verbose")
+                    " and not "))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'preparation
+            (lambda _
+              (chdir "src/httpx2")
+              (copy-recursively "../../tests/httpx2" "tests")
+              (substitute* (find-files "tests" "\\.py$")
+                (("tests\\.httpx2") "tests")
+                (("tests/httpx2") "tests"))))
+          (add-before 'build 'set-version
+            (lambda _
+              (substitute* "pyproject.toml"
+                (("\"uv-dynamic-versioning>=0\\.8\\.0\"") "")
+                (("source.*uv-dynamic-versioning.*") "source = 'vcs'")
+                (("\\.uv-dynamic-versioning") ".vcs")))))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-hatch-fancy-pypi-readme
+           python-hatch-vcs
+           python-hatchling
+           python-trustme
+           python-uvicorn
+           python-chardet))
+    (propagated-inputs
+     (list python-anyio
+           python-httpcore2
+           python-idna
+           python-truststore
+           python-typing-extensions    ;Python version < 3.13
+           ;; [optional]
+           python-brotli
+           python-click
+           python-h2
+           python-pygments
+           python-rich
+           python-socksio
+           python-zstandard))
+    (home-page "https://github.com/pydantic/httpx2")
+    (synopsis "The next generation HTTP client")
+    (description
+     "HTTPX2 is a fully featured HTTP client library for Python.  It includes
+an integrated command line client, has support for both HTTP/1.1 and HTTP/2,
+and provides both sync and async APIs.")
+    (license license:bsd-3)))
+
 (define-public python-justhtml
   (package
     (name "python-justhtml")
