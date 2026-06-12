@@ -1490,6 +1490,15 @@ and rendering molecules.")
                   (("extra_objects=.*")
                    (string-append
                     "extra_link_args=['-Wl,-rpath=" #$output "/lib'],\n")))))
+            ;; Taken from https://github.com/DanaResearchGroup/RingDecomposerLib
+            (add-after 'unpack 'patch-cython
+              (lambda _
+                (substitute* "src/python/setup.py.in"
+                  (("extensions)")
+                   "extensions, language_level=3, include_path=[\"./py_rdl/wrapper\"])"))
+                (substitute* "src/python/py_rdl/wrapper/DataInternal.pyx"
+                  (("from cRingDecomposerLib cimport \\*")
+                   "from .cRingDecomposerLib cimport *"))))
             (add-after 'build 'build-doc
               (lambda _
                 ;; Disable redundant LaTeX documentation
@@ -1516,7 +1525,7 @@ and rendering molecules.")
     (native-inputs
      (list doxygen
            python
-           python-cython-0
+           python-cython
            python-sphinx
            python-setuptools))
     (home-page "https://github.com/rareylab/RingDecomposerLib")
