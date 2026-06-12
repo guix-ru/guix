@@ -1046,6 +1046,39 @@ The goal of the ObsPy project is to facilitate rapid application development
 for seismology.")
     (license license:lgpl3)))
 
+(define-public python-ppigrf
+  (package
+    (name "python-ppigrf")
+    ;; 2.1.0 is not tagged, PyPI has no test data.
+    (properties '((commit . "5c45795b9865a9e31ef2f066588473c6a103d629")
+                  (revision . "0")))
+    (version (git-version "2.1.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/IAGA-VMOD/ppigrf")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0iwshgw81kkwkn0s1bnqvvr851x5fynpc70kz50fgfsfqkskaxjl"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-numpy
+           python-pandas))
+    (home-page "https://github.com/IAGA-VMOD/ppigrf")
+    (synopsis "International Geomagnetic Reference Field in Python")
+    (description
+     "Pure Python code to calculate @acronym{IGRF, International Geomagnetic
+Reference Field} model predictions.  The IGRF is a model of the Earth's main
+magnetic field that is updated every 5 years.")
+    (license license:expat)))
+
 (define-public python-pyogrio
   (package
     (name "python-pyogrio")
