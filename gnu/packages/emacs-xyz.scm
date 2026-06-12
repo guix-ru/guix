@@ -3849,6 +3849,33 @@ picked randomly from the most frequent words in language you're practicing,
 until time is up.")
     (license license:gpl3+)))
 
+(define-public emacs-scopeline
+  (let ((commit "eaaac149fb2445b9217214a04289ae80d48c2dbe")
+        ;; Revision is from `git describe', base version from scopeline.el.
+        (revision "47"))
+    (package
+      (name "emacs-scopeline")
+      ;; No tagged releases.
+      (version (git-version "0.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/meain/scopeline.el")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1xmw4q63ahhhx9s07725pjb7zwdbch7ki6i1cmmp2b00y1s7393z"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list #:tests? #f))              ; No test suite.
+      (home-page "https://github.com/meain/scopeline.el")
+      (synopsis "Show scope info of blocks in buffer at end of scope")
+      (description
+       "This package lets you show the scope information of blocks like
+function definitions, loops, conditions and others.")
+      (license license:asl2.0))))
+
 (define-public emacs-scribble-mode
   (let ((commit "217945d54de5e4bb207033f2116baa28f5c5ecf2")
         (revision "2"))
