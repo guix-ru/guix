@@ -46,7 +46,6 @@
   #:use-module (guix utils)
   #:use-module (gnu packages)
   #:use-module (gnu packages audio)
-  #:use-module (gnu packages gcc)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages golang))
 
