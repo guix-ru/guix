@@ -6382,6 +6382,31 @@ source files.  A neutral variety of English is used by default, but a US or UK
 locale can be selected.")
     (license license:expat)))
 
+(define-public go-github-com-clipperhouse-stringish
+  (package
+    (name "go-github-com-clipperhouse-stringish")
+    (version "0.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/clipperhouse/stringish")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1kw49n1dg8wdp7g71xbzjzrkip83vy09wk9zilshbfkpdz7grgk1"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/clipperhouse/stringish"))
+    (home-page "https://github.com/clipperhouse/stringish")
+    (synopsis "Handle strings and bytes interchangeably in Go")
+    (description
+     "This package provides a small Go module that provides a generic type
+constraint for “string-like” data, and a utf8 package that works with both
+strings and byte slices without conversions.")
+    (license license:expat)))
+
 (define-public go-github-com-cloudwego-iasm
   (package
     (name "go-github-com-cloudwego-iasm")
