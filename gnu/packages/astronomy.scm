@@ -4506,8 +4506,7 @@ files and provide related services.")
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
               "--pyargs" "ctapipe"
               "-m" "not vizier"
-              "--durations=20"
-              "--timeout=10")
+              "--durations=20")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'remove-test-files
@@ -4601,7 +4600,6 @@ files and provide related services.")
      (list nss-certs-for-test
            python-h5py
            python-pytest
-           python-pytest-timeout
            python-pytest-astropy-header
            python-pytest-xdist
            python-setuptools
