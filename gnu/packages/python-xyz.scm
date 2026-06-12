@@ -1455,6 +1455,31 @@ part of @url{https://github.com/hgrecco/pint, Pint}, the Python units
 package. ")
     (license license:bsd-3)))
 
+(define-public python-fortranformat
+  (package
+    (name "python-fortranformat")
+    (version "2.0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/brendanarnold/py-fortranformat")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0k4lpj72a6zy1m5855w6b127q8h20c1xfr0x3gasqbkqqz65kli6"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-poetry-core
+           python-pytest))
+    (home-page "https://github.com/brendanarnold/py-fortranformat")
+    (synopsis "FORTRAN format interpreter for Python")
+    (description
+     "This package mimics FORTRAN textual IO in Python - generates text from a
+Python list of variables or will read a line of text into Python variables
+according to the FORTRAN format statement passed.")
+    (license license:expat)))
+
 (define-public python-gest-api
   (package
     (name "python-gest-api")
