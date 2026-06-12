@@ -10771,6 +10771,53 @@ spherical polygons that represent arbitrary regions of the sky.")
     ;; QD_LIBRARY_LICENSE.rst for bandeled QD source
     (license license:bsd-3)))
 
+(define-public python-spinifex
+  (package
+    (name "python-spinifex")
+    (version "1.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.astron.nl/RD/spinifex")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0bvl0xvldifvrhznbhi51qjc0cax0bk0g24x13dsdyl1cydv95j2"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;14 failed, 35 passed, require network access
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              (substitute* "pyproject.toml"
+                ;; Backpoert of typing._eval_type for older Pythons.
+                ((".*eval-type-backport.*") "")))))))
+    (native-inputs
+     (list python-hatch-vcs
+           python-hatchling))
+    (propagated-inputs
+     (list python-astropy
+           python-h5py
+           python-nest-asyncio
+           python-numpy
+           python-ppigrf
+           python-pydantic
+           python-pyiri
+           python-requests
+           python-typing-extensions
+           python-unlzw3
+           ;; [optional]
+           python-casacore))
+    (home-page "https://git.astron.nl/RD/spinifex")
+    (synopsis "Correcting ionospheric Faraday rotation")
+    (description
+     "This package provides a pure Python tooling for ionospheric analyses in
+radio astronomy, e.g. getting total electron content and rotation measure.")
+    (license license:asl2.0)))
+
 (define-public python-spisea
   (package
     (name "python-spisea")
