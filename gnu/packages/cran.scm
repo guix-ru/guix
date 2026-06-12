@@ -8488,13 +8488,13 @@ included.")
 (define-public r-rstudioapi
   (package
     (name "r-rstudioapi")
-    (version "0.18.0")
+    (version "0.19.0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "rstudioapi" version))
               (sha256
                (base32
-                "1ggxhrc4zd984y1qx5m2w2dqpmwjhwp7ha39v7ivvlw10gqfwjcn"))))
+                "16h6v1vqnba4alq0n37kgyx3wj90s4i30ja3n03xralhb92bpqzi"))))
     (build-system r-build-system)
     (native-inputs
      (list r-knitr))
