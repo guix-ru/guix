@@ -3221,9 +3221,6 @@ specified directories.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:modules '((guix build pyproject-build-system)
-                  (guix build utils)
-                  (ice-9 ftw))
       #:test-flags
       #~(list "units"
               "--exclude" "test/units/cli/test_adhoc.py"
@@ -3236,14 +3233,15 @@ specified directories.")
               ;; Otherwise Ansible fails to create its config directory.
               (setenv "HOME" "/tmp")))
           (add-after 'unpack 'patch-paths
-            (lambda _
+            (lambda* (#:key inputs #:allow-other-keys)
               (substitute* "lib/ansible/_internal/_encryption/_crypt.py"
                 (("lib_so = ctypes\\.util\\.find_library\\(lib_config\\.name\\)")
-                 (string-append "lib_so = \"" #$(this-package-input "libxcrypt") "/lib/libcrypt.so.1\"")))
+                 (string-append "lib_so = '"
+                                (search-input-file inputs "/lib/libcrypt.so.1")
+                                "'")))
               (substitute* "lib/ansible/module_utils/compat/selinux.py"
-                (("libselinux.so.1" name)
-                 (string-append #$(this-package-input "libselinux")
-                                "/lib/" name)))
+                (("libselinux.so.1")
+                 (search-input-file inputs "/lib/libselinux.so.1")))
               (substitute* "test/lib/ansible_test/_internal/ansible_util.py"
                 (("PYTHONPATH=get_ansible_python_path\\(args\\)" all)
                  (string-append all "+ ':' + os.environ['GUIX_PYTHONPATH']")))
@@ -3252,22 +3250,27 @@ specified directories.")
                  (string-append all "+ ':' + os.environ['GUIX_PYTHONPATH']")))
               (substitute* "test/units/modules/test_async_wrapper.py"
                 (("/usr/bin/python")
-                 (which "python")))))
+                 (search-input-file inputs "/bin/python3")))))
          (replace 'check
-           (lambda* (#:key inputs outputs tests? test-flags #:allow-other-keys)
+           (lambda* (#:key tests? test-flags #:allow-other-keys)
              (when tests?
-               (setenv "PYTHONPATH" (string-append "lib:test/lib:" (getenv "GUIX_PYTHONPATH")))
+               (setenv "PYTHONPATH"
+                       (string-append "lib:test/lib:"
+                                      (getenv "GUIX_PYTHONPATH")))
                ;; The test suite needs to be run with 'ansible-test', which
                ;; does some extra environment setup.  Taken from
                ;; https://raw.githubusercontent.com/ansible/ansible/\
                ;; devel/test/utils/shippable/shippable.sh.
-               (apply invoke "python" "test/lib/ansible_test/_util/target/cli/ansible_test_cli_stub.py" test-flags)))))))
+               (apply invoke "python"
+                      (string-append "test/lib/ansible_test/_util/"
+                                     "target/cli/ansible_test_cli_stub.py")
+                      test-flags)))))))
     (native-inputs
      (list openssh
            openssl
            python-mock
            python-pycryptodome
-           python-pytest-8
+           python-pytest
            python-pytest-forked
            python-pytest-mock
            python-pytest-xdist
