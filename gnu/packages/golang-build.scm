@@ -258,18 +258,16 @@ functions that have a name matched by regex:.")
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/golang/protobuf")
-             (commit (string-append "v" version))))
+              (url "https://github.com/golang/protobuf")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
         (base32 "1bk7sa9ymi87hd2fv9jamxnxb3qjriamf2nsm8avp6ka37mrkz01"))))
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/golang/protobuf"
-      #:phases
-      #~(modify-phases %standard-phases
-          (delete 'build)))) ; no go files in project's root
+      #:skip-build? #t
+      #:import-path "github.com/golang/protobuf"))
     (native-inputs
      (list go-github-com-google-go-cmp))
     (propagated-inputs
