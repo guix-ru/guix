@@ -5234,3 +5234,52 @@ for various application domains, including FPGAs and ASICs.")
               license:isc))))
 
 (define-deprecated-package yosys-clang yosys)
+
+(define-public yosys-slang
+  ;; No tags or releases.
+  (let ((commit "3251530961e0e8a8054098c9bb8376474958944a")
+        (revision "0"))
+    (package
+      (name "yosys-slang")
+      (version (git-version "0.0.0" revision commit)) ;from MODULE.bazel
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/povik/yosys-slang")
+                (commit commit)
+                (recursive? #t)))       ;TODO: unvendor slang and fmt
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1gckr30dir80jhp80jlvis2b1ccpf3pc9m2bxj00fxbrs1swyw3v"))))
+      (build-system cmake-build-system)
+      (arguments
+       (list
+        #:configure-flags
+        #~(list (string-append "-DYOSYS_SLANG_REVISION=" #$version))
+        #:phases
+        #~(modify-phases %standard-phases
+            (replace 'install
+              (lambda _
+                (let ((install-dir
+                       (string-append #$output "/share/yosys/plugins")))
+                  (mkdir-p install-dir)
+                  (install-file "slang.so" install-dir)))))))
+      (native-inputs
+       (list python-minimal-wrapper yosys))
+      (native-search-paths
+       (list (search-path-specification
+               (variable "YOSYS_PLUGIN_PATH")
+               (files (list "share/yosys/plugins")))))
+      (synopsis "SystemVerilog plugin for code@{Yosys}")
+      (description
+       "code@{Yosys-slang} is a code@{Yosys} plugin providing a new command
+(@code{read_slang}) for elaborating SystemVerilog designs.  It builds on top
+of the @{slang} library to provide comprehensive SystemVerilog support.  The
+plugin supports an (informally defined) synthesizable subset of SystemVerilog
+in version IEEE 1800-2017 or IEEE 1800-2023.")
+      (home-page "https://github.com/povik/yosys-slang")
+      (license
+       (list license:expat           ;third_party/slang
+             license:bsd-2 license:bsd-3 license:psfl ;third_party/fmt
+             license:isc)))))        ;yosys-slang
