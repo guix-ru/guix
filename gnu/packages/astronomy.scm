@@ -8532,6 +8532,41 @@ Imaging Atmospheric Cherenkov Telescopes} @acronym{IRF, Instrument Response
 Function} and Sensitivities.")
     (license license:expat)))
 
+(define-public python-pyiri
+  (package
+    (name "python-pyiri")
+    (version "0.1.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/victoriyaforsythe/PyIRI")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0sp9j9i9rf6lmkjx7k60xbpms388gbsqlm5xl2jr1m5x36w2wlz1"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-fortranformat
+           python-matplotlib
+           python-netcdf4
+           python-numpy
+           python-opt-einsum
+           python-pandas
+           python-scipy))
+    (home-page "https://github.com/victoriyaforsythe/PyIRI")
+    (synopsis "Python implementation of International Reference Ionosphere")
+    (description
+     "PyIRI is a Python implementation of the @acronym{International Reference
+Ionosphere, IRI} model.  It provides fast, global, and altitude‑dependent
+evaluation of ionospheric parameters using a new spherical harmonics (SH)
+architecture.  The model supports multiple coordinate systems and efficiently
+evaluates all grid points and time frames simultaneously.")
+    (license license:expat)))
+
 (define-public python-pynbody
   (package
     (name "python-pynbody")
