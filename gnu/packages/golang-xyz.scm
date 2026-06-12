@@ -446,33 +446,6 @@ a human-readable byte format.")
 time dependencies in tests.")
     (license license:asl2.0)))
 
-(define-public go-code-rocketnine-space-tslocum-cbind
-  (package
-    (name "go-code-rocketnine-space-tslocum-cbind")
-    (version "0.1.5")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://codeberg.org/tslocum/cbind.git")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0a0gpzapm3jsivdf5h6lvlxhzngrmyj7xp5fdk20l8r4yba7yqsy"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "code.rocketnine.space/tslocum/cbind"
-      #:test-flags #~(list "--skip" "TestConfiguration")))
-    (propagated-inputs
-     (list go-github-com-gdamore-tcell-v2))
-    (home-page "https://codeberg.org/tslocum/cbind")
-    (synopsis "Key event handling library for tcell")
-    (description
-     "Package cbind provides a tcell key event encoding, decoding and handling
-as human-readable strings.")
-    (license license:expat)))
-
 (define-public go-code-forgejo-org-forgejo-levelqueue
   (package
     (name "go-code-forgejo-org-forgejo-levelqueue")
@@ -499,6 +472,33 @@ as human-readable strings.")
     (description
      "Level queue is a simple queue Go library base on
 @url{https://github.com/syndtr/goleveldb, go-leveldb}.")
+    (license license:expat)))
+
+(define-public go-code-rocketnine-space-tslocum-cbind
+  (package
+    (name "go-code-rocketnine-space-tslocum-cbind")
+    (version "0.1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/tslocum/cbind.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0a0gpzapm3jsivdf5h6lvlxhzngrmyj7xp5fdk20l8r4yba7yqsy"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.rocketnine.space/tslocum/cbind"
+      #:test-flags #~(list "--skip" "TestConfiguration")))
+    (propagated-inputs
+     (list go-github-com-gdamore-tcell-v2))
+    (home-page "https://codeberg.org/tslocum/cbind")
+    (synopsis "Key event handling library for tcell")
+    (description
+     "Package cbind provides a tcell key event encoding, decoding and handling
+as human-readable strings.")
     (license license:expat)))
 
 (define-public go-codeberg-org-anaseto-gruid
@@ -1795,6 +1795,30 @@ almost directly in Go source code.")
        "This library provides unit multipliers and functions for Go.")
       (license license:expat))))
 
+(define-public go-github-com-aleksi-pointer
+  (package
+    (name "go-github-com-aleksi-pointer")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/AlekSi/pointer")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0rncmanv62wwy7ihvjhvb695mkvy4kdzhgnn90zygs9yrfzzk0wk"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/AlekSi/pointer"))
+    (home-page "https://github.com/AlekSi/pointer")
+    (synopsis "Helper Go library to convert between pointers and values")
+    (description
+     "This package provides helpers to convert between pointers and values of
+built-in and, with generics, of any types.")
+    (license license:expat)))
+
 (define-public go-github-com-alessio-shellescape
   (package
     (name "go-github-com-alessio-shellescape")
@@ -1818,30 +1842,6 @@ almost directly in Go source code.")
      "This package provides the @code{shellescape.Quote} to escape arbitrary
 strings for a safe use as command line arguments in the most common POSIX
 shells.")
-    (license license:expat)))
-
-(define-public go-github-com-aleksi-pointer
-  (package
-    (name "go-github-com-aleksi-pointer")
-    (version "1.2.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/AlekSi/pointer")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0rncmanv62wwy7ihvjhvb695mkvy4kdzhgnn90zygs9yrfzzk0wk"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/AlekSi/pointer"))
-    (home-page "https://github.com/AlekSi/pointer")
-    (synopsis "Helper Go library to convert between pointers and values")
-    (description
-     "This package provides helpers to convert between pointers and values of
-built-in and, with generics, of any types.")
     (license license:expat)))
 
 (define-public go-github-com-alexflint-go-filemutex
@@ -1872,32 +1872,6 @@ built-in and, with generics, of any types.")
 synchronizes across processes.")
     (license license:expat)))
 
-(define-public go-github-com-allan-simon-go-singleinstance
-  (package
-    (name "go-github-com-allan-simon-go-singleinstance")
-    (version "1.0.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/allan-simon/go-singleinstance")
-              (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1q0s03cmp488d4pyxjysfingzisj4r5n8vy4cffapr6rcr9rfj1h"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/allan-simon/go-singleinstance"
-      #:test-flags #~(list "-vet=off")))
-    (home-page "https://github.com/allan-simon/go-singleinstance")
-    (synopsis "Go library to have only one instance of a software")
-    (description
-     "@code{go-singleinstance} is a Go library to have only one instance of a
-software (based on Python's
-@uref{https://github.com/pycontribs/tendo, tendo}).")
-    (license license:expat)))
-
 (define-public go-github-com-alimpfard-line
   (package
     (name "go-github-com-alimpfard-line")
@@ -1924,6 +1898,32 @@ software (based on Python's
 Go language.  It supports flexible autocompletion, live prompt, buffer update
 and stylisation, multiline editing and more.")
     (license license:bsd-2)))
+
+(define-public go-github-com-allan-simon-go-singleinstance
+  (package
+    (name "go-github-com-allan-simon-go-singleinstance")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/allan-simon/go-singleinstance")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1q0s03cmp488d4pyxjysfingzisj4r5n8vy4cffapr6rcr9rfj1h"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/allan-simon/go-singleinstance"
+      #:test-flags #~(list "-vet=off")))
+    (home-page "https://github.com/allan-simon/go-singleinstance")
+    (synopsis "Go library to have only one instance of a software")
+    (description
+     "@code{go-singleinstance} is a Go library to have only one instance of a
+software (based on Python's
+@uref{https://github.com/pycontribs/tendo, tendo}).")
+    (license license:expat)))
 
 (define-public go-github-com-alsm-ioprogress
   (package
@@ -3476,6 +3476,32 @@ especially suitable for working with geographic data.  It an alternative fork
 of https://github.com/golang/geo.")
     (license license:asl2.0)))
 
+(define-public go-github-com-blevesearch-go-faiss
+  (package
+    (name "go-github-com-blevesearch-go-faiss")
+    (version "1.0.27")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/blevesearch/go-faiss")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1y9gf2nbg3gjncs6l9fg4q2sxjildszanb24jhhsmivhwlzhcgzh"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/blevesearch/go-faiss"))
+    (inputs
+     (list faiss-for-go-faiss))
+    (home-page "https://github.com/blevesearch/go-faiss")
+    (synopsis "Go bindings for Faiss")
+    (description
+     "This package provides Go bindings for @url{https://faiss.ai/, faiss}, a
+library for vector similarity search.")
+    (license license:expat)))
+
 (define-public go-github-com-blevesearch-go-porterstemmer
   (package
     (name "go-github-com-blevesearch-go-porterstemmer")
@@ -3537,6 +3563,36 @@ storage system.  It's an alternative fork of
 https://github.com/syndtr/goleveldb.")
     (license license:bsd-2)))
 
+(define-public go-github-com-blevesearch-gtreap
+  (package
+    (name "go-github-com-blevesearch-gtreap")
+    (version "0.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/blevesearch/gtreap")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0pkcwgn2nkgqg01w95ivwbggcxihrc04k8i3wgaif2f437jpz2h7"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/blevesearch/gtreap"))
+    (home-page "https://github.com/blevesearch/gtreap")
+    (synopsis "Go immutable treap library")
+    (description
+     "This package provides an immutable treap implementation in the Go
+Language.  A treap is a data structure that maintains a dynamic set of ordered
+keys and allows binary searches among the keys.  Its height is, with high
+probability, proportional to the logarithm of the number of keys, so that each
+search, insertion, or deletion operation takes logarithmic time to perform.
+gtreap's implementation of a treap is immutable, and thus provides a simple
+approach to multi-version concurrency control.  It's an alternative fork of
+@url{https://github.com/steveyen/gtreap}.")
+    (license license:expat)))
+
 (define-public go-github-com-blevesearch-mmap-go
   (package
     (name "go-github-com-blevesearch-mmap-go")
@@ -3575,62 +3631,6 @@ program's running, don't expect consistent results between platforms
 
 It's an alternative fork of https://github.com/edsrzf/mmap-go")
     (license license:bsd-3)))
-
-(define-public go-github-com-blevesearch-go-faiss
-  (package
-    (name "go-github-com-blevesearch-go-faiss")
-    (version "1.0.27")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/blevesearch/go-faiss")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1y9gf2nbg3gjncs6l9fg4q2sxjildszanb24jhhsmivhwlzhcgzh"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/blevesearch/go-faiss"))
-    (inputs
-     (list faiss-for-go-faiss))
-    (home-page "https://github.com/blevesearch/go-faiss")
-    (synopsis "Go bindings for Faiss")
-    (description
-     "This package provides Go bindings for @url{https://faiss.ai/, faiss}, a
-library for vector similarity search.")
-    (license license:expat)))
-
-(define-public go-github-com-blevesearch-gtreap
-  (package
-    (name "go-github-com-blevesearch-gtreap")
-    (version "0.1.1")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/blevesearch/gtreap")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0pkcwgn2nkgqg01w95ivwbggcxihrc04k8i3wgaif2f437jpz2h7"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/blevesearch/gtreap"))
-    (home-page "https://github.com/blevesearch/gtreap")
-    (synopsis "Go immutable treap library")
-    (description
-     "This package provides an immutable treap implementation in the Go
-Language.  A treap is a data structure that maintains a dynamic set of ordered
-keys and allows binary searches among the keys.  Its height is, with high
-probability, proportional to the logarithm of the number of keys, so that each
-search, insertion, or deletion operation takes logarithmic time to perform.
-gtreap's implementation of a treap is immutable, and thus provides a simple
-approach to multi-version concurrency control.  It's an alternative fork of
-@url{https://github.com/steveyen/gtreap}.")
-    (license license:expat)))
 
 (define-public go-github-com-blevesearch-scorch-segment-api
   (package
@@ -14034,35 +14034,6 @@ expressing configuration which is easy for both humans and machines to read.")
     (home-page "https://github.com/hashicorp/hcl")
     (license license:mpl2.0)))
 
-(define-public go-github-com-hashicorp-hcl-vault-7
-  (package
-    (inherit go-github-com-hashicorp-hcl)
-    (name "go-github-com-hashicorp-hcl-vault-7")
-    (version "1.0.1-vault-7")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/hashicorp/hcl")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0crhhxk1357l1x4qhi83lxgvmf75j0nm7xl8w4schmjh4a62v9n6"))))
-    (arguments
-     (list
-      #:import-path "github.com/hashicorp/hcl"
-      #:test-subdirs
-      #~(list "json/..." "hcl/ast" "hcl/fmtcmd" "hcl/printer" "hcl/scanner"
-              "hcl/strconv" "hcl/token" ".")
-      #:test-flags
-      #~(list "-skip" #$(string-join '("TestFiles/list.input"
-                                       "TestFiles/list_comment.input"
-                                       "TestFiles/comment_aligned.input")
-                                     "|"))))
-    ;; Don't expose since it's is only needed to build
-    ;; go-github-com-hashicorp-vault-api.
-    (properties '((hidden? . #t)))))
-
 (define-public go-github-com-hashicorp-hcl-v2
   (package
     (name "go-github-com-hashicorp-hcl-v2")
@@ -14107,6 +14078,35 @@ HashiCorp Configuration Language}.  HCL is designed to be a language for
 expressing configuration which is easy for both humans and machines to read.")
     (home-page "https://github.com/hashicorp/hcl")
     (license license:mpl2.0)))
+
+(define-public go-github-com-hashicorp-hcl-vault-7
+  (package
+    (inherit go-github-com-hashicorp-hcl)
+    (name "go-github-com-hashicorp-hcl-vault-7")
+    (version "1.0.1-vault-7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/hashicorp/hcl")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0crhhxk1357l1x4qhi83lxgvmf75j0nm7xl8w4schmjh4a62v9n6"))))
+    (arguments
+     (list
+      #:import-path "github.com/hashicorp/hcl"
+      #:test-subdirs
+      #~(list "json/..." "hcl/ast" "hcl/fmtcmd" "hcl/printer" "hcl/scanner"
+              "hcl/strconv" "hcl/token" ".")
+      #:test-flags
+      #~(list "-skip" #$(string-join '("TestFiles/list.input"
+                                       "TestFiles/list_comment.input"
+                                       "TestFiles/comment_aligned.input")
+                                     "|"))))
+    ;; Don't expose since it's is only needed to build
+    ;; go-github-com-hashicorp-vault-api.
+    (properties '((hidden? . #t)))))
 
 (define-public go-github-com-hashicorp-logutils
   (package
@@ -17375,6 +17375,29 @@ processing.")
 @url{https://github.com/charmbracelet/lipgloss, lipgloss} Styles.")
     (license license:asl2.0)))
 
+(define-public go-github-com-kodeworks-golang-image-ico
+  (package
+    (name "go-github-com-kodeworks-golang-image-ico")
+    (version "0.0.0-20141118225523-73f0f4cfade9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Kodeworks/golang-image-ico")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zfcvpf6pdqismq9j8nvismln1dbz2i22d7c00a2ygjxldbmnd3k"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/Kodeworks/golang-image-ico"))
+    (home-page "https://github.com/Kodeworks/golang-image-ico")
+    (synopsis "Golang support for Windows .ico file format")
+    (description
+     "This package provides Golang support for Windows' @code{.ico} file format.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-komkom-toml
   (package
     (name "go-github-com-komkom-toml")
@@ -17494,42 +17517,6 @@ EXIF metadata. It's an alternative fork of
 @url{https://github.com/edwvee/exiffix} maintained by Kitty community.")
     (license license:expat)))
 
-(define-public go-github-com-kovidgoyal-imaging
-  (package
-    (name "go-github-com-kovidgoyal-imaging")
-    (version "1.8.21")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/kovidgoyal/imaging")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0s0z0zljzqk6kq5rlig6yhlqx3i4ir1l4qdpssxvssz9vbr5vppn"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/kovidgoyal/imaging"
-      #:embed-files #~(list ".*\\.icc")))
-    (native-inputs
-     (list go-github-com-google-go-cmp
-           go-github-com-stretchr-testify))
-    (propagated-inputs
-     (list go-github-com-kovidgoyal-go-parallel
-           go-github-com-kovidgoyal-go-shm
-           go-github-com-rwcarlsen-goexif
-           go-golang-org-x-image
-           go-golang-org-x-sys
-           imagemagick/stable))
-    (home-page "https://github.com/kovidgoyal/imaging")
-    (synopsis "Simple image processing package for Golang")
-    (description
-     "This package provides basic image processing functions including resize,
-rotate, crop, and various adjustments.  This is a fork maintained by Kovid
-Goyal for use in Kitty.")
-    (license license:expat)))
-
 (define-public go-github-com-kovidgoyal-go-parallel
   (package
     (name "go-github-com-kovidgoyal-go-parallel")
@@ -17582,6 +17569,42 @@ program.")
 all Unix variants. Pure Go, no external dependencies.  Implements Go versions
 of @code{shm_open()} and @code{shm_unlink()} that interoperate with the libc
 versions.")
+    (license license:expat)))
+
+(define-public go-github-com-kovidgoyal-imaging
+  (package
+    (name "go-github-com-kovidgoyal-imaging")
+    (version "1.8.21")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kovidgoyal/imaging")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0s0z0zljzqk6kq5rlig6yhlqx3i4ir1l4qdpssxvssz9vbr5vppn"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/kovidgoyal/imaging"
+      #:embed-files #~(list ".*\\.icc")))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-kovidgoyal-go-parallel
+           go-github-com-kovidgoyal-go-shm
+           go-github-com-rwcarlsen-goexif
+           go-golang-org-x-image
+           go-golang-org-x-sys
+           imagemagick/stable))
+    (home-page "https://github.com/kovidgoyal/imaging")
+    (synopsis "Simple image processing package for Golang")
+    (description
+     "This package provides basic image processing functions including resize,
+rotate, crop, and various adjustments.  This is a fork maintained by Kovid
+Goyal for use in Kitty.")
     (license license:expat)))
 
 (define-public go-github-com-kpango-fastime
@@ -17787,29 +17810,6 @@ language for Golang.")
 structure.  It can also produce a much more verbose, one-item-per-line
 representation suitable for computing diffs.")
     (license license:asl2.0)))
-
-(define-public go-github-com-kodeworks-golang-image-ico
-  (package
-    (name "go-github-com-kodeworks-golang-image-ico")
-    (version "0.0.0-20141118225523-73f0f4cfade9")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/Kodeworks/golang-image-ico")
-              (commit (go-version->git-ref version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0zfcvpf6pdqismq9j8nvismln1dbz2i22d7c00a2ygjxldbmnd3k"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/Kodeworks/golang-image-ico"))
-    (home-page "https://github.com/Kodeworks/golang-image-ico")
-    (synopsis "Golang support for Windows .ico file format")
-    (description
-     "This package provides Golang support for Windows' @code{.ico} file format.")
-    (license license:bsd-3)))
 
 (define-public go-github-com-labstack-gommon
   (package
@@ -18082,30 +18082,6 @@ Invisible, Underlined, Strikethrough
      "This package implements a parser for uniform resource names (URN) as
 specified by @uref{https://tools.ietf.org/html/rfc2141, IETF RFC 2141}.")
     (license license:expat)))
-
-(define-public go-github-com-liggitt-tabwriter
-  (package
-    (name "go-github-com-liggitt-tabwriter")
-    (version "0.0.0-20181228230101-89fcab3d43de")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/liggitt/tabwriter")
-              (commit (go-version->git-ref version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "04q8d0jk1ymvy7pv1dgfbqzk8gcjfa77psg1lk30ghlisf54pakg"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/liggitt/tabwriter"))
-    (home-page "https://github.com/liggitt/tabwriter")
-    (synopsis "Tab-separated text writer for Go")
-    (description
-     "This package provides a tabwriter implementation with additional
-features for padding and filtering escape sequences.")
-    (license license:bsd-3)))
 
 (define-public go-github-com-leonelquinteros-gotext
   (package
@@ -18524,6 +18500,30 @@ allocator.  This is primarily useful for long lived buffers that usually sit emp
      "@code{go-msgio} implements functionality to read and write
 length-delimited slices.  It's helpful for building wire protocols.")
     (license license:expat)))
+
+(define-public go-github-com-liggitt-tabwriter
+  (package
+    (name "go-github-com-liggitt-tabwriter")
+    (version "0.0.0-20181228230101-89fcab3d43de")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/liggitt/tabwriter")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "04q8d0jk1ymvy7pv1dgfbqzk8gcjfa77psg1lk30ghlisf54pakg"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/liggitt/tabwriter"))
+    (home-page "https://github.com/liggitt/tabwriter")
+    (synopsis "Tab-separated text writer for Go")
+    (description
+     "This package provides a tabwriter implementation with additional
+features for padding and filtering escape sequences.")
+    (license license:bsd-3)))
 
 (define-public go-github-com-lithammer-dedent
   (package
@@ -26818,6 +26818,49 @@ Porter2 stemmer}.  It is written completely using finite state machines to do
 suffix comparison, rather than the string-based or tree-based approaches.")
     (license license:asl2.0)))
 
+(define-public go-github-com-sylabs-sif-v2
+  (package
+    (name "go-github-com-sylabs-sif-v2")
+    (version "2.22.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sylabs/sif")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "16iv5dqdl6jqi3nhg0pl3nfw8g5ksj2g5xa9iq1i3pg4bpm5h5hq"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/sylabs/sif/v2"
+      #:test-flags
+      ;; Tests try to access file outside the scope.
+      #~(list "-skip" (string-join
+                       (list "TestLoadContainerFromPath/NoOpts"
+                             "TestLoadContainerFromPath/ReadWrite"
+                             "TestHeader_GetIntegrityReader/LaunchScript")
+                       "|"))))
+    (native-inputs
+     ;; CLI only
+     (list go-github-com-spf13-cobra
+           go-github-com-spf13-pflag))
+    (propagated-inputs
+     (list go-github-com-google-go-containerregistry
+           go-github-com-google-uuid
+           go-github-com-protonmail-go-crypto
+           go-github-com-sebdah-goldie-v2
+           go-github-com-sigstore-sigstore))
+    (home-page "https://github.com/sylabs/sif")
+    (synopsis "Singularity Image Format reference implementation")
+    (description
+     "This package provides a Go implementation for reading and writing
+Singularity Image Format (SIF) files.  SIF is a container format used by
+Singularity/Apptainer for packaging applications.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-syncthing-notify
   (package
     (name "go-github-com-syncthing-notify")
@@ -26886,49 +26929,6 @@ library in Go.  It's an alternative fork of
     (description
      "This package provides utilities for manipulating POSIX capabilities.")
     (license license:bsd-2)))
-
-(define-public go-github-com-sylabs-sif-v2
-  (package
-    (name "go-github-com-sylabs-sif-v2")
-    (version "2.22.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/sylabs/sif")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "16iv5dqdl6jqi3nhg0pl3nfw8g5ksj2g5xa9iq1i3pg4bpm5h5hq"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:skip-build? #t
-      #:import-path "github.com/sylabs/sif/v2"
-      #:test-flags
-      ;; Tests try to access file outside the scope.
-      #~(list "-skip" (string-join
-                       (list "TestLoadContainerFromPath/NoOpts"
-                             "TestLoadContainerFromPath/ReadWrite"
-                             "TestHeader_GetIntegrityReader/LaunchScript")
-                       "|"))))
-    (native-inputs
-     ;; CLI only
-     (list go-github-com-spf13-cobra
-           go-github-com-spf13-pflag))
-    (propagated-inputs
-     (list go-github-com-google-go-containerregistry
-           go-github-com-google-uuid
-           go-github-com-protonmail-go-crypto
-           go-github-com-sebdah-goldie-v2
-           go-github-com-sigstore-sigstore))
-    (home-page "https://github.com/sylabs/sif")
-    (synopsis "Singularity Image Format reference implementation")
-    (description
-     "This package provides a Go implementation for reading and writing
-Singularity Image Format (SIF) files.  SIF is a container format used by
-Singularity/Apptainer for packaging applications.")
-    (license license:bsd-3)))
 
 (define-public go-github-com-syndtr-goleveldb
   (package
@@ -28671,36 +28671,6 @@ anti-fragmentation protection.")
      "Package fasttemplate implements simple and fast template library.")
     (license license:expat)))
 
-(define-public go-github-com-vbauerster-mpb-v8
-  (package
-    (name "go-github-com-vbauerster-mpb-v8")
-    (version "8.11.3")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/vbauerster/mpb")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0zq7k0jpi8322n6f2kgygxlbldnan0x57ifyhhja74q6vlqjp1k8"))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:import-path "github.com/vbauerster/mpb/v8"))
-    (propagated-inputs
-     (list go-github-com-acarl005-stripansi
-           go-github-com-mattn-go-runewidth
-           go-github-com-vividcortex-ewma
-           go-golang-org-x-sys))
-    (home-page "https://github.com/vbauerster/mpb")
-    (synopsis "Multi-progress bar for Go CLI applications")
-    (description
-     "This package provides a multi-progress bar for Go command-line
-applications.  It supports multiple progress bars, customizable decorators,
-and dynamic bar addition/removal.")
-    (license license:unlicense)))
-
 (define-public go-github-com-vbatts-go-mtree
   (package
     (name "go-github-com-vbatts-go-mtree")
@@ -28737,6 +28707,36 @@ This is a library and simple CLI tool for
 @url{https://www.freebsd.org/cgi/man.cgi?mtree(8), mtree(8)} implemented in
 Go.")
     (license license:bsd-3)))
+
+(define-public go-github-com-vbauerster-mpb-v8
+  (package
+    (name "go-github-com-vbauerster-mpb-v8")
+    (version "8.11.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/vbauerster/mpb")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zq7k0jpi8322n6f2kgygxlbldnan0x57ifyhhja74q6vlqjp1k8"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/vbauerster/mpb/v8"))
+    (propagated-inputs
+     (list go-github-com-acarl005-stripansi
+           go-github-com-mattn-go-runewidth
+           go-github-com-vividcortex-ewma
+           go-golang-org-x-sys))
+    (home-page "https://github.com/vbauerster/mpb")
+    (synopsis "Multi-progress bar for Go CLI applications")
+    (description
+     "This package provides a multi-progress bar for Go command-line
+applications.  It supports multiple progress bars, customizable decorators,
+and dynamic bar addition/removal.")
+    (license license:unlicense)))
 
 (define-public go-github-com-vburenin-ifacemaker
   (package
@@ -32140,6 +32140,21 @@ distributions of benchmark measurements
      "This package allows access different file time metadata from Golang.")
     (license license:expat)))
 
+(define-public go-gopkg-in-fsnotify-v1
+  (package/inherit go-github-com-fsnotify-fsnotify
+    (name "go-gopkg-in-fsnotify-v1")
+    (arguments
+     (list
+      #:import-path "gopkg.in/fsnotify.v1"
+      #:test-flags #~(list "-skip" "TestDiffMatch/3")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-import-path
+            (lambda* (#:key tests? import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (substitute* (find-files "." "\\.go$")
+                  (("github.com/fsnotify/fsnotify") import-path))))))))))
+
 (define-public go-gopkg-in-go-playground-colors-v1
   (package
     (name "go-gopkg-in-go-playground-colors-v1")
@@ -32163,21 +32178,6 @@ distributions of benchmark measurements
      "This package provides a Go color manipulation, conversion and printing
 library/utility.")
     (license license:expat)))
-
-(define-public go-gopkg-in-fsnotify-v1
-  (package/inherit go-github-com-fsnotify-fsnotify
-    (name "go-gopkg-in-fsnotify-v1")
-    (arguments
-     (list
-      #:import-path "gopkg.in/fsnotify.v1"
-      #:test-flags #~(list "-skip" "TestDiffMatch/3")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-import-path
-            (lambda* (#:key tests? import-path #:allow-other-keys)
-              (with-directory-excursion (string-append "src/" import-path)
-                (substitute* (find-files "." "\\.go$")
-                  (("github.com/fsnotify/fsnotify") import-path))))))))))
 
 (define-public go-gopkg-in-inconshreveable-log15-v2
   (package
