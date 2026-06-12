@@ -954,7 +954,7 @@ source files.")
       icu4c-76
       libuv-for-node-lts
       `(,nghttp2 "lib")
-      openssl-3.0
+      openssl
       zlib
                                         ; ngtcp2? nghttp3?
       ;; Regular build-time dependencies.
@@ -975,7 +975,7 @@ source files.")
            ngtcp2
            nghttp3
            `(,nghttp2 "lib")
-           openssl-3.0
+           openssl
            zlib
            `(,zstd-1.5.7 "lib")))
     (supported-systems
