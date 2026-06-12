@@ -349,6 +349,49 @@ bindings via pybind11 for use in phonon calculations and inelastic neutron
 scattering simulations.")
     (license license:agpl3+)))
 
+(define-public python-cyten
+  ;; No PyPI release or git tag.
+  (let ((commit "20393da41dba0fd524f4132fb56ce14cb2cdbe00")
+        (revision "0"))
+    (package
+      (name "python-cyten")
+      (version (git-version "0.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/tenpy/cyten")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "161dpz15nc719mvcndmyhgkzb91facnxy3rs1c6gvsfksx37wx1m"))))
+      (build-system pyproject-build-system)
+      (arguments
+       (list
+        ;; tests: 6043 passed, 369 skipped, 252 deselected, 636 xfailed
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'check 'remove-local-source
+              (lambda _
+                (delete-file-recursively "cyten"))))))
+      (native-inputs
+       (list pybind11   ;remove when python-team is merged
+             python-h5py
+             python-pytest
+             python-scikit-build-core
+             python-sympy))
+      (propagated-inputs
+       (list python-numpy
+             python-scipy
+             python-pyyaml))
+      (home-page "https://github.com/tenpy/cyten")
+      (synopsis "Combination of Cytnx and TeNPy for quantum physics")
+      (description
+       "The name Cyten is pronounced like sci-ten, and refers to scientific
+tensor networks implmented in C++ with a focus on the provided Python
+bindings, and the python-style library in modern C++.")
+      (license license:bsd-3))))
+
 (define-public python-gofit
   (package
     (name "python-gofit")
