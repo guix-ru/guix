@@ -856,8 +856,7 @@ source files.")
                ;; These tests are timing-sensitive, and fail sporadically on
                ;; slow, busy, or even very fast machines.
                (for-each delete-file
-                         '("test/parallel/test-fs-utimes.js"
-                           "test/sequential/test-performance-eventloopdelay.js"))
+                         '("test/parallel/test-fs-utimes.js"))
 
                ;; FIXME: This test fails randomly:
                ;; https://github.com/nodejs/node/issues/31213
