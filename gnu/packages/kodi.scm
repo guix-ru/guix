@@ -265,7 +265,7 @@ secondary errors.")
 (define-public kodi
   (package
     (name "kodi")
-    (version "21.2")
+    (version "21.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -274,8 +274,7 @@ secondary errors.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1kq35hn7fl8fhsv5xvqb7snsh9lbzix56pafqz8flgc5mrrckm25"))
-              (patches (search-patches "kodi-set-libcurl-ssl-parameters.patch"))
+                "0acwg8d4ixv0a09ybaixd3na9z6w6hw82wnxw9cj8344l4103b6z"))
               (modules '((guix build utils)))
               (snippet
                '(begin
