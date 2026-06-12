@@ -55501,13 +55501,13 @@ customization by the user.")
 (define-public r-mlr3cluster
   (package
     (name "r-mlr3cluster")
-    (version "0.3.0")
+    (version "0.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "mlr3cluster" version))
        (sha256
-        (base32 "1gwspyjvdwn4811jjvhlfy28rh7v5afbakbcwk01fzykmf20g4jw"))))
+        (base32 "0023ln8752l26zm0ry2zsrjp7q0q001wbsxx08i40b1gg63nx4wb"))))
     (properties
      '((upstream-name . "mlr3cluster")
        (updater-extra-native-inputs . ("r-vctrs"))))
@@ -55516,12 +55516,19 @@ customization by the user.")
                              r-checkmate
                              r-cluster
                              r-data-table
-                             r-fpc
                              r-mlr3
                              r-mlr3misc
                              r-paradox
                              r-r6))
-    (native-inputs (list r-apcluster r-mirai r-mlbench r-testthat r-vctrs))
+    (native-inputs (list r-apcluster
+                         r-clustercrit
+                         r-fpc
+                         r-mirai
+                         r-mlbench
+                         r-mvtnorm
+                         r-testthat
+                         r-vctrs
+                         r-withr))
     (home-page "https://mlr3cluster.mlr-org.com")
     (synopsis "Cluster extension for mlr3")
     (description
