@@ -1420,9 +1420,9 @@ for syntax highlighting or a linting tool.")
     (native-inputs (list pandoc))
     (inputs (list luajit))))
 
-(define (make-lua-readline name lua)
+(define-public lua-readline
   (package
-    (name name)
+    (name "lua-readline")
     (version "3.3")
     (source
      (origin
@@ -1437,7 +1437,7 @@ for syntax highlighting or a linting tool.")
      (list
       #:tests? #f                       ;test_rl.lua is manual
       #:phases
-      #~(let* ((lua-api-version #$(version-major+minor (package-version lua)))
+      #~(let* ((lua-api-version #$(this-lua-version))
                (lua-cpath (string-append #$output "/lib/lua/" lua-api-version))
                (lua-path (string-append #$output "/share/lua/" lua-api-version))
                (shared-object "C-readline.so"))
@@ -1472,20 +1472,12 @@ It also support most of readline's alternative interface, namely
 and readline's custom completion.")
     (license license:expat)))
 
-(define-public lua5.1-readline
-  (make-lua-readline "lua5.1-readline" lua-5.1))
-
-(define-public lua5.2-readline
-  (make-lua-readline "lua5.2-readline" lua-5.2))
-
-(define-public lua-readline
-  (make-lua-readline "lua-readline" lua))
-
-(define-public lua5.4-readline
-  (make-lua-readline "lua5.4-readline" lua-5.4))
-
-(define-public lua5.5-readline
-  (make-lua-readline "lua5.5-readline" lua-5.5))
+(define-public-lua-variants lua-readline
+  (lua-5.5 lua5.5-readline)
+  (lua-5.4 lua5.4-readline)
+  (lua-5.3 lua5.3-readline)
+  (lua-5.2 lua5.2-readline)
+  (lua-5.1 lua5.1-readline))
 
 (define (make-lua-scintillua name lua lua-lpeg lua-filesystem)
   (package
