@@ -1510,7 +1510,7 @@ supports automatic snapshots timelines.")
 (define-public zfs
   (package
     (name "zfs")
-    (version "2.4.2")
+    (version "2.4.3")
     (outputs '("out" "module" "src"))
     (source
      (origin
@@ -1519,7 +1519,7 @@ supports automatic snapshots timelines.")
                            "/download/zfs-" version
                            "/zfs-" version ".tar.gz"))
        (sha256
-        (base32 "13y7pqdkpplai7vkb06xv1c7pw5fl70clhg2qnjbx5gjd870s9ky"))))
+        (base32 "19srp9gimm6kkk279d25c4338gbvcqr8m1422dgrn67mak8z420z"))))
     (build-system linux-module-build-system)
     (arguments
      (list
