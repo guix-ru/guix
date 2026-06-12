@@ -2586,6 +2586,34 @@ reports (e.g.  @url{http://jenkins-ci.org, Jenkins}).")
 per-goroutine.")
     (license license:expat)))
 
+(define-public go-github-com-kisielk-errcheck
+  (package
+    (name "go-github-com-kisielk-errcheck")
+    (version "1.20.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kisielk/errcheck")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "12q53bwy6hrx2vhyr54wqgk85zpih99fndniy6h0kq6mwld78yvd"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/kisielk/errcheck"
+      #:test-flags
+      #~(list "-skip" "TestTypeParameterizedFunctionExclude/detected")))
+    (propagated-inputs
+     (list go-golang-org-x-tools))
+    (home-page "https://github.com/kisielk/errcheck")
+    (synopsis "Check whether @code{error} is checked in Go code")
+    (description
+     "@code{errcheck} finds silently ignored errors in Go code.")
+    (license license:expat)))
+
 (define-public go-github-com-ldez-tagliatelle
   (package
     (name "go-github-com-ldez-tagliatelle")
@@ -5416,6 +5444,19 @@ similar to the Unix diff command line tool to compare files.")
      (package-propagated-inputs go-github-com-gkampitakis-ciinfo))
     (inputs '())
     (propagated-inputs '())))
+
+(define-public go-errcheck
+  (package/inherit go-github-com-kisielk-errcheck
+    (name "go-errcheck")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:tests? #t #t) #f)
+       ((#:skip-build? #t #t) #f)
+       ((#:install-source? #t #t) #f)))
+    (native-inputs
+     (package-propagated-inputs go-github-com-kisielk-errcheck))
+    (propagated-inputs '())
+    (inputs '())))
 
 (define-public go-ginkgo
   (package/inherit go-github-com-onsi-ginkgo-v2
