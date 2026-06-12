@@ -1255,7 +1255,7 @@ low-level interaction with the operating system.")
     (name "go-golang-org-x-telemetry")
     ;; Beware: the updater gets this wrong.  Use the latest commit and its
     ;; matching date.
-    (version "0.0.0-20260428171046-76f71b9afea0")
+    (version "0.0.0-20260611141451-d61e87d5f4a3")
     (source
      (origin
        (method git-fetch)
@@ -1264,7 +1264,7 @@ low-level interaction with the operating system.")
               (commit (go-version->git-ref version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "13z9sgs9lsaj2shv5hbv7i63pjjcw68r1vw7j5jkkqwcz5kkdwkp"))
+        (base32 "1czbaqfma2w2gyscqy0xwbfg7yfans8zihp7087lpd717l3dyzms"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
