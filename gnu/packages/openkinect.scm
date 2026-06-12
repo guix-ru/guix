@@ -18,6 +18,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages openkinect)
+  #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix git-download)
   #:use-module (guix build-system cmake)
@@ -32,74 +33,69 @@
   #:use-module (gnu packages image-processing))
 
 (define-public libfreenect
-  (let ((version "0.6.2"))
-    (package
-      (name "libfreenect")
-      (version version)
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/OpenKinect/libfreenect")
-                      (commit (string-append "v" version))))
-                (file-name (git-file-name name version))
-                (sha256
-                 (base32
-                  "02pb8mcl62kzdcgbnv3rw4nl0f08iw8pjiqqhfy3ycpkvyppw97w"))))
-      (build-system cmake-build-system)
-      (arguments
-       '(#:tests? #f                    ; package has no tests
-         #:configure-flags
-         '("-DBUILD_FAKENECT=ON"
-           "-DBUILD_CPP=ON"
-           "-DBUILD_EXAMPLES=OFF"       ; available in libfreenect-examples
-           "-DBUILD_CV=OFF"             ; available in libfreenect-cv
-           "-DBUILD_PYTHON=OFF"         ; available in python-libfreenect
-           "-DBUILD_C_SYNC=ON")
-         #:phases
-         (modify-phases %standard-phases
-           (add-after 'install 'install-udev-rules
-             (lambda* (#:key outputs #:allow-other-keys)
-               (let* ((out (assoc-ref outputs "out"))
-                      (rules-out (string-append out "/lib/udev/rules.d")))
-                 (install-file "../source/platform/linux/udev/51-kinect.rules"
-                               (string-append rules-out "51-kinect.rules"))
-                 #t))))))
-      (native-inputs
-       (list pkg-config))
-      (inputs
-       (list libusb))
-      (synopsis "Drivers and libraries for the Xbox Kinect device")
-      (description "libfreenect is a userspace driver for the Microsoft Kinect.
+  (package
+    (name "libfreenect")
+    (version "0.6.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/OpenKinect/libfreenect")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0fi950hbkgxrkd4xl7k9q3na8d19xj96awp1qygprb4l8gfdmlqv"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f ;package has no tests
+      #:configure-flags
+      #~(list "-DBUILD_FAKENECT=ON"
+              "-DBUILD_CPP=ON"
+              "-DBUILD_EXAMPLES=OFF" ;available in libfreenect-examples
+              "-DBUILD_CV=OFF" ;available in libfreenect-cv
+              "-DBUILD_PYTHON=OFF" ;available in python-libfreenect
+              "-DBUILD_C_SYNC=ON")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-udev-rules
+            (lambda _
+              (install-file "../source/platform/linux/udev/51-kinect.rules"
+                            (string-append #$output "/lib/udev/rules.d")))))))
+    (native-inputs (list pkg-config))
+    (inputs (list libusb))
+    (synopsis "Drivers and libraries for the Xbox Kinect device")
+    (description
+     "libfreenect is a userspace driver for the Microsoft Kinect.
 It supports: RGB and Depth Images, Motors, Accelerometer, LED and Audio.")
-      (home-page "https://openkinect.org/")
-      (license license:gpl2+))))
+    (home-page "https://openkinect.org/")
+    (license license:gpl2+)))
 
 ;; Library are already compiled in libfreenect, avoid build it again.
 (define libfreenect-derived-phases
-  '(modify-phases %standard-phases
-     (add-after 'unpack 'patch-CMakeLists.txt
-       (lambda* (#:key outputs #:allow-other-keys)
-         (substitute* "CMakeLists.txt"
-           ((".*libusb.*") "")
-           (("add_subdirectory \\(src\\)") "")
-           ((".*libfreenectConfig.cmake.*") ""))
-         #t))))
+  #~(modify-phases %standard-phases
+      (add-after 'unpack 'patch-CMakeLists.txt
+        (lambda _
+          (substitute* "CMakeLists.txt"
+            ((".*libusb.*") "")
+            (("add_subdirectory \\(src\\)") "")
+            ((".*libfreenectConfig.cmake.*") ""))))))
 
 (define-public libfreenect-examples
   (package
     (inherit libfreenect)
     (name "libfreenect-examples")
-    (inputs
-     `(("libfreenect" ,libfreenect)
-       ("glut" ,freeglut)))
     (arguments
-     `(#:tests? #f                      ; package has no tests
-       #:configure-flags '("-DBUILD_EXAMPLES=ON"
-                           "-DBUILD_FAKENECT=OFF"
-                           "-DBUILD_CPP=OFF"
-                           "-DBUILD_C_SYNC=OFF"
-                           "-DBUILD_CV=OFF")
-       #:phases ,libfreenect-derived-phases))
+     (list
+      #:tests? #f ; package has no tests
+      #:configure-flags
+      #~(list "-DBUILD_EXAMPLES=ON"
+              "-DBUILD_FAKENECT=OFF"
+              "-DBUILD_CPP=OFF"
+              "-DBUILD_C_SYNC=OFF"
+              "-DBUILD_CV=OFF")
+      #:phases libfreenect-derived-phases))
+    (inputs (list libfreenect freeglut))
     (synopsis "Examples for libfreenect, the Xbox Kinect device library")))
 
 (define-public libfreenect-opencv
@@ -109,13 +105,15 @@ It supports: RGB and Depth Images, Motors, Accelerometer, LED and Audio.")
     (inputs
      (list libfreenect opencv))
     (arguments
-     `(#:tests? #f                      ; package has no tests
-       #:configure-flags '("-DBUILD_EXAMPLES=OFF"
-                           "-DBUILD_FAKENECT=OFF"
-                           "-DBUILD_CPP=OFF"
-                           "-DBUILD_C_SYNC=OFF"
-                           "-DBUILD_CV=ON")
-       #:phases ,libfreenect-derived-phases))
+     (list
+      #:tests? #f ; package has no tests
+      #:configure-flags
+      #~(list "-DBUILD_EXAMPLES=OFF"
+              "-DBUILD_FAKENECT=OFF"
+              "-DBUILD_CPP=OFF"
+              "-DBUILD_C_SYNC=OFF"
+              "-DBUILD_CV=ON")
+      #:phases libfreenect-derived-phases))
     (synopsis "OpenCV wrapper for libfreenect, the Xbox Kinect device
 library")))
 
@@ -130,15 +128,17 @@ library")))
     (propagated-inputs
      (list python python-numpy))
     (arguments
-     `(#:tests? #f                      ; package has no tests
-       #:configure-flags '("-DBUILD_EXAMPLES=OFF"
-                           "-DBUILD_CPP=OFF"
-                           "-DBUILD_CV=OFF"
-                           "-DBUILD_C_SYNC=OFF"
-                           "-DBUILD_FAKENECT=OFF"
-                           "-DBUILD_PYTHON3=ON"
-                           ;; Relax gcc-14's strictness.
-                           "-DCMAKE_C_FLAGS=-Wno-error=int-conversion")
-       #:phases ,libfreenect-derived-phases))
+     (list
+      #:tests? #f ; package has no tests
+      #:configure-flags
+      #~(list "-DBUILD_EXAMPLES=OFF"
+              "-DBUILD_CPP=OFF"
+              "-DBUILD_CV=OFF"
+              "-DBUILD_C_SYNC=OFF"
+              "-DBUILD_FAKENECT=OFF"
+              "-DBUILD_PYTHON3=ON"
+              ;; Relax gcc-14's strictness.
+              "-DCMAKE_C_FLAGS=-Wno-error=int-conversion")
+      #:phases libfreenect-derived-phases))
     (synopsis "Python wrapper for libfreenect, the Xbox Kinect device
 library")))
