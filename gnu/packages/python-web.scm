@@ -1666,6 +1666,71 @@ resolution in a Python script without any changes to the hosts file or the use
 of a fake DNS resolver.")
     (license license:asl2.0)))
 
+(define-public python-httpcore2
+  (package
+    (name "python-httpcore2")
+    (version "2.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pydantic/httpx2")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "05mql79icxigldzw01hs77jpgihvzjahvniwncb7ji2rqzhjr42g"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'preparation
+            (lambda _
+              (chdir "src/httpcore2")
+              (copy-recursively "../../tests/httpcore2" "tests")
+              (substitute* (find-files "tests" "\\.py$")
+                (("tests\\.httpcore2") "tests")
+                (("tests/httpcore2") "tests"))))
+          (add-before 'build 'set-version
+            (lambda _
+              (substitute* "pyproject.toml"
+                ((".*uv-dynamic-versioning>.*") "")
+                (("source.*uv-dynamic-versioning.*") "source = 'vcs'"))
+              (substitute* "httpcore2/__init__.py"
+                ((".*= version\\(.*")
+                 (format #f "__version__ = ~s~%" #$version))))))))
+    (native-inputs
+     (list python-hatch-fancy-pypi-readme
+           python-hatch-vcs
+           python-hatchling
+           python-pytest
+           python-pytest-httpbin
+           python-pytest-trio))
+    (propagated-inputs
+     (list python-h11
+           python-truststore
+           ;; [optional]
+           python-anyio
+           python-h2
+           python-socksio
+           python-trio))
+    (home-page "https://github.com/pydantic/httpx2")
+    (synopsis "Minimal low-level HTTP client")
+    (description
+     "The HTTP Core package provides a minimal low-level HTTP client, which
+does one thing only.  Sending HTTP requests.
+
+Some things HTTP Core does do:
+@itemize
+@item Sending HTTP requests.
+@item Thread-safe / task-safe connection pooling.
+@item HTTP(S) proxy & SOCKS proxy support.
+@item Supports HTTP/1.1 and HTTP/2.
+@item Provides both sync and async interfaces.
+@item Async backend support for @code{asyncio} and @code{trio}.
+@end itemize")
+    (license license:bsd-3)))
+
 (define-public python-httpretty
   (package
     (name "python-httpretty")
