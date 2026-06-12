@@ -1246,6 +1246,45 @@ ci-info} in Go.")
       (description "go-snaps is a Go implementation of Jest snapshot testing.")
       (license license:expat))))
 
+(define-public go-github-com-go-openapi-testify-v2
+  (package
+    (name "go-github-com-go-openapi-testify-v2")
+    (version "2.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-openapi/testify")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0fs6xh9wz8wwiw6gq6csfhm3f51yzsdh1pw2miy4vylvvvyx4n15"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately:
+            (for-each delete-file-recursively
+                      (list "codegen"
+                            "enable/colors"
+                            "enable/yaml"
+                            "hack/migrate-testify"
+                            "internal/testintegration"))))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-openapi/testify/v2"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'pre-check
+            (lambda _
+              (setenv "GODEBUG" "asynctimerchan=0"))))))
+    (home-page "https://github.com/go-openapi/testify")
+    (synopsis "Zero-dependency assertions library for Go")
+    (description
+     "This is alternative implementation of @code{stretchr/testify} Go test
+library with zero dependencies which is 95% compatible with it.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-go-playground-assert-v2
   (package
     (name "go-github-com-go-playground-assert-v2")
