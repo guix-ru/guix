@@ -282,7 +282,7 @@ plans and designs.")
 (define-public mbpoll
   (package
     (name "mbpoll")
-    (version "1.5.2")
+    (version "1.5.4")
     (source
      (origin
        (method git-fetch)
@@ -291,7 +291,7 @@ plans and designs.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0h5qsgy5hkrq92nxfkl564w21g5vp9nnch04fdqij06ckvzf7vdc"))))
+        (base32 "11vwmm2l96v8598z0q50rgp5z57lkd09ff9l8knpr4ghkjpssf0g"))))
     (build-system cmake-build-system)
     (arguments
      (list
