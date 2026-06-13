@@ -4810,6 +4810,42 @@ Telescopes developed for @acronym{CTAO, Cherenkov Telescope Array
 Observatory}.")
     (license license:bsd-3)))
 
+(define-public python-ctapipe-io-magic
+  (package
+    (name "python-ctapipe-io-magic")
+    (version "0.5.8")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "ctapipe_io_magic" version))
+       (sha256
+        (base32 "1g574wgwrb6k25dcn9vnv8rypa4s3bc4mi16d9dksb4dbjizxiww"))))
+    (build-system pyproject-build-system)
+    (arguments
+     ;; XXX: Tests require additional data, see: <download_test_data.sh>.
+     (list
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-ctapipe-env
+            (lambda _
+              (setenv "CTAPIPE_DISABLE_NUMBA_CACHE" "1"))))))
+    (native-inputs
+     (list python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-astropy
+           python-ctapipe
+           python-numpy
+           python-scipy
+           python-uproot))
+    (home-page "https://github.com/cta-observatory/ctapipe_io_magic")
+    (synopsis "Ctapipe plugin for reading calibrated MAGIC files")
+    (description
+     "This package provides a EventSource plugin for ctapipe, needed to read the
+ calibrated data of the MAGIC telescope system.")
+    (license license:bsd-3)))
+
 (define-public python-ctaplot
   (package
     (name "python-ctaplot")
