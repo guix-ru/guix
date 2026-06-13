@@ -33,7 +33,7 @@
   #:export (fossil-fetch))
 
 (define* (fossil-fetch uri check-in file #:key (fossil-command "fossil"))
-  "Fetch CHECK-IN from URI into DIRECTORY.  CHECK-IN must be a valid
+  "Fetch CHECK-IN from URI into a tarball FILE.  CHECK-IN must be a valid
 Fossil check-in name.  Return #t on success, else raise an exception."
   (setenv "FOSSIL_HOME" "/tmp")
   (let ((name (basename (strip-store-file-name file) ".tar.gz")))
