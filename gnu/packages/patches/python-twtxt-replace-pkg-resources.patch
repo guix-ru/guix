@@ -1,0 +1,30 @@
+From: Branch Vincent (PR #178, twtxt repository)
+Date: Apr 21, 2024
+Subject: replace pkg_resources for python 3.12
+
+* Python 3.12 has removed bundled setuptools (aka pkg_resources):
+  https://docs.python.org/3.12/whatsnew/3.12.html#removed
+
+--- a/twtxt/helper.py	2026-06-12 23:37:01.869106540 -0300
++++ b/twtxt/helper.py	2026-06-12 23:40:04.335252026 -0300
+@@ -14,7 +14,6 @@
+ import textwrap
+ 
+ import click
+-import pkg_resources
+ 
+ from twtxt.mentions import format_mentions
+ from twtxt.parser import parse_iso8601
+@@ -164,11 +163,7 @@
+ 
+ 
+ def generate_user_agent():
+-    try:
+-        version = pkg_resources.require("twtxt")[0].version
+-    except pkg_resources.DistributionNotFound:
+-        version = "unknown"
+-
++    from twtxt import __version__ as version
+     conf = click.get_current_context().obj["conf"]
+     if conf.disclose_identity and conf.nick and conf.twturl:
+         user_agent = "twtxt/{version} (+{url}; @{nick})".format(

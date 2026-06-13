@@ -3109,6 +3109,48 @@ It's a spin-off of the Psi XMPP client.")
 (define-deprecated-package psi
   psi-plus)
 
+(define-public twtxt
+  (package
+    (name "twtxt")
+    (version "1.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/buckket/twtxt")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1k7187fva6pmnyrz1pq37pq7wfnxix8qgzn5dzgjk3l8ipb63c89"))
+       (patches
+        ;; Patch already merged in the project for future release.
+        (search-patches "python-twtxt-replace-pkg-resources.patch"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (inputs
+     (list python-aiohttp
+           python-click
+           python-humanize
+           python-dateutil))
+    (home-page "https://github.com/buckket/twtxt")
+    (synopsis "Decentralised, minimalist microblogging service")
+    (description
+     "@command{twtxt} is a decentralised, minimalist microblogging service for
+hackers.
+
+So you want to get some thoughts out on the internet in a convenient and slick
+way while also following the gibberish of others? Instead of signing up at a
+closed and/or regulated microblogging platform, getting your status updates
+out with twtxt is as easy as putting them in a publicly accessible text file.
+The URL pointing to this file is your identity, your account.  @code{twtxt}
+then tracks these text files, like a feedreader, and builds your unique
+timeline out of them, depending on which files you track.  The format is
+simple, human readable, and integrates well with UNIX command line
+utilities.")
+   (license license:expat)))
+
 (define-public python-zulip
   (package
     (name "python-zulip")
