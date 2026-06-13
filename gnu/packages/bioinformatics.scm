@@ -1497,7 +1497,7 @@ within this package are the 3000 bone marrow cells used for vignettes.")
                        #:tests? tests?)))))))
     (propagated-inputs (list r-jsonlite r-memoise r-qs2 r-r6 r-stringr))
     (inputs
-     (cons* openssl zlib `(,zstd "lib")
+     (cons* c-blosc openssl snappy zlib `(,zstd "lib")
             (cargo-inputs 'r-pizzarr)))
     (native-inputs
      (list pkg-config
