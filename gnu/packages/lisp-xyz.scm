@@ -845,8 +845,8 @@ functions allow Lisp programs to explore the web.")
   (sbcl-package->cl-source-package sbcl-acl-compat))
 
 (define-public sbcl-common-macros
-  (let ((commit "f261a4a07c52e5c560d90154393bd49421ece740")
-        (revision "0"))
+  (let ((commit "4596ddf32357fa793ece25cecb6e8661259b51ac")
+        (revision "1"))
     (package
       (name "sbcl-common-macros")
       (version (git-version "0" revision commit))
@@ -859,7 +859,7 @@ functions allow Lisp programs to explore the web.")
          (file-name (git-file-name "cl-common-macros" version))
          (sha256
           (base32
-           "0rn0rnccjgxsrf828bw740vs8psjjxb5x4hmk8rnqiz5p3y0lvph"))))
+           "0wgfhrh0qn9vhz49yc76a3vn6wbfldy388h7krnv0jbb7v0s92zy"))))
       (build-system asdf-build-system/sbcl)
       (arguments
        '(#:asd-systems '("common-macro-definitions")))
