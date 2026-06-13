@@ -1297,6 +1297,70 @@ backward), and manual time control
 @end itemize")
     (license license:gpl2+)))
 
+(define-public hdrl
+  (package
+    (name "hdrl")
+    (version "1.6.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://ftp.eso.org/pub/dfs/pipelines/libraries/hdrl/hdrl-"
+             version ".tar.gz"))
+       (sha256
+        (base32 "0y1kp5i7847liw8zr1m5mw3hl5ygcr5lm5m2plx024pn001b8z34"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "--enable-standalone"
+              (string-append "CC=" #$(cc-for-target))
+              (string-append "--prefix=" #$output))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'skip-tests
+            (lambda _
+              ;; Test tries to download calibration data from
+              ;; <https://ftp.eso.org/pub/dfs/pipelines/gravity/finals2000A.data>
+              ;; 2.3M.
+              (substitute* "tests/Makefile.am"
+                ((".*hdrl_download-test.*") ""))))
+          (replace 'bootstrap
+            (lambda _
+              (invoke "autoreconf" "-vif"))))))
+      (native-inputs
+     (list automake
+           autoconf
+           libtool
+           pkg-config))
+    (inputs
+     (list cfitsio
+           fftwf
+           cpl-7.3      ;CPL (headers) was not found on your system for v7.4
+           curl
+           erfa
+           gsl
+           wcslib))
+    ;; I could not find actual homepage of the project on
+    ;; <https://www.eso.org/public/about-eso/>.
+    (home-page "https://www.eso.org/public/")
+    (synopsis "ESO High-level Data Reduction Library")
+    (description
+     "@acronym{High-level Data Reduction Library, HDRL} provides
+instrument-independent, high-level scientific functions for ESO data reduction
+pipelines.  It aims to concentrate cross-pipeline algorithms in a single
+place, verify and homogenize algorithms, implement error propagation, and is
+extensively tested.  Pipeline developers and instrument consortia can use HDRL
+so that bug-fixes and improvements benefit all pipelines that use it.
+
+This package includes the HDRL library (built on top of the ESO
+@acronym{Common Pipeline Library, CPL}, unit tests, and documentation.  The
+library covers functionalities such as: overscan, bias, dark, flat, bad-pixel
+handling, Strehl, fringing, catalogue operations, efficiency and response
+computation, refraction and airmass, pattern noise, resampling, limiting
+magnitude, and barycentric correction.")
+    (license license:gpl2+)))
+
 (define* (healpix-source #:key version sha256-base32-hash)
     ;; The sources of HEALPix contains 6 independent packages (Fortran90, IDL,
     ;; C, C++, Java and Python) and distributed together with libsharp.  There
