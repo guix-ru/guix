@@ -7134,13 +7134,21 @@ supports only the basic features of the original.")
        (sha256
         (base32 "1r3igmdj4yigpayk3j609030jkx5ba9x0l4mryn0aj9jh6x4pmkh"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              ;; See: <https://github.com/LSSTDESC/Coord/issues/21>.
+              (substitute* "requirements.txt"
+                (("future") "")))))))
     (native-inputs
      (list python-astropy-minimal
            python-pytest
            python-setuptools))
     (propagated-inputs
-     (list python-future
-           python-numpy))
+     (list python-numpy))
     (home-page "https://github.com/LSSTDESC/Coord")
     (synopsis "Angles and celestial coordinates handling in Python")
     (description
