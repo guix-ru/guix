@@ -3733,7 +3733,7 @@ aim of simplifying and streamlining data conversion and standardization.")
 (define-public python-bayesicfitting
   (package
     (name "python-bayesicfitting")
-    (version "3.2.5")
+    (version "3.3.0")
     (source
      (origin
        (method git-fetch)
@@ -3742,7 +3742,7 @@ aim of simplifying and streamlining data conversion and standardization.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1l4yq907a61js7pmi4zi2gg3nq479n0f21ycmjgk3rkc4ixrislz"))))
+        (base32 "09yfyvpg6v5lnlw0yiia00vwfxmbxwa3c1a2b7viva548gmhkh8w"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -3763,7 +3763,6 @@ aim of simplifying and streamlining data conversion and standardization.")
      (list python-setuptools))
     (propagated-inputs
      (list python-astropy
-           python-future
            python-matplotlib
            python-numpy
            python-scipy))
