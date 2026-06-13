@@ -772,7 +772,7 @@ analysis.")
 (define-public cpl
   (package
     (name "cpl")
-    (version "7.3.4")
+    (version "7.4")
     (source
      (origin
        (method url-fetch)
@@ -780,7 +780,7 @@ analysis.")
              "https://ftp.eso.org/pub/dfs/pipelines/libraries/cpl/cpl-"
              version ".tar.gz"))
        (sha256
-        (base32 "090xp9scg34z60iiklf8w7gmbjbja3sdv7xk97pn8llklvks8xgi"))))
+        (base32 "1m4brm7dizwsld56q43mrwvld3390af5irgk8848iayyx5ki85v3"))))
     (build-system gnu-build-system)
     (arguments
      ;; pycpl expects to find a lib/esopipes-plugins directory.  This is
@@ -799,7 +799,8 @@ analysis.")
            pkg-config
            perl))
     (inputs
-     (list cfitsio
+     (list cext
+           cfitsio
            wcslib
            fftw
            fftwf))
@@ -8087,7 +8088,7 @@ and the Generalized Lomb-Scargle periodogram
            python-scipy
            python-setuptools))
     (inputs
-     (list cpl))
+     (list cpl-7.3))
     (propagated-inputs
      (list python-astropy))
     (home-page "https://www.eso.org/sci/software/pycpl/pycpl-site/")
