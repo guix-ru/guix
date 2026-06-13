@@ -109,7 +109,14 @@
               (lambda _
                 (substitute* "tests/test_wrapper.sh.in"
                   (("^/usr/bin/env")
-                   "env")))))))
+                   "env"))))
+            (add-after 'unpack 'disable-failing-sdlcomp-test
+              (lambda _
+                ;; Disable failing sdlcomp test for opus until it is fixed.
+                ;; https://github.com/libsndfile/libsndfile/issues/1107
+                (substitute* "tests/lossy_comp_test.c"
+                  (("sdlcomp_test_.*SF_FORMAT_OPUS.*;" match)
+                   (string-append "/* " match " */"))))))))
       (propagated-inputs (list flac
                                lame
                                libmpg123
