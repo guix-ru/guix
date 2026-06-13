@@ -246,19 +246,26 @@
            (checkout "develop")
            (add "b.txt" "B")
            (commit "Second commit")
-           (tag "v1.1" "release-1.1"))
-       (let ((directory commit relation
-                        (update-cached-checkout directory
-                                                #:ref '(tag . "v1.1")
-                                                #:cache-directory cache))
-             (head   (let* ((pipe (open-pipe* OPEN_READ (git-command)
+           (tag "v1.1" "release-1.1")
+           (checkout "master"))
+       (let* ((tag   (let* ((pipe (open-pipe* OPEN_READ (git-command)
                                               "-C" directory
-                                              "rev-parse" "HEAD"))
+                                              "rev-parse" "v1.1^{}"))
                             (str  (get-string-all pipe)))
                        (close-pipe pipe)
-                       (string-trim-right str))))
-         ;; COMMIT should be the ID of the commit object, not that of the tag.
-         (string=? commit head))))))
+                       (string-trim-right str)))
+              (cached-directory commit relation
+                                (update-cached-checkout directory
+                                                        #:ref '(tag . "v1.1")
+                                                        #:cache-directory cache))
+              (head   (let* ((pipe (open-pipe* OPEN_READ (git-command)
+                                               "-C" cached-directory
+                                               "rev-parse" "HEAD"))
+                             (str  (get-string-all pipe)))
+                        (close-pipe pipe)
+                        (string-trim-right str))))
+         (and (string=? commit head)
+              (string=? tag    head)))))))
 
 (test-assert "update-cached-checkout, untracked files removed"
   (call-with-temporary-directory
