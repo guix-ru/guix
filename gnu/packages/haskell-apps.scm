@@ -614,9 +614,6 @@ unwanted suggestions, and to add your own custom suggestions.")
                   ghc-warp-tls
                   ghc-zlib
                   ghc-semigroups))
-    (arguments
-     `(#:cabal-revision ("1"
-                         "1129flhhb1992rijw46dclvmpqlylmbrzl4swsnk2knylx6jgw5a")))
     (home-page "https://hoogle.haskell.org/")
     (synopsis "Haskell API Search")
     (description
