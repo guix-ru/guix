@@ -4337,14 +4337,21 @@ SImulations for KAscade}} binary output files using NumPy.")
        (sha256
         (base32 "16xlg0vyzdx1h5h28y8az48nhiqvx43yd9s30g3rk9ywl4r1j6h8"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              ;; See: <https://github.com/lzkelley/cosmopy/issues/6>.
+              (substitute* "requirements.txt"
+                (("future") "")))))))
     (native-inputs
      (list python-pytest
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (propagated-inputs
      (list python-astropy
            python-click
-           python-future
            python-numpy
            python-scipy))
     (home-page "https://github.com/lzkelley/cosmopy")
