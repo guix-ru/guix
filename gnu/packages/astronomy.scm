@@ -8070,7 +8070,7 @@ and the Generalized Lomb-Scargle periodogram
 (define-public python-pycpl
   (package
     (name "python-pycpl")
-    (version "1.0.3")
+    (version "1.0.4")
     (source
      (origin
        (method url-fetch)
@@ -8078,17 +8078,19 @@ and the Generalized Lomb-Scargle periodogram
              "https://ftp.eso.org/pub/dfs/pipelines/libraries/pycpl/pycpl-"
              version ".tar.gz"))
        (sha256
-        (base32 "0kfzx4k8z2k0ms6q8f16wqr120drd8fqrw9qpnks419pyc8cr5xp"))))
+        (base32 "1i598snc9dkmdgk8f5dky1a7qz5lzh5q9kkvwi5yqnqd19sx7rc5"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list cmake-minimal
+           pkg-config
            pybind11
            python-pandas
            python-pytest
            python-scipy
            python-setuptools))
     (inputs
-     (list cpl-7.3))
+     (list cext
+           cpl))
     (propagated-inputs
      (list python-astropy))
     (home-page "https://www.eso.org/sci/software/pycpl/pycpl-site/")
