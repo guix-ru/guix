@@ -4455,13 +4455,16 @@ primes and prime k-tuplets up to 264.")
 (define-public python-blis
   (package
     (name "python-blis")
-    (version "1.2.1")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "blis" version))
-              (sha256
-               (base32
-                "0nknjrd4pp8l5n68vpmcxfpr8mp0imjl51yj5g1468fwpvnvwrhh"))))
+    (version "1.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/explosion/cython-blis")
+              (commit (string-append "release-v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ncr47054iy16wapb5yndr6rf3mh8wvi54ljgs791qp3i2yvjb08"))))
     (build-system pyproject-build-system)
     (arguments
      (list
