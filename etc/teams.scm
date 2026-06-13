@@ -1131,6 +1131,14 @@ packages (e.g. Astronomy, Chemistry, Math, Physics etc.)"
                       "gnu/packages/sagemath.scm"
                       "gnu/packages/statistics.scm")))
 
+(define-team security-response
+  (team 'security-response
+        #:name "Guix security response team"
+        #:description "Members of this team read the private
+guix-security@gnu.org email address, coordinate the development of security
+fixes with the relevant people, and coordinate the publication of security
+advisories.  Its members are listed at https://guix.gnu.org/security/ ."))
+
 (define-team sugar
   (team 'sugar
         #:name "Sugar team"
@@ -1293,7 +1301,7 @@ the \"texlive\" importer."
 (define-member (person "Tobias Geerinckx-Rice"
                        "me@tobias.gr"
                        "nckx")
-  codeberg mentors)
+  codeberg mentors security-response)
 
 (define-member (person "Steve George"
                        "steve@futurile.net"
@@ -1303,7 +1311,7 @@ the \"texlive\" importer."
 (define-member (person "Leo Famulari"
                        "leo@famulari.name"
                        "lfam")
-  codeberg linux-libre)
+  codeberg linux-libre security-response)
 
 (define-member (person "Efraim Flashner"
                        "efraim@flashner.co.il"
@@ -1314,6 +1322,11 @@ the \"texlive\" importer."
                        "jgart@dismail.de"
                        "jgart")
   hare lisp mentors)
+
+(define-member (person "John Kehayias"
+                       "john@guixotic.coop"
+                       "podiki")
+  security-response)
 
 (define-member (person "Guillaume Le Vaillant"
                        "glv@posteo.net"
