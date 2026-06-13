@@ -19630,21 +19630,33 @@ allows one to make simple text-mode user interfaces on Unix-like systems")
 (define-public python-confection
   (package
     (name "python-confection")
-    (version "0.1.5")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "confection" version))
-              (sha256
-               (base32
-                "03hgb6601mx6iip4nr8i0is8x5vmh85z286j7j8lhkxxlqydswlf"))))
+    (version "1.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/explosion/confection")
+              (commit (string-append "release-v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "065a3044x26sh8wz9xw4yh1kdzn397j0mzznwvksx5qimp23117b"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'patch-pythonpath
+            (lambda _
+              (setenv "PYTHONPATH"
+                      (string-append (getcwd) ":"
+                                     (getenv "GUIX_PYTHONPATH"))))))))
     (propagated-inputs (list python-pydantic python-srsly))
-    (native-inputs (list python-pytest python-setuptools python-wheel))
+    (native-inputs (list python-pytest python-setuptools))
     (home-page "https://github.com/explosion/confection")
     (synopsis "Config system for Python")
-    (description "Confection is a lightweight library that offers a
-configuration system letting you conveniently describe arbitrary trees of
-objects.")
+    (description
+     "Confection is a lightweight library that offers a configuration system
+letting you conveniently describe arbitrary trees of objects.")
     (license license:expat)))
 
 (define-public python-configobj
