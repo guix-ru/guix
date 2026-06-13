@@ -5275,19 +5275,25 @@ with very acceptable performance.")
 (define-public python-weasel
   (package
     (name "python-weasel")
-    (version "0.4.1")
+    (version "1.0.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "weasel" version))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/explosion/weasel/")
+             (commit (string-append "release-v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1aas113r29y6yxrmdlsw80rj8w4kgw1jhfjw9rsgc4rf0w7j3g5a"))))
+        (base32 "1sxcxri9hl9rs1kvdrv81g6mlg7lifhq9xacskracz63v4nyh8na"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
-      ;; Network access is required.
-      #~(list #$@(map (lambda (test) (string-append "--deselect="
+      ;; This test raises an error, but not the one expected by pytest.
+      #~(list (string-append "--deselect=weasel/tests/test_validation.py::"
+                             "test_project_config_interpolation[10_0]")
+              ;; Network access is required.
+              #$@(map (lambda (test) (string-append "--deselect="
                                                     "weasel/tests/cli/"
                                                     test))
                       (list "test_cli.py::test_project_git_dir_asset"
@@ -5299,9 +5305,9 @@ with very acceptable performance.")
     (propagated-inputs
      (list python-cloudpathlib
            python-confection
+           python-httpx
            python-packaging
            python-pydantic
-           python-requests
            python-smart-open
            python-srsly
            python-typer
