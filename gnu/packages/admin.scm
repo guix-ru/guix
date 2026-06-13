@@ -5266,6 +5266,13 @@ cache of unix and unix-like systems.")
        (sha256
         (base32 "0pq1wy2m84ma0pg5k200f0fhywvx4qa873v8n5pz56ahc4ddcyk7"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'install 'wrap
+                 (lambda _
+                   (wrap-program (string-append #$output "/bin/solaar")
+                     `("GI_TYPELIB_PATH" = (,(getenv "GI_TYPELIB_PATH")))))))))
     (native-inputs
      (list gobject-introspection
            python-pytest
@@ -5285,6 +5292,7 @@ cache of unix and unix-like systems.")
            python-xlib
            gtk+
            python-pygobject))
+    (inputs (list libappindicator))
     (home-page "https://pwr-solaar.github.io/Solaar/")
     (synopsis "Linux devices manager for the Logitech Unifying Receiver")
     (description "This package provides tools to manage clients of the
