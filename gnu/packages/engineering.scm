@@ -1058,7 +1058,7 @@ with the kernel and various utilities such as per-cpu counters.")
 (define-public valeronoi
   (package
     (name "valeronoi")
-    (version "0.2.2")
+    (version "0.3.1")
     (source
      (origin
        (method git-fetch)
@@ -1067,14 +1067,22 @@ with the kernel and various utilities such as per-cpu counters.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1f9sh3v66z3sam4cfnqiivimpcmmqlf81apglkkla3lni94db9g4"))
+        (base32 "11avqrxrzbcrw1dz38hlifl5r7l4qfvlbyn4ln7b2jjmgwqcmh6y"))
        (snippet #~(begin
                     (use-modules (guix build utils))
-                    (delete-file-recursively "3rdparty")
-                    (substitute* '("tests/test_colormap.cpp"
-                                   "tests/test_main.cpp")
-                      (("catch\\.hpp")
-                       "catch2/catch.hpp"))))))
+                    (with-directory-excursion "3rdparty"
+                      (delete-file "catch.hpp")
+                      (delete-file "LICENSE_1_0.txt"))
+                    (with-directory-excursion "tests"
+                      (substitute* '("test_colormap.cpp"
+                                     "test_main.cpp"
+                                     "test_wifi_information.cpp"
+                                     "test_robot_map.cpp"
+                                     "test_measurements.cpp"
+                                     "test_wifi_collection.cpp"
+                                     "test_segment_generator.cpp")
+                        (("catch\\.hpp")
+                         "catch2/catch.hpp")))))))
     (build-system qt-build-system)
     (arguments
      (list #:qtbase qtbase
@@ -1099,7 +1107,9 @@ with the kernel and various utilities such as per-cpu counters.")
     (description
      "Valeronoi (Valetudo + Voronoi) is a companion for Valetudo for generating
 WiFi signal strength maps.  It visualizes them using a Voronoi diagram.")
-    (license license:gpl3+)))
+    (license (list license:gpl3+
+                   ;; License for the included "3rdparty/mdns.h"
+                   license:public-domain))))
 
 (define-public volk
   (package
