@@ -347,28 +347,28 @@ window) or a native DRM session.  It is agnostic of the rendering API (Vulkan
                 "00mfhaqjxx4m3y0ml44infpbp500prs031vhawwjp0dvk0vbxjz4"))
               (modules '((guix build utils)))
               (snippet
-               '(begin
-                  ;; Do not record a timestamp and file name in gzipped man
-                  ;; pages (this is equivalent to 'gzip --no-name'.)
-                  (substitute* "setup.py"
-                    (("gzip\\.open\\(gzfile, 'w', 9\\)")
-                     "gzip.GzipFile('', 'wb', 9, open(gzfile, 'wb'), 0.)"))))))
+               #~(begin
+                   ;; Do not record a timestamp and file name in gzipped man
+                   ;; pages (this is equivalent to 'gzip --no-name'.)
+                   (substitute* "setup.py"
+                     (("gzip\\.open\\(gzfile, 'w', 9\\)")
+                      "gzip.GzipFile('', 'wb', 9, open(gzfile, 'wb'), 0.)"))))))
     (build-system pyproject-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'configure
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "screenlayout/xrandr.py"
-               (("\"xrandr\"") (string-append "\"" (assoc-ref inputs "xrandr")
-                                              "/bin/xrandr\"")))))
-         (add-after 'install 'wrap-gi-typelib
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((out               (assoc-ref outputs "out"))
-                   (gi-typelib-path   (getenv "GI_TYPELIB_PATH")))
-               (wrap-program (string-append out "/bin/arandr")
-                 `("GI_TYPELIB_PATH" ":" prefix (,gi-typelib-path)))))))
-       #:tests? #f)) ;no tests
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((xrandr (search-input-file inputs "bin/xrandr")))
+                (substitute* "screenlayout/xrandr.py"
+                  (("\"xrandr\"") (string-append "\"" xrandr "\""))))))
+          (add-after 'install 'wrap-gi-typelib
+            (lambda _
+              (let ((gi-typelib-path (getenv "GI_TYPELIB_PATH")))
+                (wrap-program (in-vicinity #$output "bin/arandr")
+                  `("GI_TYPELIB_PATH" ":" prefix (,gi-typelib-path)))))))
+      #:tests? #f)) ;no tests
     (inputs (list bash-minimal gtk+ python-pycairo python-pygobject xrandr))
     (native-inputs (list gettext-minimal python-docutils python-setuptools))
     (home-page "https://christian.amsuess.com/tools/arandr/")
