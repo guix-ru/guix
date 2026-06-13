@@ -6306,7 +6306,7 @@ scipy.io}.")
 (define-public python-holodeck
   (package
     (name "python-holodeck")
-    (version "1.5.2")
+    (version "1.6")
     (source
      (origin
        (method git-fetch)
@@ -6315,7 +6315,10 @@ scipy.io}.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0jz54fb6yyling2a756qqahixpn1wgxmhhqmv6pf0iqds019v9k7"))))
+        (base32 "0yf7fqfpcbpy1j6ikg6x9f14r978v7pb1yrrbgvqnqvbvqckhish"))
+       (patches
+        ;; Taken from pull request 122
+        (search-patches "python-holodeck-cython-3-compat.patch"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -6326,7 +6329,7 @@ scipy.io}.")
                              "test_evolution.py::"
                              "Test_Composite_Hardening::test_basics_circ"))))
     (native-inputs
-     (list python-cython-0
+     (list python-cython
            python-pytest
            python-setuptools))
     (propagated-inputs
