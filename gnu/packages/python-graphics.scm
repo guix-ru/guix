@@ -232,13 +232,21 @@ GLFW} OpenGL application development library.")
 (define-public python-kivy
   (package
     (name "python-kivy")
-    (version "2.3.1")
+    ;; 2.3.1 (2024-12-26), to suport Python 3.12+ and Cython 3+.
+    (properties '((commit . "c38d019ed96a7f50db628975fbe944ea8b3cf66d")
+                  (revision . "0")))
+    (version (git-version "2.3.1"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "Kivy" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kivy/kivy")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1ngrnkrp6xgfl4x32i2nv3bml13l8qwa87cwrymv9k826ng98cq8"))))
+        (base32 "1f415556ykydqxxjnnc496j81xd2bvkwk5d5m8wlmfad0wkn3nrb"))))
     (build-system pyproject-build-system)
     (arguments
      `(#:tests? #f              ; Tests require many optional packages
@@ -254,7 +262,7 @@ GLFW} OpenGL application development library.")
              (setenv "HOME" (getcwd)))))))
     (native-inputs
      (list pkg-config
-           python-cython-0
+           python-cython
            ;; Not packaged yet, for tests.
            ;; python-kivy-deps-glew
            ;; python-kivy-deps-glew-dev
@@ -263,8 +271,7 @@ GLFW} OpenGL application development library.")
            ;; python-kivy-deps-sdl2
            ;; python-kivy-deps-sdl2-dev
            python-packaging
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (inputs
      (list gstreamer
            mesa
