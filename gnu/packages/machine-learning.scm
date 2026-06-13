@@ -2736,16 +2736,17 @@ and are compatible with its API.")
 (define-public python-thinc
   (package
     (name "python-thinc")
-    (version "8.3.4")
+    (version "8.3.13")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/explosion/thinc")
-              (commit (string-append "release-v" version))))
+              ;; XXX: It may be "release-v" as well.
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1iw99sw1ipbpqshny9s9hgc0v7gkcxi50x78s6avli208nixgnp5"))))
+        (base32 "04h9lbcaf4xizmcyq10lgr1gsxlgb8w4zcbf9vnzp37bn344cvig"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -2758,20 +2759,24 @@ and are compatible with its API.")
               ;; This would otherwise interfere with finding the installed
               ;; thinc when running tests.
               (delete-file-recursively "thinc"))))))
-    (propagated-inputs (list python-blis
-                             python-catalogue
-                             python-confection
-                             python-cymem
-                             python-murmurhash
-                             python-numpy
-                             python-packaging
-                             python-preshed
-                             python-pydantic
-                             python-setuptools
-                             python-srsly
-                             python-wasabi))
-    (native-inputs (list python-cython-0 python-mock python-pytest
-                         python-setuptools))
+    (propagated-inputs
+     (list python-blis
+           python-catalogue
+           python-confection
+           python-cymem
+           python-murmurhash
+           python-numpy
+           python-packaging
+           python-preshed
+           python-pydantic
+           python-srsly
+           python-wasabi))
+    (native-inputs
+     (list python-coverage
+           python-cython
+           python-mock
+           python-pytest
+           python-setuptools))
     (home-page "https://github.com/explosion/thinc")
     (synopsis "Functional take on deep learning")
     (description
