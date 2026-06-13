@@ -4955,6 +4955,44 @@ Abstract Syntax Trees} API.")
 (define-deprecated-package symbiyosys
   sby)
 
+(define-public sv-lang
+  (package
+    (name "sv-lang")
+    (version "11.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/MikePopoloski/slang")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1362w0scxiqdm7nwv8366bgbcgwv1iz2svkd9whl0wmlhqmky362"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "-DBUILD_SHARED_LIBS=ON"
+              "-DSLANG_INCLUDE_TOOLS=ON"
+              "-DSLANG_INCLUDE_TESTS=ON"
+              "-DSLANG_INCLUDE_INSTALL=ON"
+              "-DSLANG_USE_THREADS=ON"
+              "-DSLANG_INCLUDE_PYLIB=ON"
+              "-DSLANG_INCLUDE_DOCS=OFF"))) ;requires author’s m.css repository
+    (native-inputs
+     (list pkg-config python-minimal-wrapper))
+    (inputs
+     (list boost catch2-3.15 cpptrace fmt-12 mimalloc pybind11))
+    (synopsis "SystemVerilog compiler and language services")
+    (description "Slang is a software library that provides various components
+for lexing, parsing, type checking, and elaborating SystemVerilog code.  It
+comes with an executable tool that can compile and lint any SystemVerilog
+project, but it is also intended to be usable as a front end for synthesis
+tools, simulators, linters, code editors, and refactoring tools.")
+    (home-page "https://sv-lang.com/")
+    (license license:expat)))
+
 (define-public systemc
   (package
     (name "systemc")
