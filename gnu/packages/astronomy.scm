@@ -3784,7 +3784,7 @@ software system for the operations and analysis of the ESA satellite Herschel.")
 (define-public python-bdsf
   (package
     (name "python-bdsf")
-    (version "1.13.0.post2")
+    (version "1.14.1")
     (source
      (origin
        (method git-fetch)
@@ -3793,7 +3793,7 @@ software system for the operations and analysis of the ESA satellite Herschel.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01lvvm81icb5p73ckh10gvvn8rwhf92kcs7l3qhvf7pr0v15gknr"))))
+        (base32 "1mdaicv5sxwdpi6z4c0x8wb3h1rcwjffd1w3izx4lvkjb00a5a0k"))))
     (build-system pyproject-build-system)
     (arguments
      (list
