@@ -603,8 +603,8 @@ accurately in real time at any rate desired.")
 
 (define-public celestia-content
   ;; No releases or version tags.
-  (let ((commit "a76199c8bce62761ad577dc5c3523fb4925e09b7")
-        (revision "7"))
+  (let ((commit "188b22b4cf036cd5618402829d5cc0386d39f484")
+        (revision "8"))
     (package
       (name "celestia-content")
       (version (git-version "0.0.0" revision commit))
@@ -616,7 +616,7 @@ accurately in real time at any rate desired.")
                 (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0lgpy7rxpnf31w2dlwf1xvp1lf19xwfzj38vq1qjhzm81hbw9ml8"))))
+          (base32 "027bw4b7i6k878kv53r05fqzjs95cl0wqjsvwxpcm2d73j1ix2bp"))))
       (build-system cmake-build-system)
       (arguments
        (list
