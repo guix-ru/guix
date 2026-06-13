@@ -2364,7 +2364,7 @@ videoformats depend on the configuration flags of ffmpeg.")
 (define-public ffmpeg-progress-yield
   (package
     (name "ffmpeg-progress-yield")
-    (version "1.1.2")
+    (version "1.1.3")
     (source
      (origin
        (method git-fetch)
@@ -2373,7 +2373,7 @@ videoformats depend on the configuration flags of ffmpeg.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1pmqbd1mprkpak7dh2kdjqqd3d1yxayn95rhg0zzkd9hc62r4b8b"))))
+        (base32 "0hkxvrndr0kmhq7ldapg3b59k6ydfsjzkaxniv5chqfg1kg3ch9q"))))
     (build-system pyproject-build-system)
     (arguments
      (list
