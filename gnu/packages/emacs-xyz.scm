@@ -1546,6 +1546,33 @@ a generic Scheme interaction mode for the GNU Emacs editor.")
 which provides an Emacs interface to replace the built-in web UI.")
     (license license:gpl3+)))
 
+(define-public emacs-vc-backup
+  (let ((commit "0cb6b9cb842b1607c06acdc0818175623e3f004a")
+        (revision "31"))                ; As in git describe.
+    (package
+      (name "emacs-vc-backup")
+      ;; No tagged releases; version obtained from source code.
+      (version (git-version "1.1.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://codeberg.org/pkal/vc-backup.el")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1fx87ykahmbbbqijbdkprpwxq77l8yan42idnkjrinkgwmrwv2r7"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list #:tests? #f))                ; No tests.
+      (propagated-inputs (list emacs-compat))
+      (home-page "https://codeberg.org/pkal/vc-backup.el")
+      (synopsis "VC backend for versioned backups")
+      (description
+       "This package provides a VC backend that uses versioned backup files
+as a simple local version control mechanism.")
+      (license license:gpl3+))))
+
 (define-public emacs-vc-hgcmd
   (package
     (name "emacs-vc-hgcmd")
