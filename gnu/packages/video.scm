@@ -2402,16 +2402,16 @@ It is usually a complement to @code{ffmpeg-normalize}.")
 (define-public ffmpeg-normalize
   (package
     (name "ffmpeg-normalize")
-    (version "1.37.3")
+    (version "1.37.8")
     (source
      (origin
-       (method git-fetch) ; no tests in PyPI
+       (method git-fetch)
        (uri (git-reference
              (url "https://github.com/slhck/ffmpeg-normalize")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "12m6f7yxa4ksv4hc2slh45cqwzlfr1cdck4xlddxnc4brc30c69a"))))
+        (base32 "1g5xz5mi2imrh592133f08vajk9936n4rdih1nm8xl08liibqrq1"))))
     (build-system pyproject-build-system)
     (arguments
      (list
