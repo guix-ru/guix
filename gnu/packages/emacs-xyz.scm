@@ -6307,29 +6307,33 @@ you can press @samp{C-M-n} to input multiple email addresses.")
     (license license:gpl3+)))
 
 (define-public emacs-bluetooth
-  (package
-    (name "emacs-bluetooth")
-    (version "0.4.1")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://elpa.gnu.org/packages/"
-                           "bluetooth-" version ".tar"))
-       (sha256
-        (base32 "1chi9xjg5zcg6qycn2n442adhhmip1vpvg12szf1raq3zhg7lr01"))))
-    (build-system emacs-build-system)
-    (inputs
-     (list bluez dbus))
-    (propagated-inputs
-     (list emacs-compat emacs-dash emacs-transient))
-    (home-page "https://gitlab.com/rstocker/emacs-bluetooth")
-    (synopsis "Manage Bluetooth devices using Emacs")
-    (description
-     "This package implements basic Bluetooth management functionality, such
+  (let ((commit "db880e306e00f51e5456b7388371ad6329452165")) ;version bump
+    (package
+      (name "emacs-bluetooth")
+      (version "0.4.1")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://gitlab.com/rstocker/emacs-bluetooth")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0x2a4v1xlb869b87pixwyfc7snmzh6a82pvsbhfsh8jak0x9gnpy"))))
+      (build-system emacs-build-system)
+      (arguments (list #:tests? #f))    ; no tests
+      (inputs
+       (list bluez dbus))
+      (propagated-inputs
+       (list emacs-compat emacs-dash))
+      (home-page "https://gitlab.com/rstocker/emacs-bluetooth")
+      (synopsis "Manage Bluetooth devices using Emacs")
+      (description
+       "This package implements basic Bluetooth management functionality, such
 as connecting and disconnecting devices, setting properties and aliases,
 putting the adapter in discovery mode and controlling its power supply.  It
 also includes a pairing agent.")
-    (license license:gpl3+)))
+      (license license:gpl3+))))
 
 (define-public emacs-aggressive-indent
   (package
