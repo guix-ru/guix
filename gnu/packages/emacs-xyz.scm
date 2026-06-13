@@ -42666,6 +42666,30 @@ focus.  You can think of it as both something that augments and replaces the
 standard Auto-save mode.")
     (license license:gpl3+)))
 
+(define-public emacs-surround
+  (let ((commit "6807bf69be1591a419a009adf8a5071b1cdcc76e")
+        (revision "0"))
+    (package
+      (name "emacs-surround")
+      (version (git-version "1.0.3" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/mkleehammer/surround")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0vi0hnyp6bwfqlj8gwj95hm8vjz3z6cy0yprw7xhm0197fawj4qi"))))
+      (build-system emacs-build-system)
+      (home-page "https://github.com/mkleehammer/surround")
+      (synopsis "Easily add/delete/change parens, quotes, and more")
+      (description
+       "This package provides functions for working with pairs like parentheses and
+  quotes, including wrapping text, deleting pairs, marking pairs or within them,
+  and changing them.")
+      (license license:expat))))
+
 (define-public emacs-tao-theme
   (let ((commit "468ee4f6ba7afb9dbfc8855ae2c333cb16ca4408")
         (revision "1"))
