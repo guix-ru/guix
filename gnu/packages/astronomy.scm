@@ -3548,6 +3548,46 @@ celestial-to-terrestrial coordinate transformations.")
            python-pyerfa
            python-pyyaml))))
 
+(define-public python-astropydantic
+  (package
+    (name "python-astropydantic")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/JBorrow/astropydantic")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "17h7p225szdd33654kzijqg506ym9q9y86bs4pfkiacdir4f1s4g"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-fastapi
+           python-httpx
+           python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-astropy
+           python-pydantic))
+    (home-page "https://github.com/JBorrow/astropydantic")
+    (synopsis "Integrates Astropy's numerical types with Pydantic")
+    (description
+     "This package provides @code{pydantic} typing support for @code{astropy}
+unit types.  Can be used to de(serialize) astropy quantities and units.
+
+Types:
+@itemize
+@item @code{AstroPydanticUnit}: an overlay for @code{astropy.units.UnitBase}
+(all unit types).
+@item @code{AstroPydanticQuantity}: an overlay for
+@code{astropy.units.Quantity}, including array types.
+@item @code{AstroPydanticTime}: an overlay for @code{astropy.time.Time}.
+@item @code{AstroPydanticICRS}: an overlay for @code{astropy.coordinates.ICRS}
+and @code{astropy.coordinates.SkyCoord}.
+@end itemize")
+    (license license:expat)))
+
 (define-public python-astroquery
   (package
     (name "python-astroquery")
