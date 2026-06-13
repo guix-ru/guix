@@ -793,6 +793,24 @@ processing at the observatory, and the creation of data products available
 from the ESO archive facility.")
     (license license:gpl2+)))
 
+(define-public cpl-7.3
+  (package
+    (inherit cpl)
+    (version "7.3.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://ftp.eso.org/pub/dfs/pipelines/libraries/cpl/cpl-"
+             version ".tar.gz"))
+       (sha256
+        (base32 "090xp9scg34z60iiklf8w7gmbjbja3sdv7xk97pn8llklvks8xgi"))))
+    (inputs
+     (list cfitsio
+           wcslib
+           fftw
+           fftwf))))
+
 (define-public erfa
   (package
     (name "erfa")
