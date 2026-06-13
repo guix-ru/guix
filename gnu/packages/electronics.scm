@@ -3637,6 +3637,34 @@ coverage data via the @acronym{UCIS, Unified Coverage Interoperability
 Standard} data mode.")
     (license license:asl2.0)))
 
+(define-public python-pyuvm
+  (package
+    (name "python-pyuvm")
+    (version "4.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pyuvm/pyuvm")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02ldgkc4srw940xrd00r3q7jxvj5w8q5vblp4z17w04ml862inlf"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest python-setuptools))
+    (propagated-inputs
+     (list python-cocotb))
+    (home-page "https://github.com/pyuvm/pyuvm")
+    (synopsis "@acronym{UVM, Universal Verification Methodology} in Python")
+    (description
+     "PyUVM is a Python implementation of the @acronym{UVM, Universal
+Verification Methodology}, as defined in the IEEE 1800.2 standard.  It uses
+@code{cocotb} to interact with simulators and schedule simulation
+events.  It implements the most commonly used sections of the IEEE 1800.2
+standard.")
+    (license license:asl2.0)))
+
 (define-public python-pyvcd
   (package
     (name "python-pyvcd")
