@@ -4567,7 +4567,7 @@ Spectrograph}.")
 (define-public python-crds
   (package
     (name "python-crds")
-    (version "13.2.1")
+    (version "13.2.4")
     (source
      (origin
        (method git-fetch)
@@ -4576,43 +4576,20 @@ Spectrograph}.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09p7968mgnj5nr90cwwlx618rj6hfymdjnbav2lfjj878xn3ps0n"))))
+        (base32 "1g8da42gikkbhn0827dqpkj0npd7g0c61kvf22vz9n2f1abv6r1v"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 26 passed, 3 skipped
+      ;; tests: 106 passed, 539 deselected, 1 warning
       #:test-flags
       ;; XXX: Tests require a complex set up and test data, try to run some
       ;; minimal portion of unit tests to persist package compatibility during
       ;; updates, see:
       ;; <https://github.com/spacetelescope/crds/blob/13.1.1/TESTING>.
-      #~(list #$@(map (lambda (file) (string-append "--ignore=" file))
-                      ;; Network access to <https://hst-crds.stsci.edu> or
-                      ;; additional test data is required.
-                      (list "test/bestrefs/test_bestrefs.py"
-                            "test/bestrefs/test_special.py"
-                            "test/bestrefs/test_table_effects.py"
-                            "test/certify/test_certify.py"
-                            "test/core/test_cmdline.py"
-                            "test/core/test_heavy_client.py"
-                            "test/core/test_reftypes.py"
-                            "test/core/test_rmap.py"
-                            "test/core/test_substitutions.py"
-                            "test/misc/test_check_archive.py"
-                            "test/misc/test_synphot.py"
-                            "test/misc/test_uniqname.py"
-                            "test/refactoring/test_checksum.py"
-                            "test/refactoring/test_newcontext.py"
-                            "test/refactoring/test_refactor.py"
-                            "test/roman/test_roman.py"
-                            "test/submit/test_submit.py"
-                            "test/test_bad_files.py"
-                            "test/test_build6.py"
-                            "test/test_diff.py"
-                            "test/test_list.py"
-                            "test/test_matches.py"
-                            "test/test_rowdiff.py"
-                            "test/test_sync.py")))))
+      #~(list "-m" (string-join
+                    (list "not bestrefs" "cmdline" "jwst" "hst" "rmap" "roman"
+                          "special" "synphot")
+                    " and not "))))
     (native-inputs
      (list python-mock
            python-pytest
@@ -4631,7 +4608,6 @@ Spectrograph}.")
            python-parsley
            ;; [optional]
            python-beautifulsoup4
-           ;; python-crds -> python-ci-watson -> python-jwst -> python-crds
            ;; python-jwst
            python-roman-datamodels
            python-stsynphot))
