@@ -1212,7 +1212,7 @@ replacement for the OpenDWG libraries.")
 (define-public microcom
   (package
     (name "microcom")
-    (version "2023.09.0")
+    (version "2025.11.0")
     (source
      (origin
        (method git-fetch)
@@ -1221,7 +1221,7 @@ replacement for the OpenDWG libraries.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "18qr9rwn3b82h042jrz1syfiiqyf3cbpdr8vv0s5p5f51f2l3vj7"))))
+        (base32 "082q2jynycdj8wrkpd8azdwdfh9vhj4mpzarg444mw5zx3x972fn"))))
     (build-system gnu-build-system)
     (inputs (list readline))
     (native-inputs (list automake autoconf))
