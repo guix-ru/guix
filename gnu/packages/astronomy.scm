@@ -8329,6 +8329,41 @@ also transltes halo properties (mass, concentration, redshift, etc) into
 angular units for lensing computations with lenstronomy.")
     (license license:expat)))
 
+(define-public python-pyhdrl
+  (package
+    (name "python-pyhdrl")
+    (version "1.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://ftp.eso.org/pub/dfs/pipelines/libraries/pyhdrl/pyhdrl-"
+             version ".tar.gz"))
+       (sha256
+        (base32 "0if3fnaip89sf49riy5sk2hlh4asz0k4wlvvilr132s238wg9wx0"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list cmake-minimal
+           pkg-config
+           pybind11
+           python-pytest
+           python-setuptools))
+    (inputs
+     (list cext
+           cpl
+           hdrl))
+    (propagated-inputs
+     (list python-pycpl))
+    (home-page "https://www.eso.org/sci/software/pyhdrl/")
+    (synopsis "Python bindings for the ESO HDRL C libraries")
+    (description
+     "PyHDRL provides a Python 3 API (language bindings) for the ESO High
+Level Data Reduction Library (HDRL) using pybind11.  It allows for using the
+ESO High Level Data Reduction Library in Python scripts, or directly in an
+interactive Python session, and thus allows for using HDRL algorithms in
+recipes implemented in Python as part of an instrument pipeline package.")
+    (license license:gpl3+)))
+
 (define-public python-pyirf
   (package
     (name "python-pyirf")
