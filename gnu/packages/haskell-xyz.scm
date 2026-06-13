@@ -12740,8 +12740,7 @@ having to unsafely pass dummy arguments.")
                          ghc-quickcheck
                          ghc-tasty
                          ghc-tasty-quickcheck
-                         ghc-temporary
-                         ghc-bytestring-handle))
+                         ghc-temporary))
     (arguments
      `(#:cabal-revision ("2"
                          "074f5a4qcdl5vb7334i41azj4aj8i5ql03qrlr3hb5smxhvvk386")))
