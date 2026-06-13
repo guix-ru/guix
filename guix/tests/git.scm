@@ -46,7 +46,7 @@ Return DIRECTORY on success."
 
   ;; Note: As of version 0.2.0, Guile-Git lacks the necessary bindings to do
   ;; all this, so resort to the "git" command.
-  (define (git command . args)
+  (define (git* . args)
     ;; Make sure Git doesn't rely on the user's config.
     (call-with-temporary-directory
      (lambda (home)
@@ -61,8 +61,10 @@ Return DIRECTORY on success."
           ("GIT_ATTR_NOSYSTEM" "1")
           ("GIT_CONFIG_GLOBAL" ,(string-append home "/.gitconfig"))
           ("HOME" ,home))
-        (apply invoke (git-command) "-C" directory
-               command args)))))
+        (apply invoke (git-command) args)))))
+
+  (define (git command . args)
+    (apply git* "-C" directory command args))
 
   (unless (directory-exists? (string-append directory "/.git"))
     (mkdir-p directory)
@@ -112,6 +114,15 @@ Return DIRECTORY on success."
       ((('checkout branch 'orphan) rest ...)
        (git "checkout" "--orphan" branch)
        (loop rest))
+      ((('submodule repository path) rest ...)
+       (git* "-c" "protocol.file.allow=always"
+             "-C" directory "submodule" "add" repository path)
+       (loop rest))
+      ((('submodule-checkout path ref) rest ...)
+       (let ((submodule (string-append directory "/" path)))
+         (git* "-C" submodule "checkout" ref)
+         (git "add" path)
+         (loop rest)))
       ((('merge branch message) rest ...)
        (git "merge" branch "-m" message)
        (loop rest))
