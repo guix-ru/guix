@@ -1301,7 +1301,7 @@ the \"texlive\" importer."
 (define-member (person "Tobias Geerinckx-Rice"
                        "me@tobias.gr"
                        "nckx")
-  codeberg mentors security-response)
+  codeberg mentors)
 
 (define-member (person "Steve George"
                        "steve@futurile.net"
@@ -1311,7 +1311,7 @@ the \"texlive\" importer."
 (define-member (person "Leo Famulari"
                        "leo@famulari.name"
                        "lfam")
-  codeberg linux-libre security-response)
+  codeberg linux-libre)
 
 (define-member (person "Efraim Flashner"
                        "efraim@flashner.co.il"
