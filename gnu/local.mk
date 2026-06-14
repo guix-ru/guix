@@ -2082,6 +2082,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/opusfile-CVE-2022-47021.patch		\
   %D%/packages/patches/orbit2-fix-array-allocation-32bit.patch \
   %D%/packages/patches/orca-fix-gst-init-check-call.patch \
+  %D%/packages/patches/ormolu-support-cabal-syntax-3.12.patch	\
   %D%/packages/patches/ots-no-include-missing-file.patch	\
   %D%/packages/patches/owncloud-disable-updatecheck.patch	\
   %D%/packages/patches/pnet-fix-line-number-info.patch		\

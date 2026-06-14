@@ -1,0 +1,75 @@
+This is required to make ormolu compatible with our packaged
+cabal-syntax version. This boils down to reverting upstream
+commit 1f8e7e57ab8375d01c0e81edecf8068fba7b893f.
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 9f0ac7e..a27239d 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -44,9 +44,6 @@
+ * Correctly format non-promoted type-level tuples with `NoListTuplePuns`. [Issue
+   1146](https://github.com/tweag/ormolu/issues/1146).
+ 
+-* Updated to `Cabal-syntax-3.14`. [Issue
+-  1152](https://github.com/tweag/ormolu/issues/1152).
+-
+ ## Ormolu 0.7.7.0
+ 
+ * Use single-line layout for parens around single-line content. [Issue
+diff --git a/ormolu.cabal b/ormolu.cabal
+index 48c39b9..653f252 100644
+--- a/ormolu.cabal
++++ b/ormolu.cabal
+@@ -95,7 +95,7 @@ library
+   other-modules: GHC.DynFlags
+   default-language: GHC2021
+   build-depends:
+-    Cabal-syntax >=3.14 && <3.15,
++    Cabal-syntax >=3.12 && <3.13,
+     Diff >=0.4 && <2,
+     MemoTrie >=0.6 && <0.7,
+     ansi-terminal >=0.10 && <1.2,
+@@ -133,7 +133,7 @@ executable ormolu
+   autogen-modules: Paths_ormolu
+   default-language: GHC2021
+   build-depends:
+-    Cabal-syntax >=3.14 && <3.15,
++    Cabal-syntax >=3.12 && <3.13,
+     base >=4.12 && <5,
+     containers >=0.5 && <0.8,
+     directory ^>=1.3,
+@@ -184,7 +184,7 @@ test-suite tests
+ 
+   default-language: GHC2021
+   build-depends:
+-    Cabal-syntax >=3.14 && <3.15,
++    Cabal-syntax >=3.12 && <3.13,
+     QuickCheck >=2.14,
+     base >=4.14 && <5,
+     choice >=0.2.4.1 && <0.3,
+diff --git a/src/Ormolu/Utils/Cabal.hs b/src/Ormolu/Utils/Cabal.hs
+index 0541a6f..af1f0b5 100644
+--- a/src/Ormolu/Utils/Cabal.hs
++++ b/src/Ormolu/Utils/Cabal.hs
+@@ -189,17 +189,17 @@ getExtensionAndDepsMap cabalFile GenericPackageDescription {..} =
+     extractFromLibrary Library {..} =
+       extractFromBuildInfo (ModuleName.toFilePath <$> exposedModules) libBuildInfo
+     extractFromExecutable Executable {..} =
+-      extractFromBuildInfo [getSymbolicPath modulePath] buildInfo
++      extractFromBuildInfo [modulePath] buildInfo
+     extractFromTestSuite TestSuite {..} =
+       extractFromBuildInfo mainPath testBuildInfo
+       where
+         mainPath = case testInterface of
+-          TestSuiteExeV10 _ p -> [getSymbolicPath p]
++          TestSuiteExeV10 _ p -> [p]
+           TestSuiteLibV09 _ p -> [ModuleName.toFilePath p]
+           TestSuiteUnsupported {} -> []
+     extractFromBenchmark Benchmark {..} =
+       extractFromBuildInfo mainPath benchmarkBuildInfo
+       where
+         mainPath = case benchmarkInterface of
+-          BenchmarkExeV10 _ p -> [getSymbolicPath p]
++          BenchmarkExeV10 _ p -> [p]
+           BenchmarkUnsupported {} -> []
+ 

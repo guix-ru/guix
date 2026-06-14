@@ -861,6 +861,44 @@ Wayland, and Linux console environments alike.")
 formatting by forgetting all existing formatting during parsing.")
     (license license:mpl2.0)))
 
+(define-public ormolu
+  (package
+    (name "ormolu")
+    (version "0.8.0.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "ormolu" version))
+       (sha256
+        (base32 "1fh2m4sy8vzxvm1qm9413apzblqf4sla3454mx64ngkwx0pgi2ad"))
+       (patches (search-patches "ormolu-support-cabal-syntax-3.12.patch"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "ormolu")))
+    (inputs (list ghc-cabal-syntax
+                  ghc-diff
+                  ghc-lib-parser
+                  ghc-memotrie
+                  ghc-ansi-terminal
+                  ghc-choice
+                  ghc-file-embed
+                  ghc-lib-parser
+                  ghc-megaparsec
+                  ghc-syb
+                  ghc-optparse-applicative
+                  ghc-th-env
+                  ghc-unliftio))
+    (native-inputs (list ghc-quickcheck
+                         ghc-hspec
+                         ghc-hspec-megaparsec
+                         ghc-path
+                         ghc-path-io
+                         ghc-temporary
+                         hspec-discover))
+    (home-page "https://github.com/tweag/ormolu")
+    (synopsis "Formatter for Haskell source code")
+    (description "This package provides a formatter for Haskell source code.")
+    (license license:bsd-3)))
+
 (define-public greenclip
   (package
     (name "greenclip")
