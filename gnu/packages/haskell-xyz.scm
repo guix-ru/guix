@@ -13796,6 +13796,27 @@ the primary goal in the design of this package.  The Haskell data structures
 are generated programmatically from the UCD files.")
     (license license:asl2.0)))
 
+(define-public ghc-unicode-show
+  (package
+    (name "ghc-unicode-show")
+    (version "0.1.1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "unicode-show" version))
+       (sha256
+        (base32 "1sizp1wmnx1vgckwyf5nawqf9s7ibrwacgznnc1m4j5q1hydbbzl"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "unicode-show")))
+    (inputs (list ghc-safe))
+    (native-inputs (list ghc-hspec ghc-quickcheck))
+    (home-page "https://github.com/haskell-jp/unicode-show")
+    (synopsis "Unescape Unicode characters for printing")
+    (description
+     "This package provides variants of the @code{show} and @code{print}
+functions that do not escape non-ascii characters.")
+    (license license:bsd-3)))
+
 (define-public ghc-unicode-transforms
   (package
     (name "ghc-unicode-transforms")
