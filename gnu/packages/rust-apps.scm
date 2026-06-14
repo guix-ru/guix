@@ -4944,9 +4944,38 @@ minimum contrast levels, and more.")
         (base32 "1js79z4darfc0a16qq3m3c82yfpv3z7r2vpwkwk907vhvg5r1xjw"))))
     (build-system cargo-build-system)
     (arguments
-     (list #:tests? #f         ;Tests require local instance of RabbitMQ broker.
-           #:install-source? #f))
+     (list
+      #:tests? #f   ;Tests require local instance of RabbitMQ broker.
+      #:install-source? #f
+      #:modules
+      '((guix build cargo-build-system)
+        (guix build utils)
+        (ice-9 match))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-completions
+            (lambda* (#:key native-inputs #:allow-other-keys)
+              (for-each
+               (match-lambda
+                 ((shell . path)
+                  (mkdir-p (in-vicinity #$output (dirname path)))
+                  (let ((binary
+                         (if #$(%current-target-system)
+                             (search-input-file native-inputs "bin/rabbitmqadmin")
+                             (in-vicinity #$output "bin/rabbitmqadmin"))))
+                    (with-output-to-file (in-vicinity #$output path)
+                      (lambda _
+                        (invoke binary "shell" "completions" "--shell" shell))))))
+               '(("bash"    . "share/bash-completion/completions/rabbitmqadmin")
+                 ("elvish"  . "share/elvish/lib/rabbitmqadmin")
+                 ("fish"    . "share/fish/vendor_completions.d/rabbitmqadmin.fish")
+                 ("nushell" . "share/nushell/vendor/autoload/rabbitmqadmin")
+                 ("zsh"     . "share/zsh/site-functions/_rabbitmqadmin"))))))))
     (inputs (cons* mimalloc (cargo-inputs 'rabbitmqadmin)))
+    (native-inputs
+     (if (%current-target-system)
+         (list this-package)
+         '()))
     (home-page "https://www.rabbitmq.com/docs/management-cli")
     (synopsis "Manage RabbitMQ broker via the management plugin")
     (description
