@@ -20,7 +20,7 @@
 ;;; Copyright © 2023 Clément Lassieur <clement@lassieur.org>
 ;;; Copyright © 2024 Noisytoot <ron@noisytoot.org>
 ;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
-;;; Copyright © 2025 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2025, 2026 Tomas Volf <~@wolfsden.cz>
 ;;; Copyright © 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2025 Vinicius Monego <monego@posteo.net>
 ;;; Copyright © 2025 Junker <dk@junkeria.club>
@@ -494,7 +494,7 @@ and will take advantage of multiple processor cores where possible.")
 (define-public libtorrent-rasterbar
   (package
     (name "libtorrent-rasterbar")
-    (version "2.0.11")
+    (version "2.0.13")
     (source
      (origin
        (method url-fetch)
@@ -503,7 +503,7 @@ and will take advantage of multiple processor cores where possible.")
                        "releases/download/v" version "/"
                        "libtorrent-rasterbar-" version ".tar.gz"))
        (sha256
-        (base32 "0v8yrxzc7piw5lrpgkb50b4p16ic1sl4pyj0rkkasaag1xc5inzh"))))
+        (base32 "1gxinc6bw2nkkx2y4xkn4cyrs1h8m5irzbqgvqh293ii0rfbfb49"))))
     (build-system cmake-build-system)
     (arguments
      (list
