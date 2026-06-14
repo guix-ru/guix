@@ -363,7 +363,7 @@ random access nor for in-place modification.  This package provides the
   (package
     (inherit libarchive)
     (name "libarchive")
-    (version "3.8.4")
+    (version "3.8.7")
     (source
      (origin
        (method url-fetch)
@@ -374,7 +374,7 @@ random access nor for in-place modification.  This package provides the
                                  version ".tar.xz")))
        (sha256
         (base32
-         "0wxdr7qws1z1b1gp5jsm7n2ccnjlmrnds52d5wc5xkzagyslgf67"))))
+         "0x27bngfjiszsfq4wpaqpx01snyczlp0m0yj9z42fp72g92vma6k"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:phases phases)
