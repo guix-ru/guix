@@ -55,8 +55,11 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages cpp)
   #:use-module (gnu packages cups)
   #:use-module (gnu packages curl)
+  #:use-module (gnu packages docbook)
+  #:use-module (gnu packages documentation)
   #:use-module (gnu packages file)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gcc)
@@ -148,6 +151,71 @@
 application takes a set of images captured at different focus distances and
 combines them so that the complete subject is in focus.")
     (license license:expat)))
+
+(define-public mtfmapper
+  (package
+    (name "mtfmapper")
+    (version "0.7.41")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "mirror://sourceforge/mtfmapper/"
+                                  "mtfmapper-" version ".tgz"))
+              (sha256
+               (base32
+                "02080lnlfn4yyyqmhd4lwk312d7sgnf1n9qjdapiww3pf08jhdlb"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      ;; There are no automated tests that could be run from the build system.
+      #:tests? #false
+      ;; Parallel building fails when building the manuals.
+      #:parallel-build? #false
+      #:configure-flags
+      #~(list "-DBUILD_DOC=ON" "-DUNIX=ON"
+              (string-append "-DDOCDIR=" #$output "/share/mtfmapper")
+              (string-append "-DMANDIR=" #$output "/share/man/man1"))
+      #:phases
+      '(modify-phases %standard-phases
+         ;; Needed for LaTeX fonts.
+         (add-before 'build 'set-HOME
+           (lambda _ (setenv "HOME" (getcwd)))))))
+    (inputs (list eigen opencv qtbase-5 qtcharts-5 tclap zlib))
+    (native-inputs
+     (list asciidoc
+           dblatex
+           imagemagick
+           (texlive-local-tree
+            (list texlive-collection-basic
+                  texlive-pdflscape
+                  texlive-pdfpages
+                  texlive-subfigure
+                  texlive-upquote))))
+    (home-page "https://mtfmapper.blogspot.com/")
+    (synopsis "MTF measurement tool")
+    (description
+     "This package provides a utility to produce @dfn{modulation transfer
+function} (MTF) maps of images.  MTF is a measure of edge acuity.  The program
+will automatically detect dark rectangular objects on light backgrounds, and
+extract MTF values on all edges.  It can help to tune SLR autofocus.  Features
+include:
+
+@itemize
+@item Automatically extracts dark (black) rectangular objects from images, and
+  measures the Modulation Transfer Function (MTF, a measure of image sharpness)
+  across the edges of the rectangles.  Measurement is performed using the
+  \"slanted edge\" method, similar to ISO 12233.
+@item Using a special test chart (@file{.pdf} supplied), measure the point of
+  sharpest focus relative to a reference point, i.e., measure front- or
+  back-focus in DSLRs;
+@item Measure the MTF (sharpness) of your lens across the field of view;
+@item Works with many image formats, including JPEG and various raw formats;
+@item Provides feedback on chart orientation (for some chart types) helping
+  you to correctly set up the chart relative to the camera sensor;
+@item Use the GUI to visualize and compare MTF/SFR curves between different
+  images, or different edges within the same image.
+@end itemize
+")
+    (license license:bsd-2)))
 
 (define-public rapid-photo-downloader
   (package
