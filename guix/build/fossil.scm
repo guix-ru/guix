@@ -45,7 +45,7 @@ Fossil check-in name.  Return #t on success, #f otherwise."
       (invoke fossil-command
         "tarball" check-in file "--name" name "-R"
         (case (uri-scheme (string->uri-reference uri))
-          ((file https)                 ;clone the repository first
+          ((file http https)            ;clone the repository first
            (match-let ((repository (simple-format #f "/tmp/~a.fossil" name))
                        ((input . output) (pipe)))
              ;; Trust the TLS certificate of the server,
