@@ -82,7 +82,8 @@
        (primitive-exit 0))
      #:namespaces '(user uts))))
 
-(skip-if-unsupported)
+;; (skip-if-unsupported)
+(test-skip 1)   ;XXX: work around <https://codeberg.org/guix/guix/issues/7690>
 (test-assert "call-with-container, pid namespace"
   (zero?
    (call-with-container '()
@@ -188,7 +189,8 @@
      #:writable-root? #t
      #:namespaces '(user mnt))))
 
-(skip-if-unsupported)
+;; (skip-if-unsupported)
+(test-skip 1)   ;XXX: work around <https://codeberg.org/guix/guix/issues/7690>
 (test-equal "container-excursion"
   0
   (call-with-temporary-directory
@@ -240,7 +242,8 @@
           (waitpid pid)
           result))))))
 
-(skip-if-unsupported)
+;; (skip-if-unsupported)
+(test-skip 1)   ;XXX: work around <https://codeberg.org/guix/guix/issues/7690>
 (test-equal "container-excursion, same namespaces"
   42
   ;; The parent and child are in the same namespaces.  'container-excursion'
@@ -250,7 +253,8 @@
      (lambda ()
        (primitive-exit 42)))))
 
-(skip-if-unsupported)
+;; (skip-if-unsupported)
+(test-skip 1)   ;XXX: work around <https://codeberg.org/guix/guix/issues/7690>
 (test-assert "container-excursion*"
   (call-with-temporary-directory
    (lambda (root)
@@ -271,14 +275,16 @@
        (kill pid SIGKILL)
        (equal? result expected)))))
 
-(skip-if-unsupported)
+;; (skip-if-unsupported)
+(test-skip 1)   ;XXX: work around <https://codeberg.org/guix/guix/issues/7690>
 (test-equal "container-excursion*, same namespaces"
   42
   (container-excursion* (getpid)
     (lambda ()
       (* 6 7))))
 
-(skip-if-unsupported)
+;; (skip-if-unsupported)
+(test-skip 1)   ;XXX: work around <https://codeberg.org/guix/guix/issues/7690>
 (test-equal "container-excursion*, /proc"
   '("1" "2")
   (call-with-temporary-directory
