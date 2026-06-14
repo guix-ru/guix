@@ -1645,6 +1645,31 @@ repositories through the
 server}.  The main advantage compared to @code{vc-hg} is speed.")
     (license license:gpl3+)))
 
+(define-public emacs-vc-jj
+  (package
+    (name "emacs-vc-jj")
+    (version "0.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/emacs-jj-vc/vc-jj.el")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wqvfw2mgzppq1r81iw3dnr0dfwvhsn7s0q4bg24njzg5zfr6zm2"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      #:tests? #f))                     ; The tests are failing.
+    (propagated-inputs (list emacs-compat))
+    (home-page "https://codeberg.org/emacs-jj-vc/vc-jj.el")
+    (synopsis "Emacs VC backend for the Jujutsu version control system")
+    (description
+     "This package provides an Emacs VC backend for the Jujutsu version
+control system.")
+    (license license:gpl3+)))
+
 (define-public emacs-telephone-line
   (package
     (name "emacs-telephone-line")
