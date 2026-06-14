@@ -13046,6 +13046,29 @@ single, easier to use informational datatype while supporting many versions of
 Template Haskell.")
     (license license:isc)))
 
+(define-public ghc-th-env
+  (package
+    (name "ghc-th-env")
+    (version "0.1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "th-env" version))
+       (sha256
+        (base32 "01gmycna12sg2f0zslhjnjx8s86shsvmw5jpw5n5z93bvxkb20gw"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "th-env")))
+    (inputs (list ghc-th-compat))
+    (native-inputs (list ghc-markdown-unlit))
+    (home-page "https://github.com/dzhus/th-env")
+    (synopsis
+     "Template Haskell splices that expand to an environment variable")
+    (description
+     "This package provides a Template Haskell splice that expand to the value
+of an environment variable.  This can be used to embed build-time parameters in
+the application.")
+    (license license:bsd-3)))
+
 (define-public ghc-th-expand-syns
   (package
     (name "ghc-th-expand-syns")
