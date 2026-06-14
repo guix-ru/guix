@@ -3890,13 +3890,16 @@ ASCII text files using Gmsh's own scripting language.")
   ;; TODO: Maybe move to (gnu packages plotutils)
   (package
     (name "veusz")
-    (version "4.2")
+    (version "4.2.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "veusz" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/veusz/veusz")
+              (commit (string-append "veusz-" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1vc5zmjzhjkmfy2417xs8h1bix8xyd0gvikskp3k3qgf9wz22a4g"))))
+        (base32 "1wcqrzcp1h95qca25w0mrzrvq6sifvndmn2223ak0b4p1dssq1l1"))))
     (build-system pyproject-build-system)
     (arguments
      (list
