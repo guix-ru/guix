@@ -2141,6 +2141,27 @@ code pages on Windows.  On all other operating systems, the library does
 nothing.")
     (license license:bsd-3)))
 
+(define-public ghc-choice
+  (package
+    (name "ghc-choice")
+    (version "0.2.4.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "choice" version))
+       (sha256
+        (base32 "099c5ibal8llzr5nh62dnpb1pwj30gxqwdcjx0rds51ga2j32z5i"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "choice")))
+    (home-page "https://github.com/mboes/choice")
+    (synopsis "Provides a type to mitigate Boolean blindness")
+    (description
+      "Package providing a @code{Choice} type of labeled booleans to mitigate
+the Boolean blindness problem, which refers to the problem that boolean literals
+on their own aren't very informative (e.g., what does @code{True} mean in a
+given context?).")
+    (license license:bsd-3)))
+
 (define-public ghc-colour
   (package
     (name "ghc-colour")
