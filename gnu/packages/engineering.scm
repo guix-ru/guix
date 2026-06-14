@@ -4710,7 +4710,6 @@ able to work nicely with old or slow hardware.")
               (sha256
                (base32
                 "0dn7ywfik343h62sphgxhdv16ilglb1asmgg32f8r22lvsavjb2r"))))
-                ;; "0yja6fdwc9ca0fis8byh2kpbgqr441ijhp19paklz102apf6k3v4"))))
     (build-system cmake-build-system)
     (native-inputs (list qt5ct qttools-5 qtscript-5))
     (inputs
