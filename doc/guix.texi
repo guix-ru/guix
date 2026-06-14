@@ -49329,6 +49329,7 @@ system databases.
 @itemx netgroup
 @itemx networks
 @itemx password
+@itemx protocols
 @itemx public-key
 @itemx rpc
 @itemx services

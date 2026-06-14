@@ -140,6 +140,8 @@
               (default (list %files %dns)))
   (password   name-service-switch-password
               (default (list %files)))
+  (protocols  name-service-switch-protocols
+              (default '()))
   (public-key name-service-switch-public-key
               (default '()))
   (rpc        name-service-switch-rpc
@@ -234,6 +236,7 @@ Configuration File\" in the libc manual."
                    (->string "netgroup"   name-service-switch-netgroup)
                    (->string "networks"   name-service-switch-networks)
                    (->string "passwd"     name-service-switch-password)
+                   (->string "protocols"  name-service-switch-protocols)
                    (->string "publickey"  name-service-switch-public-key)
                    (->string "rpc"        name-service-switch-rpc)
                    (->string "services"   name-service-switch-services)
