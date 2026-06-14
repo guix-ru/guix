@@ -4700,7 +4700,7 @@ able to work nicely with old or slow hardware.")
 (define-public candle
   (package
     (name "candle")
-    (version "10.11.1")
+    (version "11.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -4709,7 +4709,8 @@ able to work nicely with old or slow hardware.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1ihf06narzxckbapax1k2xj6c3jhv8nhjxpad7dabzf6s8dazsip"))))
+                "0dn7ywfik343h62sphgxhdv16ilglb1asmgg32f8r22lvsavjb2r"))))
+                ;; "0yja6fdwc9ca0fis8byh2kpbgqr441ijhp19paklz102apf6k3v4"))))
     (build-system cmake-build-system)
     (native-inputs (list qt5ct qttools-5 qtscript-5))
     (inputs
