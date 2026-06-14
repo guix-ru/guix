@@ -622,7 +622,9 @@ object."
   (port            autossh-configuration-port
                    (default "0"))
   (ssh-options     autossh-configuration-ssh-options
-                   (default '())))
+                   (default '()))
+  (auto-start?     autossh-configuration-auto-start?
+		   (default #t)))
 
 (define (autossh-file-name config file)
   "Return a path in /var/run/autossh/ that is writable
@@ -670,7 +672,8 @@ object."
                                 (autossh-configuration-message config))
                #$(string-append "AUTOSSH_PORT="
                                 (autossh-configuration-port config)))))
-   (stop #~(make-kill-destructor))))
+   (stop #~(make-kill-destructor))
+   (auto-start? (autossh-configuration-auto-start? config))))
 
 (define (autossh-service-activation config)
   (with-imported-modules '((guix build utils))
