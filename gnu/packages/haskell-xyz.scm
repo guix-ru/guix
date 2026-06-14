@@ -1928,39 +1928,6 @@ testing strategies.")
     (description "More complex tests for @code{chell}.")
     (license license:expat)))
 
-(define-public ghc-chell-quickcheck-bootstrap
-  (package
-    (name "ghc-chell-quickcheck-bootstrap")
-    (version "0.2.5.2")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append
-             "https://hackage.haskell.org/package/chell-quickcheck/"
-             "chell-quickcheck-" version ".tar.gz"))
-       (sha256
-        (base32
-         "0n8c57n88r2bx0bh8nabsz07m42rh23ahs3hgyzf8gr76l08zq03"))))
-    (build-system haskell-build-system)
-    (inputs
-     `(("ghc-chell" ,ghc-chell)
-       ("ghc-random" ,ghc-random)
-       ("ghc-quickcheck" ,ghc-quickcheck)))
-    (arguments
-     `(#:tests? #f
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'update-constraints
-           (lambda _
-             (substitute* "chell-quickcheck.cabal"
-               (("QuickCheck >= 2\\.3 && < 2\\.13")
-                "QuickCheck >= 2.3 && < 2.15")))))))
-    (home-page "https://john-millikin.com/software/chell/")
-    (synopsis "QuickCheck support for the Chell testing library")
-    (description "More complex tests for @code{chell}.")
-    (properties '((hidden? . #t)))
-    (license license:expat)))
-
 (define-public ghc-chunked-data
   (package
     (name "ghc-chunked-data")
