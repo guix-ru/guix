@@ -1599,6 +1599,29 @@ as a simple local version control mechanism.")
 configuration management system.")
       (license license:gpl3+))))
 
+(define-public emacs-vc-got
+  (package
+    (name "emacs-vc-got")
+    (version "1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.omarpolo.com/vc-got.git")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "006fansniplx494jj818xn3nl6gxydgj8rk3jcbmkdpb221b7y7y"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list #:tests? #f))                ; No test suite.
+    (home-page "https://projects.omarpolo.com/vc-got.html")
+    (synopsis "VC backend for Game of Trees version control system")
+    (description
+     "This package provides an Emacs VC backend for the @acronym{got, Game of
+Trees} version control system.")
+    (license license:gpl3+)))
+
 (define-public emacs-vc-hgcmd
   (package
     (name "emacs-vc-hgcmd")
