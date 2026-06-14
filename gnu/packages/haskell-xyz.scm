@@ -4604,6 +4604,7 @@ with the @code{Validity} typeclass.")
     (properties '((upstream-name . "genvalidity-property")))
     (inputs (list ghc-quickcheck ghc-genvalidity ghc-hspec ghc-pretty-show
                   ghc-validity))
+    (native-inputs (list hspec-discover))
     (home-page "https://github.com/NorfairKing/validity#readme")
     (synopsis "Standard properties for functions on @code{Validity} types")
     (description
