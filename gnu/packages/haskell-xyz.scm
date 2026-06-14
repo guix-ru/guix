@@ -17526,7 +17526,7 @@ CHANGELOG>.")
                   ghc-network-uri
                   ghc-safe
                   ghc-sop-core))
-    (native-inputs (list ghc-hspec ghc-quickcheck))
+    (native-inputs (list hspec-discover ghc-hspec ghc-quickcheck))
     (arguments
      `(#:cabal-revision ("2"
                          "1gnnbybxpvvc82p45iqqiggrw545m6qmkgwfnv18rv83p5lqzcv0")))
