@@ -4582,7 +4582,7 @@ each constructor are represented using an n-ary product.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "genvalidity")))
     (inputs (list ghc-quickcheck ghc-random ghc-validity))
-    (native-inputs (list ghc-hspec ghc-hspec-core))
+    (native-inputs (list ghc-hspec ghc-hspec-core hspec-discover))
     (home-page "https://github.com/NorfairKing/validity#readme")
     (synopsis "Testing utilities for the @code{validity} library")
     (description
