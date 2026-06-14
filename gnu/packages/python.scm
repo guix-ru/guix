@@ -1123,7 +1123,7 @@ data types.")
 
 (define-public python-3.13
   (package
-    (name "python")
+    (name "python-next")
     (version "3.13.13")
     (source
      (origin
