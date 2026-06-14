@@ -1016,7 +1016,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
 (define-public podman
   (package
     (name "podman")
-    (version "5.8.2")
+    (version "5.8.3")
     (outputs '("out" "docker"))
     (properties
      `((output-synopsis "docker" "docker alias for podman")
@@ -1026,10 +1026,10 @@ Its main purpose is to support the key usage by @code{docker-init}:
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/containers/podman")
+             (url "https://github.com/podman-container-tools/podman")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "12bmzbfyjsf0mwnam38cw9ib54wj1znh5b7lxzdyll9cvvkhqisr"))
+        (base32 "16yxq45pqwg1l504bgsflcxfhiziaxlq8544pr20n26wcil5wbii"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
@@ -1123,7 +1123,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
      (list grep
            bats
            git-minimal/pinned
-           go-1.24
+           go-1.25
            go-md2man
            gettext-minimal ; for envsubst
            mandoc
