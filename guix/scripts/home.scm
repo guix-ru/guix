@@ -43,7 +43,8 @@
                                             %namespaces
                                             %writable-/tmp)
   #:use-module ((gnu system) #:select (operating-system?
-                                       operating-system-user-services))
+                                       operating-system-user-services
+                                       operating-system-services))
   #:autoload   (gnu system linux-container) (eval/container)
   #:autoload   (gnu system file-systems) (file-system
                                           file-system-mapping
