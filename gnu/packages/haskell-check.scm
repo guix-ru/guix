@@ -784,7 +784,7 @@ Haskell, inspired by the Ruby library RSpec.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "hspec-api")))
     (inputs (list ghc-hspec-core))
-    (native-inputs (list ghc-hspec))
+    (native-inputs (list hspec-discover ghc-hspec))
     (home-page "https://hspec.github.io/")
     (synopsis "A Testing Framework for Haskell")
     (description
