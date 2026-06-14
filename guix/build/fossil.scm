@@ -19,7 +19,8 @@
 ;;; Commentary:
 ;;;
 ;;; This is the build-side support code of (guix fossil-download).
-;;; It allows a Fossil repository to be opened at a specific revision.
+;;; It allows a source tarball to be generated from a Fossil repository
+;;; at a specific check-in.
 ;;;
 ;;; Code:
 
@@ -33,10 +34,14 @@
   #:export (fossil-fetch))
 
 (define* (fossil-fetch uri check-in file #:key (fossil-command "fossil"))
-  "Fetch CHECK-IN from URI into a tarball FILE.  CHECK-IN must be a valid
-Fossil check-in name.  Return #t on success, else raise an exception."
+  "Fetch CHECK-IN from URI into a tarball FILE using @command{fossil clone}
+followed by @command{fossil tarball}.  CHECK-IN must be a valid
+Fossil check-in name.  Return #t on success, #f otherwise."
   (setenv "FOSSIL_HOME" "/tmp")
   (let ((name (basename (strip-store-file-name file) ".tar.gz")))
+    (guard (c ((invoke-error? c)
+               (report-invoke-error c)
+               #f))
     (invoke fossil-command
       "tarball" check-in file "--name" name "-R"
       (case (uri-scheme (string->uri-reference uri))
@@ -56,4 +61,4 @@ Fossil check-in name.  Return #t on success, else raise an exception."
          (let ((message (string-append "fetching a Fossil repository through SSH"
                                        " is not supported: " uri)))
            (raise (condition (&message (message message))))))
-        ((#f) uri)))))                  ;local file
+        ((#f) uri))))))                 ;local file
