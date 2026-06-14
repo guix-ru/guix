@@ -1961,8 +1961,7 @@ testing strategies.")
                 (invoke "patch" "--force" "--no-backup-if-mismatch" "-p1"
                         "--input" patch)))))))
     (inputs
-     (list ghc-chell ghc-chell-quickcheck-bootstrap ghc-random
-           ghc-quickcheck))
+     (list ghc-chell ghc-random ghc-quickcheck))
     (home-page "https://john-millikin.com/software/chell/")
     (synopsis "QuickCheck support for the Chell testing library")
     (description "More complex tests for @code{chell}.")
