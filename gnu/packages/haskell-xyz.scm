@@ -1248,38 +1248,6 @@ debuting in bytestring-0.10.4.0, which should be shipping with GHC 7.8.
 Compatibility package for older packages.")
     (license license:bsd-3)))
 
-;; XXX: Incompatible with base
-(define-public ghc-bytestring-handle
-  (package
-    (name "ghc-bytestring-handle")
-    (version "0.1.0.6")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "bytestring-handle" version))
-       (sha256
-        (base32
-         "18f17aja1ivhr3zyg2cccn2m03hdn5jf5410dndkhf12gvgiqs7y"))
-       (patches (search-patches "ghc-bytestring-handle-ghc9.patch"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "bytestring-handle")))
-    (arguments
-     `(#:cabal-revision
-       ("2" "1x1sy3dz2ph9v6jk22wmcv5gk2bka5fv4s68i8q0j9m9pk085w37")
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'update-constraints
-           (lambda _
-             (substitute* "bytestring-handle.cabal"
-               (("base >= 4\\.2 && < 4\\.15") "base")))))))
-    (inputs
-     (list ghc-hunit ghc-quickcheck ghc-test-framework
-           ghc-test-framework-hunit ghc-test-framework-quickcheck2))
-    (home-page "https://hub.darcs.net/ganesh/bytestring-handle")
-    (synopsis "ByteString-backed Handles")
-    (description "ByteString-backed Handles") ; There is no description
-    (license license:bsd-3)))
-
 (define-public ghc-bytestring-lexing
   (package
     (name "ghc-bytestring-lexing")
