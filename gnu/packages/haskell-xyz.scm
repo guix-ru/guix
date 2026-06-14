@@ -15831,6 +15831,7 @@ information.")
                   ghc-hspec
                   ghc-hspec-core
                   ghc-validity))
+    (native-inputs (list hspec-discover))
     (home-page "https://github.com/NorfairKing/validity#readme")
     (synopsis "Standard spec's for @code{GenValidity} instances")
     (description
