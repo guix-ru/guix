@@ -1930,7 +1930,9 @@ users (e.g. Debian).")
        (method url-fetch)
        (uri (hackage-uri "js-flot" version))
        (sha256
-        (base32 "0yjyzqh3qzhy5h3nql1fckw0gcfb0f4wj9pm85nafpfqp2kg58hv"))))
+        (base32 "0yjyzqh3qzhy5h3nql1fckw0gcfb0f4wj9pm85nafpfqp2kg58hv"))
+       (modules '((guix build utils)))
+       (snippet '(for-each delete-file (find-files "." "\\.min\\.js$")))))
     (build-system haskell-build-system)
     (arguments
      (list
@@ -1940,7 +1942,6 @@ users (e.g. Debian).")
             (lambda _
               (with-directory-excursion "javascript"
                 (let ((source (format #f "flot-~a.zip" #$version)))
-                  (for-each delete-file (find-files "." "\\.min\\.js$"))
                   (invoke "bsdtar" "xf" source "--strip-components=1"
                           "--exclude=*.min.js" "*.js")
                   (delete-file source)
