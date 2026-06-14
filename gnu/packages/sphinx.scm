@@ -68,6 +68,7 @@
   #:use-module (gnu packages graph)
   #:use-module (gnu packages statistics)
   #:use-module (gnu packages tex)
+  #:use-module (gnu packages web)
   #:use-module (gnu packages xml))
 
 (define-public python-intersphinx-registry
@@ -651,12 +652,21 @@ math in HTML via JavaScript.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0la7qasz5xlyzpx20ldcc62vkwg4xk2dd39j27dqz7zv1m8mjg0c"))))
+        (base32 "0la7qasz5xlyzpx20ldcc62vkwg4xk2dd39j27dqz7zv1m8mjg0c"))
+       ;; Delete pre-minified JavaScript.
+       (snippet '(delete-file "sphinxcontrib/jquery/jquery.js"))))
     (build-system pyproject-build-system)
     (arguments
-     (list #:tests? #f))                ;No tests upstream.
+     (list #:tests? #f                  ;no tests
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'minify-jquery
+                 (lambda _
+                   (with-directory-excursion "sphinxcontrib/jquery"
+                     (invoke "esbuild" "jquery-3.6.0.js" "--minify"
+                             (string-append "--outfile=jquery.js"))))))))
     (propagated-inputs (list python-sphinx))
-    (native-inputs (list python-flit-core python-pytest))
+    (native-inputs (list esbuild python-flit-core python-pytest))
     (home-page "https://github.com/sphinx-contrib/jquery")
     (synopsis "Extension to include jQuery on newer Sphinx releases")
     (description
