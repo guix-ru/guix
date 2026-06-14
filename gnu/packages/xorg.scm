@@ -985,13 +985,13 @@ rendering commands to the X server.")
 (define-public ghc-xcb-types
   (package
     (name "ghc-xcb-types")
-    (version "0.13.0")
+    (version "0.15.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "xcb-types" version))
        (sha256
-        (base32 "0qdfj4d83b1fjmlysqncgi65ldf3qnrsj4lync95mgbaq2kzxj2r"))))
+        (base32 "15krqhh11s1ij87raiqz7inc0z9ir5vyqllh8zxki7v5l7s00gvg"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "xcb-types")))
     (inputs (list ghc-xml))
