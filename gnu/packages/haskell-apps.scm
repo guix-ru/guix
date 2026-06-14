@@ -108,6 +108,7 @@ library.  It is primarily used with HLint's @code{--refactor} flag.")
    (properties '((upstream-name . "cabal-install")))
    (inputs (list ghc-async
                  ghc-base16-bytestring
+                 ghc-cabal-install-solver
                  ghc-cryptohash-sha256
                  ghc-echo
                  ghc-edit-distance
@@ -146,7 +147,10 @@ library.  It is primarily used with HLint's @code{--refactor} flag.")
                         ghc-pretty-show))
    (arguments
     `(#:cabal-revision ("2"
-                        "0fdzqdkg2vbyg0lnbk9bdskr2d23hwjpmnc7jnvpzkcmxmcvl99n")))
+                        "0fdzqdkg2vbyg0lnbk9bdskr2d23hwjpmnc7jnvpzkcmxmcvl99n")
+      ;; The tests depend on Cabal-{QuickCheck,described,tests,tree-diff},
+      ;; which are not distributed on hackage.
+      #:tests? #f))
    (home-page "https://www.haskell.org/cabal/")
    (synopsis "Command-line interface for Cabal and Hackage")
    (description
