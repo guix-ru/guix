@@ -17073,6 +17073,35 @@ were inserted")
 and is shipped with <https://www.haskell.org/ghc/ GHC>.")
     (license license:bsd-3)))
 
+(define-public ghc-cabal-install-solver
+  (package
+    (name "ghc-cabal-install-solver")
+    (version "3.12.1.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "cabal-install-solver" version))
+       (sha256
+        (base32 "0yjy49awzs79adx1xn705v3cpmqhvgpym49jaws9h0z9ag9s3nvi"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "cabal-install-solver")))
+    (inputs (list ghc-cabal-syntax ghc-edit-distance ghc-network-uri))
+    (native-inputs (list ghc-tasty ghc-tasty-quickcheck ghc-tasty-hunit))
+    (arguments
+     `(#:cabal-revision ("1"
+                         "0bai933mfjv0gazbbvvwaglzhgqnzdf3i1zl8r18cc9amwrh4rag")
+       #:phases (modify-phases %standard-phases
+                  (add-before 'configure 'update-constraints
+                    (lambda _
+                      (substitute* "cabal-install-solver.cabal"
+                        (("tasty-quickcheck <0.11") "tasty-quickcheck")))))))
+    (home-page "https://www.haskell.org/cabal/")
+    (synopsis
+     "Solver component of command-line interface for Cabal and Hackage")
+    (description
+     "The solver component used in cabal-install command-line program.")
+    (license license:bsd-3)))
+
 (define-public ghc-cabal-syntax
   (package
     (name "ghc-cabal-syntax")
