@@ -25038,6 +25038,9 @@ may cause undefined behaviour.
 Whether this service should be started automatically by the Shepherd.  If it
 is @code{#f}, the service has to be started manually with @command{herd start}.
 
+@item @code{shepherd-provision} (default: @code{'(autossh)})
+The list of symbols defining the name(s) of the Shepherd service.
+
 @end table
 @end deftp
 

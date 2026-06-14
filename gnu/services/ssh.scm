@@ -624,19 +624,23 @@ object."
   (ssh-options     autossh-configuration-ssh-options
                    (default '()))
   (auto-start?     autossh-configuration-auto-start?
-		   (default #t)))
+		   (default #t))
+  (shepherd-provision autossh-configuration-shepherd-provision
+                   (default '(autossh))))
 
 (define (autossh-file-name config file)
   "Return a path in /var/run/autossh/ that is writable
    by @code{user} from @code{config}."
-  (string-append "/var/run/autossh/"
-                 (autossh-configuration-user config)
-                 "/" file))
+  (string-append "/var/run/"
+                 (symbol->string
+                  (first (autossh-configuration-shepherd-provision config))) "/"
+                 (autossh-configuration-user config) "/"
+                 file))
 
 (define (autossh-shepherd-service config)
   (shepherd-service
    (documentation "Automatically set up ssh connections (and keep them alive).")
-   (provision '(autossh))
+   (provision (autossh-configuration-shepherd-provision config))
    (requirement '(user-processes))
    (start #~(make-forkexec-constructor
              (list #$(file-append autossh "/bin/autossh")
