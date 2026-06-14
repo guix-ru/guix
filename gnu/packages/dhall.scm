@@ -96,8 +96,11 @@
                          ghc-mockery
                          ghc-doctest))
     (arguments
-     `(#:cabal-revision ("2"
-                         "1h9kxpn3kzwmxj07mqc0cxjj2ak3dyxnifb78z5vn34xn747j5bk")))
+     (list
+      #:cabal-revision
+      '("2" "1h9kxpn3kzwmxj07mqc0cxjj2ak3dyxnifb78z5vn34xn747j5bk")
+      ;; Tests require internet access
+      #:tests? #f))
     (home-page "http://hackage.haskell.org/package/dhall")
     (synopsis "Configuration language guaranteed to terminate")
     (description
