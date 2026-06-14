@@ -1943,32 +1943,42 @@ natural language processing framework.")
 (define-public python-spacy
   (package
     (name "python-spacy")
-    (version "3.8.7")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "spacy" version))
-              (sha256
-               (base32
-                "0269wj9wpy9a8g206q6q9m6f5jjkpdq8xi22w5mjfln5qrsd23vh"))))
+    (version "3.8.14")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/explosion/spaCy")
+              (commit (string-append "release-v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0inb1x7gmf1j7kcr35v472hia4lkn1qr234snqkz27rqglzhvmy3"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 3534 passed, 1232 skipped, 5 deselected, 24 xfailed, 7 xpassed, 62118
+      ;; tests: 3605 passed, 1232 skipped, 6 deselected, 24 xfailed, 7
+      ;;        xpassed, 5 subtests passed
       #:test-flags
-      #~(list "-k" (string-append
-                    ;; We don't do that around here.
-                    "not test_download_compatibility"
-                    ;; This needs to download a model.
-                    " and not test_validate_compatibility_table"
-                    ;; This tries to run the application with typer, which fails
-                    ;; with an unspecified error, possibly because the build
-                    ;; container doesn't have /bin/sh.
-                    " and not test_project_assets"
-                    ;; DeprecationWarning: SelectableGroups dict interface is
-                    ;; deprecated. Use select.
-                    " and not test_pass_doc_to_pipeline[2]"
-                    ;; AssertionError: Registry 'loggers' missing entries.
-                    " and not test_registry_entries"))
+      #~(list #$@(map (lambda (test)
+                        (string-append "--deselect=tests/" test))
+                      (list
+                       ;; Fail to compare setup.cfg and requirements.txt
+                       ;; versions.
+                       "package/test_requirements.py::test_build_dependencies"
+                       ;; Result
+                       ;; DeprecationWarning('datetime.datetime.utcfromtimestamp()
+                       ;; is deprecated and scheduled for removal in a future
+                       ;; version. Use timezone-aware objects to represent
+                       ;; datetimes in UTC:
+                       ;; datetime.datetime.fromtimestamp(timestamp,
+                       ;; datetime.UTC).'
+                       "test_cli_app.py::test_project_assets"
+                       "test_cli_app.py::test_project_push_pull"
+                       ;; AssertionError: Registry 'loggers' missing entries.
+                       "test_registry_population.py::test_registry_entries"
+                       ;; Tests require network access.
+                       "test_cli.py::test_download_compatibility"
+                       "test_cli.py::test_validate_compatibility_table")))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'remove-local-spacy
@@ -1980,10 +1990,8 @@ natural language processing framework.")
     (propagated-inputs (list python-catalogue
                              python-cymem
                              python-jinja2
-                             python-langcodes
                              python-murmurhash
                              python-numpy
-                             python-packaging
                              python-preshed
                              python-pydantic
                              python-requests
@@ -1996,7 +2004,10 @@ natural language processing framework.")
                              python-wasabi
                              python-weasel))
     (native-inputs
-     (list python-cython python-pytest python-mock))
+     (list python-cython
+           python-pytest
+           python-mock
+           python-setuptools))
     (home-page "https://spacy.io")
     (synopsis "Natural Language Processing (NLP) in Python")
     (description
