@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2014-2016, 2022-2023 Ludovic Courtès <ludo@gnu.org>
-;;; Copyright © 2025 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2025-2026 Tomas Volf <~@wolfsden.cz>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -86,7 +86,10 @@
   ;; Additional build options.
   '())
 
-(define* (evaluate/print-with-store mvalue #:key build?)
+(define* (evaluate/print-with-store mvalue
+                                    #:key
+                                    build?
+                                    (build-mode (build-mode normal)))
   "Run monadic value MVALUE in the store monad and print its value."
   (with-store store
     (apply set-build-options store
@@ -102,7 +105,7 @@
                            (mlet %store-monad ((obj mvalue))
                              (if (derivation? obj)
                                  (mbegin %store-monad
-                                   (built-derivations (list obj))
+                                   (built-derivations (list obj) build-mode)
                                    (return
                                     (match (derivation->output-paths obj)
                                       (((_ . files) ...) files))))
@@ -132,11 +135,28 @@ Change build verbosity to LEVEL.
 Lower OBJECT into a derivation or store file and return it."
   (evaluate/print-with-store (lower-object (repl-eval repl form))))
 
-(define-meta-command ((build guix) repl (form))
-  "build OBJECT
-Lower OBJECT and build it, returning its output file name(s)."
-  (evaluate/print-with-store (lower-object (repl-eval repl form))
-                             #:build? #t))
+(define-meta-command ((build guix) repl (form) . args)
+  "build OBJECT [BUILD-MODE]
+Lower OBJECT and build it, returning its output file name(s).
+
+Build mode defaults to 'normal.  If expression is provided, it must evaluate
+to one of the following symbols: normal, check, repair."
+  (let ((build-mode (match args
+                      ((mode)
+                       (match mode
+                         ((or 'normal ''normal) (build-mode normal))
+                         ((or 'check ''check)   (build-mode check))
+                         ((or 'repair ''repair) (build-mode repair))
+                         ((or 'normal ''normal) (build-mode normal))
+                         (_
+                          (format #t ";; ERROR: Invalid build mode.~%")
+                          #f)))
+                      (()
+                       (build-mode normal)))))
+    (when build-mode
+      (evaluate/print-with-store (lower-object (repl-eval repl form))
+                                 #:build? #t
+                                 #:build-mode build-mode))))
 
 (define-meta-command ((build-options guix) repl (opts))
   "build-options OPTIONS
