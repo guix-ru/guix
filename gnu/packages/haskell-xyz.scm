@@ -17962,7 +17962,7 @@ such as ala'.")
                   ghc-http-types
                   ghc-network-uri
                   ghc-yaml))
-    (native-inputs (list ghc-hspec ghc-http-client-tls ghc-http-conduit
+    (native-inputs (list hspec-discover ghc-hspec ghc-http-client-tls ghc-http-conduit
                          ghc-mockery))
     (home-page "https://github.com/assertible/vcr")
     (synopsis "Record and replay HTTP interactions")
