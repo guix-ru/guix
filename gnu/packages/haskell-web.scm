@@ -13,6 +13,7 @@
 ;;; Copyright © 2020 Alexandru-Sergiu Marton <brown121407@member.fsf.org>
 ;;; Copyright © 2020 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;; Copyright © 2022 Alice Brenon <alice.brenon@ens-lyon.fr>
+;;; Copyright © 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -31,6 +32,7 @@
 
 (define-module (gnu packages haskell-web)
   #:use-module (gnu packages)
+  #:use-module (gnu packages backup)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages haskell)
   #:use-module (gnu packages haskell-check)
@@ -1930,8 +1932,23 @@ users (e.g. Debian).")
        (sha256
         (base32 "0yjyzqh3qzhy5h3nql1fckw0gcfb0f4wj9pm85nafpfqp2kg58hv"))))
     (build-system haskell-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'build-minified-javascript
+            (lambda _
+              (with-directory-excursion "javascript"
+                (let ((source (format #f "flot-~a.zip" #$version)))
+                  (for-each delete-file (find-files "." "\\.min\\.js$"))
+                  (invoke "bsdtar" "xf" source "--strip-components=1"
+                          "--exclude=*.min.js" "*.js")
+                  (delete-file source)
+                  (apply invoke "esbuild" "--minify"
+                         "--out-extension:.js=.min.js" "--outdir=."
+                         (find-files "." "\\.js$")))))))))
     (properties '((upstream-name . "js-flot")))
-    (native-inputs (list ghc-http))
+    (native-inputs (list esbuild ghc-http libarchive))
     (home-page "https://github.com/ndmitchell/js-flot")
     (synopsis "Obtain minified flot code")
     (description
