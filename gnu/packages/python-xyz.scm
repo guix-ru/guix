@@ -41241,13 +41241,16 @@ across Python versions 3.7+.")
 (define-public python-wand
   (package
     (name "python-wand")
-    (version "0.7.0")
+    (version "0.7.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "wand" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/emcconville/wand")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1ya00xn57x3lfk6d498lv23hqdq93fmada2v5rskzhj8q8y9i3z4"))))
+        (base32 "0yzv3jwbfg0h2n102718cw392gx2dkrbpj4b54khszrcgrsifa2a"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -41261,7 +41264,7 @@ across Python versions 3.7+.")
                 (("os\\.environ\\.get\\('WAND_MAGICK_LIBRARY_SUFFIX'\\)")
                  "\".Q16\"")))))))
     (native-inputs
-     (list python-setuptools python-pytest python-wheel))
+     (list python-setuptools python-pytest))
     (inputs
      (list imagemagick))
     (home-page "https://docs.wand-py.org/")
