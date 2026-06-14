@@ -188,6 +188,7 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix cvs-download)
+  #:use-module (guix fossil-download)
   #:use-module (guix download)
   #:use-module (guix deprecation)
   #:use-module (guix bzr-download)
@@ -1571,6 +1572,31 @@ which provides an Emacs interface to replace the built-in web UI.")
       (description
        "This package provides a VC backend that uses versioned backup files
 as a simple local version control mechanism.")
+      (license license:gpl3+))))
+
+(define-public emacs-vc-fossil
+  (let ((check-in "a5a35f440a130c18")
+        (revision "153"))               ; check-ins from `fossil info'
+    (package
+      (name "emacs-vc-fossil")
+      ;; No tagged releases; version obtained from source code.
+      (version (fossil-version "20230504" revision check-in))
+      (source
+       (origin
+         (method fossil-fetch)
+         (uri (fossil-reference
+               (uri "https://tumbleweed.nu/r/vc-fossil")
+               (check-in check-in)))
+         (sha256
+          (base32 "11lpvbv5jn5jm0blpbnkfhvmzm3nyccy5a1zacbc21r6sj2y6imr"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list #:tests? #f))                ; No test suite.
+      (home-page "https://tumbleweed.nu/r/vc-fossil")
+      (synopsis "VC backend for the Fossil SCM")
+      (description
+       "This package provides a VC backend for the Fossil software
+configuration management system.")
       (license license:gpl3+))))
 
 (define-public emacs-vc-hgcmd
