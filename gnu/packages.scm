@@ -177,7 +177,8 @@ flags."
    (map (lambda (directory)
           (if (string=? directory %distro-root-directory)
               (string-append directory "/gnu/packages/patches")
-              directory))
+              (or (false-if-exception (canonicalize-path directory))
+                  directory)))
         (map strip-trailing-slash %load-path))))
 
 ;; This procedure is used by Emacs-Guix up to 0.5.1.1, so keep it for now.
