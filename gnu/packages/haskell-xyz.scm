@@ -5444,23 +5444,28 @@ descriptions.")
 (define-public ghc-hindent
   (package
     (name "ghc-hindent")
-    (version "5.3.4")
+    (version "6.3.0")
     (source (origin
               (method url-fetch)
               (uri (hackage-uri "hindent" version))
               (sha256
                (base32
-                "1pc20iza3v0ljzbx6cycm1j1kbmz8h95xwfq47fd6zfmsrx9w6vn"))))
+                "0axbrrpqm4p8d43ypdsgi345xz7zbdll9a1zv235dia4cxk0mpv4"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hindent")))
-    (inputs (list ghc-haskell-src-exts
+    (inputs (list ghc-async
+                  ghc-lib-parser
+                  ghc-lib-parser-ex
                   ghc-monad-loops
-                  ghc-utf8-string
-                  ghc-yaml
-                  ghc-unix-compat
+                  ghc-optparse-applicative
                   ghc-path
                   ghc-path-io
-                  ghc-optparse-applicative))
+                  ghc-regex-tdfa
+                  ghc-split
+                  ghc-syb
+                  ghc-unicode-show
+                  ghc-utf8-string
+                  ghc-yaml))
     (native-inputs (list ghc-hspec ghc-diff))
     (home-page "https://github.com/mihaimaruseac/hindent")
     (synopsis "Extensible Haskell pretty printer")
