@@ -2030,7 +2030,7 @@ formats.")
 (define-public zycore
   (package
     (name "zycore")
-    (version "1.5.0")
+    (version "1.5.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -2038,7 +2038,7 @@ formats.")
                     (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
-               (base32 "0s962pkqybh1xbs75y4jb4bqc9qnq0sviqd570mirqdhhq87agib"))))
+               (base32 "1szpwqqw12frdchmq2qkcqrmb88afq56fsn2nbd96vmsdzmnhwnq"))))
     (build-system cmake-build-system)
     (native-inputs (list googletest))
     (arguments (list #:configure-flags
