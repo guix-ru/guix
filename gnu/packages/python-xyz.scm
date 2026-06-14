@@ -20172,25 +20172,25 @@ with a new public API, and RPython support.")
 (define-public python-hy
   (package
     (name "python-hy")
-    (version "1.2.0")
+    (version "1.3.0")
     (source
      (origin
-       (method git-fetch) ;no tests in PyPI release
+       (method git-fetch)
        (uri (git-reference
              (url "https://github.com/hylang/hy")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1z5p5y2k8g3j264lvzvlzkyc1d1dqs8j5ixnmm79xh7jkcgi7adq"))))
+        (base32 "0sdv5amhl0p4f84bmw2iy85a7rrkjg969l2gcr6cfl03lb0nxj87"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       ;; This test expects the hy executable to be called 'hy', but in Guix
       ;; it's .hy-real.
       #:test-flags #~(list "-k" "not test_sys_executable")))
-    (native-inputs (list python-pytest python-setuptools python-wheel))
+    (native-inputs (list python-pytest python-setuptools))
     (propagated-inputs (list python-funcparserlib))
-    (home-page "https://docs.hylang.org/en/stable/")
+    (home-page "https://hylang.org/hy/doc")
     (synopsis "Lisp frontend to Python")
     (description
      "Hy is a dialect of Lisp that's embedded in Python.  Since Hy transforms
