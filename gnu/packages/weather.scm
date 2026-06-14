@@ -39,7 +39,7 @@
 (define-public wego
   (package
     (name "wego")
-    (version "2.3")
+    (version "2.4")
     (source
      (origin
        (method git-fetch)
@@ -48,16 +48,15 @@
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "16fx09wf5mll8nbyq5bjd9lbwmq1bqhsvln56jjqpzm28nbjarb0"))))
+        (base32 "1p1a7lfa26rfjz2j3x8izsdwncsfac2zizl63n9lay1s0cx5b9a4"))))
     (build-system go-build-system)
     (arguments '(#:import-path "github.com/schachmat/wego"))
-    (propagated-inputs
-     (list go-golang-org-x-sys
-           go-github-com-rivo-uniseg
-           go-github-com-mattn-go-isatty
-           go-github-com-schachmat-ingo
+    (native-inputs
+     (list go-github-com-mattn-go-colorable
            go-github-com-mattn-go-runewidth
-           go-github-com-mattn-go-colorable))
+           go-github-com-muesli-mango
+           go-github-com-muesli-roff
+           go-github-com-schachmat-ingo))
     (home-page "https://github.com/schachmat/wego")
     (synopsis "Weather client for the terminal")
     (description "Wego is a weather client for the terminal.  It shows
