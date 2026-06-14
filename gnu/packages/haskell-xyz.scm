@@ -4713,7 +4713,7 @@ matching patterns against file paths.")
         (base32 "1b3rnva77k9naw5bl573bqgmsq7n9i8rrrvfvhbjcndqgmzhkini"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "GLURaw")))
-    (inputs (list ghc-openglraw))
+    (inputs (list glu ghc-openglraw))
     (home-page "http://www.haskell.org/haskellwiki/Opengl")
     (synopsis "Raw Haskell bindings GLU")
     (description
