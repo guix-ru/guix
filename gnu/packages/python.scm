@@ -1315,6 +1315,8 @@ data types.")
     (license license:psfl)))
 
 ;; Next 3.x version.
+;; Make sure that the name of the package is altered as well to avoid
+;; conflicts, see: <https://codeberg.org/guix/guix/issues/9255>.
 (define-public python-next python-3.13)
 
 ;; Current 3.x version.
