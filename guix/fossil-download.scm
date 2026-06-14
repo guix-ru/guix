@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2025 Nguyễn Gia Phong <cnx@loang.net>
+;;; Copyright © 2025-2026 Nguyễn Gia Phong <cnx@loang.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -80,36 +80,50 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
   (let* ((modules (source-module-closure '((guix build fossil)
                                            (guix build download)
                                            (guix build download-nar))))
+         (extensions (list
+                      ;; For Disarchive and SWH:
+                      (@* (gnu packages backup) disarchive)
+                      (@* (gnu packages gnupg) guile-gcrypt)
+                      (@* (gnu packages tls) guile-gnutls)
+                      (@* (gnu packages guile) guile-json-4)
+                      ;; For download-nar:
+                      (@* (gnu packages guile) guile-lzlib)))
          (uri (fossil-reference-uri ref))
          (scheme-of-uri (uri-scheme (string->uri-reference uri)))
          (check-in (fossil-reference-check-in ref))
          (tarball-name (or name (fossil-file-name (basename uri) check-in)))
-         (tarball-url (and (eq? 'https scheme-of-uri)
-                           (simple-format #f "~a/tarball/~a/~a"
-                             uri check-in tarball-name)))
-         (guile-json (@* (gnu packages guile) guile-json-4))
-         (gnutls (@* (gnu packages tls) guile-gnutls))
-         (guile-lzlib (@* (gnu packages guile) guile-lzlib))
          (build
           (with-imported-modules modules
-            (with-extensions (list guile-json gnutls ;for (guix swh)
-                                   guile-lzlib)
+            (with-extensions extensions
               #~(begin
                   (use-modules (guix build fossil)
                                ((guix build download)
-                                #:select (download-method-enabled? url-fetch))
-                               (guix build download-nar))
-                  (or (and (download-method-enabled? 'upstream)
-                           (or (and #$tarball-url
-                                    (url-fetch #$tarball-url #$output))
-                               (fossil-fetch
-                                #$(if scheme-of-uri uri (local-file uri))
-                                #$check-in
-                                #$output
-                                #:fossil-command
-                                #+(file-append fossil "/bin/fossil"))))
-                      (and (download-method-enabled? 'nar)
-                           (download-nar #$output))))))))
+                                #:select (download-method-enabled?))
+                               (guix build download-nar)
+                               (ice-9 match))
+                  (let try ((download-methods
+                             (filter download-method-enabled?
+                                     '(upstream internet-archive
+                                       nar disarchive))))
+                    (match download-methods
+                      (('upstream other-download-methods ...)
+                       (or (fossil-fetch-url #$uri #$check-in #$output
+                                             #:download-methods '(upstream))
+                           (fossil-fetch
+                            #$(if scheme-of-uri uri (local-file uri))
+                            #$check-in
+                            #$output
+                            #:fossil-command
+                            #+(file-append fossil "/bin/fossil"))
+                           (try other-download-methods)))
+                      (('nar other-download-methods ...)
+                       (or (download-nar #$output)
+                           (try other-download-methods)))
+                      ((archive other-download-methods ...)
+                       (or (fossil-fetch-url #$uri #$check-in #$output
+                                             #:download-methods (list archive))
+                           (try other-download-methods)))
+                      (() #f))))))))
     (mlet %store-monad ((guile (package->derivation guile system)))
       (gexp->derivation tarball-name build
                         #:leaked-env-vars '("http_proxy" "https_proxy"
