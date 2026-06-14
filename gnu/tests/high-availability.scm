@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2017 Christopher Baines <mail@cbaines.net>
-;;; Copyright © 2025 Artur Wroblewski <wrobell@riseup.net>
+;;; Copyright © 2025-2026 Artur Wroblewski <wrobell@riseup.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -19,6 +19,7 @@
 
 (define-module (gnu tests high-availability)
   #:use-module (gnu tests)
+  #:use-module (gnu packages high-availability)
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system shadow)
@@ -34,12 +35,15 @@
   (plain-file "rabbitmq.conf" "
 listeners.tcp.1 = 127.0.0.1:15672
 listeners.tcp.2 = ::1:15672
+
+distribution.listener.interface = 127.0.0.1
 "))
 
 (define %rabbitmq-os
   (simple-operating-system
     (service rabbitmq-service-type
-             (rabbitmq-configuration (config-file %rabbitmq-config-file)))))
+             (rabbitmq-configuration (node-name "rabbit@komputilo")
+                                     (config-file %rabbitmq-config-file)))))
 
 (define* (run-rabbitmq-test #:key (rabbitmq-port 15672))
   "Run tests in %RABBITMQ-OS, forwarding PORT."
@@ -94,6 +98,29 @@ listeners.tcp.2 = ::1:15672
              '(file-exists? "/var/log/rabbitmq/rabbit@komputilo.log")
              marionette))
 
+          (test-assert "RabbitMQ await startup command is successful"
+            (marionette-eval
+             '(begin
+                (use-modules (guix build utils))
+
+                (current-output-port (open-file "/dev/console" "w0"))
+                (invoke #$(file-append rabbitmq "/sbin/rabbitmqctl")
+                        "await_startup"
+                        "-n"
+                        "rabbit@komputilo"))
+             marionette))
+
+          (test-assert "RabbitMQ status command is successful"
+            (marionette-eval
+             '(begin
+                (use-modules (guix build utils))
+
+                (current-output-port (open-file "/dev/console" "w0"))
+                (invoke #$(file-append rabbitmq "/sbin/rabbitmqctl")
+                        "status"
+                        "-n"
+                        "rabbit@komputilo"))
+             marionette))
           (test-end))))
 
   (gexp->derivation "rabbitmq-test" test))

@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2018 Christopher Baines <mail@cbaines.net>
-;;; Copyright © 2025 Artur Wroblewski <wrobell@riseup.net>
+;;; Copyright © 2025-2026 Artur Wroblewski <wrobell@riseup.net>
 ;;; Copyright © 2026 Mathieu Lirzin <mthl@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -32,19 +32,25 @@
 
   #:export (rabbitmq-configuration rabbitmq-configuration?
                                    rabbitmq-configuration-rabbitmq
+                                   rabbitmq-configuration-node-name
                                    rabbitmq-configuration-config-file
+                                   rabbitmq-configuration-env-config-file
                                    rabbitmq-configuration-plugins
                                    rabbitmq-service-type))
 
-;; By default, start on local ipv4 and ipv6 interfaces only, see also:
+;; By default, start messaging and inter-node RabbitMQ listeners on local
+;; interfaces only, see also:
 ;;
 ;;   https://www.rabbitmq.com/docs/networking
 ;;
-;; NOTE: How to enable plugins to listen on localhost only?
+;; NOTE: Enabling a RabbitMQ plugin will make it usually listen on a public
+;; interface.
 (define %default-rabbitmq-config-file
   (plain-file "rabbitmq.conf" "
 listeners.tcp.1 = 127.0.0.1:5672
 listeners.tcp.2 = ::1:5672
+
+distribution.listener.interface = 127.0.0.1
 "))
 
 (define-record-type* <rabbitmq-configuration> rabbitmq-configuration
@@ -52,8 +58,11 @@ listeners.tcp.2 = ::1:5672
   rabbitmq-configuration?
   (rabbitmq rabbitmq-configuration-rabbitmq
             (default rabbitmq))
+  (node-name rabbitmq-configuration-node-name
+             (default "rabbit@localhost"))
   (config-file rabbitmq-configuration-config-file
                (default %default-rabbitmq-config-file))
+  (env-config-file rabbitmq-configuration-env-file (default #f))
   ;; It can be a mnesia database or a khepri database, so use "data" instead
   ;; of the traditional "mnesia".
   (data-directory rabbitmq-configuration-data-directory
@@ -102,7 +111,7 @@ listeners.tcp.2 = ::1:5672
 
 (define (rabbitmq-shepherd-service config)
   (match-record config <rabbitmq-configuration>
-    (rabbitmq data-directory config-file plugins)
+    (rabbitmq node-name data-directory config-file env-config-file plugins)
     (with-imported-modules
       (source-module-closure '((gnu build shepherd)))
       (list
@@ -119,10 +128,14 @@ listeners.tcp.2 = ::1:5672
               #:group "rabbitmq"
               #:environment-variables
               (append
+                (if #$env-config-file
+                  (list (string-append "RABBITMQ_CONF_ENV_FILE="
+                                       #$env-config-file))
+                  (list))
                 (list
+                  (string-append "RABBITMQ_NODENAME=" #$node-name)
                   (string-append "RABBITMQ_CONFIG_FILE=" #$config-file)
                   "RABBITMQ_PID_FILE=/var/run/rabbitmq/pid"
-                  "RABBITMQ_CONF_ENV_FILE=/run/current-system/profile/etc/rabbitmq/rabbitmq-env.conf"
                   (string-append
                     "RABBITMQ_ENABLED_PLUGINS_FILE="
                     #$data-directory

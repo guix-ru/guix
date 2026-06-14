@@ -143,7 +143,7 @@ Copyright @copyright{} 2025 Zacchaeus@*
 Copyright @copyright{} 2025, 2026 Sergio Pastor Pérez@*
 Copyright @copyright{} 2024 Evgeny Pisemsky@*
 Copyright @copyright{} 2025 jgart@*
-Copyright @copyright{} 2025 Artur Wroblewski@*
+Copyright @copyright{} 2025-2026 Artur Wroblewski@*
 Copyright @copyright{} 2025 Edouard Klein@*
 Copyright @copyright{} 2025 Rodion Goritskov@*
 Copyright @copyright{} 2025 dan@*
@@ -37654,24 +37654,24 @@ A simple example configuration is given below.
 @lisp
 (service rabbitmq-service-type
          (rabbitmq-configuration
-           (rabbitmq-configuration
-             (plugins '("rabbitmq_stream"
-                        "rabbitmq_management"
-                        "rabbitmq_prometheus")))))
+           (plugins '("rabbitmq_stream"
+                      "rabbitmq_management"
+                      "rabbitmq_prometheus"))))
 @end lisp
-@end defvar
 
 At startup, RabbitMQ broker logs its initialization messages into
 @file{/var/log/messages} file.  Once running, the logging messages can be
 found in a logging file of a RabbitMQ node in @file{/var/log/rabbitmq}
 directory.
 
-@quotation Note
+@quotation Warning
 The default configuration of the RabbitMQ service enables the RabbitMQ
 broker to accept connections only on loopback interfaces.  However,
 enabling certain plugins may open ports on all network interfaces.  See
-also @url{https://www.rabbitmq.com/docs/networking#ports, RabbitMQ Port Access}.
+also @url{https://www.rabbitmq.com/docs/networking#ports, RabbitMQ Port
+Access}.
 @end quotation
+@end defvar
 
 @deftp {Data Type} rabbitmq-configuration
 This data type represents the configuration for RabbitMQ.
@@ -37680,8 +37680,21 @@ This data type represents the configuration for RabbitMQ.
 @item @code{rabbitmq} (default: @code{rabbitmq})
 The RabbitMQ package to use.
 
+@item @code{node-name} (default: @code{"rabbit@@localhost"})
+Node name of a RabbitMQ broker instance. See also
+@url{https://www.rabbitmq.com/docs/clustering#node-names, RabbitMQ Node
+Names}.
+
 @item @code{config-file} (default: @code{%default-rabbitmq-config-file})
 Configuration file for the RabbitMQ broker. See also
+@url{https://www.rabbitmq.com/docs/configure, RabbitMQ Configuration}.
+
+@item @code{env-config-file} (default: @code{#f})
+Environment configuration file for the RabbitMQ broker.
+
+Set RabbitMQ environment variables, for example Erlang parameters, node
+name, or configuration file location, using @code{variable=value} format.
+Each variable name without @code{RABBITMQ_} prefix. See also
 @url{https://www.rabbitmq.com/docs/configure, RabbitMQ Configuration}.
 
 @item @code{data-directory} (default: @code{"/var/lib/rabbitmq/data"})
@@ -37691,7 +37704,6 @@ cluster member information, and other persistent node state.
 @item @code{plugins} (default: @code{'()})
 A list of RabbitMQ plugins to enable.  View all available plugins using
 the @command{rabbitmq-plugins list} command.
-
 @end table
 @end deftp
 
