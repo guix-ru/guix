@@ -11261,7 +11261,8 @@ programming.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "sdl2-mixer")))
     (inputs (list ghc-data-default-class ghc-lifted-base ghc-monad-control
-                  ghc-sdl2 ghc-vector))
+                  ghc-sdl2 ghc-vector sdl2-mixer))
+    (native-inputs (list pkg-config))
     (home-page "http://hackage.haskell.org/package/sdl2-mixer")
     (synopsis "Bindings to SDL2 mixer")
     (description "This package provides Haskell bindings to
