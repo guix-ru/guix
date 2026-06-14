@@ -36,6 +36,7 @@
   #:use-module (gnu packages haskell-check)
   #:use-module (gnu packages haskell-crypto)
   #:use-module (gnu packages haskell-xyz)
+  #:use-module (gnu packages web)
   #:use-module (guix build-system haskell)
   #:use-module (guix gexp)
   #:use-module (guix download)
@@ -1888,11 +1889,25 @@ using chart.js instead of flot.")
        (method url-fetch)
        (uri (hackage-uri "js-jquery" version))
        (sha256
-        (base32 "01mizq5s0nkbss800wjkdfss9ia193v5alrzsj356by5l40zm1x0"))))
+        (base32 "01mizq5s0nkbss800wjkdfss9ia193v5alrzsj356by5l40zm1x0"))
+       ;; Delete the pre-minified JQuery copy.
+       (snippet `(delete-file ,(format #f "javascript/jquery-~a.min.js"
+                                       version)))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "js-jquery")))
-    (arguments `(#:tests? #f)) ; tests do network IO
-    (native-inputs (list ghc-http))
+    (arguments
+     (list
+      #:tests? #f                       ; tests do network IO
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'minify-jquery
+            (lambda _
+              (with-directory-excursion "javascript"
+                (let ((jquery #$(format #f "jquery-~a.js" version))
+                      (jquery-min #$(format #f "jquery-~a.min.js" version)))
+                  (invoke "esbuild" jquery "--minify"
+                          (string-append "--outfile=" jquery-min)))))))))
+    (native-inputs (list esbuild ghc-http))
     (home-page "https://github.com/ndmitchell/js-jquery")
     (synopsis "Obtain minified jQuery code")
     (description
