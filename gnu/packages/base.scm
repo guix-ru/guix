@@ -1640,15 +1640,15 @@ command.")
     (name "tzdata")
     ;; This package should be kept in sync with python-pytz and python-tzdata
     ;; in (gnu packages time).
-    (version "2025a")
+    (version "2026b")
     (source (origin
-             (method url-fetch)
-             (uri (string-append
-                   "https://data.iana.org/time-zones/releases/tzdata"
-                   version ".tar.gz"))
-             (sha256
-              (base32
-               "1l7hnlgc4wgy2gmaj5zmswpzbyq23h7vsndnw2zhwibw5k3wnpsd"))))
+              (method url-fetch)
+              (uri (string-append
+                    "https://data.iana.org/time-zones/releases/tzdata"
+                    version ".tar.gz"))
+              (sha256
+               (base32
+                "0i7mqs9awir627n2w7yvldaqglvkl6p8cdm4pjszwswsy7cl6i8i"))))
     (build-system gnu-build-system)
     (arguments
      (list #:tests? #f
@@ -1702,12 +1702,8 @@ command.")
                      (delete-file-recursively (string-append out "/usr"))
                      (symlink (string-append out "/share/zoneinfo")
                               (string-append out "/share/zoneinfo/posix"))
-                     (delete-file-recursively
-                      (string-append out "/share/zoneinfo-posix"))
                      (copy-recursively (string-append out "/share/zoneinfo-leaps")
                                        (string-append out "/share/zoneinfo/right"))
-                     (delete-file-recursively
-                      (string-append out "/share/zoneinfo-leaps"))
                      (install-file "leap-seconds.list"
                                    (string-append out "/share/zoneinfo")))))
                (delete 'configure))))
@@ -1718,7 +1714,7 @@ command.")
                           version ".tar.gz"))
                     (sha256
                      (base32
-                      "0qahpwp1zlyvi7qrlm4r74pmj3c7sx3jlg9xw2siwj3nkzapk5hi")))))
+                      "0i533kv67wrk1f3h646zxrq3s17vrf9y4n7w48f55lzm4y2fvs9p")))))
     (home-page "https://www.iana.org/time-zones")
     (synopsis "Database of current and historical time zones")
     (description "The Time Zone Database (often called tz or zoneinfo)
