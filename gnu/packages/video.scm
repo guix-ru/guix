@@ -3972,7 +3972,7 @@ capabilities.")
      (list python-meson python-pytest pkg-config))
     (inputs
      (list ffmpeg libass tesseract-ocr zimg))
-    (home-page "http://www.vapoursynth.com/")
+    (home-page "https://www.vapoursynth.com/")
     (synopsis "Video processing framework")
     (description "VapourSynth is a C++ library and Python module for video
 manipulation.  It aims to be a modern rewrite of Avisynth, supporting
