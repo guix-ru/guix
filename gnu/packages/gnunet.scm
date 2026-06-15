@@ -155,20 +155,25 @@ tool to extract metadata from a file and print the results.")
 (define-public libmicrohttpd
   (package
    (name "libmicrohttpd")
-   (version "1.0.3")
+   (version "1.0.5")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnu/libmicrohttpd/libmicrohttpd-"
                                 version ".tar.gz"))
             (sha256
              (base32
-              "0shj6kk4xp3k45vv696bzgx4s2jzpvhp11syck1zb70rmrxba5kq"))))
+              "18iyrnib66450v9mv1fx5m0isc36xv285ryjjxxljvzsivsh0vdl"))))
    (build-system gnu-build-system)
    (arguments
     (list #:configure-flags
           #~(list "--disable-static")))
+   (native-inputs
+    (list pkg-config))
    (inputs
-    (list curl gnutls/dane libgcrypt openssl zlib))
+    (list curl libgcrypt openssl zlib))
+   (propagated-inputs
+    ;; Required by Requires.private
+    (list gnutls/dane))
    (synopsis "C library implementing an HTTP 1.1 server")
    (description
     "GNU libmicrohttpd is a small, embeddable HTTP server implemented as a
