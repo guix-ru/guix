@@ -499,6 +499,14 @@ and many external plugins.")
 build-system level.")
     (license license:gpl3+)))
 
+(define-public python-next-pytest-guix
+  (package/inherit python-pytest-guix
+    (name "python-next-pytest-guix")
+    ;; Need to use the name "python" as that is what the builder accesses.
+    (native-inputs
+     `(("python" ,(module-ref (resolve-interface '(gnu packages python))
+                              'python-next))))))
+
 (define-public python-pytoml
   (package
     (name "python-pytoml")

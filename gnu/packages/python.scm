@@ -1345,6 +1345,12 @@ data types.")
     ;; for XML support, which is generally expected to be available.
     (inputs (list expat libffi openssl zlib))))
 
+(define-public python-next-minimal
+  (package/inherit python-next
+    (name "python-next-minimal")
+    (outputs '("out"))
+    (inputs (list expat libffi openssl zlib))))
+
 (define-public python-debug
   (package/inherit python
     (name "python-debug")
@@ -1417,8 +1423,11 @@ and the unversioned commands available.")))
 (define-public python-wrapper (wrap-python3 python))
 (define-public python-minimal-wrapper (wrap-python3 python-minimal))
 
+(define-public python-next-wrapper (wrap-python3 python-next))
+(define-public python-next-minimal-wrapper (wrap-python3 python-next-minimal))
+
 ;; The Python used in pyproject-build-system.
-(define-public python-sans-pip
+(define-public (remove-pip python)
   (hidden-package
    (package/inherit python
      (arguments
@@ -1427,8 +1436,33 @@ and the unversioned commands available.")))
          #~(append '("--with-ensurepip=no")
                    (delete "--with-ensurepip=install" #$flags))))))))
 
+(define-public python-sans-pip
+  (remove-pip python))
+
 (define-public python-sans-pip-wrapper
   (wrap-python3 python-sans-pip))
+
+(define-public python-next-sans-pip
+  (remove-pip python-next))
+
+(define-public python-next-sans-pip-wrapper
+  (wrap-python3 python-next-sans-pip))
+
+(define-public python-next-setuptools-bootstrap
+  ((package-input-rewriting/spec
+    `(("python" . ,(const python-next-sans-pip))))
+   python-setuptools-bootstrap))
+
+(define-public with-python-next
+  (package-input-rewriting
+   `((,python . ,python-next)
+     (,python-minimal . ,python-next-minimal)
+     (,python-wrapper . ,python-next-wrapper)
+     (,python-minimal-wrapper . ,python-next-minimal-wrapper)
+     (,python-sans-pip . ,python-next-sans-pip)
+     (,python-sans-pip-wrapper . ,python-next-sans-pip-wrapper)
+     (,python-setuptools-bootstrap . ,python-next-setuptools-bootstrap)
+     (,python-pytest-guix . ,python-next-pytest-guix))))
 
 (define-public pythoncapi-compat
   ;; No release nor tags: use the latest commit.
