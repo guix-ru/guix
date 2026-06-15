@@ -686,7 +686,7 @@ and a high score table.")
 (define-public komikku
   (package
     (name "komikku")
-    (version "50.4.0")
+    (version "50.6.0")
     (source
      (origin
        (method git-fetch)
@@ -696,7 +696,7 @@ and a high score table.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0skkb1b6jgfzy3v1bhbgxkgxmjvnxdi442asp5gdm7j8j9cv5wxv"))))
+         "067c2vzxr2h5n1zysapwad7zadyy4fkpz28szddwla9bvqmf5wf0"))))
     (build-system meson-build-system)
     (arguments
      (list
