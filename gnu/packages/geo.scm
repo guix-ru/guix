@@ -1649,7 +1649,7 @@ development.")
 (define-public pdal
   (package
     (name "pdal")
-    (version "2.10.0")
+    (version "2.10.2")
     (source
      (origin
        (method git-fetch)
@@ -1658,7 +1658,7 @@ development.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0kbr084qmfkhc6wm76d1vgn2rvl3brzl588r2rd9441pvb19m9ds"))))
+        (base32 "164mqn7vz68nsr2ihhpqryp550p9ls02n0gqnaiw455210f0n4ap"))))
     (build-system cmake-build-system)
     (arguments
      (list
