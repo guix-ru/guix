@@ -431,6 +431,29 @@ across several operating systems.")
     (home-page "https://codeberg.org/ifreund/zig-pixman")
     (license license:expat)))
 
+(define-public zig-tracy
+  (let ((commit "67d2d89e351048c76fc6d161e0ac09d8a831dc60")
+        (revision "0"))
+    (package
+      (name "zig-tracy")
+      (version (git-version "0.0.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://github.com/kristoff-it/tracy")
+                       (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "0hb6qsx589icsa16ip59jlfr55mgdqlnmzwzwngyzzls3dp3bah4"))))
+      (build-system zig-build-system)
+      (arguments (list #:zig zig-0.15))
+      (home-page "https://github.com/kristoff-it/tracy")
+      (synopsis "Zig bindings for Tracy")
+      (description "This package provides bindings for Tracy, the frame
+profiler (@pxref{https://tracy.nereid.pl}).")
+      (license license:expat))))
+
 (define-public zig-wayland
   (package
     (name "zig-wayland")
