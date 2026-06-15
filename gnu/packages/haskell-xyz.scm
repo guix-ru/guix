@@ -2846,27 +2846,6 @@ packages.")
     (description "This package defines a class for types with default values.")
     (license license:bsd-3)))
 
-(define-public ghc-data-default-instances-old-locale
-  (package
-    (name "ghc-data-default-instances-old-locale")
-    (version "0.0.1")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (hackage-uri "data-default-instances-old-locale" version))
-        (sha256
-          (base32 "00h81i5phib741yj517p8mbnc48myvfj8axzsw44k34m48lv1lv0"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "data-default-instances-old-locale")))
-    (inputs
-     (list ghc-data-default-class ghc-old-locale))
-    (home-page
-      "https://hackage.haskell.org/package/data-default-instances-old-locale")
-    (synopsis "Default instances for types in old-locale")
-    (description "Provides Default instances for types from the old-locale
-  package.")
-    (license license:bsd-3)))
-
 (define-public ghc-data-fix
   (package
     (name "ghc-data-fix")
