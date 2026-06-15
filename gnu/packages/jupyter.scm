@@ -511,7 +511,14 @@ to Jupyter Server for their Python Web application backend.")
               ;; Some tests try to write to $HOME.
               (setenv "HOME" "/tmp")
               ;; jupyter-core demands this be set.
-              (setenv "JUPYTER_PLATFORM_DIRS" "1")))
+              (setenv "JUPYTER_PLATFORM_DIRS" "1")
+              ;; dont depend on openssh
+              ;; it does not actually call it
+              ;; just asserts that a ssh is in PATH
+              (let* ((tmp (getenv "TMPDIR"))
+                     (ssh (in-vicinity tmp "ssh")))
+                (symlink (which "false") ssh)
+                (setenv "PATH" (string-append tmp ":" (getenv "PATH"))))))
           (add-after 'check 'fix-syntax-error
             ;; Hatchling seems to generate entry scripts with invalid imports.
             (lambda _
@@ -527,7 +534,7 @@ to Jupyter Server for their Python Web application backend.")
     (inputs
      (list iproute    ;ip       jupyter_client/localinterfaces.py
            net-tools  ;ifconfig jupyter_client/localinterfaces.py
-           openssh))  ;ssh      jupyter_client/ssh/tunnel.py
+           ))
     (propagated-inputs
      (list python-dateutil
            python-jupyter-core
