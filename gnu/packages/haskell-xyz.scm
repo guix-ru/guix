@@ -16214,6 +16214,7 @@ string types into values of other string types.")
         (base32 "1n5jjnnflh2ldqvcs44al572240s2435bh5m761hrpbmai5y6kwd"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "postgresql-libpq-configure")))
+    (inputs (list postgresql))
     (home-page "https://github.com/haskellari/postgresql-libpq")
     (synopsis "low-level binding to libpq: configure based provider")
     (description
