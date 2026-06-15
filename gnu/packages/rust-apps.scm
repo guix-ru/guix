@@ -991,7 +991,7 @@ through tools like `gdb`.")
      (append (if (%current-target-system)
                  (list this-package)
                  '())
-             (list git-minimal
+             (list git-minimal/pinned
                    gnupg
                    openssh
                    pkg-config)))
