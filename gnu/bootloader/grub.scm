@@ -190,7 +190,7 @@ prepend to any store file name."
     (if (memq 'gfxterm (bootloader-configuration-terminal-outputs config))
         #~(format #f "
 if loadfont unicode; then
-  set gfxmode=~a
+  set gfxmode=~s
   insmod all_video
   insmod gfxterm
 fi~%"
