@@ -2846,27 +2846,6 @@ packages.")
     (description "This package defines a class for types with default values.")
     (license license:bsd-3)))
 
-(define-public ghc-data-default-instances-base
-  (package
-    (name "ghc-data-default-instances-base")
-    (version "0.1.0.1")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (hackage-uri "data-default-instances-base" version))
-       (sha256
-        (base32 "0ym1sw3ssdzzifxxhh76qlv8kkmb2iclc158incv1dklyr9y8kw4"))))
-    (build-system haskell-build-system)
-    (properties '((upstream-name . "data-default-instances-base")))
-    (inputs
-     (list ghc-data-default-class))
-    (home-page "https://hackage.haskell.org/package/data-default-instances-base")
-    (synopsis "Default instances for types in base")
-    (description
-     "This package provides default instances for types from the base
-package.")
-    (license license:bsd-3)))
-
 (define-public ghc-data-default-instances-containers
   (package
     (name "ghc-data-default-instances-containers")
