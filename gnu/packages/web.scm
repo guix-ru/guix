@@ -46,7 +46,7 @@
 ;;; Copyright © 2020, 2022 Michael Rohleder <mike@rohleder.de>
 ;;; Copyright © 2020, 2021 Ryan Prior <rprior@protonmail.com>
 ;;; Copyright © 2020 Alexandru-Sergiu Marton <brown121407@posteo.ro>
-;;; Copyright © 2021, 2024 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2021, 2024, 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2021 Stefan Reichör <stefan@xsteve.at>
 ;;; Copyright © 2021 la snesne <lasnesne@lagunposprasihopre.org>
 ;;; Copyright © 2021 Matthew James Kraai <kraai@ftbfs.org>
@@ -217,6 +217,8 @@
   #:use-module (gnu packages wget)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xml)
+  #:use-module (gnu packages zig)
+  #:use-module (gnu packages zig-xyz)
   #:use-module (gnu packages)
   #:use-module (guix build-system ant)
   #:use-module (guix build-system cargo)
@@ -233,6 +235,7 @@
   #:use-module (guix build-system qt)
   #:use-module (guix build-system scons)
   #:use-module (guix build-system trivial)
+  #:use-module (guix build-system zig)
   #:use-module (guix cvs-download)
   #:use-module (guix download)
   #:use-module (guix fossil-download)
@@ -7009,6 +7012,41 @@ w3c webidl files and a binding configuration file.")
 rendering engine entirely written from scratch.  It is small and capable of
 handling many of the web standards in use today.")
     (license license:gpl2+)))
+
+(define-public superhtml
+  (package
+    (name "superhtml")
+    (version "0.6.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/kristoff-it/superhtml")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1ii2c2ssjpg0f8yr19gi4knhly7xcbfxpwq7889b8k2mmzrxri6g"))
+              (snippet
+               (rename-zig-dependencies
+                '(("known_folders" . "zig-known-folders")
+                  ("lsp_kit" . "zig-lsp-kit")
+                  ("scripty" . "zig-scripty")
+                  ("tracy" . "zig-tracy"))))))
+    (build-system zig-build-system)
+    (arguments (list #:zig zig-0.15
+                     #:install-source? #f))
+    (inputs (list zig-known-folders-for-zig-0.15
+                  zig-lsp-kit-for-zig-0.15
+                  zig-scripty
+                  zig-tracy))
+    (home-page "https://github.com/kristoff-it/superhtml")
+    (synopsis "HTML validator, formatter, LSP, and templating language library")
+    (description "SuperHTML is an HTML validator, formatter, @acronym{LSP,
+Language Server Protocol}, and templating language library.  It provides the
+@command{superhtml} command that can validate and autoformat HTML files.  The
+tool can be used either directly (for example by running it on save), or
+through a LSP client implementation.")
+    (license license:expat)))
 
 (define-public surfraw
   (let ((commit "ebb8131c7c623ef90d3345cd9d64203693861013")
