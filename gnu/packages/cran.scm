@@ -33450,7 +33450,7 @@ user credentials.")
     (properties `((upstream-name . "gert")))
     (build-system r-build-system)
     (inputs
-     (list libgit2 openssh openssl pcre2 zlib))
+     (list libgit2 openssl pcre2 zlib))
     (propagated-inputs
      (list r-askpass
            r-credentials
