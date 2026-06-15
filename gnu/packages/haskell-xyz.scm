@@ -17507,7 +17507,8 @@ CHANGELOG>")
                          ghc-network
                          ghc-quickcheck
                          ghc-servant-server
-                         ghc-markdown-unlit))
+                         ghc-markdown-unlit
+                         hspec-discover))
     (arguments
      `(#:cabal-revision ("2"
                          "01if9an74258ri4sg91z64f200wl5z9i368ngc25wcgqkzpda3xd")))
