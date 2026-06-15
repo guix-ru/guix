@@ -431,6 +431,36 @@ across several operating systems.")
     (home-page "https://codeberg.org/ifreund/zig-pixman")
     (license license:expat)))
 
+(define-public zig-scripty
+  (let ((commit "50dbab8945440089384f26ec165d870c29555247")
+        (revision "0"))
+    (package
+      (name "zig-scripty")
+      (version (git-version "0.1.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://github.com/kristoff-it/scripty")
+                       (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "1qkmrisac80h2k996a8s60pxr4fyn3gfjisb9dvpyl29pa4ghwmg"))))
+      (build-system zig-build-system)
+      (arguments (list #:zig zig-0.15))
+      (inputs (list zig-tracy))
+      (home-page "https://github.com/kristoff-it/scripty")
+      (synopsis "Tiny scripting language meant to be embedded in strings")
+      (description "Scripty is a tiny scripting language meant to be embedded
+in strings or other similar constructs, usually within a host document.
+Scripty supports only the basic syntax necessary to build expressions that can:
+@itemize
+@item refer to basic literals;
+@item access fields starting from a root evaluation context (eg $foo.bar);
+@item call functions.
+@end itemize")
+      (license license:expat))))
+
 (define-public zig-tracy
   (let ((commit "67d2d89e351048c76fc6d161e0ac09d8a831dc60")
         (revision "0"))
