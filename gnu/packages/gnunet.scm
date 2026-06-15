@@ -88,16 +88,14 @@
 (define-public libextractor
   (package
     (name "libextractor")
-    (version "1.13")
+    (version "1.14")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/libextractor/libextractor-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "0mgprmwdhdwq9xhfxfhcncd304425nvcc4zi8ci5f0nja4n333xv"))
-              (patches
-               (search-patches "libextractor-tidy-support.patch"))))
+                "1026dg626b0vy55rz3wv9rpmvqsqahbpphsdqqr4mz6a7x1mafhs"))))
     (build-system gnu-build-system)
     (outputs '("out"
                "static"))               ; 420 KiB .a files
@@ -107,9 +105,6 @@
                                   #$(this-package-input "libltdl")))
            #:phases
            #~(modify-phases %standard-phases
-               (add-after 'unpack 'force-reconfigure
-                 (lambda _
-                   (delete-file "configure")))
                (add-after 'install 'move-static-libraries
                  (lambda* (#:key outputs #:allow-other-keys)
                    ;; Move static libraries to the "static" output.
@@ -122,12 +117,7 @@
                                  (delete-file file))
                                (find-files lib "\\.a$"))))))))
     (native-inputs
-     (list autoconf-2.71
-           automake
-           gettext-minimal
-           libtool
-           pkg-config
-           texinfo))
+     (list pkg-config))
     (inputs
      (list bzip2
            exiv2-0.27
