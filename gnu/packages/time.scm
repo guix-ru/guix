@@ -232,13 +232,13 @@ applications, and several support tools.")
   (package
     (name "python-tzdata")
     ;; This package should be kept in sync with tzdata in (gnu packages base).
-    (version "2025.1")
+    (version "2026.2")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "tzdata" version))
        (sha256
-        (base32 "156nh5d0fagghgyz54ymbd4cnr6z05w8iiin2syjinwcx04lk294"))
+        (base32 "041dlvnl5xmykw9ln5za85ygh11dba71cbk65bh1i40dv3kzswwi"))
        (modules '((guix build utils)))
        (snippet #~(delete-file-recursively "src/tzdata/zoneinfo"))))
     (build-system pyproject-build-system)
@@ -255,10 +255,7 @@ applications, and several support tools.")
                      (const #t)))))))
     (inputs (list tzdata))
     (native-inputs
-     (list python-pytest
-           python-pytest-subtests
-           python-setuptools
-           python-wheel))
+     (list python-setuptools))
     (home-page "https://github.com/python/tzdata")
     (synopsis "Python wrapper of IANA time zone data")
     (description "This package provides a thin Python wrapper around tzdata.")
