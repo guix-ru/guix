@@ -16122,6 +16122,7 @@ Language} for @code{ghc-persistent}.")
         (base32 "1dg709kz1rrgj3ir24a8pww47my03h3k5vcn2qld7h2ffcbnlxd9"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "persistent-mysql")))
+    (arguments (list #:tests? #f)) ; tests require a running MySql database
     (inputs (list ghc-persistent
                   ghc-aeson
                   ghc-blaze-builder
@@ -16131,16 +16132,8 @@ Language} for @code{ghc-persistent}.")
                   ghc-mysql-simple
                   ghc-resourcet
                   ghc-resource-pool
-                  ghc-unliftio-core))
-    (native-inputs (list ghc-fast-logger
-                         ghc-hspec
-                         ghc-http-api-data
-                         ghc-hunit
-                         ghc-path-pieces
-                         ghc-persistent-qq
-                         ghc-persistent-test
-                         ghc-quickcheck
-                         ghc-quickcheck-instances))
+                  ghc-unliftio-core
+                  pcre))
     (home-page "http://www.yesodweb.com/book/persistent")
     (synopsis
      "Backend for the @code{ghc-persistent} library using MySQL database server")
