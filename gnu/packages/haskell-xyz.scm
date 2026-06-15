@@ -52,6 +52,7 @@
 (define-module (gnu packages haskell-xyz)
   #:use-module (gnu packages)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages check)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages emacs)
@@ -12065,7 +12066,6 @@ mainstream languages.")
     (build-system haskell-build-system)
     (properties '((upstream-name . "splitmix")))
     (native-inputs (list ghc-hunit
-                         ghc-hunit
                          ghc-math-functions
                          ghc-test-framework
                          ghc-test-framework-hunit
@@ -12074,7 +12074,7 @@ mainstream languages.")
                          ghc-tf-random
                          ghc-vector
                          ghc-base-compat-batteries
-                         ghc-hunit))
+                         testu01))
     (home-page "http://hackage.haskell.org/package/splitmix")
     (synopsis "Fast and splittable pseudorandom number generator")
     (description
