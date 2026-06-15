@@ -40008,7 +40008,6 @@ information about geometries.")
      (list curl
            gdal
            geos
-           openssh
            openssl
            pcre2
            proj-9.3
