@@ -428,7 +428,8 @@ to @code{cabal repl}).")
                         (string-append bin "/git-remote-annex"))
                (symlink (string-append bin "/git-annex")
                         (string-append bin "/git-remote-tor-annex"))))))))
-    (inputs (list ghc-network-uri
+    (inputs (list curl
+                  ghc-network-uri
                   ghc-optparse-applicative
                   ghc-uuid
                   ghc-data-default
@@ -515,10 +516,13 @@ to @code{cabal repl}).")
                   ghc-network-info
                   ghc-torrent
                   ghc-magic
-                  ghc-criterion))
+                  ghc-criterion
+                  lsof
+                  rsync
+                  xdg-utils))
     (propagated-inputs
      (list git))
-    (native-inputs (list ghc-filepath-bytestring))
+    (native-inputs (list perl ghc-filepath-bytestring))
     (home-page "https://git-annex.branchable.com/")
     (synopsis "Manage files with Git, without checking in their contents")
     (description "This package allows managing files with Git, without
