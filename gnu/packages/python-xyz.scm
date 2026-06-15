@@ -183,6 +183,7 @@
 ;;; Copyright © 2026 Akiyoshi Suda <code@akiyoshisuda.com>
 ;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
+;;; Copyright © 2026 John Dawson <dawson.john.andrew@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -2638,6 +2639,34 @@ like pie glass').")
     (description "This package provides Spyder-specific extras for the
 Language Server Protocol (LSP) on Python, such as document symbol searching
 and others.")
+    (license license:expat)))
+
+(define-public python-pylsp-rope
+  (package
+    (name "python-pylsp-rope")
+    (version "0.1.17")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/python-rope/pylsp-rope")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1mgmlqv75z6cpqqak4vqprrgdhxa4b2ll56zijjx9bkn0rjr4jc0"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-lsp-server
+           python-rope))
+    (home-page "https://github.com/python-rope/pylsp-rope")
+    (synopsis
+     "Extended refactoring capabilities for Python LSP Server using Rope")
+    (description
+     "This plugs in to Python LSP Server, adding code actions that refactor
+using Rope.")
     (license license:expat)))
 
 (define-public python-pypydispatcher
