@@ -4087,15 +4087,10 @@ supported by services such as Ubuntu's @code{NotifyOSD}.")
                   ghc-utf8-string
                   ghc-xml-types
                   ghc-xml-conduit))
-    (native-inputs (list ghc-hunit
-                         ghc-syb
-                         ghc-test-framework
-                         ghc-test-framework-hunit
-                         ghc-doctest
-                         ghc-doctest-driver-gen))
     (arguments
      `(#:cabal-revision ("5"
-                         "0y9f6dcgmmfzgxq9dbgs6lypd6pmcb0x1qvvkj20l74ba9k30v96")))
+                         "0y9f6dcgmmfzgxq9dbgs6lypd6pmcb0x1qvvkj20l74ba9k30v96")
+       #:tests? #f)) ; tests fail to compile with current xml-conduit
     (home-page "https://github.com/haskell-party/feed")
     (synopsis "Haskell package for handling various syndication formats")
     (description
