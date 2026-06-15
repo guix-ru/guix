@@ -16065,14 +16065,15 @@ Haskell datatypes in text form using the @code{ghc-blaze-builder} library.")
         (base32 "0hwv1hlr65m5l2zrrj5zmvrjz9y2814jy05l17l5jb4j4j5xw3z2"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "mysql-simple")))
+    (arguments (list #:tests? #f)) ; tests require a running MySql database
     (inputs (list ghc-attoparsec
                   ghc-base16-bytestring
                   ghc-blaze-builder
                   ghc-mysql
                   ghc-pcre-light
+                  pcre
                   ghc-old-locale
                   ghc-vector))
-    (native-inputs (list ghc-hspec))
     (home-page "https://github.com/paul-rouse/mysql-simple")
     (synopsis "Mid-level MySQL client library")
     (description
