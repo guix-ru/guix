@@ -25,7 +25,7 @@
 ;;; Copyright © 2023 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2024 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2024 Sharlatan Hellseher <sharlatanus@gmail.com>
-;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
+;;; Copyright © 2024, 2026 Zheng Junjie <z572@z572.online>
 ;;; Copyright © 2024 Vinicius Monego <monego@posteo.net>
 ;;; Copyright © 2024, 2025 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2026 jgart <jgart@dismail.de>
@@ -293,14 +293,14 @@ you will remove support for the pytz-specific interface.")
   (package
     (name "python-pytz")
     ;; This package should be kept in sync with tzdata in (gnu packages base).
-    (version "2025.1")
+    (version "2026.2")
     (source
      (origin
       (method url-fetch)
       (uri (pypi-uri "pytz" version))
       (sha256
        (base32
-        "13hpf2my8mgqkr38ch7s3rym9zz60m6pq87rcn7b46155az45ny2"))))
+        "0snxgkmxdjpkaiknr88y6ai99600phdf53r1dwvp85gj55xv8q0f"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:test-backend #~'unittest
