@@ -3174,6 +3174,30 @@ retried.")
 allowing you to declaratively define \"match\" rules.")
     (license license:bsd-3)))
 
+(define-public testu01
+  (let ((commit "57e98bf33880daedc930739c81e39b89a8d24dba")
+        (revision "1"))
+    (package
+      (name "testu01")
+      (version (git-version "1.2.3" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/umontreal-simul/TestU01-2009")
+               (commit commit)))
+         (sha256
+          (base32 "0ja83px81jmvsijvdisi1n632p4wv0nk2im089z6jpldqdf1h4ws"))
+         (file-name (git-file-name name version))))
+      (build-system gnu-build-system)
+      (synopsis "Utilities for testing uniform random number generators")
+      (description
+       "TestU01 is a software library, implemented in the ANSI C language, and
+offering a collection of utilities for the empirical statistical testing of
+uniform random number generators.")
+      (home-page "https://github.com/umontreal-simul/TestU01-2009")
+      (license license:asl2.0))))
+
 (define-public theft
   (package
    (name "theft")
