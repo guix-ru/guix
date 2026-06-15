@@ -47,6 +47,7 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages cpp)
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages cyrus-sasl)
@@ -62,9 +63,11 @@
   #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages ncurses)
   #:use-module (gnu packages nettle)
+  #:use-module (gnu packages networking)
   #:use-module (gnu packages nss)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages pretty-print)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-check)
@@ -76,6 +79,7 @@
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages ssh)
   #:use-module (gnu packages tls)
+  #:use-module (gnu packages upnp)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages web)
   #:use-module (gnu packages xml)
@@ -98,7 +102,7 @@
 (define-public transmission
   (package
     (name "transmission")
-    (version "4.1.1")
+    (version "4.1.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -110,7 +114,24 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1v5qjarqvd26v757mj56yyw75mn3ydvhxl5hdkw8hn3idr1lww3k"))))
+                "02brbjwmpn26igwg2a8cwz5a9d8cl8im1xgd6zi4i13a8lgym3ql"))
+              (modules '((guix build utils)))
+              (snippet
+               #~(begin
+                   (for-each
+                    (lambda (x)
+                      (delete-file-recursively (string-append "third-party/" x)))
+                    '("fast_float"
+                      "fmt"
+                      "libdeflate"
+                      "libevent"
+                      "libnatpmp"
+                      "libpsl"
+                      "miniupnp"))
+                   (for-each
+                    (lambda (x)
+                      (delete-file (string-append "cmake/" x)))
+                    '("FindFmt.cmake" "FindFastFloat.cmake"))))))
     (build-system cmake-build-system)
     (outputs '("out"                      ; library and command-line interface
                "gui"))                    ; graphical user interface
@@ -123,11 +144,6 @@
                     (guix build utils))
         #:phases
         #~(modify-phases %standard-phases
-           ;; Avoid embedding kernel version for reproducible build
-           (add-after 'unpack 'remove-kernel-version
-             (lambda _
-               (substitute* "third-party/miniupnp/miniupnpc/updateminiupnpcstrings.sh"
-                 (("OS_VERSION=`uname -r`") "OS_VERSION=Guix"))))
            (replace 'check
              (lambda* (#:key tests? parallel-tests? #:allow-other-keys)
                (if tests?
@@ -168,10 +184,16 @@
                    (,(getenv "GDK_PIXBUF_MODULE_FILE")))))))))
     (inputs (list bash-minimal
                   curl
+                  fast-float
+                  fmt-12
                   (list glib "bin")
                   gtkmm
                   libappindicator
+                  libdeflate
                   libevent
+                  libnatpmp
+                  libpsl
+                  miniupnpc
                   openssl
                   python
                   zlib))
