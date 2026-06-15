@@ -1,0 +1,47 @@
+From 58f62c9e09d5a239b2502469923c6d87a227d9de Mon Sep 17 00:00:00 2001
+From: Bram Vandenbogaerde <bram@vdb.space>
+Date: Tue, 24 Sep 2024 22:46:53 +0200
+Subject: [PATCH] fix: stop redefining the GHC version to fix incompatibilities
+ between Int# and Int32# in happy
+
+https://github.com/paul-rouse/mysql-simple/pull/61
+
+---
+ src/Language/Python/Version2/Parser/Parser.y | 5 ++++-
+ src/Language/Python/Version3/Parser/Parser.y | 4 ++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/Language/Python/Version2/Parser/Parser.y b/src/Language/Python/Version2/Parser/Parser.y
+index b06d47e..b312349 100644
+--- a/src/Language/Python/Version2/Parser/Parser.y
++++ b/src/Language/Python/Version2/Parser/Parser.y
+@@ -1,8 +1,11 @@
+ {
+ {-# LANGUAGE CPP #-}
+ 
+-#undef __GLASGOW_HASKELL__
++-- For legacy reasons
++#if __GLASGOW_HASKELL__ < 901 
++#undef __GLASGOW_HASKELL_
+ #define __GLASGOW_HASKELL__ 709
++#endif 
+ -----------------------------------------------------------------------------
+ -- |
+ -- Module      : Language.Python.Version2.Parser.Parser 
+diff --git a/src/Language/Python/Version3/Parser/Parser.y b/src/Language/Python/Version3/Parser/Parser.y
+index 214faeb..d473be4 100644
+--- a/src/Language/Python/Version3/Parser/Parser.y
++++ b/src/Language/Python/Version3/Parser/Parser.y
+@@ -1,8 +1,12 @@
+ {
+ {-# LANGUAGE CPP #-}
+ 
++-- For legacy reasons
++#if __GLASGOW_HASKELL__ < 901 
+ #undef __GLASGOW_HASKELL__
+ #define __GLASGOW_HASKELL__ 709
++#endif
++
+ -----------------------------------------------------------------------------
+ -- |
+ -- Module      : Language.Python.Version3.Parser.Parser 

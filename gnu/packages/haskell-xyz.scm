@@ -6679,7 +6679,8 @@ with @code{wc} (for a web service).")
        (method url-fetch)
        (uri (hackage-uri "language-python" version))
        (sha256
-        (base32 "1mf3czvnh9582klv0c9g7pcn1wx4qjwpvhv8la6afaifv6y5lki2"))))
+        (base32 "1mf3czvnh9582klv0c9g7pcn1wx4qjwpvhv8la6afaifv6y5lki2"))
+       (patches (search-patches "ghc-language-python-fix-build-with-happy-2.patch"))))
     (build-system haskell-build-system)
     (arguments
      `(#:cabal-revision ("2"
