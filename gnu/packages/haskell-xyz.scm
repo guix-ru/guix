@@ -5764,6 +5764,7 @@ representations of current time.")
         (base32 "1g47rf3pglfkjyk3qfz6wvjp0zh16s4qhayqyyzxg91aqq3fqqd6"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "hpack")))
+    (arguments (list #:tests? #f)) ; tests require internet access
     (inputs (list ghc-glob
                   ghc-aeson
                   ghc-bifunctors
@@ -5776,13 +5777,6 @@ representations of current time.")
                   ghc-unordered-containers
                   ghc-vector
                   ghc-yaml))
-    (native-inputs (list ghc-hunit
-                         ghc-quickcheck
-                         ghc-hspec
-                         ghc-interpolate
-                         ghc-mockery
-                         ghc-temporary
-                         ghc-vcr))
     (home-page "https://github.com/sol/hpack#readme")
     (synopsis "Tools for an alternative Haskell package format")
     (description
