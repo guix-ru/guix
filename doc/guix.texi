@@ -5165,6 +5165,16 @@ the system type of the build host.
 @item --bootstrap
 Use the bootstrap Guile to build the latest Guix.  This option is only
 useful to Guix developers.
+
+@item --full
+Perform a full clone of the repository of each pulled channel.
+
+By default, @command{guix pull} makes a @dfn{sparse checkout} of channel
+repositories, only fetching data that is required.  Consequently,
+contents of additional branches and historical versions of some files
+may be missing.  By passing @option{--full}, you instruct @command{guix
+pull} to perform a full clone with all the branches, all the history,
+and all the file contents.
 @end table
 
 The @dfn{channel} mechanism allows you to instruct @command{guix pull} which
@@ -5370,6 +5380,9 @@ guix time-machine -C <(echo %default-channels) @dots{}
 @itemx -x
 Select or exclude channels that need to be updated.  @xref{pull-select}, for
 more info.
+
+@item --full
+Perform a full clone of the repository of each pulled channel.
 
 @end table
 

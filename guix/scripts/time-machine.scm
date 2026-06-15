@@ -87,6 +87,8 @@ If COMMAND is not provided, print path to the time-machine profile.\n"))
   (display (G_ "
       --no-check-certificate
                          do not validate the certificate of HTTPS servers"))
+  (display (G_ "
+      --full             make a full clone of the Git repositories of channels"))
   (newline)
   (show-build-options-help)
   (newline)
@@ -143,6 +145,9 @@ If COMMAND is not provided, print path to the time-machine profile.\n"))
          (option '("no-check-certificate") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'verify-certificate? #f result)))
+         (option '("full") #f #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'full? #t result)))
          (option '(#\h "help") #f #f
                  (lambda args
                    (leave-on-EPIPE (show-help))
@@ -227,7 +232,8 @@ to %OLDEST-POSSIBLE-COMMIT is not that of an ancestor."
             (ref          (assoc-ref opts 'ref))
             (substitutes?  (assoc-ref opts 'substitutes?))
             (authenticate? (assoc-ref opts 'authenticate-channels?))
-            (verify-certificate? (assoc-ref opts 'verify-certificate?)))
+            (verify-certificate? (assoc-ref opts 'verify-certificate?))
+            (full? (assoc-ref opts 'full?)))
        (let* ((directory
                (with-store store
                  (with-status-verbosity (assoc-ref opts 'verbosity)
@@ -244,7 +250,8 @@ to %OLDEST-POSSIBLE-COMMIT is not that of an ancestor."
                                               #:validate-channels
                                               validate-guix-channel
                                               #:verify-certificate?
-                                              verify-certificate?)))))
+                                              verify-certificate?
+                                              #:full? full?)))))
               (executable (string-append directory "/bin/guix")))
          (if command-line
              (apply execl (cons* executable executable command-line))

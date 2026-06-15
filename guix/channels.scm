@@ -6,6 +6,7 @@
 ;;; Copyright © 2024 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2024 Rostislav Svoboda <Rostislav.Svoboda@gmail.com>
 ;;; Copyright © 2026 Simon Tournier <zimon.toutoune@gmail.com>
+;;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -49,7 +50,8 @@
                            repository-info
                            commit-short-id
                            tag->commit
-                           with-repository)
+                           with-repository
+                           ensure-reference-available)
   #:autoload   (guix git-authenticate) (authenticate-repository)
   #:autoload   (guix openpgp) (openpgp-fingerprint->bytevector
                                openpgp-format-fingerprint)
@@ -447,8 +449,10 @@ fails."
     (channel-introduction channel))
 
   (define keyring-reference
-    (channel-metadata-keyring-reference
-     (read-channel-metadata-from-source checkout)))
+    (string-append
+     keyring-reference-prefix
+     (channel-metadata-keyring-reference
+      (read-channel-metadata-from-source checkout))))
 
   (define (make-reporter start-commit end-commit commits)
     (format (current-error-port)
@@ -480,14 +484,16 @@ commits)...~%"
 
   ;; XXX: Too bad we need to re-open CHECKOUT.
   (with-repository checkout repository
+    ;; This might be a checkout with filtered blobs, explicitly ask for the
+    ;; keyring branch contents.
+    (ensure-reference-available repository keyring-reference)
+
     (authenticate-repository repository
                              (string->oid
                               (channel-introduction-first-signed-commit intro))
                              (channel-introduction-first-commit-signer intro)
                              #:end (string->oid commit)
-                             #:keyring-reference
-                             (string-append keyring-reference-prefix
-                                            keyring-reference)
+                             #:keyring-reference keyring-reference
                              #:authentic-commits authentic-commits
                              #:make-reporter make-reporter)))
 
@@ -497,12 +503,16 @@ commits)...~%"
                                   (authenticate? #t)
                                   (validate-pull
                                    ensure-forward-channel-update)
-                                  (verify-certificate? #t))
+                                  (verify-certificate? #t)
+                                  (full? #f))
   "Return the latest channel instance for CHANNEL.  When STARTING-COMMIT is
 true, call VALIDATE-PULL with CHANNEL, STARTING-COMMIT, the target commit, and
 their relation.  When AUTHENTICATE? is false, CHANNEL is not authenticated.
 When VERIFY-CERTIFICATE? is false, invalid X.509 host certificates are
-accepted."
+accepted.
+
+If FULL? is true, perform a full checkout, containing all the branches, file
+contents, and history."
   (define (dot-git? file stat)
     (and (string=? (basename file) ".git")
          (eq? 'directory (stat:type stat))))
@@ -512,7 +522,9 @@ accepted."
                   (update-cached-checkout (channel-url channel)
                                           #:ref (channel-reference channel)
                                           #:starting-commit starting-commit
-                                          #:verify-certificate? verify-certificate?)))
+                                          #:verify-certificate? verify-certificate?
+                                          #:full? full?
+                                          #:files-with-history '(".guix-authorizations"))))
     (when relation
       (validate-pull channel starting-commit commit relation))
 
@@ -597,7 +609,8 @@ information."
                                    (authenticate? #t)
                                    (validate-pull
                                     ensure-forward-channel-update)
-                                   (verify-certificate? #t))
+                                   (verify-certificate? #t)
+                                   (full? #f))
   "Return a list of channel instances corresponding to the latest checkouts of
 CHANNELS and the channels on which they depend.
 
@@ -610,7 +623,10 @@ accepted.
 CURRENT-CHANNELS is the list of currently used channels.  It is compared
 against the newly-fetched instances of CHANNELS, and VALIDATE-PULL is called
 for each channel update and can choose to emit warnings or raise an error,
-depending on the policy it implements."
+depending on the policy it implements.
+
+If FULL? is true, perform a full checkouts, containing all the branches, file
+contents, and history."
   (define (current-commit name)
     ;; Return the current commit for channel NAME.
     (any (lambda (channel)
@@ -659,7 +675,8 @@ depending on the policy it implements."
                                                 #:starting-commit
                                                 current
                                                 #:verify-certificate?
-                                                verify-certificate?)))
+                                                verify-certificate?
+                                                #:full? full?)))
                  (when authenticate?
                    ;; CHANNEL is authenticated so we can trust the
                    ;; primary URL advertised in its metadata and warn

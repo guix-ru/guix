@@ -243,6 +243,7 @@
 
    (eval . (put 'call-with-progress-reporter 'scheme-indent-function 1))
    (eval . (put 'with-repository 'scheme-indent-function 2))
+   (eval . (put 'with-sparse-checkout 'scheme-indent-function 2))
    (eval . (put 'with-temporary-git-repository 'scheme-indent-function 2))
    (eval . (put 'with-served-git-repository 'scheme-indent-function 2))
    (eval . (put 'with-environment-variables 'scheme-indent-function 1))

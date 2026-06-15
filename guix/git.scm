@@ -6,6 +6,7 @@
 ;;; Copyright © 2022 Maxime Devos <maximedevos@telenet.be>
 ;;; Copyright © 2023 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2023, 2025, 2026 Simon Tournier <zimon.toutoune@gmail.com>
+;;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -39,13 +40,16 @@
   (git-reference-url git-reference-commit git-reference-recursive?)
   #:autoload   (guix config) (%git)
   #:use-module (guix sets)
-  #:use-module ((guix diagnostics) #:select (leave warning info))
+  #:use-module ((guix diagnostics)
+                #:select (leave warning info formatted-message))
   #:use-module (guix progress)
   #:autoload   (guix swh) (swh-download commit-id?)
   #:use-module (rnrs bytevectors)
   #:use-module (ice-9 format)
   #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
+  #:use-module (ice-9 rdelim)
+  #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-11)
   #:use-module (srfi srfi-26)
@@ -61,6 +65,7 @@
             repository-info
             update-cached-checkout
             url+commit->name
+            ensure-reference-available
             latest-repository-commit
             commit-difference
             commit-relation
@@ -80,9 +85,17 @@
 
             git-reference->git-checkout))
 
+(define %legacy-repository-cache-directory
+  ;; Directory containing cached checkouts prior to resorting to blob
+  ;; filtering.  This directory would only contain full checkouts.
+  (string-append (cache-directory #:ensure? #f) "/checkouts"))
+
 (define %repository-cache-directory
+  ;; Directory used for cached checkouts.  The "-v2" suffix was introduced
+  ;; when switching to blob-filtered checkouts, which the former
+  ;; Guile-Git/libgit2 implementation cannot handle.
   (make-parameter (string-append (cache-directory #:ensure? #f)
-                                 "/checkouts")))
+                                 "/checkouts-v2")))
 
 (define (honor-system-x509-certificates!)
   "Use the system's X.509 certificates for Git checkouts over HTTPS.  Honor
@@ -182,6 +195,93 @@ the 'SSL_CERT_FILE' and 'SSL_CERT_DIR' environment variables."
   ;; Return true to indicate that we should go on.
   #t)
 
+
+;;;
+;;; Git CLI output parser.
+;;;
+
+(define (read-progress port)
+  "Parse and print Git CLI progress from PORT."
+
+  ;; Characters that delimit a progress line from the Git CLI output.
+  (define line-delimiter "\r\n")
+
+  ;; Regex to match progress lines from the Git CLI output.
+  (define progress-regex
+    (make-regexp "^(remote:[ \t]*)?([^:]+):[ \t]+([0-9]{1,3})%"))
+
+  (define (line->progress line)
+    (and=> (regexp-exec progress-regex line)
+           (lambda (rx-match)
+             (cons (string-trim-both (match:substring rx-match 2))
+                   (string->number (match:substring rx-match 3))))))
+
+  (define (translate-progress-label label)
+    (match label
+      ("Counting objects"    (G_ "counting objects"))
+      ("Compressing objects" (G_ "compressing objects"))
+      ("Receiving objects"   (G_ "receiving objects"))
+      ("Resolving deltas"    (G_ "resolving deltas"))
+      ("Updating files"      (G_ "updating files"))
+      (else (string-downcase label)))) ;no translation.
+
+  (define (render progress)
+    (match-let* (((english-label . percent) progress)
+                 (port (current-error-port))
+                 (width (max (- (current-terminal-columns)
+                                (terminal-string-width english-label) 7)
+                             3))
+                 (bar (progress-bar percent width)))
+      (erase-current-line port)
+      (format port "~a ~3,d% ~a"
+              (translate-progress-label english-label)
+              percent bar)
+      (force-output port)))
+
+  (let ((line (read-delimited line-delimiter port)))
+    (unless (eof-object? line)
+      (and=> (line->progress line)
+             render)
+      (read-progress port))))
+
+(define-condition-type &git-cli-error &error
+  git-cli-error?
+  (program      git-cli-error-program)
+  (arguments    git-cli-error-arguments)
+  (exit-status  git-cli-error-exit-status)
+  (term-signal  git-cli-error-term-signal)
+  (stop-signal  git-cli-error-stop-signal))
+
+(define (invoke-git . args)
+  "Invoke %git with ARGS while parsing output into progress bars."
+  (match-let* (((input . output) (pipe))
+               ;; Git prints progress to STDERR, STDOUT is used for messages
+               ;; that we do not want to show when using this wrapper.
+               ;; Unfortunately, Guile does not provide a platform agnostic
+               ;; '%null-device' variable.
+               (null-device (open-output-file "/dev/null"))
+               (args* `(,%git
+                        "-c" "color.ui=false" ;ensure color is disabled.
+                        ,@args))
+               (pid (spawn %git args*
+                           #:output null-device
+                           #:error output
+                           ;; Set and easy to parse locale.
+                           #:environment (cons "LC_ALL=C" (environ)))))
+    (close-port output)
+    (read-progress input)
+    (match-let* (((id . status) (waitpid pid)))
+      (unless (zero? status)
+        (raise (condition
+                (&git-cli-error
+                 (program %git)
+                 (arguments args*)
+                 (exit-status (status:exit-val status))
+                 (term-signal (status:term-sig status))
+                 (stop-signal (status:stop-sig status))))))
+      #t)))
+
+
 (define* (make-default-fetch-options #:key (verify-certificate? #t))
   "Return the default fetch options.  VERIFY-CERTIFICATE? determines whether
 to verify X.509 host certificates."
@@ -216,19 +316,37 @@ If one of them is #f, the corresponding default setting is kept unchanged."
   (when read-timeout
     (set-server-timeout! read-timeout)))
 
-(define* (clone* url directory #:key (verify-certificate? #t))
+(define* (clone* url directory
+                 #:key
+                 (full? #t)
+                 (verify-certificate? #t))
   "Clone git repository at URL into DIRECTORY.  Upon failure,
-make sure no empty directory is left behind."
+make sure no empty directory is left behind.
+
+If FULL? is true, perform a full checkout, containing all the branches, file
+contents, and history."
   (with-throw-handler #t
     (lambda ()
       (mkdir-p directory)
 
       (let* ((repository
-              (clone url directory
-                     (make-clone-options
-                      #:fetch-options (make-default-fetch-options
-                                       #:verify-certificate?
-                                       verify-certificate?)))))
+              (if full?
+                  (clone url directory
+                         (make-clone-options
+                          #:fetch-options (make-default-fetch-options
+                                           #:verify-certificate?
+                                           verify-certificate?)))
+                  (begin
+                    ;; XXX: As of libgit2 1.9.7 (used by Guile-Git), there's
+                    ;; no support for fetch filters. A big Git repo (such as
+                    ;; Guix) takes a lot of bandwidth and CPU time to clone,
+                    ;; this is one of the main culprits of the percived
+                    ;; slowness of 'guix pull'.
+                    (invoke-git "clone" "--progress"
+                                "--filter=blob:none"
+                                url directory)
+                    ;; Return a libgit2 object
+                    (repository-open directory)))))
         repository))
     (lambda _
       (false-if-exception (rmdir directory)))))
@@ -349,7 +467,11 @@ OID (roughly the commit hash) corresponding to REF."
   (define obj
     (resolve-reference repository ref))
 
-  (reset repository obj RESET_HARD)
+  ;; XXX: since we are cloning using Git filters though the shell we need to
+  ;; use Git from the shell. This is because 'libgit2' does not support lazily
+  ;; fetching Git blobs, so we need to use the CLI to fetch those missing
+  ;; blobs for us.
+  (reset* repository obj RESET_HARD)
 
   ;; There might still be untracked files in REPOSITORY due to an interrupted
   ;; checkout for example; delete them.
@@ -462,28 +584,47 @@ a copy archived at Software Heritage."
    (lambda (bare)
      (and (swh-download url tag-or-commit bare
                         #:archive-type 'git-bare)
-          (let ((repository (clone* bare output)))
+          (let ((repository (clone* bare output #:full? #t)))
             (remote-set-url! repository "origin" url)
             repository)))))
 
 (define* (clone/swh-fallback url ref cache-directory
-                             #:key (verify-certificate? #t))
+                             #:key
+                             (full? #t)
+                             (verify-certificate? #t))
   "Like 'clone', but fallback to Software Heritage if the repository cannot be
-found at URL."
+found at URL.
+
+If FULL? is true, perform a full checkout, containing all the branches, file
+contents, and history."
   (define (inaccessible-url-error? err)
     (let ((class (git-error-class err))
           (code  (git-error-code err)))
       (or (= class GITERR_HTTP)                   ;404 or similar
           (= class GITERR_NET))))                 ;unknown host, etc.
-
-  (catch 'git-error
+  ;; Catching all exceptions since need to catch both '&git-error' from
+  ;; Guile-Git and '&git-cli-error' from the 'invoke-git' procedure.
+  (catch #t
     (lambda ()
       (clone* url cache-directory
+              #:full? full?
               #:verify-certificate? verify-certificate?))
     (lambda (key err)
+      (if (and (git-cli-error? err)
+               (git-cli-error-exit-status err))
+          (warning (G_ "command~{ ~s~} failed with status ~a~%")
+                   (cons (git-cli-error-program err)
+                         (git-cli-error-arguments err))
+                   (git-cli-error-exit-status err))
+          (leave (G_ "command~{ ~s~} terminated due to signal signal ~a~%")
+                 (cons (git-cli-error-program err)
+                       (git-cli-error-arguments err))
+                 (or (git-cli-error-term-signal err)
+                     (git-cli-error-stop-signal err))))
       (match ref
         (((or 'commit 'tag-or-commit) . commit)
-         (if (inaccessible-url-error? err)
+         (if (or (git-cli-error? err) ;from 'invoke-git'.
+                 (inaccessible-url-error? err))
              (or (clone-from-swh url commit cache-directory)
                  (begin
                    (warning (G_ "revision ~a of ~a \
@@ -491,7 +632,9 @@ could not be fetched from Software Heritage~%")
                             commit url)
                    (throw key err)))
              (throw key err)))
-        (_ (throw key err))))))
+        (_ (if (git-cli-error? err)
+               (leave (G_ "failed to clone from '~a'~%") url)
+               (throw key err)))))))
 
 (define cached-checkout-expiration
   ;; Return the expiration time procedure for a cached checkout.
@@ -546,6 +689,8 @@ could not be fetched from Software Heritage~%")
                                  (read-timeout 45000)
                                  (ref '())
                                  recursive?
+                                 (full? #f)
+                                 (files-with-history '())
                                  (check-out? #t)
                                  starting-commit
                                  (log-port (%make-void-port "w"))
@@ -574,7 +719,14 @@ X.509 host certificate; otherwise, warn about the problem and keep going.
 Wait for up to CONNECTION-TIMEOUT milliseconds when establishing connection to
 the remote server, and for up to READ-TIMEOUT milliseconds when reading from
 it.  When zero, use the system defaults for these timeouts; when false, leave
-current settings unchanged."
+current settings unchanged.  Warning: These timeout values are ignored unless
+FULL? is true.
+
+If FULL? is true, perform a full checkout, containing all the branches, file
+contents, and history.
+
+FILES-WITH-HISTORY is a list of patterns that controls which file's blobs must
+be pressent accross the checkout history."
   (define (cache-entries directory)
     (filter-map (match-lambda
                   ((or "." "..")
@@ -613,6 +765,7 @@ current settings unchanged."
           (repository    (if cache-exists?
                              (repository-open cache-directory)
                              (clone/swh-fallback url ref cache-directory
+                                                 #:full? full?
                                                  #:verify-certificate?
                                                  verify-certificate?)))
           (config (repository-config repository)))
@@ -655,6 +808,19 @@ current settings unchanged."
                              #:verify-certificate?
                              verify-certificate?)))
 
+       ;; XXX: Now that 'switch-to-ref' moved HEAD, retrieve all blobs
+       ;; corresponding to the sparse files reachable from any of the current
+       ;; branch commits.  Each of the FILES-WITH-HISTORY in each commit is
+       ;; required for the authentication of said commit during the call to
+       ;; 'authenticate-repository'.  'with-sparse-checkout' makes a sparse
+       ;; repository, only within the context of its body, the repository tree
+       ;; will go back to normal outside of the body.  This is required since
+       ;; 'build-aux/build-self.scm' will be needed for computing the Guix
+       ;; derivation later on.
+       (with-sparse-checkout repository files-with-history
+         #:cone? #f
+         (backfill repository))
+
        ;; Reclaim file descriptors and memory mappings associated with
        ;; REPOSITORY as soon as possible.
        (repository-close! repository)
@@ -681,7 +847,95 @@ current settings unchanged."
                                                #:cleanup-period
                                                %checkout-cache-cleanup-period)))
 
+       ;; Blob filtering sets up a new cache directory but the old cache
+       ;; directory still needs to be cleaned up.  Remove after 2027-12-01.
+       (maybe-remove-expired-cache-entries %legacy-repository-cache-directory
+                                           cache-entries
+                                           #:entry-expiration
+                                           cached-checkout-expiration
+                                           #:delete-entry delete-checkout
+                                           #:cleanup-period
+                                           (* 2 %checkout-cache-cleanup-period))
+
        (values cache-directory (oid->string oid) relation)))))
+
+;; XXX: Guile git is not able to lazily fetch blobs filtered through a clone
+;; using '--filter=blob:none', 'guix pull' filters those blobs to speedup the
+;; process.
+(define (ensure-reference-available repository reference)
+  "Ensure all blobs in the tree of REFERENCE, a string such as
+\"origin/master\", are present in REPOSITORY."
+  (invoke-git "-C" (repository-working-directory repository)
+              "backfill" "--max-count=1" "--no-sparse" reference))
+
+(define* (sparse-set repository patterns #:key (cone? #t))
+  "Enable and configure REPOSITORY as a sparse checkout described by the list
+of PATTERNS.
+
+When CONE? is #t, each pattern in PATTERNS specifies files or directories,
+including the contents of those directories and their descendants.  Otherwise,
+each pattern uses Git's ignore-style syntax to select files and directories."
+  ;; XXX: The usage of '--no-cone' is discouraged since it comes with a few
+  ;; drawbacks, however, for the performance improvements of this pull request
+  ;; this is required. Although the authors advise against using it, the
+  ;; feature will not be removed as exposed here:
+  ;; https://lore.kernel.org/git/CABPp-BEJoMcQSF4EyO0VJJVDY5CZtSEgzyK3_2vOMLSBv4HLeQ@mail.gmail.com
+  (let ((workdir (repository-working-directory repository))
+        (type (if cone? "--cone" "--no-cone")))
+    (apply invoke-git "-C" workdir
+           "sparse-checkout" "set" type patterns)))
+
+(define (sparse-disable repository)
+  "Disable sparse checkout in REPOSITORY."
+  (invoke-git "-C" (repository-working-directory repository)
+              "sparse-checkout" "disable"))
+
+(define* (call-with-sparse-checkout repository patterns proc
+                                    #:key (cone? #t))
+  "Call PROC in REPOSITORY configured with a sparse checkout following
+list of PATTERNS."
+  (catch #t
+    (lambda ()
+      (sparse-set repository patterns #:cone? cone?)
+      (proc repository)
+      (sparse-disable repository))
+    (lambda args
+      (sparse-disable repository)
+      (apply throw args))))
+
+(define-syntax with-sparse-checkout
+  (syntax-rules ()
+    "Open the REPOSITORY at DIRECTORY and configure a sparse checkout
+following list of PATTERNS within the dynamic extent of EXP.  The optional
+keyword argument CONE? controls how the patterns are processed."
+    ((_ repository patterns #:cone? cone? exp ...)
+     (call-with-sparse-checkout
+      repository patterns
+      (lambda (repository) exp ...)
+      #:cone? cone?))
+    ((_ repository patterns exp ...)
+     (call-with-sparse-checkout
+      repository patterns
+      (lambda (repository) exp ...)))))
+
+(define (backfill repository)
+  "Download missing objects in REPOSITORY head."
+  (invoke-git "-C" (repository-working-directory repository)
+              "backfill"))
+
+(define (reset* repository obj type)
+  "Reset REPOSITORY HEAD to point to OBJ ensuring blobs are present.
+TYPE controls the reset behavior."
+  (let* ((workdir (repository-working-directory repository))
+         (commit (object->commit obj))
+         (id (commit-id commit))
+         (type* (cond
+                 ((eq? type RESET_SOFT) "--soft")
+                 ((eq? type RESET_MIXED) "--mixed")
+                 ((eq? type RESET_HARD) "--hard"))))
+    ;; Note: Shelling out to 'git' here because Guile-Git/libgit2 cannot
+    ;; lazily fetch missing blobs from a sparse checkout.
+    (invoke-git "-C" workdir "reset" type* (oid->string id))))
 
 (define* (latest-repository-commit store url
                                    #:key

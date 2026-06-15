@@ -869,7 +869,10 @@ failing when GUIX is too old and lacks the 'guix repl' command."
   ;; Former directory for cached inferiors, by default under $HOME/.cache.
   (string-append (cache-directory #:ensure? #f) "/inferiors"))
 
-(define* (channel-full-commit channel #:key (verify-certificate? #t))
+(define* (channel-full-commit channel
+                              #:key
+                              (verify-certificate? #t)
+                              (full? #f))
   "Return the commit designated by CHANNEL as quickly as possible.  If
 CHANNEL's 'commit' field is a full SHA1, return it as-is; if it's a SHA1
 prefix, resolve it; and if 'commit' is unset, fetch CHANNEL's branch tip."
@@ -883,7 +886,8 @@ prefix, resolve it; and if 'commit' is unset, fetch CHANNEL's branch tip."
                      (update-cached-checkout (channel-url channel)
                                              #:ref ref
                                              #:check-out? #f
-                                             #:verify-certificate? verify-certificate?)))
+                                             #:verify-certificate? verify-certificate?
+                                             #:full? full?)))
           commit))))
 
 (define* (cached-channel-instance store
@@ -894,7 +898,8 @@ prefix, resolve it; and if 'commit' is unset, fetch CHANNEL's branch tip."
                                   (ttl (* 3600 24 30))
                                   (reference-channels '())
                                   (validate-channels (const #t))
-                                  (verify-certificate? #t))
+                                  (verify-certificate? #t)
+                                  (full? #f))
   "Return a directory containing a guix filetree defined by CHANNELS, a list of channels.
 The directory is a subdirectory of CACHE-DIRECTORY, where entries can be
 reclaimed after TTL seconds.  This procedure opens a new connection to the
@@ -906,14 +911,18 @@ instances against REFERENCE-CHANNELS; it is passed as #:validate-pull to
 channel commit is deemed \"invalid\".
 
 When VERIFY-CERTIFICATE? is true, raise an error when encountering an invalid
-X.509 host certificate; otherwise, warn about the problem and keep going."
+X.509 host certificate; otherwise, warn about the problem and keep going.
+
+If FULL? is true, perform a full checkouts, containing all the branches, file
+contents, and history."
   (define commits
     ;; Since computing the instances of CHANNELS is I/O-intensive, use a
     ;; cheaper way to get the commit list of CHANNELS.  This limits overhead
     ;; to the minimum in case of a cache hit.
     (map (lambda (channel)
            (channel-full-commit channel
-                                #:verify-certificate? verify-certificate?))
+                                #:verify-certificate? verify-certificate?
+                                #:full? full?))
          channels))
 
   (define (key commits)
@@ -981,7 +990,8 @@ X.509 host certificate; otherwise, warn about the problem and keep going."
                                                            #:validate-pull
                                                            validate-channels
                                                            #:verify-certificate?
-                                                           verify-certificate?))
+                                                           verify-certificate?
+                                                           #:full? full?))
                              (commits -> (map channel-instance-commit instances)))
           ;; Return early if cache is hit with filled channel dependencies.
           (if (file-exists? (cached commits))

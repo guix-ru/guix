@@ -144,6 +144,8 @@ Download and deploy the latest version of Guix.\n"))
   -v, --verbosity=LEVEL  use the given verbosity LEVEL"))
   (display (G_ "
       --bootstrap        use the bootstrap Guile to build the new Guix"))
+  (display (G_ "
+      --full             make a full clone of the Git repositories of channels"))
   (newline)
   (show-build-options-help)
   (newline)
@@ -248,6 +250,9 @@ Download and deploy the latest version of Guix.\n"))
          (option '("bootstrap") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'bootstrap? #t result)))
+         (option '("full") #f #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'full? #t result)))
 
          (option '(#\h "help") #f #f
                  (lambda args
@@ -1067,7 +1072,8 @@ Use '~/.config/guix/channels.scm' instead."))
             (current-channels (profile-channels profile))
             (validate-pull    (assoc-ref opts 'validate-pull))
             (authenticate?    (assoc-ref opts 'authenticate-channels?))
-            (verify-certificate? (assoc-ref opts 'verify-certificate?)))
+            (verify-certificate? (assoc-ref opts 'verify-certificate?))
+            (full? (assoc-ref opts 'full?)))
        (cond
         ((assoc-ref opts 'query)
          (process-query opts profile))
@@ -1101,7 +1107,8 @@ Use '~/.config/guix/channels.scm' instead."))
                                                    #:authenticate?
                                                    authenticate?
                                                    #:verify-certificate?
-                                                   verify-certificate?)))
+                                                   verify-certificate?
+                                                   #:full? full?)))
                    (format (current-error-port)
                            (N_ "Building from this channel:~%"
                                "Building from these channels:~%"
