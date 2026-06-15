@@ -37936,8 +37936,19 @@ them in distributed compute environments.")
          "1i4pfy3y7dhzywnmx270cl442k2xlpd8ix127c6fgpvibi8z9h48"))))
     (properties `((upstream-name . "parallelly")))
     (build-system r-build-system)
-    ;; Tests require SSH
-    (native-inputs (list openssh))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'pre-check
+            (lambda _
+              ;; dont depend on openssh
+              ;; it does not actually call it
+              ;; just asserts that a ssh is in PATH
+              (let* ((tmp (getenv "TMPDIR"))
+                     (ssh (in-vicinity tmp "ssh")))
+                (symlink (which "false") ssh)
+                (setenv "PATH" (string-append tmp ":" (getenv "PATH")))))))))
     (home-page "https://github.com/HenrikBengtsson/parallelly")
     (synopsis "Enhancements of the parallel package")
     (description
