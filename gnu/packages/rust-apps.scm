@@ -2801,7 +2801,7 @@ container management applications.")
            (list this-package)
            '())
        (list pkg-config
-             git-minimal))) ; For tests
+             git-minimal/pinned))) ; For tests
     (inputs (cons `(,zstd "lib")
                   (cargo-inputs 'onefetch)))
     (home-page "https://onefetch.dev")
