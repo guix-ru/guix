@@ -12668,10 +12668,6 @@ which can't be decoded in the current locale encoding.")
         (base32 "19fs8g1p07ckb0ydak4fczz58ngy3aywkliv1hbcvlc5w512j8ig"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "system-filepath")))
-    (arguments
-     `(#:tests? #f ; TODO: Needs chell ==0.4.*
-       #:cabal-revision
-       ("1" "18llfvisghrn9w9yfgacqn51gs50a0lngah3bmg852h0swj7vkp8")))
     (native-inputs
      (list ghc-chell ghc-chell-quickcheck ghc-quickcheck))
     (home-page "https://github.com/fpco/haskell-filesystem")
