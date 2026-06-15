@@ -102,7 +102,7 @@
                            "TestUtil_Exec_CommandTimeout")
                      "|"))))
     (native-inputs
-     (list git-minimal
+     (list git-minimal/pinned
            go-github-com-google-go-cmp
            go-github-com-stretchr-testify
            go-github-com-urfave-cli-v3))
