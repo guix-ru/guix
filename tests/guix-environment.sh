@@ -58,9 +58,9 @@ guix environment --bootstrap --ad-hoc guile-bootstrap --pure	\
      --preserve='^GUIX_TEST_A' --preserve='^GUIX_TEST_D'	\
      -- "$SHELL" -c set > "$tmpdir/a"
 grep '^PATH=' "$tmpdir/a"
-grep '^GUIX_TEST_ABC=' "$tmpdir/a"
-grep '^GUIX_TEST_DEF=' "$tmpdir/a"
-grep '^GUIX_TEST_XYZ=' "$tmpdir/a" && false
+grep '^GUIX_TEST_ABC=1' "$tmpdir/a"
+grep '^GUIX_TEST_DEF=2' "$tmpdir/a"
+grep '^GUIX_TEST_XYZ=3' "$tmpdir/a" && false
 
 # Make sure the exit value is preserved.
 if guix environment --bootstrap --ad-hoc guile-bootstrap --pure \
