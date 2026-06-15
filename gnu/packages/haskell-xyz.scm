@@ -16672,7 +16672,7 @@ highlighting and display the results in Brick-based interfaces.")
     (properties '((upstream-name . "githash")))
     (inputs (list ghc-th-compat))
     (native-inputs (list ghc-hspec hspec-discover ghc-temporary ghc-unliftio
-                         git-minimal))
+                         git-minimal/pinned))
     (home-page "https://github.com/snoyberg/githash#readme")
     (synopsis "Compile git revision info into Haskell projects")
     (description "Please see the README and documentation at
