@@ -823,6 +823,22 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
                (base32
                 "11yla93vm2896fzhm3fz8lk3y3iz5iy7vd6wa7wnwvhsfd2dbfq3"))))))
 
+(define-public catch2-3.15
+  (package
+    (inherit catch2-3.8)
+    (name "catch2")
+    (version "3.15.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/catchorg/Catch2")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1sswpsa8v3nx9ydyzj867y9514sgfzhmvi8vqvrz576sh2a008r5"))))))
+
 (define-public cmocka
   (package
     (name "cmocka")
