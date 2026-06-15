@@ -188,7 +188,7 @@ authentication and support for SSL3 and TLS.")
 (define-public gnunet
   (package
     (name "gnunet")
-    (version "0.25.2")
+    (version "0.27.0")
     (source
      (origin
        (method url-fetch)
@@ -196,7 +196,7 @@ authentication and support for SSL3 and TLS.")
                            ".tar.gz"))
        (sha256
         (base32
-         "1rn24rm6z5p0vnk5lwq0jihnbh956n24yd5nmmgv2firbp1nzdza"))))
+         "01ra62bp6sc4v9nmnydwycbk1f8bz0cbd6m4cqvrkl5qyfrzxn4x"))))
     (build-system meson-build-system)
     (inputs
      (list bluez
