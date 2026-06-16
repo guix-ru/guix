@@ -389,8 +389,8 @@ across several operating systems.")
        (substitute-keyword-arguments arguments
          ((#:zig _ #f) zig-0.14))))))
 
-(define-public zig-known-folders-for-zls-0.15
-  (let ((commit "92defaee76b07487769ca352fd0ba95bc8b42a2f")
+(define-public zig-known-folders-for-zig-0.15
+  (let ((commit "83d39161eac2ed6f37ad3cb4d9dd518696ce90bb")
         (revision "0")
         (base zig-known-folders))
     (package
@@ -405,10 +405,14 @@ across several operating systems.")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1bwv7kndr4lv7khrrjwg2vgg3cy41y28rmv7rbv7jy06shqy4nzq"))))
+          (base32 "0czhcdrj2scpg14y75mfgg2xdn79is79ny10ys6fx8dl7xhdm9bx"))))
       (arguments
        (substitute-keyword-arguments arguments
          ((#:zig _ #f) zig-0.15))))))
+
+;;; TODO: Remove after 2027-01-16.
+(define-deprecated-package zig-known-folders-for-zls-0.15
+  zig-known-folders-for-zig-0.15)
 
 (define-public zig-pixman
   (package
@@ -754,6 +758,6 @@ Language Server Protocol} for the Zig programming language.")
          (prepend zig-lsp-kit-for-zls-0.15)
          (delete "zig-lsp-codegen")
          (replace "zig-diffz" zig-diffz-for-zls-0.15)
-         (replace "zig-known-folders" zig-known-folders-for-zls-0.15))))))
+         (replace "zig-known-folders" zig-known-folders-for-zig-0.15))))))
 
 (define-public zig-zls zig-zls-0.13)
