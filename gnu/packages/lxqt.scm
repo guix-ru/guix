@@ -214,7 +214,7 @@ applications.")
 (define-public liblxqt
   (package
     (name "liblxqt")
-    (version "2.3.0")
+    (version "2.4.0")
     (source
      (origin
        (method url-fetch)
@@ -222,7 +222,7 @@ applications.")
              "https://github.com/lxqt/" name "/releases/download/"
              version "/" name "-" version ".tar.xz"))
        (sha256
-        (base32 "1p74hvw6qncvj04dvzxkv22hvn0rsjx6z1csi7nmcvhn5yfn2p1b"))))
+        (base32 "0jpfz0ydyaxw5v1zzdlxj7nvllnv8dbmax32acihfdzb8ib229v6"))))
     (build-system cmake-build-system)
     (arguments
      `(#:tests? #f                      ; no tests
