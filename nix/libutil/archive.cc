@@ -155,94 +155,169 @@ struct CaseInsensitiveCompare
     }
 };
 
+/* Used to place a consistent upper bound on recursion depth */
+#define DIRECTORY_NESTING_LIMIT 256
 
-static void parse(ParseSink & sink, Source & source, const Path & path)
+static void parse(ParseSink & sink, Source & source, const Path & path,
+                  int nestLimit)
 {
+    if (nestLimit <= 0) throw Error("nar directory nesting limit reached");
     string s;
 
     s = readString(source);
     if (s != "(") throw badArchive("expected open tag");
 
-    enum { tpUnknown, tpRegular, tpDirectory, tpSymlink } type = tpUnknown;
+    s = readString(source);
+    if (s != "type") throw badArchive("expected type tag");
 
-    std::map<Path, int, CaseInsensitiveCompare> names;
+    s = readString(source);
 
-    while (1) {
-        checkInterrupt();
-
+    if (s == "regular") {
+        bool executable = false;
         s = readString(source);
-
-        if (s == ")") {
-            break;
-        }
-
-        else if (s == "type") {
-            if (type != tpUnknown)
-                throw badArchive("multiple type fields");
-            string t = readString(source);
-
-            if (t == "regular") {
-                type = tpRegular;
-                sink.createRegularFile(path);
-            }
-
-            else if (t == "directory") {
-                sink.createDirectory(path);
-                type = tpDirectory;
-            }
-
-            else if (t == "symlink") {
-                type = tpSymlink;
-            }
-
-            else throw badArchive("unknown file type " + t);
-
-        }
-
-        else if (s == "contents" && type == tpRegular) {
-            parseContents(sink, source, path);
-        }
-
-        else if (s == "executable" && type == tpRegular) {
+        if (s == "executable") {
+            executable = true;
             readString(source);
-            sink.isExecutable();
+            s = readString(source);
         }
 
-        else if (s == "entry" && type == tpDirectory) {
-            string name, prevName;
+        if (s != "contents") throw badArchive("expected contents tag");
+
+        sink.createRegularFile(path);
+        if (executable) sink.isExecutable();
+        parseContents(sink, source, path);
+        s = readString(source);
+        if (s != ")") throw badArchive("expected close tag");
+    }
+    else if (s == "symlink") {
+        s = readString(source);
+        if (s != "target") throw badArchive("expected target tag");
+        s = readString(source);
+        sink.createSymlink(path, s);
+        s = readString(source);
+        if (s != ")") throw badArchive("expected close tag");
+    }
+    else if (s == "directory") {
+        string prevName;
+        sink.createDirectory(path);
+        while (true) {
+            checkInterrupt();
+            s = readString(source);
+            if (s == ")") break;
+            if (s != "entry") throw badArchive("expected entry tag");
 
             s = readString(source);
-            if (s != "(") throw badArchive("expected open tag");
+            if (s != "(") throw badArchive("expected entry open tag");
 
-            while (1) {
-                checkInterrupt();
+            s = readString(source);
+            if (s != "name") throw badArchive("expected name tag");
+
+            s = readString(source);
+            string name = s;
+            if (name.empty() || name == "." || name == ".."
+                || name.find('/') != string::npos
+                || name.find((char) 0) != string::npos)
+                throw Error(std::format("NAR contains invalid file name `{}'", name));
+            if (!prevName.empty() && name <= prevName)
+                throw Error("NAR directory is not sorted");
+
+            s = readString(source);
+            if (s != "node") throw badArchive("expected node tag");
+
+            parse(sink, source, path + "/" + name, nestLimit - 1);
+
+            s = readString(source);
+            if (s != ")") throw badArchive("expected entry close tag");
+            prevName = name;
+        }
+    }
+    else throw badArchive("unknown type");
+}
+
+/* Unbounded variant that doesn't recurse, uses path as its stack */
+static void parse_unbounded(ParseSink & sink, Source & source, Path & path)
+{
+    string prevName;
+    string s;
+start:
+    s = readString(source);
+    if (s != "(") throw badArchive("expected open tag");
+
+    s = readString(source);
+    if (s != "type") throw badArchive("expected type tag");
+
+    s = readString(source);
+
+    if (s == "regular") {
+        bool executable = false;
+        s = readString(source);
+        if (s == "executable") {
+            executable = true;
+            readString(source);
+            s = readString(source);
+        }
+
+        if (s != "contents") throw badArchive("expected contents tag");
+
+        sink.createRegularFile(path);
+        if (executable) sink.isExecutable();
+        parseContents(sink, source, path);
+        s = readString(source);
+        if (s != ")") throw badArchive("expected close tag");
+    }
+    else if (s == "symlink") {
+        s = readString(source);
+        if (s != "target") throw badArchive("expected target tag");
+        s = readString(source);
+        sink.createSymlink(path, s);
+        s = readString(source);
+        if (s != ")") throw badArchive("expected close tag");
+    }
+    else if (s == "directory") {
+        sink.createDirectory(path);
+        while (true) {
+            checkInterrupt();
+            s = readString(source);
+            if (s == ")") break;
+            if (s != "entry") throw badArchive("expected entry tag");
+
+            s = readString(source);
+            if (s != "(") throw badArchive("expected entry open tag");
+
+            s = readString(source);
+            if (s != "name") throw badArchive("expected name tag");
+
+            s = readString(source);
+            {
+                string name = s;
+                if (name.empty() || name == "." || name == ".."
+                    || name.find('/') != string::npos
+                    || name.find((char) 0) != string::npos)
+                    throw Error(std::format("NAR contains invalid file name `{}'", name));
+                if (!prevName.empty() && name <= prevName)
+                    throw Error("NAR directory is not sorted");
 
                 s = readString(source);
+                if (s != "node") throw badArchive("expected node tag");
 
-                if (s == ")") {
-                    break;
-                } else if (s == "name") {
-                    name = readString(source);
-                    if (name.empty() || name == "." || name == ".." || name.find('/') != string::npos || name.find((char) 0) != string::npos)
-                        throw Error(std::format("NAR contains invalid file name `{}'", name));
-                    if (name <= prevName)
-                        throw Error("NAR directory is not sorted");
-                    prevName = name;
-                } else if (s == "node") {
-                    if (s.empty()) throw badArchive("entry name missing");
-                    parse(sink, source, path + "/" + name);
-                } else
-                    throw badArchive("unknown field " + s);
+                /* parse(sink, source, path + "/" + name); */
+                path.append("/" + name);
+                prevName = "";
+                goto start;
             }
-        }
 
-        else if (s == "target" && type == tpSymlink) {
-            string target = readString(source);
-            sink.createSymlink(path, target);
+        continue_directory:
+            s = readString(source);
+            if (s != ")") throw badArchive("expected entry close tag");
         }
+    }
+    else throw badArchive("unknown type");
 
-        else
-            throw badArchive("unknown field " + s);
+    string::size_type slash_pos = path.rfind("/");
+    if (slash_pos != string::npos) {
+        prevName = string(path, slash_pos+1);
+        path.erase(slash_pos);
+        goto continue_directory;
     }
 }
 
@@ -258,7 +333,12 @@ void parseDump(ParseSink & sink, Source & source)
     }
     if (version != archiveVersion1)
         throw badArchive("input doesn't look like a normalized archive");
-    parse(sink, source, "");
+
+    parse(sink, source, "", DIRECTORY_NESTING_LIMIT);
+    /*
+    string file = "";
+    parse_unbounded(sink, source, file);
+    */
 }
 
 
