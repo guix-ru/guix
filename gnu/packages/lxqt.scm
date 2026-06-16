@@ -677,14 +677,14 @@ allows for launching applications or shutting down the system.")
 (define-public lxqt-session
   (package
     (name "lxqt-session")
-    (version "2.3.0")
+    (version "2.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/lxqt/" name "/releases/download/"
                            version "/" name "-" version ".tar.xz"))
        (sha256
-        (base32 "13vjkyrxqayl1d00bf3j1k5qvs99d36xxdd5y8cg22byb1x2j4ff"))))
+        (base32 "0i5sgg2sryjz2pbmia2m18xrqwhrb7sqhklny6ap3z0brs73fzyp"))))
     (build-system cmake-build-system)
     (inputs
      (list bash-minimal
@@ -724,7 +724,7 @@ allows for launching applications or shutting down the system.")
             ;; LXQt applications install their default config files into
             ;; 'share/lxqt' and search them from XDG_CONFIG_DIRS/lxqt.
             (variable "XDG_CONFIG_DIRS")
-            (files '("share")))))
+            (files '("share" "etc/xdg")))))
     (home-page "https://lxqt-project.org")
     (synopsis "Session manager for LXQt")
     (description "lxqt-session provides the standard session manager
