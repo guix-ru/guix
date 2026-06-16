@@ -1381,35 +1381,35 @@ other git-like projects such as @code{libgit2}.")
                                "libgit2-path-max.patch"))
               (modules '((guix build utils)))
               (snippet
-               '(begin
-                  (for-each delete-file-recursively
-                            '("deps/chromium-zlib"
-                              "deps/llhttp"
-                              "deps/ntlmclient"
-                              "deps/pcre"
-                              "deps/winhttp"
-                              "deps/zlib"))))))
+               #~(begin
+                   (for-each delete-file-recursively
+                             '("deps/chromium-zlib"
+                               "deps/llhttp"
+                               "deps/ntlmclient"
+                               "deps/pcre"
+                               "deps/winhttp"
+                               "deps/zlib"))))))
     (build-system cmake-build-system)
     (outputs '("out" "debug"))
     (arguments
-     `(#:configure-flags
-       (list "-DUSE_NTLMCLIENT=OFF" ;TODO: package this
-             "-DREGEX_BACKEND=pcre2"
-             "-DUSE_HTTP_PARSER=http-parser"
-             "-DUSE_SSH=ON" ; cmake fails to find libssh if this is missing
-             ;; See https://github.com/libgit2/libgit2/issues/7169
-             ,@(if (target-32bit?)
-                   '("-DCMAKE_C_FLAGS=-D_FILE_OFFSET_BITS=64")
-                   '()))
-       #:phases
-       (modify-phases %standard-phases
-         ;; Run checks more verbosely, unless we are cross-compiling.
-         (replace 'check
-           (lambda* (#:key (tests? #t) #:allow-other-keys)
-             (if tests?
-                 (invoke "./libgit2_tests" "-v" "-Q")
-                 ;; Tests may be disabled if cross-compiling.
-                 (format #t "Test suite not run.~%")))))))
+     (list #:configure-flags
+           #~(list "-DUSE_NTLMCLIENT=OFF"         ;TODO: package this
+                   "-DREGEX_BACKEND=pcre2"
+                   "-DUSE_HTTP_PARSER=http-parser"
+                   "-DUSE_SSH=ON" ; cmake fails to find libssh if this is missing
+                   ;; See https://github.com/libgit2/libgit2/issues/7169
+                   #$@(if (target-32bit?)
+                          '("-DCMAKE_C_FLAGS=-D_FILE_OFFSET_BITS=64")
+                          '()))
+           #:phases
+           #~(modify-phases %standard-phases
+               ;; Run checks more verbosely, unless we are cross-compiling.
+               (replace 'check
+                 (lambda* (#:key (tests? #t) #:allow-other-keys)
+                   (if tests?
+                       (invoke "./libgit2_tests" "-v" "-Q")
+                       ;; Tests may be disabled if cross-compiling.
+                       (format #t "Test suite not run.~%")))))))
     (inputs
      (list libssh2 http-parser))
     (native-inputs
