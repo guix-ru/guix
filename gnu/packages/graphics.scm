@@ -637,7 +637,28 @@ with the @command{autotrace} utility or as a C library, @code{libautotrace}.")
                      "-DEMBREE_IGNORE_CMAKE_CXX_FLAGS=OFF"
                      "-DCMAKE_CXX_FLAGS=-flax-vector-conversions"))
                   (else
-                   '())))))
+                   '())))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-pkg-config
+            (lambda _
+              (let* ((pkgconfig-dir (string-append #$output "/lib/pkgconfig"))
+                     (pc-file (string-append pkgconfig-dir "/embree4.pc")))
+                (mkdir-p pkgconfig-dir)
+                (call-with-output-file pc-file
+                  (lambda (port)
+                    (format port "\
+prefix=~a
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Embree
+Description: High-performance ray tracing library
+Version: ~a
+Cflags: -I${includedir}
+Libs: -L${libdir} -lembree4
+" #$output #$version)))))))))
     (inputs
      (list glfw onetbb))
     (home-page "https://www.embree.org/")
@@ -664,7 +685,12 @@ applications.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1kcvz7g6j56anv9zjyd3gidxl46vipw0gg82lns12m45cd43iwxm"))))))
+                "1kcvz7g6j56anv9zjyd3gidxl46vipw0gg82lns12m45cd43iwxm"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (delete 'install-pkg-config)))))))
 
 (define-public openvdb
   (package
