@@ -1396,6 +1396,12 @@ other git-like projects such as @code{libgit2}.")
                    "-DREGEX_BACKEND=pcre2"
                    "-DUSE_HTTP_PARSER=http-parser"
                    "-DUSE_SSH=ON" ; cmake fails to find libssh if this is missing
+
+                   ;; Use the SHA1 implementation from OpenSSL rather than the
+                   ;; builtin one.  This halves the CPU time spent in the
+                   ;; "indexing objects" phase when cloning the Guix repo.
+                   "-DUSE_SHA1=HTTPS"
+
                    ;; See https://github.com/libgit2/libgit2/issues/7169
                    #$@(if (target-32bit?)
                           '("-DCMAKE_C_FLAGS=-D_FILE_OFFSET_BITS=64")
