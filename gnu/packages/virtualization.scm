@@ -2620,19 +2620,19 @@ Open Container Initiative (OCI) image layout and its tagged images.")
 (define-public skopeo
   (package
     (name "skopeo")
-    (version "1.22.2")
+    (version "1.23.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
-                    (url "https://github.com/containers/skopeo")
+                    (url "https://github.com/podman-container-tools/skopeo")
                     (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "05ag8rj2w6p78llhiwb2h460nf0vn7mppaara6l1dcb84sycj8jg"))))
+                "0l83k5gj5dx26wx200y61xcxxhxccwdqnj2r7xfs0h8fh56pmfvj"))))
     (build-system gnu-build-system)
     (native-inputs
-     (list go-1.24
+     (list go
            go-md2man
            pkg-config))
     (inputs
@@ -2675,7 +2675,7 @@ Open Container Initiative (OCI) image layout and its tagged images.")
                 `("PATH" suffix
                   ;; We need at least newuidmap, newgidmap and mount.
                   ("/run/privileged/bin"))))))))
-    (home-page "https://github.com/containers/skopeo")
+    (home-page "https://github.com/podman-container-tools/skopeo")
     (synopsis "Interact with container images and container image registries")
     (description
      "@command{skopeo} is a command line utility providing various operations
