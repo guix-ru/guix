@@ -344,7 +344,7 @@ currently does not do much, but it might in the future.")
 (define-public guile-arguments
   (package
     (name "guile-arguments")
-    (version "0.1.1")
+    (version "0.2.0")
     (source
      (origin
        (method git-fetch)
@@ -354,7 +354,7 @@ currently does not do much, but it might in the future.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1r71l6099afk017a3ck5mpp2xhb3bm45s6nga24lhby52rxbkayl"))))
+         "1zznif1bdw9lh5wx3jjal2r7gvz9xxm0ichadn3jkl592zw1lrjz"))))
     (build-system gnu-build-system)
     (arguments
      (list
