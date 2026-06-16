@@ -812,14 +812,14 @@ components to build desktop file managers which belongs to LXDE.")
 (define-public pcmanfm-qt
   (package
     (name "pcmanfm-qt")
-    (version "2.3.0")
+    (version "2.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/lxqt/" name "/releases/download/"
                            version "/" name "-" version ".tar.xz"))
        (sha256
-        (base32 "02bdf6cp4pg6s9lrxpg15pqj0n4agf6ldhnfaksd7vbayg04rarh"))))
+        (base32 "1bwdnibb96q1q0drsswmxr6zld40frdvrypggi4010w1bb7imysk"))))
     (build-system cmake-build-system)
     (arguments
      (list
