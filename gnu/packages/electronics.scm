@@ -3608,6 +3608,33 @@ from cython cimport numeric"))))
 the @acronym{FDTD, Finite-Difference Time-Domain} method.")
     (license license:gpl3+)))
 
+(define-public python-pyrtl
+  (package
+    (name "python-pyrtl")
+    (version "0.12")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/UCSBarchlab/PyRTL")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0f0g57lwpbzbm1hk9n7ndzw0zpx6srclsxxbsp2760wcna64lpl6"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatchling python-hatch-vcs python-pytest))
+    (propagated-inputs
+     (list python-graphviz python-pyparsing))
+    (synopsis
+     "@acronym{RTL, Register Transfert Level} hardware design and simulation")
+    (description
+     "PyRTL provides a collection of classes for Pythonic @acronym{RTL,
+Register Transfer Logic}-level design, simulation, tracing, and testing,
+suitable for teaching and research.")
+    (home-page "https://UCSBarchlab.github.io/PyRTL")
+    (license license:bsd-3)))
+
 (define-public python-pyucis
   (package
     (name "python-pyucis")
