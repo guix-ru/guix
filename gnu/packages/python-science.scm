@@ -2321,7 +2321,7 @@ Xarray Datatree.")
     (arguments
      (list
       #:build-backend "hatchling.build" ; recent versions use uv-build
-      ;; 3054 passed, 238 skipped, 72 xfailed
+      ;; tests: 3557 passed, 118 skipped, 79 xfailed
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
               ;; Run a minimal portion of tests, the complete test suite
@@ -2331,7 +2331,8 @@ Xarray Datatree.")
      (list python-hatchling
            python-pytest
            python-pytest-env
-           python-pytest-xdist))
+           python-pytest-xdist
+           tzdata-for-tests))
     (propagated-inputs
      ;;    [core]
      (list python-duckdb
@@ -2343,7 +2344,7 @@ Xarray Datatree.")
            ;; python-cudf
            python-dask
            ;; python-ibis-framework
-           python-modin
+           ;; python-modin      ;blocked by guix/guix#9336
            python-packaging
            ;; python-pyarrow-hotfix
            ;; python-pyspark
