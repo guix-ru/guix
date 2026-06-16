@@ -263,8 +263,9 @@ compatible Zig code based on the @acronym{LSP, Language Server Protocol} meta
 model.")
       (license license:expat))))
 
-(define-public zig-lsp-kit-for-zls-0.15
-  (let ((commit "6274eebace9a6a82ce182e24468fef88e0b95f37")
+(define-public zig-lsp-kit-for-zig-0.15
+  ;; Use the latest commit from the 0.15.x branch.
+  (let ((commit "421ae644f53bd788e3699b5fc22b3e07b161e2b6")
         (revision "0"))
     (package
       (name "zig-lsp-kit")
@@ -277,7 +278,7 @@ model.")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0g4jdvj2pj6qbg912fxifk8rq6bg62kpgpcm0nfmi2h1h34cwp53"))))
+          (base32 "0bm011zi7m1vbj3lss8h68v1gzhy45c06ff4r7mdaf34kwqax0ir"))))
       (build-system zig-build-system)
       (arguments (list #:skip-build? #t))
       (home-page "https://zigtools.github.io/lsp-kit/")
@@ -286,6 +287,10 @@ model.")
        "Zig @acronym{LSP, Language Server Protocol} Kit provides the necessary
 building blocks to develop LSP implementations in Zig.")
       (license license:expat))))
+
+;;; TODO: Remove after 2027-01-16.
+(define-deprecated-package zig-lsp-kit-for-zls-0.15
+  zig-lsp-kit-for-zig-0.15)
 
 (define-public zig-diffz
   (let ((commit "420fcb22306ffd4c9c3c761863dfbb6bdbb18a73")
@@ -755,7 +760,7 @@ Language Server Protocol} for the Zig programming language.")
          (replace "zig" zig-0.15)))
       (inputs
        (modify-inputs inputs
-         (prepend zig-lsp-kit-for-zls-0.15)
+         (prepend zig-lsp-kit-for-zig-0.15)
          (delete "zig-lsp-codegen")
          (replace "zig-diffz" zig-diffz-for-zls-0.15)
          (replace "zig-known-folders" zig-known-folders-for-zig-0.15))))))
