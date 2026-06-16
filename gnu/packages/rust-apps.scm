@@ -395,6 +395,11 @@ textual.")
              "clipboard")
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-references
+            (lambda _
+              (substitute* (find-files "crates/atuin/src/shell")
+                (("atuin (uuid|history|search)" all)
+                 (string-append #$output "/bin/" all)))))
           (add-before 'check 'pre-check
             (lambda _
               (setenv "HOME" "/tmp")))
