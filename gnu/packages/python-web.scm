@@ -14196,13 +14196,13 @@ Amazon S3 or any other external service.")
 (define-public python-fastapi
   (package
     (name "python-fastapi")
-    (version "0.131.0")
+    (version "0.137.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "fastapi" version))
        (sha256
-        (base32 "1zs80pz8p04akxxmyfihqgii1wjhhad6qx1cjfd8kqmya9g1acb5"))))
+        (base32 "072lzn48rwf9rjix4nqb5ym6hnaj2fb3jxclilym7n9h89q608w2"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -14225,6 +14225,8 @@ Amazon S3 or any other external service.")
            ;; python-pwdlib
            python-pyjwt
            python-pytest
+           python-pytest-timeout
+           python-pytest-xdist
            python-sqlalchemy-2
            ;; python-sqlmodel
            python-types-orjson
@@ -14237,11 +14239,13 @@ Amazon S3 or any other external service.")
            ;; [optional]
            python-email-validator
            python-fastapi-cli
+           ;; python-fastar
            python-httpx
            python-itsdangerous
            python-jinja2
            python-multipart
            python-orjson
+           python-pydantic
            python-pydantic-extra-types
            python-pydantic-settings
            python-pyyaml
