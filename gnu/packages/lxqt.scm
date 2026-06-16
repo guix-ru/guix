@@ -343,14 +343,14 @@ the operating system LXQt is running on.")
 (define-public lxqt-menu-data
   (package
     (name "lxqt-menu-data")
-    (version "2.3.0")
+    (version "2.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/lxqt/" name "/releases/download/"
                            version "/" name "-" version ".tar.xz"))
        (sha256
-        (base32 "013fbcymy1h3arhhd7jqy498pdny63ih1wid7w3pr4j8iax48fkh"))))
+        (base32 "1k3693mxldfvv2nkr54p0c11mkyh3kjq2355b0ryc6fwc9sy91rl"))))
     (build-system cmake-build-system)
     (arguments
      (list #:tests? #f))                ;no tests
