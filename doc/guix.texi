@@ -53251,8 +53251,10 @@ alias ls="ls -alF"
 @item @code{bash-profile} (default: @code{()}) (type: text-config)
 List of file-like objects, which will be added to @file{.bash_profile}.
 Used for executing user's commands at start of login shell (In most
-cases the shell started on tty just after login).  @file{.bash_login}
-won't be ever read, because @file{.bash_profile} always present.
+cases the shell started on tty just after login). Since
+@file{.bash_profile} is always generated, Bash will never load
+subsequent startup files with lower precedence such as
+@file{.bash_login}.
 
 @item @code{bashrc} (default: @code{()}) (type: text-config)
 List of file-like objects, which will be added to @file{.bashrc}.  Used
