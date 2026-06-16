@@ -1596,6 +1596,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/hare-fallback-cache.patch 		\
   %D%/packages/patches/hdf4-reproducibility.patch 		\
   %D%/packages/patches/hdf4-shared-fortran.patch 		\
+  %D%/packages/patches/hal-disable-googletest.patch		\
   %D%/packages/patches/hdf5-config-date.patch			\
   %D%/packages/patches/hdf-eos2-build-shared.patch 		\
   %D%/packages/patches/hdf-eos2-remove-gctp.patch		\

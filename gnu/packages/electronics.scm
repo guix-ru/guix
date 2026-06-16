@@ -879,6 +879,99 @@ Simulator Trace} files.")
       ;; Exception against free government use in tcl_np.c and tcl_np.h.
       (license (list license:gpl2+ license:expat license:tcl/tk)))))
 
+(define-public hal
+  (package
+    (name "hal")
+    (version "4.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/emsec/hal")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1mb8mdrw8kp9mxj7ayv9gw59ghkbaj4jy1pbba8ia3s2nbzwqwp0"))
+       (patches
+        (search-patches "hal-disable-googletest.patch"))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils)
+                         (ice-9 ftw)
+                         (srfi srfi-26))
+            (define (delete-all-but directory . preserve)
+              (with-directory-excursion directory
+                (let* ((pred (negate (cut member <>
+                                          (cons* "." ".." preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (cut delete-file-recursively <>) items))))
+            (delete-all-but "deps" "abc" "subprocess")))))
+    (build-system qt-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;too many failures in this release
+      #:configure-flags
+      #~(list "-DBUILD_ALL_PLUGINS=ON"
+              "-DBUILD_TESTS=ON"
+              (string-append
+               "-DLIBRARY_INSTALL_DIRECTORY_FULL="
+               #$output "/lib;" #$output "/lib/hal_plugins")
+              "-DUSE_VENDORED_PYBIND11=OFF"
+              "-DUSE_VENDORED_SPDLOG=OFF"
+              "-DUSE_VENDORED_QUAZIP=OFF"
+              "-DUSE_VENDORED_IGRAPH=OFF"
+              "-DUSE_VENDORED_NLOHMANN_JSON=OFF"
+              "-DHAL_VERSION_MAJOR=4"
+              "-DHAL_VERSION_MINOR=5"
+              "-DHAL_VERSION_PATCH=0"
+              "-DHAL_VERSION_TWEAK=0"
+              "-DHAL_VERSION_ADDITIONAL_COMMITS=0"
+              "-DHAL_VERSION_DIRTY=false"
+              "-DHAL_VERSION_BROKEN=false"
+              "-DENABLE_PPA=OFF"
+              (string-append "-DCMAKE_MODULE_PATH="
+                             #$(this-package-native-input "sanitizers-cmake")
+                             "/share/sanitizers-cmake/cmake"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-cmake-release-detection
+            (lambda _
+              (substitute* '("cmake/detect_dependencies.cmake"
+                             "plugins/gui/CMakeLists.txt")
+                (("IMPORTED_LOCATION_RELEASE\\)") "LOCATION)"))))
+          (add-before 'check 'set-home
+            (lambda _ (setenv "HOME" "/tmp"))))))
+    (native-inputs
+     (list googletest
+           pkg-config
+           pybind11
+           python-wrapper
+           sanitizers-cmake
+           verilator))
+    (inputs
+     (list bitwuzla
+           boost
+           gmp
+           graphviz
+           igraph
+           nlohmann-json
+           mpfr
+           qtbase-5
+           qtsvg-5
+           quazip-5
+           rapidjson
+           spdlog
+           symfpu
+           z3))
+    (home-page "https://github.com/emsec/hal")
+    (synopsis "Hardware analyzer for netlists")
+    (description "HAL is an @acronym{EDA, Electronic Design Automation}
+comprehensive netlist reverse engineering and manipulation framework.  It
+provides a framework to parse netlists of arbitrary sources, e.g., FPGAs or
+ASICs, into a graph-based netlist representation, providing the necessary
+built-in tools for traversal and analysis of the included gates and nets.")
+    (license license:expat)))
+
 (define-public horizon-eda
   (package
     (name "horizon-eda")
