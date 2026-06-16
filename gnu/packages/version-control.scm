@@ -1365,7 +1365,7 @@ other git-like projects such as @code{libgit2}.")
 (define-public libgit2-1.9
   (package
     (name "libgit2")
-    (version "1.9.2")
+    (version "1.9.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1374,10 +1374,9 @@ other git-like projects such as @code{libgit2}.")
               (file-name (git-file-name "libgit2" version))
               (sha256
                (base32
-                "1f3wnw0s5fx4lf68i400mj6l7qyw9hf6mr7i2xlqqmp9q23q89sc"))
+                "07gfycsmq3hdaic3x3ldgnry3gnam1yxsy8q5f94s52xgb7j59b4"))
               (patches
-               (search-patches "libgit2-uninitialized-proxy-settings.patch"
-                               "libgit2-proxy-reconnection.patch"
+               (search-patches "libgit2-proxy-reconnection.patch"
                                "libgit2-path-max.patch"))
               (modules '((guix build utils)))
               (snippet
@@ -1411,12 +1410,12 @@ other git-like projects such as @code{libgit2}.")
                        ;; Tests may be disabled if cross-compiling.
                        (format #t "Test suite not run.~%")))))))
     (inputs
-     (list libssh2 http-parser))
+     (list http-parser))
     (native-inputs
      (list pkg-config python))
     (propagated-inputs
      ;; These libraries are in 'Requires.private' in libgit2.pc.
-     (list openssl pcre2 zlib))
+     (list openssl libssh2 pcre2 zlib))
     (home-page "https://libgit2.org/")
     (synopsis "Library providing Git core methods")
     (description
@@ -1440,7 +1439,11 @@ write native speed custom Git applications in any language with bindings.")
               (file-name (git-file-name "libgit2" version))
               (sha256
                (base32
-                "1f3wnw0s5fx4lf68i400mj6l7qyw9hf6mr7i2xlqqmp9q23q89sc"))))
+                "1f3wnw0s5fx4lf68i400mj6l7qyw9hf6mr7i2xlqqmp9q23q89sc"))
+              (patches
+               (search-patches "libgit2-uninitialized-proxy-settings.patch"
+                               "libgit2-proxy-reconnection.patch"
+                               "libgit2-path-max.patch"))))
     (arguments
      (list #:configure-flags
            #~(list "-DUSE_NTLMCLIENT=OFF"         ;TODO: package this
@@ -1460,6 +1463,11 @@ write native speed custom Git applications in any language with bindings.")
                        (invoke "./libgit2_tests" "-v" "-Q")
                        ;; Tests may be disabled if cross-compiling.
                        (format #t "Test suite not run.~%")))))))
+    (inputs
+     (list libssh2 http-parser))
+    (propagated-inputs
+     ;; These libraries are in 'Requires.private' in libgit2.pc.
+     (list openssl pcre2 zlib))
     (properties '((hidden? . #t)))))
 
 (define-public libgit2-1.8
@@ -1486,7 +1494,12 @@ write native speed custom Git applications in any language with bindings.")
                               "deps/ntlmclient"
                               "deps/pcre"
                               "deps/winhttp"
-                              "deps/zlib"))))))))
+                              "deps/zlib"))))))
+    (inputs
+     (list libssh2 http-parser))
+    (propagated-inputs
+     ;; These libraries are in 'Requires.private' in libgit2.pc.
+     (list openssl pcre2 zlib))))
 
 (define-public libgit2-1.7
   (package
@@ -1577,6 +1590,16 @@ write native speed custom Git applications in any language with bindings.")
                 "1dngga8jq419z6ps65wpmh2jihcf70k6r98pb1m1yiwj7qqh9792"))))
     (arguments
      (substitute-keyword-arguments (package-arguments libgit2-1.5)
+       ((#:configure-flags _ #~'())
+        ;; XXX: Drop '-DUSE_SHA1=HTTPS' to avoid a major rebuild.
+        #~(list "-DUSE_NTLMCLIENT=OFF"
+                "-DREGEX_BACKEND=pcre2"
+                "-DUSE_HTTP_PARSER=system"
+                "-DUSE_SSH=ON" ; cmake fails to find libssh if this is missing
+                ;; See https://github.com/libgit2/libgit2/issues/7169
+                #$@(if (target-32bit?)
+                       '("-DCMAKE_C_FLAGS=-D_FILE_OFFSET_BITS=64")
+                       '())))
        ((#:phases _ '%standard-phases)
         `(modify-phases %standard-phases
            ;; Run checks more verbosely, unless we are cross-compiling.
