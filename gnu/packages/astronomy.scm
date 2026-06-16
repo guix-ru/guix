@@ -10361,7 +10361,8 @@ and the options
     (native-inputs
      (list nss-certs-for-test
            python-assay
-           python-pandas
+           python-pandas-minimal
+           python-pytz
            python-setuptools))
     (propagated-inputs
      (list python-certifi
