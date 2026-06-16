@@ -1,7 +1,7 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2013 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2013 Cyril Roelandt <tipecaml@gmail.com>
-;;; Copyright © 2013-2022, 2024-2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2022, 2024-2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2013, 2014 Andreas Enge <andreas@enge.fr>
 ;;; Copyright © 2015, 2016 Mathieu Lirzin <mthl@gnu.org>
 ;;; Copyright © 2014, 2015, 2016 Mark H Weaver <mhw@netris.org>
@@ -1425,6 +1425,42 @@ provided as a re-entrant linkable library with a solid API, allowing you to
 write native speed custom Git applications in any language with bindings.")
     ;; GPLv2 with linking exception
     (license license:gpl2)))
+
+(define-public libgit2-1.9/pinned
+  ;; This is a pinned version used as a dependency for 'rust-cargo-c'.
+  ;; Update periodically.
+  (package/inherit libgit2-1.9
+    (version "1.9.2")
+    (source (origin
+              (inherit (package-source libgit2-1.9))
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/libgit2/libgit2")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name "libgit2" version))
+              (sha256
+               (base32
+                "1f3wnw0s5fx4lf68i400mj6l7qyw9hf6mr7i2xlqqmp9q23q89sc"))))
+    (arguments
+     (list #:configure-flags
+           #~(list "-DUSE_NTLMCLIENT=OFF"         ;TODO: package this
+                   "-DREGEX_BACKEND=pcre2"
+                   "-DUSE_HTTP_PARSER=http-parser"
+                   "-DUSE_SSH=ON" ; cmake fails to find libssh if this is missing
+                   ;; See https://github.com/libgit2/libgit2/issues/7169
+                   #$@(if (target-32bit?)
+                          '("-DCMAKE_C_FLAGS=-D_FILE_OFFSET_BITS=64")
+                          '()))
+           #:phases
+           #~(modify-phases %standard-phases
+               ;; Run checks more verbosely, unless we are cross-compiling.
+               (replace 'check
+                 (lambda* (#:key (tests? #t) #:allow-other-keys)
+                   (if tests?
+                       (invoke "./libgit2_tests" "-v" "-Q")
+                       ;; Tests may be disabled if cross-compiling.
+                       (format #t "Test suite not run.~%")))))))
+    (properties '((hidden? . #t)))))
 
 (define-public libgit2-1.8
   (package
