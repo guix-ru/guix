@@ -8833,7 +8833,7 @@ fight against their plot and save his fellow rabbits from slavery.")
 (define-public 0ad-data
   (package
     (name "0ad-data")
-    (version "0.27.1")
+    (version "0.28.0")
     (source
      (origin
        (method url-fetch)
@@ -8841,7 +8841,7 @@ fight against their plot and save his fellow rabbits from slavery.")
                            version "-unix-data.tar.xz"))
        (file-name (string-append name "-" version ".tar.xz"))
        (sha256
-        (base32 "16592xq1ncjxc072rd4lzn2bp941fmfj85r0q1gh52qkvxnjszl3"))))
+        (base32 "0vsj75y4a4psfqiaf2l9n7mhrfh5xzhg1wpzlkh4fb0hw85b6i78"))))
     (build-system trivial-build-system)
     (native-inputs (list tar unzip xz))
     (arguments
