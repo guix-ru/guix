@@ -27551,7 +27551,7 @@ and corruption checks.")
 (define-public python-fasteners
   (package
     (name "python-fasteners")
-    (version "0.17.3")
+    (version "0.20")
     (source (origin
               ;; No tests in the pypi tarball
               (method git-fetch)
@@ -27561,16 +27561,10 @@ and corruption checks.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0m0dxv8ljpkq99s3d1mib1zfb0ppx3h74h5yr8809zsrq2klfn0m"))))
+                "0zf28x5n3svkxan97r89331s7dy0prix7111m0hf3mx5gk3nbj47"))))
     (build-system pyproject-build-system)
-    (arguments
-     `(#:phases (modify-phases %standard-phases
-                  (replace 'check
-                    (lambda* (#:key tests? #:allow-other-keys)
-                      (when tests?
-                        (invoke "pytest")))))))
-    (native-inputs (list python-diskcache python-more-itertools
-                         python-setuptools python-pytest python-wheel))
+    (native-inputs (list python-diskcache python-eventlet python-more-itertools
+                         python-setuptools python-pytest))
     (home-page "https://github.com/harlowja/fasteners")
     (synopsis "Python package that provides useful locks")
     (description
