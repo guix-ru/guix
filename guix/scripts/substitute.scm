@@ -44,7 +44,7 @@
                            . guix:open-connection-for-uri)))
   #:use-module (guix progress)
   #:use-module ((guix build syscalls)
-                #:select (set-thread-name))
+                #:select (set-thread-name mkdtemp!))
   #:use-module (ice-9 rdelim)
   #:use-module (ice-9 match)
   #:use-module (ice-9 format)
@@ -630,6 +630,26 @@ default value."
   ;; use the current output port instead.
   (make-parameter 4))
 
+;; XXX: copied from (guix utils)
+(define (call-with-temporary-directory-in directory proc)
+  "Call PROC with a name of a temporary directory; close the directory and
+delete it when leaving the dynamic extent of this call."
+  (let* ((template  (string-append directory "/guix-directory-"
+                                   ;; In case the temporary directory may be
+                                   ;; garbage collected, including our pid
+                                   ;; ensures that no live process can mistake
+                                   ;; our freshly-created instance for their
+                                   ;; old deleted one.
+                                   (number->string (getpid))
+                                   ".XXXXXX"))
+         (tmp-dir   (mkdtemp! template)))
+    (dynamic-wind
+      (const #t)
+      (lambda ()
+        (proc tmp-dir))
+      (lambda ()
+        (false-if-exception (delete-file-recursively tmp-dir))))))
+
 (define-command (guix-substitute . args)
   (category internal)
   (synopsis "implement the build daemon's substituter protocol")
@@ -712,15 +732,35 @@ default value."
                       actual-hash
                       cpu-usage
                       (with-cpu-usage-monitoring
-                       (process-substitution
-                        store-path destination
-                        #:cache-urls (substitute-urls)
-                        #:acl (current-acl)
-                        #:deduplicate? deduplicate?
-                        #:print-build-trace?
-                        print-build-trace?
-                        #:fast-decompression?
-                        fast-decompression?))))
+                       ;; Restore inside a temporary directory until the hash
+                       ;; can be verified so that no dangling references a
+                       ;; user may have laying around will point to
+                       ;; attacker-controlled content in the meantime.
+                       (call-with-temporary-directory-in (dirname destination)
+                         (lambda (temp-directory)
+                           (let* ((temp-destination
+                                   (string-append temp-directory "/restored"))
+                                  (narinfo
+                                   expected-hash
+                                   actual-hash
+                                   (process-substitution
+                                    store-path temp-destination
+                                    #:cache-urls (substitute-urls)
+                                    #:acl (current-acl)
+                                    #:deduplicate? deduplicate?
+                                    #:print-build-trace?
+                                    print-build-trace?
+                                    #:fast-decompression?
+                                    fast-decompression?)))
+                             (when (and expected-hash actual-hash
+                                        (bytevector=? actual-hash
+                                                      expected-hash))
+                               (catch 'system-error
+                                 (lambda ()
+                                   (delete-file-recursively destination))
+                                 (const #f))
+                               (rename-file temp-destination destination))
+                             (values narinfo expected-hash actual-hash)))))))
 
                  (if expected-hash
                      (begin
@@ -777,6 +817,7 @@ default value."
 
 ;;; Local Variables:
 ;;; eval: (put 'with-redirected-error-port 'scheme-indent-function 0)
+;;; eval: (put 'call-with-temporary-directory-in 'scheme-indent-function 1)
 ;;; End:
 
 ;;; substitute.scm ends here

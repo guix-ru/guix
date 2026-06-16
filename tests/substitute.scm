@@ -39,6 +39,7 @@
   #:use-module (rnrs io ports)
   #:use-module (web uri)
   #:use-module (ice-9 regex)
+  #:use-module (ice-9 binary-ports)
   #:use-module (srfi srfi-11)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-34)
@@ -142,6 +143,21 @@ version identifier.."
   ;; <https://www.rfc-editor.org/rfc/rfc5737>.
   "http://203.0.113.1")
 
+(define (plain-file-nar-sha256 string)
+  (sha256 (call-with-output-bytevector
+           (lambda (port)
+             (let ((bv (string->utf8 string)))
+               (call-with-input-bytevector
+                bv
+                (lambda (contents)
+                  (write-file-tree #t port
+                                   #:file-type+size
+                                   (lambda (_)
+                                     (values 'regular
+                                             (bytevector-length
+                                              bv)))
+                                   #:file-port
+                                   (const contents)))))))))
 
 (define %narinfo
   ;; Skeleton of the narinfo used below.
@@ -150,7 +166,7 @@ version identifier.."
 URL: example.nar
 Compression: none
 NarHash: sha256:" (bytevector->nix-base32-string
-                   (sha256 (string->utf8 "Substitutable data."))) "
+                   (plain-file-nar-sha256 "Substitutable data.")) "
 NarSize: 42
 References: bar baz
 Deriver: " (%store-prefix) "/foo.drv
@@ -819,7 +835,7 @@ Compression: lzip
 URL: example.nar
 Compression: none
 NarHash: sha256:" (bytevector->nix-base32-string
-                   (sha256 (string->utf8 "Substitutable data."))) "
+                   (plain-file-nar-sha256 "Substitutable data.")) "
 NarSize: 42
 References: bar baz
 Deriver: " (%store-prefix) "/foo.drv
