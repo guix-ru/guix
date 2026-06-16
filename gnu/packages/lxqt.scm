@@ -758,14 +758,14 @@ permissions of other users including root.")
 (define-public lxqt-themes
   (package
     (name "lxqt-themes")
-    (version "2.3.0")
+    (version "2.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/lxqt/" name "/releases/download/"
                            version "/" name "-" version ".tar.xz"))
        (sha256
-        (base32 "1cyc299ybv1q6jsixzy3vqjrb6yaqdh1nyzyxvin83mm15j9bsp6"))))
+        (base32 "1yrjyjd1snkzj52krn5k8r35vm4ljqqjinj1f5s98nxgzph7b55k"))))
     (build-system cmake-build-system)
     (native-inputs
      (list lxqt-build-tools))
