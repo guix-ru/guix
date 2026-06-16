@@ -1357,7 +1357,7 @@ using a stylus.")
 (define-public xournalpp
   (package
     (name "xournalpp")
-    (version "1.3.4")
+    (version "1.3.5")
     (source
      (origin
        (method git-fetch)
@@ -1366,7 +1366,7 @@ using a stylus.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1rs3x9k4nnlwpml49fzjsnp3hs807i7y8ccgffgngmb71999bla4"))))
+        (base32 "01f4hvwrpx3wkvyqrjl5bmd7vsdiicxw3dga5wxkifks3qx7vw16"))))
     (build-system cmake-build-system)
     (arguments
      (list
