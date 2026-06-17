@@ -438,6 +438,32 @@ It can be used with QEMU, Hyperkit, Hyper-V and User-Mode Linux.
 The binary is called @command{gvproxy}.")
     (license license:asl2.0)))
 
+(define-public go-github-com-opencontainers-image-tools
+  (package
+    (name "go-github-com-opencontainers-image-tools")
+    (version "0.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/opencontainers/image-tools")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0drxjgcxm268cwv547anl23rv1jx7mvdfxp7nxr6fjbzpxav6bd2"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/opencontainers/image-tools"))
+    (home-page "https://github.com/opencontainers/image-tools")
+    (synopsis "OCI Image Tooling")
+    (description
+     "@code{oci-image-tool} is a collection of tools for working with the
+@url{https://github.com/opencontainers/image-spec, OCI image format
+specification}.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-rootless-containers-rootlesskit-v3
   (package
     (name "go-github-com-rootless-containers-rootlesskit-v3")
