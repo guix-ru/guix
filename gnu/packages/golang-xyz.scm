@@ -22785,6 +22785,7 @@ digests with little effort.")
     (license (list license:asl2.0 license:cc-by-sa4.0))))
 
 (define-public go-github-com-opencontainers-image-spec
+  ;; TODO: Move to (gnu packages containers).
   (package
     (name "go-github-com-opencontainers-image-spec")
     (version "1.1.0")
@@ -22796,17 +22797,19 @@ digests with little effort.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "108jws0i4kbawcihprj3wxp3yqv7nrynkwzwmbz42sx8dmbfq0kc"))))
+        (base32 "108jws0i4kbawcihprj3wxp3yqv7nrynkwzwmbz42sx8dmbfq0kc"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "schema")))))
     (build-system go-build-system)
     (arguments
      (list
       #:skip-build? #t
       #:import-path "github.com/opencontainers/image-spec"))
     (propagated-inputs
-     (list go-github-com-opencontainers-go-digest
-           go-github-com-russross-blackfriday
-           go-github-com-xeipuuv-gojsonreference
-           go-github-com-xeipuuv-gojsonschema))
+     (list go-github-com-opencontainers-go-digest))
     (home-page "https://github.com/opencontainers/image-spec")
     (synopsis "OCI Image Format Specification")
     (description
