@@ -5112,20 +5112,19 @@ final image.")
 (define-public python-drms
   (package
     (name "python-drms")
-    (version "0.9.0")
+    (version "0.9.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "drms" version))
        (sha256
-        (base32 "0nnyqzy9dblis3q1xhx77z8ys1k969fh9qqdvmapn46v91299gml"))))
+        (base32 "1v651dddh38fdap0jb4mmnw8lkbvlcxd3jkcc21jlkp2lhpiqbsg"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-astropy-minimal
            python-pytest-astropy
            python-setuptools
-           python-setuptools-scm
-           python-wheel))
+           python-setuptools-scm))
     (propagated-inputs
      (list python-numpy
            python-packaging
