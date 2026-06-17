@@ -507,6 +507,35 @@ highlighting for a large number of languages, git integration, and automatic
 paging.")
     (license (list license:expat license:asl2.0))))
 
+(define-public bibtex-format
+  (let ((commit "dae63e9f756cb7dc62dd4912ee4cbdd2fe59e603")
+        (revision "0"))
+    (package
+      (name "bibtex-format")
+      (version (git-version "0.2.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://gitlab.com/smaller-infinity/bibtex-format.git/")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "19ax1minkxzcncmlrsnj5dbfwq7v3w1h1vwrwk2rhj49binjz96j"))))
+      (build-system cargo-build-system)
+      (arguments
+       (list
+        #:install-source? #f))
+      (inputs (cargo-inputs 'bibtex-format))
+      (home-page "https://gitlab.com/smaller-infinity/bibtex-format")
+      (synopsis "BibTeX formatter that is compliant with Emacs's bibtex-mode")
+      (description
+       "A fast Bibtex formatter that is (largely) compliant with emacs's
+bibtex-mode.  This project aims to help with that by building a new formatter
+in Rust that is fast but follows the same (or at least similar) behavior as
+the emacs formatter.")
+      (license license:mpl2.0))))
+
 (define-public bottom
   (package
     (name "bottom")
