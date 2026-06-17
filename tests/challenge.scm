@@ -182,7 +182,7 @@ value."
        (out2 -> (derivation->output-path drv2))
        (item -> (string-append (%store-prefix) "/"
                                (bytevector->nix-base32-string
-                                (random-bytevector 32))
+                                (random-bytevector 20))
                                "-foo"
                                (number->string (current-time) 16))))
     (mbegin %store-monad
