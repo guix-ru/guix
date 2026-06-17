@@ -3309,13 +3309,13 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
 (define-public python-astropy
   (package
     (name "python-astropy")
-    (version "7.2.0")
+    (version "8.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "astropy" version))
        (sha256
-        (base32 "0w1hih745aw76zqvfcg9bw8pl4rrmahizgclrl1vdbpyn4kbqj5f"))
+        (base32 "1hzxl7xkr19kkjlgiy9ph2dw3hdzi92pipgd6c218vzj87dyakbz"))
        (modules '((guix build utils)))
        (snippet
         '(begin
@@ -3331,7 +3331,7 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 31207 passed, 443 skipped, 226 xfailed
+      ;; tests: 31946 passed, 410 skipped, 261 xfailed
       #:test-flags
       #~(list "--pyargs" "astropy"
               ;; XXX: Tests are not thread save when they are more than 8.
@@ -3375,6 +3375,7 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
            python-pytest-astropy-header
            python-pytest-doctestplus
            python-pytest-xdist
+           python-setuptools
            python-setuptools-scm
            python-sgp4
            python-skyfield
@@ -3382,7 +3383,9 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
            specification-astropy-data))
     (inputs
      (list expat
-           wcslib))
+           ;; XXX: One test fails with WCSLIB@8.8: ValueError: ERROR 5 in
+           ;; wcsset() at line 2895 of file wcs.c.
+           wcslib-8.6))
     (propagated-inputs
      (list python-astropy-iers-data
            python-configobj      ;to replace custom module
