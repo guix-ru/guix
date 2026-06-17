@@ -7942,6 +7942,78 @@ binned galaxy positions or shear) in cylindrical projection, but its core
 functionality is more general.")
     (license license:bsd-3)))
 
+(define-public python-plasmapy
+  (package
+    (name "python-plasmapy")
+    (version "2026.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/PlasmaPy/plasmapy")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1zvsdmn2q4iqpm236sl2m4hrpfb9j7y69wv0jnxs0f2vm10pf4c8"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; tests: 4320 passed, 30 skipped, 5 xfailed, 1 xpassed, 16 warnings
+      #:test-flags
+      #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
+              "-k"
+              (string-join
+               ;; Tests require network access to get data files from
+               ;; <https://github.com/PlasmaPy/PlasmaPy-data>.
+               (list "not test_stopping_power_errors"
+                     "test_stopping_power_interpolation"
+                     "test_stopping_power_no_interpolation"
+                     "test_NIST_particle_stopping"
+                     ;; XXX: Not equal to tolerance <...>.
+                     "test_relativistic_body"
+                     "test_vals_stix_figs[kwargs1-expected1]"
+                     "test_known1")
+               " and not "))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-pytest-config
+            (lambda _
+              (substitute* "pyproject.toml"
+                ;; Make sure we have control over number of parallel tests.
+                ((".*--numprocesses=.*") ""))))
+          (add-before 'check 'set-HOME
+            (lambda _
+              (setenv "HOME" "/tmp"))))))
+    (native-inputs
+     (list nss-certs-for-test
+           python-pytest
+           python-pytest-xdist
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-astropy
+           python-h5py
+           python-lmfit
+           python-matplotlib
+           python-mpmath
+           python-numpy
+           python-packaging
+           python-pandas
+           python-requests
+           python-scipy
+           python-tqdm
+           python-wrapt
+           python-xarray))
+    (home-page "https://docs.plasmapy.org/")
+    (synopsis "Python package for plasma research and education")
+    (description
+     "PlasmaPy is Python package for plasma research and education.  PlasmaPy
+intends to be for plasma science what Astropy is for astronomy — a collection
+of functionality commonly needed by plasma scientists and researchers
+globally, running within and leveraging the open source scientific Python
+ecosystem.")
+    (license license:bsd-3)))
+
 (define-public python-poppy
   (package
     (name "python-poppy")
