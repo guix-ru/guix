@@ -1681,6 +1681,61 @@ of a fake DNS resolver.")
 @code{fakeweb}.")
     (license license:expat)))
 
+(define-public python-jiter
+  (package
+    (name "python-jiter")
+    (version "0.15.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pydantic/jiter/")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1z2ljacsc64yykkxvjnq6rq4z56xwr8jhcw02ckv6b85kc66x63p"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:imported-modules (append %cargo-build-system-modules
+                                 %pyproject-build-system-modules)
+      #:modules '(((guix build cargo-build-system) #:prefix cargo:)
+                  (guix build pyproject-build-system)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'prepare-cargo-build-system
+            (lambda args
+              (for-each (lambda (phase)
+                          (format #t "Running cargo phase: ~a~%" phase)
+                          (apply (assoc-ref cargo:%standard-phases phase)
+                                 #:cargo-target #$(cargo-triplet)
+                                 args))
+                        '(prepare-rust-crates
+                          unpack-rust-crates
+                          configure
+                          check-for-pregenerated-files
+                          patch-cargo-checksums))))
+          (add-after 'prepare-cargo-build-system 'chdir
+            (lambda _
+              (chdir "crates/jiter-python"))))))
+    (native-inputs
+     (append (list maturin
+                   python-dirty-equals
+                   python-pytest
+                   rust
+                   `(,rust "cargo"))
+             (or (and=> (%current-target-system)
+                        (compose list make-rust-sysroot))
+                 '())))
+    (inputs (cargo-inputs 'jiter))
+    (home-page "https://github.com/pydantic/jiter/")
+    (synopsis "Iterable JSON parser")
+    (description
+     "This package provides a fast Python iterable JSON parser, backed by Rust
+libraries.")
+    (license license:bsd-3)))
+
 (define-public python-justhtml
   (package
     (name "python-justhtml")
