@@ -880,9 +880,10 @@ International Astronomical Union}.")
            pkg-config
            perl))
     (inputs
-     (list cfitsio
-           wcslib
-           cpl))
+     (list cext
+           cfitsio
+           cpl
+           wcslib))
     (native-search-paths
      (list (search-path-specification
              (variable "ESOREX_PLUGIN_DIR")
