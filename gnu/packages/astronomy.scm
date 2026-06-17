@@ -3385,7 +3385,7 @@ astronomy and astrophysics.")
 (define-public python-astropy-iers-data
   (package
     (name "python-astropy-iers-data")
-    (version "0.2026.5.11.1.8.52")
+    (version "0.2026.6.15.15.33.16")
     (source
      (origin
        (method git-fetch)
@@ -3394,7 +3394,7 @@ astronomy and astrophysics.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "04wnb7fgfx3izp2qq772zvh00r4p27qi06k4azlip499h5m06fmb"))))
+        (base32 "1kj313frd2mnhsfbyvqd2df7zbfrm1hlc1zdpnhkl2kj2y3iaaww"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f)) ; no tests
