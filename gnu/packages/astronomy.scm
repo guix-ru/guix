@@ -6698,23 +6698,30 @@ observationally-derived galaxy merger catalogs.")
 (define-public python-irispy-lmsal
   (package
     (name "python-irispy-lmsal")
-    (version "0.6.0")
+    (version "0.7.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "irispy_lmsal" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/LM-SAL/irispy")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0mri5l1xwwzibzfq2fywzwb8kv3xm9yv9f3qfv31zac2fd1xzbna"))))
+        (base32 "1pdb54izn4xxngprgmd01dcc9kb2b1a7mn4zv7n25f9nkhxk5qq7"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 67 passed, 2 skipped, 7 deselected
+      ;; tests: 172 passed, 1 skipped, 9 deselected 
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              (substitute* "pyproject.toml"
+                ;; Remove when python-team is merged.
+                (("scipy>=1.17.0") "scipy>=1.16.3")
+                (("pandas>=3.0.0") "pandas>=2.3.3"))))
           (add-before 'sanity-check 'set-home
             (lambda _
-              ;; E PermissionError: [Errno 13] Permission denied:
-              ;; '/homeless-shelter'
               (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list ffmpeg
@@ -6724,13 +6731,18 @@ observationally-derived galaxy merger catalogs.")
            python-setuptools
            python-setuptools-scm))
     (propagated-inputs
-     (list python-dkist
+     (list python-astropy
+           python-dkist
            python-mpl-animators
            python-ndcube
            python-pandas
            python-scipy
            python-sunpy
-           python-sunraster))
+           python-sunraster
+           ;; [optional]
+           python-astroscrappy
+           ;; python-rsliding   ;not packaged yet in Guix
+           python-fiasco))
     (home-page "https://iris.lmsal.com/")
     (synopsis "Tools to read and analyze data from the IRIS solar-observing satellite")
     (description
