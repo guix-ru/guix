@@ -731,6 +731,55 @@ allows for launching applications or shutting down the system.")
 for the LXQt desktop environment.")
     (license license:lgpl2.1+)))
 
+(define-public lxqt-wayland-session
+  (package
+    (name "lxqt-wayland-session")
+    (version "0.4.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://github.com/lxqt/" name "/releases/download/"
+                           version "/" name "-" version ".tar.xz"))
+       (sha256
+        (base32 "1i91r0savg0s5wpn0qlm86nzk27jbwybb26knz889dccvjz8zpi2"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ; no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'patch-startlxqtwayland
+            (lambda _
+              (substitute* "startlxqtwayland.in"
+                (("/usr/share/X11/xkb/rules/base.lst")
+                 (string-append #$(this-package-input "xkeyboard-config")
+                                "/share/X11/xkb/rules/base.lst"))))))))
+    (native-inputs
+     (list pkg-config xdg-user-dirs))
+    (inputs
+     (list liblxqt xkeyboard-config))
+    (home-page "https://lxqt-project.org")
+    (synopsis "Start LXQt Session with a Wayland compositor")
+    (description
+     "This package provides files needed for the LXQt Wayland Session: Wayland
+session start script, its desktop entry for display managers and default
+configurations for actually supported compositors which are:
+@itemize
+@item Labwc
+@item Wayfire
+@item kwin_wayland
+@item Hyprland
+@item Niri
+@item river
+@item Sway
+@end itemize")
+    ;; Most code is under GPL 2.1+, artwork is under CC-BY-SA 4.0.
+    (license (list license:bsd-3
+                   license:cc-by-sa4.0
+                   license:expat
+                   license:gpl3+
+                   license:lgpl2.1+))))
+
 (define-public lxqt-sudo
   (package
     (name "lxqt-sudo")
