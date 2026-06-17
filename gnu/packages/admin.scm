@@ -357,7 +357,7 @@ characters can be replaced as well, as can UTF-8 characters.")
 (define-public hetznercloud-cli
   (package
     (name "hetznercloud-cli")
-    (version "1.61.0")
+    (version "1.65.0")
     (source
      (origin
        (method git-fetch)
@@ -366,7 +366,7 @@ characters can be replaced as well, as can UTF-8 characters.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1mwiqy05s43faxqv1llk242nikmgb09wy5i7m1kjvkjg0zzjn20s"))))
+        (base32 "1k9bx21v2783c30yysafn3w8kc8z5pvxx5qziib713dzf2b63xsx"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -374,7 +374,21 @@ characters can be replaced as well, as can UTF-8 characters.")
       #:install-source? #f
       #:import-path "github.com/hetznercloud/cli/cmd/hcloud"
       #:unpack-path "github.com/hetznercloud/cli"
-      #:test-subdirs #~(list "../../...")))       ;test the whole library
+      #:test-subdirs #~(list "../../...")         ;test the whole library
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-completions
+            (lambda _
+              (define (install-completion shell file)
+                (let ((file (string-append #$output file)))
+                  (mkdir-p (dirname file))
+                  (with-output-to-file file
+                    (lambda _
+                      (invoke (string-append #$output "/bin/hcloud")
+                              "completion" shell)))))
+              (install-completion "bash" "/share/bash-completion/completions/hcloud")
+              (install-completion "fish" "/share/fish/vendor_completions.d/hcloud.fish")
+              (install-completion "zsh" "/share/zsh/site-functions/_hcloud"))))))
     (native-inputs
      (list go-github-com-burntsushi-toml
            go-github-com-cheggaaa-pb-v3
