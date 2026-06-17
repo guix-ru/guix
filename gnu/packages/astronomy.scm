@@ -6342,7 +6342,7 @@ from a cosmological simulation.")
 (define-public python-hapiclient
   (package
     (name "python-hapiclient")
-    (version "0.2.7")
+    (version "0.2.9")
     (source
      (origin
        (method git-fetch)
@@ -6351,7 +6351,7 @@ from a cosmological simulation.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1c36x8rcnn2hzaq78zzldp3zkz8v4wzwvllb0n3nj6k3favk2xbg"))))
+        (base32 "068gr8afildh81za89jnd7zhspzri0m38pj7ypvamwmyfdk2jjrd"))))
     (build-system pyproject-build-system)
     (arguments
      (list
