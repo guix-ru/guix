@@ -68,6 +68,7 @@
   #:use-module (gnu packages golang-check)
   #:use-module (gnu packages golang-compression)
   #:use-module (gnu packages golang-crypto)
+  #:use-module (gnu packages golang-maths)
   #:use-module (gnu packages golang-web)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages guile)
@@ -606,7 +607,102 @@ user_namespaces(7))}.  It is used to run containers engines as an
 unprivileged user, known as \"Rootless mode\".")
     (license license:asl2.0)))
 
-
+(define-public go-go-podman-io-storage
+  (package
+    (name "go-go-podman-io-storage")
+    (version "1.60.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/podman-container-tools/container-libs")
+              (commit (go-version->git-ref version #:subdir "storage"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "00i4j4975mc9bhcm72zcy2xi3xr2x5prps1qas3gmjsvzk89wny6"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (define (directory? x)
+                (and=> (stat x #f)
+                       (compose (cut eq? 'directory <>) stat:type)))
+              (with-directory-excursion directory
+                (let* ((pred
+                        (negate (cut member <> (append '("." "..") preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (lambda (item)
+                              (if (directory? item)
+                                  (delete-file-recursively item)
+                                  (delete-file item)))
+                            items))))
+            (delete-all-but "." "storage")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.podman.io/storage"
+      #:unpack-path "go.podman.io"
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; Root access is required.
+                       (list "TestAttachLoopbackDeviceRace"
+                             "TestChangesWithChangesGH13590"
+                             "TestChroot.*"
+                             "TestCopyDir"
+                             "TestCopyWithTarInexistentDestWillCreateIt"
+                             "TestEnsureRemoveAllWithMount"
+                             "TestLookupAdditionalLayerDecodeError"
+                             "TestLookupAdditionalLayerSuccess"
+                             "TestMkdir.*"
+                             "TestReplaceFileTarWrapper"
+                             "TestStoreDelete"
+                             "TestStoreMultiList"
+                             "TestSupportsShifting"
+                             "TestTarUntarWithXattr"
+                             "TestTarWithBlockCharFifo"
+                             "TestTarWithMaliciousSymlinks"
+                             "TestUnshareOOMScoreAdj"
+                             "TestUntarHardlinkToSymlink"
+                             "TestUntarPath"
+                             "TestUntarWithMaliciousSymlinks"
+                             "TestVfs.*")
+                       "|"))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (inputs
+     (list btrfs-progs))
+    (propagated-inputs
+     (list go-github-com-burntsushi-toml
+           go-github-com-containerd-stargz-snapshotter-estargz
+           go-github-com-cyphar-filepath-securejoin
+           go-github-com-docker-go-units
+           go-github-com-google-go-intervals
+           go-github-com-json-iterator-go
+           go-github-com-klauspost-compress
+           go-github-com-klauspost-pgzip
+           go-github-com-mattn-go-shellwords
+           go-github-com-mistifyio-go-zfs-v3
+           go-github-com-moby-sys-capability
+           go-github-com-moby-sys-mountinfo
+           go-github-com-moby-sys-user
+           go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-selinux
+           go-github-com-sirupsen-logrus
+           go-github-com-tchap-go-patricia-v2
+           go-github-com-ulikunitz-xz
+           go-github-com-vbatts-tar-split
+           go-golang-org-x-sync
+           go-golang-org-x-sys
+           go-gotest-tools-v3))
+    (home-page "https://go.podman.io")
+    (synopsis "Manage layer/image/container storage")
+    (description
+     "@code{storage} is a Go library which aims to provide methods for storing
+filesystem layers, container images, and containers.")
+    (license license:asl2.0)))
 
 ;;;
 ;;; Executables:
@@ -1463,6 +1559,32 @@ To get @code{podman machine} working, install @code{qemu-minimal}, and
 @url{https://compose-spec.io/, Compose Spec} for @code{podman} focused on
 being rootless and not requiring any daemon to be running.")
     (license license:gpl2)))
+
+(define-public podman-containers-storage
+  (package/inherit go-go-podman-io-storage
+    (name "podman-containers-storage")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _ "") "go.podman.io/storage/cmd/...")
+       ((#:install-source? #t #t) #f)
+       ((#:tests? #t #t) #f)
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'install 'build-and-install-docs
+              (lambda* (#:key unpack-path #:allow-other-keys)
+                (with-directory-excursion (string-append "src/" unpack-path
+                                                         "/storage")
+                  (setenv "PREFIX" #$output)
+                  (invoke "make" "-C" "docs" "docs" "install"))))))))
+    (native-inputs
+     (append
+      (modify-inputs native-inputs
+        (append go-md2man))
+      (package-propagated-inputs go-go-podman-io-storage)))
+    (propagated-inputs '())
+    (description
+     "@code{containers-storage} is a command line tool for manipulating local
+layer/image/container stores.")))
 
 (define-public buildah
   (package
