@@ -2356,7 +2356,7 @@ editing on the Web.")
 (define-public quantlib
   (package
     (name "quantlib")
-    (version "1.37")
+    (version "1.42.1")
     (source
      (origin
        (method url-fetch)
@@ -2364,7 +2364,7 @@ editing on the Web.")
              "https://github.com/lballabio/QuantLib/releases/download/v"
              version "/QuantLib-" version ".tar.gz"))
        (sha256
-        (base32 "095d6vj938wjfhjxgcwpqwvjy6xlwl522gn2rk69wg0ky97fb15j"))))
+        (base32 "0zwrw8blhwyfilggvycv88qmn8ysgdahhriqvzcs71sc6ssiwnhj"))))
     (build-system gnu-build-system)
     (arguments
      `(#:configure-flags
