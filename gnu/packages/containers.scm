@@ -438,6 +438,67 @@ It can be used with QEMU, Hyperkit, Hyper-V and User-Mode Linux.
 The binary is called @command{gvproxy}.")
     (license license:asl2.0)))
 
+(define-public go-github-com-opencontainers-image-spec-schema
+  (package
+    (name "go-github-com-opencontainers-image-spec-schema")
+    (version "0.0.0-20260514171043-13cff54902ec")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/opencontainers/image-spec")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jg1wfbr6rva24cz6q6d73wgaridzkh9sclzm2dwxpiwmbkcas38"))
+         (modules '((guix build utils)
+                    (ice-9 ftw)
+                    (srfi srfi-26)))
+         (snippet
+          #~(begin
+              (define (delete-all-but directory . preserve)
+                (define (directory? x)
+                  (and=> (stat x #f)
+                         (compose (cut eq? 'directory <>) stat:type)))
+                (with-directory-excursion directory
+                  (let* ((pred
+                          (negate (cut member <> (append '("." "..") preserve))))
+                         (items (scandir "." pred)))
+                    (for-each (lambda (item)
+                                (if (directory? item)
+                                    (delete-file-recursively item)
+                                    (delete-file item)))
+                              items))))
+              (delete-all-but "." "schema")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:embed-files
+      ;; For go-github-com-santhosh-tekuri-jsonschema-v6:
+      #~(list "applicator"
+              "content"
+              "core"
+              "format"
+              "format-annotation"
+              "format-assertion"
+              "meta-data"
+              "schema"
+              "unevaluated"
+              "validation")
+      #:import-path "github.com/opencontainers/image-spec/schema"
+      #:unpack-path "github.com/opencontainers/image-spec"))
+    (propagated-inputs
+     (list go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-image-spec
+           go-github-com-russross-blackfriday-v2
+           go-github-com-santhosh-tekuri-jsonschema-v6))
+    (home-page "https://github.com/opencontainers/image-spec")
+    (synopsis "OCI Image Format")
+    (description
+     "Package schema defines the OCI image media types, schema definitions and
+validation functions.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-opencontainers-image-tools
   (package
     (name "go-github-com-opencontainers-image-tools")
