@@ -9405,7 +9405,7 @@ spectra, and data.")
 (define-public python-pyvo
   (package
     (name "python-pyvo")
-    (version "1.8.1")
+    (version "1.9.1")
     (source
      (origin
        (method git-fetch)
@@ -9414,16 +9414,23 @@ spectra, and data.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1cizipvfaqcjli1jirm2pc9fm2j8jrjrpdnzwar8lzvzpkyc7hm6"))))
+        (base32 "0x9qwcvhap7bw86j1y3hfsdyw3kvsax8sglj6wgb4p3mgzkr82cv"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 441 passed, 56 skipped, 1 xfailed
+      ;; tests: 483 passed, 59 skipped, 1 xfailed
       #:test-flags
-      #~(list "--pyargs" "pyvo")))
+      #~(list "--pyargs" "pyvo")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-HOME
+            (lambda _
+              (setenv "HOME" "/tmp"))))))
     (native-inputs
-     (list python-pytest-astropy
+     (list nss-certs-for-test
+           python-pytest-astropy
            python-pytest-doctestplus
+           python-pytest-timeout
            python-requests-mock
            python-setuptools
            python-setuptools-scm))
