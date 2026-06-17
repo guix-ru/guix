@@ -1454,7 +1454,7 @@ and auto-mapping slices to MIDI note numbers.")
 (define-public lilypond
   (package
     (name "lilypond")
-    (version "2.24.4")
+    (version "2.26.0")
     (source
      (origin
        (method url-fetch)
@@ -1462,7 +1462,7 @@ and auto-mapping slices to MIDI note numbers.")
                            "v" (version-major+minor version) "/"
                            "lilypond-" version ".tar.gz"))
        (sha256
-        (base32 "073qa7m9xkghad4x37rxb9v45vp4vfmsylwnjzhj17y7f4ss0vz9"))))
+        (base32 "01gy0s5j1x01pgjzs5gqx2kaz76ql0sa27wdrpfrjzvzpaz2vs5v"))))
     (build-system gnu-build-system)
     (arguments
       (list #:tests? #f                      ;out-test/collated-files.html fails
