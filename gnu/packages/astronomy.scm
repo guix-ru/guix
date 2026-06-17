@@ -5366,6 +5366,58 @@ Euclid Consortium should be used.")
 exitinction laws found in the literature.")
     (license license:expat)))
 
+(define-public python-fiasco
+  (package
+    (name "python-fiasco")
+    (version "0.8.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/wtbarnes/fiasco")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0m9whz5l2wqbip8f29n2ssl06a10aszc87lf6482l7rnq87v1x6s"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; Network access is required to fetch remote data from
+      ;; <download.chiantidatabase.org>.
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-manifest.in
+            ;; See: <https://codeberg.org/guix/guix/issues/4393>.
+            (lambda* (#:key name source inputs #:allow-other-keys)
+              (let ((port (open-file "MANIFEST.in" "w")))
+                (for-each
+                 (lambda (file)
+                   (display "include " port)
+                   (display file port)
+                   (display "\n" port))
+                 (find-files "fiasco"))
+                (close port)))))))
+    (native-inputs
+     (list nss-certs-for-test   ;sanity-check fails without it
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-astropy
+           python-fortranformat
+           python-h5py
+           python-numpy
+           python-plasmapy))
+    (home-page "https://fiasco.readthedocs.io")
+    (synopsis "Python interface to the CHIANTI atomic database")
+    (description
+     "fiasco provides a Python interface to
+@url{http://www.chiantidatabase.org/, CHIANTI}, an atomic database for
+astrophysical spectroscopy.  In addition to several high-level abstractions of
+the atomic data, fiasco also provides many common atomic physics
+calculations.")
+    (license license:bsd-3)))
+
 (define-public python-fits-schema
   (package
     (name "python-fits-schema")
