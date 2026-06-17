@@ -3487,7 +3487,8 @@ with a focus on working with embedded toolchains.")
               ;; There are specific instructions to not enable more flags
               ;; than absolutely needed.
               #$@(if (or (target-ppc64le?)
-                         (target-riscv64?))
+                         (target-riscv64?)
+                         (target-hurd?))
                      #~((setenv "FAKETIME_COMPILE_CFLAGS"
                                 "-DFORCE_MONOTONIC_FIX -DFORCE_PTHREAD_NONVER"))
                      #~((setenv "FAKETIME_COMPILE_CFLAGS"
