@@ -20589,27 +20589,24 @@ using the @code{ast} module.")
     (version "1.3.4")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "lmfit" version))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/lmfit/lmfit-py")
+             (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "15z4zcyc4crfdw22qnbaq8wrf552jgl83gd3nk2zc5zp8f6c48iw"))))
+        (base32 "00zx5fc5qkk8cxjpz00z8xm4kga7m0jgr8pbgb097sifbxlix0d9"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:test-flags
-      ;; Costly tests that may fail with multiprocessing.context.TimeoutError.
-      #~(list "--ignore=tests/test_jacobian_pickling.py")
-      #:phases
-      #~(modify-phases %standard-phases
-          ;; XXX: Unclear why, but the phase seems broken.
-          ;; asteval>=1.0 is not understood correctly.
-          (delete 'sanity-check))))
-    (propagated-inputs
-     (list python-asteval python-dill python-numpy python-scipy
-           python-uncertainties))
     (native-inputs
-     (list python-pytest python-setuptools))
+     (list python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-asteval
+           python-dill
+           python-numpy
+           python-scipy
+           python-uncertainties))
     (home-page "https://lmfit.github.io/lmfit-py/")
     (synopsis "Least-Squares minimization with bounds and constraints")
     (description
