@@ -5962,16 +5962,16 @@ astronomy-specific functionality")
 (define-public python-glue-core
   (package
     (name "python-glue-core")
-    (version "1.25.0")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "glue_core" version))
        (sha256
-        (base32 "0wmz67wlkd2qr9dlb5g96q80cqhfynhbmrqzr7r6kj3v8629ydf0"))))
+        (base32 "1n5bq0p9w1v2cwjbaz68dnrq93r0hrcangif0y5xdfxmx8a0kqvz"))))
     (build-system pyproject-build-system)
     (arguments
-     ;; tests: 1556 passed, 1 deselected, 6 xfailed, 1 xpassed, 41 warnings
+     ;; tests: 1642 passed, 1 deselected, 6 xfailed, 1 xpassed, 37 warnings
      (list
       #:test-flags
       ;; XXX: This test is flaky, it can fail if the CI system is slow.
@@ -5982,25 +5982,26 @@ astronomy-specific functionality")
            python-setuptools
            python-setuptools-scm))
     (propagated-inputs
-     (list python-astrodendro
-           python-astropy
+     (list python-astropy
            python-dill
            python-echo
            python-fast-histogram
+           python-h5py
            python-ipython
            python-matplotlib
            python-mpl-scatter-density
            python-numpy
            python-openpyxl
            python-pandas
-           python-pyavm
-           python-pillow
-           python-scikit-image
            python-scipy
-           python-setuptools ; to load extenral plugins, glue/main.py.
            python-shapely
-           python-spectral-cube
-           python-xlrd))
+           python-xlrd
+           ;; [optional]
+           python-astrodendro
+           python-pillow
+           python-pyavm
+           python-scikit-image
+           python-spectral-cube))
     (home-page "http://glueviz.org")
     (synopsis "Multidimensional data visualization project")
     (description
