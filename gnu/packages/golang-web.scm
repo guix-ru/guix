@@ -10894,7 +10894,7 @@ projects like rclone.")
 (define-public go-github-com-hetznercloud-hcloud-go-v2
   (package
     (name "go-github-com-hetznercloud-hcloud-go-v2")
-    (version "2.36.0")
+    (version "2.43.0")
     (source
      (origin
        (method git-fetch)
@@ -10903,7 +10903,7 @@ projects like rclone.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1d9ihn1aqjqhmrbdr236z5ia1rq5bkza582cmfy7y6l1046mgsyr"))))
+        (base32 "1n6s0by52r35dffc1xpf4b45lfslz2hgz6iljlqifvdkh599hki5"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -10913,9 +10913,7 @@ projects like rclone.")
      (list go-github-com-google-go-cmp
            go-github-com-stretchr-testify))
     (propagated-inputs
-     (list go-github-com-jmattheis-goverter
-           go-github-com-prometheus-client-golang
-           go-github-com-vburenin-ifacemaker
+     (list go-github-com-prometheus-client-golang
            go-golang-org-x-crypto
            go-golang-org-x-net))
     (home-page "https://github.com/hetznercloud/hcloud-go")
