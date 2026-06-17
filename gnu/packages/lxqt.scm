@@ -1142,9 +1142,8 @@ like @command{tar} and @command{zip}.")
            xdg-user-dirs
            xdg-utils
            ;; Base
-           ;; TODO: qtsvg is needed for lxqt apps to display icons. Maybe it
-           ;; should be added to their propagated-inputs?
-           qtsvg
+           qtsvg                        ; for icons
+           qtwayland                    ; for wayland session
            ;; Core
            lxqt-about
            lxqt-admin
@@ -1160,10 +1159,12 @@ like @command{tar} and @command{zip}.")
            lxqt-session
            lxqt-sudo
            lxqt-themes
+           lxqt-wayland-session
            pcmanfm-qt
            ;; Extra
            picom
            font-dejavu
+           labwc
            lximage-qt
            obconf-qt
            openbox
