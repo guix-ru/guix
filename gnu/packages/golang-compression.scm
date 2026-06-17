@@ -1213,7 +1213,7 @@ any dependency on any C code.")
 (define-public go-github-com-vbatts-tar-split
   (package
     (name "go-github-com-vbatts-tar-split")
-    (version "0.12.2")
+    (version "0.12.3")
     (source
      (origin
        (method git-fetch)
@@ -1222,7 +1222,7 @@ any dependency on any C code.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "08zf59nsfkfndjb2hgf4ccvpsi8aijd1daa5v19my2bfiabqf0za"))))
+        (base32 "1m1c3phig5c0k1g2445h0ic81mkpvbhn476crmdzc4hpc22imj9s"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -1306,8 +1306,7 @@ interface tool to compress and decompress LZ4 files."))))
   (package/inherit go-github-com-vbatts-tar-split
     (name "go-tar-split")
     (arguments
-     (substitute-keyword-arguments
-         (package-arguments go-github-com-vbatts-tar-split)
+     (substitute-keyword-arguments arguments
        ((#:tests? _ #t) #f)
        ((#:install-source? _ #t) #f)
        ((#:skip-build? _ #t) #f)
