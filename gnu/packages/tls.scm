@@ -314,7 +314,7 @@ required structures.")
     ;; This package supersedes the Guile bindings that came with GnuTLS until
     ;; version 3.7.8 included.
     (name "guile-gnutls")
-    (version "5.0.1")
+    (version "5.0.2")
     (home-page "https://codeberg.org/guile-gnutls/guile-gnutls")
     (source (origin
               ;; url-fetch is used here to avoid a circular dependency with
@@ -324,7 +324,7 @@ required structures.")
                                   version "-src.tar.gz"))
               (sha256
                (base32
-                "0kqngyx4520gjk49l6whjd2ss994kaj9rm78lli6p3q6xry0945i"))))
+                "1g1v2l9iczfc1h662szcgaxgri403kam5flyjq6rpja4jixxbxjg"))))
     (build-system gnu-build-system)
     (outputs '("out" "debug"))
     (arguments
@@ -349,8 +349,7 @@ required structures.")
     (inputs
      (list gnutls
            guile-3.0))
-    (properties '((release-tag-prefix . "v")
-                  (release-tag-version-delimiter . ".")))
+    (properties '((ftp-directory . "gnutls")))
     (synopsis "Guile bindings to GnuTLS")
     (description
      "This package provides Guile bindings to GnuTLS, a library implementation
