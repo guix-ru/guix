@@ -8646,6 +8646,48 @@ architecture.  The model supports multiple coordinate systems and efficiently
 evaluates all grid points and time frames simultaneously.")
     (license license:expat)))
 
+(define-public python-pymcfost
+  (package
+    (name "python-pymcfost")
+    (version "0.1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pymcfost" version))
+       (sha256
+        (base32 "0nr3s4pvdi4ihvq4jmaqpb09skb71y8xw7yvkxzlh1yb7gpd5zzh"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      ;; No parameter files found in <...>.
+      #~(list "--deselect=tests/test_plot.py::test_compare_data_th_plot_T")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              (substitute* "pyproject.toml"
+                ;; progressbar is not maintained, use alternative fork.
+                (("progressbar") "progressbar2")))))))
+    (native-inputs
+     (list python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (propagated-inputs
+     (list python-astropy
+           python-cmasher
+           python-matplotlib
+           python-numpy
+           python-progressbar2
+           python-scipy))
+    (home-page "https://github.com/cpinte/pymcfost")
+    (synopsis "Interface to the 3D radiative transfer code MCFOST")
+    (description
+     "Pymcfost is a Python interface to the 3D radiative transfer code
+MCFOST.  The goal is to provide a simple and light interface to explore and
+plot a single (or a few) model(s).")
+    (license license:expat)))
+
 (define-public python-pynbody
   (package
     (name "python-pynbody")
