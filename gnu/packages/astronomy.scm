@@ -9628,7 +9628,7 @@ channels
 (define-public python-radiospectra
   (package
     (name "python-radiospectra")
-    (version "0.6.1")
+    (version "0.7.0")
     (source
      (origin
        (method git-fetch)
@@ -9637,7 +9637,7 @@ channels
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0xm8jsxs3xf2zgavp9r2ym3xjspb7bv75f74y9qajzsz7dfb8w53"))))
+        (base32 "0bv9j9p0sarg8cqlfmj838m33mms0f7jmf483lnxx7i331j152b8"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -9645,6 +9645,11 @@ channels
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count))))
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-pytest-config
+            (lambda _
+              (substitute* "pytest.ini"
+                ;; ModuleNotFoundError: No module named 'pyparsing.warnings'
+                ((".*pyparsing.warnings.*") ""))))
           (add-before 'check 'set-HOME
             (lambda _
               (setenv "HOME" "/tmp"))))))
