@@ -12127,8 +12127,8 @@ in @code{SWIFT} snapshots to enable efficient reading of sub-regions.")
     (name "python-swiftsimsoap")
     ;; There is not correct version tag or PyPI release, use the latest commit
     ;; from master HEAD.
-    (properties '((commit . "6d9bc69c1321ab1be89cf21a68e23f92420678df")
-                  (revision . "1")))
+    (properties '((commit . "9ff3902ccb7fed00819c1e5bb4d95123f6e42208")
+                  (revision . "2")))
     (version (git-version "1.0.0"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -12140,7 +12140,7 @@ in @code{SWIFT} snapshots to enable efficient reading of sub-regions.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1g2bmxy79zss62nlii2m8l9qz3rd2bf9l44jvm442nxds2ch329w"))))
+        (base32 "1kxsz1qm4gq18yzmqlm1bfmf6ry4br2b4cwvanib4pjx7wxa26b9"))))
     (build-system pyproject-build-system)
     (arguments
      (list
