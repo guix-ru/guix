@@ -50,7 +50,7 @@
   #:use-module (gnu packages suckless)
   #:use-module (gnu packages terminals)
   #:use-module (gnu packages virtualization)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages xorg)
   #:use-module (gnu services desktop)
   #:use-module (gnu services networking)
