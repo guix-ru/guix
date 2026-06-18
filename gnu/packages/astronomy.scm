@@ -9302,7 +9302,7 @@ memory usage, improving performance and run in parallel with MPI.")
 (define-public python-pyspedas
   (package
     (name "python-pyspedas")
-    (version "2.1.1")
+    (version "2.1.2")
     (source
      (origin
        (method git-fetch)
@@ -9311,7 +9311,7 @@ memory usage, improving performance and run in parallel with MPI.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1v262y85f61hcx9b0l4ppb266xlmz0nlikzdfixk12y03z5f6m7j"))))
+        (base32 "0zc33mwprddrac60xwzsv33in1vq50hdycvh1mkrjhfyz5pvmxfi"))))
     (build-system pyproject-build-system)
     (arguments
      (list
