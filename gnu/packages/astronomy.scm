@@ -4651,7 +4651,7 @@ files and provide related services.")
 (define-public python-ctapipe
   (package
     (name "python-ctapipe")
-    (version "0.30.0")
+    (version "0.31.0")
     (source
      (origin
        (method git-fetch)
@@ -4660,11 +4660,11 @@ files and provide related services.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0ii9iyxbm22bqvgwp7gqs0m7n1vy3jyhgs85dikdz0y2vc7irizr"))))
+        (base32 "1xkm21nan9fxvfjgna4schm1fcq2m38a05nl4x7h4f5riwx7g2lw"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 165 passed, 14 warnings
+      ;; tests: 174 passed, 14 warnings
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
               "--pyargs" "ctapipe"
@@ -4771,6 +4771,7 @@ files and provide related services.")
     (propagated-inputs
      (list python-astropy
            python-docutils
+           python-hist
            python-joblib
            python-numba
            python-numpy
