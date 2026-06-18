@@ -819,4 +819,32 @@ Language Server Protocol} for the Zig programming language.")
          (replace "zig-diffz" zig-diffz-for-zls-0.15)
          (replace "zig-known-folders" zig-known-folders-for-zig-0.15))))))
 
+(define-public zig-zls-0.16
+  (package
+    (inherit zig-zls-0.15)
+    (name "zig-zls")
+    (version "0.16.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/zigtools/zls")
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0sbxz7nk9xam6whi8z05a469c9sfg50gkjm70ivavx1hpcwmck4k"))
+              (snippet
+               (rename-zig-dependencies
+                '(("diffz" . "zig-diffz")
+                  ("known_folders" . "zig-known-folders")
+                  ("lsp_kit" . "zig-lsp-kit"))))))
+    (native-inputs
+     (modify-inputs native-inputs
+       (replace "zig" zig-0.16)))
+    (inputs
+     (modify-inputs inputs
+       (replace "zig-diffz" zig-diffz-for-zls-0.16)
+       (replace "zig-known-folders" zig-known-folders-for-zig-0.16)
+       (replace "zig-lsp-kit" zig-lsp-kit-for-zig-0.16)))))
+
 (define-public zig-zls zig-zls-0.13)
