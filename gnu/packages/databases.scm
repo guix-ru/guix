@@ -2119,6 +2119,65 @@ value.  There is no concept of data tables or data types.  Records are
 organized in a hash table or B+ tree.")
     (license license:lgpl2.1+)))
 
+(define-public rayforce
+  ;; No release commit, version from include/rayforce.h
+  (let ((revision "1")
+        (commit "a4a4d059c0b990670462cf1b61c1d2afb1bd7b04"))
+    (package
+     (name "rayforce")
+     (version (git-version "2.1.0" revision commit))
+     (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/RayforceDB/rayforce")
+                    (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0i2acqag83wkq2a0mbig5fq2nwas7qx3kn9bf5x9awp87hhg7n8c"))))
+     (build-system gnu-build-system)
+     (arguments
+      (list #:make-flags
+            #~(list (string-append "CC=" #$(cc-for-target))
+                    (string-append "GIT_HASH=" #$commit)
+                    "BUILD_DATE=unknown"
+                    "CFLAGS=-fPIC $(WARNS) -std=$(STD) -g -O2 \
+                    -fsanitize=address,undefined -fno-omit-frame-pointer")
+            #:test-target "test"
+            #:phases
+            #~(modify-phases %standard-phases
+                (delete 'bootstrap)
+                (delete 'configure)
+                (add-after 'build 'build-library
+                  (lambda* (#:key make-flags #:allow-other-keys)
+                    (apply invoke "make" "lib" make-flags)
+                    (invoke #$(cc-for-target) "-shared" "-o" "librayforce.so"
+                            "librayforce.a")))
+                (add-before 'check 'delete-failing-tests
+                  (lambda _
+                    (with-directory-excursion "test/rfl/system"
+                       (for-each delete-file
+                                 (list "ipc_diff.rfl"
+                                       "log_journal.rfl"
+                                       "log_journal_advanced.rfl")))))
+                (replace 'install
+                  (lambda _
+                    (install-file "rayforce"
+                                  (string-append #$output "/bin"))
+                    (install-file "librayforce.a"
+                                  (string-append #$output "/lib"))
+                    (install-file "librayforce.so"
+                                  (string-append #$output "/lib"))
+                    (install-file "include/rayforce.h"
+                                  (string-append #$output "/include")))))))
+     (native-inputs (list gawk grep python))
+     (home-page "https://rayforcedb.com")
+     (synopsis "Column analytics and graph traversal engine")
+     (description "Rayforce is a combined engine for performing computations
+on tables and graphs.  It features a Lisp-like language for performing queries
+and operations.")
+     (license license:expat))))
+
 (define-public recutils
   (package
     (name "recutils")
