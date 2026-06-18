@@ -8788,6 +8788,36 @@ with sensible defaults out of the box.")
            python-pytest
            python-setuptools))))
 
+(define-public python-click-option-group
+  (package
+    (name "python-click-option-group")
+    (version "0.5.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/click-contrib/click-option-group")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1y9sprpgdmi4ww7hv04ciy0n6kacr4s8001zmf8781wr8vrxfb01"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatch-vcs
+           python-hatchling
+           python-pytest))
+    (propagated-inputs
+     (list python-click))
+    (home-page "https://click-option-group.readthedocs.io/")
+    (synopsis "Option groups missing in Click")
+    (description
+     "Click is a package for creating powerful and beautiful command line
+interfaces (CLI) in Python, but it has no the functionality for creating option
+groups.  The aim of this package is to provide group options with extensible
+functionality using canonical and clean API (Click-like API as far as
+possible).")
+    (license license:bsd-3)))
+
 (define-public python-clickgen
   (package
     (name "python-clickgen")
