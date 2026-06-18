@@ -7599,26 +7599,25 @@ Carlo.")
 (define-public python-ndcube
   (package
     (name "python-ndcube")
-    (version "2.4.0")
+    (version "2.4.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "ndcube" version))
        (sha256
-        (base32 "1344zzjp90s9cfvckf70gsby4ypav1xi2wx9s8cpcv05yzypmiqw"))))
+        (base32 "0nqsscpfdrvdiil0nb7zd5wp6p2r93pq5y07c9izyry8bjqjmzba"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 533 passed, 9 skipped, 10 xfailed, 18 warnings
-      #:test-flags
-      #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
-              ;; See: <https://github.com/sunpy/ndcube/issues/913>.
-              ;;
-              ;; TypeError: Invalid types were passed, got (Quantity,
-              ;; Quantity, Quantity) expected (Time, Quantity, Quantity).
-              "-k" "not test_crop_by_extra_coords_values_all_axes_with_coord")
+      ;; tests: 554 passed, 9 skipped, 27 deselected, 10 xfailed, 2 warnings
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-reproject-compatibility
+            (lambda _
+              (substitute* "ndcube/ndcube.py"
+                ;; It will be a part of 2.4.2, see
+                ;; <https://github.com/sunpy/ndcube/milestone/45>.
+                (("from reproject.wcs_utils") "from reproject._wcs_utils"))))
           (add-before 'sanity-check 'set-home-env
             (lambda _
               ;; Tests require HOME to be set.
@@ -7631,7 +7630,6 @@ Carlo.")
            python-pytest-astropy
            python-pytest-mpl
            ;; python-pytest-memray                  ;not packaged yet in Guix
-           python-pytest-xdist
            python-setuptools
            python-setuptools-scm
            python-specutils
