@@ -282,8 +282,8 @@ your QtWidgets application.")
       (license license:expat))))
 
 (define-public qite
-  (let ((commit "75fb3b6bbd5c6a5a8fc35e08a6efbfb588ed546a")
-        (revision "74"))
+  (let ((commit "e9d33c84a0b346185b27efb44189f18acaa53906")
+        (revision "75"))
     (package
       (name "qite")
       (version (git-version "0" revision commit))
@@ -296,7 +296,12 @@ your QtWidgets application.")
            (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0jmmgy9pvk9hwwph1nwy7hxhczy8drhl4ymhnjjn6yx7bckssvsq"))))
+          (base32 "13rwlb77hw44qksfh82mpklhkjr6z4pv1n4dj906hdw6213448vj"))
+         (modules '((guix build utils)))
+         (snippet
+          #~(begin
+              (substitute* "libqite/CMakeLists.txt"
+                (("CXX_STANDARD 14") "CXX_STANDARD 20"))))))
       (build-system qt-build-system)
       (arguments
        `(#:tests? #f                    ; no target
