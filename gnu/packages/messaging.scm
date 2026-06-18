@@ -2979,7 +2979,7 @@ implementation of an MQTT version client class.")
 (define-public psi-plus
   (package
     (name "psi-plus")
-    (version "1.5.2115")
+    (version "1.5.2140")
     (source
      (origin
        (method git-fetch)
@@ -2990,10 +2990,26 @@ implementation of an MQTT version client class.")
        (file-name (git-file-name name version))
        (modules '((guix build utils)))
        (snippet
-        `(begin
-           (delete-file-recursively "3rdparty")))
+        #~(begin
+            (delete-file-recursively "3rdparty")
+            (substitute* "CMakeLists.txt"
+              (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty.*") "")
+              (("add_subdirectory\\( 3rdparty \\)") ""))
+            (substitute* "src/CMakeLists.txt"
+              (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty.*") "")
+              (("add_dependencies\\(\\$\\{PROJECT_NAME\\} qhttp\\)")
+               "target_link_libraries(${PROJECT_NAME} qhttp)"))
+            (substitute* "src/src.cmake"
+              (("include\\(\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qite/libqite/libqite.cmake\\)")
+               "list(APPEND EXTRA_LIBS qite)"))
+            (substitute* '("src/filesharingmanager.h" "src/widgets/psirichtext.cpp"
+                           "src/filesharingmanager.cpp" "src/widgets/psitextview.cpp"
+                           "src/chatview_te.cpp" "src/msgmle.cpp")
+              (("qite.h") "qite/qite.h")
+              (("qiteaudio.h") "qite/qiteaudio.h")
+              (("qiteaudiorecorder.h") "qite/qiteaudiorecorder.h"))))
        (sha256
-        (base32 "14za9rh7nszv5px5a2w43ysi9977zws8a5mxsh7wc8ksr693faz2"))))
+        (base32 "084nl0808mhz0vndsp504mvnvhwn2gvmp0qz2iw1rvfv86r26y3i"))))
     (build-system qt-build-system)
     (arguments
      `(#:tests? #f                      ; No target
@@ -3014,42 +3030,6 @@ implementation of an MQTT version client class.")
         "-DUSE_CCACHE=OFF")             ; Not required
        #:phases
        (modify-phases %standard-phases
-         (add-after 'unpack 'patch-source
-           (lambda _
-             (substitute* "CMakeLists.txt"
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/http-parser/http_parser.h")
-                "")
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qhttp/qhttp.pro")
-                "")
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qite/qite.pro")
-                "")
-               (("add_subdirectory\\( 3rdparty \\)")
-                ""))
-             (substitute* "src/CMakeLists.txt"
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qite/libqite")
-                "")
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/http-parser")
-                "")
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qhttp/src/private")
-                "")
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qhttp/src")
-                "")
-               (("\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty")
-                "")
-               (("add_dependencies\\(\\$\\{PROJECT_NAME\\} qhttp\\)")
-                "target_link_libraries(${PROJECT_NAME} qhttp)"))
-             (substitute* "src/src.cmake"
-               (("include\\(\\$\\{PROJECT_SOURCE_DIR\\}/3rdparty/qite/libqite/libqite.cmake\\)")
-                "list(APPEND EXTRA_LIBS qite)"))
-             (substitute* '("src/filesharingmanager.h" "src/widgets/psirichtext.cpp"
-                            "src/filesharingmanager.cpp" "src/widgets/psitextview.cpp"
-                            "src/chatview_te.cpp" "src/msgmle.cpp")
-               (("qite.h")
-                "qite/qite.h")
-               (("qiteaudio.h")
-                "qite/qiteaudio.h")
-               (("qiteaudiorecorder.h")
-                "qite/qiteaudiorecorder.h"))))
          (add-after 'install 'wrap-executable
            (lambda* (#:key outputs #:allow-other-keys)
              (let ((out (assoc-ref outputs "out")))
