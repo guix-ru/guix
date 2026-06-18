@@ -2182,4 +2182,43 @@ toolchain.  Among other features it provides
       (native-inputs
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
+
+(define zig-0.16-libc-abi-tools
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
+          (commit "d1b3c04c4a386540708b76fe416a5e09ad97801d")))
+    (file-name "libc-abi-tools")
+    (sha256
+     (base32 "0a4f1bhgi6rd33gp3zlarcibagd603km4g97pdkphdkbs11066x1"))))
+
+(define-public zig-0.16
+  (package
+    (inherit zig-0.15)
+    (name "zig")
+    (version "0.16.0")
+    (source
+     (origin
+       (inherit (zig-source
+                 version version
+                 "0m5sj165wf4imq4fj7bsb38y49il5cagx1vw0slb5jmcls2wri6s"))
+       (patches
+        (search-patches
+         "zig-0.14-use-baseline-cpu-by-default.patch"
+         "zig-0.16-fix-runpath.patch"))))
+    (inputs
+     (modify-inputs (package-inputs zig-0.15)
+       (prepend zlib)
+       (replace "clang" clang-21)
+       (replace "lld" lld-21)))
+    (native-inputs
+     (modify-inputs (package-native-inputs zig-0.15)
+       (delete "glibc-abi-tool")
+       (prepend zig-0.16-libc-abi-tools)
+       (replace "llvm" llvm-21)
+       (replace "zig" `(,zig-0.15.0-2876 "zig1"))))
+    (properties `((max-silent-time . 9600)
+                  ,@(clang-compiler-cpu-architectures "21")))))
+
 (define-public zig zig-0.13)

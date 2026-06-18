@@ -1,0 +1,168 @@
+From 0db495c7db59bf61239f09de5dd77c0669238941 Mon Sep 17 00:00:00 2001
+From: Theodor Thornhill <theo@thornhill.no>
+Date: Thu, 18 Jun 2026 21:42:13 +0200
+Subject: [PATCH] Zig 0.16 fix runpath
+
+---
+ lib/std/Build/Step/Compile.zig     |  2 ++
+ lib/std/zig.zig                    |  3 +++
+ lib/std/zig/system/NativePaths.zig | 36 ++++++++++++++++----------
+ src/main.zig                       | 41 +++++++++++++++++++++++++++---
+ 4 files changed, 65 insertions(+), 17 deletions(-)
+
+diff --git a/lib/std/Build/Step/Compile.zig b/lib/std/Build/Step/Compile.zig
+index 529b58a0dd..fc3ffe09e3 100644
+--- a/lib/std/Build/Step/Compile.zig
++++ b/lib/std/Build/Step/Compile.zig
+@@ -807,6 +807,8 @@ pub fn runPkgConfig(step: *Step, lib_name: []const u8) !PkgConfigResult {
+             try zig_cflags.append(arg);
+         } else if (mem.startsWith(u8, arg, wl_rpath_prefix)) {
+             try zig_cflags.appendSlice(&[_][]const u8{ "-rpath", arg[wl_rpath_prefix.len..] });
++        } else if (mem.startsWith(u8, arg, "-Wl,-rpath=")) {
++            try zig_libs.appendSlice(&[_][]const u8{ "-L", arg["-Wl,-rpath=".len..] });
+         } else if (b.debug_pkg_config) {
+             return step.fail("unknown pkg-config flag '{s}'", .{arg});
+         }
+diff --git a/lib/std/zig.zig b/lib/std/zig.zig
+index 0dcd947046..4c9e4ac6dc 100644
+--- a/lib/std/zig.zig
++++ b/lib/std/zig.zig
+@@ -762,6 +762,9 @@ pub const EnvVar = enum {
+     C_INCLUDE_PATH,
+     CPLUS_INCLUDE_PATH,
+     LIBRARY_PATH,
++    CROSS_C_INCLUDE_PATH,
++    CROSS_CPLUS_INCLUDE_PATH,
++    CROSS_LIBRARY_PATH,
+     CC,
+ 
+     // Terminal integration
+diff --git a/lib/std/zig/system/NativePaths.zig b/lib/std/zig/system/NativePaths.zig
+index ead8eb2f70..ed8faa0309 100644
+--- a/lib/std/zig/system/NativePaths.zig
++++ b/lib/std/zig/system/NativePaths.zig
+@@ -178,24 +178,34 @@ pub fn detect(
+ 
+         // Distros like guix don't use FHS, so they rely on environment
+         // variables to search for headers and libraries.
+-        if (std.zig.EnvVar.C_INCLUDE_PATH.get(environ_map)) |c_include_path| {
+-            var it = mem.tokenizeScalar(u8, c_include_path, ':');
++        const cross_library_path = std.zig.EnvVar.CROSS_LIBRARY_PATH.get(environ_map);
++        const library_path = std.zig.EnvVar.LIBRARY_PATH.get(environ_map);
++        const guix_path = cross_library_path orelse library_path;
++        if (guix_path) |paths| {
++            var it = mem.tokenizeScalar(u8, paths, ':');
+             while (it.next()) |dir| {
+-                try self.addIncludeDir(dir);
++                try self.addLibDir(dir);
++                try self.addRPath(dir);
+             }
+         }
+-
+-        if (std.zig.EnvVar.CPLUS_INCLUDE_PATH.get(environ_map)) |cplus_include_path| {
+-            var it = mem.tokenizeScalar(u8, cplus_include_path, ':');
+-            while (it.next()) |dir| {
+-                try self.addIncludeDir(dir);
++        if (cross_library_path != null) {
++            if (std.zig.EnvVar.CROSS_C_INCLUDE_PATH.get(environ_map)) |cross_c_include_path| {
++                var include_it = mem.tokenizeScalar(u8, cross_c_include_path, ':');
++                while (include_it.next()) |dir| try self.addIncludeDir(dir);
++            }
++            if (std.zig.EnvVar.CROSS_CPLUS_INCLUDE_PATH.get(environ_map)) |cross_cplus_include_path| {
++                var include_it = mem.tokenizeScalar(u8, cross_cplus_include_path, ':');
++                while (include_it.next()) |dir| try self.addIncludeDir(dir);
+             }
+         }
+-
+-        if (std.zig.EnvVar.LIBRARY_PATH.get(environ_map)) |library_path| {
+-            var it = mem.tokenizeScalar(u8, library_path, ':');
+-            while (it.next()) |dir| {
+-                try self.addLibDir(dir);
++        if (library_path != null) {
++            if (std.zig.EnvVar.C_INCLUDE_PATH.get(environ_map)) |c_include_path| {
++                var include_it = mem.tokenizeScalar(u8, c_include_path, ':');
++                while (include_it.next()) |dir| try self.addIncludeDir(dir);
++            }
++            if (std.zig.EnvVar.CPLUS_INCLUDE_PATH.get(environ_map)) |cplus_include_path| {
++                var include_it = mem.tokenizeScalar(u8, cplus_include_path, ':');
++                while (include_it.next()) |dir| try self.addIncludeDir(dir);
+             }
+         }
+     }
+diff --git a/src/main.zig b/src/main.zig
+index 0395a21a5f..71eaeb993e 100644
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -3979,7 +3979,26 @@ fn createModule(
+         }
+ 
+         const target_query = std.zig.parseTargetQueryOrReportFatalError(arena, target_parse_options);
+-        const target = std.zig.resolveTargetQueryOrFatal(io, target_query);
++        var target = std.zig.resolveTargetQueryOrFatal(io, target_query);
++
++        if (target_query.dynamic_linker == null) {
++            const guix_lib_path =
++                std.zig.EnvVar.CROSS_LIBRARY_PATH.get(environ_map) orelse std.zig.EnvVar.LIBRARY_PATH.get(environ_map) orelse null;
++            if (guix_lib_path) |lib_path| {
++                if (target.dynamic_linker.get()) |standard_path| {
++                    const linker_basename = fs.path.basename(standard_path);
++                    var it = mem.tokenizeScalar(u8, lib_path, ':');
++                    while (it.next()) |dir| {
++                        const candidate = try std.fmt.allocPrint(arena, "{s}/{s}", .{ dir, linker_basename });
++                        if (Io.Dir.accessAbsolute(io, candidate, .{})) |_| {
++                            target.dynamic_linker.set(candidate);
++                            break;
++                        } else |_| {}
++                    }
++                }
++            }
++        }
++
+         break :t .{
+             .result = target,
+             .is_native_os = target_query.isNativeOs(),
+@@ -4077,7 +4096,7 @@ fn createModule(
+                 create_module.want_native_include_dirs = true;
+         }
+ 
+-        if (create_module.each_lib_rpath orelse resolved_target.is_native_os) {
++        if (create_module.each_lib_rpath orelse false) {
+             try create_module.rpath_list.ensureUnusedCapacity(arena, create_module.lib_directories.items.len);
+             for (create_module.lib_directories.items) |lib_directory| {
+                 create_module.rpath_list.appendAssumeCapacity(lib_directory.path.?);
+@@ -4085,9 +4104,11 @@ fn createModule(
+         }
+ 
+         // Trigger native system library path detection if necessary.
++        const is_guix = std.zig.EnvVar.CROSS_LIBRARY_PATH.isSet(environ_map) or std.zig.EnvVar.LIBRARY_PATH.isSet(environ_map);
+         if (create_module.sysroot == null and
+-            resolved_target.is_native_os and resolved_target.is_native_abi and
+-            create_module.want_native_include_dirs)
++            (is_guix or
++                (resolved_target.is_native_os and resolved_target.is_native_abi and
++                    create_module.want_native_include_dirs)))
+         {
+             var paths = std.zig.system.NativePaths.detect(arena, io, target, environ_map) catch |err|
+                 fatal("unable to detect native system paths: {t}", .{err});
+@@ -4138,6 +4159,18 @@ fn createModule(
+             color,
+         ) catch |err| fatal("failed to resolve link inputs: {s}", .{@errorName(err)});
+ 
++        if (is_guix) {
++            for (create_module.link_inputs.items) |link_input| {
++                const p = switch (link_input) {
++                    .dso => |dso| dso.path,
++                    else => continue,
++                };
++                if (fs.path.dirname(p.sub_path) orelse p.root_dir.path) |ld| {
++                    try create_module.rpath_list.append(arena, ld);
++                }
++            }
++        }
++
+         if (!create_module.opts.any_dyn_libs) for (create_module.link_inputs.items) |item| switch (item) {
+             .dso, .dso_exact => {
+                 create_module.opts.any_dyn_libs = true;
+-- 
+2.54.0
+
