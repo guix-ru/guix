@@ -7409,7 +7409,7 @@ translations.")
      (list python-poetry-core
            python-setuptools))
     (propagated-inputs
-     (list python-fits-schema))
+     (list python-fits-schema-0.5.6))
     (home-page "https://github.com/open-gamma-ray-astro/ogadf-schema")
     (synopsis
      "Definition of the open gamma ray astronomy data formats using fits-schema")
