@@ -695,7 +695,7 @@ with a few extensions.")
 supporting the CommonMark specification.  Features include page and
 directory search, document and link navigation, hotkeys, and
 one-click export to web browser.")
-    (license license:gpl2)))
+    (license (list license:gpl2 license:expat))))
 
 (define-public python-mistletoe
   (package
