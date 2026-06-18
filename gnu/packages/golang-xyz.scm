@@ -2693,6 +2693,30 @@ optimized for sparse nodes of
 for Go.")
     (license license:asl2.0)))
 
+(define-public go-github-com-aryann-difflib
+  (package
+    (name "go-github-com-aryann-difflib")
+    (version "0.0.0-20210328193216-ff5ff6dc229b")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/aryann/difflib")
+             (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0z2m4pg5flwkvwgym4w6cynmklc9v8q5bwa6gag0wv1mx5srr8a1"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/aryann/difflib"))
+    (home-page "https://github.com/aryann/difflib")
+    (synopsis "Diff two sequences of text")
+    (description
+     "@code{difflib} is a simple library in Go for diffing two sequences of
+text.")
+    (license license:expat)))
+
 (define-public go-github-com-asaskevich-govalidator
   (package
     (name "go-github-com-asaskevich-govalidator")
