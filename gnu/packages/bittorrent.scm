@@ -328,12 +328,15 @@ speed and efficiency.")
                (base32
                 "0azpqclksczh1j7kpkwqh68xp3p9rayf9dym1c2iif56fm960mgh"))))
     (build-system gnu-build-system)
-    (inputs (list libtorrent
-                  ncurses
-                  curl
-                  cyrus-sasl
-                  openssl
-                  zlib))
+    (arguments (list #:configure-flags #~(list "--with-xmlrpc-tinyxml2")))
+    (inputs
+     (list libtorrent
+           ncurses
+           curl
+           cyrus-sasl
+           openssl
+           tinyxml2
+           zlib))
     (native-inputs (list autoconf automake cppunit libtool pkg-config))
     (synopsis "BitTorrent client with ncurses interface")
     (description
