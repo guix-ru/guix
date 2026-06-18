@@ -9322,26 +9322,16 @@ PSF} describing how the optical system spreads light from sources.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2288 passed, 566 skipped, 99 warnings
+      ;; tests: 2282 passed, 575 skipped
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
-              ;; AssertionError: assert 'Broadcasting is being used' in ''
-              "-k" (string-append
-                    "not test_reproject_parallel_broadcasting[none]"
-                    " and not test_reproject_parallel_broadcasting[None]"
-                    " and not test_reproject_parallel_broadcasting[memmap]"))
+              "--pyargs" "reproject")
       #:phases
       #~(modify-phases %standard-phases
-          (replace 'check
-            (lambda* (#:key tests? test-flags #:allow-other-keys)
-              (when tests?
-                (with-directory-excursion #$output
-                  (setenv "HOME" "/tmp")
-                  (apply invoke "pytest" "-vv" test-flags)))))
-          (add-before 'check 'post-check
+          (add-before 'check 'pre-check
             (lambda _
-              (for-each delete-file-recursively
-                        (find-files #$output "__pycache__" #:directories? #t)))))))
+              (delete-file-recursively "reproject")
+              (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list python-asdf
            python-cython
