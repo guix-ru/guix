@@ -236,7 +236,7 @@
   #:use-module (gnu packages vpn)
   #:use-module (gnu packages web)
   #:use-module (gnu packages webkit)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xiph)
   #:use-module (gnu packages xml)

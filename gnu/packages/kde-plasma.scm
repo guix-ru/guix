@@ -92,7 +92,7 @@
   #:use-module (gnu packages video)
   #:use-module (gnu packages vpn)
   #:use-module (gnu packages vulkan)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages textutils)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages xdisorg)

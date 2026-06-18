@@ -53,7 +53,7 @@
   #:use-module (gnu packages text-editors)
   #:use-module (gnu packages video)
   #:use-module (gnu packages wget)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)

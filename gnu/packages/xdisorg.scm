@@ -175,7 +175,7 @@
   #:use-module (gnu packages video)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages version-control)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages logging)

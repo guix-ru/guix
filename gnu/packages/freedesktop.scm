@@ -154,7 +154,7 @@
   #:use-module (gnu packages vulkan)
   #:use-module (gnu packages w3m)
   #:use-module (gnu packages web)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)
