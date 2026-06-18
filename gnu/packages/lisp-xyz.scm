@@ -68,7 +68,7 @@
 ;;; This file only contains Common Lisp libraries.
 ;;; Common Lisp compilers and tooling go to lisp.scm.
 ;;; Common Lisp applications should go to the most appropriate file,
-;;; e.g. StumpWM is in wm.scm.
+;;; e.g. StumpWM is in window-management.scm.
 ;;; Common Lisp libraries related to code testing facilities go
 ;;; to lisp-check.scm.
 

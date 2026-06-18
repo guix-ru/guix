@@ -54,7 +54,7 @@
 ;;; This file only contains Common Lisp compilers and tooling.
 ;;; Common Lisp libraries go to lisp-xyz.scm.
 ;;; Common Lisp applications should go to the most appropriate file,
-;;; e.g. StumpWM is in wm.scm.
+;;; e.g. StumpWM is in window-management.scm.
 
 (define-module (gnu packages lisp)
   #:use-module (gnu packages)
