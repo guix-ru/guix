@@ -453,6 +453,26 @@ across several operating systems.")
 (define-deprecated-package zig-known-folders-for-zls-0.15
   zig-known-folders-for-zig-0.15)
 
+(define-public zig-known-folders-for-zig-0.16
+  (let ((commit "7deb7aa3ba631db04faaa343cd30553c34b7d01d")
+        (revision "0"))
+    (package
+      (inherit zig-known-folders)
+      (name "zig-known-folders")
+      (version (git-version "0.16.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/ziglibs/known-folders")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "19g6z3cdgyh1c3kj02c9vlkg812hh7f76pdsxk6x2bwn9x6wxd2l"))))
+      (arguments
+       (substitute-keyword-arguments arguments
+         ((#:zig _ #f) zig-0.16))))))
+
 (define-public zig-pixman
   (package
     (name "zig-pixman")
