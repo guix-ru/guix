@@ -764,6 +764,16 @@ source files.")
                             (find-files "deps/openssl"
                                         (lambda (file stat)
                                           (not (string-contains file "nodejs-openssl.cnf")))))
+                  ;; [temp.names] requires a 'template' when calling a template
+                  ;; member via a dependent expression.  This header is compiled
+                  ;; for 32-bit targets (V8_TARGET_ARCH_32_BIT), so
+                  ;; non-conformance goes unnoticed elsewhere.  Coincidentally
+                  ;; fixed in upstream v8 at:
+                  ;; https://chromium-review.googlesource.com/c/v8/v8/+/6830052
+                  (substitute*
+                      "deps/v8/src/compiler/turboshaft/int64-lowering-reducer.h"
+                    (("__ Tuple<Word32, Word32>")
+                     "__ template Tuple<Word32, Word32>"))
                   ;; Remove bundled software, where possible
                   (for-each delete-file-recursively
                             '("deps/brotli"
