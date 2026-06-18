@@ -8714,6 +8714,34 @@ encoding/decoding.  It has no dependencies.")
      (list
       #:import-path "github.com/derekparker/trie/v3"))))
 
+(define-public go-github-com-deruina-timberjack
+  (package
+    (name "go-github-com-deruina-timberjack")
+    (version "1.4.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/DeRuina/timberjack")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gkfl82vs5qr0fm561rcijpjzasanvwcqaab4ggaijrp07lp7hrl"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/DeRuina/timberjack"))
+    (native-inputs
+     (list go-github-com-fortytw2-leaktest))
+    (propagated-inputs
+     (list go-github-com-klauspost-compress))
+    (home-page "https://github.com/DeRuina/timberjack")
+    (synopsis "Package for writing logs to rolling files")
+    (description
+     "Timberjack is a Go log rolling library with support for size-based,
+time-based, and manual rotation.")
+    (license license:expat)))
+
 (define-public go-github-com-detailyang-go-fallocate
   (package
     (name "go-github-com-detailyang-go-fallocate")
