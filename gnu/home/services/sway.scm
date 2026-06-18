@@ -25,7 +25,7 @@
   #:use-module (gnu system keyboard)
   #:use-module (gnu services configuration)
   #:use-module (gnu home services)
-  #:use-module (gnu packages wm)
+  #:use-module (gnu packages window-management)
   #:use-module (gnu packages terminals)
   #:export (;; Event codes
             %ev-code-mouse-left
