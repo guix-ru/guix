@@ -1023,6 +1023,30 @@ can use the mock clock.  This is a maintained fork of benbjohnson's
      "This package provides a linter to find named returns in Go code.")
     (license license:gpl3)))
 
+(define-public go-github-com-fortytw2-leaktest
+  (package
+    (name "go-github-com-fortytw2-leaktest")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/fortytw2/leaktest")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0487zghyxqzk6zdbhd2j074pcc2l15l4sfg5clrjqwfbql7519wx"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/fortytw2/leaktest"))
+    (home-page "https://github.com/fortytw2/leaktest")
+    (synopsis "Goroutine leak detector")
+    (description
+     "Refactored, tested variant of the goroutine leak detector found in both
+@code{net/http} and the @code{cockroachdb} source tree.")
+    (license license:bsd-3)))
+
 ;; XXX: The project looks like abandoned, see
 ;; <https://github.com/frankban/quicktest/issues/172>, remove when nothing
 ;; depends on it.
