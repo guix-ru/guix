@@ -9201,7 +9201,7 @@ natively in Siril.")
 (define-public python-pysm3
   (package
     (name "python-pysm3")
-    (version "3.4.4")
+    (version "3.4.5")
     (source
      (origin
        (method git-fetch)
@@ -9210,7 +9210,7 @@ natively in Siril.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1sig5h9v9xw1c5rk0891yh7pxx68ckjwkg59cbzvd8skcqvmmwh8"))))
+        (base32 "0sq2ndg9f9zpm79fnspvph2w5zi2ssz75wzm1aqriyn7gcl7k9rg"))))
     (build-system pyproject-build-system)
     (arguments
      (list
