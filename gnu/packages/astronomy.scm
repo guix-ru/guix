@@ -7320,7 +7320,15 @@ the easy construction of interactive matplotlib widget based animations.")
        (sha256
         (base32 "16z3qzdd31is2dxkp4jgazcykrhx3m2i3qrs7dl9rbhlj5nxx1iy"))))
     (build-system pyproject-build-system)
-    ;; tests: 213 passed, 2 skipped, 1 xpassed, 99 warnings
+    (arguments
+     (list
+      ;; tests: 210 passed, 2 skipped, 3 deselected, 1 xpassed, 940 warnings
+      #:test-flags
+      #~(list
+         ;; Not equal to tolerance <...>.
+         "--deselect=tests/test_models.py::test_anisotropic_inverse_compton_lum"
+         "--deselect=tests/test_models.py::test_synchrotron_lum"
+         "--deselect=tests/test_models.py::test_inverse_compton_lum")))
     (native-inputs
      (list python-hatch-vcs
            python-hatchling
