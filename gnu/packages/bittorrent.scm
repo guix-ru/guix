@@ -317,7 +317,7 @@ speed and efficiency.")
 (define-public rtorrent
   (package
     (name "rtorrent")
-    (version "0.16.1")
+    (version "0.16.14")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -326,7 +326,7 @@ speed and efficiency.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0azpqclksczh1j7kpkwqh68xp3p9rayf9dym1c2iif56fm960mgh"))))
+                "0l032679ga5w40285yjh2crglw6qbmp4wzarbqdshb629njs4b2p"))))
     (build-system gnu-build-system)
     (arguments (list #:configure-flags #~(list "--with-xmlrpc-tinyxml2")))
     (inputs
