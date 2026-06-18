@@ -9642,6 +9642,41 @@ This package provides the static libraries required to run programs
 compiled against the nauty library.")
     (license license:asl2.0)))
 
+(define-public nodesoup
+  (package
+    (name "nodesoup")
+    ;; Package has no release, using the latest commit.
+    (properties '((commit . "3158ad082bb0cd1abee75418b12b35522dbca74f")
+                  (revision . "0")))
+    (version (git-version "0.1.0" ;CMakeLists.txt shows this version.
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/olvb/nodesoup")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ahx04jh4743v84ckn670yc1qz62nqf7bb75fappnlxp03lyllml"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list #:tests? #f ;No tests provided by package.
+           #:configure-flags
+           #~(list "-DBUILD_DEMO=OFF"
+                   "-DBUILD_SHARED_LIBS=ON")))
+    (native-inputs (list pkg-config))
+    (inputs (list cairo))
+    (home-page "https://github.com/olvb/nodesoup")
+    (synopsis "C++ implementation of Fruchterman-Reingold and Kamada Kawai algorithms")
+    (description "This library implements the Fruchterman-Reingold force-directed
+graph layout algorithm.  It applies repulsion between all vertex pairs (to avoid overlap)
+and attraction between connected vertices (to pull them together).  Forces decay with
+distance, and a global temperature limits maximum displacement per iteration, causing the
+layout to sta0bilize gradually.")
+    (license license:unlicense)))
+
 (define-public speedcrunch
   (package
     (name "speedcrunch")
