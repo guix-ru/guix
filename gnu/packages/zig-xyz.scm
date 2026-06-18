@@ -292,6 +292,23 @@ building blocks to develop LSP implementations in Zig.")
 (define-deprecated-package zig-lsp-kit-for-zls-0.15
   zig-lsp-kit-for-zig-0.15)
 
+(define-public zig-lsp-kit-for-zig-0.16
+  (let ((commit "cf0ff08ac00301859656bbd4a5af6fcb889497e4")
+        (revision "0"))
+    (package
+      (inherit zig-lsp-kit-for-zig-0.15)
+      (name "zig-lsp-kit")
+      (version (git-version "0.1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/zigtools/lsp-kit")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0nf4yb6sndgv18iqrysqw4iba7srwyicqwfpij6bl2h4xsbnxqnk")))))))
+
 (define-public zig-diffz
   (let ((commit "420fcb22306ffd4c9c3c761863dfbb6bdbb18a73")
         (revision "0"))
