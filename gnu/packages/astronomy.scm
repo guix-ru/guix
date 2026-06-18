@@ -12374,7 +12374,7 @@ includes tools to help create both publication-ready and quick figures.")
 (define-public python-virgodc
   (package
     (name "python-virgodc")
-    (version "1.0.2")
+    (version "1.0.4")
     (source
      (origin
        (method git-fetch)
@@ -12383,7 +12383,7 @@ includes tools to help create both publication-ready and quick figures.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01h8n2pg6q8fwfxclx4hj0f56fcndnnvjnl0jhivmwqp2bm1gbgq"))))
+        (base32 "1fzdhdh01gkv57qlkiqh6wrg9brq4340m4n8bxvk8k7igx22hzk4"))))
     (build-system pyproject-build-system)
     (arguments
      (list
