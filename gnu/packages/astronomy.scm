@@ -8566,27 +8566,24 @@ recipes implemented in Python as part of an instrument pipeline package.")
 (define-public python-pyirf
   (package
     (name "python-pyirf")
-    (version "0.13.0")
+    (version "0.14.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "pyirf" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/cta-observatory/pyirf")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "17z8czdqk6c742ww9274x9inx0q201908la0i27gv7r1496l0l0b"))))
+        (base32 "01fk3rywhslvqsmr6vjdlicak1s5n39i139i6958wbk573vd8m3q"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; It fails to load optional Gammapy, remove when it's packaged.
       #:test-flags
-      #~(list "--ignore=pyirf/io/tests/test_gadf.py"
-              ;; fixture 'prod5_irfs' not found
-              "-k" (string-append "not test_EnergyDispersionEstimator"
-                                  " and not test_EffectiveAreaEstimator_prod5"))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'check 'pre-check
-            (lambda _
-              (delete-file "pyirf/conftest.py"))))))
+      #~(list
+         ;; Network access is required to run "python download_irfs.py".
+         "-k" (string-append "not test_EnergyDispersionEstimator"
+                             " and not test_EffectiveAreaEstimator_prod5"))))
     (native-inputs
      (list python-ogadf-schema
            python-pytest
@@ -8594,11 +8591,12 @@ recipes implemented in Python as part of an instrument pipeline package.")
            python-setuptools-scm))
     (propagated-inputs
      (list python-astropy
-           python-gammapy
            python-numpy
            python-packaging
            python-scipy
-           python-tqdm))
+           python-tqdm
+           ;; [optional]
+           python-gammapy))
     (home-page "https://github.com/cta-observatory/pyirf")
     (synopsis "Python IRF builder")
     (description
