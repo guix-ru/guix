@@ -88,7 +88,7 @@
   #:use-module (gnu packages fonts)
   #:use-module ((gnu packages nwg-shell) #:select (nwg-hello))
   #:use-module (gnu packages terminals)
-  #:use-module ((gnu packages wm) #:select (sway))
+  #:use-module ((gnu packages window-management) #:select (sway))
   #:use-module ((gnu build file-systems)
                 #:select (mount-flags->bit-mask
                           swap-space->flags-bit-mask))
