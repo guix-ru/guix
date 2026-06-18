@@ -1528,7 +1528,7 @@ Guile.")
   (package
     (inherit lilypond)
     (name "lilypond-next")
-    (version "2.25.35")
+    (version "2.27.1")
     (source
      (origin
        (method url-fetch)
@@ -1536,7 +1536,7 @@ Guile.")
                            "v" (version-major+minor version) "/"
                            "lilypond-" version ".tar.gz"))
        (sha256
-        (base32 "0q7az6jxnkpvbfa4d0fb1mqp2cvl6agkaiccfh7l7r8yvf6c8ydx"))))))
+        (base32 "14ykhp9bzw9hhzcy215dj3ylfil3hxnyy2wqy0xdniz23r2sr0db"))))))
 
 (define-public emacs-lilypond-mode
   (package
