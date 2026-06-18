@@ -11423,6 +11423,7 @@ functionality needed for solar data analysis.")
                           "test_search_low_latency"
                           "test_search_soop"
                           "test_search_wavelength_detector_column"
+                          "test_soar_server_down"
                           "test_wavelength_column_wavelength_exists"
                           "test_wavelength_range"
                           "test_wavelength_single"
