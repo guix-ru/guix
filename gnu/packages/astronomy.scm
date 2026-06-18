@@ -5485,10 +5485,10 @@ calculations.")
 (define-public python-fits-schema
   (package
     (name "python-fits-schema")
-    ;; 0.5.6 was released in 2022, there are NumPy 2 comparability changes
-    ;; which are available on master HEAD, use the latest commit for now.
-    (properties '((commit . "ccffe04a8a47f2bd0f69014caaf73d9679b89a87")
-                  (revision . "0")))
+    ;; 0.5.6 (2022-04-14), there are NumPy 2 comparability changes which are
+    ;; available on master HEAD, use the latest commit for now.
+    (properties '((commit . "e638ea7595597b8ecfe0761886e7052e58b81a2d")
+                  (revision . "1")))
     (version (git-version "0.5.6"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -5500,7 +5500,7 @@ calculations.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0lj8vb3b2s7m56bs4am6856w8vdlyi4p86gj7hlkncfngsgx1f8v"))))
+        (base32 "0rj9xwlr9clnlvw0nvr0ynpvwny380pnjynw45c7znnhlnh02dn0"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-pytest
