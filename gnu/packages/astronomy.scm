@@ -732,8 +732,8 @@ in FITS files.")
     (name "cianna")
     ;; Project does not publish regular releases, see:
     ;; <https://github.com/Deyht/CIANNA/issues/3>.
-    (properties '((commit . "3c4156801b91a9824d534baae9d1473d1aed56d8")
-                  (revision . "0")))
+    (properties '((commit . "7e22ab36c9ee2ad32e22c54772fd40687b8bcd0a")
+                  (revision . "1")))
     (version (git-version "1.0.1.4"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -745,7 +745,7 @@ in FITS files.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1qjlzd4zy7ydxr2kvw4qjkmzq9pp5wi3z809sxlc88k3l75djp7m"))))
+        (base32 "0922n0frvvzia5il1jjxs7yzjrlzymn790c6rbyddz9xnxrp99jd"))))
     (build-system cmake-build-system)
     (arguments
      (list
