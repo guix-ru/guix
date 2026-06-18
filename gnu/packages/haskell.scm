@@ -1928,8 +1928,11 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
                     (string-append
                      "*.iserv.ghc.link.opts += -optl-Wl,-rpath,"
                      #$output "/lib/ghc-" #$(package-version this-package)
-                     "/lib/" #$(or (%current-target-system)
-                                   (%current-system))
+                     "/lib/" #$(match (gnu-triplet->nix-system
+                                        (or (%current-target-system)
+                                            (%current-system)))
+                                 ("i686-linux" "i386-linux")
+                                 (x x))
                      "-ghc-" #$(package-version this-package) "/")
                     port)))))
             ;; This phase patches the 'ghc-pkg' command so that it sorts the list
