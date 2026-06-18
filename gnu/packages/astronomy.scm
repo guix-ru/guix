@@ -7287,7 +7287,7 @@ emission lines in 1-D spectra, especially galaxy and quasar spectra.")
 (define-public python-lofar-h5plot
   (package
     (name "python-lofar-h5plot")
-    (version "2.9.2")
+    (version "2.9.4")
     (source
      (origin
        (method git-fetch)
@@ -7296,7 +7296,7 @@ emission lines in 1-D spectra, especially galaxy and quasar spectra.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "14v7jld6cd39f4l57jk93xn94s911x1zi53ms3dmd414chklsgys"))))
+        (base32 "1mp018qcdcq3vvgv7p2lf8dqb4mrpf6yc5hb20gfl500bzpg9v9d"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f)) ; no tests provided
