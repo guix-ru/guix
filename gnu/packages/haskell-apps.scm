@@ -675,22 +675,18 @@ LaTeX output.")
     (license license:gpl2+)))
 
 (define-public kmonad
-  ;; Project is active, but no new releases exist. Pick current master
-  ;; HEAD as of 2024-08-18.
-  (let ((commit "07cd1cb4fddb46a8d9de3bb9d06196d08b7a8ed2")
-        (revision "1"))
-    (package
-      (name "kmonad")
-      (version (git-version "0.4.2" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/david-janssen/kmonad")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "08ybif2lw0jy9h2hrlvx3469a3hkvih9gsg60kp9qnklzvqjdy5i"))))
+  (package
+    (name "kmonad")
+    (version "0.4.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kmonad/kmonad")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ng07i2zb98gx7giz7cjxjx908p1v14wn913k810n550k2gfbvp9"))))
     (build-system haskell-build-system)
     (arguments
      (list
@@ -726,6 +722,7 @@ LaTeX output.")
                          git))
     (inputs (list ghc-cereal
                   ghc-exceptions
+                  ghc-hinotify
                   ghc-lens
                   ghc-megaparsec
                   ghc-optparse-applicative
@@ -742,7 +739,7 @@ advanced functionality, such as custom keymap layers and modifiers, macros,
 and conditional mappings that send a different keycode when tapped or held.
 By operating at a lower level than most similar tools, it supports X11,
 Wayland, and Linux console environments alike.")
-    (license license:expat))))
+    (license license:expat)))
 
 (define-public matterhorn
   (package
