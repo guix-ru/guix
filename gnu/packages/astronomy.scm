@@ -9104,22 +9104,30 @@ weather indices as pysat.Instrument objects.")
 (define-public python-pysiaf
   (package
     (name "python-pysiaf")
-    (version "0.25.0")
+    (version "0.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "pysiaf" version))
        (sha256
-        (base32 "17r06dzx8r12llrhjlp23mmdb5bw4ydmnswdzyincvsz1gc55f9r"))))
+        (base32 "19z8kqqkv6qv8dzcq3s593abwdmzhnrapd42fyj03z1j9bhvlmia"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 32 passed, 2 deselected
+      ;; tests: 43 passed, 2 deselected
       #:test-flags
       ;; Disable 2 failing tests, see
       ;; <https://github.com/spacetelescope/pysiaf/issues/338>
       #~(list "-k" (string-append "not test_write_jwst_siaf_xlsx"
-                                  " and not test_write_jwst_siaf_xml" ))))
+                                  " and not test_write_jwst_siaf_xml" ))
+
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              (substitute* "pyproject.toml"
+                ;; All tests passed.
+                (("astropy >= 7.0.0, < 8.0.0") "astropy")))))))
     (native-inputs
      (list python-pytest
            python-setuptools
