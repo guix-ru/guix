@@ -9873,20 +9873,25 @@ pipelines.")
 (define-public python-romancal
   (package
     (name "python-romancal")
-    (version "1.0.0")
+    ;; 1.0.0 (2026-05-15), to support Astropy 8.
+    (properties '((commit . "282aa278db03bdbbbe59f65c6250732abfe92a0a")
+                  (revision . "0")))
+    (version (git-version "1.0.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/spacetelescope/romancal")
-              (commit version)))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1ybyw7xkgdr3fzlvly2i8q8j0y56zyd94z75p4pvjhnqbm5i37vk"))))
+        (base32 "0qvlqzk5mzw5d4fwmvklqdmsdfyvvdl8vja5485cg8c9fpsc674s"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 433 passed, 323 skipped, 18 deselected, 10 warnings
+      ;; tests: 459 passed, 331 skipped, 18 deselected, 9 warnings
       #:test-flags
       #~(list "--color=no"
               ;; Tests requiring calibration data.
