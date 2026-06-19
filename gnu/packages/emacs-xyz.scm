@@ -46083,7 +46083,7 @@ PDDL files with syntax highlighting, templates, auto-completion, and more.")
 (define-public emacs-plantuml-mode
   (package
     (name "emacs-plantuml-mode")
-    (version "1.8.0")
+    (version "1.9.0")
     (source
      (origin
        (method git-fetch)
@@ -46092,7 +46092,7 @@ PDDL files with syntax highlighting, templates, auto-completion, and more.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1h68bfczpvbzi29ggl3dciiz5187px14xi2sz5pywwl84sg5x2b5"))))
+        (base32 "125w8lz89wvr1micz470rvyfv1qq71xxjl0brimrbsb6ql5vrqam"))))
     (arguments
      (list
       #:tests? #f  ; Unclear why tests fail.
