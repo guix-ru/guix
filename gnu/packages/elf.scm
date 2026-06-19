@@ -86,14 +86,14 @@ libraries.")
 (define-public elfutils
   (package
     (name "elfutils")
-    (version "0.192")
+    (version "0.195")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://sourceware.org/elfutils/ftp/"
                                   version "/elfutils-" version ".tar.bz2"))
               (sha256
                (base32
-                "1d0nnkm59pwi9hrr28w0ifb6smldrjk6rn33kcgs3ar4msz9jq31"))
+                "09n0ilhn39ahnqxisw0g5mn7s5wlh0mwm3qkis0w4g8zgzgryqip"))
               (patches (search-patches "elfutils-tests-ptrace.patch"))))
     (build-system gnu-build-system)
 
@@ -110,6 +110,9 @@ libraries.")
                                               (assoc-ref %outputs "out")
                                               "/lib")
                                "--disable-static"
+                               ;; Make sure 'ar' and 'ranlib' produce archives in a
+                               ;; deterministic fashion.
+                               "--enable-deterministic-archives"
                                ;; TODO: Enable the debuginfo server.  It
                                ;; increases the closure size significantly
                                ;; and presents bootstrapping problems, so
@@ -178,7 +181,7 @@ libraries.")
                              (string-append all "exit 77;\n"))))))
                    #~()))))
 
-    (native-inputs (list m4))
+    (native-inputs (list m4 pkg-config))
     (inputs (list xz zlib))
     (home-page "https://sourceware.org/elfutils/")
     (synopsis "Collection of utilities and libraries to handle ELF files and
