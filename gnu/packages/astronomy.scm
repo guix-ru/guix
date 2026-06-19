@@ -3314,6 +3314,19 @@ much of the core functionality and some common tools needed for performing
 astronomy and astrophysics.")
     (license license:bsd-3)))
 
+(define-public python-astropy-7
+  (package
+    (inherit python-astropy)
+    (name "python-astropy")
+    (version "7.2.1")
+    (source
+     (origin
+       (inherit (package-source python-astropy))
+       (method url-fetch)
+       (uri (pypi-uri "astropy" version))
+       (sha256
+        (base32 "1jvj3z21ihi6gnrb6c8mcrnyxhqfm9b75ga98mwyd0wixhpfpqy0"))))))
+
 (define-public python-astropy-healpix
   (package
     (name "python-astropy-healpix")
