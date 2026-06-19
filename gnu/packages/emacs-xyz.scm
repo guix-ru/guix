@@ -47790,7 +47790,7 @@ current region or entire buffer.")
 (define-public emacs-nasm-mode
   (package
     (name "emacs-nasm-mode")
-    (version "1.1.1")
+    (version "1.2.0")
     (source
      (origin
        (method git-fetch)
@@ -47800,7 +47800,7 @@ current region or entire buffer.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1dyc50a1zskx9fqxl2iy2x74f3bkb2ccz908v0aj13rqfqqnns9j"))))
+         "11qjcbvac2aqba136zyvgqhcfcrx6znc9s4cym8mcvfms05sphsm"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/skeeto/nasm-mode")
     (synopsis "NASM x86 assembly major mode")
