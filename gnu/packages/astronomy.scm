@@ -7050,29 +7050,48 @@ astronomical tables
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 1508 passed, 43621 warnings
+      ;; tests: 1499 passed, 42423 warnings
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
               ;; TypeError: SparseSolverBase.__init__() got an unexpected
               ;; keyword argument 'num_iter_lens'
               "--ignore=test/test_ImSim/test_image_model_pixelbased.py"
-              ;; TypeError: SLIT_Starlets.function_2d() got an unexpected
-              ;; keyword argument 'n_pix_x'
-              (string-append "--deselect=test/test_Sampling/test_likelihood.py"
-                             "::TestLikelihoodModule"
-                             "::test_pixelbased_modelling")
-              ;; XXX: Arrays are not almost equal to 2 decimals ACTUAL:
-              ;; np.float64(-0.45561142171932245) DESIRED:
-              ;; -0.43443425572190225
-              (string-append "--deselect=test/test_Sampling/test_Likelihoods/"
-                             "test_position_likelihood.py"
-                             "::TestPositionLikelihood"
-                             "::test_multiplane_position_likelihood")
-              ;; XXX: AttributeError: 'FileFinder' object has no attribute
-              ;; 'find_module'.
-              ;; See: <https://github.com/lenstronomy/lenstronomy/issues/845>.
-              (string-append "--deselect=test/test_Util/test_package_util.py"
-                             "::test_short_and_laconic"))
+              #$@(map (lambda (ls) (string-append "--deselect=test/"
+                                                  (string-join ls "::")))
+                      ;; TypeError: SLIT_Starlets.function_2d() got an
+                      ;; unexpected keyword argument 'n_pix_x'
+                      '(("test_Sampling/test_likelihood.py"
+                         "TestLikelihoodModule"
+                         "test_pixelbased_modelling")
+                        ;; Arrays are not almost equal to <...> decimals <...>.
+                        ("test_Sampling/test_Likelihoods/test_position_likelihood.py"
+                         "TestPositionLikelihood"
+                         "test_multiplane_position_likelihood")
+                        ("test_Workflow/test_tracer_model_fit.py"
+                         "TestTracerModelFit" "test_run_fit")
+                        ;; AttributeError: 'FileFinder' object has no
+                        ;; attribute 'find_module'.  See:
+                        ;; <https://github.com/lenstronomy/lenstronomy/issues/845>.
+                        ("test_Util/test_package_util.py"
+                         "test_short_and_laconic")
+                        ;; TypeError: FLRW.angular_diameter_distance() got some
+                        ;; positional-only arguments passed as keyword
+                        ;; arguments: 'z'
+                        ("test_Cosmo/test_cosmo_interp.py" "TestCosmoInterp"
+                         "test_angular_diameter_distance")
+                        ("test_Cosmo/test_cosmo_interp.py" "TestCosmoInterp"
+                         "test_angular_diameter_distance_array")
+                        ("test_Cosmo/test_lens_cosmo.py" "TestLensCosmo"
+                         "test_beta_double_source_plane")
+                        ("test_Cosmo/test_lens_cosmo.py" "TestLensCosmo"
+                         "test_theta_E_power_law_scaling")
+                        ("test_LensModel/test_Solver/test_lens_equation_solver.py"
+                         "TestLensEquationSolver" "test_lens_equation_scaling")
+                        ("test_LensModel/test_lens_model.py" "TestLensModel"
+                         "test_change_source_redshift")
+                        ("test_Sampling/test_likelihood.py"
+                         "TestLikelihoodModule"
+                         "test_multi_source_redshift_likelihood"))))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'pre-check
