@@ -84,9 +84,9 @@ for `sh' in $PATH, and without nscd, and with static NSS modules."
          ((#:configure-flags flags)
           ;; Arrange so that getaddrinfo & co. do not contact the nscd,
           ;; and can use statically-linked NSS modules.
-          `(cons* "--disable-nscd" "--disable-build-nscd"
-                  "--enable-static-nss"
-                  ,flags))))
+          #~(cons* "--disable-nscd" "--disable-build-nscd"
+                   "--enable-static-nss"
+                   #$flags))))
 
       ;; Remove the 'debug' output to allow bit-reproducible builds (when the
       ;; 'debug' output is used, ELF files end up with a .gnu_debuglink, which
