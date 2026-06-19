@@ -547,22 +547,52 @@
             ;; bundled libraries: lose that restriction.
             (("#if defined\\(OFFICIAL_BUILD\\)")
              "#if 0"))
+
+          ;; The complete list of replacement system libraries can be found
+          ;; at this file.
           (invoke "python" "build/linux/unbundle/replace_gn_files.py"
                   "--system-libraries"
+                  ;; abseil-cpp libraries must be used together:
+                  ;; "absl_algorithm" "absl_base" "absl_cleanup" "absl_container"
+                  ;; "absl_crc" "absl_debugging" "absl_flags" "absl_functional"
+                  ;; "absl_hash" "absl_log" "absl_log_internal" "absl_memory"
+                  ;; "absl_meta" "absl_numeric" "absl_random" "absl_status"
+                  ;; "absl_strings" "absl_synchronization" "absl_time"
+                  ;; "absl_types" "absl_utility"
                   "brotli"
+                  ;; "crc32c"
                   "dav1d"
+                  ;; "double-conversion"
+                  ;; "ffmpeg"
                   "flac"
+                  ;; "flatbuffers"
                   "fontconfig"
                   "freetype"
                   "harfbuzz"
+                  ;; "highway"
+                  ;; "icu"
+                  ;; "jsoncpp"
+                  ;; "libaom"
                   "libdrm"
                   "libjpeg"
                   "libpng"
+                  ;; "libsecret"
+                  ;; "libusb"
+                  ;; "libvpx"
                   "libwebp"
                   "libxml"
+                  ;; "libXNVCtrl"
                   "libxslt"
+                  ;; "libyuv"
                   "openh264"
                   "opus"
+                  ;; "re2"
+                  ;; "simdutf"
+                  ;; "snappy"
+                  ;; SPIRV must be used together
+                  ;; "swiftshader-SPIRV-Headers" "swiftshader-SPIRV-Tools"
+                  ;; "vulkan_memory_allocator"
+                  ;; "woff2"
                   "zlib"
                   "zstd")))))
 
