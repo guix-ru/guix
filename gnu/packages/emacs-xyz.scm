@@ -46420,7 +46420,7 @@ arbitrary Emacs Lisp objects.")
   (let ((commit "44c49e5a9262ede4b4477bafb13b42b1ba047b9c"))
     (package
       (name "emacs-csound-mode")
-      (version "0.2.3")
+      (version "0.2.1")
       (source
        (origin
          (method git-fetch)
@@ -46430,7 +46430,7 @@ arbitrary Emacs Lisp objects.")
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "0kfhca1n0iv1400jf4ggjbarg7ry8ccd5bs7cf2brjdiqp74cvwb"))))
+           "1c88ak0jaj51fwiqniqxd7xyk23wjl9m57znzm8j267ld8g12znp"))))
       (build-system emacs-build-system)
       (arguments
        (list
