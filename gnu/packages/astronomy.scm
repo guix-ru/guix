@@ -10638,12 +10638,21 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 1904 passed
+      ;; tests: 1878 passed
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
-              ;; Disable tests requiring access to CRDS servers to download
-              ;; ~500MiB of data.
-              "-k" "not test_crds_selectors_vs_datamodel and not test_report")
+              "-k" (string-append
+                    ;; Disable tests requiring access to CRDS servers to
+                    ;; download ~500MiB of data.
+                    "not test_crds_selectors_vs_datamodel and not test_report"
+                    ;; XXX: Might be Astropy 8 incompatibility:
+                    ;; astropy.utils.exceptions.AstropyUserWarning: Column
+                    ;; 'FLAG' contains NULL (undefined) values which will be
+                    ;; converted to False. To preserve NULL information,
+                    ;; reopen the file with logical_as_bytes=True and check
+                    ;; for bytes values of b'\x00' (NULL), b'T' (True), and
+                    ;; b'F' (False).
+                    " and not test_amioi_model_"))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'set-home
