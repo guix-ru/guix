@@ -6277,7 +6277,7 @@ scheme and builds with the HEALPix C++ library.")
      (list python-pytest
            python-setuptools))
     (propagated-inputs
-     (list python-astropy
+     (list python-astropy-7
            python-emcee
            python-h5py
            python-lenstronomy
