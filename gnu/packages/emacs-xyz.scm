@@ -46248,7 +46248,7 @@ rather excellent completion provided by both Bash and Zsh.")
   (let ((commit "8388de44c488106a53913e7028b0e3f3859982bb")) ;version bump
     (package
       (name "emacs-shell-command+")
-      (version "2.5.0")
+      (version "2.4.2")
       (source (origin
                 (method git-fetch)
                 (uri (git-reference
@@ -46257,7 +46257,7 @@ rather excellent completion provided by both Bash and Zsh.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "1mrik2cwz9fs6mqfry00nxlpk6ky02zgpwr7dh5n4fqlavjly4j2"))))
+                  "022i7ydwckxqk16s4a83mrdr0c4rmap906qypdkjfh1rjw75qwm5"))))
       (build-system emacs-build-system)
       (arguments
        (list #:test-command #~(list "make" "test")))
