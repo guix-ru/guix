@@ -1077,11 +1077,11 @@ desired format.")
     (home-page "https://codeberg.org/git-pages/git-pages")
     (synopsis "Scalable static site server for Git forges")
     (description
-     "is a static site server for use with Git forges (i.e.  a @code{GitHub}
-Pages replacement).  It is written with efficiency in mind, scaling
-horizontally to any number of machines and serving sites up to multiple
-gigabytes in size, while being equally suitable for small single-user
-deployments.")
+     "@command{git-pages} is a static site server for use with Git
+forges (i.e.  a @code{GitHub} Pages replacement).  It is written with
+efficiency in mind, scaling horizontally to any number of machines and serving
+sites up to multiple gigabytes in size, while being equally suitable for small
+single-user deployments.")
     (license license:bsd-0)))
 
 (define-public git-pages-cli
