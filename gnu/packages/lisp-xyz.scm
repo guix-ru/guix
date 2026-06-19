@@ -28,7 +28,7 @@
 ;;; Copyright © 2021 Cameron Chaparro <cameron@cameronchaparro.com>
 ;;; Copyright © 2021, 2024, 2025 Charles Jackson <charles.b.jackson@protonmail.com>
 ;;; Copyright © 2021, 2022 Foo Chuan Wei <chuanwei.foo@hotmail.com>
-;;; Copyright © 2021-2025 jgart <jgart@dismail.de>
+;;; Copyright © 2021-2026 jgart <jgart@dismail.de>
 ;;; Copyright © 2021 Aleksandr Vityazev <avityazev@posteo.org>
 ;;; Copyright © 2021 Jacob MacDonald <jaccarmac@gmail.com>
 ;;; Copyright © 2022 Jai Vetrivelan <jaivetrivelan@gmail.com>
@@ -12884,6 +12884,34 @@ be usable from multi-threaded programs.")
 
 (define-public ecl-cmd
   (sbcl-package->ecl-package sbcl-cmd))
+
+(define-public sbcl-cm
+  (let ((commit "4b72b9e17eccc012b5dd78e61c828b08c4530e7b")
+        (revision "0"))
+    (package
+      (name "sbcl-cm")
+      (version (git-version "2.12.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://codeberg.org/ormf/cm")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0578j1xmhgfch4rp2dvkwn0dfhiy7kdd1i1p84f56vfdmzb540qx"))))
+      (build-system asdf-build-system/sbcl)
+      (inputs (list sbcl-alexandria))
+      (synopsis " Algorithmic music composition system")
+      (description "Common Music (CM) is a real-time music composition system.")
+      (home-page "http://www.sourceforge.net/projects/commonmusic")
+      (license license:llgpl))))
+
+(define-public cl-cm
+  (sbcl-package->cl-source-package sbcl-cm))
+
+(define-public ecl-cm
+  (sbcl-package->ecl-package sbcl-cm))
 
 (define-public sbcl-cmn
   (package
