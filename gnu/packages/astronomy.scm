@@ -13213,6 +13213,24 @@ header.")
                  (delete-file-recursively "C/flexed")))))
     (properties '((hidden? . #t)))))
 
+(define-public wcslib-8.6
+  (package
+    (inherit wcslib)
+    (name "wcslib")
+    (version "8.6")
+    (source
+     (origin
+       (inherit (package-source wcslib))
+       (method url-fetch)
+       (uri (string-append "https://www.atnf.csiro.au/computing/software/wcs/"
+                           "wcslib-releases/"
+                           "wcslib-" version ".tar.bz2"))
+       (sha256
+        (base32 "0nndcz82qvfx3hhhw0bylyrydnc23a8bqhp71w4yz6d10lv44c70"))
+       (snippet
+        #~(begin (use-modules (guix build utils))
+                 (delete-file-recursively "C/flexed")))))))
+
 (define-public wcstools
   (package
     (name "wcstools")
