@@ -121,6 +121,7 @@
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages readline)
+  #:use-module (gnu packages serialization)
   #:use-module (gnu packages specifications)
   #:use-module (gnu packages sphinx)
   #:use-module (gnu packages sqlite)
@@ -10501,7 +10502,7 @@ but has evolved to support other missions as well.")
 (define-public python-space-dolphin
   (package
     (name "python-space-dolphin")
-    (version "1.3.0")
+    (version "1.4.0")
     (source
      (origin
        (method git-fetch)
@@ -10510,11 +10511,11 @@ but has evolved to support other missions as well.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0nzdy4d8ysmz8h4s56r31zxnk125lninpyzhr589ibny0k5is3nr"))))
+        (base32 "126ks09wsv33g55m82vrqazfgy7ndbns0knhsqf9g7vg50jwq5wz"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 85 passed, 8 deselected, 394 warnings
+      ;; tests: 86 passed, 8 deselected, 37 warnings
       #:test-flags
       #~(list "--ignore=test/test_ai/test_modeler.py"
               "--ignore=test/test_ai/test_vision.py"
@@ -10522,17 +10523,29 @@ but has evolved to support other missions as well.")
               "--ignore=test/test_util/test_jax_util.py"
               #$@(map (lambda (ls) (string-append "--deselect=test/"
                                                   (string-join ls "::")))
-                      ;; AttributeError: `np.string_` was removed in the NumPy
-                      ;; 2.0 release. Use `np.bytes_` instead.
-                      '(("test_analysis/test_output.py" "TestOutput"
-                         "test_load_output")
-                        ("test_processor/test_core.py" "TestProcessor"
+                      ;; Depends on Jax.
+                      '(("test_processor/test_core.py" "TestProcessor"
                          "test_swim")
-                        ("test_processor/test_files.py" "TestFileSystem"
-                         "test_save_load_output_h5")
-                        ;; OSError: Could not find a suitable TLS CA
-                        ;; certificate bundle, invalid path:
-                        ;; /etc/ssl/certs/ca-certificates.crt
+                        ;; TODO: Report upstram on failing tests.
+                        ;; TypeError: ModelBandPlot.source_plot() missing 2
+                        ;; required positional arguments: 'numPix' and
+                        ;; 'deltaPix_source'
+                        ("test_analysis/test_output.py" "TestOutput"
+                         "test_plot_model_overview")
+                        ;; TypeError: matplotlib.axes._axes.Axes.matshow() got
+                        ;; multiple values for keyword argument 'vmax'
+                        ("test_analysis/test_output.py" "TestOutput"
+                         "test_plot_model_decomposition")
+                        ;; TypeError: ModelBandPlot.source() got an unexpected
+                        ;; keyword argument 'delta_pix'
+                        ("test_analysis/test_output.py" "TestOutput"
+                         "test_get_magnification_extended_source")
+                        ;; AttributeError: 'LensEquationSolver' object has no
+                        ;; attribute 'find_bright_image'. Did you mean:
+                        ;; 'findBrightImage'?
+                        ("test_analysis/test_output.py" "TestOutput"
+                         "test_get_magnification_point_source")
+                        ;; Network access is required.
                         ("test_processor/test_files.py" "TestFileSystem"
                          "test_get_trained_model_file_path")
                         ;; ModuleNotFoundError: No module named 'jax'
@@ -10558,6 +10571,7 @@ but has evolved to support other missions as well.")
            python-matplotlib
            python-numpy
            python-pyyaml
+           python-ruamel.yaml
            python-schwimmbad
            python-scipy
            python-tqdm))
