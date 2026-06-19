@@ -256,8 +256,8 @@ when jobs finish.")
              `(,hwloc "lib")
              json-c
              linux-pam)
-       (if (supported-package? openpmix-4)
-           (list openpmix-4)
+       (if (supported-package? openpmix-5)
+           (list openpmix-5)
            '())
        (list munge
              numactl
@@ -754,11 +754,11 @@ commonly needed services in distributed and parallel computing systems.")
     ;; The provided license is kind of BSD-style but specific.
     (license (license:fsf-free "https://github.com/openpmix/openpmix?tab=License-1-ov-file#License-1-ov-file"))))
 
-(define-public openpmix-4
+(define-public openpmix-5
   (package
     (inherit openpmix)
     (name "openpmix")
-    (version "4.2.8")
+    (version "5.0.10")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -768,22 +768,16 @@ commonly needed services in distributed and parallel computing systems.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "08ni1km2gy2nwk2dymvj3pr74nffnmqicdw53nnrc3ls5s82iw1c"))
-              (modules '((guix build utils)))
-              (snippet
-               ;; Prevent 'autogen.pl' from running 'git submodule'.
-               #~(substitute* "autogen.pl"
-                   (("-f \".gitmodules\"")
-                    "0")))))
+                "0m1zg6bgrbchpfvcvhiznpb5bk98lm0vfxrac08kghldjw4dkc4b"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags flags #~'())
         #~(list (string-append "--with-hwloc="
                                (ungexp (this-package-input "hwloc") "lib"))
-                "--enable-python-bindings"))))
-    (native-inputs
-     (modify-inputs native-inputs
-       (replace "python-cython" python-cython-0)))))
+                "--enable-python-bindings"))))))
+
+;; 2026-06-25
+(define-deprecated-package openpmix-4 openpmix-5)
 
 (define-public prrte
   (package
