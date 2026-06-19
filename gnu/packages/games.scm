@@ -2826,8 +2826,8 @@ watch your CPU playing while enjoying a cup of tea!")
       #:make-flags
       #~(list
          (string-append "PREFIX=" #$output)
-         ;; Add the -W without overwriting the -I and -D.
-         "CFLAGS=-g -O2 -I../include -DNOTPARMDECL -Wno-error=cast-qual"
+         ;; Without this, build system assumes ncurses and tinfo are combined.
+         "LIBS=-ltinfo"
          (string-append "CC=" #$(cc-for-target))
          (string-append "GREPPATH="
                         (search-input-file %build-inputs "/bin/grep")))
@@ -2871,15 +2871,9 @@ watch your CPU playing while enjoying a cup of tea!")
               (substitute* "sys/unix/sysconf"
                 (("^.*GREPPATH[^\n]+")
                  (string-append "GREPPATH="
-                                (search-input-file inputs "/bin/grep"))))))
-          (add-before 'configure 'add-compression
-            (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* "include/config.h"
-                (("^.*define COMPRESS [^\n]+")
-                 (string-append
-                  "#define COMPRESS \""
-                  (search-input-file inputs "/bin/compress")
-                  "\"")))))
+                                (search-input-file inputs "/bin/grep"))))
+              (substitute* "sys/unix/hints/linux.500"
+                (("/bin/gzip") (search-input-file inputs "bin/gzip")))))
           (add-before 'configure 'make-reproducible
             (lambda _
               (substitute* "include/config.h"
@@ -2946,9 +2940,9 @@ done
            pkg-config))
     (inputs
      (list grep
+           gzip
            less
            lua-5.4
-           ncompress
            ncurses/tinfo
            perl))
     (home-page "https://nethack.org")
