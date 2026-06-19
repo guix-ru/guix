@@ -28929,7 +28929,7 @@ like to use for example.
          (postgresql-configuration
           (config-file
            (postgresql-config-file
-            (log-destination "stderr")
+            (log-destination "csvlog,stderr")
             (hba-file
              (plain-file "pg_hba.conf"
                          "
@@ -28946,7 +28946,7 @@ host	all	all	::1/128 	md5"))
 @end lisp
 
 @table @asis
-@item @code{log-destination} (default: @code{"syslog"})
+@item @code{log-destination} (default: @code{"stderr"})
 The logging method to use for PostgreSQL@.  Valid values are
 @code{"stderr"}, @code{"csvlog"}, @code{"jsonlog"}, @code{"syslog"} and
 @code{"eventlog"}.  Multiple values are accepted, separated by commas.

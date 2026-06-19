@@ -127,7 +127,7 @@ host	all	all	::1/128 	scram-sha-256"))
   postgresql-config-file make-postgresql-config-file
   postgresql-config-file?
   (log-destination   postgresql-config-file-log-destination
-                     (default "syslog"))
+                     (default "stderr"))
   (hba-file          postgresql-config-file-hba-file
                      (default %default-postgres-hba))
   (ident-file        postgresql-config-file-ident-file
@@ -312,7 +312,9 @@ host	all	all	::1/128 	scram-sha-256"))
       ( postgresql port locale config-file
         log-directory data-directory
         extension-packages)
-    (let* ((pg_ctl-wrapper
+    (let* ((log-destination (postgresql-config-file-log-destination
+                             config-file))
+           (pg_ctl-wrapper
             ;; Wrapper script that switches to the 'postgres' user before
             ;; launching daemon.
             (program-file
@@ -350,7 +352,11 @@ host	all	all	::1/128 	scram-sha-256"))
       (list (shepherd-service
               (provision '(postgres postgresql))
               (documentation "Run the PostgreSQL daemon.")
-              (requirement '(user-processes loopback syslogd))
+              (requirement `(user-processes
+                             loopback
+                             ,@(if (string-contains "syslog" log-destination)
+                                   '(syslogd)
+                                   '())))
               (modules `((ice-9 match)
                          ,@%default-modules))
               (actions (list (shepherd-configuration-action config-file)))
@@ -529,10 +535,7 @@ rolname = '" ,name "')) as not_exists;\n"
                         (list #$(postgresql-create-roles config))
                         #:user "postgres"
                         #:group "postgres"
-                        ;; XXX: As of Shepherd 1.0.2, #:log-file is not
-                        ;; supported.
-                        ;; #:log-file #$log
-                        ))))
+                        #:log-file #$log))))
            (documentation "Create PostgreSQL roles.")))))
 
 (define %postgresql-role-file-systems
