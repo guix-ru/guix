@@ -46199,7 +46199,7 @@ test cases in a simplified form.")
 (define-public emacs-exemplify-eval
   (package
     (name "emacs-exemplify-eval")
-    (version "0.3.0")
+    (version "0.5.0")
     (source
      (origin
        (method git-fetch)
@@ -46208,7 +46208,7 @@ test cases in a simplified form.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0f2rfgjcmpw45y0ayx8ww9d9q86y0jwkb46ixp1qd7782qxpa5lg"))))
+        (base32 "1crql17h8j4xgc7fw6jxcva45b6dm8qdy6hfn1wqzrzbwcvblvih"))))
     (build-system emacs-build-system)
     (arguments
      (list #:tests? #f))                ;no tests
