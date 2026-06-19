@@ -8788,6 +8788,31 @@ with sensible defaults out of the box.")
            python-pytest
            python-setuptools))))
 
+(define-public python-click-aliases
+  (package
+    (name "python-click-aliases")
+    (version "1.0.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/click-contrib/click-aliases")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jl45vl73x6hrqgj9n3jhga19v0c923v5kv3vdmb2wwn936jyxcw"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-poetry-core))
+    (propagated-inputs
+     (list python-click))
+    (home-page "https://github.com/click-contrib/click-aliases")
+    (synopsis "Enable aliases for Click")
+    (description
+     "This package helps to add (mutiple) aliases to a click group or command.")
+    (license license:expat)))
+
 (define-public python-click-option-group
   (package
     (name "python-click-option-group")
