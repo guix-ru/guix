@@ -548,9 +548,23 @@
             (("#if defined\\(OFFICIAL_BUILD\\)")
              "#if 0"))
           (invoke "python" "build/linux/unbundle/replace_gn_files.py"
-                  "--system-libraries" "brotli" "dav1d" "flac" "fontconfig"
-                  "freetype" "harfbuzz" "libdrm" "libjpeg" "libpng" "libwebp"
-                  "libxml" "libxslt" "openh264" "opus" "zlib" "zstd")))))
+                  "--system-libraries"
+                  "brotli"
+                  "dav1d"
+                  "flac"
+                  "fontconfig"
+                  "freetype"
+                  "harfbuzz"
+                  "libdrm"
+                  "libjpeg"
+                  "libpng"
+                  "libwebp"
+                  "libxml"
+                  "libxslt"
+                  "openh264"
+                  "opus"
+                  "zlib"
+                  "zstd")))))
 
 (define opus+custom
   (package/inherit opus
