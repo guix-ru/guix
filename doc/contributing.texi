@@ -3258,9 +3258,7 @@ the same package in Guix, maintenance has stopped upstream, or the package
 is not adequately maintained in Guix.
 
 @table @asis
-@item
-Removal candidates that are building leaf packages
-
+@item Removal candidates that are building leaf packages
 Leaf packages may be removed following the above process, assuming that
 there is no opposition to the removal or that consensus for the removal
 has been reached.
@@ -3269,9 +3267,7 @@ instance applications, but also packages used in a service) should
 not be removed unless there are particularly good reasons, such as
 security implications.
 
-@item
-Removal candidates that are building packages with dependents
-
+@item Removal candidates that are building packages with dependents
 Removing building packages on which other packages depend causes more
 disruption than removing leaf packages, since at the same time all
 dependent packages need to be removed.  This may still be desirable for
