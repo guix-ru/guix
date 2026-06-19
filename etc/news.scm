@@ -9,7 +9,7 @@
 ;; Copyright © 2020, 2022 Marius Bakke <marius@gnu.org>
 ;; Copyright © 2020, 2021 Mathieu Othacehe <m.othacehe@gmail.com>
 ;; Copyright © 2020 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
-;; Copyright © 2020-2025 Maxim Cournoyer <maxim@guixotic.coop>
+;; Copyright © 2020-2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;; Copyright © 2021–2023 Leo Famulari <leo@famulari.name>
 ;; Copyright © 2021 Zhu Zihao <all_but_last@163.com>
 ;; Copyright © 2021 Chris Marusich <cmmarusich@gmail.com>
@@ -42,6 +42,16 @@
 
 (channel-news
  (version 0)
+
+ (entry (commit "16b1072f661051e6bc20d8dcafdb183960dd188b")
+        (title
+         (en "PostgreSQL logs now go to a unified place"))
+        (body
+         (en "The default value for the @code{log-destination} field of the
+@code{postgresql-config-file} record has been updated from @code{\"syslog\"}
+to @code{\"stderr\"}, matching the upstream default.  This means that by
+default, the PostgreSQL logs are now written to the
+@file{/var/log/postgresql/pg_ctl.log} file instead of sent to syslog.")))
 
  (entry (commit "c9dcd203e5356f13b736d5be121fd61874be1a93")
         (title
