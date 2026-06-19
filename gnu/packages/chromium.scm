@@ -132,7 +132,8 @@
     "third_party/dav1d" ;BSD-2
     "third_party/dawn" ;ASL2.0
     ;; TODO: can likely be unbundled when Vulkan is updated.
-    "third_party/dawn/third_party/khronos" ;ASL2.0
+    "third_party/dawn/third_party/EGL-Registry/src/sdk" ; ASL2.0
+    "third_party/dawn/third_party/OpenGL-Registry" ;ASL2.0
     "third_party/dawn/third_party/gn/webgpu-cts" ;BSD-3
     "third_party/dawn/third_party/renderdoc" ;Expat
     "third_party/dawn/third_party/webgpu-headers" ;BSD-3
@@ -198,14 +199,13 @@
     "third_party/google_input_tools/third_party/closure_library" ;ASL2.0
     "third_party/google_input_tools/third_party/closure_library/third_party/closure" ;Expat
     "third_party/googletest" ;BSD-3
-    "third_party/harfbuzz-ng" ;Expat
+    "third_party/harfbuzz" ;Expat
     "third_party/highway" ;ASL2.0
     "third_party/hunspell" ;MPL1.1/GPL2+/LGPL2.1+
     "third_party/hyphenation-patterns" ;Expat
     ;; FIXME: Our icu does not have some headers such as udatamem.h.
     "third_party/icu" ;Unicode3.0
     "third_party/ink" ;ASL2.0
-    "third_party/ink_stroke_modeler" ;ASL2.0
     "third_party/inspector_protocol" ;BSD-3
     "third_party/ipcz" ;BSD-3
     "third_party/jinja2" ;BSD-3
@@ -364,7 +364,6 @@
     "third_party/woff2" ;ASL2.0
     "third_party/wuffs" ;ASL2.0
     "third_party/xcbproto" ;X11
-    "third_party/xdg-utils" ;Expat
     "third_party/xnnpack" ;BSD-3
 
     ;; These are forked components of the X11 keybinding code.
@@ -387,13 +386,13 @@
     "v8/third_party/v8/codegen" ;Expat
     ))
 
-(define %blacklisted-files
+(define %denied-files
   ;; 'third_party/blink/perf_tests/resources/svg/HarveyRayner.svg' carries a
   ;; nonfree license according to LICENSES in the same directory.  As we don't
   ;; run the Blink performance tests, just remove everything to save ~70MiB.
   '("third_party/blink/perf_tests"))
 
-(define %chromium-version "147.0.7727.137")
+(define %chromium-version "149.0.7827.155")
 (define %ungoogled-revision (string-append %chromium-version "-1"))
 (define %debian-revision (string-append "debian/" %ungoogled-revision))
 
@@ -405,7 +404,7 @@
     (file-name (git-file-name "ungoogled-chromium" %ungoogled-revision))
     (sha256
      (base32
-      "1ha84j3zckdv2l8dpicqhmr6a8mq3bqwalw0bmgamvlmns9i7nrj"))))
+      "099mbm39ab34jqz8yh1498lwadnhc4qm6202c4vxd69vnm7f4fzq"))))
 
 (define %debian-origin
   (origin
@@ -418,7 +417,7 @@
                                 ((_ version) version))))
     (sha256
      (base32
-      "04lqbclkvn9nsksgjpjilh78a8y17mwwq4pmhr6h8gvpp2y3bhhc"))))
+      "0ki9ia8ii2l0jm2jhnp671nwjhqf9jdywddcs2lxk33fwif6y919"))))
 
 (define (origin-file origin file)
   (computed-file
@@ -443,12 +442,16 @@
          "fixes/rust-clanglib.patch"
          "llvm-19/clang19.patch"
          "llvm-19/clone-traits.patch"
+         "llvm-19/const-profile.patch"
+         "llvm-19/iota.patch"
          "llvm-19/keyfactory.patch"
+         "llvm-19/raw-ref-map-find.patch"
          "llvm-19/value-or.patch"
          "llvm-22/ignore-for-ubsan.patch"
          "system/openjpeg.patch"
          "trixie/cookie-string-view.patch"
-         "trixie/nodejs-main.patch")))
+         "trixie/nodejs-main.patch"
+         "trixie/revert-v8-sanitize.patch")))
 
 (define %guix-patches
   (list (local-file
@@ -474,7 +477,15 @@
         (local-file
          (assume-valid-file-name
           (search-patch
-           "ungoogled-chromium-system-nspr.patch")))))
+           "ungoogled-chromium-rust-toolchain-var.patch")))
+        (local-file
+         (assume-valid-file-name
+          (search-patch
+           "ungoogled-chromium-system-nspr.patch")))
+        (local-file
+         (assume-valid-file-name
+          (search-patch
+           "ungoogled-chromium-unbundle-minizip.patch")))))
 
 (define %patches
   (append %debian-patches
@@ -516,9 +527,9 @@
 
           ;; Run after the ungoogled scripts to avoid interfering with
           ;; patches or file lists.
-          (format #t "Removing blacklisted files...~%")
+          (format #t "Removing denied files...~%")
           (force-output)
-          (for-each delete-file-recursively '#$%blacklisted-files)
+          (for-each delete-file-recursively '#$%denied-files)
 
           (format #t "Pruning third party files...~%")
           (force-output)
@@ -537,7 +548,7 @@
              "#if 0"))
           (invoke "python" "build/linux/unbundle/replace_gn_files.py"
                   "--system-libraries" "flac" "fontconfig" "freetype"
-                  "harfbuzz-ng" "libjpeg" "libpng" "libwebp" "libxml"
+                  "harfbuzz" "libjpeg" "libpng" "libwebp" "libxml"
                   "libxslt" "openh264" "opus" "zlib")))))
 
 (define opus+custom
@@ -567,7 +578,7 @@
                                   %chromium-version "-lite.tar.xz"))
               (sha256
                (base32
-                "1m22whg5n9lw9gqhalm95jwfm45lqp4a7cs3mn3f4n8w0rvr0r5j"))
+                "0qm8vpckcmsar1rnmx57a6nifaayzsa3slkazx5zsr5dwc5gsfaf"))
               (modules '((guix build utils)))
               (snippet (force ungoogled-chromium-snippet))))
     (build-system gnu-build-system)
@@ -590,15 +601,16 @@
               "is_official_build=true"
               "clang_use_chrome_plugins=false"
               "use_clang_modules=false"
-              "use_custom_libcxx=false" ; support for this is deprecated and to be removed.
+              ; support for this is deprecated and to be removed.
+              "use_custom_libcxx=false"
               "optimize_webui=false"
               "webnn_use_tflite=false"
+              "webnn_use_litert=false"
               "build_tflite_with_xnnpack=false"
               "safe_browsing_use_unrar=false"
               "chrome_pgo_phase=0"
               "use_sysroot=false"
               "goma_dir=\"\""
-              "enable_nacl=false"
               "use_unofficial_version_number=false"
               "treat_warnings_as_errors=false"
               "use_official_google_api_keys=false"
@@ -615,9 +627,6 @@
               "enable_hangout_services_extension=false"
               "enable_widevine=false"
               "fatal_linker_warnings=false"
-              ;; Disable code using TensorFlow until it has been scrutinized
-              ;; by the ungoogled project.
-              "build_with_tflite_lib=false"
               ;; Avoid dependency on code formatting tools.
               "blink_enable_generated_code_formatting=false"
               ;; Don't bother building Dawn tests.
@@ -642,6 +651,7 @@
               "blink_symbol_level=0"
               "v8_symbol_level=0"
               "v8_enable_backtrace=false"
+              "v8_drumbrake_bounds_checks=true"
 
               ;; Define a custom toolchain that simply looks up CC, AR and
               ;; friends from the environment.
@@ -712,6 +722,8 @@
             (lambda* (#:key inputs native-inputs #:allow-other-keys)
               (let* ((libopenjp2 (search-input-file inputs "lib/libopenjp2.so"))
                      (openjpeg (dirname (dirname libopenjp2)))
+                     (gperf (search-input-file (or native-inputs inputs)
+                                               "/bin/gperf"))
                      (compiler-rt-path (dirname
                                         (dirname
                                          (search-input-file (or native-inputs inputs)
@@ -761,6 +773,11 @@
                 ;; which prevents the code that tries to use it from falling
                 ;; back to the pyyaml provided by Guix.
                 (delete-file-recursively "third_party/pyyaml")
+
+                ;; Since M148, gperf binary is bundled upstream and expected to
+                ;; be available here.
+                (mkdir-p "third_party/gperf/cipd")
+                (symlink (dirname gperf) "third_party/gperf/cipd/bin")
 
                 (substitute*
                     "third_party/breakpad/breakpad/src/common/linux/libcurl_wrapper.h"

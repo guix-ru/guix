@@ -6,7 +6,7 @@ Subject: [PATCH] Update compiler patch for M147 beta
 Signed-off-by: Matt Jolly <kangie@gentoo.org>
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -367,9 +367,6 @@ config("compiler") {
+@@ -368,9 +368,6 @@ config("compiler") {
  
    configs += [
      # See the definitions below.
@@ -16,7 +16,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
      ":compiler_codegen",
      ":compiler_deterministic",
      ":clang_warning_suppression",
-@@ -1690,43 +1687,6 @@ config("compiler_deterministic") {
+@@ -1726,43 +1723,6 @@ config("compiler_deterministic") {
      }
    }
  
@@ -60,7 +60,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
    # Tells the compiler not to use absolute paths when passing the default
    # paths to the tools it invokes. We don't want this because we don't
    # really need it and it can mess up the RBE cache entries.
-@@ -1759,88 +1719,6 @@ config("compiler_deterministic") {
+@@ -1795,88 +1755,6 @@ config("compiler_deterministic") {
    }
  }
  
@@ -149,7 +149,8 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
  # Controls the usage of a warning suppression mapping (WSM) file to suppress
  # warnings based on the path of the file they come from. It's controlled by the
  # `clang_warning_suppression_file` gn argument , which points to a text file
-@@ -1896,18 +1774,6 @@ config("sanitize_c_array_bounds") {
+@@ -1926,18 +1804,6 @@ ubsan_hardening("return") {
+   sanitizer = "return"
    }
  }
  
@@ -168,7 +169,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
  config("compiler_arm_fpu") {
    if (current_cpu == "arm" && !is_ios) {
      cflags = [ "-mfpu=neon" ]
-@@ -2386,11 +2252,7 @@ config("chromium_code") {
+@@ -2419,11 +2285,7 @@ config("chromium_code") {
        defines = [ "_HAS_NODISCARD" ]
      }
    } else {

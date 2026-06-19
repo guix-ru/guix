@@ -1,0 +1,182 @@
+From 5f1fdab4f819433c081603358190b7f64449ff92 Mon Sep 17 00:00:00 2001
+From: LN Liberda <lauren@selfisekai.rocks>
+Date: Sat, 4 Apr 2026 20:49:57 +0200
+Subject: [PATCH] Use rust_sysroot instead of hardcoding
+ //third_party/rust-toolchain
+
+Bug: 491242305
+---
+ build/config/rust.gni      | 4 ++--
+ build/rust/cargo_crate.gni | 4 ++--
+ build/rust/std/BUILD.gn    | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+Also:
+
+From: Matt Jolly <kangie@gentoo.org>
+Date: Sun, 26 Apr 2026 19:28:34 +1000
+Subject: [PATCH 1/2] build/rust: Use rust_sysroot for bindings and wrappers
+ globally
+
+Hardcoded `//third_party/rust-toolchain` paths were still lingering
+in various places, causing build failures (e.g., ninja errors for missing
+`rustc` and `rs_bindings_from_cc` rules) when utilizing a custom Rust
+sysroot.
+
+This patch updates `rustc_wrapper_inputs`, `cc_bindings_from_rs`,
+`rs_bindings_from_cc`, `rustfmt`, and `clippy-driver` to use the
+configured `rust_sysroot` GN argument instead of hardcoding the default
+tree path. For Python scripts like `run_rs_bindings_from_cc.py`, paths
+are now parsed via command line arguments rather than relying on
+relative directory resolution.
+
+Bug: 491242305
+Signed-off-by: Matt Jolly <kangie@gentoo.org>
+
+diff --git a/build/config/rust.gni b/build/config/rust.gni
+index af3dfac4574f9..82fa215ea75d9 100644
+--- a/build/config/rust.gni
++++ b/build/config/rust.gni
+@@ -433,7 +433,7 @@ rustc_wrapper_inputs = [
+ ]
+ 
+ if (host_os == "win") {
+-  rustc_wrapper_inputs += [ "//third_party/rust-toolchain/bin/rustc.exe" ]
++  rustc_wrapper_inputs += [ "$rust_sysroot/bin/rustc.exe" ]
+ } else {
+-  rustc_wrapper_inputs += [ "//third_party/rust-toolchain/bin/rustc" ]
++  rustc_wrapper_inputs += [ "$rust_sysroot/bin/rustc" ]
+ }
+diff --git a/build/rust/cargo_crate.gni b/build/rust/cargo_crate.gni
+index 4b07ea1312ebc..2b78953c17825 100644
+--- a/build/rust/cargo_crate.gni
++++ b/build/rust/cargo_crate.gni
+@@ -464,9 +464,9 @@ template("cargo_crate") {
+       ]
+ 
+       if (host_os == "win") {
+-        inputs += [ "//third_party/rust-toolchain/bin/rustc.exe" ]
++        inputs += [ "$rust_sysroot/bin/rustc.exe" ]
+       } else {
+-        inputs += [ "//third_party/rust-toolchain/bin/rustc" ]
++        inputs += [ "$rust_sysroot/bin/rustc" ]
+       }
+ 
+       build_script_target = ":${_build_script_name}($rust_macro_toolchain)"
+diff --git a/build/rust/std/BUILD.gn b/build/rust/std/BUILD.gn
+index 105a1d52a1682..88ed50182a604 100644
+--- a/build/rust/std/BUILD.gn
++++ b/build/rust/std/BUILD.gn
+@@ -269,9 +269,9 @@ if (toolchain_has_rust) {
+       out_depfile = rebase_path(depfile, root_build_dir)
+ 
+       if (host_os == "win") {
+-        inputs = [ "//third_party/rust-toolchain/bin/rustc.exe" ]
++        inputs = [ "$rust_sysroot/bin/rustc.exe" ]
+       } else {
+-        inputs = [ "//third_party/rust-toolchain/bin/rustc" ]
++        inputs = [ "$rust_sysroot/bin/rustc" ]
+       }
+ 
+       # For the rustc sysroot we must include even the rlibs we don't pass to
+--- a/build/rust/gni_impl/run_rs_bindings_from_cc.py
++++ b/build/rust/gni_impl/run_rs_bindings_from_cc.py
+@@ -15,13 +15,6 @@ CHROMIUM_SRC_DIR = os.path.relpath(os.path.join(THIS_DIR, os.pardir, os.pardir))
+ sys.path.append(THIS_DIR)
+ from run_bindgen import filter_clang_args
+ 
+-RUST_TOOLCHAIN_DIR = os.path.join(CHROMIUM_SRC_DIR, "third_party",
+-                                  "rust-toolchain")
+-RUSTFMT_EXE_PATH = os.path.join(RUST_TOOLCHAIN_DIR, "bin", "rustfmt")
+-RUSTFMT_CONFIG_PATH = os.path.join(CHROMIUM_SRC_DIR, ".rustfmt.toml")
+-RS_BINDINGS_FROM_CC_EXE_PATH = os.path.join(RUST_TOOLCHAIN_DIR, "bin",
+-                                            "rs_bindings_from_cc")
+-
+ 
+ def format_cmdline(args):
+ 
+@@ -35,6 +28,10 @@ def format_cmdline(args):
+ 
+ def main():
+   parser = argparse.ArgumentParser()
++  parser.add_argument("--rs_bindings_from_cc_path",
++                      required=True)
++  parser.add_argument("--rustfmt_path",
++                      required=True)
+   parser.add_argument("--targets_and_args_from_gn",
+                       metavar="FILE",
+                       help="File parsed into --targets_and_args Crubit arg",
+@@ -81,8 +78,9 @@ def main():
+       json.dumps(targets_and_args)))
+ 
+   # All Crubit invocations in Chromium share the following cmdline args.
+-  generator_args.append(f"--rustfmt_exe_path={RUSTFMT_EXE_PATH}")
+-  generator_args.append(f"--rustfmt_config_path={RUSTFMT_CONFIG_PATH}")
++  generator_args.append(f"--rustfmt_exe_path={args.rustfmt_path}")
++  rustfmt_config_path = os.path.join(CHROMIUM_SRC_DIR, ".rustfmt.toml")
++  generator_args.append(f"--rustfmt_config_path={rustfmt_config_path}")
+   generator_args.append(
+       "--crubit_support_path=third_party/crubit/src/rs_bindings_from_cc/support"
+   )
+@@ -113,7 +111,7 @@ def main():
+   clang_args += ["-Wno-unused-command-line-argument"]
+ 
+   # Print a copy&pastable final cmdline when asked for debugging help.
+-  cmdline = [RS_BINDINGS_FROM_CC_EXE_PATH, f"--flagfile={params_file_path}"]
++  cmdline = [args.rs_bindings_from_cc_path, f"--flagfile={params_file_path}"]
+   cmdline.extend(clang_args)
+   if "CRUBIT_DEBUG" in os.environ:
+     pretty_cmdline = format_cmdline(cmdline)
+--- a/build/rust/gni_impl/rust_target.gni
++++ b/build/rust/gni_impl/rust_target.gni
+@@ -719,14 +719,14 @@ template("rust_target") {
+           # `import`ed for `LoadRustEnvAndFlags`, etc.
+           inputs = rustc_wrapper_inputs
+           if (host_os == "win") {
+-            inputs += [ "//third_party/rust-toolchain/bin/clippy-driver.exe" ]
++            inputs += [ "$rust_sysroot/bin/clippy-driver.exe" ]
+           } else {
+-            inputs += [ "//third_party/rust-toolchain/bin/clippy-driver" ]
++            inputs += [ "$rust_sysroot/bin/clippy-driver" ]
+           }
+ 
+           args = [
+             "--clippy-driver",
+-            rebase_path("//third_party/rust-toolchain/bin/clippy-driver",
++            rebase_path("$rust_sysroot/bin/clippy-driver",
+                         root_build_dir),
+             "--rustc-env-and-flags",
+             rebase_path(_rustc_env_and_flags, root_build_dir),
+--- a/build/rust/rs_bindings_from_cc.gni
++++ b/build/rust/rs_bindings_from_cc.gni
+@@ -248,7 +248,15 @@ template("rs_bindings_from_cc") {
+     }
+ 
+     script = "//build/rust/gni_impl/run_rs_bindings_from_cc.py"
+-    inputs = [ "//third_party/rust-toolchain/bin/rs_bindings_from_cc" ]
++
++    if (host_os == "win") {
++      _rs_bindings_from_cc_exe = "${rust_sysroot}/bin/rs_bindings_from_cc.exe"
++      _rustfmt_exe = "${rust_sysroot}/bin/rustfmt.exe"
++    } else {
++      _rs_bindings_from_cc_exe = "${rust_sysroot}/bin/rs_bindings_from_cc"
++      _rustfmt_exe = "${rust_sysroot}/bin/rustfmt"
++    }
++    inputs = [ _rs_bindings_from_cc_exe ]
+     sources = invoker.public_headers
+     outputs = [
+       _rs_out_path,
+@@ -268,6 +276,10 @@ template("rs_bindings_from_cc") {
+       string_join(",", _rebased_public_headers),
+       "--targets_and_args_from_gn",
+       rebase_path(_metadata_path),
++      "--rs_bindings_from_cc_path",
++      rebase_path(_rs_bindings_from_cc_exe, root_build_dir),
++      "--rustfmt_path",
++      rebase_path(_rustfmt_exe, root_build_dir),
+     ]
+ 
+     # Several important compiler flags come from default_compiler_configs
+-- 
+2.53.0
+

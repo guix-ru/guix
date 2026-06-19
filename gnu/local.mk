@@ -2575,7 +2575,9 @@ dist_patch_DATA =						\
   %D%/packages/patches/ungoogled-chromium-extension-search-path.patch	\
   %D%/packages/patches/ungoogled-chromium-increase-fortify-level.patch	\
   %D%/packages/patches/ungoogled-chromium-RUNPATH.patch		\
+  %D%/packages/patches/ungoogled-chromium-rust-toolchain-var.patch	\
   %D%/packages/patches/ungoogled-chromium-system-nspr.patch	\
+  %D%/packages/patches/ungoogled-chromium-unbundle-minizip.patch	\
   %D%/packages/patches/unknown-horizons-python-3.8-distro.patch	\
   %D%/packages/patches/unknown-horizons-python-3.9.patch	\
   %D%/packages/patches/unknown-horizons-python-3.10.patch	\
