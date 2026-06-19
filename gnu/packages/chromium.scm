@@ -451,42 +451,20 @@
          "trixie/revert-v8-sanitize.patch")))
 
 (define %guix-patches
-  (list (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-custom-compiler.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-empty-parsed-rustc-args.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-extension-search-path.patch")))
-        (local-file
-         (assume-valid-file-name
-           (search-patch
-            "ungoogled-chromium-increase-fortify-level.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-override-libdrm-assertion.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-RUNPATH.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-rust-toolchain-var.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-system-nspr.patch")))
-        (local-file
-         (assume-valid-file-name
-          (search-patch
-           "ungoogled-chromium-unbundle-minizip.patch")))))
+  (map (lambda (patch)
+         (local-file
+          (assume-valid-file-name
+           (search-patch patch))))
+       (list
+         "ungoogled-chromium-custom-compiler.patch"
+         "ungoogled-chromium-empty-parsed-rustc-args.patch"
+         "ungoogled-chromium-extension-search-path.patch"
+         "ungoogled-chromium-increase-fortify-level.patch"
+         "ungoogled-chromium-override-libdrm-assertion.patch"
+         "ungoogled-chromium-RUNPATH.patch"
+         "ungoogled-chromium-rust-toolchain-var.patch"
+         "ungoogled-chromium-system-nspr.patch"
+         "ungoogled-chromium-unbundle-minizip.patch")))
 
 (define %patches
   (append %debian-patches
