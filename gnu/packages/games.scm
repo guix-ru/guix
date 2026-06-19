@@ -12758,72 +12758,47 @@ earn extra balls.  Also included is Neverputt, which is a 3D miniature golf
 game.")  ;thanks to Debian for description
       (license license:gpl2+))))
 
+;; TODO: We may wish to package the server and client separately.
 (define-public pokerth
   (package
     (name "pokerth")
-    (version "1.1.2")
+    (version "2.0.8")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://sourceforge/pokerth/pokerth/"
-                           version "/pokerth-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pokerth/pokerth")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0yi9bj3k8yc1gkwmaf14zbbvvn13n54n1dli8k6j1pkph3p3vjq2"))
-       (modules '((guix build utils)))
+        (base32 "1hwnywqq5c05j1qym5q82r9inyps3p1fsjd7c819575vvqcdwqx8"))
+       (modules '((guix build utils) (ice-9 ftw) (srfi srfi-1)))
        (snippet
-        '(begin
-           ;; Remove bundled websocketpp.
-           (delete-file-recursively "src/third_party/websocketpp")
-           (substitute* "pokerth_lib.pro"
-             (("src/third_party/websocketpp")
-              ""))))
-       (patches (search-patches "pokerth-boost.patch"))))
+        #~(begin
+            ;; XXX: We must use the ancient bundled websocketpp because the new
+            ;; one is not compatible with newer versions of boost asio:
+            ;; https://github.com/zaphoyd/websocketpp/issues/721
+            ;; One alternative is to use boost-1.83 as an input.
+            ;; XXX: Can we copy the third party boost headers in from somewhere?
+            (let ((keep '("boost" "websocketpp")))
+              (with-directory-excursion "src/third_party"
+                (for-each delete-file-recursively
+                          (lset-difference string=?
+                                           (scandir ".")
+                                           (cons* "." ".." keep)))))))))
     (build-system qt-build-system)
     (inputs
-     (list boost-1.83
-           curl
-           gsasl
-           libgcrypt
-           libircclient
-           protobuf-2                   ;remove package when no longer needed
-           qtbase-5
-           qtwayland-5
-           (sdl-union (list sdl sdl-mixer))
-           sqlite
-           tinyxml
-           websocketpp
-           zlib))
-    (arguments
-     (list
-      #:tests? #f                       ; No test suite
-      #:modules '((guix build qt-build-system)
-                  ((guix build gnu-build-system) #:prefix gnu:)
-                  (guix build utils))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-paths
-            (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* (find-files "." "\\.pro$")
-                (("LIB_DIRS =")
-                 (string-append "LIB_DIRS = "
-                                #$(this-package-input "boost") "/lib")))))
-          (add-after 'unpack 'fix-build
-            (lambda _
-              ;; Fixes for Boost versions >= 1.66.
-              (substitute* '("src/net/common/clientthread.cpp"
-                             "src/net/serveraccepthelper.h")
-                (("boost::asio::socket_base::non_blocking_io command\\(true\\);")
-                 "")
-                (("newSock->io_control\\(command\\);")
-                 "newSock->non_blocking(true);")
-                (("acceptedSocket->io_control\\(command\\);")
-                 "acceptedSocket->non_blocking(true);"))))
-          (replace 'configure
-            (lambda _
-              (invoke "qmake" "pokerth.pro" "CONFIG+=client"
-                      (string-append "PREFIX=" #$output))))
-          (replace 'build (assoc-ref gnu:%standard-phases 'build))
-          (replace 'install (assoc-ref gnu:%standard-phases 'install)))))
+     (list boost
+           openssl
+           protobuf
+           qtbase
+           qtdeclarative
+           qtmultimedia
+           qtsvg
+           qtwayland
+           sqlite))
+    (native-inputs (list qttools qtwebsockets))
+    (arguments (list #:tests? #f))     ;TODO: 'bot client' must be built & run
     (home-page "https://www.pokerth.net")
     (synopsis "Texas holdem poker game")
     (description
