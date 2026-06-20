@@ -3938,20 +3938,24 @@ email header.")
          "1xxrdh0pr7yml83xdk0x20dqrnmwkhvhjkqwk16d41kxx0p391zr"))))
     (build-system pyproject-build-system)
     (arguments
-     (list #:tests? (not (%current-target-system)) ;git path hardcoded.
-           #:phases
-           #~(modify-phases %standard-phases
-               ;; XXX: dnspython attempts to read /etc/resolv.conf when loading
-               ;; resolver.py, which breaks the sanity check in dependent
-               ;; packages.  This should rather be fixed in dnspython.
-               (delete 'sanity-check)
-               ;; This ensures git is present when called.
-               (add-after 'unpack 'hardcode-git-bin
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (substitute* (find-files "src/b4" "\\.py$")
-                     (("\\['git'")
-                      (string-append
-                       "['" (search-input-file inputs "bin/git") "'"))))))))
+     (list
+      #:tests? (not (%current-target-system)) ; git path is hardcoded.
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; INFO: phase `sanity-check' fails with the following message:
+          ;; . . .
+          ;; ...checking requirements: ERROR: b4==<version>
+          ;; DistributionNotFound(Requirement.parse('git-filter-repo<3.0,>=2.30'),
+          ;; {'b4'})
+          ;; This should rather be fixed in git-filter-repo.
+          (delete 'sanity-check)
+          ;; This ensures git is present when called.
+          (add-after 'unpack 'hardcode-git-bin
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* (find-files "src/b4" "\\.py$")
+                (("\\['git'")
+                 (string-append
+                  "['" (search-input-file inputs "bin/git") "'"))))))))
     (inputs
      (list git-filter-repo
            git-minimal
@@ -3960,8 +3964,9 @@ email header.")
            python-dnspython
            python-requests))
     (native-inputs
-     (list python-pytest python-setuptools))
-    (home-page "https://git.kernel.org/pub/scm/utils/b4/b4.git")
+     (list python-pytest
+           python-setuptools))
+    (home-page "https://b4.docs.kernel.org/en/latest/")
     (synopsis "Tool for working with patches in public-inbox archives")
     (description
      "The @code{b4} command is designed to make it easier to participate in
