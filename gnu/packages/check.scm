@@ -781,19 +781,20 @@ It allows the specification of behaviour scenarios using a given-when-then
 pattern.")
       (license license:apsl2))))
 
-(define-public catch2-3.8
+(define-public catch2-3.15
   (package
     (name "catch2")
-    (version "3.8.1")
+    (version "3.15.1")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-         (url "https://github.com/catchorg/Catch2")
-         (commit (string-append "v" version))))
+              (url "https://github.com/catchorg/Catch2")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0v1k14n02aiw4rv5sxhc5612cjhkdj59cjpm50qfxhapsdv54n3f"))))
+        (base32
+         "1sswpsa8v3nx9ydyzj867y9514sgfzhmvi8vqvrz576sh2a008r5"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -807,6 +808,21 @@ pattern.")
     (description "Catch2 stands for C++ Automated Test Cases in Headers and is
 a multi-paradigm automated test framework for C++ and Objective-C.")
     (license license:boost1.0)))
+
+(define-public catch2-3.8
+  (package
+    (inherit catch2-3.15)
+    (name "catch2")
+    (version "3.8.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+         (url "https://github.com/catchorg/Catch2")
+         (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0v1k14n02aiw4rv5sxhc5612cjhkdj59cjpm50qfxhapsdv54n3f"))))))
 
 (define-public catch2-3.5
   (package
@@ -825,22 +841,6 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
 
 ;; 2026-06-20
 (define-deprecated-package catch2-3 catch2-3.5)
-
-(define-public catch2-3.15
-  (package
-    (inherit catch2-3.8)
-    (name "catch2")
-    (version "3.15.1")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/catchorg/Catch2")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "1sswpsa8v3nx9ydyzj867y9514sgfzhmvi8vqvrz576sh2a008r5"))))))
 
 (define-public cmocka
   (package
