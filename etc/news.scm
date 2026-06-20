@@ -45,13 +45,20 @@
 
  (entry (commit "16b1072f661051e6bc20d8dcafdb183960dd188b")
         (title
-         (en "PostgreSQL logs now go to a unified place"))
+         (en "PostgreSQL logs now go to a unified place")
+         (de "PostgreSQL-Protokolle gehen jetzt an einheitlichen Platz"))
         (body
          (en "The default value for the @code{log-destination} field of the
 @code{postgresql-config-file} record has been updated from @code{\"syslog\"}
 to @code{\"stderr\"}, matching the upstream default.  This means that by
 default, the PostgreSQL logs are now written to the
-@file{/var/log/postgresql/pg_ctl.log} file instead of sent to syslog.")))
+@file{/var/log/postgresql/pg_ctl.log} file instead of sent to syslog.")
+         (de "Der vorgegebene Wert des Feldes @code{log-destination} im
+Verbundstyp @code{postgresql-config-file} wurde von @code{\"syslog\"} zu
+@code{\"stderr\"} aktualisiert, was der vom Anbieter festgelegte Vorgabewert
+ist. Das heißt, dass in der Vorgabeeinstellung die Protokolldateien von
+PostgreSQL jetzt in die Datei @file{/var/log/postgresql/pg_ctl.log} geschrieben
+werden, statt an syslog geschickt zu werden.")))
 
  (entry (commit "c9dcd203e5356f13b736d5be121fd61874be1a93")
         (title
