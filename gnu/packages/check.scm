@@ -781,7 +781,7 @@ It allows the specification of behaviour scenarios using a given-when-then
 pattern.")
       (license license:apsl2))))
 
-(define-public catch2-3.15
+(define-public catch2
   (package
     (name "catch2")
     (version "3.15.1")
@@ -811,7 +811,7 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
 
 (define-public catch2-3.8
   (package
-    (inherit catch2-3.15)
+    (inherit catch2)
     (name "catch2")
     (version "3.8.1")
     (source
@@ -841,6 +841,7 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
 
 ;; 2026-06-20
 (define-deprecated-package catch2-3 catch2-3.5)
+(define-deprecated-package catch2-3.15 catch2)
 
 (define-public cmocka
   (package

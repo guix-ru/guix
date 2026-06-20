@@ -4983,7 +4983,7 @@ Abstract Syntax Trees} API.")
     (native-inputs
      (list pkg-config python-minimal-wrapper))
     (inputs
-     (list boost catch2-3.15 cpptrace fmt-12 mimalloc pybind11))
+     (list boost catch2 cpptrace fmt-12 mimalloc pybind11))
     (synopsis "SystemVerilog compiler and language services")
     (description "Slang is a software library that provides various components
 for lexing, parsing, type checking, and elaborating SystemVerilog code.  It
