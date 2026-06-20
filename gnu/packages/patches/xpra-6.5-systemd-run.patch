@@ -1,0 +1,50 @@
+Distribution specific patch, not going upstream
+
+Disable systemd-run if the command is not found.
+
+diff --git a/xpra/scripts/main.py b/xpra/scripts/main.py
+index f3aaf7547b..0218de8a98 100755
+--- a/xpra/scripts/main.py
++++ b/xpra/scripts/main.py
+@@ -470,24 +470,24 @@ def use_systemd_run(s) -> bool:
+     if not is_systemd_pid1():
+         return False  # pragma: no cover
+     # test it:
+-    cmd = ["systemd-run", "--quiet"]
+-    if getuid() != 0:
+-        cmd += ["--user"]
+-    cmd += ["--scope", "--", "true"]
+-    proc = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=False)
+     try:
+-        proc.communicate(timeout=2)
+-        r = proc.returncode
+-    except TimeoutExpired:  # pragma: no cover
+-        r = None
+-    if r is None:
+-        stop_proc(proc, "systemd-run")
+-        if proc.poll() is None:
+-            try:
+-                proc.communicate(timeout=1)
+-            except TimeoutExpired:  # pragma: no cover
+-                r = None
+-    return r == 0
++        cmd = ["systemd-run", "--quiet", "--user", "--scope", "--", "true"]
++        proc = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=False)
++        try:
++            proc.communicate(timeout=2)
++            r = proc.returncode
++        except TimeoutExpired:  # pragma: no cover
++            r = None
++        if r is None:
++            stop_proc(proc, "systemd-run")
++            if proc.poll() is None:
++                try:
++                    proc.communicate(timeout=1)
++                except TimeoutExpired:  # pragma: no cover
++                    r = None
++        return r == 0
++    except FileNotFoundError:
++        return False
+ 
+ 
+ def verify_gir() -> None:
