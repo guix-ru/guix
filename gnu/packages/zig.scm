@@ -35,28 +35,7 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages llvm-meta)
-  #:use-module (gnu packages web)
-  #:export (rename-zig-dependencies))
-
-(define* (rename-zig-dependencies mapping #:optional (directories '(".")))
-  "Snippet to rename Zig dependencies in build.zig and build.zig.zon."
-  `(begin
-     (use-modules (ice-9 match)
-                  (guix build utils))
-     (for-each
-      (lambda (directory)
-        (for-each
-         (match-lambda
-           ((old-name . new-name)
-            (with-directory-excursion directory
-              (substitute* "build.zig"
-                (((string-append "([Dd]ependency.\")" old-name) _ prefix)
-                 (string-append prefix new-name)))
-              (substitute* "build.zig.zon"
-                (((format #f "\\.(@\")?~a\"?" old-name))
-                 (format #f ".@\"~a\"" new-name))))))
-         (quote ,mapping)))
-      (quote ,directories))))
+  #:use-module (gnu packages web))
 
 (define (zig-source version commit hash)
   (origin

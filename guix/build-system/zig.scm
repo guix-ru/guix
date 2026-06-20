@@ -29,6 +29,7 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-26)
   #:export (add-build.zig.zon
+            rename-zig-dependencies
 
             zig-build-system))
 
@@ -53,6 +54,26 @@
     },
 }~%" ,name ,version (quote ,paths) (quote ,dependencies))
      (close-port port)))
+
+(define* (rename-zig-dependencies mapping #:optional (directories '(".")))
+  "Snippet to rename Zig dependencies in build.zig and build.zig.zon."
+  `(begin
+     (use-modules (ice-9 match)
+                  (guix build utils))
+     (for-each
+      (lambda (directory)
+        (for-each
+         (match-lambda
+           ((old-name . new-name)
+            (with-directory-excursion directory
+              (substitute* "build.zig"
+                (((string-append "([Dd]ependency.\")" old-name) _ prefix)
+                 (string-append prefix new-name)))
+              (substitute* "build.zig.zon"
+                (((format #f "\\.(@\")?~a\"?" old-name))
+                 (format #f ".@\"~a\"" new-name))))))
+         (quote ,mapping)))
+      (quote ,directories))))
 
 (define (default-zig)
   "Return the default zig package, resolved lazily."
