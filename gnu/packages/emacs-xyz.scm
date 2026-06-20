@@ -46551,7 +46551,7 @@ displayed for sharing.")
     (build-system emacs-build-system)
     (arguments (list #:tests? #f))      ; no tests
     (propagated-inputs
-     (list emacs-compat))
+     (list emacs-compat emacs-llama emacs-org))     ;requires "Org v9.8"
     (home-page "https://github.com/tarsius/orglink")
     (synopsis "Use Org mode links in other modes")
     (description "This library implements support for some Org mode link types
