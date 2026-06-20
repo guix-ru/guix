@@ -63,7 +63,7 @@
      (if (%current-target-system)
          (list #:configure-flags #~(list "-DBUILD_TESTING=OFF"))
          '()))
-    (native-inputs (list catch2-3 pkg-config))
+    (native-inputs (list catch2-3.5 pkg-config))
     (propagated-inputs (list icu4c))
     (native-search-paths (list (search-path-specification
                                 (variable "DICPATH")

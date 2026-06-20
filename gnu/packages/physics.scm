@@ -329,7 +329,7 @@ Version: ~a
                            (find-files "../source/brille" "\\.py$")
                            (find-files "." "^_brille\\..*\\.so$")))))))))
     (native-inputs
-     (list catch2-3
+     (list catch2-3.5
            cmake-minimal
            highfive
            pybind11-2

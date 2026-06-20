@@ -128,7 +128,7 @@
            (search-path-specification
             (variable "LUANTI_MOD_PATH")
             (files '("share/luanti/mods")))))
-    (native-inputs (list catch2-3 pkg-config))
+    (native-inputs (list catch2-3.5 pkg-config))
     (inputs (list curl
                   freetype
                   gettext-minimal

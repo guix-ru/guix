@@ -11485,7 +11485,7 @@ Bluefish supports many programming and markup languages.")
      '(#:glib-or-gtk? #t
        #:configure-flags '("-Dsystemd=false")))
     (native-inputs
-     (list catch2-3
+     (list catch2-3.5
            cmake
            `(,glib "bin")               ;for glib-mkenums.
            `(,gtk+ "bin")               ;gtk-update-icon-cache

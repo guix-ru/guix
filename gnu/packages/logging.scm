@@ -294,7 +294,7 @@ output in multiple windows in a terminal.")
                                    " DESTINATION "
                                    #$output:bin "/bin"
                                    ")\n"))))))))
-    (native-inputs (list catch2-3))
+    (native-inputs (list catch2-3.5))
     (inputs (list googlebenchmark))
     (propagated-inputs (list fmt-11))
     (home-page "https://github.com/gabime/spdlog")

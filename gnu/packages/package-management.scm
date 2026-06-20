@@ -1809,7 +1809,7 @@ endif()
                         "~Use CA certificate from the root prefix" ; no CA certs in build env
                         "~remote_yaml_file")))))))  ; downloads from raw.githubusercontent.com
     (native-inputs
-     (list catch2-3 cli11 pkg-config python))
+     (list catch2-3.5 cli11 pkg-config python))
     (inputs
      (list curl
            libarchive

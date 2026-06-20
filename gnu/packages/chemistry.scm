@@ -1719,7 +1719,7 @@ Tanimoto scoring.")
     (native-inputs
      (list bison
            boost-numpy
-           catch2-3
+           catch2-3.5
            eigen
            flex
            freesasa

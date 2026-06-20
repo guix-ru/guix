@@ -4520,7 +4520,7 @@ exec ~a/bin/freedink -refdir ~a/share/dink\n"
                  (base32
                   "1ai7x5lfy8c1d11crz33ayy21alry740f78qjjxwzdfr6ph7pkzq"))))
       (build-system cmake-build-system)
-      (native-inputs (list catch2-3))
+      (native-inputs (list catch2-3.5))
       (home-page "https://www.fuzzylite.com/")
       (synopsis "Fuzzy logic control binary")
       (description
@@ -10490,7 +10490,7 @@ your score gets higher, you level up and the blocks fall faster.")
                    (substitute* "CMakeLists.txt"
                      (("games\\)") "bin)")))))))
     (inputs
-     (list catch2-3
+     (list catch2-3.5
            flac
            glew
            libavif

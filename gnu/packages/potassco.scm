@@ -205,7 +205,7 @@ satisfiability checking (SAT).")
                 (("find_package\\(Clasp") "find_package(clasp"))
               (rename-file "cmake/ClingoConfig.cmake.in"
                            "cmake/clingo-config.cmake.in"))))))
-    (inputs (list catch2-3 clasp libpotassco))
+    (inputs (list catch2-3.5 clasp libpotassco))
     (native-inputs (list bison re2c
                          mpark-variant
                          pkg-config
@@ -271,7 +271,7 @@ over difference logic.")
                       "find_package(Catch2 3 REQUIRED)")))))))
     (home-page "https://github.com/potassco/clingo-lpx")
     (inputs (list clingo flint))
-    (native-inputs (list catch2-3))
+    (native-inputs (list catch2-3.5))
     (synopsis "Simplex solver")
     (description "Clingo-LPX is an extension to Clingo that models constraints
 and goals over linear (in)equations.")
@@ -311,7 +311,7 @@ and goals over linear (in)equations.")
                       (string-append "#" all))))))))
     (home-page "https://potassco.org/clingcon")
     (inputs (list clingo wide-integer))
-    (native-inputs (list catch2-3))
+    (native-inputs (list catch2-3.5))
     (synopsis "Constraint answer set solver")
     (description "Clingcon is an answer set solver for constraint logic
 It extends Clingo with constraint solving capacities for constraints over

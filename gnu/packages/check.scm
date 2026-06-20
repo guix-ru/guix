@@ -808,7 +808,7 @@ pattern.")
 a multi-paradigm automated test framework for C++ and Objective-C.")
     (license license:boost1.0)))
 
-(define-public catch2-3
+(define-public catch2-3.5
   (package
     (inherit catch2-3.8)
     (name "catch2")
@@ -822,6 +822,9 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
               (sha256
                (base32
                 "11yla93vm2896fzhm3fz8lk3y3iz5iy7vd6wa7wnwvhsfd2dbfq3"))))))
+
+;; 2026-06-20
+(define-deprecated-package catch2-3 catch2-3.5)
 
 (define-public catch2-3.15
   (package
@@ -3289,7 +3292,7 @@ tests.  The output format is JSON.")
                       (lambda* (#:key tests? #:allow-other-keys)
                         (when tests?
                           (invoke "test/self_test"))))))))
-    (native-inputs (list catch2-3))
+    (native-inputs (list catch2-3.5))
     (home-page "https://github.com/rollbear/trompeloeil")
     (synopsis "Header only C++14 mocking framework")
     (description

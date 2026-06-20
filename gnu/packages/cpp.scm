@@ -3005,7 +3005,7 @@ comma separated value (CSV) files.")
       #~(modify-phases %standard-phases
           (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
     (inputs (list boost libgc c-rrb))
-    (native-inputs (list catch2-3 doctest fmt pkg-config))
+    (native-inputs (list catch2-3.5 doctest fmt pkg-config))
     (home-page "https://sinusoid.es/immer")
     (synopsis "Immutable data structures")
     (description "Immer is a library of persistent and immutable data structures

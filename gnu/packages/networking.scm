@@ -4230,7 +4230,7 @@ communication over HTTP.")
             (lambda _
               (chdir "dev"))))))
     (native-inputs
-     (list catch2-3
+     (list catch2-3.5
            json-dto))
     (inputs
      (list openssl
