@@ -3412,6 +3412,24 @@ Dates (astropy.time)} to provide UT1 values, and the polar motions are used in
 celestial-to-terrestrial coordinate transformations.")
     (license license:bsd-3)))
 
+(define-public python-astropy-iers-data-next
+  ;; astropy-iers-data is updated quite often, refresh the main package with
+  ;; Astropy or during planed refresh cycle. The latest version is safe to be
+  ;; installed to user's profile.
+  (package
+    (inherit python-astropy-iers-data)
+    (name "python-astropy-iers-data")
+    (version "0.2026.6.15.15.33.16")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/astropy/astropy-iers-data")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1kj313frd2mnhsfbyvqd2df7zbfrm1hlc1zdpnhkl2kj2y3iaaww"))))))
+
 ;; A bare minimal package, mainly to use in tests and reduce closure
 ;; size. Tests are left out in the main package to slim down native-inputs.
 (define-public python-astropy-minimal
