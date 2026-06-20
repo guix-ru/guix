@@ -5046,7 +5046,7 @@ implementing them.")
 (define-public yggdrasil
   (package
     (name "yggdrasil")
-    (version "0.5.13")
+    (version "0.5.14")
     (source
      (origin
        (method git-fetch)
@@ -5057,12 +5057,16 @@ implementing them.")
           (recursive? #t)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09rwii1c52y3659nlnlrfssfn2yf6gz3s45h8vjmd4j05fpqv1rg"))
+        (base32 "005a66p95p8mn30zgfxrdrldz5nn7xwfzh9p38c59fz1kvrafg3f"))
        (patches (search-patches "yggdrasil-extra-config.patch"))))
     (build-system go-build-system)
     (arguments
      (list #:import-path "github.com/yggdrasil-network/yggdrasil-go"
            #:install-source? #f
+           ;; XXX: Test fails with "runtime error: slice bounds out of range
+           ;; [:32] with capacity 0."  See:
+           ;;   <https://github.com/yggdrasil-network/yggdrasil-go/issues/1353>
+           #:test-flags #~(list "-skip" "TestConfigReadFromEmpty/empty")
            #:phases
            #~(modify-phases %standard-phases
                (replace 'build
