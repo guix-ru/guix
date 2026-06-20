@@ -798,7 +798,7 @@ The SUBDIR argument defaults to \"efi/Guix\", as it is also the case for
 (define-public dtc
   (package
     (name "dtc")
-    (version "1.7.2")
+    (version "1.8.1")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -806,8 +806,7 @@ The SUBDIR argument defaults to \"efi/Guix\", as it is also the case for
                     "dtc-" version ".tar.gz"))
               (sha256
                (base32
-                "1x609axqpkw5d47pz3ag34ycy3w7y1d0i8q4715hvlmgszmya07j"))
-              (patches (search-patches "dtc-fix-test.patch"))))
+                "1c5wy7mcnhwwj1x5s5ajvc6i1xfgl9nycibz3v4mgsccfk75qkj5"))))
     (build-system meson-build-system)
     (arguments
      (list
