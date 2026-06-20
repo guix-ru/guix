@@ -33,7 +33,7 @@
 ;;; Copyright © 2023 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2023 Thomas Ieong <th.ieong@free.fr>
 ;;; Copyright © 2023 conses <contact@conses.eu>
-;;; Copyright © 2023, 2024 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;;; Copyright © 2023, 2024, 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;; Copyright © 2024 Dominic Martinez <dom@dominicm.dev>
 ;;; Copyright © 2024 Herman Rimm <herman@rimm.ee>
 ;;; Copyright © 2024 Jesse Eisses <jesse@eisses.email>
@@ -2227,7 +2227,7 @@ URL using a struct that represents the URL query parameters.")
 (define-public go-github-com-arceliar-ironwood
   (package
     (name "go-github-com-arceliar-ironwood")
-    (version "v0.0.0-20260117132459-7017dbc41d8e")
+    (version "v0.0.0-20260613025018-d50055b11f5e")
     (source
      (origin
        (method git-fetch)
@@ -2237,7 +2237,7 @@ URL using a struct that represents the URL query parameters.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "17y9hb9xw3lmqd3gs6xfindx1jlgy0kb0x74x6x3x93vglva4c8v"))))
+         "0i19m3z246xhg3dp0vwkgxfwzm9gwci7ia7853h9ssr5ymb2ia65"))))
     (build-system go-build-system)
     (arguments
      (list
