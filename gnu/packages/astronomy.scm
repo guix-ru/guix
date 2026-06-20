@@ -9344,10 +9344,14 @@ PSF} describing how the optical system spreads light from sources.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2282 passed, 575 skipped
+      ;; tests: 2289 passed, 566 skipped
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
-              "--pyargs" "reproject")
+              "--pyargs" "reproject"
+              ;; Failed to download
+              ;; <https://datacenter.iers.org/data/9/finals2000A.all>.
+              "-k" (string-append "not test_solar_wcs"
+                                  " and not test_negative_lon_cdelt"))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'pre-check
