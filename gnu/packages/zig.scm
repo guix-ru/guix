@@ -229,7 +229,7 @@ toolchain.  Among other features it provides
          "zig-0.10-use-system-paths.patch"
          "zig-0.10-fix-runpath.patch"))))
     (arguments
-     (substitute-keyword-arguments (package-arguments zig-0.9)
+     (substitute-keyword-arguments arguments
        ((#:tests? _ #t)
         (not (%current-target-system)))
        ((#:configure-flags flags ''())
@@ -261,12 +261,12 @@ toolchain.  Among other features it provides
                           ;; binaries.
                           "-Dskip-non-native"))))))))
     (inputs
-     (modify-inputs (package-inputs zig-0.9)
+     (modify-inputs inputs
        (prepend zlib `(,zstd "lib"))
        (replace "clang" clang-15)
        (replace "lld" lld-15)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.9)
+     (modify-inputs native-inputs
        (replace "glibc-abi-tool" zig-0.10-glibc-abi-tool)
        (replace "llvm" llvm-15)))
     (properties `((max-silent-time . 9600)
@@ -1144,7 +1144,7 @@ toolchain.  Among other features it provides
          "zig-0.11-use-system-paths.patch"
          "zig-0.11-fix-runpath.patch"))))
     (arguments
-     (substitute-keyword-arguments (package-arguments zig-0.10)
+     (substitute-keyword-arguments arguments
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
             (add-after 'unpack 'set-host-triple
@@ -1177,11 +1177,11 @@ toolchain.  Among other features it provides
                   (invoke (string-append #$output "/bin/zig")
                           "test" "-I" "test" "test/behavior.zig"))))))))
     (inputs
-     (modify-inputs (package-inputs zig-0.10)
+     (modify-inputs inputs
        (replace "clang" clang-16)
        (replace "lld" lld-16)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.10)
+     (modify-inputs native-inputs
        (prepend binaryen `(,zig-0.10.0-3985 "zig1"))
        (replace "glibc-abi-tool" zig-0.11-glibc-abi-tool)
        (replace "llvm" llvm-16)))
@@ -1503,7 +1503,7 @@ toolchain.  Among other features it provides
          "zig-0.12-use-system-paths.patch"
          "zig-0.12-fix-runpath.patch"))))
     (arguments
-     (substitute-keyword-arguments (package-arguments zig-0.11)
+     (substitute-keyword-arguments arguments
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
             (replace 'patch-more-shebangs
@@ -1514,11 +1514,11 @@ toolchain.  Among other features it provides
                   (("/usr/bin/env")
                    (search-input-file inputs "bin/clang++")))))))))
     (inputs
-     (modify-inputs (package-inputs zig-0.11)
+     (modify-inputs inputs
        (replace "clang" clang-17)
        (replace "lld" lld-17)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.11)
+     (modify-inputs native-inputs
        (replace "glibc-abi-tool" zig-0.12-glibc-abi-tool)
        (replace "llvm" llvm-17)
        (replace "zig" `(,zig-0.11.0-3604 "zig1"))))
@@ -1585,11 +1585,11 @@ toolchain.  Among other features it provides
          "zig-0.12-use-system-paths.patch"
          "zig-0.13-fix-runpath.patch"))))
     (inputs
-     (modify-inputs (package-inputs zig-0.12)
+     (modify-inputs inputs
        (replace "clang" clang-18)
        (replace "lld" lld-18)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.12)
+     (modify-inputs native-inputs
        (replace "glibc-abi-tool" zig-0.13-glibc-abi-tool)
        (replace "llvm" llvm-18)
        (replace "zig" `(,zig-0.12.0-109 "zig1"))))
@@ -1816,7 +1816,7 @@ toolchain.  Among other features it provides
 
 (define-public zig-0.14
   (package
-    (inherit zig-0.13)
+    (inherit zig-0.12)
     (name "zig")
     (version "0.14.1")
     (source
@@ -1836,11 +1836,11 @@ toolchain.  Among other features it provides
             (substitute* "build.zig"
               (("\\.*.max_rss.*") ""))))))
     (inputs
-     (modify-inputs (package-inputs zig-0.13)
+     (modify-inputs inputs
        (replace "clang" clang-19)
        (replace "lld" lld-19)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.13)
+     (modify-inputs native-inputs
        (replace "glibc-abi-tool" zig-0.14-glibc-abi-tool)
        (replace "llvm" llvm-19)
        (replace "zig" `(,zig-0.13.0-3252 "zig1"))))
@@ -1973,7 +1973,7 @@ toolchain.  Among other features it provides
 
 (define-public zig-0.15
   (package
-    (inherit zig-0.14)
+    (inherit zig-0.12)
     (name "zig")
     (version "0.15.2")
     (source
@@ -1987,7 +1987,7 @@ toolchain.  Among other features it provides
          "zig-0.14-use-system-paths.patch"
          "zig-0.15-fix-runpath.patch"))))
     (arguments
-     (substitute-keyword-arguments (package-arguments zig-0.14)
+     (substitute-keyword-arguments arguments
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
             (delete 'install-glibc-abilists)
@@ -2013,11 +2013,11 @@ toolchain.  Among other features it provides
                      "glibc"
                      "netbsd")))))))))
     (inputs
-     (modify-inputs (package-inputs zig-0.14)
+     (modify-inputs inputs
        (replace "clang" clang-20)
        (replace "lld" lld-20)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.14)
+     (modify-inputs native-inputs
        (delete "glibc-abi-tool")
        (prepend zig-0.15-libc-abi-tools)
        (replace "llvm" llvm-20)
@@ -2164,14 +2164,12 @@ toolchain.  Among other features it provides
          "zig-0.14-use-baseline-cpu-by-default.patch"
          "zig-0.16-fix-runpath.patch"))))
     (inputs
-     (modify-inputs (package-inputs zig-0.15)
-       (prepend zlib)
+     (modify-inputs inputs
        (replace "clang" clang-21)
        (replace "lld" lld-21)))
     (native-inputs
-     (modify-inputs (package-native-inputs zig-0.15)
-       (delete "glibc-abi-tool")
-       (prepend zig-0.16-libc-abi-tools)
+     (modify-inputs native-inputs
+       (replace "libc-abi-tools" zig-0.16-libc-abi-tools)
        (replace "llvm" llvm-21)
        (replace "zig" `(,zig-0.15.0-2876 "zig1"))))
     (properties `((max-silent-time . 9600)
