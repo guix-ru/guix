@@ -36,30 +36,7 @@
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages llvm-meta)
   #:use-module (gnu packages web)
-  #:export (add-build.zig.zon
-            rename-zig-dependencies))
-
-(define* (add-build.zig.zon name version dependencies #:optional (paths '("")))
-  "Snippet to generate build.zig.zon of DEPENDENCIES for package NAME@VERSION."
-  `(let ((port (open-file "build.zig.zon" "w" #:encoding "utf8")))
-     (format port "\
-.{
-    .name = \"~a\",
-    .version = \"~a\",
-    .paths = .{
-~{\
-        \"~a\",
-~}\
-    },
-    .dependencies = .{
-~{\
-        .@\"~a\" = .{
-            .url = \"\",
-        },
-~}\
-    },
-}~%" ,name ,version (quote ,paths) (quote ,dependencies))
-     (close-port port)))
+  #:export (rename-zig-dependencies))
 
 (define* (rename-zig-dependencies mapping #:optional (directories '(".")))
   "Snippet to rename Zig dependencies in build.zig and build.zig.zon."

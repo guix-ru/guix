@@ -28,8 +28,31 @@
   #:use-module (guix build-system gnu)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-26)
-  #:export (zig-build-system))
+  #:export (add-build.zig.zon
 
+            zig-build-system))
+
+(define* (add-build.zig.zon name version dependencies #:optional (paths '("")))
+  "Snippet to generate build.zig.zon of DEPENDENCIES for package NAME@VERSION."
+  `(let ((port (open-file "build.zig.zon" "w" #:encoding "utf8")))
+     (format port "\
+.{
+    .name = \"~a\",
+    .version = \"~a\",
+    .paths = .{
+~{\
+        \"~a\",
+~}\
+    },
+    .dependencies = .{
+~{\
+        .@\"~a\" = .{
+            .url = \"\",
+        },
+~}\
+    },
+}~%" ,name ,version (quote ,paths) (quote ,dependencies))
+     (close-port port)))
 
 (define (default-zig)
   "Return the default zig package, resolved lazily."
