@@ -913,7 +913,7 @@ advanced instruction sets including AVX-512, APX, and AVX10.2.")
          (sha256
           (base32 "1w8da10whrhc7j82jf90814m3blabkl9s0kg8hv8h2fj5y3ji7hw"))))
       (build-system gnu-build-system)
-      (native-inputs (list catch2))
+      (native-inputs (list catch2-2))
       (arguments
        (list
         #:test-target "test"
@@ -978,7 +978,7 @@ mathematical functions operating on batches.")
     (arguments
      (list
       #:configure-flags #~(list "-DCMAKE_CXX_STANDARD=17")))
-    (native-inputs (list boost catch2))
+    (native-inputs (list boost catch2-2))
     (home-page "https://github.com/renatoGarcia/icecream-cpp")
     (synopsis "C++ library for @code{printf} debugging")
     (description
@@ -1057,7 +1057,7 @@ distribute with your projects
                      (install-file "../source/include/tcb/span.hpp"
                                    (string-append #$output "/include")))))))
       (native-inputs
-       (list catch2))
+       (list catch2-2))
       (home-page "https://github.com/tcbrindle/span")
       (synopsis "C++20's @code{std::span} shim for older compilers")
       (description "This package provides a single-header implementation of
@@ -1330,7 +1330,7 @@ successor of hyprland-qtutils.")
                    (substitute* "unittests/type_info_test.cpp"
                      (("catch[.]hpp") "catch2/catch.hpp"))))))
     (build-system cmake-build-system)
-    (inputs (list catch2))
+    (inputs (list catch2-2))
     (home-page "https://chaiscript.com/")
     (synopsis "Embedded scripting language designed for C++")
     (description
@@ -1476,7 +1476,7 @@ and EETF.")
           (add-after 'unpack 'change-directory
             (lambda _
               (chdir "dev"))))))
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     (propagated-inputs (list rapidjson))    ;#include'd
     (home-page "https://github.com/Stiffstream/json_dto")
     (synopsis "JSON to C++ structures conversion library")
@@ -2084,7 +2084,7 @@ library.")
     (arguments
      (list
       #:configure-flags #~(list "-DRAPIDFUZZ_BUILD_TESTING=ON")))
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     (home-page "https://github.com/rapidfuzz/rapidfuzz-cpp")
     (synopsis "Rapid fuzzy string matching using the Levenshtein Distance")
     (description
@@ -2944,7 +2944,7 @@ services including database, analytic, and machine learning technologies.")
        (patches (search-patches "libexpected-use-provided-catch2.patch"))))
     (build-system cmake-build-system)
     (native-inputs
-     (list catch2))
+     (list catch2-2))
     (synopsis "C++11/14/17 std::expected with functional-style extensions")
     (description "@code{std::expected} is proposed as the preferred way to
 represent objects which will either have an expected value, or an unexpected
@@ -3036,7 +3036,7 @@ written in C++.")
      #:phases
      #~(modify-phases %standard-phases
          (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
-   (native-inputs (list boost catch2))
+   (native-inputs (list boost catch2-2))
    (home-page "https://sinusoid.es/zug")
    (synopsis "Higher-order sequence transformers")
    (description "Zug is a C++ library providing transducers, that is,
@@ -3067,7 +3067,7 @@ composable sequential transformations.")
                             (delete-file-recursively "test/event_loop")))
                         (replace 'check (assoc-ref gnu:%standard-phases 'check)))))
    (inputs (list boost-1.83 immer zug))
-   (native-inputs (list catch2 cereal))
+   (native-inputs (list catch2-2 cereal))
    (home-page "https://sinusoid.es/lager")
    (synopsis "Library for value-oriented design")
    (description "Lager is a library for value-oriented design implementing
@@ -3186,7 +3186,7 @@ standards.")
            #~(list "-DCLI11_SINGLE_FILE=OFF"
                    "-DCLI11_BUILD_EXAMPLES=OFF")))
     (native-inputs
-     (list catch2 doxygen googletest))
+     (list catch2-2 doxygen googletest))
     (synopsis "Command line parser for C++11")
     (description
      "CLI11 is a command line parser for C++11 and beyond that provides a rich
@@ -3835,7 +3835,7 @@ std::function:
                    (install-file "../source/mustache.hpp"
                                  (string-append (assoc-ref outputs "out")
                                                 "/include")))))))
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     (home-page "https://github.com/kainjow/Mustache")
     (synopsis "Mustache text templates for modern C++")
     (description "@code{cpp-mustache} is a Mustache implementation for C++ 11
@@ -5023,7 +5023,7 @@ on @code{.po} files and doesn't need @code{.mo} files pre-generated.")
                 ((".*http.*catchorg/Catch2.*") "")
                 (("FetchContent_MakeAvailable\\(Catch2\\)")
                  "find_package(Catch2 REQUIRED)")))))))
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     (home-page "https://github.com/TartanLlama/optional")
     (synopsis "Implementation of std::optional with extensions for C++11/14/17")
     (description "@code{tl::optional} provides a single-header implementation of
@@ -5082,7 +5082,7 @@ C++23.")
                       (string-append prefix " PATHS \""
                                      #$(this-package-input "debug-assert")
                                      "/lib/cmake/debug_assert\")"))))))))
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     (inputs (list debug-assert))
     (home-page "https://github.com/foonathan/type_safe")
     (synopsis "C++ abstractions for preventing bugs via the type system")

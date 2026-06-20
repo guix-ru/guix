@@ -1641,7 +1641,7 @@ between different versions of ØMQ.")
     (native-inputs
      (list pkg-config))
     (inputs
-     (list catch2 zeromq))
+     (list catch2-2 zeromq))
     (home-page "https://zeromq.org")
     (synopsis "C++ bindings for the ØMQ messaging library")
     (description

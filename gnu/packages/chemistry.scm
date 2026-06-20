@@ -812,7 +812,7 @@ quantum chemistry (and molecular mechanics) softwares.")
                   python-pyqt
                   glm
                   netcdf))
-    (native-inputs (list cmake-minimal catch2 python-pytest python-setuptools))
+    (native-inputs (list cmake-minimal catch2-2 python-pytest python-setuptools))
     (propagated-inputs (list python-numpy-1))
     (home-page "https://pymol.org")
     (synopsis "Molecular visualization system")

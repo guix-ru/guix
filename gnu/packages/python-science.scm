@@ -2565,7 +2565,7 @@ aggregated sum and more.")
       #:configure-flags
       #~(list "-DopenPMD_SUPERBUILD=OFF")))
     (native-inputs
-     (list catch2
+     (list catch2-2
            python-numpy))
     (inputs
      (list hdf5

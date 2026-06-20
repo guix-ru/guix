@@ -6487,7 +6487,7 @@ Fresnel integrals, and similar related functions as well.")
                 (("GIT_TAG v2.13.6")
                  "")))))))
     (native-inputs
-     (list catch2
+     (list catch2-2
            python-wrapper ;You need python installed to generate unittests.
            python-numpy   ;You need numpy ...
            python-scipy   ;You need scipy ...

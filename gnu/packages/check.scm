@@ -697,7 +697,7 @@ multi-paradigm automated test framework for C++ and Objective-C.")
 a multi-paradigm automated test framework for C++ and Objective-C.")
     (license license:boost1.0)))
 
-(define-public catch2
+(define-public catch2-2
   (package
     (name "catch2")
     (version "2.13.10")
@@ -3547,10 +3547,10 @@ provides a simple way to achieve this.")
                                   "-DRC_ENABLE_TESTS=on")))
       (build-system cmake-build-system)
       (inputs (list boost
-                    catch2
+                    catch2-2
                     doctest
                     googletest))
-      (native-inputs (list catch2 googletest))
+      (native-inputs (list catch2-2 googletest))
       (home-page "https://github.com/emil-e/rapidcheck")
       (synopsis "Property based testing framework for C++")
       (description "Rapidcheck is a property based testing framework for C++.

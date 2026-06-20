@@ -1095,7 +1095,7 @@ with the kernel and various utilities such as per-cpu counters.")
                   qtbase
                   qtsvg
                   qtwayland))
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     (home-page "https://github.com/ccoors/Valeronoi")
     (synopsis "WiFi mapping companion application for Valetudo")
     (description
@@ -3874,7 +3874,7 @@ perform various useful functions such as:
                                "predicates"
                                "xml"))))))))
 
-    (native-inputs (list catch2))
+    (native-inputs (list catch2-2))
     ;; XXX: Inputs are currently only used to build tests.
     ;;      We would need to patch the CMake recipe to build a shared library
     ;;      with all of these.

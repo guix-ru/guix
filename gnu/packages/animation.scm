@@ -373,7 +373,7 @@ waveform until they line up with the proper sounds.")
           (add-after 'unpack 'fix-tests
             (lambda _
               ;; Its bundled catch2-2.5.0 fails to build with glibc-2.35.
-              (copy-file #$(file-append catch2 "/include/catch2/catch.hpp")
+              (copy-file #$(file-append catch2-2 "/include/catch2/catch.hpp")
                          "tests/src/catch.hpp")))
           (replace 'configure
             (lambda* (#:key inputs outputs #:allow-other-keys)

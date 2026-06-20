@@ -1554,7 +1554,7 @@ content models.")
                   (("^include.*Catch2_SOURCE_DIR.*contrib/Catch.cmake.*")
                    "include(Catch)\n")))))))
       (native-inputs
-       (list catch2
+       (list catch2-2
              pkg-config
              postgresql))
       (inputs
