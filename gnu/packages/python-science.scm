@@ -5757,7 +5757,7 @@ and more
 (define-public python-plotly
   (package
     (name "python-plotly")
-    (version "5.24.1") ;XXX: it's the last 5.X.X, released on <2024-09-12>
+    (version "6.8.0")
     (source
      (origin
        (method git-fetch)
@@ -5766,94 +5766,80 @@ and more
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0pnsj23bxj7c39hzdz49v72flwbc8knc7dy831lvc0hrbssm4j60"))
-       (snippet #~(delete-file "packages/python/plotly/versioneer.py"))))
+        (base32 "147vgm22zrg4wcjc427mxszbb8v6vhs7hgchcm8678cy304hawvd"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2715 passed, 18 skipped, 41 deselected, 606 warnings
+      ;; tests: 3039 passed, 24 skipped, 292 deselected, 4 xfailed, 556 warnings
       #:test-flags
-      ;; XXX: Combination of missing packages and assertion errors.
-      #~(list "--ignore=plotly/tests/test_optional/test_kaleido/test_kaleido.py"
+      ;; Missing dependencies.
+      #~(list "--ignore=plotly/matplotlylib/mplexporter/tests/test_basic.py"
+              "--ignore=plotly/matplotlylib/mplexporter/tests/test_utils.py"
+              "--ignore=plotly/matplotlylib/tests/test_renderer.py"
+              "--ignore=tests/test_io/test_renderers.py"
+              "--ignore=tests/test_optional/test_kaleido/test_kaleido.py"
+              ;; XXX: Combination of missing packages and assertion errors.
               "-k" (string-join
-                    (list "not test_build_df_from_vaex_and_polars"
-                          "test_build_df_with_hover_data_from_vaex_and_polars"
-                          "test_bytesio"
+                    (list "not test_acceptance_named"
                           "test_colorscale_and_levels_same_length"
                           "test_correct_order_param"
+                          "test_date_in_hover"
                           "test_dependencies_not_imported"
-                          "test_ensure_orca_ping_and_proc"
-                          "test_external_server_url"
                           "test_fips_values_same_length"
-                          "test_full_choropleth"
-                          "test_invalid_figure_json"
-                          "test_latex_fig_to_image[eps]"
+                          "test_from_json_output_type"
+                          "test_get_module_exists_submodule"
+                          "test_iplot_mpl_works"
+                          "test_iplot_works_after_you_call_init_notebook_mode"
+                          "test_iplot_works_without_init_notebook_mode"
                           "test_lazy_imports"
-                          "test_legend_dots"
-                          "test_linestyle"
-                          "test_mimetype_combination"
-                          "test_orca_executable_path"
-                          "test_orca_version_number"
-                          "test_pdf_renderer_show_override"
-                          "test_png_renderer_mimetype"
-                          "test_problematic_environment_variables[eps]"
-                          "test_sanitize_json[auto]"
-                          "test_sanitize_json[json]"
-                          "test_sanitize_json[orjson]"
+                          "test_ols_trendline_slopes"
+                          "test_overall_trendline"
+                          "test_read_json_from_file_string"
+                          "test_read_json_from_filelike"
+                          "test_read_json_from_pathlib"
+                          "test_render_mode"
                           "test_scope_is_not_list"
-                          "test_scraper"
-                          "test_server_timeout_shutdown"
-                          "test_simple_to_image[eps]"
-                          "test_svg_renderer_show"
-                          "test_to_image_default[eps]"
-                          "test_topojson_fig_to_image[eps]"
-                          "test_validate_orca"
-                          "test_write_image_string[eps]"
-                          "test_write_image_string_bad_extension_failure"
-                          "test_write_image_string_bad_extension_override"
-                          "test_write_image_string_format_inference[eps]"
-                          "test_write_image_writeable[eps]")
+                          "test_trendline_enough_values"
+                          "test_trendline_nan_values"
+                          "test_trendline_on_timeseries"
+                          "test_trendline_results_passthrough")
                     " and not "))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'build 'skip-npm
             ;; npm is not packaged so build without it
             (lambda _
-              (setenv "SKIP_NPM" "T")))
-          (add-after 'unpack 'chdir
-            (lambda _
-              (chdir "packages/python/plotly"))))))
+              (setenv "SKIP_NPM" "T"))))))
     ;; XXX: Plotly requires a long list of test only packages, do not
-    ;; propagate them, see: <packages/python/plotly/test_requirements>.
+    ;; propagate them, see:
+    ;; <https://github.com/plotly/plotly.py/blob/v6.8.0/pyproject.toml#L56>.
     (native-inputs
-     (list python-geopandas
-           python-ipykernel
-           python-ipython-minimal
-           python-ipywidgets
-           python-matplotlib
-           python-nbformat
-           python-numpy-1
+     (list ;; python-anywidget          ;not packaged yet in Guix
+           python-colorcet
+           python-geopandas
+           python-hatchling
+           python-inflect
+           ;; python-kaleido            ;not packaged yet in Guix
+           python-numpy
            python-orjson
-           python-pandas
+           python-pandas-minimal
+           ;; python-pdfrw              ;not packaged yet in Guix
            python-pillow
-           python-psutil
+           ;; python-plotly-geo         ;not packaged yet in Guix
+           python-polars
+           python-pyarrow
            python-pyshp
-           python-pytest-8
+           python-pytest
            python-pytz
-           python-requests
-           python-retrying
            python-scikit-image
-           python-scipy
-           python-setuptools
+           python-scipy-minimal
            python-shapely
            python-statsmodels
-           python-tenacity
-           python-vaex-core
-           python-versioneer
-           python-xarray))
+           python-xarray
+           tzdata-for-tests))
     (propagated-inputs
-     (list python-packaging
-           python-tenacity))
+     (list python-narwhals
+           python-packaging))
     (home-page "https://plotly.com/python/")
     (synopsis "Interactive plotting library for Python")
     (description
