@@ -4529,7 +4529,7 @@ exec ~a/bin/freedink -refdir ~a/share/dink\n"
                  (base32
                   "1ai7x5lfy8c1d11crz33ayy21alry740f78qjjxwzdfr6ph7pkzq"))))
       (build-system cmake-build-system)
-      (native-inputs (list catch2-3.5))
+      (native-inputs (list catch2))
       (home-page "https://www.fuzzylite.com/")
       (synopsis "Fuzzy logic control binary")
       (description
