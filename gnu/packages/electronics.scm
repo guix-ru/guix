@@ -2335,7 +2335,7 @@ which allows one to install the M8 firmware on any Teensy.")
 (define-public magic
   (package
     (name "magic")
-    (version "8.3.652")
+    (version "8.3.664")
     (source
      (origin
        (method git-fetch)
@@ -2344,7 +2344,7 @@ which allows one to install the M8 firmware on any Teensy.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "07q2lldcq6zb1apa5d3paciha92r6jlp7xny8pc31f56k5s9jnmz"))))
+        (base32 "0lrcsm3my0v7fvi9hw32h8kbjcgrm7jw3ipg16h11j7k0hnz88r3"))))
     (build-system gnu-build-system)
     (arguments
      (list
