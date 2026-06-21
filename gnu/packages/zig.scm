@@ -55,9 +55,9 @@
          '("stage1/zig1.wasm"
            "stage1/zig1.wasm.zst")
          ;; Generated from glibc sources, see also:
-         ;; https://github.com/ziglang/zig/blob/master/lib/libc/glibc/README.md
-         ;; https://github.com/ziglang/glibc-abi-tool
-         '("lib/libc/glibc/abilists")
+         ;; https://codeberg.org/ziglang/zig/src/branch/master/lib/libc/glibc/README.md
+         ;; https://codeberg.org/ziglang/libc-abi-tools
+         (find-files "lib/libc" "^abilists$")
          ;; IETF RFC documents have nonfree license.
          (find-files "." "^rfc[0-9]+\\.txt"))))))
 
@@ -1832,7 +1832,7 @@ toolchain.  Among other features it provides
        (snippet
         #~(begin
             #$(origin-snippet (package-source zig-0.13))
-            ;; TODO: Add this to zig-source.
+            ;; For ARM builds.
             (substitute* "build.zig"
               (("\\.*.max_rss.*") ""))))))
     (inputs
