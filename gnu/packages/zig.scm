@@ -1111,88 +1111,6 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
-(define zig-0.11-libc-abi-tools
-  (origin
-    (method git-fetch)
-    (uri (git-reference
-          (url "https://codeberg.org/ziglang/libc-abi-tools")
-          (commit "13576b1ea957882be7ff2c99f4cdc27454930219")))
-    (file-name "libc-abi-tools")
-    (sha256
-     (base32 "09m0ipixxw0dnal0zsgk6kvcz29y9s256b9y00s4hkhj95n630il"))
-    (modules '((guix build utils)))
-    (snippet
-     #~(begin
-         (substitute* "consolidate.zig"
-           ((".*minor = 3[5678].*") "")
-           (("(w\\.writeIntLittle.u16, )(@intCast.*);" _ prefix suffix)
-            (string-append prefix "@as(u16, " suffix ");")))
-         (with-directory-excursion "glibc"
-           (for-each delete-file-recursively
-                     '("2.35" "2.36" "2.37" "2.38")))))))
-
-(define-public zig-0.11
-  (package
-    (inherit zig-0.10)
-    (name "zig")
-    (version "0.11.0")
-    (source
-     (origin
-       (inherit (zig-source
-                 version version
-                 "0qh7c27cd4wcdjj0mbpkarvwypfk1js8hkyxs0z149qv75zkbrca"))
-       (patches
-        (search-patches
-         "zig-0.11-build-respect-PKG_CONFIG-env-var.patch"
-         "zig-0.9-use-baseline-cpu-by-default.patch"
-         "zig-0.11-use-system-paths.patch"
-         "zig-0.11-fix-runpath.patch"))))
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-            (add-after 'unpack 'set-host-triple
-              (lambda _
-                (substitute* "CMakeLists.txt"
-                  (("\\$\\{ZIG_HOST_TARGET_TRIPLE\\}")
-                   (zig-target
-                    #$(platform-target
-                       (lookup-platform-by-system (%current-system))))))))
-            (add-after 'unpack 'prepare-source
-              (lambda* (#:key native-inputs inputs #:allow-other-keys)
-                (install-file (search-input-file
-                               (or native-inputs inputs) "bin/zig1.wasm")
-                              "stage1")
-                (make-file-writable "stage1/zig1.wasm")))
-            (add-after 'install 'build-zig1
-              (lambda _
-                (invoke (string-append #$output "/bin/zig")
-                        "build" "update-zig1" "--verbose")))
-            (add-after 'build-zig1 'install-zig1
-              (lambda _
-                (install-file "stage1/zig1.wasm"
-                              (string-append #$output:zig1 "/bin"))))
-            ;; TODO: Disable tests for macOS target and run full test.
-            ;; Issue with glibc in CPLUS_INCLUDE_PATH:
-            ;; <https://github.com/ziglang/zig/issues/18063>.
-            (replace 'check
-              (lambda* (#:key tests? #:allow-other-keys)
-                (when tests?
-                  (invoke (string-append #$output "/bin/zig")
-                          "test" "-I" "test" "test/behavior.zig"))))))))
-    (inputs
-     (modify-inputs inputs
-       (replace "clang" clang-16)
-       (replace "lld" lld-16)))
-    (native-inputs
-     (modify-inputs native-inputs
-       (prepend binaryen `(,zig-0.10.0-3985 "zig1"))
-       (replace "libc-abi-tools" zig-0.11-libc-abi-tools)
-       (replace "llvm" llvm-16)))
-    (outputs '("out" "zig1"))
-    (properties `((max-silent-time . 9600)
-                  ,@(clang-compiler-cpu-architectures "16")))))
-
 
 ;;;
 ;;; Bootstrap path for Zig 0.12.
@@ -1202,7 +1120,7 @@ toolchain.  Among other features it provides
 (define zig-0.11.0-149
   (let ((commit "7a85ad151daece3d0bba3c8d23081502a0956c95")
         (revision "149")
-        (base zig-0.11))
+        (base zig-0.10.0-3985))
     (package
       (inherit base)
       (name "zig")
@@ -1210,18 +1128,11 @@ toolchain.  Among other features it provides
       (source (zig-source
                version commit
                "1kb245d4wfs1dyv7ccw3xiawasggpln9qxfqwlp4gkdg50l1qyzw"))
-      ;; zig1
-      (arguments
-       (substitute-keyword-arguments (package-arguments zig-0.10.0-747)
-         ((#:phases phases '%standard-phases)
-          #~(modify-phases #$phases
-              (replace 'build-zig1
-                (lambda _
-                  (invoke "zig" "build" "--zig-lib-dir" "lib"
-                          "update-zig1" "--verbose")))))))
+      ;; zig2+zig1
+      (arguments (package-arguments zig-0.10.0-748))
       (native-inputs
        (modify-inputs native-inputs
-         (replace "zig" `(,base "out")))))))
+         (replace "zig" `(,base "zig1")))))))
 
 (define zig-0.11.0-384
   (let ((commit "88f5315ddfc6eaf3e28433504ec046fb3252db7c")
@@ -1480,55 +1391,6 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
-(define zig-0.12-libc-abi-tools
-  (origin
-    (method git-fetch)
-    (uri (git-reference
-          (url "https://codeberg.org/ziglang/libc-abi-tools")
-          (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
-    (file-name "libc-abi-tools")
-    (sha256
-     (base32 "1q9plbqkkk3jzrvsgcjmj5jjdncz4ym9p0snglz4kkjwwm65gqs1"))))
-
-(define-public zig-0.12
-  (package
-    (inherit zig-0.11)
-    (name "zig")
-    (version "0.12.1")
-    (source
-     (origin
-       (inherit (zig-source
-                 version version
-                 "0ssgfrsk116p16rwjwq1z2pvvcdij6s30s19bhzjms7maz4s77hb"))
-       (patches
-        (search-patches
-         "zig-0.12-build-respect-PKG_CONFIG-env-var.patch"
-         "zig-0.12-use-baseline-cpu-by-default.patch"
-         "zig-0.12-use-system-paths.patch"
-         "zig-0.12-fix-runpath.patch"))))
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-            (replace 'patch-more-shebangs
-              (lambda* (#:key inputs #:allow-other-keys)
-                ;; Zig uses information about an ELF file to determine the
-                ;; version of glibc and other data for native builds.
-                (substitute* "lib/std/zig/system.zig"
-                  (("/usr/bin/env")
-                   (search-input-file inputs "bin/clang++")))))))))
-    (inputs
-     (modify-inputs inputs
-       (replace "clang" clang-17)
-       (replace "lld" lld-17)))
-    (native-inputs
-     (modify-inputs native-inputs
-       (replace "libc-abi-tools" zig-0.12-libc-abi-tools)
-       (replace "llvm" llvm-17)
-       (replace "zig" `(,zig-0.11.0-3604 "zig1"))))
-    (properties `((max-silent-time . 9600)
-                  ,@(clang-compiler-cpu-architectures "17")))))
-
 
 ;;;
 ;;; Bootstrap path for Zig 0.13.
@@ -1537,7 +1399,7 @@ toolchain.  Among other features it provides
 (define zig-0.12.0-109
   (let ((commit "b7799ef322103c8e449c45494c29fb4a8c9867df")
         (revision "109")
-        (base zig-0.12))
+        (base zig-0.11.0-3604))
     (package
       (inherit base)
       (name "zig")
@@ -1545,60 +1407,18 @@ toolchain.  Among other features it provides
       (source (zig-source
                version commit
                "1zy19w93wrd7dfdih8hfk9h3brkgaspaa60ipcmf08hlx6z2f0bz"))
-      ;; zig1
-      (arguments
-       (substitute-keyword-arguments (package-arguments zig-0.10.0-747)
-         ((#:phases phases '%standard-phases)
-          #~(modify-phases #$phases
-              ;; Build errors when zig1.wasm is not found.
-              (add-after 'unpack 'prepare-source
-                (lambda _
-                  (invoke "touch" "stage1/zig1.wasm")))
-              (replace 'build-zig1
-                (lambda _
-                  (invoke "zig" "build" "--zig-lib-dir" "lib"
-                          "update-zig1" "--verbose")))))))
+      ;; zig2+zig1
+      (arguments (package-arguments zig-0.10.0-748))
+      (inputs
+       (modify-inputs inputs
+         (replace "clang" clang-18)
+         (replace "lld" lld-18)))
       (native-inputs
        (modify-inputs native-inputs
-         (replace "zig" `(,base "out")))))))
-
-(define zig-0.13-libc-abi-tools
-  (origin
-    (method git-fetch)
-    (uri (git-reference
-          (url "https://codeberg.org/ziglang/libc-abi-tools")
-          (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
-    (file-name "libc-abi-tools")
-    (sha256
-     (base32 "1q9plbqkkk3jzrvsgcjmj5jjdncz4ym9p0snglz4kkjwwm65gqs1"))))
-
-(define-public zig-0.13
-  (package
-    (inherit zig-0.12)
-    (name "zig")
-    (version "0.13.0")
-    (source
-     (origin
-       (inherit (zig-source
-                 version version
-                 "0ly8042lbsa8019g0d1jg4l06rxpq2530n9mijq66n4lmx7a5976"))
-       (patches
-        (search-patches
-         "zig-0.13-build-respect-PKG_CONFIG-env-var.patch"
-         "zig-0.12-use-baseline-cpu-by-default.patch"
-         "zig-0.12-use-system-paths.patch"
-         "zig-0.13-fix-runpath.patch"))))
-    (inputs
-     (modify-inputs inputs
-       (replace "clang" clang-18)
-       (replace "lld" lld-18)))
-    (native-inputs
-     (modify-inputs native-inputs
-       (replace "libc-abi-tools" zig-0.13-libc-abi-tools)
-       (replace "llvm" llvm-18)
-       (replace "zig" `(,zig-0.12.0-109 "zig1"))))
-    (properties `((max-silent-time . 9600)
-                  ,@(clang-compiler-cpu-architectures "18")))))
+         (replace "llvm" llvm-18)
+         (replace "zig" `(,base "zig1"))))
+      (properties `((max-silent-time . 9600)
+                    ,@(clang-compiler-cpu-architectures "18"))))))
 
 
 ;;;
@@ -1608,7 +1428,7 @@ toolchain.  Among other features it provides
 (define zig-0.13.0-286
   (let ((commit "d72a8db2db1a5c77af2deb713248dc53f9adcb73")
         (revision "286")
-        (base zig-0.13))
+        (base zig-0.12.0-109))
     (package
       (inherit base)
       (name "zig")
@@ -1808,58 +1628,32 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "zig1")))))))
 
-(define zig-0.14-libc-abi-tools
-  (origin
-    (method git-fetch)
-    (uri (git-reference
-          (url "https://codeberg.org/ziglang/libc-abi-tools")
-          (commit "ed9d3bb356413e73b836955e75f399dfb3ec255e")))
-    (file-name "libc-abi-tools")
-    (sha256
-     (base32 "0ckhwlszm0vkiqsyp2rzp1zcfljh1ng24c7pdvpyfj51x4s612z1"))))
-
-(define-public zig-0.14
-  (package
-    (inherit zig-0.12)
-    (name "zig")
-    (version "0.14.1")
-    (source
-     (origin
-       (inherit (zig-source
-                 version version
-                 "0cnc3bzl965ckm70ayd6a29zn5h9cy3qzyfncp4n7mzkiwhlj58f"))
-       (patches
-        (search-patches
-         "zig-0.14-use-baseline-cpu-by-default.patch"
-         "zig-0.14-use-system-paths.patch"
-         "zig-0.14-fix-runpath.patch"))
-       (snippet
-        #~(begin
-            #$(origin-snippet (package-source zig-0.13))
-            ;; For ARM builds.
-            (substitute* "build.zig"
-              (("\\.*.max_rss.*") ""))))))
-    (inputs
-     (modify-inputs inputs
-       (replace "clang" clang-19)
-       (replace "lld" lld-19)))
-    (native-inputs
-     (modify-inputs native-inputs
-       (replace "libc-abi-tools" zig-0.14-libc-abi-tools)
-       (replace "llvm" llvm-19)
-       (replace "zig" `(,zig-0.13.0-3252 "zig1"))))
-    (properties `((max-silent-time . 9600)
-                  ,@(clang-compiler-cpu-architectures "19")))))
-
 
 ;;;
 ;;; Bootstrap path for Zig 0.15.
 ;;;
 
+(define zig-0.14.0-0
+  (let ((commit "5ad91a646a753cc3eecd8751e61cf458dadd9ac4")
+        (revision "0")
+        (base zig-0.13.0-3252))
+    (package
+      (inherit base)
+      (name "zig")
+      (version (git-version "0.14.0" revision commit))
+      (source (zig-source
+               version commit
+               "0ndrwir81zhkwviwnzwqc4vszc1klv1fnlf66nmdwijrkqi5wasp"))
+      ;; zig2+zig1
+      (arguments (package-arguments zig-0.10.0-748))
+      (native-inputs
+       (modify-inputs native-inputs
+         (replace "zig" `(,base "zig1")))))))
+
 (define zig-0.14.0-687
   (let ((commit "cc047fdd959edb260f7a6e305ccad53f185ece66")
         (revision "687")
-        (base zig-0.14))
+        (base zig-0.14.0-0))
     (package
       (inherit base)
       (name "zig")
@@ -1965,80 +1759,32 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
-(define zig-0.15-libc-abi-tools
-  (origin
-    (method git-fetch)
-    (uri (git-reference
-          (url "https://codeberg.org/ziglang/libc-abi-tools")
-          (commit "ec46122c7b8c7854f08e67e108083907d09996f5")))
-    (file-name "libc-abi-tools")
-    (sha256
-     (base32 "0s46f1wbqg53wxlrljb9afw4s8j5cl5vz5xhajy6fagy05xns2bc"))))
-
-(define-public zig-0.15
-  (package
-    (inherit zig-0.12)
-    (name "zig")
-    (version "0.15.2")
-    (source
-     (origin
-       (inherit (zig-source
-                 version version
-                 "0kr8y1xzb7ffqg4yy7ncg4jh6kndxn5xfqf2viy5gvqdqqql8ymv"))
-       (patches
-        (search-patches
-         "zig-0.14-use-baseline-cpu-by-default.patch"
-         "zig-0.14-use-system-paths.patch"
-         "zig-0.15-fix-runpath.patch"))))
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-            (replace 'copy-libc-abi-tools
-              (lambda* (#:key inputs native-inputs #:allow-other-keys)
-                (mkdir-p "/tmp/libc-abi-tools")
-                (with-directory-excursion "/tmp/libc-abi-tools"
-                  (copy-recursively
-                   (dirname (search-input-file
-                             (or native-inputs inputs) "list.zig"))
-                   ".")
-                  (for-each make-file-writable (find-files ".")))))
-            ;; Added support for more libc implementations.
-            (replace 'install-abilists
-              (lambda _
-                (with-directory-excursion "/tmp/libc-abi-tools"
-                  (for-each
-                   (lambda (libc)
-                     (with-directory-excursion libc
-                       (invoke (string-append #$output "/bin/zig")
-                               "run" "consolidate.zig")
-                       (install-file
-                        "abilists"
-                        (string-append #$output "/lib/zig/libc/" libc))))
-                   '("freebsd"
-                     "glibc"
-                     "netbsd")))))))))
-    (inputs
-     (modify-inputs inputs
-       (replace "clang" clang-20)
-       (replace "lld" lld-20)))
-    (native-inputs
-     (modify-inputs native-inputs
-       (replace "libc-abi-tools" zig-0.15-libc-abi-tools)
-       (replace "llvm" llvm-20)
-       (replace "zig" `(,zig-0.14.0-1197 "zig1"))))
-    (properties `((max-silent-time . 9600)
-                  ,@(clang-compiler-cpu-architectures "20")))))
-
 
 ;;;
 ;;; Bootstrap path for Zig 0.16.
 ;;;
 
+(define zig-0.15.0-0
+  (let ((commit "94cda37d691316ad4129ee37bbdecb911349109f")
+        (revision "0")
+        (base zig-0.14.0-1197))
+    (package
+      (inherit base)
+      (name "zig")
+      (version (git-version "0.15.0" revision commit))
+      (source (zig-source
+               version commit
+               "1wlw9acjff9hhghqmcrbh42n6hwkfgzdbkcizk9p948z2pnqmic2"))
+      ;; zig2+zig1
+      (arguments (package-arguments zig-0.10.0-748))
+      (native-inputs
+       (modify-inputs native-inputs
+         (replace "zig" `(,base "zig1")))))))
+
 (define zig-0.15.0-1447
   (let ((commit "ce0df033cf2bb6986c6c226786e6543d05e29a77")
         (revision "1447")
-        (base zig-0.15))
+        (base zig-0.15.0-0))
     (package
       (inherit base)
       (name "zig")
@@ -2144,6 +1890,71 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
+
+;;;
+;;; Public packages.
+;;;
+
+(define zig-0.11-libc-abi-tools
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
+          (commit "13576b1ea957882be7ff2c99f4cdc27454930219")))
+    (file-name "libc-abi-tools")
+    (sha256
+     (base32 "09m0ipixxw0dnal0zsgk6kvcz29y9s256b9y00s4hkhj95n630il"))
+    (modules '((guix build utils)))
+    (snippet
+     #~(begin
+         (substitute* "consolidate.zig"
+           ((".*minor = 3[5678].*") "")
+           (("(w\\.writeIntLittle.u16, )(@intCast.*);" _ prefix suffix)
+            (string-append prefix "@as(u16, " suffix ");")))
+         (with-directory-excursion "glibc"
+           (for-each delete-file-recursively
+                     '("2.35" "2.36" "2.37" "2.38")))))))
+
+(define zig-0.12-libc-abi-tools
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
+          (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
+    (file-name "libc-abi-tools")
+    (sha256
+     (base32 "1q9plbqkkk3jzrvsgcjmj5jjdncz4ym9p0snglz4kkjwwm65gqs1"))))
+
+(define zig-0.13-libc-abi-tools
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
+          (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
+    (file-name "libc-abi-tools")
+    (sha256
+     (base32 "1q9plbqkkk3jzrvsgcjmj5jjdncz4ym9p0snglz4kkjwwm65gqs1"))))
+
+(define zig-0.14-libc-abi-tools
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
+          (commit "ed9d3bb356413e73b836955e75f399dfb3ec255e")))
+    (file-name "libc-abi-tools")
+    (sha256
+     (base32 "0ckhwlszm0vkiqsyp2rzp1zcfljh1ng24c7pdvpyfj51x4s612z1"))))
+
+(define zig-0.15-libc-abi-tools
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
+          (commit "ec46122c7b8c7854f08e67e108083907d09996f5")))
+    (file-name "libc-abi-tools")
+    (sha256
+     (base32 "0s46f1wbqg53wxlrljb9afw4s8j5cl5vz5xhajy6fagy05xns2bc"))))
+
 (define zig-0.16-libc-abi-tools
   (origin
     (method git-fetch)
@@ -2153,6 +1964,223 @@ toolchain.  Among other features it provides
     (file-name "libc-abi-tools")
     (sha256
      (base32 "0a4f1bhgi6rd33gp3zlarcibagd603km4g97pdkphdkbs11066x1"))))
+
+(define-public zig-0.11
+  (package
+    (inherit zig-0.10)
+    (name "zig")
+    (version "0.11.0")
+    (source
+     (origin
+       (inherit (zig-source
+                 version version
+                 "0qh7c27cd4wcdjj0mbpkarvwypfk1js8hkyxs0z149qv75zkbrca"))
+       (patches
+        (search-patches
+         "zig-0.11-build-respect-PKG_CONFIG-env-var.patch"
+         "zig-0.9-use-baseline-cpu-by-default.patch"
+         "zig-0.11-use-system-paths.patch"
+         "zig-0.11-fix-runpath.patch"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'set-host-triple
+              (lambda _
+                (substitute* "CMakeLists.txt"
+                  (("\\$\\{ZIG_HOST_TARGET_TRIPLE\\}")
+                   (zig-target
+                    #$(platform-target
+                       (lookup-platform-by-system (%current-system))))))))
+            (add-after 'unpack 'prepare-source
+              (lambda* (#:key native-inputs inputs #:allow-other-keys)
+                (install-file (search-input-file
+                               (or native-inputs inputs) "bin/zig1.wasm")
+                              "stage1")
+                (make-file-writable "stage1/zig1.wasm")))
+            (add-after 'install 'build-zig1
+              (lambda _
+                (invoke (string-append #$output "/bin/zig")
+                        "build" "update-zig1" "--verbose")))
+            (add-after 'build-zig1 'install-zig1
+              (lambda _
+                (install-file "stage1/zig1.wasm"
+                              (string-append #$output:zig1 "/bin"))))
+            ;; TODO: Disable tests for macOS target and run full test.
+            ;; Issue with glibc in CPLUS_INCLUDE_PATH:
+            ;; <https://github.com/ziglang/zig/issues/18063>.
+            (replace 'check
+              (lambda* (#:key tests? #:allow-other-keys)
+                (when tests?
+                  (invoke (string-append #$output "/bin/zig")
+                          "test" "-I" "test" "test/behavior.zig"))))))))
+    (inputs
+     (modify-inputs inputs
+       (replace "clang" clang-16)
+       (replace "lld" lld-16)))
+    (native-inputs
+     (modify-inputs native-inputs
+       (prepend binaryen `(,zig-0.10.0-3985 "zig1"))
+       (replace "libc-abi-tools" zig-0.11-libc-abi-tools)
+       (replace "llvm" llvm-16)))
+    (outputs '("out" "zig1"))
+    (properties `((max-silent-time . 9600)
+                  ,@(clang-compiler-cpu-architectures "16")))))
+
+(define-public zig-0.12
+  (package
+    (inherit zig-0.11)
+    (name "zig")
+    (version "0.12.1")
+    (source
+     (origin
+       (inherit (zig-source
+                 version version
+                 "0ssgfrsk116p16rwjwq1z2pvvcdij6s30s19bhzjms7maz4s77hb"))
+       (patches
+        (search-patches
+         "zig-0.12-build-respect-PKG_CONFIG-env-var.patch"
+         "zig-0.12-use-baseline-cpu-by-default.patch"
+         "zig-0.12-use-system-paths.patch"
+         "zig-0.12-fix-runpath.patch"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            (replace 'patch-more-shebangs
+              (lambda* (#:key inputs #:allow-other-keys)
+                ;; Zig uses information about an ELF file to determine the
+                ;; version of glibc and other data for native builds.
+                (substitute* "lib/std/zig/system.zig"
+                  (("/usr/bin/env")
+                   (search-input-file inputs "bin/clang++")))))))))
+    (inputs
+     (modify-inputs inputs
+       (replace "clang" clang-17)
+       (replace "lld" lld-17)))
+    (native-inputs
+     (modify-inputs native-inputs
+       (replace "libc-abi-tools" zig-0.12-libc-abi-tools)
+       (replace "llvm" llvm-17)
+       (replace "zig" `(,zig-0.11.0-3604 "zig1"))))
+    (properties `((max-silent-time . 9600)
+                  ,@(clang-compiler-cpu-architectures "17")))))
+
+(define-public zig-0.13
+  (package
+    (inherit zig-0.12)
+    (name "zig")
+    (version "0.13.0")
+    (source
+     (origin
+       (inherit (zig-source
+                 version version
+                 "0ly8042lbsa8019g0d1jg4l06rxpq2530n9mijq66n4lmx7a5976"))
+       (patches
+        (search-patches
+         "zig-0.13-build-respect-PKG_CONFIG-env-var.patch"
+         "zig-0.12-use-baseline-cpu-by-default.patch"
+         "zig-0.12-use-system-paths.patch"
+         "zig-0.13-fix-runpath.patch"))))
+    (inputs
+     (modify-inputs inputs
+       (replace "clang" clang-18)
+       (replace "lld" lld-18)))
+    (native-inputs
+     (modify-inputs native-inputs
+       (replace "libc-abi-tools" zig-0.13-libc-abi-tools)
+       (replace "llvm" llvm-18)
+       (replace "zig" `(,zig-0.12.0-109 "zig1"))))
+    (properties `((max-silent-time . 9600)
+                  ,@(clang-compiler-cpu-architectures "18")))))
+
+(define-public zig-0.14
+  (package
+    (inherit zig-0.12)
+    (name "zig")
+    (version "0.14.1")
+    (source
+     (origin
+       (inherit (zig-source
+                 version version
+                 "0cnc3bzl965ckm70ayd6a29zn5h9cy3qzyfncp4n7mzkiwhlj58f"))
+       (patches
+        (search-patches
+         "zig-0.14-use-baseline-cpu-by-default.patch"
+         "zig-0.14-use-system-paths.patch"
+         "zig-0.14-fix-runpath.patch"))
+       (snippet
+        #~(begin
+            #$(origin-snippet (package-source zig-0.13))
+            ;; For ARM builds.
+            (substitute* "build.zig"
+              (("\\.*.max_rss.*") ""))))))
+    (inputs
+     (modify-inputs inputs
+       (replace "clang" clang-19)
+       (replace "lld" lld-19)))
+    (native-inputs
+     (modify-inputs native-inputs
+       (replace "libc-abi-tools" zig-0.14-libc-abi-tools)
+       (replace "llvm" llvm-19)
+       (replace "zig" `(,zig-0.13.0-3252 "zig1"))))
+    (properties `((max-silent-time . 9600)
+                  ,@(clang-compiler-cpu-architectures "19")))))
+
+(define-public zig-0.15
+  (package
+    (inherit zig-0.12)
+    (name "zig")
+    (version "0.15.2")
+    (source
+     (origin
+       (inherit (zig-source
+                 version version
+                 "0kr8y1xzb7ffqg4yy7ncg4jh6kndxn5xfqf2viy5gvqdqqql8ymv"))
+       (patches
+        (search-patches
+         "zig-0.14-use-baseline-cpu-by-default.patch"
+         "zig-0.14-use-system-paths.patch"
+         "zig-0.15-fix-runpath.patch"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            (replace 'copy-libc-abi-tools
+              (lambda* (#:key inputs native-inputs #:allow-other-keys)
+                (mkdir-p "/tmp/libc-abi-tools")
+                (with-directory-excursion "/tmp/libc-abi-tools"
+                  (copy-recursively
+                   (dirname (search-input-file
+                             (or native-inputs inputs) "list.zig"))
+                   ".")
+                  (for-each make-file-writable (find-files ".")))))
+            ;; Added support for more libc implementations.
+            (replace 'install-abilists
+              (lambda _
+                (with-directory-excursion "/tmp/libc-abi-tools"
+                  (for-each
+                   (lambda (libc)
+                     (with-directory-excursion libc
+                       (invoke (string-append #$output "/bin/zig")
+                               "run" "consolidate.zig")
+                       (install-file
+                        "abilists"
+                        (string-append #$output "/lib/zig/libc/" libc))))
+                   '("freebsd"
+                     "glibc"
+                     "netbsd")))))))))
+    (inputs
+     (modify-inputs inputs
+       (replace "clang" clang-20)
+       (replace "lld" lld-20)))
+    (native-inputs
+     (modify-inputs native-inputs
+       (replace "libc-abi-tools" zig-0.15-libc-abi-tools)
+       (replace "llvm" llvm-20)
+       (replace "zig" `(,zig-0.14.0-1197 "zig1"))))
+    (properties `((max-silent-time . 9600)
+                  ,@(clang-compiler-cpu-architectures "20")))))
 
 (define-public zig-0.16
   (package
