@@ -460,7 +460,7 @@ particular CPU vendor or architecture.")
                   fmt-11
                   spdlog-1.15
                   boost
-                  catch2-3.8))
+                  catch2))
     (native-inputs
      (list cli11
            nlohmann-json
