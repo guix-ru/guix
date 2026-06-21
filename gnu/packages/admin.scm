@@ -3105,10 +3105,10 @@ features of ls(1), find(1), stat(1) and du(1).")
      (list #:phases
            #~(modify-phases %standard-phases
                (add-before 'build 'substitute-file-names
-                 (lambda* (#:key inputs #:allow-other-keys)
+                 (lambda _
                    ;; Use the right shell when executing the watcher and
                    ;; user-provided shell commands.
-                   (let ((bash (assoc-ref inputs "bash")))
+                   (let ((bash #$(this-package-input "bash-minimal")))
                      (substitute* '("src/direvent.c" "src/progman.c")
                        (("\"/bin/sh\"")
                         (string-append "\"" bash "/bin/sh\""))))
@@ -3119,6 +3119,7 @@ features of ls(1), find(1), stat(1) and du(1).")
                       (string-append prefix (which "sh")))
                      (("/bin/kill")
                       (which "kill"))))))))
+    (inputs (list bash-minimal))
     (home-page "https://www.gnu.org.ua/software/direvent/")
     (synopsis "Daemon to monitor directories for events such as file removal")
     (description
