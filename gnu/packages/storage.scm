@@ -250,7 +250,7 @@
                               `("GUIX_PYTHONPATH" prefix (,PYTHONPATH))))
                           scripts)))))))
     (native-inputs
-     (list catch2-3.8
+     (list catch2
            patchelf
            pkg-config
            python
