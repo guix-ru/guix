@@ -76,7 +76,7 @@
          (("(@ctz.)u.., " _ prefix) prefix)
          (("(@popCount.)u.., " _ prefix) prefix)))))
 
-(define-public zig-0.10
+(define zig-0.10
   (package
     (name "zig")
     (version "0.10.1")
