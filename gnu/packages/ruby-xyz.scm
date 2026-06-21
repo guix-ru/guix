@@ -1135,7 +1135,7 @@ under the hood.")
                (("require 'bundler/setup'") "nil")
                (("Bundler::GemHelper\\.install_tasks") "nil")))))))
     (native-inputs
-     (list ruby-rack-test ruby-rspec-core ruby-sinatra))
+     (list ruby-rack-test ruby-minitest ruby-sinatra ruby-kramdown))
     (propagated-inputs
      (list ruby-temple ruby-tilt))
     (synopsis "Minimalist template language for Ruby")
