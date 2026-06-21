@@ -3543,7 +3543,7 @@ limits.")
                 (("\"glxinfo\"")
                  (string-append
                   "\"" (search-input-file inputs "bin/glxinfo") "\""))))))))
-    (native-inputs (list catch2-3.8
+    (native-inputs (list catch2
                          pkg-config
                          qttools))
     (inputs (list dbus
