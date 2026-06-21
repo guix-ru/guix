@@ -34,6 +34,7 @@
 ;;; Copyright © 2026 Daniel Littlewood <dan@danielittlewood.xyz>
 ;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2026 Herman Rimm <herman@rimm.ee>
+;;; Copyright © 2026 Jason Conroy <jconroy@tscripta.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -61,7 +62,8 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system meson)
-  #:use-module (guix build-system ocaml)
+  #:use-module ((guix build-system ocaml)
+                #:select ((ocaml5-build-system . ocaml-build-system)))
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system qt)
   #:use-module (gnu packages)
@@ -103,6 +105,7 @@
   #:use-module (gnu packages markup)
   #:use-module (gnu packages nss)
   #:use-module (gnu packages ocaml)
+  #:use-module ((gnu packages ocaml5) #:prefix ocaml5:)
   #:use-module (gnu packages ocr)
   #:use-module (gnu packages package-management)
   #:use-module (gnu packages pcre)
@@ -171,7 +174,7 @@ convert data in any way.")
 (define-public cpdf
   (package
     (name "cpdf")
-    (version "2.9")
+    (version "2.9.1")
     (source
      (origin
        (method git-fetch)
@@ -180,31 +183,35 @@ convert data in any way.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0gp5c82jmypa0ssdm3bdf3shaf9m0vncjs61bcqnchrxaclcd9vg"))))
+        (base32 "1pd5gjc4h1c7d0mzr288wfq01f4382s9w79p0ial9pbnib0r0w1z"))))
     (build-system ocaml-build-system)
     (arguments
      (list
       #:tests? #f ;no tests
+      #:make-flags
+      #~(list (string-append "CC="
+                             #$(cc-for-target)))
       #:phases
-        #~(modify-phases %standard-phases
-            (delete 'configure)
-            (add-after 'unpack 'patch-makefile-shell
-              (lambda _
-                (patch-makefile-SHELL "OCamlMakefile")))
-            (add-after 'install 'install-bin
-              (lambda _
-                (let ((bin (string-append #$output "/bin")))
-                  (install-file "cpdf" bin))))
-            (add-after 'install-bin 'install-doc
-              (lambda _
-                (let ((doc (string-append #$output "/share/doc/"
-                                          #$name "-" #$version))
-                      (man1 (string-append #$output "/share/man/man1")))
-                  (install-file "cpdf.1" man1)
-                  (install-file "cpdfmanual.pdf" doc)
-                  (copy-recursively "doc/cpdf/html"
-                                    (string-append doc "/html"))))))))
-    (propagated-inputs (list ocaml-camlpdf))
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (add-after 'unpack 'patch-makefile-shell
+            (lambda _
+              (patch-makefile-SHELL "OCamlMakefile")))
+          (add-after 'install 'install-bin
+            (lambda _
+              (let ((bin (string-append #$output "/bin")))
+                (install-file "cpdf" bin))))
+          (add-after 'install-bin 'install-doc
+            (lambda _
+              (let ((doc (string-append #$output "/share/doc/"
+                                        #$name "-"
+                                        #$version))
+                    (man1 (string-append #$output "/share/man/man1")))
+                (install-file "cpdf.1" man1)
+                (install-file "cpdfmanual.pdf" doc)
+                (copy-recursively "doc/cpdf/html"
+                                  (string-append doc "/html"))))))))
+    (propagated-inputs (list ocaml5:ocaml-camlpdf))
     (home-page "https://www.coherentpdf.com")
     (synopsis "Command-line tool for PDF manipulation")
     (description
