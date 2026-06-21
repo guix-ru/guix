@@ -4131,7 +4131,7 @@ G-codes to binary and vice versa.")
                        (,(string-append #$(this-package-input "gtk+")
                                         "/share/glib-2.0/schemas")))))))))
     (native-inputs
-     (list pkg-config catch2-3.8))
+     (list pkg-config catch2))
     (inputs
      (list bash-minimal
            boost
