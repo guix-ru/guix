@@ -3079,7 +3079,7 @@ environment variable is set and output is to tty.")
     (arguments
      (list #:tests? #f ; There are no tests.
            #:make-flags #~(list (string-append "CC=" #$(cc-for-target))
-                                (string-append "PREFIX=" %output))
+                                (string-append "PREFIX=" #$output))
            #:phases #~(modify-phases %standard-phases
                         (delete 'configure))))
     (synopsis "Tool to generate customized file listings")
