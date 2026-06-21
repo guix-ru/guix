@@ -143,14 +143,20 @@ Build mode defaults to 'normal.  If expression is provided, it must evaluate
 to one of the following symbols: normal, check, repair."
   (let ((build-mode (match args
                       ((mode)
-                       (match mode
-                         ((or 'normal ''normal) (build-mode normal))
-                         ((or 'check ''check)   (build-mode check))
-                         ((or 'repair ''repair) (build-mode repair))
-                         ((or 'normal ''normal) (build-mode normal))
-                         (_
-                          (format #t ";; ERROR: Invalid build mode.~%")
-                          #f)))
+                       ;; Evaluate mode expression, in case the user is using
+                       ;; a Scheme value instead of syntax.
+                       (let ((mode (or (parameterize ((current-warning-port
+                                                       (%make-void-port "w")))
+                                         (false-if-exception
+                                          (repl-eval repl mode)))
+                                       mode)))
+                         (match mode
+                           ('normal (build-mode normal))
+                           ('check  (build-mode check))
+                           ('repair (build-mode repair))
+                           (_
+                            (format #t ";; ERROR: Invalid build mode.~%")
+                            #f))))
                       (()
                        (build-mode normal)))))
     (when build-mode
