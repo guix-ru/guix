@@ -10617,7 +10617,7 @@ your score gets higher, you level up and the blocks fall faster.")
                    (substitute* "CMakeLists.txt"
                      (("games\\)") "bin)")))))))
     (inputs
-     (list catch2-3.5
+     (list catch2
            flac
            glew
            libavif
