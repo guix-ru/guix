@@ -194,6 +194,15 @@ bool isHash(std::string_view s)
     return true;
 }
 
+
+bool isHash32(std::string_view s)
+{
+    if (s.length() != 32) return false;
+    for (unsigned char c : s)
+        if (base32Values[c] == -1) return false;
+    return true;
+}
+
 /* The "hash context".  */
 struct Ctx
 {

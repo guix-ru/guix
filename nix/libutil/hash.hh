@@ -72,8 +72,13 @@ Hash parseHash32(HashType ht, std::string_view s);
 /* Parse a base-16 or base-32 representation of a hash code. */
 Hash parseHash16or32(HashType ht, std::string_view s);
 
-/* Verify that the given string is a valid hash code. */
+/* Verify that the given string is a valid base16 hash code with 32
+   characters. */
 bool isHash(std::string_view s);
+
+/* Verify that the given string is a valid base32 hash code with 32
+   characters. */
+bool isHash32(std::string_view s);
 
 /* Compute the hash of the given string. */
 Hash hashString(HashType ht, const string & s);
