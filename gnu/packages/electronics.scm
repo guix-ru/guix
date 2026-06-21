@@ -3704,7 +3704,7 @@ the @acronym{FDTD, Finite-Difference Time-Domain} method.")
 (define-public python-pyrtl
   (package
     (name "python-pyrtl")
-    (version "0.12")
+    (version "1.0.0")
     (source
      (origin
        (method git-fetch)
@@ -3713,7 +3713,7 @@ the @acronym{FDTD, Finite-Difference Time-Domain} method.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0f0g57lwpbzbm1hk9n7ndzw0zpx6srclsxxbsp2760wcna64lpl6"))))
+        (base32 "0r42yh9ncrb6k9z35skw35dba4173lmb7xxka13iwwwghnl935vy"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-hatchling python-hatch-vcs python-pytest))
