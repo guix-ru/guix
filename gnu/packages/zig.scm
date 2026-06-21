@@ -61,13 +61,13 @@
          ;; IETF RFC documents have nonfree license.
          (find-files "." "^rfc[0-9]+\\.txt"))))))
 
-(define zig-0.9-glibc-abi-tool
+(define zig-0.9-libc-abi-tools
   (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "6f992064f821c612f68806422b2780c9260cbc4c")))
-    (file-name "glibc-abi-tool")
+    (file-name "libc-abi-tools")
     (sha256
      (base32 "0lsi3f2lkixcdidljby73by2sypywb813yqdapy9md4bi2h8hhgp"))))
 
@@ -149,15 +149,18 @@
                         ;; Non-native tests try to link and execute non-native
                         ;; binaries.
                         "-Dskip-non-native"))))
-          (add-before 'check 'install-glibc-abilists
+          (add-before 'check 'copy-libc-abi-tools
             (lambda* (#:key inputs native-inputs #:allow-other-keys)
-              (mkdir-p "/tmp/glibc-abi-tool")
-              (with-directory-excursion "/tmp/glibc-abi-tool"
+              (mkdir-p "/tmp/libc-abi-tools")
+              (with-directory-excursion "/tmp/libc-abi-tools"
                 (copy-recursively
                  (dirname (search-input-file
                            (or native-inputs inputs) "consolidate.zig"))
                  ".")
-                (for-each make-file-writable (find-files "."))
+                (for-each make-file-writable (find-files ".")))))
+          (add-after 'copy-libc-abi-tools 'install-abilists
+            (lambda _
+              (with-directory-excursion "/tmp/libc-abi-tools"
                 (invoke (string-append #$output "/bin/zig")
                         "run" "consolidate.zig")
                 (install-file
@@ -169,7 +172,7 @@
     ;; Zig compiles fine with GCC, but also needs native LLVM libraries.
     (native-inputs
      (list llvm-13
-           zig-0.9-glibc-abi-tool))
+           zig-0.9-libc-abi-tools))
     (native-search-paths
      (list $C_INCLUDE_PATH
            $CPLUS_INCLUDE_PATH
@@ -197,13 +200,13 @@ toolchain.  Among other features it provides
                   ,@(clang-compiler-cpu-architectures "13")))
     (license license:expat)))
 
-(define zig-0.10-glibc-abi-tool
+(define zig-0.10-libc-abi-tools
   (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "b07bf67ab3c15881f13b9c3c03bcec04535760bb")))
-    (file-name "glibc-abi-tool")
+    (file-name "libc-abi-tools")
     (sha256
      (base32 "0csn3c9pj8wchwy5sk5lfnhjn8a3c8cp45fv7mkpi5bqxzdzf1na"))
     (modules '((guix build utils)))
@@ -267,7 +270,7 @@ toolchain.  Among other features it provides
        (replace "lld" lld-15)))
     (native-inputs
      (modify-inputs native-inputs
-       (replace "glibc-abi-tool" zig-0.10-glibc-abi-tool)
+       (replace "libc-abi-tools" zig-0.10-libc-abi-tools)
        (replace "llvm" llvm-15)))
     (properties `((max-silent-time . 9600)
                   ,@(clang-compiler-cpu-architectures "15")))))
@@ -372,11 +375,12 @@ toolchain.  Among other features it provides
                 (lambda _
                   (install-file "stage1/zig1.wasm.zst"
                                 (string-append #$output:zig1 "/bin"))))
-              (delete 'install-glibc-abilists)))))
+              (delete 'copy-libc-abi-tools)
+              (delete 'install-abilists)))))
       (native-inputs
        (modify-inputs native-inputs
          (prepend binaryen)
-         (delete "glibc-abi-tool")))
+         (delete "libc-abi-tools")))
       (outputs '("out" "zig1")))))
 
 ;; Supply zig1.wasm.zst, build zig2 + zig1.wasm, install zig2 + zig1.wasm.zst.
@@ -1107,13 +1111,13 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
-(define zig-0.11-glibc-abi-tool
+(define zig-0.11-libc-abi-tools
   (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "13576b1ea957882be7ff2c99f4cdc27454930219")))
-    (file-name "glibc-abi-tool")
+    (file-name "libc-abi-tools")
     (sha256
      (base32 "09m0ipixxw0dnal0zsgk6kvcz29y9s256b9y00s4hkhj95n630il"))
     (modules '((guix build utils)))
@@ -1183,7 +1187,7 @@ toolchain.  Among other features it provides
     (native-inputs
      (modify-inputs native-inputs
        (prepend binaryen `(,zig-0.10.0-3985 "zig1"))
-       (replace "glibc-abi-tool" zig-0.11-glibc-abi-tool)
+       (replace "libc-abi-tools" zig-0.11-libc-abi-tools)
        (replace "llvm" llvm-16)))
     (outputs '("out" "zig1"))
     (properties `((max-silent-time . 9600)
@@ -1476,13 +1480,13 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
-(define zig-0.12-glibc-abi-tool
+(define zig-0.12-libc-abi-tools
   (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
-    (file-name "glibc-abi-tool")
+    (file-name "libc-abi-tools")
     (sha256
      (base32 "1q9plbqkkk3jzrvsgcjmj5jjdncz4ym9p0snglz4kkjwwm65gqs1"))))
 
@@ -1519,7 +1523,7 @@ toolchain.  Among other features it provides
        (replace "lld" lld-17)))
     (native-inputs
      (modify-inputs native-inputs
-       (replace "glibc-abi-tool" zig-0.12-glibc-abi-tool)
+       (replace "libc-abi-tools" zig-0.12-libc-abi-tools)
        (replace "llvm" llvm-17)
        (replace "zig" `(,zig-0.11.0-3604 "zig1"))))
     (properties `((max-silent-time . 9600)
@@ -1558,13 +1562,13 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "out")))))))
 
-(define zig-0.13-glibc-abi-tool
+(define zig-0.13-libc-abi-tools
   (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
-    (file-name "glibc-abi-tool")
+    (file-name "libc-abi-tools")
     (sha256
      (base32 "1q9plbqkkk3jzrvsgcjmj5jjdncz4ym9p0snglz4kkjwwm65gqs1"))))
 
@@ -1590,7 +1594,7 @@ toolchain.  Among other features it provides
        (replace "lld" lld-18)))
     (native-inputs
      (modify-inputs native-inputs
-       (replace "glibc-abi-tool" zig-0.13-glibc-abi-tool)
+       (replace "libc-abi-tools" zig-0.13-libc-abi-tools)
        (replace "llvm" llvm-18)
        (replace "zig" `(,zig-0.12.0-109 "zig1"))))
     (properties `((max-silent-time . 9600)
@@ -1804,13 +1808,13 @@ toolchain.  Among other features it provides
        (modify-inputs native-inputs
          (replace "zig" `(,base "zig1")))))))
 
-(define zig-0.14-glibc-abi-tool
+(define zig-0.14-libc-abi-tools
   (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "ed9d3bb356413e73b836955e75f399dfb3ec255e")))
-    (file-name "glibc-abi-tool")
+    (file-name "libc-abi-tools")
     (sha256
      (base32 "0ckhwlszm0vkiqsyp2rzp1zcfljh1ng24c7pdvpyfj51x4s612z1"))))
 
@@ -1841,7 +1845,7 @@ toolchain.  Among other features it provides
        (replace "lld" lld-19)))
     (native-inputs
      (modify-inputs native-inputs
-       (replace "glibc-abi-tool" zig-0.14-glibc-abi-tool)
+       (replace "libc-abi-tools" zig-0.14-libc-abi-tools)
        (replace "llvm" llvm-19)
        (replace "zig" `(,zig-0.13.0-3252 "zig1"))))
     (properties `((max-silent-time . 9600)
@@ -1990,9 +1994,7 @@ toolchain.  Among other features it provides
      (substitute-keyword-arguments arguments
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
-            (delete 'install-glibc-abilists)
-            ;; TODO: Remove newly-added abilists files in zig-source.
-            (add-before 'check 'install-abilists
+            (replace 'copy-libc-abi-tools
               (lambda* (#:key inputs native-inputs #:allow-other-keys)
                 (mkdir-p "/tmp/libc-abi-tools")
                 (with-directory-excursion "/tmp/libc-abi-tools"
@@ -2000,7 +2002,11 @@ toolchain.  Among other features it provides
                    (dirname (search-input-file
                              (or native-inputs inputs) "list.zig"))
                    ".")
-                  (for-each make-file-writable (find-files "."))
+                  (for-each make-file-writable (find-files ".")))))
+            ;; Added support for more libc implementations.
+            (replace 'install-abilists
+              (lambda _
+                (with-directory-excursion "/tmp/libc-abi-tools"
                   (for-each
                    (lambda (libc)
                      (with-directory-excursion libc
@@ -2018,8 +2024,7 @@ toolchain.  Among other features it provides
        (replace "lld" lld-20)))
     (native-inputs
      (modify-inputs native-inputs
-       (delete "glibc-abi-tool")
-       (prepend zig-0.15-libc-abi-tools)
+       (replace "libc-abi-tools" zig-0.15-libc-abi-tools)
        (replace "llvm" llvm-20)
        (replace "zig" `(,zig-0.14.0-1197 "zig1"))))
     (properties `((max-silent-time . 9600)
@@ -2163,6 +2168,26 @@ toolchain.  Among other features it provides
         (search-patches
          "zig-0.14-use-baseline-cpu-by-default.patch"
          "zig-0.16-fix-runpath.patch"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            ;; Added OpenBSD libc support.
+            (replace 'install-abilists
+              (lambda _
+                (with-directory-excursion "/tmp/libc-abi-tools"
+                  (for-each
+                   (lambda (libc)
+                     (with-directory-excursion libc
+                       (invoke (string-append #$output "/bin/zig")
+                               "run" "consolidate.zig")
+                       (install-file
+                        "abilists"
+                        (string-append #$output "/lib/zig/libc/" libc))))
+                   '("freebsd"
+                     "glibc"
+                     "netbsd"
+                     "openbsd")))))))))
     (inputs
      (modify-inputs inputs
        (replace "clang" clang-21)
