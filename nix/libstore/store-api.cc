@@ -29,10 +29,82 @@ bool isStorePath(const Path & path)
 }
 
 
+bool isStoreName(const string & name, string & problemDescription)
+{
+    const string validChars = "+-._?=";
+    if (name.empty()) {
+        problemDescription = "empty string is not a valid name";
+        return false;
+    }
+    /* Disallow names starting with a dot for possible security
+       reasons (e.g., "." and ".."). */
+    if (name.starts_with(".")) {
+        problemDescription = std::format("invalid name: `{}' (can't begin with dot)",
+                                         name);
+        return false;
+    }
+    for (const auto& i : name)
+        if (!((i >= 'A' && i <= 'Z') ||
+              (i >= 'a' && i <= 'z') ||
+              (i >= '0' && i <= '9') ||
+              validChars.find(i) != string::npos))
+        {
+            problemDescription = std::format("invalid character `{}' in name `{}'",
+                                             i,
+                                             name);
+            return false;
+        }
+    return true;
+}
+
+
+bool isStoreName(const string & name)
+{
+    string problemDescription; /* Placeholder */
+    return isStoreName(name, problemDescription);
+}
+
+
+void checkStoreName(const string & name)
+{
+    string problemDescription;
+    if (!isStoreName(name, problemDescription))
+        throw Error(problemDescription);
+}
+
+
+bool isStoreBasenameStrict(const string & name)
+{
+    /* 1. At least 34 characters long
+       2. First 32 characters are all nix-base32 characters
+       3. 33rd character (index 32) is a dash
+       4. 34th character (index 33) and those following it form a valid store
+          name. */
+    return name.size() >= 34
+        && isHash32(string(name, 0, 32))
+        && name[32] == '-'
+        && isStoreName(string(name, 33));
+}
+
+
+bool isStorePathStrict(const Path & path)
+{
+    return isStorePath(path)
+        && isStoreBasenameStrict(string(path, settings.nixStore.size() + 1));
+}
+
+
 void assertStorePath(const Path & path)
 {
     if (!isStorePath(path))
         throw Error(std::format("path `{}' is not in the store", path));
+}
+
+
+void assertStorePathStrict(const Path & path)
+{
+    if (!isStorePathStrict(path))
+        throw Error(std::format("path `{}' is not a valid store path", path));
 }
 
 
@@ -55,22 +127,7 @@ string storePathToName(const Path & path)
 }
 
 
-void checkStoreName(const string & name)
-{
-    string validChars = "+-._?=";
-    /* Disallow names starting with a dot for possible security
-       reasons (e.g., "." and ".."). */
-    if (name.starts_with("."))
-        throw Error(std::format("invalid name: `{}' (can't begin with dot)", name));
-    for (const auto& i : name)
-        if (!((i >= 'A' && i <= 'Z') ||
-              (i >= 'a' && i <= 'z') ||
-              (i >= '0' && i <= '9') ||
-              validChars.find(i) != string::npos))
-        {
-            throw Error(std::format("invalid character `{}' in name `{}'", i, name));
-        }
-}
+
 
 
 /* Store paths have the following form:
@@ -250,6 +307,28 @@ template<class T> T readStorePaths(Source & from)
     return paths;
 }
 
+
 template PathSet readStorePaths(Source & from);
 
+
+Path readStorePathStrict(Source & from)
+{
+    Path path = readString(from);
+    assertStorePathStrict(path);
+    return path;
 }
+
+
+template<class T> T readStorePathsStrict(Source & from)
+{
+    T paths = readStrings<T>(from);
+    for (auto& i : paths) assertStorePathStrict(i);
+    return paths;
+}
+
+
+template PathSet readStorePathsStrict(Source & from);
+
+}
+
+

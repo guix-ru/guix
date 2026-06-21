@@ -301,6 +301,12 @@ public:
 
 /* Throw an exception if `path' is not directly in the Nix store. */
 void assertStorePath(const Path & path);
+/* Throw an exception if `path' is not a valid path for a store item.  This
+   requires not only that it is directly in the store (like with
+   assertStorePath), but also that it has a valid hash part (32 nix-base32
+   characters) followed by a dash ('-') followed by a valid store name as per
+   isStoreName and checkStoreName. */
+void assertStorePathStrict(const Path & path);
 
 bool isInStore(const Path & path);
 bool isStorePath(const Path & path);
@@ -308,7 +314,19 @@ bool isStorePath(const Path & path);
 /* Extract the name part of the given store path. */
 string storePathToName(const Path & path);
 
+/* Return true iff `name' is a valid name for a store item.  If false is
+   returned, `problemDescription' is set to a string suitable for use in an
+   Error exception. */
+bool isStoreName(const string & name, string & problemDescription);
+bool isStoreName(const string & name);
 void checkStoreName(const string & name);
+
+/* Return true iff `name' is a valid basename for a store item's path, e.g. of
+   the form hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh-NAME, where 'h' represents a
+   nix-base32 character and NAME is a valid store name per isStoreName. */
+bool isStoreBasenameStrict(const string & name);
+/* Return true iff `path' is a valid path for a store item. */
+bool isStorePathStrict(const Path & path);
 
 
 /* Chop off the parts after the top-level store name, e.g.,
