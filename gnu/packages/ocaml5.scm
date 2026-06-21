@@ -1647,6 +1647,9 @@ compilation and linkage, there are new frontends of the various OCaml
 compilers that can directly deal with packages.")
     (license license:x11)))
 
+;; Use this alias for packages built with the default ocaml 5.x compiler.
+(define-public ocaml-findlib ocaml5.4-findlib)
+
 (define-public ocaml5.0-findlib
   (package
     (inherit ocaml5.4-findlib)
