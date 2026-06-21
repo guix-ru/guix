@@ -4000,7 +4000,7 @@ visualization, matrix manipulation.")
          (file-name (git-file-name name version))
          (sha256
           (base32 "0ivc0zhpf0gz55jfj0gbkff6yw5gpwazk94asldzznn7x9jmbb0i"))))
-      (native-inputs (list catch2-3.8))
+      (native-inputs (list catch2))
       (propagated-inputs (list zlib boost heatshrink))
       (build-system cmake-build-system)
       (home-page "https://github.com/prusa3d/libbgcode")
