@@ -2897,7 +2897,7 @@ development, not the kernel implementation of ACPI.")
 (define-public s-tui
   (package
     (name "s-tui")
-    (version "1.3.0")
+    (version "1.4.0")
     (source
      (origin
        (method git-fetch)
@@ -2906,10 +2906,21 @@ development, not the kernel implementation of ACPI.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0yqyndavlskzd0v0cby8v477ivyrpqxd58cn708y46yixz7r14h7"))))
+        (base32 "1aj97xbdv01rsfjkn75g7y26knsyrw5nzr79x14vbixlnpgx6c1w"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases #~(modify-phases %standard-phases
+                   (add-after 'unpack 'patch-/bin/sh
+                     (lambda _
+                       (substitute* (list "s_tui/sources/hook_script.py"
+                                          "tests/test_hooks.py"
+                                          "tests/test_helper_functions.py")
+                         (("/bin/sh") (which "sh"))))))))
     (native-inputs
-     (list python-pytest
+     (list bash-minimal
+           python-pytest
+           python-pytest-mock
            python-setuptools))
     (inputs
      (list python-psutil
