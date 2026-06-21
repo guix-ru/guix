@@ -3762,7 +3762,7 @@ physics engine is just a system for procedural animation.")
                           ;; No video device available.
                           "~[!nonportable]"))))))))
     (native-inputs
-     (list catch2-3.8 pkg-config))
+     (list catch2 pkg-config))
     (inputs
      (list fontconfig lodepng/c sdl3 stb-truetype utf8proc zlib))
     (home-page "https://github.com/libtcod/libtcod")
