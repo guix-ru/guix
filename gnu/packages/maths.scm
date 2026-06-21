@@ -2375,7 +2375,7 @@ Blosc-compressed datasets.")
               "-GNinja")))
     (native-inputs
      (list boost-1.83
-           catch2-3.5
+           catch2
            ninja))
     (inputs
      (list hdf5))
