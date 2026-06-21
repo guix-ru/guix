@@ -17,20 +17,11 @@ static unsigned int refLength = 32; /* characters */
 static void search(const unsigned char * s, unsigned int len,
     StringSet & hashes, StringSet & seen)
 {
-    static bool initialised = false;
-    static bool isBase32[256];
-    if (!initialised) {
-        for (unsigned int i = 0; i < 256; ++i) isBase32[i] = false;
-        for (unsigned int i = 0; i < base32Chars.size(); ++i)
-            isBase32[(unsigned char) base32Chars[i]] = true;
-        initialised = true;
-    }
-
     for (unsigned int i = 0; i + refLength <= len; ) {
         int j;
         bool match = true;
         for (j = refLength - 1; j >= 0; --j)
-            if (!isBase32[(unsigned char) s[i + j]]) {
+            if (base32Values[(unsigned char) s[i + j]] == -1) {
                 i += j + 1;
                 match = false;
                 break;

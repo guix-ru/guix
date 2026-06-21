@@ -17,6 +17,18 @@
 
 namespace nix {
 
+static std::vector<char> getBase32Values()
+{
+    assert(base32Chars.size() <= std::numeric_limits<unsigned char>::max()+1);
+    assert(base32Chars.size() <= std::numeric_limits<char>::max()+1);
+    std::vector<char> values(std::numeric_limits<unsigned char>::max()+1, -1);
+    for (string::size_type j = 0; j < base32Chars.size(); j++)
+        values[(unsigned char) base32Chars[j]] = (char) j;
+    return values;
+}
+
+const std::vector<char> base32Values = getBase32Values();
+
 
 Hash::Hash()
 {
@@ -139,11 +151,10 @@ Hash parseHash32(HashType ht, std::string_view s)
 
     for (unsigned int n = 0; n < len; ++n) {
         char c = s[len - n - 1];
-        unsigned char digit;
-        for (digit = 0; digit < base32Chars.size(); ++digit) /* !!! slow */
-            if (base32Chars[digit] == c) break;
-        if (digit >= 32)
+        char sdigit = base32Values[(unsigned char) c];
+        if (sdigit < 0)
             throw Error(std::format("invalid base-32 hash '{}'", s));
+        unsigned char digit = (unsigned char) sdigit;
         unsigned int b = n * 5;
         unsigned int i = b / 8;
         unsigned int j = b % 8;

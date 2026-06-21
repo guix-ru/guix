@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gcrypt.h>
+#include <limits>
 
 #include "archive.hh"
 #include "types.hh"
@@ -11,6 +12,8 @@ namespace nix {
 
 // omitted: E O U T
 inline const string base32Chars {"0123456789abcdfghijklmnpqrsvwxyz"};
+/* Maps character to value, or -1 if not part of base32 character set. */
+extern const std::vector<char> base32Values;
 
 typedef enum {
     htUnknown = 0,
