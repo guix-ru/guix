@@ -3081,14 +3081,14 @@ features of ls(1), find(1), stat(1) and du(1).")
 (define-public direvent
   (package
     (name "direvent")
-    (version "5.4")
+    (version "5.5")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/direvent/direvent-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "1flmswj1by9afqal55hc70l2hshcawyn0j2if92y6rxb58cwdfqx"))))
+                "1dywdzwzjn1g7cpm2f1mz0iasdhjn0ddhcagkcz6gxz6nfsc05hf"))))
     (build-system gnu-build-system)
     (arguments
      (list #:phases
