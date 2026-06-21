@@ -809,24 +809,9 @@ pattern.")
 a multi-paradigm automated test framework for C++ and Objective-C.")
     (license license:boost1.0)))
 
-(define-public catch2-3.8
-  (package
-    (inherit catch2)
-    (name "catch2")
-    (version "3.8.1")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-         (url "https://github.com/catchorg/Catch2")
-         (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0v1k14n02aiw4rv5sxhc5612cjhkdj59cjpm50qfxhapsdv54n3f"))))))
-
 (define-public catch2-3.5
   (package
-    (inherit catch2-3.8)
+    (inherit catch2)
     (name "catch2")
     (version "3.5.3")
     (source (origin
