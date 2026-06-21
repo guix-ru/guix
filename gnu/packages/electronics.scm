@@ -1298,7 +1298,7 @@ characterization result in a liberty library file.")
 (define-public kicad
   (package
     (name "kicad")
-    (version "10.0.3")
+    (version "10.0.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1306,7 +1306,7 @@ characterization result in a liberty library file.")
                     (commit version)))
               (sha256
                (base32
-                "0ldaj072x16452xw2wszbk20g932rz36zappjrxc4m6ygx298aa3"))
+                "1dp2rcblpz1i5hzrv5kb7cq91agha5msm2slhny3gf8x0gbzmawq"))
               (file-name (git-file-name name version))))
     (build-system cmake-build-system)
     (arguments
@@ -1463,7 +1463,7 @@ package.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "05h8dbygch2kp4s5ikspxngwv999j7jwsiwm4pzwwcrir7dqzdfl"))))
+                "1ns0lg360h3h55w2xv5lyj0qzy6nc1cr02vll95c0vma34rc1qwa"))))
     (build-system cmake-build-system)
     (native-inputs (list python-wrapper))
     (arguments
@@ -1493,7 +1493,7 @@ libraries.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0wdzsn7z11wc5yskk576a4a6qfagsvw0y6r034inxrnfc32aiah9"))))
+                "15cz4lh6dzqdl2cc9nqnpa8bd73h5p33vnvmc4l68js5wqlsyba1"))))
     (synopsis "Official KiCad footprint libraries")
     (description "This package contains the official KiCad footprint libraries.")))
 
@@ -1510,7 +1510,7 @@ libraries.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "01nbjcs3890hyfmafc623ldmfi9n8sjr5m0wripz5fq5fjdnzqxl"))))
+                "0mkc9km540n6ri5is4fjw5abv8afidwj9q7fmbs66l6kx1z3lxky"))))
     (synopsis "Official KiCad 3D model libraries")
     (description "This package contains the official KiCad 3D model libraries.")))
 
