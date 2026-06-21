@@ -3368,7 +3368,7 @@ includes a complete LAPACK implementation.")
                (base32
                 "0xxqjz4lba57vn65m2k5jxrz0v7y6jwnhxwg6njd4vrafv5w17yv"))))
     (native-inputs
-     (list catch2-3.8))
+     (list catch2))
     (build-system cmake-build-system)
     (home-page "https://libsemigroups.github.io/HPCombi/")
     (synopsis "Fast combinatorics in C++ using SSE/AVX instruction sets")
