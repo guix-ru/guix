@@ -2098,6 +2098,30 @@ Knuth’s LR(1) parser construction technique.")
     ;; are QPL licensed.
     (license (list license:gpl2+ license:qpl))))
 
+(define-public ocaml-earley
+  (package
+    (name "ocaml5-earley")
+    (version "3.0.0")
+    (home-page "https://github.com/rlepigre/ocaml-earley")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url (string-append home-page ".git"))
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vi58zdxchpw6ai0bz9h2ggcmg8kv57yk6qbx82lh47s5wb3mz5y"))))
+    (build-system dune-build-system)
+    (propagated-inputs (list ocaml-stdlib-shims))
+    (synopsis "Parsing library based on Earley Algorithm")
+    (description
+     "Earley is a parser combinator library base on Earley's
+algorithm.  It is intended to be used in conjunction with an OCaml syntax
+extension which allows the definition of parsers inside the language.  There
+is also support for writing OCaml syntax extensions in a camlp4 style.")
+    (license license:cecill-b)))
+
 (define-public ocaml-monolith
   (package
     (name "ocaml5-monolith")
