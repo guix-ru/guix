@@ -3,7 +3,7 @@
 ;;; Copyright © 2021 Sarah Morgensen <iskarian@mgsn.dev>
 ;;; Copyright © 2021 Calum Irwin <calumirwin1@gmail.com>
 ;;; Copyright © 2022-2024 Efraim Flashner <efraim@flashner.co.il>
-;;; Copyright © 2023, 2024 Hilton Chain <hako@ultrarare.space>
+;;; Copyright © 2023, 2024, 2026 Hilton Chain <hako@ultrarare.space>
 ;;; Copyright © 2025 dan <i@dan.games>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -217,7 +217,6 @@ toolchain.  Among other features it provides
 
 (define-public zig-0.10
   (package
-    (inherit zig-0.9)
     (name "zig")
     (version "0.10.1")
     (source
@@ -231,49 +230,106 @@ toolchain.  Among other features it provides
          "zig-0.9-use-baseline-cpu-by-default.patch"
          "zig-0.10-use-system-paths.patch"
          "zig-0.10-fix-runpath.patch"))))
+    (build-system cmake-build-system)
     (arguments
-     (substitute-keyword-arguments arguments
-       ((#:tests? _ #t)
-        (not (%current-target-system)))
-       ((#:configure-flags flags ''())
-        #~(cons "-DZIG_SHARED_LLVM=ON"
-                #$flags))
-       ((#:phases phases '%standard-phases)
-        #~(modify-phases #$phases
-            #$@(if (target-riscv64?)
-                   `((delete 'adjust-tests))
-                   '())
-            (add-after 'patch-source-shebangs 'patch-more-shebangs
-              (lambda* (#:key inputs #:allow-other-keys)
-                ;; Zig uses information about an ELF file to determine the
-                ;; version of glibc and other data for native builds.
-                (substitute* "lib/std/zig/system/NativeTargetInfo.zig"
-                  (("/usr/bin/env") (search-input-file inputs "bin/clang++")))))
-            (replace 'check
-              (lambda* (#:key tests? #:allow-other-keys)
-                (when tests?
-                  ;; error(libc_installation): msvc_lib_dir may not be empty for
-                  ;; windows-msvc.
-                  (unsetenv "ZIG_LIBC")
-                  (invoke (string-append #$output "/bin/zig")
-                          "build" "test"
-                          ;; We're not testing the compiler bootstrap chain.
-                          "-Dskip-stage1"
-                          "-Dskip-stage2-tests"
-                          ;; Non-native tests try to link and execute non-native
-                          ;; binaries.
-                          "-Dskip-non-native"))))))))
+     (list
+      #:tests? (not (%current-target-system))
+      #:out-of-source? #f               ;for tests
+      #:configure-flags
+      #~(list (string-append "-DZIG_LIB_DIR=" #$output "/lib/zig")
+              "-DZIG_TARGET_MCPU=baseline"
+              (string-append
+               "-DZIG_TARGET_TRIPLE="
+               (zig-target
+                #$(platform-target
+                   (lookup-platform-by-target-or-system
+                    (or (%current-target-system)
+                        (%current-system))))))
+              "-DZIG_USE_LLVM_CONFIG=ON"
+              "-DZIG_SHARED_LLVM=ON")
+      #:imported-modules
+      (cons '(guix build zig-utils)
+            %cmake-build-system-modules)
+      #:modules
+      (cons '(guix build zig-utils)
+            '((guix build cmake-build-system)
+              (guix build utils)))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'patch-source-shebangs 'patch-more-shebangs
+            (lambda* (#:key inputs #:allow-other-keys)
+              ;; Zig uses information about an ELF file to determine the
+              ;; version of glibc and other data for native builds.
+              (substitute* "lib/std/zig/system/NativeTargetInfo.zig"
+                (("/usr/bin/env") (search-input-file inputs "bin/clang++")))))
+          (add-before 'configure 'zig-configure zig-configure)
+          (delete 'check)
+          (add-after 'install 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                ;; error(libc_installation): msvc_lib_dir may not be empty for
+                ;; windows-msvc.
+                (unsetenv "ZIG_LIBC")
+                (invoke (string-append #$output "/bin/zig")
+                        "build" "test"
+                        ;; We're not testing the compiler bootstrap chain.
+                        "-Dskip-stage1"
+                        "-Dskip-stage2-tests"
+                        ;; Non-native tests try to link and execute non-native
+                        ;; binaries.
+                        "-Dskip-non-native"))))
+          (add-before 'check 'copy-libc-abi-tools
+            (lambda* (#:key inputs native-inputs #:allow-other-keys)
+              (mkdir-p "/tmp/libc-abi-tools")
+              (with-directory-excursion "/tmp/libc-abi-tools"
+                (copy-recursively
+                 (dirname (search-input-file
+                           (or native-inputs inputs) "consolidate.zig"))
+                 ".")
+                (for-each make-file-writable (find-files ".")))))
+          (add-after 'copy-libc-abi-tools 'install-abilists
+            (lambda _
+              (with-directory-excursion "/tmp/libc-abi-tools"
+                (invoke (string-append #$output "/bin/zig")
+                        "run" "consolidate.zig")
+                (install-file
+                 "abilists"
+                 (string-append #$output "/lib/zig/libc/glibc"))))))))
     (inputs
-     (modify-inputs inputs
-       (prepend zlib `(,zstd "lib"))
-       (replace "clang" clang-15)
-       (replace "lld" lld-15)))
+     (list clang-15                     ;Clang propagates llvm.
+           lld-15
+           zlib
+           `(,zstd "lib")))
+    ;; Zig compiles fine with GCC, but also needs native LLVM libraries.
     (native-inputs
-     (modify-inputs native-inputs
-       (replace "libc-abi-tools" zig-0.10-libc-abi-tools)
-       (replace "llvm" llvm-15)))
+     (list llvm-15
+           zig-0.10-libc-abi-tools))
+    (native-search-paths
+     (list $C_INCLUDE_PATH
+           $CPLUS_INCLUDE_PATH
+           $LIBRARY_PATH
+           (search-path-specification
+             (variable "GUIX_ZIG_PACKAGE_PATH")
+             (files '("src/zig")))))
+    (synopsis "General purpose programming language and toolchain")
+    (description "Zig is a general-purpose programming language and
+toolchain.  Among other features it provides
+@itemize
+@item an Optional type instead of null pointers,
+@item manual memory management,
+@item generic data structures and functions,
+@item compile-time reflection and compile-time code execution,
+@item integration with C using zig as a C compiler, and
+@item concurrency via async functions.
+@end itemize")
+    (home-page "https://ziglang.org/")
+    ;; Currently building zig can take up to 10GB of RAM for linking stage1:
+    ;; https://github.com/ziglang/zig/issues/6485
+    (supported-systems %64bit-supported-systems)
+    ;; Stage3 can take a lot of time and isn't verbose.
     (properties `((max-silent-time . 9600)
-                  ,@(clang-compiler-cpu-architectures "15")))))
+                  ,@(clang-compiler-cpu-architectures "15")))
+    (license license:expat)))
 
 
 ;;;
