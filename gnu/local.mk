@@ -2699,11 +2699,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/zed-0.225.10-keep-regular-file-workspaces.patch	\
   %D%/packages/patches/zed-0.225.10-remove-patch-crates-io.patch	\
   %D%/packages/patches/zed-0.225.10-use-mock-livekit-on-linux.patch	\
-  %D%/packages/patches/zig-0.9-build-respect-PKG_CONFIG-env-var.patch	\
-  %D%/packages/patches/zig-0.9-fix-runpath.patch		\
-  %D%/packages/patches/zig-0.9-riscv-support.patch		\
   %D%/packages/patches/zig-0.9-use-baseline-cpu-by-default.patch	\
-  %D%/packages/patches/zig-0.9-use-system-paths.patch		\
   %D%/packages/patches/zig-0.10-build-respect-PKG_CONFIG-env-var.patch	\
   %D%/packages/patches/zig-0.10-fix-runpath.patch		\
   %D%/packages/patches/zig-0.10-use-system-paths.patch		\
