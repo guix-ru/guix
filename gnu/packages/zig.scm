@@ -65,7 +65,7 @@
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/glibc-abi-tool")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "6f992064f821c612f68806422b2780c9260cbc4c")))
     (file-name "glibc-abi-tool")
     (sha256
@@ -188,7 +188,7 @@ toolchain.  Among other features it provides
 @item integration with C using zig as a C compiler, and
 @item concurrency via async functions.
 @end itemize")
-    (home-page "https://github.com/ziglang/zig")
+    (home-page "https://ziglang.org/")
     ;; Currently building zig can take up to 10GB of RAM for linking stage1:
     ;; https://github.com/ziglang/zig/issues/6485
     (supported-systems %64bit-supported-systems)
@@ -201,7 +201,7 @@ toolchain.  Among other features it provides
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/glibc-abi-tool")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "b07bf67ab3c15881f13b9c3c03bcec04535760bb")))
     (file-name "glibc-abi-tool")
     (sha256
@@ -1111,7 +1111,7 @@ toolchain.  Among other features it provides
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/glibc-abi-tool")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "13576b1ea957882be7ff2c99f4cdc27454930219")))
     (file-name "glibc-abi-tool")
     (sha256
@@ -1480,7 +1480,7 @@ toolchain.  Among other features it provides
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/glibc-abi-tool")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
     (file-name "glibc-abi-tool")
     (sha256
@@ -1562,7 +1562,7 @@ toolchain.  Among other features it provides
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/glibc-abi-tool")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "fc5d0a7046b76795e4219f8f168e118ec29fbc53")))
     (file-name "glibc-abi-tool")
     (sha256
@@ -1808,7 +1808,7 @@ toolchain.  Among other features it provides
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/glibc-abi-tool")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "ed9d3bb356413e73b836955e75f399dfb3ec255e")))
     (file-name "glibc-abi-tool")
     (sha256
@@ -1965,7 +1965,7 @@ toolchain.  Among other features it provides
   (origin
     (method git-fetch)
     (uri (git-reference
-          (url "https://github.com/ziglang/libc-abi-tools")
+          (url "https://codeberg.org/ziglang/libc-abi-tools")
           (commit "ec46122c7b8c7854f08e67e108083907d09996f5")))
     (file-name "libc-abi-tools")
     (sha256
