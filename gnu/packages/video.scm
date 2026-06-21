@@ -249,7 +249,7 @@
 (define-public ani-cli
   (package
     (name "ani-cli")
-    (version "4.9")
+    (version "4.14")
     (source
      (origin
        (method git-fetch)
@@ -258,7 +258,7 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0ihiiwxgimf9q6hd4g9xxmxps8ngrwl4vwvd8mymmb7dcjjrwfzg"))))
+        (base32 "0jm26w53nd70dfmkdaia8gqsmly80g1rvjgdyzwirc1xvw68l81v"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -298,6 +298,7 @@
                   grep
                   mpv
                   ncurses
+                  openssl
                   sed
                   yt-dlp))
     (native-search-paths
