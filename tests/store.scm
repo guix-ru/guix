@@ -37,7 +37,9 @@
   #:use-module (guix gexp)
   #:use-module (gnu packages)
   #:use-module (gnu packages bootstrap)
+  #:use-module (ice-9 binary-ports)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 rdelim)
   #:use-module (ice-9 regex)
   #:use-module (rnrs bytevectors)
   #:use-module (rnrs io ports)
@@ -1521,6 +1523,111 @@ System: x86_64-linux~%"
                   (imported (import-paths %store source)))
              (pk 'corrupt-imported imported)
              #f)))))
+
+
+(define* (plain-dump filename contents #:key signed?)
+  (let* ((contents (if (bytevector? contents)
+                       contents
+                       (string->utf8 contents)))
+         (item-dump (call-with-bytevector-output-port
+                     (lambda (port)
+                       (call-with-input-bytevector
+                        contents
+                        (lambda (contents-port)
+                          (write-file-tree #t port
+                                           #:file-type+size (lambda (_)
+                                                              (values 'regular
+                                                                      (bytevector-length
+                                                                       contents)))
+                                           #:file-port (const contents-port))))
+                       (write-int #x4558494e port)  ;%export-magic
+                       (write-string filename port) ;store item
+                       (write-string-list '() port) ;references
+                       (write-string "" port)))))   ;deriver
+    (call-with-bytevector-output-port
+     (lambda (port)
+       (write-int 1 port) ;start
+       (put-bytevector port item-dump)
+       (write-int (if signed? 1 0) port) ;signed
+       (when signed?
+         (let* ((read-canonical-sexp
+                 (compose gcrypt:string->canonical-sexp read-string))
+                (public-key (call-with-input-file %public-key-file
+                              read-canonical-sexp))
+                (private-key (call-with-input-file %private-key-file
+                               read-canonical-sexp)))
+           (write-string (gcrypt:canonical-sexp->string
+                          (signature-sexp
+                           (gcrypt:bytevector->hash-data
+                            (gcrypt:sha256 item-dump)
+                            #:key-type (gcrypt:key-type public-key))
+                           private-key
+                           public-key))
+                         port)))
+       (write-int 0 port)))))
+
+(test-assert "import path not in store, unsigned"
+  ;; error should be produced before the signature is even considered
+  (call-with-input-bytevector
+   (plain-dump (string-append (%store-prefix) "/../../notinstore")
+               (random-text))
+   (lambda (port)
+     (guard (c ((store-protocol-error? c)
+                (pk 'c c)
+                (and (not (zero? (store-protocol-error-status c)))
+                     (let ((message (store-protocol-error-message c)))
+                       (pk 'error-message message)
+                       (or (string-contains message "is not a valid store path")
+                           (string-contains message "is not in the store"))))))
+       (import-paths %store port)
+       #f))))
+
+(test-assert "import path not in store, signed"
+  (call-with-input-bytevector
+   (plain-dump (string-append (%store-prefix) "/../../notinstore")
+               (random-text))
+   (lambda (port)
+     (guard (c ((store-protocol-error? c)
+                (pk 'c c)
+                (and (not (zero? (store-protocol-error-status c)))
+                     (let ((message (store-protocol-error-message c)))
+                       (pk 'error-message message)
+                       (or (string-contains message "is not a valid store path")
+                           (string-contains message "is not in the store"))))))
+       (import-paths %store port)
+       #f))))
+
+(test-assert "import invalid path, unsigned"
+  ;; error should be produced before the signature is even considered
+  (call-with-input-bytevector
+   (plain-dump  (string-append (%store-prefix)
+                               "/!@#$%^&*()_+=-[]{}\\|';:,<>.")
+                (random-text))
+   (lambda (port)
+     (guard (c ((store-protocol-error? c)
+                (pk 'c c)
+                (and (not (zero? (store-protocol-error-status c)))
+                     (let ((message (store-protocol-error-message c)))
+                       (pk 'error-message message)
+                       (string-contains message "is not a valid store path")))))
+       (import-paths %store port)
+       #f))))
+
+(test-assert "import invalid path, signed"
+  (call-with-input-bytevector
+   (plain-dump  (string-append (%store-prefix)
+                               "/!@#$%^&*()_+=-[]{}\\|';:,<>.")
+                (random-text)
+                #:signed? #t)
+   (lambda (port)
+     (guard (c ((store-protocol-error? c)
+                (pk 'c c)
+                (and (not (zero? (store-protocol-error-status c)))
+                     (let ((message (store-protocol-error-message c)))
+                       (pk 'error-message message)
+                       (string-contains message "is not a valid store path")))))
+       (import-paths %store port)
+       #f))))
 
 (test-assert "verify-store"
   (let* ((text  (random-text))

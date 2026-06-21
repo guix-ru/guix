@@ -1340,12 +1340,16 @@ Path LocalStore::importPath(bool requireSignature, Source & source)
     if (magic != EXPORT_MAGIC)
         throw Error("normalized archive cannot be imported; wrong format");
 
-    Path dstPath = readStorePath(hashAndReadSource);
+    /* The path being imported must at least be syntactically valid.  This
+     * doesn't guarantee that it can be constructed by some existing method,
+     * but it at least rules out paths like "/gnu/store/nix-12982-1" or
+     * "/gnu/store/." or "/gnu/store/..". */
+    Path dstPath = readStorePathStrict(hashAndReadSource);
 
-    PathSet references = readStorePaths<PathSet>(hashAndReadSource);
+    PathSet references = readStorePathsStrict<PathSet>(hashAndReadSource);
 
     Path deriver = readString(hashAndReadSource);
-    if (deriver != "") assertStorePath(deriver);
+    if (deriver != "") assertStorePathStrict(deriver);
 
     Hash hash = hashAndReadSource.hashSink.finish().first;
     hashAndReadSource.hashing = false;
