@@ -1705,7 +1705,7 @@ network-transparent printing system.")
 (define-public xcffibgen
   (package
     (name "xcffibgen")
-    (version "1.4.0")
+    (version "1.12.0")
     (source
      (origin
        (method git-fetch)
@@ -1714,8 +1714,17 @@ network-transparent printing system.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0wz6zlaqsmpw7ahaadpd7m5n5c5b2ya30xwsana4j5ljygdvzqp9"))))
+        (base32 "0x92lfrk7qgfkysy00af2b3lbdqnjkg6rshfxpjbyr33yll0nnbn"))))
     (build-system haskell-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-requirements
+            (lambda _
+              (substitute* "xcffib.cabal"
+                (("(filepath|containers|bytestring).*$" all lib)
+                 (string-append lib ",\n"))))))))
     (native-inputs
      (list ghc-hunit ghc-test-framework ghc-test-framework-hunit))
     (inputs
@@ -1739,16 +1748,18 @@ generate code for the @code{python-xcbffib} package.")
 (define-public python-xcffib
   (package
     (name "python-xcffib")
-    (version "1.5.0")
+    (version (package-version xcffibgen))
     (source (package-source xcffibgen))
     (build-system pyproject-build-system)
     (native-inputs
      (list pkg-config
+           python-pytest
            python-setuptools
-           python-wheel
            which
            xcb-proto
-           xcffibgen))
+           xcffibgen
+           xeyes
+           xorg-server-for-tests))
     (inputs
      (list libxcb))
     (propagated-inputs
@@ -1756,8 +1767,6 @@ generate code for the @code{python-xcbffib} package.")
            python-six))
     (arguments
      (list
-      ;; Tests seem to require version 3.12 of Python.
-      #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'build 'generate-bindings
@@ -1765,7 +1774,9 @@ generate code for the @code{python-xcbffib} package.")
               (substitute* "Makefile"
                 (("^GEN=.*")
                  (format #f "GEN=~a~%"
-                         (search-input-file inputs "/bin/xcffibgen"))))
+                         (search-input-file inputs "/bin/xcffibgen")))
+                ((".*ruff.*")
+                 ""))
               (invoke "make" "xcffib")))
           (add-before 'build 'fix-libxcb-path
             (lambda* (#:key inputs #:allow-other-keys)
