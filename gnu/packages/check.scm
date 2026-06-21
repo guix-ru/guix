@@ -3430,9 +3430,11 @@ with a focus on working with embedded toolchains.")
                          (target-riscv64?)
                          (target-hurd?))
                      #~((setenv "FAKETIME_COMPILE_CFLAGS"
-                                "-DFORCE_MONOTONIC_FIX -DFORCE_PTHREAD_NONVER"))
+                                "-DFORCE_MONOTONIC_FIX -DFORCE_PTHREAD_NONVER \
+-Wno-error=discarded-qualifiers"))
                      #~((setenv "FAKETIME_COMPILE_CFLAGS"
-                                "-DFORCE_MONOTONIC_FIX")))))
+                                "-DFORCE_MONOTONIC_FIX \
+-Wno-error=discarded-qualifiers")))))
           (add-before 'check 'pre-check
             (lambda _
               (substitute* "test/functests/test_exclude_mono.sh"
