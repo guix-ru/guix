@@ -6963,7 +6963,7 @@ intended for use with event loops such as async.")
 (define-public ruby-tilt
   (package
     (name "ruby-tilt")
-    (version "2.2.0")
+    (version "2.7.0")
     (source
      (origin
        (method git-fetch)               ;the distributed gem lacks tests
@@ -6972,7 +6972,7 @@ intended for use with event loops such as async.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "056zm4vzx9xjwl7zgmb17hzb91qx5cvzk60wvsxchfybvl03gn5d"))))
+        (base32 "1yzf4mgnypb2dxj1jw08qli01pnczyafgb7akjgl131i96zpdg03"))))
     (build-system ruby-build-system)
     (arguments
      (list
@@ -6981,10 +6981,31 @@ intended for use with event loops such as async.")
           (add-before 'check 'set-SASS_IMPLEMENTATION
             (lambda _
               (setenv "SASS_IMPLEMENTATION" "sassc"))))))
-    (propagated-inputs
-     (list ruby-pandoc-ruby ruby-sassc))
     (native-inputs
-     (list bundler ruby-yard ruby-builder ruby-erubis ruby-markaby))
+     ;; Optional test dependencies which causes dependency cycles:
+     ;; - ruby-haml: tilt -> ruby-haml -> tilt
+     ;; - ruby-slim: tilt -> ruby-sinatra -> ruby-slim -> tilt
+     ;; Missing optional dependencies:
+     ;; - babel/transpiler by tilt/babel
+     ;; - coffee_script    by tilt/coffee
+     ;; - commonmarker     by tilt/commonmarker
+     ;; - livescript       by tilt/livescript
+     ;; - radius           by tilt/radius
+     ;; - typescript-node  by tilt/typescript
+     (list ruby-asciidoctor/minimal
+           ruby-builder
+           ruby-erubi
+           ruby-kramdown
+           ruby-liquid
+           ruby-markaby
+           ruby-nokogiri
+           ruby-pandoc-ruby
+           ruby-prawn
+           ruby-rdiscount
+           ruby-redcarpet
+           ruby-redcloth
+           ruby-sass
+           ruby-yajl-ruby))
     (synopsis "Generic interface to multiple Ruby template engines")
     (description
      "Tilt is a thin interface over a number of different Ruby template
