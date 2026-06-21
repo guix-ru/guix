@@ -6153,6 +6153,47 @@ manipulate such data.")
     ;; against the library to be released under any terms.
     (license license:lgpl2.1)))
 
+(define-public ocaml-camlpdf
+  (package
+    (name "ocaml5-camlpdf")
+    (version "2.9.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/johnwhitington/camlpdf")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0as85qdci3wkbsirsdkjb7qzl49ifc3rydp6rj4fivgnhkmncw3z"))))
+    (build-system ocaml-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests
+      #:make-flags
+      #~(list (string-append "CC="
+                             #$(cc-for-target)))
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (add-after 'unpack 'patch-makefile-shell
+            (lambda _
+              (patch-makefile-SHELL "OCamlMakefile")))
+          (add-after 'install 'install-doc
+            (lambda _
+              (let ((doc (string-append #$output "/share/doc/"
+                                        #$name "-"
+                                        #$version)))
+                (copy-recursively "doc/camlpdf/html"
+                                  (string-append doc "/html"))))))))
+    (home-page "https://github.com/johnwhitington/camlpdf")
+    (synopsis "OCaml library for PDF file manipulation")
+    (description
+     "CamlPDF is an OCaml library that provides functionality for reading,
+writing, and modifying PDF files.  It serves as the foundation for the
+@command{cpdf} command-line tool and various API bindings.")
+    (license license:lgpl2.1+)))
+
 (define-public ocaml-benchmark
   (package
     (name "ocaml5-benchmark")
