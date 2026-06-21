@@ -670,38 +670,8 @@ interface.")
 formats.")
       (license license:expat))))
 
-(define-public zig-zls-0.10
-  (package
-    (name "zig-zls")
-    (version "0.10.0")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/zigtools/zls")
-                    (commit version)
-                    (recursive? #t)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "1lsks7h3z2m4psyn9mwdylv1d6a9i3z54ssadiz76w0clbh8ch9k"))))
-    (build-system zig-build-system)
-    (inputs (list zig-0.10 python))
-    (arguments
-     (list #:zig zig-0.10
-           #:install-source? #f
-           #:zig-release-type "safe"
-           ;; The tests fail with memory leaks.
-           #:tests? #f))
-    (synopsis "Zig language server")
-    (description
-     "Zig Language Server is a language server implementing the @acronym{LSP,
-Language Server Protocol} for the Zig programming language.")
-    (home-page "https://github.com/zigtools/zls")
-    (license license:expat)))
-
 (define-public zig-zls-0.12
   (package
-    (inherit zig-zls-0.10)
     (name "zig-zls")
     (version "0.12.0")
     (source
@@ -733,7 +703,13 @@ Language Server Protocol} for the Zig programming language.")
              #:zig-test-flags
              #~(list #$version-data-path))))
     (inputs (list zig-diffz zig-known-folders))
-    (native-inputs (list zig-0.12))))
+    (native-inputs (list zig-0.12))
+    (synopsis "Zig language server")
+    (description
+     "Zig Language Server is a language server implementing the @acronym{LSP,
+Language Server Protocol} for the Zig programming language.")
+    (home-page "https://github.com/zigtools/zls")
+    (license license:expat)))
 
 (define-public zig-zls-0.13
   (let ((base zig-zls-0.12))
