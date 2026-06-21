@@ -7013,6 +7013,13 @@ engines in an attempt to make their usage as generic as possible.")
     (home-page "https://github.com/rtomayko/tilt/")
     (license license:expat)))
 
+(define-public ruby-tilt/minimal
+  (hidden-package
+    (package
+      (inherit ruby-tilt)
+      (arguments (list #:tests? #f))
+      (native-inputs (list))))); clear out for minimal build
+
 (define-public ruby-thread-safe
   (package
     (name "ruby-thread-safe")
