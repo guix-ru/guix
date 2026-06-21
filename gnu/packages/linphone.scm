@@ -66,13 +66,13 @@
 (define-public bcunit
   (package
     (name "bcunit")
-    (version "5.3.101")
+    (version "5.4.118")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://gitlab.linphone.org/BC/public/bcunit.git")
-             (commit version)))
+              (url "https://gitlab.linphone.org/BC/public/bcunit.git")
+              (commit version)))
        (file-name (git-file-name name version))
        (sha256
         (base32 "0rpkc9bjlf370p5fsrbp9b481zakdndmfxyg5vwza0a9z19f81vb"))))
