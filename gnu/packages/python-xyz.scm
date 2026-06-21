@@ -29,7 +29,7 @@
 ;;; Copyright © 2016-2023 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2016, 2017, 2021, 2022 Stefan Reichör <stefan@xsteve.at>
 ;;; Copyright © 2016, 2017, 2019 Alex Vong <alexvong1995@gmail.com>
-;;; Copyright © 2016–2018, 2021–2024 Arun Isaac <arunisaac@systemreboot.net>
+;;; Copyright © 2016–2018, 2021–2024, 2026 Arun Isaac <arunisaac@systemreboot.net>
 ;;; Copyright © 2016, 2017, 2018, 2020, 2021 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2016–2022 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2016, 2017 Thomas Danckaert <post@thomasdanckaert.be>
@@ -24214,7 +24214,15 @@ JPEG2000 and GIF files in pure Python.")
               ;; pip: command not found
               (substitute* "test/test.py"
                 (("def test_console_script")
-                 "def __disable_test_console_script")))))))
+                 "def __disable_test_console_script"))))
+          ;; Disable tests that fail with zsh 5.9.1. See
+          ;; https://github.com/kislyuk/argcomplete/issues/544
+          (add-before 'check 'disable-failing-zsh-tests
+            (lambda _
+              (substitute* "test/test.py"
+                (("def (test_python_completion|test_python_filename_completion|test_python_module|test_python_not_executable)" all)
+                 (string-append "@unittest.skip(\"fails with zsh 5.9.1\")\n    "
+                                all))))))))
     (native-inputs
      (list python-hatch-vcs
            python-hatchling
