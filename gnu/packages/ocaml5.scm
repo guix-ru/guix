@@ -50,6 +50,8 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages ocaml5)
+  #:use-module (gnu packages)
+  #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages curl)
@@ -77,7 +79,8 @@
   #:use-module (gnu packages web)
   #:use-module (gnu packages xorg)
   #:use-module ((guix build-system dune)
-                #:select ((ocaml5-dune-build-system . dune-build-system)))
+                #:select ((ocaml5-dune-build-system . dune-build-system)
+                          %dune-build-system-modules))
   #:use-module ((guix build-system ocaml)
                 #:select ((ocaml5-build-system . ocaml-build-system)))
   #:use-module (guix build-system gnu)
@@ -2143,6 +2146,56 @@ testing by using the @code{afl-fuzz} tool.")
 that involve memoization and recursion.")
     ;; With static-linking exception
     (license license:lgpl2.0)))
+
+(define-public ocaml-stdcompat
+  (package
+    (name "ocaml5-stdcompat")
+    (version "21.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/thierry-martinez/stdcompat")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (modules '((guix build utils)))
+       (snippet
+        #~(for-each delete-file
+                    '("Makefile.in" "configure")))
+       ;; This patch makes the latest release compatible with OCaml 5.4 in the
+       ;; sense that all existing compatibility shims will now compile. It
+       ;; does not backport OCaml 5.4 features to older compilers. See
+       ;; https://github.com/ocamllibs/stdcompat/issues/62.
+       (patches (search-patches "ocaml5-stdcompat21.1-ocaml5.4-compat.patch"))
+       (sha256
+        (base32 "15b36cl1w9x26vbwn6bfkqv9w3ciwb357xasd0hchwycn35s9nm6"))))
+    (build-system dune-build-system)
+    (arguments
+     (list
+      #:imported-modules `((guix build gnu-build-system)
+                           ,@%dune-build-system-modules)
+      #:modules '((guix build dune-build-system)
+                  ((guix build gnu-build-system)
+                   #:prefix gnu:)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'bootstrap
+            (assoc-ref gnu:%standard-phases
+                       'bootstrap))
+          (add-before 'build 'prepare-build
+            (lambda _
+              (let ((bash (which "bash")))
+                (setenv "CONFIG_SHELL" bash)
+                (setenv "SHELL" bash)))))))
+    (native-inputs (list autoconf automake ocaml ocaml-findlib))
+    (home-page "https://github.com/thierry-martinez/stdcompat")
+    (synopsis "Compatibility module for OCaml standard library")
+    (description
+     "This package provides a compatibility module for the OCaml standard library.
+It allows programs to use some recent additions to the standard library while
+preserving the ability to be compiled on former versions of OCaml.")
+    (license license:bsd-2)))
 
 (define-public ocaml-base
   (package
