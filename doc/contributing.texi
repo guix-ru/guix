@@ -2262,27 +2262,15 @@ patch submissions and topic branches.
 @menu
 * The Issue Tracker::           The official bug and patch tracker.
 * Managing Patches and Branches::  How changes to Guix are managed.
-* Debbugs User Interfaces::     Ways to interact with Debbugs.
 * Cuirass Build Notifications::  Be alerted of any breakage via RSS feeds.
 @end menu
 
 @node The Issue Tracker
 @subsection The Issue Tracker
 
-@cindex email workflow, deprecated
-@cindex issue tracker, for the email workflow
-@cindex Debbugs, issue tracking system
 Bug reports (@dfn{issues}) and patch submissions (@dfn{pull requests})
 are currently tracked at the @uref{https://codeberg.org/guix/guix,
 project's home at Codeberg}.
-
-Before January 1st, 2026, bug reports and patches were tracked using the
-Debbugs instance at @uref{https://bugs.gnu.org}, which can also be
-browsed at @uref{https://issues.guix.gnu.org}.  This has been
-discontinued and Codeberg is now the sole option to report new bugs and
-propose new changes@footnote{Check out
-@uref{https://codeberg.org/guix/guix-consensus-documents/src/branch/main/002-codeberg.md,
-Guix Consensus Document 002} for details on this decision.}.
 
 @node Managing Patches and Branches
 @subsection Managing Patches and Branches
@@ -2389,203 +2377,6 @@ that are ready to be merged.  When the branch is no longer a work in
 progress, it should be renamed, with the @samp{wip-} prefix removed, and
 only then should the merge requests be created, as documented earlier.
 
-@node Debbugs User Interfaces
-@subsection Debbugs User Interfaces
-
-@quotation Warning
-This section is about bug reports and patches sent by email to
-@uref{https://issues.guix.gnu.org, Debbugs}, which is discontinued.
-Since January 1st, 2026, bug reports and patches are submitted as issues
-and pull requests on @uref{https://codeberg.org/guix/guix, Codeberg}.
-@xref{Submitting Patches}, for more info.
-@end quotation
-
-@subsubsection Web interface
-
-@cindex mumi, web interface for issues
-A web interface (actually @emph{two} web interfaces!) are available to
-browse issues:
-
-@itemize
-@item
-@url{https://issues.guix.gnu.org} provides a pleasant interface powered
-by mumi@footnote{Mumi is a nice piece of software written in Guile, and
-you can help!  See
-@url{https://codeberg.org/guix/mumi}.} to browse bug
-reports and patches, and to participate in discussions; mumi also has a
-command-line interface as we will see below;
-@item
-@url{https://bugs.gnu.org/guix} lists bug reports;
-@item
-@url{https://bugs.gnu.org/guix-patches} lists patch submissions.
-@end itemize
-
-To view discussions related to issue number @var{n}, go to
-@indicateurl{https://issues.guix.gnu.org/@var{n}} or
-@indicateurl{https://bugs.gnu.org/@var{n}}.
-
-@subsubsection Command-Line Interface
-
-@cindex mumi command-line interface
-@cindex mumi am
-@cindex mumi compose
-@cindex mumi send-email
-@cindex mumi www
-Mumi also comes with a command-line interface that can be used to search
-existing issues, open new issues, compose replies, apply and send
-patches.  You do not need to use Emacs to use the mumi command-line
-client.  You interact with it only on the command-line.
-
-To use the mumi command-line interface, navigate to a local clone of the
-Guix git repository, and drop into a shell with mumi, git and
-git:send-email installed.
-
-@example
-$ cd guix
-~/guix$ guix shell mumi git git:send-email
-@end example
-
-To search for issues, say all open issues about "zig", run
-
-@example
-~/guix [env]$ mumi search zig is:open
-
-#60889 Add zig-build-system
-opened on 17 Jan 17:37 Z by Ekaitz Zarraga
-#61036 [PATCH 0/3] Update zig to 0.10.1
-opened on 24 Jan 09:42 Z by Efraim Flashner
-#39136 [PATCH] gnu: services: Add endlessh.
-opened on 14 Jan 2020 21:21 by Nicol? Balzarotti
-#60424 [PATCH] gnu: Add python-online-judge-tools
-opened on 30 Dec 2022 07:03 by gemmaro
-#45601 [PATCH 0/6] vlang 0.2 update
-opened on  1 Jan 2021 19:23 by Ryan Prior
-@end example
-
-Pick an issue and make it the "current" issue.
-
-@example
-~/guix [env]$ mumi current 61036
-
-#61036 [PATCH 0/3] Update zig to 0.10.1
-opened on 24 Jan 09:42 Z by Efraim Flashner
-@end example
-
-Once an issue is the current issue, you can open the issue in a web
-browser, compose replies, apply patches, send patches, etc. with short
-succinct commands.
-
-Open the issue in your web browser using
-
-@example
-~/guix [env]$ mumi www
-@end example
-
-Compose a reply using
-
-@example
-~/guix [env]$ mumi compose
-@end example
-
-Compose a reply and close the issue using
-
-@example
-~/guix [env]$ mumi compose --close
-@end example
-
-@command{mumi compose} opens your mail client by passing @samp{mailto:}
-URIs to @command{xdg-open}.  So, you need to have @command{xdg-open} set
-up to open your mail client correctly.
-
-Apply the latest patchset from the issue using
-
-@example
-~/guix [env]$ mumi am
-@end example
-
-You may also apply a patchset of a specific version (say, v3) using
-
-@example
-~/guix [env]$ mumi am v3
-@end example
-
-Or, you may apply a patch from a specific e-mail message.  For example,
-to apply the patch from the 4th message (message index starts from 0),
-run
-
-@example
-~/guix [env]$ mumi am @@4
-@end example
-
-@command{mumi am} is a wrapper around @command{git am}.  You can pass
-@command{git am} arguments to it after a @samp{--}.  For example, to add
-a Signed-off-by trailer, run
-
-@example
-~/guix [env]$ mumi am -- -s
-@end example
-
-Create and send patches to the issue using
-
-@example
-~/guix [env]$ git format-patch origin/master
-~/guix [env]$ mumi send-email foo.patch bar.patch
-@end example
-
-Note that you do not have to pass in @samp{--to} or @samp{--cc}
-arguments to @command{git format-patch}.  @command{mumi send-email} will
-put them in correctly when sending the patches.
-
-To open a new issue, run
-
-@example
-~/guix [env]$ mumi new
-@end example
-
-and send an email (using @command{mumi compose}) or patches (using
-@command{mumi send-email}).
-
-@command{mumi send-email} is really a wrapper around @command{git
-send-email} that automates away all the nitty-gritty of sending patches.
-It uses the current issue state to automatically figure out the correct
-@samp{To} address to send to, other participants to @samp{Cc}, headers
-to add, etc.
-
-Also note that, unlike @command{git send-email}, @command{mumi
-send-email} works perfectly well with single and multiple patches alike.
-It automates away the debbugs dance of sending the first patch, waiting
-for a response from debbugs and sending the remaining patches.  It does
-so by sending the first patch, polling the server for a response, and
-then sending the remaining patches.  This polling can unfortunately take
-a few minutes.  So, please be patient.
-
-@subsubsection Emacs Interface
-
-If you use Emacs, you may find it more convenient to interact with
-issues using @file{debbugs.el}, which you can install with:
-
-@example
-guix install emacs-debbugs
-@end example
-
-For example, to list all open issues on @code{guix-patches}, hit:
-
-@example
-@kbd{C-u} @kbd{M-x} debbugs-gnu @kbd{RET} @kbd{RET} guix-patches @kbd{RET} n y
-@end example
-
-For a more convenient (shorter) way to access both the bugs and patches
-submissions, you may want to configure the
-@code{debbugs-gnu-default-packages} and
-@code{debbugs-gnu-default-severities} Emacs variables (@pxref{Minor
-Mode,,, debbugs-ug, The Debbugs User Guide}).
-
-To search for bugs, @samp{@kbd{M-x} debbugs-gnu-guix-search} can be
-used.
-
-@xref{Top,,, debbugs-ug, Debbugs User Guide}, for more information on
-this nifty tool!
-
 @node Cuirass Build Notifications
 @subsection Cuirass Build Notifications
 
@@ -2680,24 +2471,6 @@ description: A group of mentors who chaperone contributions by newcomers.
 members:
 + Charlie Smith <charlie@@example.org>
 @dots{}
-@end example
-
-@cindex mentoring
-You can run the following command to have the Mentors team put in
-CC of a patch series:
-
-@example
-$ git send-email --to=@var{ISSUE_NUMBER}@@debbugs.gnu.org \
-  --header-cmd='etc/teams.scm cc-mentors-header-cmd' *.patch
-@end example
-
-The appropriate team or teams can also be inferred from the modified
-files.  For instance, if you want to send the two latest commits of the
-current Git repository to review, you can run:
-
-@example
-$ guix shell -D guix
-[env]$ git send-email --to=@var{ISSUE_NUMBER}@@debbugs.gnu.org -2
 @end example
 
 @cindex teams, on Codeberg

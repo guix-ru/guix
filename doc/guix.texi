@@ -307,7 +307,7 @@ Package Management
 Substitutes
 
 * Official Substitute Servers::  One particular source of substitutes.
-* Volunteer Run Mirrors::        Additional, regional sources of substitutes.
+* Volunteer Run Mirrors::       Additional, regional sources of substitutes.
 * Substitute Server Authorization::  How to enable or disable substitutes.
 * Getting Substitutes from Other Servers::  Substitute diversity.
 * Substitute Authentication::   How Guix verifies substitutes.
@@ -3993,7 +3993,7 @@ also result from derivation builds, can be available as substitutes.
 
 @menu
 * Official Substitute Servers::  One particular source of substitutes.
-* Volunteer Run Mirrors::  Additional, regional sources of substitutes.
+* Volunteer Run Mirrors::       Additional, regional sources of substitutes.
 * Substitute Server Authorization::  How to enable or disable substitutes.
 * Getting Substitutes from Other Servers::  Substitute diversity.
 * Substitute Authentication::   How Guix verifies substitutes.
