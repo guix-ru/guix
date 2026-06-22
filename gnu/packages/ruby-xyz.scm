@@ -3624,7 +3624,7 @@ failure.")
     (arguments
      (list #:tests? #f)) ; No included tests
     (propagated-inputs
-     (list ruby-thor ruby-tilt ruby-temple))
+     (list ruby-thor ruby-tilt/minimal ruby-temple))
     (synopsis "Haml is a Ruby library to generate HTML documents")
     (description
      "@acronym{Haml, HTML Abstraction Markup Language} is a layer on top of
