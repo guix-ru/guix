@@ -4629,7 +4629,7 @@ localization.")
                  (lambda* (#:key tests? #:allow-other-keys)
                    (when tests?
                      (invoke "rspec")))))))
-    (native-inputs (list ruby-bacon ruby-erubi ruby-rspec ruby-tilt))
+    (native-inputs (list ruby-bacon ruby-erubi ruby-rspec ruby-tilt/minimal))
     (synopsis "Template compilation framework in Ruby")
     (description "Temple is an abstraction and framework for compiling
 templates to pure Ruby.")
