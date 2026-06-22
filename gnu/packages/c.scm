@@ -157,6 +157,38 @@ data structure with good performance characteristics for concatenation and
 slicing.")
      (license license:boost1.0))))
 
+(define-public c-sbsv
+  (package
+    (name "c-sbsv")
+    (version "0.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/hsh814/sbsv")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1xzx0xhikwqvmzdbhprzljfvnxznr3an3jf0v07hwkixvh80s4f5"))
+       (modules '((guix build utils)))
+       (snippet #~(begin                ;remove the separate Python library
+                    (delete-file-recursively "sbsv")
+                    (delete-file-recursively "tests")
+                    (delete-file "pyproject.toml")
+                    (delete-file "uv.lock")))))
+    (build-system cmake-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'change-directory
+                 (lambda _ (chdir "libsbsv"))))))
+    (home-page "https://github.com/hsh814/sbsv")
+    (synopsis "Square bracket separated values")
+    (description
+     "This C library provides a schema-driven structured log data format
+for the ease of writing and parsing.")
+    (license license:expat)))
+
 (define-public c-siphash
   (package
     (name "c-siphash")
