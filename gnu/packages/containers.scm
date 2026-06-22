@@ -124,6 +124,37 @@
 archives as created by Podman, CRI-O and containerd.")
     (license license:asl2.0)))
 
+(define-public go-github-com-containerd-aufs
+  (package
+    (name "go-github-com-containerd-aufs")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/containerd/aufs")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jyyyf6sr910m602axmp4h4j1l2n680cpp60z09pvprz55zi4ba0"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t  ;source only package
+      #:tests? #f
+      #:import-path "github.com/containerd/aufs"))
+    (propagated-inputs
+     (list ;; go-github-com-containerd-containerd       ; cycles
+           go-github-com-containerd-continuity
+           go-github-com-pkg-errors
+           go-golang-org-x-sys))
+    (home-page "https://github.com/containerd/aufs")
+    (synopsis "AUFS snapshotter containerd v1")
+    (description
+     "This package provides an @acronym{Advanced multi-layered Unification
+FilesyStem, AUFS} implementation of the snapshot interface for containerd.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-containerd-containerd-v2
   (package
     (name "go-github-com-containerd-containerd-v2")
