@@ -48,6 +48,7 @@
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages image)
+  #:use-module (gnu packages image-processing)
   #:use-module (gnu packages maths)
   #:use-module (gnu packages ncurses)
   #:use-module (gnu packages onc-rpc)
@@ -301,6 +302,68 @@ went to university in the 1990s, this is the library for you.")
     (name "guile2.2-charting")
     (inputs (list guile-2.2))
     (propagated-inputs (list guile2.2-cairo))))
+
+(define-public matplotplusplus
+  (package
+    (name "matplotplusplus")
+    (version "1.2.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/alandefreitas/matplotplusplus")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils))
+            (for-each delete-file-recursively
+                      '("source/3rd_party/cimg"
+                        "source/3rd_party/nodesoup"))))
+       (sha256
+        (base32 "0cvz8h8hsj6gavcx1wgda39yi2m3csz4bvpn82rbqzc9ilf8z0dy"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'patch-sh-path
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (substitute* "source/matplot/util/popen.cpp"
+                     (("/bin/sh")
+                      (search-input-file inputs "bin/sh"))))))
+           #:configure-flags
+           #~(list "-DMATPLOTPP_WITH_SYSTEM_NODESOUP=ON"
+                   "-DMATPLOTPP_WITH_SYSTEM_CIMG=ON"
+                   "-DMATPLOTPP_BUILD_EXAMPLES=ON"
+                   "-DMATPLOTPP_BUILD_EXAMPLES_WITH_ADD_TEST=ON"
+                   "-DMATPLOTPP_BUILD_TESTS=ON"
+                   "-DMATPLOT_BUILD_FOR_DOCUMENTATION_IMAGES=ON"
+                   ;;TODO: build with experimental opengl backend.
+                   "-DMATPLOTPP_BUILD_EXPERIMENTAL_OPENGL_BACKEND=OFF"
+                   (string-append "-DNODESOUP_INCLUDE_DIR="
+                                  #$(this-package-input "nodesoup")
+                                  "/include/nodesoup"))))
+    (native-inputs (list cimg
+                         gnuplot))
+    (inputs (list bash-minimal
+                  fftw
+                  gnuplot
+                  ijg-libjpeg
+                  lapack
+                  libpng
+                  libtiff
+                  nodesoup
+                  openblas
+                  opencv
+                  zlib))
+    (home-page "https://alandefreitas.github.io/matplotplusplus")
+    (synopsis "C++ graphics library for data visualization")
+    (description "Matplot++ is a graphics library for data visualization that provides
+interactive plotting, means for exporting plots in high-quality formats for scientific
+publications, a compact syntax consistent with similar libraries, dozens of plot
+categories with specialized algorithms, multiple coding styles, and supports generic
+backends.")
+    (license license:expat)))
 
 (define-public ploticus
   (package
