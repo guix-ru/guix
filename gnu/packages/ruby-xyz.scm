@@ -1137,7 +1137,7 @@ under the hood.")
     (native-inputs
      (list ruby-rack-test ruby-minitest ruby-sinatra ruby-kramdown))
     (propagated-inputs
-     (list ruby-temple ruby-tilt))
+     (list ruby-temple ruby-tilt/minimal))
     (synopsis "Minimalist template language for Ruby")
     (description "Slim is a template language for Ruby that aims to reduce the
 syntax to the minimum while remaining clear.")
