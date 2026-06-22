@@ -11691,22 +11691,25 @@ Call}.")
 (define-public go-github-com-jellydator-ttlcache-v3
   (package
     (name "go-github-com-jellydator-ttlcache-v3")
-    (version "3.4.0")
+    ;; 3.4.0 (2025-06-17), the latest changes provide fix for
+    ;; <https://github.com/jellydator/ttlcache/issues/207>.
+    (properties '((commit . "87a96cbf94c3d009ac14d8f5747efb7239dc5631")
+                  (revision . "0")))
+    (version (git-version "3.4.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/jellydator/ttlcache")
-              (commit (string-append "v" version))))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0c7k99d0km5vplfikb58j2wbriy3mzzrrfrc0d85x50km0y4g4ln"))))
+        (base32 "1z9si2sdq0xxq9vwlm4z58c43aypqs4d50kx03ghrnj46qkzl7d5"))))
     (build-system go-build-system)
     (arguments
      (list
-      ;; Remove when a fresh version is released.
-      ;; See: <https://github.com/jellydator/ttlcache/issues/207>.
-      #:go go-1.24
       #:import-path "github.com/jellydator/ttlcache/v3"
       #:phases
       #~(modify-phases %standard-phases
