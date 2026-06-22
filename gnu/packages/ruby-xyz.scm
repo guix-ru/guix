@@ -5256,25 +5256,19 @@ definitions on a Ruby object.")
 (define-public ruby-redcarpet
   (package
     (name "ruby-redcarpet")
-    (version "3.5.0")
+    (version "3.6.1")
     (source (origin
-              (method url-fetch)
-              (uri (rubygems-uri "redcarpet" version))
+              (method git-fetch) ;for tests
+              (uri (git-reference
+                     (url "https://github.com/vmg/redcarpet")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
               (sha256
                (base32
-                "0skcyx1h8b5ms0rp2zm3ql6g322b8c1adnkwkqyv7z3kypb4bm7k"))))
+                "0xb0lqpyrkhb078cwqng67szfa31vlhxsazz3nym0na6dgdj5s3r"))))
     (build-system ruby-build-system)
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         ;; The gem archive does not include the conformance tests.
-         (add-after 'unpack 'disable-conformance-tests
-          (lambda _
-            (substitute* "Rakefile"
-              (("task :test => %w\\[test:unit test:conformance\\]")
-               "task :test => %w[test:unit]")))))))
     (native-inputs
-     (list bundler ruby-test-unit ruby-rake-compiler))
+     (list ruby-test-unit ruby-rake-compiler perl tidy-html))
     (synopsis "Extensible Markdown to (X)HTML converter")
     (description
      "Redcarpet is an extensible Ruby library for Markdown processing and
