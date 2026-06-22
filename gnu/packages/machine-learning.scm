@@ -4863,6 +4863,8 @@ different backends")
                          (find-files "." "\\.so$")))))
             (add-after 'install 'python-wrap
               (lambda* (#:key inputs outputs #:allow-other-keys)
+                ;; Upstream removed the executable flag.
+                (chmod (search-input-file outputs "bin/koboldcpp.py") #o744)
                 (wrap-program (search-input-file outputs "bin/koboldcpp.py")
                   `("GUIX_PYTHONPATH" =
                     (,(getenv "GUIX_PYTHONPATH")
