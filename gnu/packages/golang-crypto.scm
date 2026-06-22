@@ -896,6 +896,32 @@ signing.")
 support encrypted container images.")
     (license license:asl2.0)))
 
+(define-public go-github-com-containerd-imgcrypt
+  (package
+    (inherit go-github-com-containerd-imgcrypt-v2)
+    (name "go-github-com-containerd-imgcrypt")
+    (version "1.1.11")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/containerd/imgcrypt")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0vr82v8g45zjm2khkq66fffs4ykkwnc0cjv4ylc5xbgb3z4zm4y7"))))
+    (arguments
+     (list
+      #:tests? #f       ;source only package
+      #:import-path "github.com/containerd/imgcrypt"))
+    (propagated-inputs
+     (list ;; go-github-com-containerd-containerd    ;cycles
+           go-github-com-containerd-typeurl
+           go-github-com-containers-ocicrypt
+           go-github-com-gogo-protobuf
+           go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-image-spec))))
+
 (define-public go-github-com-containers-libtrust
   (package
     (name "go-github-com-containers-libtrust")
