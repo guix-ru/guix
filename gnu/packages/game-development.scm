@@ -952,16 +952,21 @@ clone.")
 (define-public trenchbroom
   (package
     (name "trenchbroom")
-    (version "2025.4")
+    ;; TODO: Required for removal of catch2-3.8, revert on next release.
+    (properties '((commit . "ef7c7a473100116acabd6ed51f11dd40496cfae6")
+                  (revision . "0")))
+    (version (git-version "2026.1"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/TrenchBroom/TrenchBroom")
-             (commit (string-append "v" version))))
+             (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0858q0dfr8f3z8aaafgvrx3zbmjlsldjyw6jjic4x4psyw2xfg3h"))))
+        (base32 "0djr5mh6421k5xmlvp1fwnl9x0zz8z4flivr7clc0rkz9fmhcf30"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags
@@ -975,11 +980,12 @@ clone.")
            #~(modify-phases %standard-phases
                (add-after 'unpack 'fix-build-system
                  (lambda _
+                   (substitute* "lib/TbBaseLib/src/Uuid.cpp"
+                     (("include \"stduuid\\/uuid.h\"")
+                      "include <uuid.h>"))
                    (substitute* "CMakeLists.txt"
                      (("set\\(CMAKE_TOOLCHAIN_FILE")
-                      "#set(CMAKE_TOOLCHAIN_FILE"))
-                   (substitute* "app/CMakeLists.txt"
-                     (("/usr") #$output))))
+                      "#set(CMAKE_TOOLCHAIN_FILE"))))
                (add-before 'build 'set-environment-variables
                  (lambda _
                    ;; Set home so fontconfig can write cache.
@@ -1011,7 +1017,8 @@ clone.")
     (inputs
      (list assimp
            bash-minimal
-           catch2-3.8
+           catch2
+           cpptrace
            fmt
            freeglut
            freeimage
@@ -1024,7 +1031,9 @@ clone.")
            miniz
            qtbase
            qtsvg
-           tinyxml2))
+           stduuid
+           tinyxml2
+           `(,zstd "lib")))
     (native-inputs (list git pandoc python p7zip))
     (home-page "https://kristianduske.com/trenchbroom/")
     (synopsis "Cross-platform level editor for Quake-engine based games")
@@ -1032,7 +1041,8 @@ clone.")
 Quake-engine based games.  It supports Quake, Quake 2, Hexen 2, as well as
 other games.  TrenchBroom provides many simple and advanced tools to create
 complex and interesting levels.")
-    (license license:gpl3+)))
+    (license (list license:gpl3+        ;trenchbroom
+                   license:expat))))    ;`lib/(KdLib|VmLib)
 
 (define-public tsukundere
   (package
