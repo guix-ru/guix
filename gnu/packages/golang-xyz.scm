@@ -23968,7 +23968,7 @@ containers on Linux according to the OCI specification.")
 (define-public go-github-com-opencontainers-runtime-spec
   (package
     (name "go-github-com-opencontainers-runtime-spec")
-    (version "1.2.1")
+    (version "1.3.0")
     (source
      (origin
        (method git-fetch)
@@ -23977,7 +23977,7 @@ containers on Linux according to the OCI specification.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bh2awpdmbjh65js45vidm3s2pf42jykgad5wb772pysd7qnphbv"))))
+        (base32 "0vih1hp1jlmp1m476cgj3afaqrpd8gid6h73yp5r0qalb7n0ar07"))))
     (build-system go-build-system)
     (arguments
      (list
