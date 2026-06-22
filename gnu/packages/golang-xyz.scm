@@ -737,6 +737,31 @@ recursively any exported one.  It also won't merge structs inside
 maps (because they are not addressable using Go reflection).")
     (license license:bsd-3)))
 
+(define-public go-fortio-org-safecast
+  (package
+    (name "go-fortio-org-safecast")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/fortio/safecast")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1k9am5nd3z63nciasj7pg1028v76jjna3gvbj02kwn6kzi6scxp1"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "fortio.org/safecast"))
+    (home-page "https://fortio.org/safecast")
+    (synopsis "Safetly cast between numeric types in Go")
+    (description
+     "Package safecast allows you to safely cast between numeric types in Go
+and return errors (or panic when using the Must* variants) when the cast would
+result in a loss of precision, range or sign.")
+    (license license:asl2.0)))
+
 (define-public go-fyne-io-systray
   (package
     (name "go-fyne-io-systray")
