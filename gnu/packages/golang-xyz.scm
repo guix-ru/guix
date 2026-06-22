@@ -36263,9 +36263,10 @@ It allows one to safely call Unveil / Pledge on non-OpenBSD operating systems.")
     (license license:isc)))
 
 (define-public go-tags-cncf-io-container-device-interface
+  ;; TODO: Move to (gnu packages containers).
   (package
     (name "go-tags-cncf-io-container-device-interface")
-    (version "1.0.1")
+    (version "1.1.0")
     (source
      (origin
        (method git-fetch)
@@ -36274,7 +36275,7 @@ It allows one to safely call Unveil / Pledge on non-OpenBSD operating systems.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1wpp8fsrfjmgfkwwanakbigf68khwycdxbmr82k309fawfpbz7fj"))
+        (base32 "1nb9267phixkph4i6506ycx0j2b93y5blarhyg22mkvmcib4f3gh"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
