@@ -205,7 +205,7 @@ satisfiability checking (SAT).")
                 (("find_package\\(Clasp") "find_package(clasp"))
               (rename-file "cmake/ClingoConfig.cmake.in"
                            "cmake/clingo-config.cmake.in"))))))
-    (inputs (list catch2-3.5 clasp libpotassco))
+    (inputs (list catch2 clasp libpotassco))
     (native-inputs (list bison re2c
                          mpark-variant
                          pkg-config
