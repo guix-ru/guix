@@ -2399,7 +2399,7 @@ of use.")
 (define-public openmw
   (package
     (name "openmw")
-    (version "0.50.0")
+    (version "0.51.0")
     (source
      (origin
        (method git-fetch)
@@ -2408,7 +2408,7 @@ of use.")
              (commit (string-append "openmw-" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1a1jhfn6c2awjwz9xskix8ff5v9d45rcfcn2nm4jcgdalb40vz4q"))))
+        (base32 "0jhk4zmdryx9wcpw1p0k0s0p4rryv3bb66hspn1kj0k40h8sgv8g"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -2430,6 +2430,7 @@ of use.")
                          '("MESA_EXTENSION_OVERRIDE" = ("-GL_ARB_clip_control"))))))))
     (native-inputs (list boost doxygen pkg-config))
     (inputs (list bullet
+                  collada-dom
                   ffmpeg
                   libxt
                   lz4
