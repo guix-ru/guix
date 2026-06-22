@@ -457,7 +457,7 @@ AUX_FILES =						\
   gnu/packages/aux-files/guix.vim			\
   gnu/packages/aux-files/guix-nvim.vim			\
   gnu/packages/aux-files/linux-libre/7.0-arm64.conf	\
-  gnu/packages/aux-files/linux-libre/7.0-riscv64.conf	\
+  gnu/packages/aux-files/linux-libre/7.0-riscv.conf	\
   gnu/packages/aux-files/linux-libre/7.0-x86_64.conf	\
   gnu/packages/aux-files/linux-libre/6.19-arm64.conf	\
   gnu/packages/aux-files/linux-libre/6.19-i686.conf	\
