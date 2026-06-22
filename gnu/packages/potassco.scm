@@ -271,7 +271,7 @@ over difference logic.")
                       "find_package(Catch2 3 REQUIRED)")))))))
     (home-page "https://github.com/potassco/clingo-lpx")
     (inputs (list clingo flint))
-    (native-inputs (list catch2-3.5))
+    (native-inputs (list catch2))
     (synopsis "Simplex solver")
     (description "Clingo-LPX is an extension to Clingo that models constraints
 and goals over linear (in)equations.")
