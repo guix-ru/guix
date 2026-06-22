@@ -6982,9 +6982,6 @@ intended for use with event loops such as async.")
             (lambda _
               (setenv "SASS_IMPLEMENTATION" "sassc"))))))
     (native-inputs
-     ;; Optional test dependencies which causes dependency cycles:
-     ;; - ruby-haml: tilt -> ruby-haml -> tilt
-     ;; - ruby-slim: tilt -> ruby-sinatra -> ruby-slim -> tilt
      ;; Missing optional dependencies:
      ;; - babel/transpiler by tilt/babel
      ;; - coffee_script    by tilt/coffee
@@ -6995,6 +6992,7 @@ intended for use with event loops such as async.")
      (list ruby-asciidoctor/minimal
            ruby-builder
            ruby-erubi
+           ruby-haml
            ruby-kramdown
            ruby-liquid
            ruby-markaby
@@ -7005,6 +7003,7 @@ intended for use with event loops such as async.")
            ruby-redcarpet
            ruby-redcloth
            ruby-sass
+           ruby-slim
            ruby-yajl-ruby))
     (synopsis "Generic interface to multiple Ruby template engines")
     (description
