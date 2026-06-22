@@ -14823,7 +14823,7 @@ entities.")
          "1ryfja9yd3fq8n1p5yi3qnd0pjk7bkycmxxmbb1bj0axlr1pdv20"))))
     (build-system ruby-build-system)
     (propagated-inputs
-     (list ruby-mustermann ruby-rack ruby-rack-protection ruby-tilt))
+     (list ruby-mustermann ruby-rack ruby-rack-protection ruby-tilt/minimal))
     (synopsis "DSL for quick web applications creation in Ruby")
     (description
      "Sinatra is a DSL for quickly creating web applications in Ruby with
