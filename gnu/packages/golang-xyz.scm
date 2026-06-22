@@ -7495,6 +7495,31 @@ repositories.")
      "This package provides a ZFS snapshotter plugin for containerd.")
     (license license:asl2.0)))
 
+(define-public go-github-com-containerd-zfs
+  (package
+    (inherit go-github-com-containerd-zfs-v2)
+    (name "go-github-com-containerd-zfs")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/containerd/zfs")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1936pkjm71c4x40ww7p8pnwcdcg06j34m1v5zlxywwsl434avscm"))))
+    (arguments
+     (list
+      #:skip-build? #t  ;source only package
+      #:tests? #f
+      #:import-path "github.com/containerd/zfs"))
+    (propagated-inputs
+     (list ;; go-github-com-containerd-continuity       ;cycles
+           go-github-com-containerd-log
+           go-github-com-containerd-plugin
+           go-github-com-mistifyio-go-zfs-v3))))
+
 ;; XXX: This package was moved; please update your references to use
 ;; go.podman.io/image/v5 instead. New development of this project happens on
 ;; https://github.com/containers/container-libs.
