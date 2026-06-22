@@ -374,7 +374,7 @@ test framework of choice is left to be done by the implementer.")
 (define-public specification-runtime-spec
   (package
     (name "specification-runtime-spec")
-    (version "1.2.0")
+    (version "1.3.0")
     (source
      (origin
        (method git-fetch)
@@ -383,7 +383,7 @@ test framework of choice is left to be done by the implementer.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "102smpg308dq984f6zkjzwq5jz8jbfswiwfwxcrp1hh197jydxf9"))))
+        (base32 "0vih1hp1jlmp1m476cgj3afaqrpd8gid6h73yp5r0qalb7n0ar07"))))
     (build-system copy-build-system)
     (outputs '("out" "golang-src"))
     (arguments
