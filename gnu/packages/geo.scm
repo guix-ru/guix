@@ -3703,14 +3703,14 @@ growing set of geoscientific methods.")
 (define-public qgis
   (package
     (name "qgis")
-    (version "3.42.1")
+    (version "3.44.11")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://qgis.org/downloads/qgis-"
                            version ".tar.bz2"))
        (sha256
-        (base32 "1sf18bfvx6ph7cd5sqhkpjl2sly7v46d0bw4b50hq50j8yr02slx"))))
+        (base32 "1i3j5xmlhnlxqs66lf4psfc0b23r7hyw14qw9jdv27p9rq9wwvpa"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -3780,6 +3780,7 @@ growing set of geoscientific methods.")
                                "test_analysis_processingpdalalgs"
                                "test_analysis_processing"
                                "test_app_gpsintegration"
+                               "test_app_qgisappclipboard"
                                "test_3d_mesh3drendering"
                                "PyQgsAnnotation"
                                "PyQgsAnnotationLayer"
@@ -3798,6 +3799,7 @@ growing set of geoscientific methods.")
                                "PyQgsOGRProviderGpkg"
                                "PyQgsProcessExecutablePt1"
                                "PyQgsProcessExecutablePt2"
+                               "PyQgsProcessingGdalAlgsVirtualLayers"
                                "PyQgsProjectionSelectionWidgets"
                                "PyQgsProviderConnectionGpkg"
                                "PyQgsProviderConnectionSpatialite"
