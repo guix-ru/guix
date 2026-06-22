@@ -45,7 +45,8 @@
 
  (entry (commit "86776ccd30bb44eb856fcf3a14a8338f38fe1367")
         (title
-         (en "Openresolv update requires restarting NetworkManager"))
+         (en "Openresolv update requires restarting NetworkManager")
+         (pt "Atualização do openresolv exige reiniciar o NetworkManager"))
         (body
          (en "With this update to the @code{openresolv} package,
 @command{openresolv} now expects the @file{/etc/resolv.conf} configuration
@@ -57,12 +58,25 @@ you can issue the following commands, as root:
 @example
 rm /etc/resolv.conf
 herd restart NetworkManager
+@end example")
+         (pt "Com esta atualização do pacote @code{openresolv},
+@command{openresolv} agora espera que a configuração do arquivo
+@file{/etc/resolv.conf} contenha um comentário de cabeçalho @samp{# Generated
+by resolvconf}.  Isto é lidado pelo NetworkManager, mas pode possivelmente não
+acontecer imediatamente.  Para atualizar forçosamente o arquivo
+@file{/etc/resolv.conf} e recuperar um DNS funcional, você pode executar o
+comando a seguir, como superusuário:
+
+@example
+rm /etc/resolv.conf
+herd restart NetworkManager
 @end example")))
 
  (entry (commit "16b1072f661051e6bc20d8dcafdb183960dd188b")
         (title
          (en "PostgreSQL logs now go to a unified place")
-         (de "PostgreSQL-Protokolle gehen jetzt an einheitlichen Platz"))
+         (de "PostgreSQL-Protokolle gehen jetzt an einheitlichen Platz")
+         (pt "Os registros do PostgreSQL agora estão em um local unificado"))
         (body
          (en "The default value for the @code{log-destination} field of the
 @code{postgresql-config-file} record has been updated from @code{\"syslog\"}
@@ -74,7 +88,12 @@ Verbundstyp @code{postgresql-config-file} wurde von @code{\"syslog\"} zu
 @code{\"stderr\"} aktualisiert, was der vom Anbieter festgelegte Vorgabewert
 ist. Das heißt, dass in der Vorgabeeinstellung die Protokolldateien von
 PostgreSQL jetzt in die Datei @file{/var/log/postgresql/pg_ctl.log} geschrieben
-werden, statt an syslog geschickt zu werden.")))
+werden, statt an syslog geschickt zu werden.")
+         (pt "O valor padrão para o campo @code{log-destination} do registro
+@code{postgresql-config-file} foi atualizado de @code{\"syslog\"} para
+@code{\"stderr\"}, casando o padrão do fornecedor.  Isto significa que, por
+padrão, os registros do PostgreSQL são agora escritos no arquivo
+@file{/var/log/postgresql/pg_ctl.log} em vez de enviados ao syslog.")))
 
  (entry (commit "c9dcd203e5356f13b736d5be121fd61874be1a93")
         (title
