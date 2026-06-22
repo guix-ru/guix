@@ -13548,6 +13548,117 @@ from their pages.  It can be used for a wide range of purposes, from data
 mining to monitoring and automated testing.")
     (license license:bsd-3)))
 
+(define sdmx-test-data
+  (let* ((commit "cd7899341b46e179e9f19b638478d70197e12c74")
+         (revision "1")
+         (name "sdmx-test-data")
+         (version (git-version "0" revision commit)))
+    (origin
+      (method git-fetch)
+      (uri (git-reference
+            (url "https://github.com/khaeru/sdmx-test-data")
+            (commit commit)))
+      (file-name (git-file-name name version))
+      (sha256
+       (base32 "1n9y83raxxpgljbi0wjj27lhmyn19fnc2325a6cchwsa3b65ywv7")))))
+
+(define-public python-sdmx1
+  (package
+    (name "python-sdmx1")
+    (version "2.26.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/khaeru/sdmx")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "096c60pxzcw71bc9fj3hpjprrdiia365rqalapxx56g6g1vkgka9"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      #~(list
+         ;; 804 passed, 122 skipped, 28 deselected, 23 xfailed, 1 xpassed, 3 warnings
+         ;; XXX: 'Version' object has no attribute 'pre'
+         "--ignore=sdmx/tests/model/test_version.py"
+         ;; Most of these tests require network connection.
+         "--ignore=sdmx/tests/test_client.py"
+         "--ignore=sdmx/tests/test_sources.py"
+         "--ignore=sdmx/tests/test_docs.py"
+         "--ignore=sdmx/tests/test_session.py"
+         "--ignore=sdmx/tests/writer/test_xml.py"
+         "--ignore=sdmx/tests/reader/test_xml_v21.py"
+         "--deselect=sdmx/tests/convert/test_pandas.py::test_dataset_constraint"
+         ;; Wrong python-flaky version
+         "--deselect=sdmx/tests/format/test_xml.py::test_install_schemas_in_user_cache"
+         "--deselect=sdmx/tests/format/test_xml.py::test_install_schemas"
+         "--deselect=sdmx/tests/format/test_xml.py::test_validate_xml_from_v2_1_samples"
+         "--deselect=sdmx/tests/format/test_xml.py::test_validate_xml_from_v3_0_samples"
+         "--deselect=sdmx/tests/format/test_xml.py::test_validate_xml_invalid_doc"
+         "--deselect=sdmx/tests/format/test_xml.py::test_validate_xml_invalid_message_type"
+         "--deselect=sdmx/tests/format/test_xml.py::test_validate_xml_max_errors"
+         ;; sqlite3.OperationalError
+         "--deselect=sdmx/tests/util/test_requests.py::TestOfflineAdapter::test_raises")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-version
+            (lambda _
+              ;; versioningit needs git tags; patch pyproject.toml to use
+              ;; static version and create _version.py directly.
+              (substitute* "pyproject.toml"
+                (("version.source = \"versioningit\"")
+                 "
+[tool.hatch.version]
+path = \"sdmx/_version.py\"")
+                ((", \"versioningit\"")
+                 ""))
+              (call-with-output-file "sdmx/_version.py"
+                (lambda (port)
+                  (format port "__version__ = \"~a\"~%" #$version)))))
+          (add-before 'check 'pre-check
+            (lambda _
+              (setenv "SDMX_TEST_DATA" #$sdmx-test-data)
+              (setenv "HOME" (dirname (getcwd))))))))
+    (propagated-inputs
+     (list python-dateutil
+           python-lxml
+           python-pandas
+           python-platformdirs
+           python-requests))
+    (native-inputs
+     (list python-filelock
+           python-flaky
+           python-hatchling
+           python-jinja2
+           python-pyarrow
+           python-pytest
+           python-pytest-cov
+           python-pytest-xdist
+           python-requests-mock
+           python-requests-cache
+           python-responses))
+    (home-page "https://sdmx1.readthedocs.io")
+    (synopsis "Statistical Data and Metadata eXchange (SDMX) for Python")
+    (description "This package provides a Python implementation of the
+SDMX 2.1 and 3.0 standards for Statistical Data and Metadata eXchange.
+These standards are developed and used by statistical agencies and
+international organisations.  This package can be used to:
+@itemize
+@item Explore and retrieve data available from SDMX-REST web services
+operated by providers including the World Bank, International Monetary
+Fund, Eurostat, OECD, and United Nations;
+@item Read and write data and metadata in file formats including
+SDMX-ML (XML), SDMX-JSON, and SDMX-CSV;
+@item Convert data and metadata into @code{python-pandas} objects, for
+use with the analysis, plotting, and other tools in the Python data
+science ecosystem;
+@item Apply the SDMX information model (IM) to structure and publish
+your own data.
+@end itemize")
+    (license license:asl2.0)))
+
 (define-public python-jstyleson
   (let ((commit "8c47cc9e665b3b1744cccfaa7a650de5f3c575dd")
         (revision "0"))
