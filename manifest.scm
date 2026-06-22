@@ -45,11 +45,9 @@
 
        ;; Useful extras for patches submission.
        (packages->manifest
-        (filter supported-package?       ;rust is not yet available everywhere
-                (map specification->package
-                     (list "codeberg-cli"
-                           "git"
-                           "nss-certs"))))
+        (map specification->package
+             (list "git"
+                   "nss-certs")))
        ;; For installer
        (specifications->manifest
         (list "guile-newt"
