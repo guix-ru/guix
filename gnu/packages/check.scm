@@ -234,7 +234,7 @@ should use to get comprehensive combinatorial coverage of your parameters.")
         (base32 "0lsg791x6n95pxg6vif8qfc46nqcamhjq3g0dl5xqf6imy7n3acd"))))
     (build-system glib-or-gtk-build-system)
     (native-inputs
-     (list clang pkg-config python-wrapper))
+     (list clang-13 pkg-config python-wrapper))
     (inputs
      (list glib))
     (synopsis "Code checker for C")
@@ -2755,7 +2755,7 @@ seamlessly into your existing Python unit testing work flow.")
                      #:test-flags #~(list "lit.py" "tests")))
     ;; This can be built with any version of llvm.
     (native-inputs
-     (list llvm
+     (list llvm-13
            python-setuptools))
     (home-page "https://llvm.org/")
     (synopsis "LLVM Software Testing Tool")

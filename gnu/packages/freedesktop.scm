@@ -3573,7 +3573,7 @@ notifies the user using any notification daemon implementing
            (list rust "cargo")
            rust-bindgen-cli
            shaderc
-           clang ; bindgen does not work without it
+           clang-13 ; bindgen does not work without it
            vulkan-headers
            ;; For tests
            python))

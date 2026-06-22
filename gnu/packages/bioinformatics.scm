@@ -207,7 +207,7 @@
     (build-system cargo-build-system)
     (arguments
      (list #:install-source? #f))
-    (native-inputs (list clang pkg-config))
+    (native-inputs (list clang-13 pkg-config))
     (inputs (cons* curl openssl zlib (cargo-inputs 'alignoth)))
     (home-page "https://github.com/alignoth/alignoth")
     (synopsis "Tool for creating alignment plots from bam files.")
@@ -6634,7 +6634,7 @@ other types of unwanted sequence from high-throughput sequencing reads.")
              n2p2
              gsl
              openblas
-             libomp
+             libomp-13
              eigen
              netcdf
              pnetcdf

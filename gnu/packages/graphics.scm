@@ -1036,9 +1036,9 @@ baking tools to produce normal maps.")
                            "|")))
     (native-inputs
      (list bison
-           clang
+           clang-13
            flex
-           llvm
+           llvm-13
            pybind11-2
            python-wrapper))
     (inputs
@@ -2832,7 +2832,7 @@ Cflags: -I${includedir}~%" #$output #$version)))))
                   (format #t "test suite not run~%")))))))
   (native-inputs
    (append (if (target-x86-32?)
-               (list clang-toolchain)
+               (list clang-toolchain-13)
                '())
            (list gn libjpeg-turbo ninja pkg-config python-wrapper
                  spirv-tools spirv-headers
@@ -3096,7 +3096,7 @@ and build scripts for the OpenXR loader.")
                     (invoke "./tester_noexcept"))
                   (format #t "test suite not run~%")))))))
     (inputs (list nlohmann-json stb-image stb-image-write))
-    (native-inputs (list catch-framework clang))
+    (native-inputs (list catch-framework clang-13))
     (home-page "https://github.com/syoyo/tinygltf")
     (synopsis "Header only GL Transmission Format library")
     (description "This package provides a header only C++11

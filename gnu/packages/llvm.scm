@@ -1275,11 +1275,11 @@ Library.")
   (make-clang-toolchain clang-22 libomp-22))
 
 ;; Default LLVM and Clang version.
-(define-public libomp libomp-13)
-(define-public llvm llvm-13)
-(define-public clang-runtime clang-runtime-13)
-(define-public clang clang-13)
-(define-public clang-toolchain clang-toolchain-13)
+(define-public libomp libomp-22)
+(define-public llvm llvm-22)
+(define-public clang-runtime clang-runtime-22)
+(define-public clang clang-22)
+(define-public clang-toolchain clang-toolchain-22)
 
 
 
@@ -2332,15 +2332,20 @@ dependency relationships is easier, particularly for large projects.")
      (list clang))
     (propagated-inputs '())
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'configure
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let ((clang-format (search-input-file inputs "/bin/clang-format")))
-               (copy-file "tools/clang-format/clang-format.el" "clang-format.el")
-               (emacs-substitute-variables "clang-format.el"
-                 ("clang-format-executable"
-                  clang-format))))))))
+     (list
+      #:lisp-directory "clang/tools/clang-format"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((clang-format (search-input-file inputs "/bin/clang-format")))
+                (emacs-substitute-variables "clang-format.el"
+                  ("clang-format-executable"
+                   clang-format))))))
+      #:test-command #~(list "emacs" "-Q" "--batch"
+                             "-l" "clang-format.el"
+                             "-l" "clang-format-test.el"
+                             "-f" "ert-run-tests-batch-and-exit")))
     (synopsis "Format code using clang-format")
     (description "This package filters code through @code{clang-format}
 to fix its formatting.  @code{clang-format} is a tool that formats
@@ -2463,7 +2468,7 @@ using @code{clang-rename}.")))
       (description "This package contains the OCaml bindings distributed with
 LLVM."))))
 
-(define-public ocaml-llvm (make-ocaml-llvm llvm))
+(define-public ocaml-llvm (make-ocaml-llvm llvm-13))
 
 (define-public wllvm
   (package
@@ -2506,7 +2511,7 @@ LLVM."))))
                   (("'file'")
                    (pystr (search-input-file inputs "/bin/file"))))))))))
     (inputs (list binutils file))
-    (native-inputs (list clang procps python-pytest python-setuptools))
+    (native-inputs (list clang-13 procps python-pytest python-setuptools))
     (home-page "https://github.com/SRI-CSL/whole-program-llvm")
     (synopsis "Whole Program LLVM")
     (description "This package provides a toolkit for building whole-program

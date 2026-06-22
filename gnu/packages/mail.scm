@@ -3989,7 +3989,7 @@ on the fly.  Both programs are written in C and are very fast.")
                "CARGO_FEATURE_UNPREFIXED_MALLOC_ON_SUPPORTED_PLATFORMS" "1")
               (setenv "JEMALLOC_OVERRIDE"
                       (search-input-file inputs "/lib/libjemalloc.so")))))))
-    (native-inputs (list clang pkg-config))
+    (native-inputs (list clang-13 pkg-config))
     (inputs (cons* bzip2
                    jemalloc
                    librdkafka

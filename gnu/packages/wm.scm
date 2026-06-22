@@ -2705,7 +2705,7 @@ built on dwl — crafted for speed, flexibility, and a customizable desktop expe
          '())
      (list pkg-config)))
    (inputs
-    (cons* clang
+    (cons* clang-13
            dbus
            libdisplay-info
            libinput-minimal

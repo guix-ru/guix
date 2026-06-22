@@ -379,7 +379,7 @@ method, one of the most popular choices for Traditional Chinese users.")
     (native-inputs
      (list autoconf
            automake
-           clang
+           clang-13
            help2man
            libtool
            libyaml

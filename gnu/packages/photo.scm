@@ -762,7 +762,7 @@ photographic equipment.")
            `(,glib "bin")
            gobject-introspection
            intltool
-           llvm
+           llvm-13
            opencl-headers
            perl
            pkg-config
@@ -791,7 +791,7 @@ photographic equipment.")
            libheif
            libjpeg-turbo
            libjxl                    ;optional, for JPEG-XL support
-           libomp
+           libomp-13
            libpng
            libraw
            libsecret                 ;optional, for storing passwords
@@ -877,7 +877,7 @@ and enhance them.")
              `(,glib "bin")
              gobject-introspection
              intltool
-             llvm                       ;optional
+             llvm-13                    ;optional
              opencl-headers
              perl
              pkg-config
@@ -955,7 +955,7 @@ help you achieve your own interpretation of raw digital photographs.")
     (native-inputs
      (list pkg-config qttools-5))
     (inputs
-     (list graphicsmagick libomp qtbase-5))
+     (list graphicsmagick libomp-13 qtbase-5))
     (home-page "https://photoflare.io")
     (synopsis "Quick, simple but powerful image editor")
     (description "Photoflare is a cross-platform image editor with an aim

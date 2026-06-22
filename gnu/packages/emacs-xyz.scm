@@ -12960,7 +12960,7 @@ described on the homepage.")
               (invoke "cmake" "server"
                       (string-append "-DCMAKE_INSTALL_PREFIX=" #$output)))))))
     (inputs
-     (list clang))
+     (list clang-13))
     (build-system cmake-build-system)
     (synopsis "Server for the Emacs @dfn{irony mode}")))
 

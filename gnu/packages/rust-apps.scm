@@ -655,8 +655,8 @@ choice.  Supported launchers are: dmenu, fuzzel, rofi, walker and custom.")
        (sha256
         (base32 "0frzcnyah3a1srdwyx2rcpbh7hpwy6608cvhsqz5z9hdc08z8cg3"))))
     (build-system cargo-build-system)
-    (native-inputs (list clang cmake-minimal %tinycbor-source))
-    (inputs (cons llvm (cargo-inputs 'c2rust)))
+    (native-inputs (list clang-13 cmake-minimal %tinycbor-source))
+    (inputs (cons llvm-13 (cargo-inputs 'c2rust)))
     (arguments
      (list #:install-source? #f
            #:phases
@@ -1832,7 +1832,7 @@ repositories.")
                  configure
                  check-for-pregenerated-files
                  patch-cargo-checksums)))))))
-    (native-inputs (list clang pkg-config rust `(,rust "cargo")))
+    (native-inputs (list clang-13 pkg-config rust `(,rust "cargo")))
     (inputs (cons* glib gtk libadwaita pipewire (cargo-inputs 'helvum)))
     (home-page "https://gitlab.freedesktop.org/pipewire/helvum")
     (synopsis "GTK patchbay for pipewire")
@@ -2899,7 +2899,7 @@ performance and customizability.")
                         #:include-regexp ("\\.1$")))
                      args))))))
     (native-inputs (list git-minimal/pinned pkg-config))
-    (inputs (cons* bzip2 bzip3-1.4 clang xz zlib `(,zstd "lib")
+    (inputs (cons* bzip2 bzip3-1.4 clang-13 xz zlib `(,zstd "lib")
                    (cargo-inputs 'ouch)))
     (home-page "https://github.com/ouch-org/ouch")
     (synopsis "Compression and decompression utility")
@@ -2924,7 +2924,7 @@ decompressing files and directories.")
     (build-system cargo-build-system)
     (arguments
      (list #:install-source? #f))
-    (native-inputs (list clang pkg-config))
+    (native-inputs (list clang-13 pkg-config))
     (inputs (cons* pipewire
                    (cargo-inputs 'pwmenu)))
     (home-page "https://github.com/e-tho/pwmenu")
@@ -3678,7 +3678,7 @@ of the project is to be runnable on untrusted networks without crashing.")
     (arguments
      (list #:install-source? #f))
     (native-inputs
-     (list clang pkg-config))
+     (list clang-13 pkg-config))
     (inputs
      (cons* alsa-lib ffmpeg
             (cargo-inputs 'soundcloud-tui)))

@@ -1839,7 +1839,7 @@ directory contents.")
                    (setenv "NM" "llvm-nm")
                    (setenv "CC" "clang")
                    (setenv "CXX" "clang++"))))))
-    (native-inputs (list clang llvm))
+    (native-inputs (list clang-13 llvm-13))
     (home-page "https://apple.github.io/swift-corelibs-libdispatch/")
     (synopsis "Concurrent code execution on multicore hardware")
     (description

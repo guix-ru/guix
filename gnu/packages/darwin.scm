@@ -81,11 +81,11 @@
                             "missing"
                             ,@(find-files "." "^Makefile\\.in$"))))))))
       (inputs (list libobjc2
-                    clang-toolchain))
+                    clang-toolchain-13))
       (native-inputs (list libtool
                            autoconf
                            automake
-                           clang-toolchain))
+                           clang-toolchain-13))
       (build-system gnu-build-system)
       (arguments
        (list

@@ -111,7 +111,7 @@
     (inputs
      (cons* nettle openssl sqlite (cargo-inputs 'sequoia-chameleon-gnupg)))
     (native-inputs
-     (list capnproto clang gnupg pkg-config sequoia-sq))
+     (list capnproto clang-13 gnupg pkg-config sequoia-sq))
     (home-page "https://sequoia-pgp.org/")
     (synopsis "Sequoia's reimplementation of the GnuPG interface")
     (description "This package provides Sequoia's reimplementation of the
@@ -180,7 +180,7 @@ This Guix package is built to use the nettle cryptographic library.")
     (inputs
      (cons* nettle openssl pcsc-lite sqlite (cargo-inputs 'sequoia-sq)))
     (native-inputs
-     (list capnproto clang pkg-config))
+     (list capnproto clang-13 pkg-config))
     (home-page "https://sequoia-pgp.org/")
     (synopsis "Command-line frontend for Sequoia OpenPGP")
     (description "This package provides the command-line frontend for Sequoia
@@ -205,7 +205,7 @@ gpg-agent, openpgp-card and softkeys keystore backends.")
     (inputs
      (cons* bzip2 nettle openssl (cargo-inputs 'sequoia-sqv)))
     (native-inputs
-     (list clang pkg-config))
+     (list clang-13 pkg-config))
     (arguments
      `(#:imported-modules ((guix build copy-build-system)
                            ,@%cargo-build-system-modules)
@@ -289,7 +289,7 @@ This Guix package is built to use the nettle cryptographic library.")
     (inputs
      (cons* nettle openssl sqlite (cargo-inputs 'sequoia-wot-tools)))
     (native-inputs
-     (list clang gnupg pkg-config))
+     (list clang-13 gnupg pkg-config))
     (home-page "https://sequoia-pgp.org/")
     (synopsis "Implementation of OpenPGP's web of trust")
     (description

@@ -282,7 +282,7 @@ for some KDevelop language plugins (Ruby, PHP, CSS...).")
     (native-inputs
      (list extra-cmake-modules pkg-config shared-mime-info qttools))
     (inputs (list boost
-                  clang
+                  clang-13
                   grantlee
                   karchive
                   kcmutils

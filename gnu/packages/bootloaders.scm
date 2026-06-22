@@ -242,7 +242,7 @@
              ;; little-endian binaries for the bootloader and the utilities
              ;; and building with clang is the easiest option.
              (if (target-ppc64le?)
-                 (list clang)
+                 (list clang-13)
                  '())
 
              ;; Depend on LVM2 for libdevmapper, used by 'grub-probe' and

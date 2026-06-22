@@ -241,7 +241,7 @@ which are themselves described in 'ddl.dic'.")
      (list boost
            openblas
            python
-           libomp))
+           libomp-13))
     (propagated-inputs
      (list python-beartype
            python-graphviz

@@ -310,8 +310,8 @@ simple way to add custom protocol messages.")
            python-pytest-flake8))
     (inputs
      (list bash-minimal
-           clang
-           llvm
+           clang-13
+           llvm-13
            unifdef
            python
            python-pebble
@@ -1165,7 +1165,7 @@ to aid in debugging.")
                    (search-input-file inputs "bin/tcc")))))))))
     (native-inputs (list antlr4
                          cmake-minimal
-                         clang           ;for tests
+                         clang-13        ;for tests
                          python-aiosmtpd ;for tests
                          python-dateutil ;for tests
                          python-docutils ;for tests

@@ -2696,7 +2696,7 @@ Automation}, portable and vendor neutral FPGA place and route tool.")
     (inputs
      (list jansson
            libffi
-           llvm
+           llvm-13
            readline
            tcl
            `(,zstd "lib")))
@@ -3125,7 +3125,7 @@ formats.")
            glpk
            gmp
            lemon-graph
-           libomp
+           libomp-13
            mpfr
            or-tools
            protobuf-6

@@ -211,7 +211,7 @@
             imagemagick
             libarchive
             libcaca
-            llvm
+            llvm-13
             lz4
             lzip
             ocaml

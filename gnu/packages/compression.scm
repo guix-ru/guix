@@ -3354,7 +3354,7 @@ exported by the zlib library.")
       #~(list (string-append "CXX=" #$(cxx-for-target))
               ;; Linker fails when you use CC=cc-for-target
               (string-append "CC=" #$(cxx-for-target)))))
-    (native-inputs (list clang))
+    (native-inputs (list clang-13))
     (synopsis "Lossless data-compression program optimized for file size")
     (description
      "Cmix is a lossless data compression program aimed at optimizing compression

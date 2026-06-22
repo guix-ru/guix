@@ -6308,7 +6308,7 @@ authentication on behalf of its clients.")
                 "1y0g1j9ib1b0likjizw70hibky20gxxirqls6hf4crc214279v0m"))))
     (build-system cmake-build-system)
     (native-inputs (list python))
-    (inputs (list clang llvm))
+    (inputs (list clang-13 llvm-13))
     (home-page "https://github.com/KDE/clazy/")
     (synopsis "Qt-oriented static code analyzer")
     (description "clazy is a compiler plugin which allows @command{clang} to

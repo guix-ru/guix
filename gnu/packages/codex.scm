@@ -821,7 +821,7 @@
               ;; Disable network access.
               (setenv "CODEX_SANDBOX_NETWORK_DISABLED" "1"))))))
     (native-inputs `(("bubblewrap" ,bubblewrap) ;tests need bwrap on PATH
-                     ("clang" ,clang)
+                     ("clang" ,clang-13)
                      ("cmake-minimal" ,cmake-minimal)
                      ("libunwind" ,libunwind)
                      ("lsof" ,lsof)            ;app-server tests
@@ -900,7 +900,7 @@ default-features = false
                   (display "22.22.0" port))))))))
     (native-inputs
      `(("cmake-minimal" ,cmake-minimal)
-       ("clang" ,clang)
+       ("clang" ,clang-13)
        ("pkg-config" ,pkg-config)
        ("bubblewrap-source" ,(package-source bubblewrap))))
     (inputs (cons* libcap openssl sqlite zlib `(,zstd "lib")

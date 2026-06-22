@@ -13610,7 +13610,7 @@ GtkTextView widgets.")
     (inputs
      (list bash-minimal                 ;for wrap-program
            cmark
-           clang
+           clang-13
            devhelp
            d-spy
            ;; Cyclic modular dependency
@@ -13632,7 +13632,7 @@ GtkTextView widgets.")
            libportal
            libsoup
            libspelling
-           llvm
+           llvm-13
            libostree
            python
            python-pygobject-3.50

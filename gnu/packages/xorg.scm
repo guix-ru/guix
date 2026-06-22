@@ -3104,7 +3104,7 @@ server driver works.")
     (inputs
      (list libx11
            libxext
-           llvm
+           llvm-13
            mesa ; for xatracker
            xorg-server))
     (native-inputs
@@ -6587,7 +6587,7 @@ direct replacement for @command{xvfb-run} specifically.
                      (copy-file src dst)))))))
     (native-inputs (list pkg-config))
     (inputs
-     (cons* clang
+     (cons* clang-13
             fontconfig
             xcb-util-cursor
             xorg-server-xwayland

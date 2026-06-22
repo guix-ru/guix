@@ -563,7 +563,7 @@ provides semantic syntax highlighting and selections in the Kakoune text editor.
                (install-file "rc/parinfer.kak"
                              (string-append out "/share/kak/autoload"))))))))
     (inputs
-     (cons clang (cargo-inputs 'parinfer-rust)))
+     (cons clang-13 (cargo-inputs 'parinfer-rust)))
     (home-page "https://github.com/justinbarclay/parinfer-rust")
     (synopsis "Infer parentheses for Clojure, Lisp and Scheme")
     (description
@@ -597,7 +597,7 @@ can load dynamic libraries.")
                        (let ((lib (string-append #$output "/lib")))
                          (with-directory-excursion "target/release"
                            (install-file "libparinfer_rust.so" lib))))))))
-    (inputs (cons clang (cargo-inputs 'parinfer-rust-emacs)))
+    (inputs (cons clang-13 (cargo-inputs 'parinfer-rust-emacs)))
     (home-page "https://github.com/justinbarclay/parinfer-rust-emacs")
     (synopsis "Emacs-centric fork of parinfer-rust")
     (description

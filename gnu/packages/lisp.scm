@@ -210,7 +210,7 @@ executable Common Lisp image.  It is similar to cl-launch and hu.dwim.build.")
                                      "carp-header-parse")))))))
       (inputs
        (list bash-minimal
-             clang
+             clang-13
              ghc-blaze-markup
              ghc-blaze-html
              ghc-split
@@ -1138,7 +1138,7 @@ and make for REPLs that start blazing fast.
        (sha256
         (base32 "0cr1w4lcszipfp7d0pk7v42dzqrd6i7b498f81lqymijgp3v4vkd"))))
     (build-system gnu-build-system)
-    (inputs (list clang readline libffi openssl pkg-config))
+    (inputs (list clang-13 readline libffi openssl pkg-config))
     (arguments
      '(#:phases (modify-phases %standard-phases
                   (delete 'configure)

@@ -815,7 +815,7 @@ from a mounted file system.")
     (native-inputs
      (list pkg-config))
     (inputs
-     (cons* clang
+     (cons* clang-13
             eudev
             keyutils
             libaio

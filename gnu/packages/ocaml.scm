@@ -5738,13 +5738,15 @@ necessary set of rewriters.")
                         (string-append
                          (assoc-ref outputs "out")
                          "/lib/ocaml/site-lib")
-                        (string-append "--with-llvm-version=" #$(package-version llvm))
+                        (string-append "--with-llvm-version="
+                                       #$(package-version
+                                          (this-package-input "llvm")))
                         "--with-llvm-config=llvm-config"
                         "--disable-ghidra"
                         "--disable-llvm-static"
                         "--enable-llvm"
                         "--enable-everything"))))))
-      (native-inputs (list clang ocaml-oasis ocaml-ounit))
+      (native-inputs (list clang-13 ocaml-oasis ocaml-ounit))
       (propagated-inputs
        (list
         camlzip
@@ -5768,7 +5770,7 @@ necessary set of rewriters.")
         ocaml-z3
         ocaml-zarith))
       (inputs
-       (list gmp llvm ncurses))
+       (list gmp llvm-13 ncurses))
       (synopsis "Binary Analysis Platform")
       (description "Binary Analysis Platform is a framework for writing program
 analysis tools, that target binary files.  The framework consists of a plethora

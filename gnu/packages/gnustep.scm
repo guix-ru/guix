@@ -124,7 +124,7 @@ to easily create cross-compiled binaries.")
                                 "-DCMAKE_CXX_COMPILER=clang++"
                                 "-DTESTS=ON")))
     (inputs
-     (list clang robin-map))
+     (list clang-13 robin-map))
     (home-page "https://www.gnustep.org/")
     (synopsis "Objective-C runtime library for Clang")
     (description "Libobjc2 is an Objective-C runtime library designed as a

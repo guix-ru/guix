@@ -6328,7 +6328,7 @@ Jax, PyTorch and TensorFlow — with a seamless integration between them.")
             (lambda* (#:rest args)
               (apply (assoc-ref gnu:%standard-phases 'check)
                      #:test-target "ctranslate2_test" args))))))
-    (native-inputs (list libomp
+    (native-inputs (list libomp-13
                          cxxopts
                          spdlog
                          googletest

@@ -78,7 +78,7 @@
                 (mkdir-p doc)
                 (copy-recursively "doc" doc)))))))
     (native-inputs
-     (list clang             ;; test-cl
+     (list clang-13          ;; test-cl
            dmd               ;; test-d
            glib              ;; test-c
            icu4c             ;; test-cpp

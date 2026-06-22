@@ -3440,7 +3440,7 @@ which is a hypervisor.")
     (native-inputs
      (list pkg-config
            xen ; Pull in Xen for libxenstore
-           clang))
+           clang-13))
     (inputs (cargo-inputs 'xen-guest-agent))
     (home-page "https://gitlab.com/xen-project/xen-guest-agent")
     (synopsis "Provides guest VM information to hosting Xen hypervisor")
