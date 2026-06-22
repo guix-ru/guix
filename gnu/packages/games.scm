@@ -1363,6 +1363,15 @@ high a score as possible.")
           ;;   https://github.com/CleverRaven/Cataclysm-DDA/issues/42598#issuecomment-667702746
           (add-after 'install 'make-clean-pre-tiles
             (lambda* (#:key make-flags outputs #:allow-other-keys)
+              ;; During cleaning, "zstd.a" file is now removed but no recreated
+              ;; during the next make run and is found missing later in the
+              ;; build process.  Avoid cleaning that file.
+              ;;
+              ;; This basically reverts upstream commit
+              ;; f61d9d2114a6b5997f399c84872dab1f1f2310b9
+              ;; (<https://github.com/CleverRaven/Cataclysm-DDA/pull/84922>).
+              (substitute* "Makefile"
+                ((" zstd\\.a") ""))
               ;; Change prefix directory and enable tile graphics and sound.
               (invoke "make" "clean")))
           (add-after 'make-clean-pre-tiles 'build-tiles
