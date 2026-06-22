@@ -23996,8 +23996,8 @@ specification-runtime-spec.")
   (package
     (name "go-github-com-opencontainers-runtime-tools")
     ;; XXX: See: <https://github.com/opencontainers/runtime-tools/issues/792>.
-    (properties '((commit . "0ea5ed0382a279b30530acccafaf070fefeddafd")
-                  (revision . "0")))
+    (properties '((commit . "8a4db579f5c88af5a0d036fad34bddc9c1f703f3")
+                  (revision . "1")))
     (version (git-version "0.9.0"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -24009,7 +24009,7 @@ specification-runtime-spec.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1385hh25ysni83wp5xdn4zajzavmnbrgz9mrpqsj3byk33xqyh3z"))
+        (base32 "0rgrnffnyyzajagcx4314hvya11rzs01nsg7d25lm9jbygq3zha2"))
        (snippet
         #~(begin (use-modules (guix build utils))
                  (delete-file-recursively "vendor")))))
