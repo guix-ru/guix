@@ -6926,19 +6926,20 @@ cgroup uses the OCI runtime-spec found
     (license license:asl2.0)))
 
 (define-public go-github-com-containerd-cgroups-v3
+  ;; TODO: Move to (gnu packages containers).
   (package
     (inherit go-github-com-containerd-cgroups)
     (name "go-github-com-containerd-cgroups-v3")
-    (version "3.0.4")
+    (version "3.1.3")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/containerd/cgroups")
-             (commit (string-append "v" version))))
+              (url "https://github.com/containerd/cgroups")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09fkbhkx0hmcfcym3zl0dshbhj3p692xg7d6y8pj732g64zk6v4k"))
+        (base32 "0afqvid6178kaxlba7kb9575b5w5g88aw3r7wdrrahbk1fjskaaq"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
@@ -6948,9 +6949,31 @@ cgroup uses the OCI runtime-spec found
             ;; - github.com/containerd/cgroups/cmd cgctl
             (delete-file-recursively "cmd")))))
     (arguments
-     (substitute-keyword-arguments
-         (package-arguments go-github-com-containerd-cgroups)
-       ((#:import-path _) "github.com/containerd/cgroups/v3")))
+     (list
+      #:import-path  "github.com/containerd/cgroups/v3"
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; Tests requiring root access to cgrups.
+                       (list "TestCPUQuotaPeriodUSec"
+                             "TestCgroupType"
+                             "TestCgroupv2CpuStats"
+                             "TestCgroupv2MemoryStats"
+                             "TestCgroupv2PSIStats"
+                             "TestCgroupv2PidsStats"
+                             "TestErrorsWhenUnitAlreadyExists"
+                             "TestEventChanCleanupAfterOOMKill"
+                             "TestEventChanCleanupOnCgroupRemoval"
+                             "TestIgnoreUnitExistsWhenPidNegativeOne"
+                             "TestKill"
+                             "TestMoveTo"
+                             "TestStatFiltered"
+                             "TestSystemd240"
+                             "TestSystemdCgroupCpuController"
+                             "TestSystemdCgroupCpuController_NilWeight"
+                             "TestSystemdCgroupMemoryController"
+                             "TestSystemdCgroupPSIController"
+                             "TestSystemdCgroupPidsController")
+                       "|"))))
     (propagated-inputs
      (list go-github-com-cilium-ebpf
            go-github-com-containerd-log
