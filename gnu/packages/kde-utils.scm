@@ -6,6 +6,7 @@
 ;;; Copyright © 2022 Petr Hodina <phodina@protonmail.com>
 ;;; Copyright © 2025, 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2025 Andreas Enge <andreas@enge.fr>
+;;; Copyright © 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -714,6 +715,54 @@ drive, USB stick, etc
 about the selected character.  This includes not only the Unicode character
 name, but also aliases, general notes and cross references to similar
 characters.")
+    (license license:gpl2+)))
+
+(define-public kclock
+  (package
+    (name "kclock")
+    (version "25.12.3")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://invent.kde.org/utilities/kclock")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1c1j1ya7s9y2y1287a4jh7w7ynnk68myzs79nh2k0wym74hk13kb"))))
+    (build-system qt-build-system)
+    (arguments (list #:qtbase qtbase    ;for Qt 6
+                     #:tests? #f))      ;no tests
+    (native-inputs (list extra-cmake-modules pkg-config))
+    (inputs
+     (list kconfig
+           kcoreaddons
+           kcrash
+           kdbusaddons
+           ki18n
+           kio
+           kirigami
+           kirigami-addons
+           kjobwidgets
+           knotifications
+           kstatusnotifieritem
+           ksvg
+           libplasma
+           qqc2-desktop-style
+           qtdeclarative
+           qtmultimedia
+           qtsvg
+           qtwayland
+           sonnet
+           wayland
+           wayland-protocols))
+    (home-page "https://invent.kde.org/utilities/kclock")
+    (synopsis "Clock application for Plasma")
+    (description "KClock is a convergent clock application for Plasma, which
+comes with alarms, a stopwatch, world clocks and timers.  Indicators are
+displayed on the system tray (if available) for pending alarms and timers, as
+well as sound notifications.  If the system has PowerDevil installed, alarms
+and timers can also wake the system from suspend.")
     (license license:gpl2+)))
 
 (define-public kdialog
