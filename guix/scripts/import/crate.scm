@@ -75,7 +75,7 @@ Import and convert the crates.io package for PACKAGE-NAME.\n"))
          (option '("allow-yanked") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'allow-yanked #t result)))
-         (option '(#\f "lockfile") #f #t
+         (option '(#\f "lockfile") #t #f
                  (lambda (opt name arg result)
                    (if (file-exists? arg)
                        (alist-cons 'lockfile arg result)
