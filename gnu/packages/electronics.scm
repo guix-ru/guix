@@ -1303,6 +1303,9 @@ characterization result in a liberty library file.")
               (sha256
                (base32
                 "1dp2rcblpz1i5hzrv5kb7cq91agha5msm2slhny3gf8x0gbzmawq"))
+              ;; See: https://gitlab.com/kicad/code/kicad/-/merge_requests/2659.
+              (patches
+               (search-patches "kicad-disable-updates.patch"))
               (file-name (git-file-name name version))))
     (build-system cmake-build-system)
     (arguments

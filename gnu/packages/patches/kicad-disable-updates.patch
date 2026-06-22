@@ -1,0 +1,310 @@
+From 8fef1fc6d10a6967358720325f0ae9e498eb9198 Mon Sep 17 00:00:00 2001
+From: Peter Polidoro <peter@polidoro.io>
+Date: Tue, 23 Jun 2026 13:27:14 -0400
+Subject: [PATCH] Add build options to disable update checks
+
+Add a KICAD_PCM_UPDATE_CHECK CMake option alongside the existing
+KICAD_UPDATE_CHECK option.
+
+When either update mechanism is disabled at build time, default its setting to
+false, hide the related setup/preferences controls, and skip the corresponding
+startup background update checks.
+---
+ CMakeLists.txt                                |  7 ++-
+ common/dialogs/panel_packages_and_updates.cpp | 12 ++--
+ common/settings/kicad_settings.cpp            |  5 +-
+ .../startwizard_provider_privacy.cpp          | 57 ++++++++++++++++---
+ .../startwizard_provider_privacy.h            | 10 ++++
+ include/settings/kicad_settings.h             | 12 ++++
+ kicad/kicad_manager_frame.cpp                 |  4 ++
+ kicad/pcm/pcm.cpp                             |  4 ++
+ 8 files changed, 96 insertions(+), 15 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index af30c49174..3e321de38a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -119,7 +119,11 @@ option( KICAD_BUILD_QA_TESTS
+     ON )
+ 
+ option( KICAD_UPDATE_CHECK
+-    "Build in update check"
++    "Build in KiCad application update check"
++    ON )
++
++option( KICAD_PCM_UPDATE_CHECK
++    "Build in Plugin and Content Manager package update check"
+     ON )
+ 
+ cmake_dependent_option( KICAD_WAYLAND
+@@ -311,6 +315,7 @@ add_compile_definitions( $<$<BOOL:${KICAD_USE_VALGRIND}>:KICAD_USE_VALGRIND> )
+ add_compile_definitions( $<$<BOOL:${KICAD_GAL_PROFILE}>:KICAD_GAL_PROFILE> )
+ add_compile_definitions( $<$<BOOL:${KICAD_WIN32_VERIFY_CODESIGN}>:KICAD_WIN32_VERIFY_CODESIGN> )
+ add_compile_definitions( $<$<BOOL:${KICAD_UPDATE_CHECK}>:KICAD_UPDATE_CHECK> )
++add_compile_definitions( $<$<BOOL:${KICAD_PCM_UPDATE_CHECK}>:KICAD_PCM_UPDATE_CHECK> )
+ 
+ # Ensure DEBUG is defined for all platforms in Debug builds
+ add_compile_definitions( $<$<CONFIG:Debug>:DEBUG> )
+diff --git a/common/dialogs/panel_packages_and_updates.cpp b/common/dialogs/panel_packages_and_updates.cpp
+index eac0bee3f6..3582312ce7 100644
+--- a/common/dialogs/panel_packages_and_updates.cpp
++++ b/common/dialogs/panel_packages_and_updates.cpp
+@@ -38,6 +38,10 @@ PANEL_PACKAGES_AND_UPDATES::PANEL_PACKAGES_AND_UPDATES( wxWindow* parent ) :
+     m_staticline3->Hide();
+     m_cbKicadUpdate->Hide();
+ #endif
++
++#ifndef KICAD_PCM_UPDATE_CHECK
++    m_cbPcmUpdate->Hide();
++#endif
+ }
+ 
+ 
+@@ -45,8 +49,8 @@ bool PANEL_PACKAGES_AND_UPDATES::TransferDataToWindow()
+ {
+     if( KICAD_SETTINGS* cfg = GetAppSettings<KICAD_SETTINGS>( "kicad" ) )
+     {
+-        m_cbKicadUpdate->SetValue( cfg->m_KiCadUpdateCheck );
+-        m_cbPcmUpdate->SetValue( cfg->m_PcmUpdateCheck );
++        m_cbKicadUpdate->SetValue( KICAD_SETTINGS::DEFAULT_KICAD_UPDATE_CHECK && cfg->m_KiCadUpdateCheck );
++        m_cbPcmUpdate->SetValue( KICAD_SETTINGS::DEFAULT_PCM_UPDATE_CHECK && cfg->m_PcmUpdateCheck );
+         m_libAutoAdd->SetValue( cfg->m_PcmLibAutoAdd );
+         m_libAutoRemove->SetValue( cfg->m_PcmLibAutoRemove );
+         m_libPrefix->SetValue( cfg->m_PcmLibPrefix );
+@@ -60,8 +64,8 @@ bool PANEL_PACKAGES_AND_UPDATES::TransferDataFromWindow()
+ {
+     if( KICAD_SETTINGS* cfg = GetAppSettings<KICAD_SETTINGS>( "kicad" ) )
+     {
+-        cfg->m_KiCadUpdateCheck = m_cbKicadUpdate->GetValue();
+-        cfg->m_PcmUpdateCheck = m_cbPcmUpdate->GetValue();
++        cfg->m_KiCadUpdateCheck = KICAD_SETTINGS::DEFAULT_KICAD_UPDATE_CHECK && m_cbKicadUpdate->GetValue();
++        cfg->m_PcmUpdateCheck = KICAD_SETTINGS::DEFAULT_PCM_UPDATE_CHECK && m_cbPcmUpdate->GetValue();
+         cfg->m_PcmLibAutoAdd = m_libAutoAdd->GetValue();
+         cfg->m_PcmLibAutoRemove = m_libAutoRemove->GetValue();
+         cfg->m_PcmLibPrefix = m_libPrefix->GetValue();
+diff --git a/common/settings/kicad_settings.cpp b/common/settings/kicad_settings.cpp
+index ea350e02df..dbe78b5389 100644
+--- a/common/settings/kicad_settings.cpp
++++ b/common/settings/kicad_settings.cpp
+@@ -50,7 +50,8 @@ KICAD_SETTINGS::KICAD_SETTINGS() :
+ 
+     m_params.emplace_back( new PARAM<wxString>( "system.last_update_check_time", &m_lastUpdateCheckTime, "" ) );
+     m_params.emplace_back( new PARAM<wxString>( "system.last_received_update", &m_lastReceivedUpdate, "" ) );
+-    m_params.emplace_back( new PARAM<bool>( "system.check_for_kicad_updates", &m_KiCadUpdateCheck, true ) );
++    m_params.emplace_back(
++            new PARAM<bool>( "system.check_for_kicad_updates", &m_KiCadUpdateCheck, DEFAULT_KICAD_UPDATE_CHECK ) );
+ 
+     m_params.emplace_back( new PARAM<wxPoint>( "template.window.pos", &m_TemplateWindowPos, wxDefaultPosition ) );
+     m_params.emplace_back( new PARAM<wxSize>( "template.window.size", &m_TemplateWindowSize, wxDefaultSize ) );
+@@ -159,7 +160,7 @@ KICAD_SETTINGS::KICAD_SETTINGS() :
+     m_params.emplace_back(
+             new PARAM<wxString>( "pcm.last_download_dir", &m_PcmLastDownloadDir, "" ) );
+ 
+-    m_params.emplace_back( new PARAM<bool>( "pcm.check_for_updates", &m_PcmUpdateCheck, true ) );
++    m_params.emplace_back( new PARAM<bool>( "pcm.check_for_updates", &m_PcmUpdateCheck, DEFAULT_PCM_UPDATE_CHECK ) );
+ 
+     m_params.emplace_back( new PARAM<bool>( "pcm.lib_auto_add", &m_PcmLibAutoAdd, true ) );
+ 
+diff --git a/common/startwizard/startwizard_provider_privacy.cpp b/common/startwizard/startwizard_provider_privacy.cpp
+index 1689482db3..cc7ae223d7 100644
+--- a/common/startwizard/startwizard_provider_privacy.cpp
++++ b/common/startwizard/startwizard_provider_privacy.cpp
+@@ -36,6 +36,19 @@ public:
+             PANEL_STARTWIZARD_PRIVACY_BASE( aParent ),
+             m_model( aModel )
+     {
++#ifndef KICAD_UPDATE_CHECK
++        m_cbAutoUpdateKiCad->Hide();
++#endif
++
++#ifndef KICAD_PCM_UPDATE_CHECK
++        m_cbAutoUpdatePCM->Hide();
++#endif
++
++#if !defined( KICAD_UPDATE_CHECK ) && !defined( KICAD_PCM_UPDATE_CHECK )
++        if( wxSizer* updatesSizer = m_stIntro->GetContainingSizer() )
++            updatesSizer->Show( false );
++#endif
++
+ #ifndef KICAD_USE_SENTRY
+         m_sizerDataCollection->Show( false );
+ #endif
+@@ -80,31 +93,51 @@ STARTWIZARD_PROVIDER_PRIVACY::STARTWIZARD_PROVIDER_PRIVACY() :
+ 
+ bool STARTWIZARD_PROVIDER_PRIVACY::NeedsUserInput() const
+ {
++#if defined( KICAD_UPDATE_CHECK ) || defined( KICAD_PCM_UPDATE_CHECK ) || defined( KICAD_USE_SENTRY )
+     COMMON_SETTINGS* commonSettings = Pgm().GetCommonSettings();
+ 
+-    return !commonSettings->m_DoNotShowAgain.update_check_prompt
+-           || !commonSettings->m_DoNotShowAgain.data_collection_prompt;
++    bool needsInput = false;
++
++#if defined( KICAD_UPDATE_CHECK ) || defined( KICAD_PCM_UPDATE_CHECK )
++    needsInput |= !commonSettings->m_DoNotShowAgain.update_check_prompt;
++#endif
++
++#ifdef KICAD_USE_SENTRY
++    needsInput |= !commonSettings->m_DoNotShowAgain.data_collection_prompt;
++#endif
++
++    return needsInput;
++#else
++    return false;
++#endif
+ }
+ 
+ 
+ wxPanel* STARTWIZARD_PROVIDER_PRIVACY::GetWizardPanel( wxWindow* aParent, STARTWIZARD* aWizard )
+ {
+     m_model = std::make_shared<STARTWIZARD_PROVIDER_PRIVACY_MODEL>();
++    m_model->m_autoUpdateKiCad = KICAD_SETTINGS::DEFAULT_KICAD_UPDATE_CHECK;
++    m_model->m_autoUpdatePCM = KICAD_SETTINGS::DEFAULT_PCM_UPDATE_CHECK;
+     return new PANEL_STARTWIZARD_PRIVACY( m_model, aParent );
+ }
+ 
+ 
+ void STARTWIZARD_PROVIDER_PRIVACY::Finish()
+ {
+-    COMMON_SETTINGS* commonSettings = Pgm().GetCommonSettings();
++    [[maybe_unused]] COMMON_SETTINGS* commonSettings = Pgm().GetCommonSettings();
+     KICAD_SETTINGS* settings = Pgm().GetSettingsManager().GetAppSettings<KICAD_SETTINGS>( "kicad" );
+ 
+-    settings->m_KiCadUpdateCheck = m_model->m_autoUpdateKiCad;
+-    settings->m_PcmUpdateCheck   = m_model->m_autoUpdatePCM;
++    settings->m_KiCadUpdateCheck = KICAD_SETTINGS::DEFAULT_KICAD_UPDATE_CHECK && m_model->m_autoUpdateKiCad;
++    settings->m_PcmUpdateCheck = KICAD_SETTINGS::DEFAULT_PCM_UPDATE_CHECK && m_model->m_autoUpdatePCM;
++
++#if defined( KICAD_UPDATE_CHECK ) || defined( KICAD_PCM_UPDATE_CHECK )
+     commonSettings->m_DoNotShowAgain.update_check_prompt = true;
++#endif
+ 
++#ifdef KICAD_USE_SENTRY
+     APP_MONITOR::SENTRY::Instance()->SetSentryOptIn( m_model->m_enableSentry );
+     commonSettings->m_DoNotShowAgain.data_collection_prompt = true;
++#endif
+ 
+     Pgm().GetSettingsManager().Save();
+ }
+@@ -112,15 +145,23 @@ void STARTWIZARD_PROVIDER_PRIVACY::Finish()
+ 
+ void STARTWIZARD_PROVIDER_PRIVACY::ApplyDefaults()
+ {
+-    COMMON_SETTINGS* commonSettings = Pgm().GetCommonSettings();
++    [[maybe_unused]] COMMON_SETTINGS* commonSettings = Pgm().GetCommonSettings();
+     KICAD_SETTINGS* settings = Pgm().GetSettingsManager().GetAppSettings<KICAD_SETTINGS>( "kicad" );
+ 
+-    settings->m_KiCadUpdateCheck = true;
+-    settings->m_PcmUpdateCheck   = true;
++    settings->m_KiCadUpdateCheck = KICAD_SETTINGS::DEFAULT_KICAD_UPDATE_CHECK;
++    settings->m_PcmUpdateCheck = KICAD_SETTINGS::DEFAULT_PCM_UPDATE_CHECK;
++
++#ifdef KICAD_USE_SENTRY
+     APP_MONITOR::SENTRY::Instance()->SetSentryOptIn( false );
++#endif
+ 
++#if defined( KICAD_UPDATE_CHECK ) || defined( KICAD_PCM_UPDATE_CHECK )
+     commonSettings->m_DoNotShowAgain.update_check_prompt = true;
++#endif
++
++#ifdef KICAD_USE_SENTRY
+     commonSettings->m_DoNotShowAgain.data_collection_prompt = true;
++#endif
+ 
+     Pgm().SaveCommonSettings();
+ }
+diff --git a/common/startwizard/startwizard_provider_privacy.h b/common/startwizard/startwizard_provider_privacy.h
+index b3fa3b7265..441e5ffbe3 100644
+--- a/common/startwizard/startwizard_provider_privacy.h
++++ b/common/startwizard/startwizard_provider_privacy.h
+@@ -26,8 +26,18 @@
+ 
+ struct STARTWIZARD_PROVIDER_PRIVACY_MODEL
+ {
++#ifdef KICAD_UPDATE_CHECK
+     bool m_autoUpdateKiCad = true;
++#else
++    bool m_autoUpdateKiCad = false;
++#endif
++
++#ifdef KICAD_PCM_UPDATE_CHECK
+     bool m_autoUpdatePCM   = true;
++#else
++    bool m_autoUpdatePCM = false;
++#endif
++
+     bool m_enableSentry    = false;
+ };
+ 
+diff --git a/include/settings/kicad_settings.h b/include/settings/kicad_settings.h
+index b337e09707..3b49fd3bef 100644
+--- a/include/settings/kicad_settings.h
++++ b/include/settings/kicad_settings.h
+@@ -42,6 +42,18 @@ struct LIB_OVERRIDE
+ class KICOMMON_API KICAD_SETTINGS : public APP_SETTINGS_BASE
+ {
+ public:
++#ifdef KICAD_UPDATE_CHECK
++    static constexpr bool DEFAULT_KICAD_UPDATE_CHECK = true;
++#else
++    static constexpr bool DEFAULT_KICAD_UPDATE_CHECK = false;
++#endif
++
++#ifdef KICAD_PCM_UPDATE_CHECK
++    static constexpr bool DEFAULT_PCM_UPDATE_CHECK = true;
++#else
++    static constexpr bool DEFAULT_PCM_UPDATE_CHECK = false;
++#endif
++
+     KICAD_SETTINGS();
+ 
+     virtual ~KICAD_SETTINGS() {}
+diff --git a/kicad/kicad_manager_frame.cpp b/kicad/kicad_manager_frame.cpp
+index 8743e5275a..e0634b3e90 100644
+--- a/kicad/kicad_manager_frame.cpp
++++ b/kicad/kicad_manager_frame.cpp
+@@ -1495,8 +1495,11 @@ void KICAD_MANAGER_FRAME::OnIdle( wxIdleEvent& aEvent )
+             pcbFrame->OnModify();
+     }
+ 
++#if defined( KICAD_PCM_UPDATE_CHECK ) || defined( KICAD_UPDATE_CHECK )
+     KICAD_SETTINGS* settings = kicadSettings();
++#endif
+ 
++#ifdef KICAD_PCM_UPDATE_CHECK
+     if( KIPLATFORM::POLICY::GetPolicyBool( POLICY_KEY_PCM ) != KIPLATFORM::POLICY::PBOOL::DISABLED
+         && settings->m_PcmUpdateCheck )
+     {
+@@ -1505,6 +1508,7 @@ void KICAD_MANAGER_FRAME::OnIdle( wxIdleEvent& aEvent )
+ 
+         m_pcm->RunBackgroundUpdate();
+     }
++#endif
+ 
+ #ifdef KICAD_UPDATE_CHECK
+     if( !m_updateManager && settings->m_KiCadUpdateCheck )
+diff --git a/kicad/pcm/pcm.cpp b/kicad/pcm/pcm.cpp
+index ea97965b69..d333b92673 100644
+--- a/kicad/pcm/pcm.cpp
++++ b/kicad/pcm/pcm.cpp
+@@ -1183,6 +1183,9 @@ struct UPDATE_CANCELLER
+ 
+ void PLUGIN_CONTENT_MANAGER::RunBackgroundUpdate()
+ {
++#ifndef KICAD_PCM_UPDATE_CHECK
++    return;
++#else
+     // If the thread is already running don't create it again
+     if( m_updateThread.joinable() )
+         return;
+@@ -1253,6 +1256,7 @@ void PLUGIN_CONTENT_MANAGER::RunBackgroundUpdate()
+                 // Update the badge on PCM button
+                 m_availableUpdateCallback( availableUpdateCount );
+             } );
++#endif
+ }
+ 
+ 
+--
+GitLab
+
