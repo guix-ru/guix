@@ -2621,6 +2621,80 @@ Distance}.")
 inspired by the causal messaging system in the Pony programming language.")
     (license license:expat)))
 
+(define-public go-github-com-arduino-go-paths-helper
+  (package
+    (name "go-github-com-arduino-go-paths-helper")
+    (version "1.14.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/arduino/go-paths-helper")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0mj4w272msnx2rckhryr288bd49cfmch6wrjmly2b6jb3fy1p321"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/arduino/go-paths-helper"
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; This phase was introduced to remove cycle links from tests.
+          ;; Another packages which depends on it one starts a infinite loop
+          ;; on (copy-recursively...
+          (add-after 'check 'remove-symlink-loop-testdata
+            (lambda* (#:key import-path #:allow-other-keys)
+	      (let ((loops (string-append
+			    "src/"
+			    import-path
+			    "/testdata/loops")))
+                (when (file-exists? loops)
+                  (delete-file-recursively loops))))))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-golang-org-x-sys))
+    (home-page "https://github.com/arduino/go-paths-helper")
+    (synopsis "Golang library to simplify handling of paths")
+    (description
+     "Paths is a library that provides a set of utilities to work with file
+paths in a platform-independent way.  It includes functions for creating
+temporary directories and files, handling null paths, and more.  It is
+designed to be used in Go applications that require file system operations
+without worrying about platform-specific details.")
+    (license license:gpl3)))
+
+(define-public go-github-com-arduino-go-properties-orderedmap
+  (package
+    (name "go-github-com-arduino-go-properties-orderedmap")
+    (version "1.8.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/arduino/go-properties-orderedmap")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11vrrj9ymkjjcjfaz078np1pa42rl041axxlsrd9iw3jzxx8jkrj"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/arduino/go-properties-orderedmap"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-arduino-go-paths-helper))
+    (home-page "https://github.com/arduino/go-properties-orderedmap")
+    (synopsis "Library for handling maps of hierarchical properties")
+    (description
+     "Package properties is a library for handling maps of
+hierarchical properties.  This library is mainly used in the Arduino
+platform software to handle configurations made of key/value pairs
+stored in files with an INI like syntax.")
+    (license license:gpl2)))
+
 (define-public go-github-com-armon-circbuf
   (package
     (name "go-github-com-armon-circbuf")
