@@ -4645,6 +4645,29 @@ based on hash tables.  These containers are designed for C++11 and C++20
 constant expression usage.")
     (license license:zlib)))
 
+(define-public stduuid
+  (package
+    (name "stduuid")
+    (version "1.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mariusbancila/stduuid")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1y7jgf45dydq0jlac5clnanwcc22la4y8c83d5i0rp87x2zll6ij"))))
+    (build-system cmake-build-system)
+    (home-page "https://github.com/mariusbancila/stduuid")
+    (synopsis
+     "C++17 implementation of @acronym{UUID, universally unique identifiers}")
+    (description "This library is a C++17 cross-platform, single-header
+implementation of UUID, a 128-bit number used to uniquely identify information
+in computer systems, such as database table keys, COM interfaces, classes and
+type libraries, and many others.")
+    (license license:expat)))
+
 (define-public string-view-lite
   (package
     (name "string-view-lite")
