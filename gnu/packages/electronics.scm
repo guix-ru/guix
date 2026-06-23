@@ -4993,6 +4993,24 @@ tools, simulators, linters, code editors, and refactoring tools.")
     (home-page "https://sv-lang.com/")
     (license license:expat)))
 
+(define sv-lang-for-yosys-slang
+  (let ((commit "f04e81565793c768b747a8fd058f3e7aeceee1b5") ;sync with yosys-slang
+        (revision "0"))
+    (package
+      (inherit sv-lang)
+      (name "sv-lang")
+      (version (git-version "10.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/MikePopoloski/slang")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "135ghdw7wm9544mpnq91vsjag2r1sk81shd3r1cw513jsjhjvim4")))))))
+
 (define-public systemc
   (package
     (name "systemc")
@@ -5467,18 +5485,26 @@ for various application domains, including FPGAs and ASICs.")
          (method git-fetch)
          (uri (git-reference
                 (url "https://github.com/povik/yosys-slang")
-                (commit commit)
-                (recursive? #t)))       ;TODO: unvendor slang and fmt
+                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1gckr30dir80jhp80jlvis2b1ccpf3pc9m2bxj00fxbrs1swyw3v"))))
+          (base32 "11p8i6ja0da0j3a64pa3h69pqfkcsibmia82kf9y7z9vjj2c20ck"))))
       (build-system cmake-build-system)
       (arguments
        (list
         #:configure-flags
-        #~(list (string-append "-DYOSYS_SLANG_REVISION=" #$version))
+        #~(list (string-append "-DYOSYS_SLANG_REVISION=" #$version)
+                (string-append "-DSLANG_REVISION="
+                               #$(package-version sv-lang-for-yosys-slang))
+                "-DUSE_EXTERNAL_FMT=ON")
         #:phases
         #~(modify-phases %standard-phases
+            (add-after 'unpack 'unbundle-sv-lang
+              (lambda _
+                (substitute* "CMakeLists.txt"
+                  (("add_subdirectory\\(third_party\\/slang\\)")
+                   "find_package(slang CONFIG QUIET)")
+                  (("slang_slang") ""))))
             (replace 'install
               (lambda _
                 (let ((install-dir
@@ -5486,7 +5512,10 @@ for various application domains, including FPGAs and ASICs.")
                   (mkdir-p install-dir)
                   (install-file "slang.so" install-dir)))))))
       (native-inputs
-       (list python-minimal-wrapper yosys))
+       (list boost
+             fmt-11                     ;11.2.0 required
+             sv-lang-for-yosys-slang
+             yosys))
       (native-search-paths
        (list (search-path-specification
                (variable "YOSYS_PLUGIN_PATH")
