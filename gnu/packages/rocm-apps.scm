@@ -56,7 +56,7 @@
               "-DROCM_FOUND=ON"
 
               (string-append "-DHIP_ROOT_DIR="
-                             #$(this-package-native-input "rocm-hipcc"))
+                             #$(this-package-native-input "rocm-toolchain"))
               (string-append "-DROCM_PATH="
                              #$(this-package-input "rocm-hip-runtime"))
               (string-append "-DHPL_MPI_DIR="
@@ -91,11 +91,9 @@
                 (rename-file (string-append #$output "/HPL.dat")
                              (string-append datadir "/HPL.dat"))))))))
     (native-inputs
-     (list rocm-cmake rocm-hipcc lld-rocm llvm-rocm git-minimal/pinned))
+     (list rocm-toolchain rocm-cmake git-minimal/pinned))
     (inputs
-     (list rocm-device-libs
-           rocm-hip-runtime
-           rocr-runtime
+     (list rocm-hip-runtime
            rocblas
            libomp-rocm
            openmpi-rocm))
