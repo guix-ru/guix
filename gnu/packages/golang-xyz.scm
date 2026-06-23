@@ -2776,6 +2776,38 @@ API that are not available in the standard golang windows/syscall
 package.")
      (license license:bsd-3))))
 
+(define-public go-github-com-arduino-pluggable-discovery-protocol-handler
+  (package
+    (name "go-github-com-arduino-pluggable-discovery-protocol-handler")
+    (version "2.2.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url
+               "https://github.com/arduino/pluggable-discovery-protocol-handler")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1v3wcydi1ccg2mkqv9mpdbcl0926c960q2hpx15yxbs8w7pp6f2s"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path
+      "github.com/arduino/pluggable-discovery-protocol-handler/v2"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-arduino-go-paths-helper
+           go-github-com-arduino-go-properties-orderedmap))
+    (home-page
+     "https://github.com/arduino/pluggable-discovery-protocol-handler")
+    (synopsis "Pluggable Discovery Protocol Handler")
+    (description
+     "Package discovery is a library for handling the Arduino
+Pluggable-Discovery protocol.")
+    (license license:gpl3)))
+
 (define-public go-github-com-armon-circbuf
   (package
     (name "go-github-com-armon-circbuf")
