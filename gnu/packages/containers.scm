@@ -607,6 +607,115 @@ user_namespaces(7))}.  It is used to run containers engines as an
 unprivileged user, known as \"Rootless mode\".")
     (license license:asl2.0)))
 
+(define-public go-go-podman-io-common
+  (package
+    (name "go-go-podman-io-common")
+    (version "0.68.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/podman-container-tools/container-libs")
+              (commit (go-version->git-ref version #:subdir "common"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1sh1ljd0gmbncanfr3jz9vlsbp6szdgikspzp6a5lghpgjl5jiy8"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (define (directory? x)
+                (and=> (stat x #f)
+                       (compose (cut eq? 'directory <>) stat:type)))
+              (with-directory-excursion directory
+                (let* ((pred
+                        (negate (cut member <> (append '("." "..") preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (lambda (item)
+                              (if (directory? item)
+                                  (delete-file-recursively item)
+                                  (delete-file item)))
+                            items))))
+            (delete-all-but "." "common")
+            ;; Module name has been changed upstream.
+            (substitute* (find-files "." "\\.go$")
+              (("github.com/disiqueira/gotree")
+               "github.com/d6o/GoTree"))))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "go.podman.io/common"
+      #:unpack-path "go.podman.io"
+      #:embed-files
+      #~(list "^VERSION$")
+      #:test-subdirs
+      ;; XXX: Remove when go-go-podman-io-image-v5 and go-go-podman-io-storage
+      ;; are updated.
+      #~(list "pkg/auth" "pkg/flag" "pkg/chown" "pkg/parse" "pkg/umask"
+              "pkg/report" "pkg/sysctl" "pkg/cgroups" "pkg/filters"
+              "pkg/formats" "pkg/machine" "pkg/seccomp" "pkg/secrets"
+              "pkg/sysinfo" "pkg/timetype" "pkg/manifests" "pkg/configmaps"
+              "libnetwork/util" "pkg/hooks/0.1.0" "pkg/strongunits"
+              "libnetwork/types" "pkg/capabilities" "libimage/platform"
+              "pkg/subscriptions" "libnetwork/resolvconf"
+              "pkg/secrets/filedriver" "pkg/configmaps/filedriver"
+              "pkg/apparmor/internal/supported")))
+    (native-inputs
+     (list go-github-com-onsi-ginkgo-v2
+           go-github-com-davecgh-go-spew
+           go-github-com-onsi-gomega
+           go-github-com-spf13-cobra
+           go-github-com-spf13-pflag
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-checkpoint-restore-checkpointctl
+           go-github-com-checkpoint-restore-go-criu-v8
+           go-github-com-containerd-platforms
+           go-github-com-containers-ocicrypt
+           go-github-com-coreos-go-systemd-v22
+           go-github-com-cyphar-filepath-securejoin
+           go-github-com-davecgh-go-spew
+           go-github-com-d6o-gotree-v3    ;go-github-com-disiqueira-gotree-v3
+           go-github-com-docker-distribution
+           go-github-com-docker-go-units
+           go-github-com-fsnotify-fsnotify
+           go-github-com-godbus-dbus-v5
+           go-github-com-hashicorp-go-multierror
+           go-github-com-jinzhu-copier
+           go-github-com-json-iterator-go
+           go-github-com-moby-sys-capability
+           go-github-com-moby-sys-devices
+           go-github-com-opencontainers-cgroups
+           go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-image-spec
+           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-runtime-tools
+           go-github-com-opencontainers-selinux
+           go-github-com-pkg-sftp
+           go-github-com-pmezard-go-difflib
+           go-github-com-seccomp-libseccomp-golang
+           go-github-com-sirupsen-logrus
+           go-github-com-skeema-knownhosts
+           go-github-com-vishvananda-netlink
+           go-go-etcd-io-bbolt
+           go-go-podman-io-image-v5
+           go-go-podman-io-storage
+           go-golang-org-x-crypto
+           go-golang-org-x-sync
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-sigs-k8s-io-yaml
+           go-tags-cncf-io-container-device-interface))
+    (home-page "https://go.podman.io")
+    (synopsis "Go code and configuration used across containers projects")
+    (description
+     "This package provides shared common files and common Go code to manage
+those files in github.com/containers repos.")
+    (license license:asl2.0)))
+
 (define-public go-go-podman-io-image-v5
   (package
     (name "go-go-podman-io-image-v5")
