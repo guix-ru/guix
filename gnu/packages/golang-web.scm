@@ -22028,17 +22028,16 @@ interacting with the etcd v3 API.")
 (define-public go-go-etcd-io-etcd-client-pkg-v3
   (package
     (name "go-go-etcd-io-etcd-client-pkg-v3")
-    (version "3.6.10")
+    (version "3.6.12")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/etcd-io/etcd")
-              (commit (go-version->git-ref version
-                                           #:subdir "client/pkg"))))
+              (commit (go-version->git-ref version #:subdir "client/pkg"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0xyq7flcdvbmiss0snriylvabkwclhyb3977vl1xy9gxq94cwqq4"))
+        (base32 "0xg0bh3fv4av63ika8f7vgj4f929b108ia5ccyqrv00j3k4vyjm1"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -22051,14 +22050,20 @@ interacting with the etcd v3 API.")
                        (items (scandir "." pred)))
                   (for-each (cut delete-file-recursively <>) items))))
             (delete-all-but "." "client")
-            (delete-all-but "client" "pkg")))))
+            (delete-all-but "client" "pkg")
+            ;; This is a workaround to provide a correct import-path.
+            (rename-file "client/pkg" "client/tmp")
+            (mkdir-p "client/pkg/v3")
+            (copy-recursively "client/tmp" "client/pkg/v3")
+            (delete-file-recursively "client/tmp")))))
     (build-system go-build-system)
     (arguments
      (list
       #:skip-build? #t
-      #:import-path "go.etcd.io/etcd/client/pkg"
+      #:import-path "go.etcd.io/etcd/client/pkg/v3"
       #:unpack-path "go.etcd.io/etcd"))
-    (native-inputs (list go-github-com-stretchr-testify))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
     (propagated-inputs
      (list go-github-com-coreos-go-systemd-v22
            go-go-uber-org-zap
