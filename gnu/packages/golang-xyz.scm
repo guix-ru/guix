@@ -31365,6 +31365,32 @@ word on a list of words, if none is found, look for a similar word.")
 produces human-readable, logfmt-style output.")
     (license license:bsd-3)))
 
+(define-public go-go-bug-st-cleanup
+  (package
+    (name "go-go-bug-st-cleanup")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/bugst/go-cleanup")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "10wjvcvajpgg2h009n2wsgjmpp3csdc3k1ym9prrqd45dcx166v5"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.bug.st/cleanup"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://go.bug.st/cleanup")
+    (synopsis "Signal interruptable context for Golang")
+    (description
+     "This package provides a @code{signal.Interrupt}/CTRL-C interruptable
+context for Go.")
+    (license license:bsd-3)))
+
 (define-public go-go-bug-st-serial
   (package
     (name "go-go-bug-st-serial")
