@@ -2695,6 +2695,32 @@ platform software to handle configurations made of key/value pairs
 stored in files with an INI like syntax.")
     (license license:gpl2)))
 
+(define-public go-github-com-arduino-go-serial-utils
+  (package
+    (name "go-github-com-arduino-go-serial-utils")
+    (version "0.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/arduino/go-serial-utils")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1pbmgzi8z8yd68cf3cj71p06r85a2b929haga7h5swniqx0qrn8g"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/arduino/go-serial-utils"))
+    (propagated-inputs
+     (list go-go-bug-st-serial))
+    (home-page "https://github.com/arduino/go-serial-utils")
+    (synopsis "Serial ports on Arduino boards procedures library")
+    (description
+     "Golang library with a bunch of procedures to handle serial ports on
+Arduino (and compatible) boards.")
+    (license license:gpl3)))
+
 (define-public go-github-com-armon-circbuf
   (package
     (name "go-github-com-armon-circbuf")
