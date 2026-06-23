@@ -2349,7 +2349,7 @@ types.")
 (define-public kubo
   (package
     (name "kubo")
-    (version "0.41.0")
+    (version "0.42.0")
     (source
      (origin
        (method git-fetch)
@@ -2358,7 +2358,7 @@ types.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1fa4szzvgzahv1n5laz11habdj4p43n8sbq5msmp0d95cnqnciyg"))
+        (base32 "1gq2r9x2846gb39jnz4qcci04gmjvj5y1p7dw2nzy2zmjx8mnm0c"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
@@ -2397,7 +2397,7 @@ types.")
            go-github-com-caddyserver-certmagic
            go-github-com-cenkalti-backoff-v4
            go-github-com-ceramicnetwork-go-dag-jose
-           go-github-com-cheggaaa-pb
+           go-github-com-cheggaaa-pb-v3
            go-github-com-cockroachdb-pebble-v2
            go-github-com-coreos-go-systemd-v22
            go-github-com-dustin-go-humanize
@@ -2407,6 +2407,8 @@ types.")
            go-github-com-google-uuid
            go-github-com-hanwen-go-fuse-v2
            go-github-com-hashicorp-go-version
+           go-github-com-ipfs-shipyard-nopfs
+           go-github-com-ipfs-shipyard-nopfs-ipfs
            go-github-com-ipfs-boxo
            go-github-com-ipfs-go-block-format
            go-github-com-ipfs-go-cid
@@ -2429,8 +2431,6 @@ types.")
            go-github-com-ipfs-go-metrics-prometheus
            go-github-com-ipfs-go-test
            go-github-com-ipfs-go-unixfsnode
-           go-github-com-ipfs-shipyard-nopfs
-           go-github-com-ipfs-shipyard-nopfs-ipfs
            go-github-com-ipld-go-car-v2
            go-github-com-ipld-go-codec-dagpb
            go-github-com-ipld-go-ipld-prime
@@ -2448,6 +2448,7 @@ types.")
            go-github-com-libp2p-go-libp2p-routing-helpers
            go-github-com-libp2p-go-libp2p-testing
            go-github-com-libp2p-go-socket-activation
+           go-github-com-mattn-go-isatty
            go-github-com-miekg-dns
            go-github-com-multiformats-go-multiaddr
            go-github-com-multiformats-go-multiaddr-dns
@@ -2480,6 +2481,7 @@ types.")
            go-golang-org-x-mod
            go-golang-org-x-sync
            go-golang-org-x-sys
+           go-golang-org-x-term
            go-google-golang-org-protobuf
            python-minimal-wrapper
            zsh))
