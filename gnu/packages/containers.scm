@@ -607,6 +607,140 @@ user_namespaces(7))}.  It is used to run containers engines as an
 unprivileged user, known as \"Rootless mode\".")
     (license license:asl2.0)))
 
+(define-public go-go-podman-io-image-v5
+  (package
+    (name "go-go-podman-io-image-v5")
+    (version "5.37.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/podman-container-tools/container-libs")
+              (commit (go-version->git-ref version #:subdir "image"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1p115gm6xj71pd00npdz5x3507iq57xmcb7pwmsrbi6fs6khq3f5"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (define (directory? x)
+                (and=> (stat x #f)
+                       (compose (cut eq? 'directory <>) stat:type)))
+              (with-directory-excursion directory
+                (let* ((pred
+                        (negate (cut member <> (append '("." "..") preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (lambda (item)
+                              (if (directory? item)
+                                  (delete-file-recursively item)
+                                  (delete-file item)))
+                            items))))
+            (delete-all-but "." "image")
+            ;; This is a workaround to provide a correct import-path.
+            (rename-file "image" "tmp")
+            (mkdir-p "image/v5")
+            (copy-recursively "tmp" "image/v5")
+            (delete-file-recursively "tmp")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "go.podman.io/image/v5"
+      #:unpack-path "go.podman.io"
+      #:embed-files
+      #~(list "^VERSION$"
+              ;; For go-github-com-santhosh-tekuri-jsonschema-v6:
+              "applicator"
+              "content"
+              "core"
+              "format"
+              "format-annotation"
+              "format-assertion"
+              "meta-data"
+              "schema"
+              "unevaluated"
+              "validation")
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; Tests try to access local directories: /usr/share,
+                       ;; /var/tmp; remote source https://quay.io/v2/,
+                       ;; https://registry.suse.com/auth.
+                       (list "TestComputeBlobInfo"
+                             "TestCreateBigFileTemp"
+                             "TestGPGSigningMechanismSign"
+                             "TestReferenceNewImage"
+                             "TestReferenceNewImageSource"
+                             "TestMkDirBigFileTemp"
+                             "TestReferencePolicyConfigurationNamespaces"
+                             "TestSetupCertificates"
+                             "TestSign"
+                             "TestSignDockerManifest"
+                             "TestSignDockerManifestWithPassphrase"
+                             "TestSimpleSignerSignImageManifest"
+                             "TestSourcePrepareLayerData")
+                       "|"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-HOME
+            (lambda _
+              (setenv "HOME" "/tmp"))))))
+    (native-inputs
+     (list btrfs-progs
+           eudev
+           gnupg
+           go-github-com-stretchr-testify
+           gpgme
+           libassuan))
+    (propagated-inputs
+     (list go-dario-cat-mergo
+           go-github-com-burntsushi-toml
+           go-github-com-containers-libtrust
+           go-github-com-containers-ocicrypt
+           go-github-com-cyberphone-json-canonicalization
+           go-github-com-distribution-reference
+           go-github-com-docker-cli
+           go-github-com-docker-distribution
+           go-github-com-docker-docker
+           go-github-com-docker-docker-credential-helpers
+           go-github-com-docker-go-connections
+           go-github-com-hashicorp-go-cleanhttp
+           go-github-com-hashicorp-go-retryablehttp
+           go-github-com-klauspost-compress
+           go-github-com-klauspost-pgzip
+           go-github-com-manifoldco-promptui
+           go-github-com-mattn-go-sqlite3
+           go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-image-spec
+           go-github-com-proglottis-gpgme
+           go-github-com-santhosh-tekuri-jsonschema-v6
+           go-github-com-secure-systems-lab-go-securesystemslib
+           go-github-com-sigstore-fulcio
+           go-github-com-sigstore-sigstore
+           go-github-com-sirupsen-logrus
+           go-github-com-sylabs-sif-v2
+           go-github-com-ulikunitz-xz
+           go-github-com-vbauerster-mpb-v8
+           go-go-etcd-io-bbolt
+           go-go-podman-io-storage
+           go-golang-org-x-crypto
+           go-golang-org-x-oauth2
+           go-golang-org-x-sync
+           go-golang-org-x-term
+           go-gopkg-in-yaml-v3))
+    (home-page "https://go.podman.io")
+    (synopsis "Go library to work in various way with containers' images")
+    (description
+     "@code{image} is a set of Go libraries aimed at working in various way
+with containers' images and container image registries.  The
+@code{containers/image} library allows application to pull and push images
+from container image registries, like the docker.io and quay.io registries. It
+also implements \"simple image signing\".  It's a successor of
+@url{https://github.com/containers/image} project.")
+    (license license:asl2.0)))
+
 (define-public go-go-podman-io-storage
   (package
     (name "go-go-podman-io-storage")
