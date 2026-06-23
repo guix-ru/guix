@@ -9581,6 +9581,30 @@ it reaches its capacity.
 @end itemize")
     (license license:expat)))
 
+(define-public go-github-com-djherbis-nio
+  (package
+    (name "go-github-com-djherbis-nio")
+    (version "3.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/djherbis/nio")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "06zd92m0p4hd6mkrp3ya043p4f9f1hhqwvcl69hxmdr1an39b699"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:test-flags #~(list "-vet=off")
+      #:import-path "github.com/djherbis/nio/v3"))
+    (propagated-inputs (list go-github-com-djherbis-buffer))
+    (home-page "https://github.com/djherbis/nio")
+    (synopsis "Concurrent buffered I/O")
+    (description "Package @code{nio} provides a few buffered I/O primitives.")
+    (license license:expat)))
+
 (define-public go-github-com-djherbis-times
   (package
     (name "go-github-com-djherbis-times")
