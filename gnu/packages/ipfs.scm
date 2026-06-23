@@ -1911,7 +1911,7 @@ through @url{https://github.com/libp2p/libp2p, LibP2P} using Go's standard
 (define-public go-github-com-libp2p-go-libp2p-kad-dht
   (package
     (name "go-github-com-libp2p-go-libp2p-kad-dht")
-    (version "0.39.1")
+    (version "0.40.0")
     (source
      (origin
        (method git-fetch)
@@ -1920,7 +1920,7 @@ through @url{https://github.com/libp2p/libp2p, LibP2P} using Go's standard
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1lyh4a4m6v7i1sj18vi02snx2291hfrj09y484y2k9wynhdr71rz"))))
+        (base32 "118sw150wdmrqvpqddjqa75ik9j3fza8m6dmhf1ai6pii3sgrg6n"))))
     (build-system go-build-system)
     (arguments
      (list
