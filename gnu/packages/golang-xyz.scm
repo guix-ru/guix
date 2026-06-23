@@ -132,9 +132,10 @@
 
   ;; TODO: Remove when go-github-com-containerd-containerd is moved to (gnu
   ;; packages containers)
+  #:use-module (gnu packages containers)
   #:use-module (gnu packages docker)
-  #:use-module (gnu packages prometheus)
-  #:use-module (gnu packages kubernetes))
+  #:use-module (gnu packages kubernetes)
+  #:use-module (gnu packages prometheus))
 
 ;;; Commentary:
 ;;;
@@ -9842,10 +9843,10 @@ interact with distribution components.")
     (license license:asl2.0)))
 
 (define-public go-github-com-docker-docker
-  ;; TODO: Move to (gnu packages docker).
+  ;; TODO: Move to (gnu packages docker) or (gnu packages containers).
   (package
     (name "go-github-com-docker-docker")
-    (version "25.0.7")
+    (version "28.5.2")
     (source
      (origin
        (method git-fetch)
@@ -9854,7 +9855,7 @@ interact with distribution components.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0852mrvs8602azqzx2zhb1xl0vs7baw8qfmkgrl625xm5hxrigvq"))
+        (base32 "1jy92qqpdj78af8m0qy0agykhmc9h0apx0lfxc8x6mcbakbg772g"))
        (snippet
         #~(begin (use-modules (guix build utils))
                  (delete-file-recursively "vendor")))))
@@ -9865,59 +9866,176 @@ interact with distribution components.")
       #:skip-build? #t
       #:test-subdirs
       ;; XXX: Remove when all inputs are packaged.
-      #~(list "api/types/strslice"
-              "api/types/time"
-              "api/types/versions"
-              "builder/remotecontext/urlutil"
-              "cli/debug"
-              "daemon/links"
-              "daemon/network"
-              "errdefs"
-              "integration/plugin"
+      #~(list "oci" "opts" "image" "layer" "quota" "client" "plugin" "errdefs"
+              "registry" "testutil" "pkg/pools" "pkg/stack" "plugin/v2"
+              "reference" "runconfig" "pkg/system" "pkg/tarsum" "image/cache"
+              "pkg/homedir" "pkg/idtools" "pkg/ioutils" "pkg/meminfo"
+              "pkg/parsers" "pkg/pidfile" "pkg/process" "pkg/stdcopy"
+              "pkg/sysinfo" "daemon/links" "internal/mod" "pkg/longpath"
+              "pkg/progress" "pkg/stringid" "pkg/tailfile" "volume/local"
+              "daemon/events" "daemon/logger" "dockerversion" "internal/opts"
+              "pkg/fileutils" "pkg/useragent" "volume/mounts"
+              "api/types/time" "daemon/network" "restartmanager"
+              "volume/drivers" "volume/service" "pkg/jsonmessage"
+              "cmd/docker-proxy" "cmd/dockerd/trap" "container/stream"
+              "internal/ioutils" "libnetwork/types" "api/types/filters"
+              "api/types/network" "cmd/dockerd/debug" "distribution/xfer"
+              "internal/cleanups" "internal/platform" "libnetwork/bitmap"
+              "libnetwork/config" "libnetwork/ipbits" "pkg/authorization"
+              "api/types/registry" "api/types/strslice" "api/types/versions"
+              "daemon/graphdriver" "integration/plugin"
+              "internal/directory" "internal/sliceutil"
+              "internal/usergroup" "libnetwork/options"
+              "pkg/namesgenerator" "pkg/parsers/kernel"
+              "registry/resumable" "api/types/container"
+              "daemon/logger/local" "internal/lazyregexp"
+              "internal/multierror" "libcontainerd/queue"
+              "libnetwork/etchosts" "libnetwork/netlabel"
+              "pkg/streamformatter" "api/server/httputils"
+              "daemon/logger/splunk" "daemon/logger/syslog"
+              "internal/containerfs" "libnetwork/datastore"
+              "libnetwork/driverapi" "libnetwork/networkdb"
+              "api/server/middleware" "daemon/logger/awslogs"
+              "distribution/metadata" "libnetwork/ipams/null"
+              "libnetwork/osl/kernel" "pkg/plugins/transport"
+              "daemon/logger/journald" "libnetwork/drvregistry"
+              "api/server/router/swarm" "daemon/graphdriver/copy"
+              "daemon/logger/templates" "libnetwork/drivers/host"
+              "libnetwork/drivers/null" "api/server/router/system"
+              "api/server/router/volume" "daemon/graphdriver/btrfs"
+              "libnetwork/portallocator" "daemon/logger/jsonfilelog"
+              "daemon/logger/loggerutils" "libnetwork/drivers/ipvlan"
+              "pkg/plugins/pluginrpc-gen" "container/stream/bytespipe"
+              "libnetwork/drivers/macvlan" "libnetwork/drivers/overlay"
+              "libnetwork/internal/caller" "daemon/graphdriver/overlay2"
+              "libnetwork/internal/addrset" "pkg/parsers/operatingsystem"
+              "daemon/internal/capabilities" "libnetwork/ipams/defaultipam"
+              "builder/remotecontext/urlutil" "libnetwork/internal/netiputil"
+              "libnetwork/internal/setmatrix"
+              "libnetwork/internal/resolvconf"
+              "daemon/internal/filedescriptors"
+              "daemon/logger/loggerutils/cache"
+              "daemon/graphdriver/fuse-overlayfs"
+              "daemon/logger/jsonfilelog/jsonlog"
+              "libnetwork/drivers/overlay/ovmanager"
+              "daemon/logger/journald/internal/export"
               "integration/plugin/logging/cmd/discard"
-              "internal/mod"
-              "libnetwork/bitmap"
-              "libnetwork/etchosts"
-              "libnetwork/internal/caller"
-              "libnetwork/ipbits"
-              "libnetwork/options"
-              "libnetwork/portallocator"
-              "pkg/broadcaster"
-              "pkg/capabilities"
-              "pkg/directory"
-              "pkg/dmesg"
-              "pkg/fileutils"
-              "pkg/homedir"
-              "pkg/ioutils"
-              "pkg/longpath"
-              "pkg/meminfo"
-              "pkg/namesgenerator"
-              "pkg/parsers"
-              "pkg/parsers/kernel"
-              "pkg/pidfile"
-              "pkg/plugins/pluginrpc-gen"
-              "pkg/process"
-              "pkg/progress"
-              "pkg/stdcopy"
-              "pkg/stringid"
-              "pkg/useragent"
-              "plugin/v2"
-              "restartmanager"
-              "volume/drivers")))
+              "libnetwork/drivers/overlay/overlayutils")))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-spf13-cobra
+           go-github-com-spf13-pflag))
     (propagated-inputs
-     (list go-github-com-containerd-containerd
+     (list go-cloud-google-com-go-compute-metadata
+           go-cloud-google-com-go-logging
+           go-code-cloudfoundry-org-clock
+           go-dario-cat-mergo
+           go-github-com-adalogics-go-fuzz-headers
+           ;; go-github-com-azure-go-ansiterm   ;Windows only
+           go-github-com-graylog2-go-gelf
+           ;; go-github-com-microsoft-go-winio  ;Windows only
+           ;; go-github-com-microsoft-hcsshim   ;Windows only
+           go-github-com-racksec-srslog
+           go-github-com-aws-aws-sdk-go-v2
+           go-github-com-aws-aws-sdk-go-v2-config
+           go-github-com-aws-aws-sdk-go-v2-credentials
+           go-github-com-aws-aws-sdk-go-v2-feature-ec2-imds
+           go-github-com-aws-aws-sdk-go-v2-service-cloudwatchlogs
+           go-github-com-aws-smithy-go
+           go-github-com-cloudflare-cfssl
+           go-github-com-containerd-cgroups-v3
+           go-github-com-containerd-containerd-api
+           go-github-com-containerd-containerd-v2
+           go-github-com-containerd-continuity
+           go-github-com-containerd-errdefs
+           go-github-com-containerd-errdefs-pkg
+           go-github-com-containerd-fifo
            go-github-com-containerd-log
+           go-github-com-containerd-platforms
+           go-github-com-containerd-typeurl-v2
+           go-github-com-coreos-go-systemd-v22
+           go-github-com-cpuguy83-tar2go
+           go-github-com-creack-pty
+           go-github-com-deckarep-golang-set-v2
            go-github-com-distribution-reference
+           go-github-com-docker-distribution
            go-github-com-docker-go-connections
+           go-github-com-docker-go-events
+           go-github-com-docker-go-metrics
            go-github-com-docker-go-units
+           go-github-com-fluent-fluent-logger-golang
+           go-github-com-godbus-dbus-v5
            go-github-com-gogo-protobuf
-           go-github-com-klauspost-compress
+           go-github-com-golang-protobuf
+           go-github-com-google-uuid
+           go-github-com-gorilla-mux
+           go-github-com-hashicorp-go-immutable-radix-v2
+           go-github-com-hashicorp-go-memdb
+           go-github-com-hashicorp-go-multierror
+           go-github-com-hashicorp-memberlist
+           go-github-com-hashicorp-serf
+           go-github-com-ishidawataru-sctp
+           go-github-com-miekg-dns
+           go-github-com-mistifyio-go-zfs-v3
+           go-github-com-mitchellh-copystructure
            go-github-com-moby-docker-image-spec
+           go-github-com-moby-go-archive
+           go-github-com-moby-ipvs
+           go-github-com-moby-locker
+           go-github-com-moby-patternmatcher
+           go-github-com-moby-profiles-apparmor
+           go-github-com-moby-profiles-seccomp
+           go-github-com-moby-pubsub
+           go-github-com-moby-sys-atomicwriter
+           go-github-com-moby-sys-mount
+           go-github-com-moby-sys-mountinfo
+           go-github-com-moby-sys-reexec
            go-github-com-moby-sys-sequential
+           go-github-com-moby-sys-signal
+           go-github-com-moby-sys-symlink
            go-github-com-moby-sys-user
            go-github-com-moby-sys-userns
+           go-github-com-moby-term
+           go-github-com-morikuni-aec
+           go-github-com-opencontainers-cgroups
+           go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-image-spec
+           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-selinux
+           go-github-com-pelletier-go-toml
+           go-github-com-pkg-errors
+           go-github-com-prometheus-client-golang
+           go-github-com-sirupsen-logrus
+           go-github-com-tonistiigi-go-archvariant
+           go-github-com-vbatts-tar-split
+           go-github-com-vishvananda-netlink
+           go-github-com-vishvananda-netns
+           go-go-etcd-io-bbolt
+           go-go-opentelemetry-io-contrib-instrumentation-google-golang-org-grpc-otelgrpc
            go-go-opentelemetry-io-contrib-instrumentation-net-http-otelhttp
-           go-go-opentelemetry-io-otel))
+           go-go-opentelemetry-io-otel
+           go-go-opentelemetry-io-otel-exporters-otlp-otlptrace-otlptracehttp
+           go-go-opentelemetry-io-otel-sdk
+           go-go-opentelemetry-io-otel-trace
+           go-golang-org-x-mod
+           go-golang-org-x-net
+           go-golang-org-x-sync
+           go-golang-org-x-sys
+           go-golang-org-x-text
+           go-golang-org-x-time
+           go-google-golang-org-genproto-googleapis-api
+           go-google-golang-org-grpc
+           go-google-golang-org-protobuf
+           go-gotest-tools-v3
+           go-resenje-org-singleflight
+           go-tags-cncf-io-container-device-interface
+
+           ;; TODO: Complete packaging.
+           ;; go-github-com-golang-gddo
+           ;; go-github-com-moby-buildkit
+           ;; go-github-com-moby-swarmkit-v2
+           ;; go-github-com-rootless-containers-rootlesskit-v2
+           #;go-go-opentelemetry-io-contrib-processors-baggagecopy))
     (home-page "https://github.com/docker/docker")
     (synopsis "The Moby Project")
     (description
