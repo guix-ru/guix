@@ -6897,7 +6897,7 @@ dependencies and a simple API.")
   ;; TODO: Move to (gnu packages containers).
   (package
     (name "go-github-com-containerd-containerd")
-    (version "1.7.31")
+    (version "1.7.33")
     (source
      (origin
        (method git-fetch)
@@ -6906,37 +6906,40 @@ dependencies and a simple API.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "167flr5ms3j12sp5v9b34cwzbdzjybq1nbsf73rwzhdldvnmdg6f"))
+        (base32 "0spsi4mwrkvqx9j1wy4rd4vdiy1gmk2zkssk3v2kdbpilsf0xga4"))
        (snippet
         #~(begin
             (use-modules (guix build utils))
             (delete-file-recursively "vendor")
             ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - github.com/containerd/containerd/api
             (delete-file-recursively "api")))))
     (build-system go-build-system)
     (arguments
      (list
       #:import-path "github.com/containerd/containerd"
       #:skip-build? #t
-      #:test-flags #~(list "-skip" "TestRuntimeWithNonEmptyMaxEnvProcs") ;Test fails in CI
+      ;; For go-github-com-containerd-nri.
+      #:embed-files #~(list "^none$")
+      ;; XXX: Some submodules require go-github-com-microsoft-hcsshim for build.
       #:test-subdirs
-      ;; XXX: Remove when all inputs are packaged.
-      #~(list "archive/compression"
+      #~(list "archive"
+              "archive/compression"
               "cio"
               "content"
               "content/local"
-              "contrib/apparmor"
               "contrib/seccomp/kernelversion"
               "diff/apply"
+              "errdefs"
               "events/exchange"
+              "filters"
               "gc"
               "gc/scheduler"
               "identifiers"
               "images"
               "labels"
               "leases"
+              "metadata"
+              "metrics/cgroups"
               "mount"
               "namespaces"
               "pkg/atomic"
@@ -6952,6 +6955,7 @@ dependencies and a simple API.")
               "pkg/failpoint"
               "pkg/ioutil"
               "pkg/kmutex"
+              "pkg/process"
               "pkg/registrar"
               "pkg/snapshotters"
               "pkg/transfer/image"
@@ -6960,14 +6964,33 @@ dependencies and a simple API.")
               "protobuf"
               "reference"
               "remotes"
+              "remotes/docker"
               "remotes/docker/auth"
               "remotes/docker/config"
               "runtime/v2/shim"
+              "sandbox"
+              "services/server"
               "services/server/config"
               "snapshots/benchsuite"
+              "snapshots/blockfile"
+              "snapshots/btrfs"
+              "snapshots/devmapper"
               "snapshots/devmapper/dmsetup"
+              "snapshots/native"
+              "snapshots/overlay"
               "snapshots/overlay/overlayutils"
-              "snapshots/storage")))
+              "snapshots/storage"
+              "sys")
+    #:test-flags
+    ;; 1. io_test.go:40: failed to start binary process: fork/exec /bin/echo:
+    ;; no such file or director.
+    ;; 2. oom_linux_test.go: expected: 1000 actual: 123.
+    ;; 3. Test fails in CI.
+    #~(list "-skip" (string-join
+                     (list "TestNewBinaryIO"
+                           "TestSetPositiveOomScoreAdjustment"
+                           "TestRuntimeWithNonEmptyMaxEnvProcs")
+                     "|"))))
     (native-inputs
      (list go-github-com-davecgh-go-spew
            go-github-com-google-go-cmp
@@ -6976,6 +6999,9 @@ dependencies and a simple API.")
      (list go-dario-cat-mergo
            go-github-com-adalogics-go-fuzz-headers
            go-github-com-adamkorcz-go-118-fuzz-build
+           ;; go-github-com-microsoft-go-winio  ;Windows only
+           ;; go-github-com-microsoft-hcsshim   ;Windows only
+           go-github-com-containerd-aufs
            go-github-com-containerd-btrfs-v2
            go-github-com-containerd-cgroups-v3
            go-github-com-containerd-console
@@ -6985,11 +7011,13 @@ dependencies and a simple API.")
            go-github-com-containerd-fifo
            go-github-com-containerd-go-cni
            go-github-com-containerd-go-runc
+           go-github-com-containerd-imgcrypt
            go-github-com-containerd-log
            go-github-com-containerd-nri
            go-github-com-containerd-platforms
            go-github-com-containerd-ttrpc
            go-github-com-containerd-typeurl-v2
+           go-github-com-containerd-zfs
            go-github-com-containernetworking-cni
            go-github-com-containernetworking-plugins
            go-github-com-coreos-go-systemd-v22
@@ -7004,7 +7032,6 @@ dependencies and a simple API.")
            go-github-com-grpc-ecosystem-go-grpc-prometheus
            go-github-com-intel-goresctrl
            go-github-com-klauspost-compress
-           go-github-com-minio-sha256-simd
            go-github-com-moby-locker
            go-github-com-moby-sys-mountinfo
            go-github-com-moby-sys-sequential
@@ -7047,12 +7074,7 @@ dependencies and a simple API.")
            go-k8s-io-cri-api
            go-k8s-io-klog-v2
            go-k8s-io-utils
-           go-tags-cncf-io-container-device-interface
-
-           ;; TODO: Complete packaging.
-           ;; go-github-com-containerd-aufs
-           ;; go-github-com-containerd-imgcrypt
-           #;go-github-com-containerd-zfs))
+           go-tags-cncf-io-container-device-interface))
     (home-page "https://containerd.io/")
     (synopsis "Container runtime support daemon")
     (description
