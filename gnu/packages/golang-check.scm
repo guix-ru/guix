@@ -2447,6 +2447,31 @@ library's testing/fstest package.")
      "This package implements a functionality to ingest JUnit XML reports.")
     (license license:expat)))
 
+(define-public go-github-com-jstemmer-go-junit-report
+  (package
+    (name "go-github-com-jstemmer-go-junit-report")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jstemmer/go-junit-report")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1x5qaicf7840l0jws26072abl6hqfzjn2pn2im0l9b4q97s7si7w"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/jstemmer/go-junit-report"))
+    (home-page "https://github.com/jstemmer/go-junit-report")
+    (synopsis "Convert Go test output to JUnit XML")
+    (description
+     "@code{go-junit-report} is a tool that converts @code{go test} output to
+an XML report, suitable for applications that expect JUnit-style XML
+reports (e.g.  @url{http://jenkins-ci.org, Jenkins}).")
+    (license license:expat)))
+
 (define-public go-github-com-jtolds-gls
   (package
     (name "go-github-com-jtolds-gls")
