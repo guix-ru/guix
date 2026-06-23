@@ -2746,6 +2746,36 @@ Arduino (and compatible) boards.")
      "Some useful functions to handle timezones in Go.")
     (license license:gpl2)))
 
+(define-public go-github-com-arduino-go-win32-utils
+  ;; Source only package for arduino-cli compatibility.
+  (hidden-package
+   (package
+     (name "go-github-com-arduino-go-win32-utils")
+     (version "1.0.0")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/arduino/go-win32-utils")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "1bv80y451h2wj4frpyv734s24l2vyqmnsvii8xl2dwb6kzbzkypd"))))
+     (build-system go-build-system)
+     (arguments
+      (list
+       #:skip-build? #t
+       #:tests? #f
+       #:import-path "github.com/arduino/go-win32-utils"))
+     (propagated-inputs (list go-golang-org-x-sys))
+     (home-page "https://github.com/arduino/go-win32-utils")
+     (synopsis "Collection of bindings ot Win32 API")
+     (description
+      "@code{win32} is a collection of useful bindings to Win32
+API that are not available in the standard golang windows/syscall
+package.")
+     (license license:bsd-3))))
+
 (define-public go-github-com-armon-circbuf
   (package
     (name "go-github-com-armon-circbuf")
