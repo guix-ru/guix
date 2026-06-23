@@ -21453,6 +21453,42 @@ library code
 browsing activities based on HTTP Upgrade (HTTPT).")
     (license license:bsd-2)))
 
+(define-public go-go-bug-st-downloader
+  (package
+    (name "go-go-bug-st-downloader")
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/bugst/go-downloader")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1nrba8k7v0cq9qp7l5f95inwkspzx7wli0dr6i62qz0jcf6ncgj2"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.bug.st/downloader/v3"
+      #:test-flags
+      ;; Skip network resource tests.
+      #~(list "-skip" (string-join
+	               (list "TestDownload"
+		             "TestResume"
+		             "TestResumeOnAlreadyCompletedFile"
+		             "TestNoResume"
+		             "TestRunAndPool"
+		             "TestApplyUserAgentHeaderUsingConfig")
+	               "|"))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://go.bug.st/downloader")
+    (synopsis "Simple HTTP/S file downloader for golang")
+    (description
+     "Package downloader provides an asynchronous file downloader with
+progress tracking and timeout support.")
+    (license license:bsd-3)))
+
 (define-public go-go-etcd-io-etcd-api-v3
   (package
     (name "go-go-etcd-io-etcd-api-v3")
