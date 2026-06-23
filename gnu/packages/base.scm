@@ -767,14 +767,14 @@ included.")
   (package
     (inherit binutils)
     (name "binutils-gold")
-    (version "2.44")
+    (version "2.46.1")
     (source
      (origin
        (inherit (package-source binutils))
        (uri (string-append "mirror://gnu/binutils/binutils-with-gold-"
                            version ".tar.bz2"))
        (sha256
-        (base32 "1j64m2czn9ygd5g1cjjcw7q43b18xh6qkrdl1pkm03ncjnj3wwrl"))))
+        (base32 "1mbcsd09xbacqhcixwik2hm73b3j8nwr6d81nbz5zwkd29hf7pz6"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags flags)
