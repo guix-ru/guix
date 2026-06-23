@@ -9815,7 +9815,7 @@ is an actively maintained fork of @url{https://github.com/ogier/pflag}.")
 (define-public go-github-com-docker-cli
   (package
     (name "go-github-com-docker-cli")
-    (version "25.0.7")
+    (version "28.5.2")
     (source
      (origin
        (method git-fetch)
@@ -9824,7 +9824,7 @@ is an actively maintained fork of @url{https://github.com/ogier/pflag}.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0gaz2pkivky94z8148aa27kdxn548j3r96xa3a9xfqpi6b1rhy27"))
+        (base32 "1ylbfk60qcr0hinmsjmhyn3g3wwa2jfi53is0cl9lk57yym1np6p"))
        (snippet
         #~(begin
             (use-modules (guix build utils))
@@ -9832,17 +9832,87 @@ is an actively maintained fork of @url{https://github.com/ogier/pflag}.")
     (build-system go-build-system)
     (arguments
      (list
+      #:skip-build? #t
       #:import-path "github.com/docker/cli"
       #:embed-files #~(list ".*\\.json")
-      #:skip-build? #t
-      #:tests? #f))
-    (propagated-inputs
-     (list go-github-com-docker-docker-credential-helpers
-           go-github-com-fvbommel-sortorder
+      #:test-subdirs
+      ;; Remove when updated to the latest version.
+      #~(list "cli" "opts" "cli/debug" "cli/flags" "cli/hints" "templates"
+              "cli/config" "pkg/kvfile" "cli/command" "cli/connhelper"
+              "cli/context/store" "cli-plugins/hooks" "internal/registry"
+              "cli/compose/loader" "cli/compose/schema" "cli/connhelper/ssh"
+              "cli-plugins/plugin" "cli-plugins/socket"
+              "internal/oauth/api" "cli/command/inspect"
+              "internal/jsonstream" "internal/lazyregexp"
+              "internal/logdetails" "internal/volumespec"
+              "cli/compose/template" "cli/config/configfile"
+              "cli/command/completion" "cli/command/idresolver"
+              "cli/config/credentials" "cli/config/memorystore"
+              "internal/oauth/manager" "cli/command/image/build"
+              "cli/command/stack/loader" "cli/compose/interpolation"
+              "cli/connhelper/commandconn" "cli/command/stack/formatter"
+              "cli/command/service/progress" "cli/command/formatter/tabwriter"
+              "cli/command/image/build/internal/urlutil")))
+    (native-inputs
+     (list go-github-com-cpuguy83-go-md2man-v2
+           go-github-com-docker-cli-docs-tool
+           go-github-com-google-go-cmp
            go-github-com-google-shlex
-           go-github-com-mitchellh-mapstructure
+           go-github-com-spf13-cobra
+           go-github-com-spf13-pflag))
+    (propagated-inputs
+     (list go-dario-cat-mergo
+           go-github-com-containerd-errdefs
+           go-github-com-containerd-log
+           go-github-com-containerd-platforms
+           go-github-com-creack-pty
+           go-github-com-distribution-reference
+           go-github-com-docker-distribution
+           go-github-com-docker-docker
+           go-github-com-docker-docker-credential-helpers
+           go-github-com-docker-go-connections
+           go-github-com-docker-go-units
+           go-github-com-fvbommel-sortorder
+           go-github-com-go-jose-go-jose-v4
+           go-github-com-go-viper-mapstructure-v2
+           go-github-com-gogo-protobuf
+           go-github-com-google-uuid
+           go-github-com-mattn-go-runewidth
+           go-github-com-moby-go-archive
+           go-github-com-moby-patternmatcher
+           go-github-com-moby-swarmkit-v2
+           go-github-com-moby-sys-atomicwriter
+           go-github-com-moby-sys-capability
+           go-github-com-moby-sys-sequential
+           go-github-com-moby-sys-signal
+           go-github-com-moby-sys-symlink
+           go-github-com-moby-term
+           go-github-com-morikuni-aec
+           go-github-com-opencontainers-go-digest
+           go-github-com-opencontainers-image-spec
+           go-github-com-pkg-browser
            go-github-com-pkg-errors
-           go-gopkg-in-yaml-v2))
+           go-github-com-sirupsen-logrus
+           ;; Archived, see:
+           ;; <https://github.com/notaryproject/notary/issues/1709>.
+           ;; go-github-com-theupdateframework-notary
+           go-github-com-tonistiigi-go-rosetta
+           go-github-com-xeipuuv-gojsonschema
+           go-go-opentelemetry-io-contrib-instrumentation-net-http-otelhttp
+           go-go-opentelemetry-io-otel
+           go-go-opentelemetry-io-otel-exporters-otlp-otlpmetric-otlpmetricgrpc
+           go-go-opentelemetry-io-otel-exporters-otlp-otlptrace-otlptracegrpc
+           go-go-opentelemetry-io-otel-metric
+           go-go-opentelemetry-io-otel-sdk
+           go-go-opentelemetry-io-otel-sdk-metric
+           go-go-opentelemetry-io-otel-trace
+           go-golang-org-x-sync
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-golang-org-x-text
+           go-gopkg-in-yaml-v3
+           go-gotest-tools-v3
+           go-tags-cncf-io-container-device-interface))
     (home-page "https://github.com/docker/cli")
     (synopsis "Docker command-line interface")
     (description "This repository is the home of the Docker command-line
