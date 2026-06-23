@@ -24562,7 +24562,7 @@ protocol.")
 (define-public go-sigs-k8s-io-knftables
   (package
     (name "go-sigs-k8s-io-knftables")
-    (version "0.0.19")
+    (version "0.0.21")
     (source
      (origin
        (method git-fetch)
@@ -24571,7 +24571,9 @@ protocol.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1dx0flrdhxbvk8wxgk90px91gx731qjq4j2di3nyfnn2sp3yfz1d"))))
+        (base32 "028x7cr5wajm455676wkc1cwrr4jmyfpy66hamnirld2xqkqcizs"))
+       (modules '((guix build utils)))
+       (snippet #~(begin (delete-file-recursively "vendor")))))
     (build-system go-build-system)
     (arguments
      (list
