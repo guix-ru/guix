@@ -6387,6 +6387,34 @@ locale can be selected.")
 the Go language features.")
     (license license:asl2.0)))
 
+(define-public go-github-com-cmaglie-pb
+  (package
+    (name "go-github-com-cmaglie-pb")
+    (version "1.0.27")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/cmaglie/pb")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0s1aqwlxlfb9z15smr56m0awxai13yns76dplkjlhm4bj53ax1zy"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/cmaglie/pb"))
+    (propagated-inputs
+     (list go-github-com-fatih-color
+           go-github-com-mattn-go-runewidth
+           go-golang-org-x-sys))
+    (home-page "https://github.com/cmaglie/pb")
+    (synopsis "Terminal progress bar")
+    (description
+     "Simple console customizable progress bars for Golang.  It's an
+alternative fork of @url{https://github.com/cheggaaa/pb}.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-cockroachdb-crlib
   (package
     (name "go-github-com-cockroachdb-crlib")
