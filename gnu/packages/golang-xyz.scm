@@ -22080,6 +22080,48 @@ capabilities.  It's a maintained fork of
 https://github.com/syndtr/gocapability.")
     (license license:bsd-2)))
 
+(define-public go-github-com-moby-sys-devices
+  (package
+    (name "go-github-com-moby-sys-devices")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/moby/sys")
+              (commit (go-version->git-ref version #:subdir "devices"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0r3dcyw3snklr40z09rzyx9pva8lic1h5wqrv222l0b4dm08d3ny"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (with-directory-excursion directory
+                (let* ((pred (negate (cut member <>
+                                          (cons* "." ".." preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (cut delete-file-recursively <>) items))))
+            (delete-all-but "." "devices")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/moby/sys/devices"
+      #:unpack-path "github.com/moby/sys"))
+    (propagated-inputs
+     (list go-github-com-opencontainers-cgroups
+           go-golang-org-x-sys))
+    (home-page "https://github.com/moby/sys")
+    (synopsis
+     "Helper functions for constructing device configurations for runc")
+    (description
+     "Package devices provides some helper functions for constructing device
+configurations for runc.  These are exclusively used by higher-level runtimes
+that need to configure runc's device list based on existing devices.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-moby-sys-mount
   (package
     (name "go-github-com-moby-sys-mount")
