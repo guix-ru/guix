@@ -3826,6 +3826,34 @@ struct initialization.")
 and restore them afterwards.")
     (license license:bsd-3)))
 
+(define-public go-go-bug-st-testifyjson
+  (package
+    (name "go-go-bug-st-testifyjson")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/bugst/go-testifyjson")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02l6x8d1l7hxnqy1a6gwdhbqvxj91v199rkj8awcqm0zrj6r7c2n"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.bug.st/testifyjson"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-itchyny-gojq))
+    (home-page "https://go.bug.st/testifyjson")
+    (synopsis "Unit-test JSON output in Golang")
+    (description
+     "Package testifyjson is a collection of utilities and helper function for
+unit testing JSON output in Go.")
+    (license license:bsd-3)))
+
 (define-public go-go-etcd-io-gofail
   (package
     (name "go-go-etcd-io-gofail")
