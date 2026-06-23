@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2020, 2024, 2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2020, 2024-2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2025 Brice Waegeneire <brice@waegenei.re>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -355,7 +355,7 @@ expected COMMIT and SIGNER~%")))
                            (file (call-with-input-file file
                                    read-authorizations))))
             (cache-key   (or (assoc-ref options 'cache-key)
-                             (repository-cache-key repository)))
+                             commit))
             (branch      (current-branch repository)))
        ;; Since the keyring branch is not authenticated, exit successfully
        ;; when invoked on it.  This exit status is what the 'post-merge' hook

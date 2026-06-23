@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2019-2022, 2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2019-2022, 2025, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -43,6 +43,7 @@
                            false-if-git-not-found)
   #:use-module (guix i18n)
   #:use-module ((guix diagnostics) #:select (formatted-message))
+  #:use-module (guix deprecation)
   #:use-module (guix openpgp)
   #:use-module ((guix utils)
                 #:select (cache-directory with-atomic-file-output))
@@ -322,7 +323,14 @@ REPOSITORY."
 (define (authenticated-commit-cache-file key)
   "Return the name of the file that contains the cache of
 previously-authenticated commits for KEY."
-  (string-append (cache-directory) "/authentication/" key))
+  (string-append (cache-directory) "/authentication/"
+
+                 ;; Remove dots to avoid cases where an attacker-controlled
+                 ;; KEY would contain "../../../etc/passwd".
+                 (string-map (match-lambda
+                               (#\. #\-)
+                               (chr chr))
+                             key)))
 
 (define (previously-authenticated-commits key)
   "Return the previously-authenticated commits under KEY as a list of commit
@@ -370,8 +378,13 @@ authenticated (only COMMIT-ID is written to cache, though)."
 ;;; High-level interface.
 ;;;
 
-(define (repository-cache-key repository)
-  "Return a unique key to store the authenticate commit cache for REPOSITORY."
+;; Remove after 2027-07-01.
+(define-deprecated (repository-cache-key repository)
+  #f                                              ;no replacement
+  "Return a unique key to store the authenticate commit cache for REPOSITORY.
+
+This procedure has become useless: the default cache key is now the
+introductory commit ID."
   (string-append "checkouts/"
                  (base64-encode
                   (sha256 (string->utf8 (repository-directory repository))))))
@@ -393,7 +406,7 @@ instead of '~a'")
 (define* (authenticate-repository repository start signer
                                   #:key
                                   (keyring-reference "keyring")
-                                  (cache-key (repository-cache-key repository))
+                                  (cache-key (oid->string start))
                                   (end (reference-target
                                         (repository-head repository)))
                                   (authentic-commits '())

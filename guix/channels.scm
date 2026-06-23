@@ -40,6 +40,7 @@
   #:autoload   (guix git-authenticate) (authenticate-repository)
   #:autoload   (guix openpgp) (openpgp-fingerprint->bytevector
                                openpgp-format-fingerprint)
+  #:autoload   (guix utils) (cache-directory)
   #:use-module (guix base16)
   #:use-module (guix records)
   #:use-module (guix gexp)
@@ -355,6 +356,36 @@ result is unspecified."
          (apply-patch patch checkout))
        (loop rest)))))
 
+(define (maybe-link-old-cache channel)
+  "Previously, the list of authenticated commits for CHANNEL would be kept
+under ~/.cache/guix/authentication/channels/NAME.  This procedure links this
+file, if it exist, to its new location at ~/.cache/guix/authentication/COMMIT
+where COMMIT is the introductory commit of CHANNEL to preserve the existing
+cache."
+  (define cache-dir
+    (cache-directory #:ensure? #f))
+
+  ;; TODO: Remove this code after 2027-07-01.
+  (let ((name (symbol->string (channel-name channel))))
+    (unless (or (string-null? name)
+                (string-contains name "/")
+                (not (file-exists? cache-dir)))
+      (define cache
+        (string-append cache-dir "/authentication/"))
+
+      (define old-cache-key
+        (string-append "channels/" name))
+
+      (define new-cache-key
+        (channel-introduction-first-signed-commit
+         (channel-introduction channel)))
+
+      (catch 'system-error
+        (lambda ()
+          (link (string-append cache old-cache-key)
+                (string-append cache new-cache-key)))
+        (const #f)))))
+
 (define* (authenticate-channel channel checkout commit
                                #:key (keyring-reference-prefix "origin/"))
   "Authenticate the given COMMIT of CHANNEL, available at CHECKOUT, a
@@ -362,9 +393,6 @@ directory containing a CHANNEL checkout.  Raise an error if authentication
 fails."
   (define intro
     (channel-introduction channel))
-
-  (define cache-key
-    (string-append "channels/" (symbol->string (channel-name channel))))
 
   (define keyring-reference
     (channel-metadata-keyring-reference
@@ -396,6 +424,8 @@ commits)...~%"
            (list (channel-commit channel))
            '()))))
 
+  (maybe-link-old-cache channel)
+
   ;; XXX: Too bad we need to re-open CHECKOUT.
   (with-repository checkout repository
     (authenticate-repository repository
@@ -407,8 +437,7 @@ commits)...~%"
                              (string-append keyring-reference-prefix
                                             keyring-reference)
                              #:authentic-commits authentic-commits
-                             #:make-reporter make-reporter
-                             #:cache-key cache-key)))
+                             #:make-reporter make-reporter)))
 
 (define* (latest-channel-instance store channel
                                   #:key (patches %patches)
