@@ -29768,8 +29768,8 @@ processes that doesn't run under Emacs.  Lisp processes created by
   (sbcl-package->clasp-package sbcl-slime-swank))
 
 (define-public sbcl-slippery-chicken
-  (let ((commit "9f58b5df598de4d8acf7db23443b2cf013082f37")
-        (revision "0"))
+  (let ((commit "bd57a217c12a0a2325a71286670c538915eeb4ba")
+        (revision "1"))
     (package
       (name "sbcl-slippery-chicken")
       (version "1.1.0")
@@ -29781,7 +29781,7 @@ processes that doesn't run under Emacs.  Lisp processes created by
                  (commit commit)))
            (file-name (git-file-name "slippery-chicken" version))
            (sha256
-            (base32 "0ysjs4nlxv5248mz68js7v67fmg0n73jlllc6lws2lz8bidqafml"))))
+            (base32 "0i3kwbafnv0hxsxlnbwmqi82i9jac1n0l87yxkpkmq0np901impv"))))
       (build-system asdf-build-system/sbcl)
       (arguments
        (list
@@ -29795,16 +29795,7 @@ processes that doesn't run under Emacs.  Lisp processes created by
                   (("/usr/bin/ffprobe")
                    (search-input-file inputs "/bin/ffprobe"))
                   (("/usr/bin/csound")
-                   (search-input-file inputs "/bin/csound")))))
-            (add-after 'unpack 'disable-fragile-test
-              ;; This test compares floating-point results bit-for-bit with
-              ;; 'equalp', which is sensitive to the platform's trig rounding.
-              ;; Comment it out with the '#+(or)' reader conditional so the
-              ;; whole form is skipped and the test is never registered.
-              (lambda _
-                (substitute* "tests/sc-test-suite.lsp"
-                  (("\\(sc-deftest test-utilities-coordinates \\(\\)")
-                   "#+(or) (sc-deftest test-utilities-coordinates ()")))))))
+                   (search-input-file inputs "/bin/csound"))))))))
       (inputs
         (list csound
               ffmpeg
