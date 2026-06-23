@@ -21203,6 +21203,103 @@ publish–subscribe pattern}.")
      "This package provides a multiplexed stream library using spdy.")
     (license license:asl2.0)))
 
+(define-public go-github-com-moby-swarmkit-v2
+  (package
+    (name "go-github-com-moby-swarmkit-v2")
+    (version "2.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/moby/swarmkit")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0mmvjnyy3r7fgmbg2h8zgigfmznln43wrnfk4d7nlm1v0crf9fdb"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            (delete-file-recursively "vendor")
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "swarmd")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/moby/swarmkit/v2"
+      #:test-flags
+      #~(list "-skip"
+              ;; Tests are supposed to be run in Docker, some of them timeout
+              ;; or fail to find node.
+              (string-join
+               (list "TestManagerFailedStartup"
+                     "TestManagerRespectsDispatcherRootCAUpdate"
+                     "TestMixedFIPSClusterNonMandatoryFIPS")
+               "|"))
+      #:test-subdirs
+      ;; XXX: Remove when <https://github.com/moby/swarmkit/pull/3245> is
+      ;; merged.
+      #~(list "ca" "cli" "log" "node" "agent" "watch" "ioutils" "manager"
+              "remotes" "ca/pkcs8" "identity" "template" "agent/csi"
+              "agent/exec" "api/naming" "ca/keyutils" "integration"
+              "volumequeue" "watch/queue" "api/equality" "internal/idm"
+              "agent/secrets" "agent/csi/plugin" "manager/watchapi"
+              "manager/allocator" "manager/logbroker" "manager/scheduler"
+              "manager/constraint" "manager/controlapi" "manager/dispatcher"
+              "manager/encryption" "manager/keymanager" "manager/state/raft"
+              "api/genericresource" "manager/deallocator"
+              "manager/state/store" "manager/orchestrator"
+              "manager/orchestrator/jobs" "manager/state/raft/storage"
+              "manager/orchestrator/global" "manager/orchestrator/update"
+              "manager/dispatcher/heartbeat" "manager/state/raft/transport"
+              "manager/state/raft/membership" "protobuf/plugin/deepcopy/test"
+              "protobuf/plugin/raftproxy/test"
+              "manager/orchestrator/replicated"
+              "manager/orchestrator/taskreaper"
+              "manager/orchestrator/jobs/global"
+              "manager/orchestrator/volumeenforcer"
+              "manager/orchestrator/jobs/replicated"
+              "manager/orchestrator/constraintenforcer")))
+    (native-inputs
+     (list go-github-com-onsi-ginkgo
+           go-github-com-onsi-gomega
+           go-github-com-spf13-cobra
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-code-cloudfoundry-org-clock
+           go-github-com-bits-and-blooms-bitset
+           go-github-com-cloudflare-cfssl
+           go-github-com-container-storage-interface-spec
+           go-github-com-distribution-reference
+           go-github-com-docker-go-events
+           go-github-com-docker-go-metrics
+           go-github-com-fernet-fernet-go
+           go-github-com-gogo-protobuf
+           go-github-com-golang-protobuf
+           go-github-com-grpc-ecosystem-go-grpc-prometheus
+           go-github-com-hashicorp-go-memdb
+           ;; go-github-com-microsoft-go-winio  ;Windows only
+           go-github-com-opencontainers-go-digest
+           go-github-com-phayes-permbits
+           go-github-com-pkg-errors
+           go-github-com-rcrowley-go-metrics
+           go-github-com-sirupsen-logrus
+           go-go-etcd-io-bbolt
+           go-go-etcd-io-etcd-client-pkg-v3
+           go-go-etcd-io-etcd-pkg-v3
+           go-go-etcd-io-etcd-server-v3
+           go-go-etcd-io-raft-v3
+           go-golang-org-x-crypto
+           go-golang-org-x-net
+           go-golang-org-x-time
+           go-google-golang-org-grpc))
+    (home-page "https://github.com/moby/swarmkit")
+    (synopsis "Node discovery, raft-based consensus, and task scheduling")
+    (description
+     "SwarmKit is a toolkit for orchestrating distributed systems at any scale.
+ It includes primitives for node discovery, raft-based consensus, task
+scheduling and more.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-moby-sys-atomicwriter
   (package
     (name "go-github-com-moby-sys-atomicwriter")
