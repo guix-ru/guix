@@ -41083,7 +41083,7 @@ functions (e.g. @code{webfeeder-title-function}).")
   (let ((commit "61dde4e3715fd1255df8f87a37d9c8022e909bf4"))
     (package
       (name "emacs-evil-numbers")
-      (version "0.6")
+      (version "0.7")
       (source
        (origin
          (method git-fetch)
@@ -41093,7 +41093,7 @@ functions (e.g. @code{webfeeder-title-function}).")
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1aqc054i30v9g5w96vni1m0f4w54gxl6sh3hsk1m8zd11krcms6r"))))
+           "006s8azhypp5n7jnvqkb4rmzqmnsdwj87c3r97zhjzgi2jq953gx"))))
       (build-system emacs-build-system)
       (arguments
        (list
