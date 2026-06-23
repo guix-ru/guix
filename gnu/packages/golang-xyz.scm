@@ -31365,6 +31365,37 @@ word on a list of words, if none is found, look for a similar word.")
 produces human-readable, logfmt-style output.")
     (license license:bsd-3)))
 
+(define-public go-go-bug-st-serial
+  (package
+    (name "go-go-bug-st-serial")
+    (version "1.7.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/bugst/go-serial")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1qylkyb3qgwic6x1j6y3r4x3mp5zqhml4cqklc877v0x59x7wlfl"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.bug.st/serial"
+      #:test-flags
+      ;; Tests expect socat in $PATH.
+      ;; Prevent adding (gnu packages networking).
+      #~(list "-skip" (string-append "TestDoubleCloseIsNoop|"
+                                     "TestSerialReadAndCloseConcurrency"))))
+    (propagated-inputs
+     (list go-golang-org-x-sys))
+    (home-page "https://go.bug.st/serial")
+    (synopsis "Serial library for Golang")
+    (description
+     "This package provides a serial library for the Go.  It manages avaiable
+serial ports.")
+    (license license:bsd-3)))
+
 (define-public go-go-etcd-io-bbolt
   (package
     (name "go-go-etcd-io-bbolt")
