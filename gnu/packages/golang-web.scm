@@ -22092,7 +22092,7 @@ endpoint parsing, retry logic, and test support functions.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "go.etcd.io/raft"))
+      #:import-path "go.etcd.io/raft/v3"))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
