@@ -883,7 +883,7 @@ noun phrases, verb phrases, etc.).")
 (define-public praat
   (package
     (name "praat")
-    (version "6.4.62")
+    (version "6.4.67")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -892,7 +892,7 @@ noun phrases, verb phrases, etc.).")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0jplas35yrhh1csdiw2mim4cgmj5iz5c3b87908smd0r528v75a6"))))
+                "14g04wk90hlzwn4qgb4n6kfqcm8bpl2k720v3h8rrinpxpdiac5n"))))
     (build-system gnu-build-system)
     (arguments
      (list #:make-flags #~(list (string-append "CC="
@@ -903,13 +903,7 @@ noun phrases, verb phrases, etc.).")
                             (substitute* "test/script/fileReadable.praat"
                               (("assert folderExists: \"~/?\"")
                                ""))))
-                        (replace 'configure
-                          (lambda _
-                            (copy-file
-                             #$(if (target-little-endian?)
-                                   "makefiles/makefile.defs.linux.pulse-gcc.LE"
-                                   "makefiles/makefile.defs.linux.pulse-gcc.BE")
-                             "makefile.defs")))
+                        (delete 'configure)
                         (replace 'check
                           (lambda* (#:key tests? #:allow-other-keys)
                             (when tests?
