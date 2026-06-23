@@ -80,6 +80,7 @@
 ;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 Luca Kredel <luca.kredel@web.de>
+;;; Copyright © 2026 Orahcio Felício de Sousa <orahcio@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -26019,6 +26020,39 @@ configuration file.")
       "Package @code{cli} provides a minimal framework for creating and
 organizing command line Go applications.")
      (license license:expat))))
+
+(define-public go-github-com-schollz-closestmatch
+  (package
+    (name "go-github-com-schollz-closestmatch")
+    (version "2.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/schollz/closestmatch")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gpzqrvka1bps790b2px0h9z1j2vjga5xx7204anl83qndiyyrli"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:test-flags #~(list "-vet=off")
+      #:import-path "github.com/schollz/closestmatch"))
+    (propagated-inputs
+     (list go-github-com-djherbis-buffer))
+    (home-page "https://github.com/djherbis/nio")
+    (synopsis "Fuzzy matching within a set of strings")
+    (description
+     "@code{closestmatch} is a simple and fast Go library for fuzzy matching
+an input string to a list of target strings.  @code{closestmatch} is useful
+for handling input from a user where the input (which could be mispelled or
+out of order) needs to match a key in a database.  @code{closestmatch} uses a
+bag-of-words approach to precompute character n-grams to represent each
+possible target string.  The closest matches have highest overlap between the
+sets of n-grams.  The precomputation scales well and is much faster and more
+accurate than Levenshtein for long strings.")
+    (license license:expat)))
 
 (define-public go-github-com-schollz-logger
   (package
