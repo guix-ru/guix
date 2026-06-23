@@ -423,7 +423,7 @@ a human-readable byte format.")
 (define-public go-code-cloudfoundry-org-clock
   (package
     (name "go-code-cloudfoundry-org-clock")
-    (version "1.54.0")
+    (version "1.76.0")
     (source
      (origin
        (method git-fetch)
@@ -432,7 +432,10 @@ a human-readable byte format.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "11a1107nhv6mq6pqy7idrph07lbgjyj6qbwqgrzg49cxclb40zda"))))
+        (base32 "0j4iqfpk5kv3zs1bx75csdb6akvqbl6rqj3w3b66g73acz78lvb0"))
+       (snippet
+        #~(begin (use-modules (guix build utils))
+                 (delete-file-recursively "vendor")))))
     (build-system go-build-system)
     (arguments
      (list
