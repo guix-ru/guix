@@ -9846,6 +9846,43 @@ is an actively maintained fork of @url{https://github.com/ogier/pflag}.")
 interface (CLI).")
     (license license:asl2.0)))
 
+(define-public go-github-com-docker-cli-docs-tool
+  (package
+    (name "go-github-com-docker-cli-docs-tool")
+    (version "0.11.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/docker/cli-docs-tool")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1w60hyxc8rgb2rhwcax3fivg917fzb9p2j62cz8qsbwgw282qv1w"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/docker/cli-docs-tool"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'remove-examples
+            (lambda* (#:key import-path #:allow-other-keys)
+              (delete-file-recursively
+               (string-append "src/" import-path "/example")))))))
+    (native-inputs
+     (list go-github-com-spf13-cobra
+           go-github-com-spf13-pflag
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-go-yaml-in-yaml-v3))
+    (home-page "https://github.com/docker/cli-docs-tool")
+    (synopsis "Utilities to generate documentation for the Docker CLI")
+    (description
+     "This package provides tools for generating Docker @acronym{Command Line
+Interface, CLI} documentation publishing on
+@url{https://docs.docker.com/reference/}.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-docker-distribution
   (package
     (name "go-github-com-docker-distribution")
