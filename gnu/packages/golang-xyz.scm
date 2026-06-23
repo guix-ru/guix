@@ -2808,6 +2808,36 @@ package.")
 Pluggable-Discovery protocol.")
     (license license:gpl3)))
 
+(define-public go-github-com-arduino-pluggable-monitor-protocol-handler
+  (package
+    (name "go-github-com-arduino-pluggable-monitor-protocol-handler")
+    (version "0.9.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url
+               "https://github.com/arduino/pluggable-monitor-protocol-handler")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "025pvqx0wmijdfilq8frif01gky5mn83slg8x4gzcdas1rnw5r74"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/arduino/pluggable-monitor-protocol-handler"))
+    (propagated-inputs
+     (list go-github-com-hashicorp-go-multierror))
+    (home-page "https://github.com/arduino/pluggable-monitor-protocol-handler")
+    (synopsis "Make pluggable monitors for Arduino CLI")
+    (description
+     "Library to ease implementation of pluggable discoveries for the
+@url{https://github.com/arduino/arduino-cli, Arduino Command Line Interface}
+following the
+@url{https://arduino.github.io/arduino-cli/latest/platform-specification,
+official specification}.")
+    (license license:gpl3)))
+
 (define-public go-github-com-armon-circbuf
   (package
     (name "go-github-com-armon-circbuf")
