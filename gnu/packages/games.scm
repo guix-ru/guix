@@ -9649,7 +9649,7 @@ elements to achieve a simple goal in the most complex way possible.")
 (define-public the-powder-toy
   (package
     (name "the-powder-toy")
-    (version "99.5.394")
+    (version "100.0.399")
     (source
      (origin
        (method git-fetch)
@@ -9658,7 +9658,7 @@ elements to achieve a simple goal in the most complex way possible.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0wd0sg3lpl9xafyj76syvpdjh574cxjmxaf9kssfjjxs20y3hjn8"))
+        (base32 "0f2gdjykavsz944j4ahpjbj6k8v4sh09d1y82c4y46wayl78cp97"))
        (snippet
         #~(begin (use-modules (guix build utils))
                  (substitute* "meson.build"
