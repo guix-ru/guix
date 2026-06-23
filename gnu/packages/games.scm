@@ -6393,23 +6393,10 @@ Transport Tycoon Deluxe.")
           #~(modify-phases #$phases
               (add-before 'check 'build-tests
                 (lambda* (#:key (tests? #t) (make-flags '()) (parallel-build? #t) #:allow-other-keys)
-                  (use-modules (ice-9 threads))
                   (when tests?
-                    (apply invoke "cmake"
-                           `("--build"
-                             "."
-                             ,@(if parallel-build?
-                                   `("-j" ,(number->string (parallel-job-count)))
-                                   ;; When unset CMake defers to the build system.
-                                   '("-j" "1"))
-                             ;; Pass the following options to the native tool.
-                             "--"
-                             ,@(if parallel-build?
-                                   ;; Set load average limit for Make and Ninja.
-                                   `("-l" ,(number->string (total-processor-count)))
-                                   '())
-                             "openttd_test"
-                             ,@make-flags)))))))))
+                    (let ((build (assoc-ref #$phases 'build)))
+                      (build #:make-flags (cons "openttd_test" make-flags)
+                             #:parallel-build? parallel-build?)))))))))
     (home-page "https://github.com/JGRennison/OpenTTD-patches")
     (synopsis "OpenTTD with additional patches")
     (description
