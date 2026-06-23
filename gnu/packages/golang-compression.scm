@@ -6,6 +6,7 @@
 ;;; Copyright © 2022-2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2024 Troy Figiel <troy@troyfigiel.com>
 ;;; Copyright © 2025 Patrick Norton <patrick.147.norton@gmail.com>
+;;; Copyright © 2026 Orahcio Felício de Sousa <orahcio@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -301,6 +302,46 @@ blocks allowing it to only read the compressed blocks required.")
 only the SVR4 (New ASCII) format is supported, both with and without
 checksums.")
     (license license:bsd-3)))
+
+(define-public go-github-com-codeclysm-extract
+  (package
+    (name "go-github-com-codeclysm-extract")
+    (version "4.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/codeclysm/extract")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1sghhj00j370x7871i1qrnk349mld5ssk2nk74xq77bkf64mxccz"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/codeclysm/extract/v4"
+      #:test-flags
+      ;; Skip tests which requires network connection.
+      #~(list "-skip" (string-join
+                       (list "TestTarGzMemoryConsumption"
+                             "TestZipMemoryConsumption"
+                             "TestZipDirectoryPermissions")
+                       "|"))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-arduino-go-paths-helper
+           go-github-com-h2non-filetype
+           go-github-com-juju-errors
+           go-github-com-klauspost-compress
+           go-github-com-ulikunitz-xz
+           go-golang-org-x-sys))
+    (home-page "https://github.com/codeclysm/extract")
+    (synopsis "Extract archives for different formats")
+    (description
+     "Package extract allows to extract archives in @code{zip},@code{tar.gz}
+or @code{tar.bz2} formats easily.")
+    (license license:expat)))
 
 (define-public go-github-com-containerd-stargz-snapshotter-estargz
   (package
