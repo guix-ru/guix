@@ -125,7 +125,7 @@ alternative fork of @url{https://github.com/gxed/bbloom}.")
 (define-public go-github-com-ipfs-boxo
   (package
     (name "go-github-com-ipfs-boxo")
-    (version "0.39.0")
+    (version "0.41.0")
     (source
      (origin
        (method git-fetch)
@@ -134,13 +134,11 @@ alternative fork of @url{https://github.com/gxed/bbloom}.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0sy7v5cnz7ajvfb1mz4p86rmsr8f8agzgfnpwyzlhvvwcglslns9"))
+        (base32 "1py1p8ijxj16k2l8szrrjw7raf63m44wdrwlaa63rfc7c9fd5nni"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
             ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - github.com/ipfs/boxo/examples
             (delete-file-recursively "examples")))))
     (build-system go-build-system)
     (arguments
