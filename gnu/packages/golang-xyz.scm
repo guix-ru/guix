@@ -16957,6 +16957,32 @@ https://github.com/zeebo/goof - calling functions in binary files." )
 for color and styles.")
     (license license:lgpl3)))
 
+(define-public go-github-com-juju-errors
+  (package
+    (name "go-github-com-juju-errors")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/juju/errors")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1j8c1kjg6iz6xdisfma024w4sjhm4vmsimyb5rrjkqpqsz079rpn"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/juju/errors"))
+    (native-inputs
+     (list go-gopkg-in-check-v1))
+    (home-page "https://github.com/juju/errors")
+    (synopsis "Go library to annotate errors")
+    (description
+     "Package errors provides an easy way to annotate errors without losing
+the original error context.")
+    (license license:lgpl3)))
+
 (define-public go-github-com-k-sone-critbitgo
   (package
     (name "go-github-com-k-sone-critbitgo")
