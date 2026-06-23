@@ -29778,6 +29778,33 @@ ESXi, Xen, or tboot.  They are meant to be used with LinuxBoot.
 dependencies of @url{https://u-root.org/, u-root} project.")
     (license license:bsd-3)))
 
+(define-public go-github-com-ugorji-go-codec
+  (package
+    (name "go-github-com-ugorji-go-codec")
+    (version "1.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ugorji/go")
+              (commit (go-version->git-ref version #:subdir "codec"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1fgfvmwqmnpil9sv9zgdw9hrf41fp8gv4qwfh7l4n1p8rv7vvxvk"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/ugorji/go/codec"
+      #:unpack-path "github.com/ugorji/go"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (home-page "https://github.com/ugorji/go")
+    (synopsis "Idiomatic codec and RPC Go library")
+    (description
+     "Package codec provides a High Performance, Feature-Rich Idiomatic Go
+codec/encoding library for BINC, MSGPACK, CBOR, JSON.")
+    (license license:expat)))
+
 (define-public go-github-com-unknwon-goconfig
   (package
     (name "go-github-com-unknwon-goconfig")
