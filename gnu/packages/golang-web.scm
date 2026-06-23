@@ -21975,17 +21975,16 @@ progress tracking and timeout support.")
 (define-public go-go-etcd-io-etcd-api-v3
   (package
     (name "go-go-etcd-io-etcd-api-v3")
-    (version "3.6.10")
+    (version "3.6.12")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/etcd-io/etcd")
-              (commit (go-version->git-ref version
-                                           #:subdir "api"))))
+              (commit (go-version->git-ref version #:subdir "api"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0xyq7flcdvbmiss0snriylvabkwclhyb3977vl1xy9gxq94cwqq4"))
+        (base32 "0xg0bh3fv4av63ika8f7vgj4f929b108ia5ccyqrv00j3k4vyjm1"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -21997,14 +21996,20 @@ progress tracking and timeout support.")
                                           (cons* "." ".." preserve))))
                        (items (scandir "." pred)))
                   (for-each (cut delete-file-recursively <>) items))))
-            (delete-all-but "." "api")))))
+            (delete-all-but "." "api")
+            ;; This is a workaround to provide a correct import-path.
+            (rename-file "api" "tmp")
+            (mkdir-p "api/v3")
+            (copy-recursively "tmp" "api/v3")
+            (delete-file-recursively "tmp")))))
     (build-system go-build-system)
     (arguments
      (list
       #:skip-build? #t
-      #:import-path "go.etcd.io/etcd/api"
+      #:import-path "go.etcd.io/etcd/api/v3"
       #:unpack-path "go.etcd.io/etcd"))
-    (native-inputs (list go-github-com-stretchr-testify))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
     (propagated-inputs
      (list go-github-com-coreos-go-semver
            go-github-com-gogo-protobuf
