@@ -2721,6 +2721,31 @@ stored in files with an INI like syntax.")
 Arduino (and compatible) boards.")
     (license license:gpl3)))
 
+(define-public go-github-com-arduino-go-timeutils
+  (package
+    (name "go-github-com-arduino-go-timeutils")
+    (version "0.0.0-20171220113728-d1dd9e313b1b")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/arduino/go-timeutils")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "03ivqvf9922pxy3hlsywfl2yn2ljyq7dsc7ivgj6v5lpxw1x7r2p"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/arduino/go-timeutils"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/arduino/go-timeutils")
+    (synopsis "Handle timezones in Golang")
+    (description
+     "Some useful functions to handle timezones in Go.")
+    (license license:gpl2)))
+
 (define-public go-github-com-armon-circbuf
   (package
     (name "go-github-com-armon-circbuf")
