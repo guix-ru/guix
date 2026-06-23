@@ -8729,6 +8729,30 @@ Features:
 @end itemize")
     (license license:expat)))
 
+(define-public go-github-com-d6o-gotree-v3
+  (package
+    (name "go-github-com-d6o-gotree-v3")
+    (version "3.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/d6o/GoTree")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1qf3i0mrg67hb9f439h76qgn7gp9vkyb7wp7lcr65q9igzn41bzp"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/d6o/GoTree/v3"))
+    (home-page "https://github.com/d6o/GoTree")
+    (synopsis "Tree printer module written in Golang ")
+    (description
+     "This package provides a simple Go module to print tree structures in
+terminal.")
+    (license license:expat)))
+
 (define-public go-github-com-danielgtaylor-mexpr
   (package
     (name "go-github-com-danielgtaylor-mexpr")
