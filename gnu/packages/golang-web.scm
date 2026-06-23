@@ -9182,7 +9182,7 @@ certificates.")
 (define-public go-github-com-google-go-containerregistry
   (package
     (name "go-github-com-google-go-containerregistry")
-    (version "0.20.2")
+    (version "0.21.7")
     (source
      (origin
        (method git-fetch)
@@ -9191,16 +9191,11 @@ certificates.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0gmbvpcbp6n9hx8dpggbxl7540b6vq3p0rm5a6lsjj2gw62p7zp5"))
+        (base32 "002qa02i1ai3qqysjzgi01v9gcx5zcx6f8bgwkik8yb415ijk80d"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
-            ;; Submodules with their own go.mod files and packed as separated
-            ;; packages:
-            ;;
-            ;; - github.com/google/go-containerregistry/cmd/krane
-            ;; - github.com/google/go-containerregistry/pkg/authn/k8schain
-            ;; - github.com/google/go-containerregistry/pkg/authn/kubernetes
+            ;; Submodules with their own go.mod files and packaged separately:
             (for-each delete-file-recursively
                       (list "cmd/krane"
                             "pkg/authn/k8schain"
@@ -9210,25 +9205,17 @@ certificates.")
     (arguments
      (list
       #:skip-build? #t
-      #:import-path "github.com/google/go-containerregistry"
-      #:test-flags
-      #~(list "-vet=off"
-              "-skip" (string-join
-                       (list "TestGcloudErrors"
-                             "TestGcloudSuccess"
-                             "TestKeychainGCRandAR")
-                       "|"))))
+      #:import-path "github.com/google/go-containerregistry"))
     (native-inputs
      ;; For the CLI commands.
      (list go-github-com-spf13-cobra
            go-github-com-google-go-cmp))
     (propagated-inputs
-     (list go-github-com-containerd-stargz-snapshotter-estargz
-           go-github-com-docker-cli
-           go-github-com-docker-distribution
-           go-github-com-docker-docker
+     (list go-github-com-docker-cli
            go-github-com-klauspost-compress
-           go-github-com-mitchellh-go-homedir
+           go-github-com-moby-docker-image-spec
+           go-github-com-moby-moby-api
+           go-github-com-moby-moby-client
            go-github-com-opencontainers-go-digest
            go-github-com-opencontainers-image-spec
            go-golang-org-x-oauth2
