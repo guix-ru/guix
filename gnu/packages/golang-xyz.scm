@@ -29268,6 +29268,31 @@ many small values.  For multi-line CSV parsing, the standard library is
 recommended.")
     (license license:expat)))
 
+(define-public go-github-com-tonistiigi-go-rosetta
+  (package
+    (name "go-github-com-tonistiigi-go-rosetta")
+    (version "0.0.0-20220804170347-3f4430f2d346")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/tonistiigi/go-rosetta")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1r7vgji0zxam3mw02mlp1kkx7k1lyxlwbpz9jizlxdvsg24dx77i"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/tonistiigi/go-rosetta"))
+    (home-page "https://github.com/tonistiigi/go-rosetta")
+    (synopsis "go-rosetta")
+    (description
+     "@code{go-rosetta} provides utilities to detect if an application is
+running as a Apple Rosetta translated binary, and to determine the native
+architecture.")
+    (license license:expat)))
+
 (define-public go-github-com-tonistiigi-units
   (package
     (name "go-github-com-tonistiigi-units")
