@@ -14487,17 +14487,16 @@ control the daemon.")
 (define-public go-github-com-moby-moby-client
   (package
     (name "go-github-com-moby-moby-client")
-    (version "0.1.0-beta.0")
+    (version "0.5.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/moby/moby")
-              (commit (go-version->git-ref version
-                                           #:subdir "client"))))
+              (commit (go-version->git-ref version #:subdir "client"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1624z57hqqw1b473arfa5m936rsrhc8h3hs2jg4645b3dykfyawn"))
+        (base32 "175i8w410z4532krammdard8gn13q4mr6bfadf81gqyd3ab60ksy"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -14516,20 +14515,22 @@ control the daemon.")
       #:import-path "github.com/moby/moby/client"
       #:unpack-path "github.com/moby/moby"))
     (native-inputs
-     (list go-gotest-tools-v3))
+     (list go-github-com-google-go-cmp))
     (propagated-inputs
      (list go-github-com-containerd-errdefs
            go-github-com-containerd-errdefs-pkg
            go-github-com-distribution-reference
            go-github-com-docker-go-connections
            go-github-com-docker-go-units
-           ;; go-github-com-microsoft-go-winio ; for Windows only
+           ;; go-github-com-microsoft-go-winio ;Windows only
            go-github-com-moby-moby-api
            go-github-com-moby-term
            go-github-com-opencontainers-go-digest
            go-github-com-opencontainers-image-spec
            go-go-opentelemetry-io-contrib-instrumentation-net-http-otelhttp
-           go-go-opentelemetry-io-otel-trace))
+           go-go-opentelemetry-io-otel-trace
+           go-golang-org-x-time
+           go-gotest-tools-v3))
     (home-page "https://github.com/moby/moby")
     (synopsis "Go client for the Docker Engine API")
     (description "Package client is a Go client for the Docker Engine API.")
