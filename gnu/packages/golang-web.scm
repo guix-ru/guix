@@ -5442,9 +5442,10 @@ library to provide APIs for CNI plugin interactions.")
     (license license:asl2.0)))
 
 (define-public go-github-com-containerd-nri
+  ;; TODO: Move to (gnu packages containers).
   (package
     (name "go-github-com-containerd-nri")
-    (version "0.10.0")
+    (version "0.12.0")
     (source
      (origin
        (method git-fetch)
@@ -5453,23 +5454,11 @@ library to provide APIs for CNI plugin interactions.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0h08xvph1z237qw5djhadk35n2w4ivvsgzl4dlm0pgy340qpvg8w"))
+        (base32 "0xa6sndksmpissnsabaxi1k2zzvp71i62s1rgb03qy7zvxsymh9d"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
             ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - github.com/containerd/nri/examples
-            ;; - github.com/containerd/nri/plugins/device-injector
-            ;; - github.com/containerd/nri/plugins/differ
-            ;; - github.com/containerd/nri/plugins/hook-injector
-            ;; - github.com/containerd/nri/plugins/logger
-            ;; - github.com/containerd/nri/plugins/network-device-injector
-            ;; - github.com/containerd/nri/plugins/network-logger
-            ;; - github.com/containerd/nri/plugins/template
-            ;; - github.com/containerd/nri/plugins/ulimit-adjuster
-            ;; - github.com/containerd/nri/plugins/v010-adapter
-            ;; - github.com/containerd/nri/plugins/wasm
             (for-each delete-file-recursively
                       (list "examples"
                             "plugins/device-injector"
@@ -5491,7 +5480,8 @@ library to provide APIs for CNI plugin interactions.")
            go-github-com-onsi-gomega
            go-github-com-onsi-ginkgo-v2))
     (propagated-inputs
-     (list go-github-com-containerd-ttrpc
+     (list go-github-com-brianvoe-gofakeit-v7
+           go-github-com-containerd-ttrpc
            go-github-com-google-go-cmp
            go-github-com-knqyf263-go-plugin
            go-github-com-moby-sys-mountinfo
@@ -5499,6 +5489,7 @@ library to provide APIs for CNI plugin interactions.")
            go-github-com-opencontainers-runtime-tools
            go-github-com-sirupsen-logrus
            go-github-com-tetratelabs-wazero
+           go-golang-org-x-mod
            go-golang-org-x-sys
            go-google-golang-org-grpc
            go-google-golang-org-protobuf
