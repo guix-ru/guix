@@ -9543,6 +9543,44 @@ images within the registry.  Its main purpose is to abstract tags and digests
 atimes for files.")
     (license license:expat)))
 
+(define-public go-github-com-djherbis-buffer
+  (package
+    (name "go-github-com-djherbis-buffer")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/djherbis/buffer")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "17m6la583p9yskcj3bmhnazj8j4v8bmfjjp0kkv8i0zhqmcm0wmq"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/djherbis/buffer"))
+    (home-page "https://github.com/djherbis/buffer")
+    (synopsis "Composable Buffers for Golang")
+    (description
+     "Package buffer implements a series of Buffers which can be composed to
+implement complicated buffering strategies.
+
+Supported buffers:
+
+@itemize
+@item Wrapper for bytes.
+@item File-based buffering.
+@item A fixed length linked-list of buffers.
+@item A queue of buffers.
+@item A single buffer which begins overwriting the oldest buffered data when
+it reaches its capacity.
+@item A single buffer which when full, writes the overflow to a given io.
+@item Empty buffer.
+@item Customize buffers.
+@end itemize")
+    (license license:expat)))
+
 (define-public go-github-com-djherbis-times
   (package
     (name "go-github-com-djherbis-times")
