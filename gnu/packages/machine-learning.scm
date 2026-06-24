@@ -1159,7 +1159,7 @@ algorithm.")
 (define-public openmm
   (package
     (name "openmm")
-    (version "8.5.0")
+    (version "8.5.2")
     (source
      (origin
        (method git-fetch)
@@ -1169,12 +1169,13 @@ algorithm.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "081yxldinf5ldrag4f50a7kx13fi9wzynq1zc1m619ap14y6nzrl"))))
+         "0y62jg9jl4hrwgcpak6gm7pyvr509msx72a5yp2bqlqir2fa0qzn"))))
     (build-system cmake-build-system)
     (arguments
      (list
       #:configure-flags
       '(list "-DOPENMM_BUILD_SHARED_LIB=TRUE"
+             "-DOPENMM_BUILD_REFERENCE_TESTS=FALSE"      ;takes too long on ci
              "-DOPENMM_BUILD_C_AND_FORTRAN_WRAPPERS=TRUE"
              "-DOPENMM_BUILD_PYTHON_WRAPPERS=TRUE"
              "-DOPENMM_BUILD_CUDA_LIB=FALSE")
@@ -1210,7 +1211,7 @@ algorithm.")
            opencl-headers
            python-cython
            python-setuptools
-           swig))
+           swig-4.4))
     (home-page "https://github.com/openmm/openmm/")
     (synopsis "Toolkit for molecular simulation")
     (description
