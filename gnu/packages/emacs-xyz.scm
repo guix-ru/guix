@@ -48632,7 +48632,7 @@ projects.")
                 (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "19z22apsci921vccqd6nsmx8ayp96lr3ifjprgx97cdr896pj2qm"))))
+          (base32 "0zqyg20yk2kgp1cgbis20z880lr4napy52rxcklp9y6l8n0qg1jf"))))
       (build-system emacs-build-system)
       (native-inputs (list emacs-buttercup))
       (home-page "https://github.com/d12frosted/vui.el")
