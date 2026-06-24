@@ -1721,8 +1721,7 @@ bootloader in Espressif ESP8266 & ESP32 series chips.")
 (define-public radare2
   (package
     (name "radare2")
-    ;; TODO: Delete upstreamed phase 'find-capital-zydis' at versions >6.1.6.
-    (version "6.1.6")                   ;keep in sync with iaito,r2ghidra
+    (version "6.1.8")                   ;keep in sync with iaito,r2ghidra
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1730,7 +1729,7 @@ bootloader in Espressif ESP8266 & ESP32 series chips.")
                     (commit version)))
               (sha256
                (base32
-                "1a1d36nk4jkzlxywrzgf45wlzh7zifl7ilz8nj89d7n0mlk55g8r"))
+                "1p8h3wwmbaizxj08pif2mk8vcq2xiv5yavhdgcdwf8mcyp99c7qs"))
               (file-name (git-file-name name version))
               (patches
                (search-patches "radare2-fix-meson-build-to-use-sys-sdb.patch"
@@ -1751,11 +1750,6 @@ bootloader in Espressif ESP8266 & ESP32 series chips.")
               "-Duse_sys_zydis=true")
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'configure 'find-capital-zydis
-            (lambda _
-              (substitute* '("meson.build")
-                ;; We want the big one.
-                (("(find_library\\(')zydis" _ f) (string-append f "Zydis")))))
           ;; CHECK LATER: This patches an incorrect relative include.
           (add-before 'build 'fix-relative-include
             (lambda _
