@@ -223,8 +223,8 @@ LaTeX does for scientific text.")
 (define-public guile-charting
   ;; This commit fixes a few things, including Guile 3 support, not available
   ;; in the latest release.
-  (let ((commit "75f755b691a9f712f3b956657d01805d6a8a1b98")
-        (revision "1"))
+  (let ((commit "72c148fe164da36cf3f0fb877d858d65f10ee785")
+        (revision "2"))
     (package
       (name "guile-charting")
       (version (git-version "0.2.0" revision commit))
@@ -236,7 +236,7 @@ LaTeX does for scientific text.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "03049g7wnpyfi0r36ij4a46kc9l45jbanx02iklkjwav2n6jqnnk"))))
+                  "1fnilx9973b6958gnjrr8012mhi840cp66rj5iq6gkp02kx34i3r"))))
       (build-system gnu-build-system)
       (native-inputs
        (list autoconf automake texinfo pkg-config))
