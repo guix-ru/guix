@@ -384,7 +384,7 @@ comparison and diagnostics.")
 (define r-with-tests
   (package
     (name "r-with-tests")
-    (version "4.6.0")
+    (version "4.6.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://cran/src/base/R-"
@@ -392,7 +392,7 @@ comparison and diagnostics.")
                                   version ".tar.xz"))
               (sha256
                (base32
-                "09sszy5fykpl2lyzxw5rgiabb3f5l62bqamnm7g2q9d57xlv7wli"))))
+                "10spzsmyh32pkg124slbq19g9qm19ki7ar6xbsyg3wsiw60ra574"))))
     (build-system gnu-build-system)
     (arguments
      (list
