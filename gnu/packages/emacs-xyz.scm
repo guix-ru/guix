@@ -47802,6 +47802,7 @@ current region or entire buffer.")
         (base32
          "11qjcbvac2aqba136zyvgqhcfcrx6znc9s4cym8mcvfms05sphsm"))))
     (build-system emacs-build-system)
+    (arguments (list #:tests? #f))                   ; No tests.
     (home-page "https://github.com/skeeto/nasm-mode")
     (synopsis "NASM x86 assembly major mode")
     (description
