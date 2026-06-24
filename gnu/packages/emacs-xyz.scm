@@ -42241,7 +42241,11 @@ federated microblogging social network.")
                           (rename-file f
                                        (basename f)))
                         (find-files "./ui" ".*\\.el$")))))))
-    (propagated-inputs (list emacs-emojify emacs-request))
+    (propagated-inputs
+     (list emacs-emojify
+           emacs-async-http-queue
+           emacs-org                    ;requires org 9.0
+           emacs-request))
     (home-page "https://github.com/tanrax/org-social.el")
     (synopsis "Emacs client for Org-social")
     (description
