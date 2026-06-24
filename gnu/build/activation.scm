@@ -497,6 +497,8 @@ improvement."
   (mkdir-p "/run")
   ;; Atomically make SYSTEM current.
   (let ((new (string-append %current-system ".new")))
+    (when (file-exists? new)
+      (delete-file new))
     (symlink system new)
     (rename-file new %current-system)))
 
