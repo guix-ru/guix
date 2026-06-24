@@ -5038,7 +5038,7 @@ policies, and so on.
 (define-public radicle
   (package
     (name "radicle")
-    (version "1.8.0")
+    (version "1.9.1")
     (source
      (origin
        (method url-fetch/tarbomb)
@@ -5046,7 +5046,7 @@ policies, and so on.
              "https://files.radicle.dev/releases/"
              version "/heartwood-" version ".tar.gz"))
        (sha256
-        (base32 "15w0jijwfbvrfwpn89qbcf2mlxnjyhrcjhjymjgwdqcswpz89pn1"))
+        (base32 "0z4ygjn5gmhh4v3iw5g5hxy536288wz464sb1vh90145wnjx4i74"))
        (modules '((guix build utils)))
        (snippet
         '(begin
