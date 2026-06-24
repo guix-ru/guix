@@ -28362,6 +28362,39 @@ structures using selector strings.  It's similar to @code{jq}/@code{yq}, but
 supports JSON, YAML, TOML, XML and CSV with zero runtime dependencies.")
     (license license:expat)))
 
+(define-public go-github-com-tomwright-dasel-v3
+  (package
+    (inherit go-github-com-tomwright-dasel-v2)
+    (name "go-github-com-tomwright-dasel-v3")
+    (version "3.11.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/TomWright/dasel")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0q9mb540h948qnh4hkff92a592fhhybajld2h7la4n6iaak55y2x"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:embed-files #~(list ".*\\.xml")
+      #:import-path "github.com/tomwright/dasel/v3"))
+    (native-inputs
+     (list go-github-com-charmbracelet-bubbles
+           go-github-com-charmbracelet-bubbletea
+           go-github-com-charmbracelet-lipgloss
+           go-github-com-google-go-cmp))
+    (propagated-inputs
+     (list go-github-com-alecthomas-kong
+           go-github-com-goccy-go-json
+           go-github-com-hashicorp-hcl-v2
+           go-github-com-pelletier-go-toml-v2
+           go-github-com-zclconf-go-cty
+           go-go-yaml-in-yaml-v4
+           go-gopkg-in-ini-v1))))
+
 (define-public go-github-com-tonistiigi-dchapes-mode
   (package
     (name "go-github-com-tonistiigi-dchapes-mode")
