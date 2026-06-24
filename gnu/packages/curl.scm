@@ -421,7 +421,7 @@ asynchronously via cURL in C++.")
     (inputs (list curl
                   go-golang-org-x-sys
                   go-golang-org-x-term))
-    (home-page "https://curlie.io")
+    (home-page "https://rs.github.io/curlie")
     (synopsis "The power of curl, the ease of use of httpie")
     (description "If you like the interface of HTTPie but miss the features of
 curl, curlie is what you are searching for.  Curlie is a frontend to
