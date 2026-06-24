@@ -27030,14 +27030,13 @@ passed from LaTeX to Python.")
 (define-public python-latexminted
   (package
     (name "python-latexminted")
-    ;; Version 0.6.0 is not compatible with our packaged python-pygments.
-    (version "0.5.1")
+    (version "0.7.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "latexminted" version))
        (sha256
-        (base32 "12pj51nw7k3h6pv8r7k7382jwvs5wsd80cpkv222nkv07gnfg390"))))
+        (base32 "1yj08q1bpy0lk3gk6zs9b7ik83mwn9d7s85fpvyj1wk06iphj96p"))))
     (build-system pyproject-build-system)
     (arguments (list #:tests? #f))      ; No tests upstream.
     (propagated-inputs (list python-latex2pydata
