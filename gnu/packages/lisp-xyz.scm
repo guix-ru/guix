@@ -29812,6 +29812,12 @@ generative algorithmic composition.")
 (define-public cl-slippery-chicken
   (sbcl-package->cl-source-package sbcl-slippery-chicken))
 
+(define-public ecl-slippery-chicken
+  (package
+    (inherit (sbcl-package->ecl-package sbcl-slippery-chicken))
+    ;; https://github.com/mdedwards/slippery-chicken/issues/112
+    (arguments (list #:tests? #f))))
+
 (define-public sbcl-slite
   (let ((commit "942a95330592d30be5ac02fb1b697fb14ccbf1af")
         (revision "0"))
