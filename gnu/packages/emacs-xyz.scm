@@ -9564,7 +9564,7 @@ and code formatting.")
 (define-public emacs-ef-themes
   (package
     (name "emacs-ef-themes")
-    (version "2.1.0")
+    (version "2.2.0")
     (source
      (origin
        (method git-fetch)
@@ -9574,7 +9574,7 @@ and code formatting.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0z3myb12sjxyk7sl1xa4bwq6zjhhhfydl8d4z55pshs9c5pa489h"))))
+         "0pmyfzckiqa6gcqj8sb9vvvk2hpgj2jx5vssr5vavz812631hmha"))))
     (build-system emacs-build-system)
     (arguments
      (list
