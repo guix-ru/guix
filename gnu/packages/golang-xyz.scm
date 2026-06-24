@@ -35036,6 +35036,21 @@ import layers from images.  Those other tools can then either manage the
 concept of images on their own, or let the API/CLI handle storing the image
 metadata and/or configuration.")))
 
+(define-public dasel
+  (package/inherit go-github-com-tomwright-dasel-v3
+    (name "dasel")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:tests? _ #t) #f)
+       ((#:install-source? _ #t) #f)
+       ((#:import-path _) "github.com/tomwright/dasel/v3/cmd/dasel")
+       ((#:unpack-path _ "") "github.com/tomwright/dasel/v3")))
+    (native-inputs
+     (append (package-native-inputs go-github-com-tomwright-dasel-v3)
+             (package-propagated-inputs go-github-com-tomwright-dasel-v3)))
+    (propagated-inputs '())
+    (inputs '())))
+
 (define-public glua
   (package/inherit go-github-com-yuin-gopher-lua
     (name "glua")
