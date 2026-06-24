@@ -2088,8 +2088,8 @@ the following inside the checkout:
 
 @example shell
 $ guix shell rust rust:cargo -- cargo generate-lockfile
-$ guix shell rust rust:cargo -- cargo audit
-$ guix shell rust rust:cargo -- cargo license
+$ guix shell rust rust:cargo cargo-audit -- cargo audit
+$ guix shell rust rust:cargo cargo-license -- cargo license
 @end example
 
 @quotation Note
