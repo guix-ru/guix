@@ -51,6 +51,7 @@
 ;;; Copyright © 2026 Daniel Khodabakhsh <d@niel.khodabakh.sh>
 ;;; Copyright © 2026 Spencer King <spencer.king@wustl.edu>
 ;;; Copyright © 2026 Brent Wedderburn <mb@bean.za.net>
+;;; Copyright © 2026 Orahcio Felício de Sousa <orahcio@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -73,6 +74,7 @@
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system emacs)
+  #:use-module (guix build-system go)
   #:use-module (guix build-system guile)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system meson)
@@ -125,6 +127,15 @@
   #:use-module (gnu packages gl)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
+  #:use-module (gnu packages golang)
+  #:use-module (gnu packages golang-build)
+  #:use-module (gnu packages golang-check)
+  #:use-module (gnu packages golang-compression)
+  #:use-module (gnu packages golang-crypto)
+  #:use-module (gnu packages golang-maths)
+  #:use-module (gnu packages golang-vcs)
+  #:use-module (gnu packages golang-web)
+  #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages graphics)
   #:use-module (gnu packages graphviz)
   #:use-module (gnu packages groff)
@@ -1517,6 +1528,116 @@ developed at MIT to model electromagnetic systems.")
 specified in high-level description language into ready-to-compile C code for
 the API of spice simulators.  Based on transformations specified in XML
 language, ADMS transforms Verilog-AMS code into other target languages.")
+    (license license:gpl3)))
+
+(define-public arduino-cli
+  (package
+    (name "arduino-cli")
+    (version "1.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/arduino/arduino-cli")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "15iqly4clwxp8l3kd7gfnmszbyq1586rjymc6a4zi6bh2q8zm59i"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:go go-1.26
+      #:install-source? #f
+      #:import-path "github.com/arduino/arduino-cli"
+      ;; List tests which need no internet resource
+      ;; Skiping
+      ;; internal/arduino/monitor
+      ;; internal/arduino/resources
+      ;; internal/arduino/cores/packagemanager
+      ;; internal/cli/arguments
+      ;; internal/integrationtest
+      #:test-subdirs
+      #~(list "commands"
+              "internal/go-configmap"
+              "internal/i18n"
+              "internal/buildcache"
+              "internal/cli/feedback"
+              "internal/cli/feedback/result"
+              "internal/locales"
+              "internal/locales/cmd/po"
+              "internal/arduino/utils"
+              "internal/arduino/security"
+              "internal/arduino/builder"
+              "internal/arduino/builder/cpp"
+              "internal/arduino/builder/internal/compilation"
+              "internal/arduino/builder/internal/detector"
+              "internal/arduino/builder/internal/diagnostics"
+              "internal/arduino/builder/internal/preprocessor"
+              "internal/arduino/builder/internal/preprocessor/internal/ctags"
+              "internal/arduino/builder/internal/progress"
+              "internal/arduino/builder/internal/runner"
+              "internal/arduino/builder/internal/utils"
+              "internal/arduino/cores"
+              "internal/arduino/cores/packageindex"
+              "internal/arduino/libraries"
+              "internal/arduino/libraries/librariesindex"
+              "internal/arduino/libraries/librariesmanager"
+              "internal/arduino/libraries/librariesresolver"
+              "internal/arduino/sketch"
+              "internal/cli/configuration"
+              "internal/cli/lib"
+              "internal/cli/monitor"
+              "internal/orderedmap"
+              "pkg/fqbn")))
+    (native-inputs
+     (list go-fortio-org-safecast
+           go-github-com-arduino-go-paths-helper
+           go-github-com-arduino-go-properties-orderedmap
+           go-github-com-arduino-go-serial-utils
+           go-github-com-arduino-go-timeutils
+           go-github-com-arduino-go-win32-utils
+           go-github-com-arduino-pluggable-discovery-protocol-handler
+           go-github-com-arduino-pluggable-monitor-protocol-handler
+           go-github-com-cmaglie-pb
+           go-github-com-codeclysm-extract
+           go-github-com-djherbis-buffer
+           go-github-com-djherbis-nio
+           go-github-com-fatih-color
+           go-github-com-go-git-go-git-v5
+           go-github-com-gofrs-uuid-v5
+           go-github-com-leonelquinteros-gotext
+           go-github-com-marcinbor85-gohex
+           go-github-com-mattn-go-colorable
+           go-github-com-mattn-go-isatty
+           go-github-com-protonmail-go-crypto
+           go-github-com-rifflock-lfshook
+           go-github-com-rogpeppe-go-internal
+           go-github-com-schollz-closestmatch
+           go-github-com-sirupsen-logrus
+           go-github-com-spf13-cobra
+           go-github-com-spf13-viper
+           go-github-com-stretchr-testify
+           go-github-com-xeipuuv-gojsonschema
+           go-go-bug-st-cleanup
+           go-go-bug-st-downloader
+           go-go-bug-st-f
+           go-go-bug-st-relaxed-semver
+           go-go-bug-st-testifyjson
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-golang-org-x-text
+           go-google-golang-org-genproto-googleapis-rpc
+           go-google-golang-org-grpc
+           go-google-golang-org-protobuf
+           go-gopkg-in-yaml-v3
+           go-github-com-mailru-easyjson))
+    (home-page "https://github.com/arduino/arduino-cli")
+    (synopsis "Tools to manage Arduino compatible boards")
+    (description
+     "Arduino Command Line Interface is an all-in-one solution that provides
+Boards/Library Managers, sketch builder, board detection, uploader, and many
+other tools needed to use any Arduino compatible board and platform from
+command line or machine interfaces.")
     (license license:gpl3)))
 
 (define-public audmes
