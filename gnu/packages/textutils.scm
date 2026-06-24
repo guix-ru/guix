@@ -1820,7 +1820,7 @@ of a Unix terminal to HTML code.")
 (define-public vale
   (package
     (name "vale")
-    (version "3.13.0")
+    (version "3.15.1")
     (source
      (origin
        (method git-fetch)
@@ -1828,7 +1828,7 @@ of a Unix terminal to HTML code.")
               (url "https://github.com/errata-ai/vale")
               (commit (string-append "v" version))))
        (sha256
-        (base32 "0qa1maav2zf6z5ij1yg6i3gbkknngqhlrhlkxrypzdf7q10558kr"))
+        (base32 "1mb7737b19v4j07jnwy0cgicwaq5wwq27am5hw7wnf2qbc8g57ff"))
        (file-name (git-file-name name version))))
     (build-system go-build-system)
     (arguments
@@ -1855,7 +1855,8 @@ of a Unix terminal to HTML code.")
             (lambda _
               (setenv "HOME" "/tmp"))))))
     (native-inputs
-     (list go-github-com-adrg-frontmatter
+     (list go-github-com-masterminds-sprig-v3
+           go-github-com-adrg-frontmatter
            go-github-com-adrg-strutil
            go-github-com-adrg-xdg
            go-github-com-bmatcuk-doublestar-v4
@@ -1866,10 +1867,9 @@ of a Unix terminal to HTML code.")
            go-github-com-gobwas-glob
            go-github-com-jdkato-go-tree-sitter-julia
            go-github-com-jdkato-twine
-           go-github-com-masterminds-sprig-v3
            go-github-com-mitchellh-mapstructure
            go-github-com-niklasfasching-go-org
-           go-github-com-olekukonko-tablewriter-0.0.5
+           go-github-com-olekukonko-tablewriter
            go-github-com-otiai10-copy
            go-github-com-pelletier-go-toml-v2
            go-github-com-pterm-pterm
@@ -1877,11 +1877,12 @@ of a Unix terminal to HTML code.")
            go-github-com-smacker-go-tree-sitter
            go-github-com-spf13-pflag
            go-github-com-tomwright-dasel-v2
+           go-github-com-tomwright-dasel-v3
            go-github-com-yuin-goldmark
            go-golang-org-x-exp
            go-golang-org-x-net
            go-golang-org-x-sys
-           go-gopkg-in-yaml-v2))
+           go-gopkg-in-yaml-v3))
     (home-page "https://github.com/errata-ai/vale")
     (synopsis "Fully customizable syntax-aware linter that focuses on your style")
     (description
