@@ -34,6 +34,7 @@
 ;; Copyright © 2025 jgart <jgart@dismail.de>
 ;; Copyright © 2025 Steve George <steve@futurile.net>
 ;; Copyright © 2026 Noé Lopez <noelopez@free.fr>
+;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
 
 ;;
 ;; Copying and distribution of this file, with or without modification, are
@@ -42,6 +43,30 @@
 
 (channel-news
  (version 0)
+
+ (entry (commit "2949c187f600841cdcddfc4f955506b34b79244f")
+        (title
+         (en "@command{pull} and @command{time-machine} can select or exclude
+channels to update"))
+        (body
+         (en "The @command{guix pull} and @command{guix time-machine} can now
+be optionally passed @option{--select} (@option{-e}) or
+@option{--exclude} (@option{-x}) to control which channels should be updated.
+
+For instance, the command below updates the @code{guix-science} and
+@code{guix-past} channels while keeping Guix at the current commit:
+
+@example
+guix pull -e guix-science -e guix-past
+@end example
+
+To update all but the @code{guix} channel, one could do as follows:
+
+@example
+guix pull -x guix
+@end example
+
+See @samp{info \"(guix)Invoking guix pull\"} for more information.")))
 
  (entry (commit "86776ccd30bb44eb856fcf3a14a8338f38fe1367")
         (title
