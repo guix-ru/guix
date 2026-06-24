@@ -29768,8 +29768,8 @@ processes that doesn't run under Emacs.  Lisp processes created by
   (sbcl-package->clasp-package sbcl-slime-swank))
 
 (define-public sbcl-slippery-chicken
-  (let ((commit "bd57a217c12a0a2325a71286670c538915eeb4ba")
-        (revision "1"))
+  (let ((commit "50ea0ef02fe6e29f43c4683220004a31c09c1d1c")
+        (revision "2"))
     (package
       (name "sbcl-slippery-chicken")
       (version "1.1.0")
@@ -29781,7 +29781,7 @@ processes that doesn't run under Emacs.  Lisp processes created by
                  (commit commit)))
            (file-name (git-file-name "slippery-chicken" version))
            (sha256
-            (base32 "0i3kwbafnv0hxsxlnbwmqi82i9jac1n0l87yxkpkmq0np901impv"))))
+            (base32 "0jfjpbpldnj9bqpk32gqn6imphydzmzp63bdvw89h5216hk53c8m"))))
       (build-system asdf-build-system/sbcl)
       (arguments
        (list
