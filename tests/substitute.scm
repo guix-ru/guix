@@ -357,6 +357,29 @@ Deriver: foo.drv")
              (lambda ()
                (guix-substitute "--query")))))))))
 
+(test-equal "query narinfo that returns different store path"
+  ;; The narinfo is valid and authorized but its 'StorePath' field points to a
+  ;; different store item.
+  ""
+
+  (let ((prefix (string-append "StorePath: " (%store-prefix)
+                               "/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-BAR
+NarHash: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+References: bar baz\n")))
+    (with-narinfo (string-append prefix
+                                 "Signature: " (signature-field prefix) "
+URL: example.nar
+Compression: none
+NarSize: 42
+Deriver: foo.drv")
+      (string-trim-both
+       (with-output-to-string
+         (lambda ()
+           (with-input-from-string (string-append "have " (%store-prefix)
+                                                  "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo")
+             (lambda ()
+               (guix-substitute "--query")))))))))
+
 (test-equal "query narinfo signed with authorized key"
   (string-append (%store-prefix) "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo")
 
@@ -892,6 +915,18 @@ System: mips64el-linux\n")))
           (call-with-input-file "substitute-retrieved" get-string-all))
         (lambda ()
           (false-if-exception (delete-file "substitute-retrieved")))))))
+
+(test-quit "substitute, narinfo does not match requested store item"
+    "no valid substitute"
+  (with-http-server `((200 ,(string-append %narinfo "Signature: "
+                                           (signature-field %narinfo))))
+    (parameterize ((substitute-urls (list (%local-url))))
+      ;; Narinfo is valid, signed, and authorized but requested item is
+      ;; /bbb…-bar and narinfo is for /aaa…-foo.
+      (request-substitution (string-append (%store-prefix)
+                                           "/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-bar")
+                            "substitute-retrieved")
+      #f)))
 
 (test-end "substitute")
 

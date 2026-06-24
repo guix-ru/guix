@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013-2021, 2023-2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2021, 2023-2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2014 Nikita Karetnikov <nikita@karetnikov.org>
 ;;; Copyright © 2018 Kyle Meyer <kyle@kyleam.com>
 ;;; Copyright © 2020 Christopher Baines <mail@cbaines.net>
@@ -230,7 +230,11 @@ it contains invalid store file names--and return the narinfo otherwise."
     (dump-port port (%make-void-port "w")))
 
   (define (handle-narinfo-response request response port result)
-    (let* ((code   (response-code response))
+    (let* ((hash-part (basename
+                       (string-drop-right (uri-path (request-uri request))
+                                          (string-length ".narinfo"))))
+           (path   (hash-part->path hash-part))
+           (code   (response-code response))
            (len    (response-content-length response))
            (cache  (response-cache-control response))
            (ttl    (and cache (assoc-ref cache 'max-age))))
@@ -240,21 +244,18 @@ it contains invalid store file names--and return the narinfo otherwise."
       ;; belong to the next response.
       (if (= code 200)                            ; hit
           (let ((narinfo (read-narinfo port url #:size len)))
-            (if narinfo
+            (if (and narinfo path
+                     ;; Make sure we got what we asked for.
+                     (string=? (narinfo-path narinfo) path))
                 (begin
                   (cache-narinfo! url (narinfo-path narinfo) narinfo ttl)
                   (cons narinfo result))
                 result))
-          (let* ((path      (uri-path (request-uri request)))
-                 (hash-part (basename
-                             (string-drop-right path 8)))) ;drop ".narinfo"
-            ;; Log the failing queries and indicate if it failed because the
-            ;; narinfo is being baked.
-            (let ((baking?
-                   (assoc-ref (response-headers response) 'x-baking)))
-              (debug "could not fetch ~a~a ~a~a~%"
-                     url path code
-                     (if baking? " (baking)" "")))
+          ;; Log the failing queries and indicate if it failed because the
+          ;; narinfo is being baked.
+          (let ((baking? (assoc-ref (response-headers response) 'x-baking)))
+            (debug "could not fetch ~a~a ~a~a~%"
+                   url path code (if baking? " (baking)" ""))
             (if len
                 (get-bytevector-n port len)
                 (read-to-eof port))
@@ -288,7 +289,14 @@ it contains invalid store file names--and return the narinfo otherwise."
               (files (map (compose (cut string-append base <> ".narinfo")
                                    store-path-hash-part)
                           paths)))
-         (filter-map (cut narinfo-from-file <> url) files)))
+         (filter-map (lambda (file path)
+                       (let ((narinfo (narinfo-from-file file url)))
+                         (and narinfo
+                              ;; Make sure we got what we asked for.
+                              (string=? (narinfo-path narinfo) path)
+                              narinfo)))
+                     files
+                     paths)))
       (else
        (leave (G_ "~s: unsupported server URI scheme~%")
               (if uri (uri-scheme uri) url)))))
