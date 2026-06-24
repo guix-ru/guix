@@ -29,6 +29,7 @@
   #:use-module (guix utils)
   #:use-module (gnu packages)
   #:use-module (gnu packages base)  ; glibc
+  #:use-module (gnu packages compression)
   #:use-module (gnu packages gnupg)
   #:use-module (gnu packages hardware)
   #:use-module (gnu packages llvm)
@@ -192,17 +193,17 @@ gpg-agent, openpgp-card and softkeys keystore backends.")
 (define-public sequoia-sqv
   (package
     (name "sequoia-sqv")
-    (version "1.3.0")
+    (version "1.4.0")
     (source
       (origin
         (method url-fetch)
         (uri (crate-uri "sequoia-sqv" version))
         (file-name (string-append name "-" version ".tar.gz"))
         (sha256
-          (base32 "0q2ylgzpnx290mwp8626j14b5z318074ag5dj99282vj4qfmf949"))))
+          (base32 "0qlfd5z0swpzc3886p4i53zqc1c34mpmk7821qc5rmls0448nfsx"))))
     (build-system cargo-build-system)
     (inputs
-     (cons* nettle openssl (cargo-inputs 'sequoia-sqv)))
+     (cons* bzip2 nettle openssl (cargo-inputs 'sequoia-sqv)))
     (native-inputs
      (list clang pkg-config))
     (arguments
