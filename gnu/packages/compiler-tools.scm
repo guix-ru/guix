@@ -33,6 +33,7 @@
   #:use-module (gnu packages man)
   #:use-module (gnu packages python)
   #:use-module (gnu packages)
+  #:use-module (guix build-system cmake)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system trivial)
   #:use-module (guix download)
@@ -218,7 +219,7 @@ symbolic link to the @command{oyacc} command from the same-named package.")))
 (define-public packcc
   (package
     (name "packcc")
-    (version "1.8.0")
+    (version "3.1.0")
     (source
      (origin
        (method git-fetch)
@@ -228,40 +229,26 @@ symbolic link to the @command{oyacc} command from the same-named package.")))
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0b25p7ri1l2l20awyknljfnj7r4rg7cf2x3bljijx5q6j8rxdcsg"))))
-    (build-system gnu-build-system)
+         "00aad9hx9kks2wyba8m2gb1pgsc1sxfpgndnfqhs7jswzks6455w"))))
+    (build-system cmake-build-system)
     (arguments
      (list
+      #:modules
+      '((guix build cmake-build-system)
+        ((guix build gnu-build-system) #:prefix gnu:)
+        (guix build utils))
       #:phases
       #~(modify-phases %standard-phases
-          (delete 'configure)
-          (add-before 'build 'chdir
-            (lambda _
-              (chdir "build/gcc")))
-          (add-before 'check 'pre-check
-            (lambda _
-              (setenv "CC" #$(cc-for-target))
-              ;; The style tests are supposed to be skipped when
-              ;; uncrustify is unavailable, but a stray version
-              ;; check prevents it from working.  This can be
-              ;; removed for future versions of PackCC.
-              (substitute* "../../tests/style.d/style.bats"
-                (("^[[:blank:]]+check_uncrustify_version")
-                 ""))))
-          (replace 'install
-            (lambda _
-              (let* ((out #$output:out)
-                     (bindir (string-append out "/bin"))
-                     (docdir (string-append out "/share/doc/packcc")))
-                (install-file "release/bin/packcc" bindir)
-                (install-file "../../README.md" docdir)))))))
+          ;; INFO: This project does not use ctest.
+          (replace 'check
+            (assoc-ref gnu:%standard-phases 'check)))))
     (native-inputs
-     (list bats))
+     (list bats python))
     (home-page "https://github.com/arithy/packcc")
     (synopsis "Packrat parser generator for C")
     (description
-     "PackCC is a packrat parser generator for the C programming language.
-Its main features are:
+     "PackCC is a @url{https://arxiv.org/abs/cs/0603077, packrat}
+parser generator for the C programming language.  Its main features are:
 @itemize
 @item Generates a parser in C from a grammar described in a PEG.
 @item Gives your parser great efficiency by packrat parsing.
