@@ -46902,6 +46902,31 @@ and rejection tracking.")
 the TypeScript implementation.")
     (license license:gpl3+)))
 
+(define-public emacs-async-http-queue
+  (let ((commit "95ca963a6e3f94d9b1b77bf0e0e4661477c26d05")
+        (revision "0"))
+    (package
+      (name "emacs-async-http-queue")
+      (version "0.1.0")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://git.andros.dev/andros/async-http-queue-el.git")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0mnag3pxwi13if7rgcsnlg39j51w4h8rsdajlhqap9j6536jaxc3"))))
+      (build-system emacs-build-system)
+      (arguments (list #:tests? #f))    ;no tests
+      (home-page "https://git.andros.dev/andros/async-http-queue-el")
+      (synopsis "Parallel HTTP fetching for Emacs")
+      (description
+       "This package provides a lightweight, async parallel HTTP fetching
+library using @code{url-retrieve} to download multiple URLs asynchronously
+with configurable concurrency limits.")
+      (license license:gpl3))))
+
 (define-public emacs-rocket-chat
   ;; No release.
   (let ((commit "96fe27a8678de5ae4061f635108a7192eee13f98"))
