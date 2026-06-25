@@ -915,7 +915,7 @@ user-level language.")
 (define-public iaito
   (package
     (name "iaito")
-    (version "6.1.6")
+    (version "6.1.8")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -923,7 +923,7 @@ user-level language.")
                      (commit version)))
               (sha256
                (base32
-                "1xx1vd9dc1i3kq0zmzx7zfvw083yz5jyg4wmzq630l5fyrzpqql4"))
+                "02w2sq7a0zl9yc58dkh3pg3wi3g58b7cgfifjdd567srprz550k8"))
               (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
