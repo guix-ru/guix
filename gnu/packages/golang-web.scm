@@ -14956,6 +14956,44 @@ JSON tools. @code{OjG} is optimized to processing huge data sets where data
 does not necessarily conform to a fixed structure.")
     (license license:expat)))
 
+(define-public go-github-com-olivere-elastic
+  (package
+    (name "go-github-com-olivere-elastic")
+    (version "7.0.32")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/olivere/elastic")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1wgb891qs4rgw1sfpwfnplp57g4w4sq3ci31h7121cx118hy1v17"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "recipes")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f       ;they need running ElasticSearch instance in Docker
+      #:import-path "github.com/olivere/elastic/v7"))
+    (propagated-inputs
+     (list go-github-com-aws-aws-sdk-go
+           go-github-com-mailru-easyjson
+           go-github-com-opentracing-opentracing-go
+           go-github-com-pkg-errors
+           go-github-com-smartystreets-go-aws-auth
+           go-go-opencensus-io
+           go-go-opentelemetry-io-otel))
+    (home-page "https://github.com/olivere/elastic")
+    (synopsis "Elasticsearch client for the Go")
+    (description
+     "Package elastic provides an interface to the Elasticsearch server
+@url{https://www.elastic.co/products/elasticsearch}.")
+    (license license:expat)))
+
 (define-public go-github-com-openfga-go-sdk
   (package
     (name "go-github-com-openfga-go-sdk")
