@@ -2609,7 +2609,7 @@ for the Matrix protocol.  It is built on to of @code{Boost.Asio}.")
            qtwayland
            qtsvg
            re2
-           spdlog-1.13
+           spdlog
            vulkan-headers
            vulkan-loader
            xdg-utils                    ; xdg-open for opening URLs
