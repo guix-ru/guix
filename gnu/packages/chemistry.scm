@@ -7,6 +7,7 @@
 ;;; Copyright © 2020 Vincent Legoll <vincent.legoll@gmail.com>
 ;;; Copyright © 2021 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2022, 2023, 2024, 2025 David Elsing <david.elsing@posteo.net>
+;;; Copyright © 2025 Laura Kirsch <laurakirsch240406@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -47,6 +48,7 @@
   #:use-module (gnu packages cpp)
   #:use-module (gnu packages documentation)
   #:use-module (gnu packages compiler-tools)
+  #:use-module (gnu packages elf)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages fortran-xyz)
@@ -83,7 +85,7 @@
 (define-public avogadrolibs
   (package
     (name "avogadrolibs")
-    (version "1.100.0")
+    (version "1.102.1")
     (source
      (origin
        (method git-fetch)
@@ -91,71 +93,90 @@
              (url "https://github.com/OpenChemistry/avogadrolibs")
              (commit version)))
        (sha256
-        (base32 "1l9bp3ba8yx9mk2in5v375jzi1w4y7l1xl37xqv869810drgjffc"))
+        (base32 "026na6np5pfi77vis1wcncs3h7vidibpwra2j00brfdm5is92qa6"))
        (file-name (git-file-name name version))))
     (build-system cmake-build-system)
-    (native-inputs
-     (list eigen
-           mmtf-cpp
-           googletest
-           pkg-config
-           pybind11-2))
-    (inputs
-      `(("glew" ,glew)
-        ("libarchive" ,libarchive)
-        ("libmsym" ,libmsym)
-        ("molequeue" ,molequeue)
-        ("python" ,python)
-        ("spglib" ,spglib)
-        ("qtbase-5" ,qtbase-5)
-        ("qtsvg-5" ,qtsvg-5)
-        ("avogadro-molecules"
-          ,(origin
-            (method git-fetch)
-            (uri
-              (git-reference
-                (url "https://github.com/openchemistry/molecules")
-                (commit "8a37883")))
-            (file-name (git-file-name name version))
-            (sha256
-              (base32
-                "00mfx0bwmqazbiklrvaijjd5n4wa5lp3z73291ihm78q0v9dzhl4"))))
-        ("avogadro-crystals"
-          ,(origin
-            (method git-fetch)
-            (uri
-              (git-reference
-                (url "https://github.com/openchemistry/crystals")
-                (commit "28404bd")))
-            (file-name (git-file-name name version))
-            (sha256
-              (base32
-                "0kcz99q5nfl2v2qmm9cqnbb2c2qqzw79vsnv557i7x64bxsxrw1m"))))
-        ("avogadro-fragments"
-          ,(origin
-            (method git-fetch)
-            (uri
-              (git-reference
-                (url "https://github.com/openchemistry/fragments")
-                (commit "c4943b5")))
-            (file-name (git-file-name name version))
-            (sha256
-              (base32
-                "17l6qmkc25wb0nvic708l25fxiy89b3vfs0x5d40qcnn27bid32n"))))))
+    (native-inputs (list eigen
+                         googletest
+                         pkg-config
+                         pybind11
+                         patchelf))
+    (inputs `(("glew" ,glew)
+              ("libarchive" ,libarchive)
+              ("libmsym" ,libmsym)
+              ("python" ,python)
+              ("spglib" ,spglib)
+              ("qtbase" ,qtbase)
+              ("qtsvg" ,qtsvg)
+              ("jkqtplotter" ,jkqtplotter)
+              ("hdf5" ,hdf5)
+              ("avogadro-molecules"
+                ,(origin
+                   (method git-fetch)
+                   (uri
+                     (git-reference
+                       (url "https://github.com/openchemistry/molecules")
+                       (commit "8a37883")))
+                   (file-name
+                     (git-file-name name version))
+                   (sha256
+                     (base32 "00mfx0bwmqazbiklrvaijjd5n4wa5lp3z73291ihm78q0v9dzhl4"))))
+              ("avogadro-crystals"
+                ,(origin
+                 (method git-fetch)
+                 (uri
+                   (git-reference
+                     (url "https://github.com/openchemistry/crystals")
+                     (commit "7adea78")))
+                 (file-name
+                   (git-file-name name version))
+                 (sha256
+                   (base32 "11pqc2ppd1lsizxs11ppaih4w3ck9qmgn92rrc4zrdwfssawa72s"))))
+              ("avogadro-fragments"
+                ,(origin
+                 (method git-fetch)
+                 (uri
+                   (git-reference
+                     (url "https://github.com/openchemistry/fragments")
+                     (commit "43c900d")))
+                 (file-name
+                   (git-file-name name version))
+                 (sha256
+                   (base32 "0ak3sf6vzrzxsqawb56kk4mvfazdi45xad07zvh0021f0mcbi9sb"))))))
     (arguments
      (list
-      #:configure-flags #~(list "-DENABLE_TESTING=ON")
+      #:configure-flags
+      #~(list "-DENABLE_TESTING=ON" "-DQT_VERSION=6" "-DUSE_HDF5=ON"
+              "-DUSE_PYTHON=ON")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'symlink
             (lambda _
-              (begin
-                (symlink (assoc-ref %build-inputs "avogadro-molecules")
-                         "../molecules")
-                (symlink (assoc-ref %build-inputs "avogadro-crystals")
-                         "../crystals")
-                (symlink (assoc-ref %build-inputs "avogadro-fragments")
-                         "../fragments")))))))
+              (symlink (assoc-ref %build-inputs "avogadro-molecules")
+                       "../molecules")
+              (symlink (assoc-ref %build-inputs "avogadro-crystals")
+                       "../crystals")
+              (symlink (assoc-ref %build-inputs "avogadro-fragments")
+                       "../fragments")))
+          (add-before 'install 'patch-python-install-path
+            (lambda _
+              (substitute* "python/cmake_install.cmake"
+                ((#$(this-package-input "python"))
+                 #$output))))
+          (add-after 'install 'extend-python-rpath
+            ;; The phase is brittle and should be replaced by one that
+            ;; does not hardcode the Python version.
+            (lambda _
+              (invoke "patchelf" "--add-rpath"
+                      (string-append #$output "/lib")
+                      (string-append #$output
+                       "/lib/python3.12/site-packages/avogadro/"
+                       "core.cpython-312-x86_64-linux-gnu.so"))
+              (invoke "patchelf" "--add-rpath"
+                      (string-append #$output "/lib")
+                      (string-append #$output
+                       "/lib/python3.12/site-packages/avogadro/"
+                       "io.cpython-312-x86_64-linux-gnu.so")))))))
     (home-page "https://www.openchemistry.org/projects/avogadro2/")
     (synopsis "Libraries for chemistry, bioinformatics, and related areas")
     (description
