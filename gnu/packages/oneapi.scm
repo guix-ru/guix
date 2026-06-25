@@ -258,7 +258,7 @@ more thread-enabled Python libraries.")))
 (define-public umf
   (package
     (name "umf")
-    (version "1.0.3")
+    (version "1.1.0")
     (source
      (origin
        (method git-fetch)
@@ -267,7 +267,7 @@ more thread-enabled Python libraries.")))
               (commit (string-append "v" version))))
        (sha256
         (base32
-         "16svxs1damgv29fcksw7538lyvrfa33b5ziwn7sjf85d2z091flg"))))
+         "0ms7dihh3wnj5zb2mgq3l7h99f1x0y8w5ccr92gfcd8lvfnbk7nm"))))
     (build-system cmake-build-system)
     (arguments
      (list
