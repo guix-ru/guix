@@ -2118,7 +2118,7 @@ Expressions, and being faster to type than grep.")
 (define-public yq
   (package
     (name "yq")
-    (version "4.53.2")
+    (version "4.53.3")
     (source
      (origin
        (method git-fetch)
@@ -2127,7 +2127,7 @@ Expressions, and being faster to type than grep.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "10910496h435jdiwmcpdqhc70gyfgbmarhazqcdvii20p58k53aa"))))
+        (base32 "1s21w1757x010f56qn2ykrabxp2sljx69zpyrk560yq5inxx73vv"))))
     (build-system go-build-system)
     (arguments
      (list
