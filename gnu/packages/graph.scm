@@ -700,7 +700,7 @@ contains supporting code for evaluation and parameter tuning.")
     (native-inputs
      (list python-scipy python-setuptools))
     (inputs
-     (list faiss openblas python-wrapper swig-4.0))
+     (list faiss openblas python-wrapper swig-4.4))
     (propagated-inputs
      (list python-numpy))
     (description "Faiss is a library for efficient similarity search and
