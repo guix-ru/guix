@@ -834,8 +834,7 @@ quantum chemistry (and molecular mechanics) softwares.")
                   freeglut
                   glew
                   libxml2
-                  mmtf-cpp
-                  python-pyqt
+                  python-pyqt-6
                   glm
                   netcdf))
     (native-inputs (list cmake-minimal catch2-2 python-pytest python-setuptools))
