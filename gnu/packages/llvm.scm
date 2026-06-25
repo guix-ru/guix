@@ -2352,6 +2352,35 @@ to fix its formatting.  @code{clang-format} is a tool that formats
 C/C++/Obj-C code according to a set of style options, see
 @url{https://clang.llvm.org/docs/ClangFormatStyleOptions.html}.")))
 
+(define-public emacs-clang-include-fixer
+  (package
+    (inherit clang)
+    (name "emacs-clang-include-fixer")
+    (build-system emacs-build-system)
+    (inputs
+     (list clang))
+    (propagated-inputs '())
+    (arguments
+     (list
+      #:lisp-directory "clang-tools-extra/clang-include-fixer/tool"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'configure
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((clang-include-fixer
+                     (search-input-file inputs "/bin/clang-include-fixer")))
+                (emacs-substitute-variables "clang-include-fixer.el"
+                  ("clang-include-fixer-executable"
+                   clang-include-fixer))))))
+      #:test-command #~(list "emacs" "-Q" "--batch"
+                             "-l" "clang-include-fixer.el"
+                             "-l" "clang-include-fixer-test.el"
+                             "-f" "ert-run-tests-batch-and-exit")))
+    (synopsis "Emacs interface to @code{clang-include-fixer}")
+    (description "This package provides an automated way of adding #include
+directives for missing symbols in one translation unit, see
+@url{http://clang.llvm.org/extra/clang-include-fixer.html}.")))
+
 (define-public emacs-clang-rename
   (package
     (inherit clang-19)
