@@ -1,5 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2025 David Elsing <david.elsing@posteo.net>
+;;; Copyright © 2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -18,6 +19,7 @@
 
 (define-module (gnu packages fortran-xyz)
   #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix build-system cmake)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system meson)
   #:use-module (guix gexp)
@@ -35,6 +37,53 @@
 ;;;
 ;;; Code:
 
+(define-public fortran-coretran
+  (package
+    (name "fortran-coretran")
+    (version "1.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/leonfoks/coretran")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "16g2rjypkb7vq3wd9za7vidsn244mw4inpc75rwqd1nps8rkxnpf"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      ;; XXX: Tests fail with error: Fortran runtime error: Bad integer for
+      ;; item 1 in list input
+      #:tests? #f
+      #:configure-flags
+      #~(list "-DBUILD_SHARED_LIBS=ON"
+              "-DBUILD_TESTING=ON"
+              "-DCMAKE_BUILD_TYPE=RELEASE"
+              (string-append "-DCMAKE_INSTALL_PREFIX=" #$output))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir-to-src
+            (lambda _
+              ;; Change to src where CMakeLists.txt is located, move "test"
+              ;; inside "src" to prevent build faileur.
+              (mkdir "src/test")
+              (copy-recursively "test" "src/test")
+              (delete-file-recursively "test")
+              (chdir "src")
+              (substitute* "CMakeLists.txt"
+                (("../test") "/test")))))))
+    (native-inputs
+     (list gfortran))
+    (home-page "https://github.com/leonfoks/coretran")
+    (synopsis "Fortran library with core routines and object-oriented classes")
+    (description
+     "This package provides an easy to follow library to make Fortran easier
+in general with wrapped interfaces, sorting routines, kD-Trees, and other
+algorithms to handle scientific data and concepts.  The library contains core
+fortran routines and object-oriented classes.")
+    (license license:bsd-3)))
+
 (define-public fortran-dftd4
   (package
     (name "fortran-dftd4")
