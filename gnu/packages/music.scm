@@ -609,26 +609,16 @@ scan your media library periodically, for example from a cron job.")
 (define-public mopidy-mopiqtt
   (package
     (name "mopidy-mopiqtt")
-    (version "1.2.0")
+    (version "1.2.1")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/fmarzocca/mopiqtt")
-             (commit version)))
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1gaxxbpws9xshsbknq78h0c1k3ynvc466hkq4952pv00q203zqk4"))
-       ;; XXX: https://github.com/fmarzocca/Mopiqtt/issues/6
-       (modules '((guix build utils)))
-       (snippet
-        '(begin
-           (substitute* "tests/test_smoke.py"
-             (("mqtt")
-              "mopiqtt"))
-           (substitute* "tests/conftest.py"
-             (("mqtt")
-              "mopiqtt"))))))
+        (base32 "1044y8si6lan7m9cyg0s7k53x1wmldjj6c0nwq1zdgs19xcsd703"))))
     (build-system pyproject-build-system)
     (native-inputs (list python-pytest python-setuptools))
     (propagated-inputs (list mopidy python-paho-mqtt python-pykka))
