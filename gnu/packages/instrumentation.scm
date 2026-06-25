@@ -110,7 +110,7 @@
            python-3
            python-setuptools
            python-sphinx
-           swig-4.0
+           swig-4.4
            xmltoman))
     (home-page "https://babeltrace.org/")
     (synopsis "Trace manipulation toolkit")
