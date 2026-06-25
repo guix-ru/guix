@@ -964,6 +964,25 @@ compressed bitmap data structures (also called bitset).  They are ideally
 suited to represent sets of integers over relatively small ranges.")
     (license license:asl2.0)))
 
+(define-public go-github-com-roaringbitmap-roaring-v2
+  (package
+    (inherit go-github-com-roaringbitmap-roaring)
+    (name "go-github-com-roaringbitmap-roaring-v2")
+    (version "2.18.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/RoaringBitmap/roaring")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0i213i44834anir2m675dc9h809ni5ncrnnynmm6vdvjfinacaic"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/RoaringBitmap/roaring/v2"))))
+
 (define-public go-github-com-saracen-fastzip
   (package
     (name "go-github-com-saracen-fastzip")
