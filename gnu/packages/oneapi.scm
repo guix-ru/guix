@@ -38,7 +38,7 @@
 (define-public level-zero
   (package
     (name "level-zero")
-    (version "1.27.0")
+    (version "1.31.0")
     (source
      (origin
        (method git-fetch)
@@ -46,22 +46,15 @@
               (url "https://github.com/oneapi-src/level-zero/")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
-       (snippet
-        #~(begin
-            (use-modules (guix build utils))
-            (with-directory-excursion "third_party"
-              (delete-file-recursively "spdlog_headers"))))
        (sha256
         (base32
-         "1f08046g4anbqn3sk8fdpi6xdb8pkq1y28a5rxrai9rmah1v07kw"))))
+         "1v9179qgysr5sn43q163n7lzyq9zqyr56i5imqpjqaf75fzdawgz"))))
     (build-system cmake-build-system)
     (arguments
      (list
       #:tests? #f
       #:configure-flags
-      #~(list "-DSYSTEM_SPDLOG=ON"
-              (string-append "-DVERSION_SHA=" #$version))))
-    (inputs (list spdlog-1.14))
+      #~(list (string-append "-DVERSION_SHA=" #$version))))
     (native-inputs (list pkg-config python-minimal-wrapper))
     (home-page
      "https://oneapi-src.github.io/level-zero-spec/level-zero/latest/index.html")
