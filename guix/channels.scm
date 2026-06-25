@@ -252,6 +252,17 @@ could be found at DIRECTORY or one of its ancestors."
          (refs? (and branch
                      (string? branch)
                      (string-prefix? "refs/" branch))))
+    (unless (or commit branch)
+      ;; One of these two fields must be set or there is nothing to pull from.
+      (raise (make-compound-condition
+              (formatted-message (G_ "channel '~a' \
+has neither 'branch' nor 'commit' set")
+                                 (channel-name channel))
+              (condition
+               (&error-location
+                (location
+                 (source-properties->location (channel-location channel))))))))
+
     (if commit
         (if refs?
             `(symref        . (,branch . ,commit))
