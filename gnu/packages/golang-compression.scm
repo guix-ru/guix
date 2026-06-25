@@ -955,7 +955,7 @@ LZ4 data blocks.  The implementation is based on the reference C
      (list go-github-com-bits-and-blooms-bitset
            go-github-com-google-uuid
            go-github-com-mschoch-smat))
-    (home-page "https://github.com/RoaringBitmap/roaring")
+    (home-page "http://roaringbitmap.org/")
     (synopsis "Roaring bitmaps in Go")
     (description
      "This package is an implementation of Roaring bitmaps as described at
