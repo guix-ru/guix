@@ -1686,7 +1686,8 @@ Tanimoto scoring.")
                      "-E" (string-append
                            "("
                            (string-join
-                            '(;; need pickled data
+                            '("moldraw2DTestCatch"
+                              ;; need pickled data
                               "pyDiscreteValueVect" "pySparseIntVect"
                               "graphmoltestPickler" "pyPartialCharges"
                               "substructLibraryTest" "pyFeatures"
@@ -1719,7 +1720,7 @@ Tanimoto scoring.")
     (native-inputs
      (list bison
            boost-numpy
-           catch2-3.5
+           catch2
            eigen
            flex
            freesasa
