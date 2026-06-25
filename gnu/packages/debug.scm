@@ -1053,7 +1053,7 @@ to aid in debugging.")
 (define-public delve
   (package
     (name "delve")
-    (version "1.26.3")
+    (version "1.27.0")
     (source
      (origin
        (method git-fetch)
@@ -1062,8 +1062,7 @@ to aid in debugging.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32
-         "0mf363l7md4193cgrpb6hkhmsgnlnrx44q1bzw3zq0bmjrcg3fj7"))
+        (base32 "0xdawy3vlr74zna1dhqkrdil5dyrfn13d24clxycsrsrx65z5cl3"))
        (snippet
         #~(begin (use-modules (guix build utils))
                  (delete-file-recursively "vendor")))))
@@ -1084,17 +1083,15 @@ to aid in debugging.")
            go-github-com-derekparker-trie-v3
            go-github-com-go-delve-liner
            go-github-com-google-go-dap
-           go-github-com-hashicorp-golang-lru
            go-github-com-mattn-go-colorable
            go-github-com-mattn-go-isatty
            go-github-com-spf13-cobra
            go-github-com-spf13-pflag
            go-go-starlark-net
+           go-go-yaml-in-yaml-v3
            go-golang-org-x-arch
            go-golang-org-x-sys
-           go-golang-org-x-telemetry
-           go-golang-org-x-tools
-           go-gopkg-in-yaml-v3))
+           go-golang-org-x-telemetry))
     (home-page "https://github.com/go-delve/delve")
     (synopsis "Debugger for the Go programming language")
     (description "Delve is a debugger for the Go programming language.")
