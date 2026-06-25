@@ -30399,7 +30399,7 @@ defining document metadata in the YAML format.")
 (define-public go-github-com-yuin-gopher-lua
   (package
     (name "go-github-com-yuin-gopher-lua")
-    (version "1.1.1")
+    (version "1.1.2")
     (source
      (origin
        (method git-fetch)
@@ -30408,7 +30408,7 @@ defining document metadata in the YAML format.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bvmd6kywbwzcpdqmmk6gjzrc2x4q24q1p25si4sm0s18kfqnmap"))))
+        (base32 "13y49fs389xasgv7v64bwyk76yjl6k1f35qs8sqq1aw2vfy1wfxj"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -35055,8 +35055,7 @@ metadata and/or configuration.")))
   (package/inherit go-github-com-yuin-gopher-lua
     (name "glua")
     (arguments
-     (substitute-keyword-arguments
-         (package-arguments go-github-com-yuin-gopher-lua)
+     (substitute-keyword-arguments arguments
        ((#:tests? _ #t) #f)
        ((#:install-source? _ #t) #f)
        ((#:import-path _) "github.com/yuin/gopher-lua/cmd/glua")
