@@ -960,7 +960,7 @@ extensions over the standard utility.")
 (define-public sourcetrail
   (package
     (name "sourcetrail")
-    (version "2.0.0")
+    (version "2.1.0")
     (source
      (origin
        (method git-fetch)
@@ -971,7 +971,7 @@ extensions over the standard utility.")
        (patches (search-patches "sourcetrail-fix-cmakelists-and-paths.patch"))
        (file-name (git-file-name name version))
        (sha256
-        "06rp9ba9lkzwm8m7agzajg550h632kqb57bs9srvbgv411bkvgdd")
+        "0ya737byp1204sc5l11zi7fn7fgvqmcwyq84lbdxhyjvyfhb8598")
        (modules '((guix build utils)))
        (snippet #~(begin
                     (for-each delete-file-recursively
@@ -1034,7 +1034,7 @@ extensions over the standard utility.")
                   qtsvg
                   qtwayland
                   range-v3
-                  spdlog-1.13
+                  spdlog
                   sqlite
                   tinyxml))
     (native-inputs (list googletest))
