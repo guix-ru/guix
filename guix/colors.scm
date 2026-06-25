@@ -137,6 +137,13 @@ that subsequent output will not have any colors in effect."
     "Return true if PORT is a tty.  Memoize the result."
     (isatty? port)))
 
+(define dumb-terminal?
+  (mlambdaq ()
+    "Return #t if TERM=dumb or if TERM is not set.  Memoize the result."
+    (match (getenv "TERM")
+      ((or "dumb" #f) #t)
+      (_ #f))))
+
 (define (color-output? port)
   "Return true if we should write colored output to PORT."
   (and (not (getenv "NO_COLOR"))
@@ -236,10 +243,16 @@ documented at
   "Return true if PORT is a terminal that supports hyperlink escapes."
   ;; Note that terminals are supposed to ignore OSC escapes they don't
   ;; understand (this is the case of xterm as of version 349, for instance.)
-  ;; However, Emacs comint as of 26.3 does not ignore it and instead lets it
-  ;; through, hence the 'INSIDE_EMACS' special case below.
+  ;;
+  ;; Emacs users can add 'ansi-osc-compilation-filter' to
+  ;; 'compilation-filter-hook' to propertize the hyperlinks, in that case,
+  ;; remember to set TERM to something other than the default.  For example, a
+  ;; user of 'M-x shell' that is using Bash, may create a
+  ;; '~/.emacs.d/init_bash.sh' file with 'export TERM=eterm-color'.  For the
+  ;; compilation filters to affect 'M-x shell', one can enable
+  ;; 'compilation-shell-minor-mode'.
   (and (isatty?* port)
-       (not (getenv "INSIDE_EMACS"))))
+       (not (dumb-terminal?))))
 
 (define* (file-hyperlink file #:optional (text file))
   "Return TEXT with escapes for a hyperlink to FILE."
