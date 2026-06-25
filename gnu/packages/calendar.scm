@@ -590,7 +590,7 @@ configured to show the current time in different timezones.")
 (define-public hebcal
   (package
     (name "hebcal")
-    (version "5.9.4")
+    (version "5.12.3")
     (source
      (origin
        (method git-fetch)
@@ -599,7 +599,7 @@ configured to show the current time in different timezones.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0hw4485s83amvl03y33zkxi9ka9yq6rvbdsw20m6fc4m2bj8lb79"))))
+        (base32 "03wql50ls6hsxmsy0aigwv954nvsy83vis46bjzgfi6riil61v92"))))
     (build-system go-build-system)
     (arguments
      (list
