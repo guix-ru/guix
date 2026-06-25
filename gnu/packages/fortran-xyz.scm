@@ -145,7 +145,7 @@ a.s.o.
 (define-public fortran-mctc-lib
   (package
     (name "fortran-mctc-lib")
-    (version "0.5.1")
+    (version "0.5.2")
     (source
      (origin
        (method git-fetch)
@@ -155,7 +155,7 @@ a.s.o.
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1wp8apv0psl2hkhlrd5pgnhbxk8zpxa0ijkhcnb09klbxcsi8p5f"))))
+         "16jml9y34xicqpfqz5gr139nj4f6kxks1ff5w0gi9w1bnyjmz510"))))
     (build-system meson-build-system)
     (arguments
      (list
