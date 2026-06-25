@@ -396,8 +396,7 @@ Hurd-minimal package which are needed for both glibc and GCC.")
               (inherit (package-source hurd-headers))
               (patches (search-patches "hurd-pfinet-recv-control-block.patch"
                                        "hurd-refcounts-assert.patch"
-                                       "hurd-rumpdisk-no-hd.patch"
-                                       "hurd-startup.patch"))))
+                                       "hurd-rumpdisk-no-hd.patch"))))
     (version (package-version hurd-headers))
     (arguments
      `(#:tests? #f                      ;no "check" target
