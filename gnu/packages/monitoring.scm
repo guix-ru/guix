@@ -1058,6 +1058,57 @@ written in Go with pluggable metric collectors.")
 (define-deprecated-package go-github-com-prometheus-node-exporter
   prometheus-node-exporter)
 
+(define-public prometheus-postfix-exporter
+  (package
+    (name "prometheus-postfix-exporter")
+    (version "0.20.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              ;; It's a fork, original project is unmaintained since 2020, see
+              ;; <https://github.com/kumina/postfix_exporter/issues/122>.
+              (url "https://github.com/Hsn723/postfix_exporter")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09p76wxkl07ad4mrbbf863zmjk506lssjqplqacxqhcbfjb3lvxm"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:import-path "github.com/hsn723/postfix_exporter"
+      #:build-flags #~(list "-tags" "nosystemd,nodocker")
+      #:embed-files #~(list "landing_page.css" "landing_page.html")
+      #:test-flags #~(list "-tags" "nosystemd,nodocker")))
+    (native-inputs
+     (list go-github-com-alecthomas-kingpin-v2
+           go-github-com-coreos-go-systemd-v22
+           go-github-com-docker-docker
+           go-github-com-nxadm-tail
+           go-github-com-prometheus-client-golang
+           go-github-com-prometheus-client-model
+           go-github-com-prometheus-common
+           go-github-com-prometheus-exporter-toolkit
+           go-github-com-stretchr-testify
+           go-gopkg-in-tomb-v1
+           go-k8s-io-api
+           go-k8s-io-apimachinery
+           go-k8s-io-client-go
+           go-k8s-io-utils))
+    (home-page "https://github.com/hsn723/postfix_exporter")
+    (synopsis "Prometheus Postfix exporter")
+    (description
+     "Prometheus metrics exporter for @url{http://www.postfix.org/, the
+Postfix mail server}.  This exporter provides histogram metrics for the size
+and age of messages stored in the mail queue.  It extracts these metrics from
+Postfix by connecting to a UNIX socket under @code{/var/spool}.  It also
+counts events by parsing Postfix's log entries, using regular expression
+matching.  The log entries are retrieved from the systemd journal, the Docker
+logs, or from a log file.  This package is built from a maintained fork of
+original @url{https://github.com/kumina/postfix_exporter} project.")
+    (license license:asl2.0)))
+
 (define-public prometheus-postgres-exporter
   (package
     (name "prometheus-postgres-exporter")
