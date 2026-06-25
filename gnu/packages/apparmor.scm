@@ -95,7 +95,7 @@
            python-minimal
            python-setuptools
            ruby
-           swig-4.0
+           swig-4.4
            which))
     (home-page "https://apparmor.net")
     (synopsis "Linux kernel security module")
