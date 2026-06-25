@@ -1,8 +1,9 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2012-2014, 2019, 2022 Ludovic Courtès <ludo@gnu.org>
-;;; Copyright © 2016, 2024-2025 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2012-2014, 2019, 2021-2022 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2016, 2022, 2024-2025 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2017, 2020, 2021 Sergei Trofimovich <slyfox@inbox.ru>
 ;;; Copyright © 2018, 2022 Tobias Geerinckx-Rice <me@tobias.gr>
+;;; Copyright © 2020-2021 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2021 Foo Chuan Wei <chuanwei.foo@hotmail.com>
 ;;; Copyright © 2024-2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2025 Alexey Abramov <levenson@mmer.org>
@@ -25,6 +26,7 @@
 
 (define-module (gnu packages compiler-tools)
   #:use-module (gnu packages autotools)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages bison)
   #:use-module (gnu packages gawk)
   #:use-module (gnu packages m4)
@@ -212,6 +214,62 @@ besides libc.")
     (description
      "This package provides the @command{yacc} command, implemented as a
 symbolic link to the @command{oyacc} command from the same-named package.")))
+
+(define-public packcc
+  (package
+    (name "packcc")
+    (version "1.8.0")
+    (home-page "https://github.com/arithy/packcc")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url home-page)
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0b25p7ri1l2l20awyknljfnj7r4rg7cf2x3bljijx5q6j8rxdcsg"))))
+    (build-system gnu-build-system)
+    (arguments
+     '(#:phases (modify-phases %standard-phases
+                  (delete 'configure)
+                  (add-before 'build 'chdir
+                    (lambda _
+                      (chdir "build/gcc")))
+                  (add-before 'check 'pre-check
+                    (lambda _
+                      (setenv "CC" "gcc")
+                      ;; The style tests are supposed to be skipped when
+                      ;; uncrustify is unavailable, but a stray version
+                      ;; check prevents it from working.  This can be
+                      ;; removed for future versions of PackCC.
+                      (substitute* "../../tests/style.d/style.bats"
+                        (("^[[:blank:]]+check_uncrustify_version")
+                         ""))))
+                  (replace 'install
+                    (lambda* (#:key outputs #:allow-other-keys)
+                      (let ((out (assoc-ref outputs "out")))
+                        (install-file "release/bin/packcc"
+                                      (string-append out "/bin"))
+                        (install-file "../../README.md"
+                                      (string-append out "/share/doc/packcc"))))))))
+    (native-inputs
+     (list bats))
+    (synopsis "Packrat parser generator for C")
+    (description
+     "PackCC is a packrat parser generator for the C programming language.
+Its main features are:
+@itemize
+@item Generates a parser in C from a grammar described in a PEG.
+@item Gives your parser great efficiency by packrat parsing.
+@item Supports direct and indirect left-recursive grammar rules.
+@end itemize
+The grammar of your parser can be described in a @acronym{PEG, Parsing
+Expression Grammar}.  The PEG is a top-down parsing language, and is similar
+to the regular-expression grammar.  The PEG does not require tokenization to
+be a separate step, and tokenization rules can be written in the same way as
+any other grammar rules.")
+    (license license:expat)))
 
 (define-public re2c
   (package

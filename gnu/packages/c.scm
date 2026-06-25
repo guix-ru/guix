@@ -963,61 +963,9 @@ as dictionaries, skip lists, and memory pools.")
       ;; clarified (see: https://github.com/WuBingzheng/libwuya/issues/2).
       (license license:gpl2+))))
 
-(define-public packcc
-  (package
-    (name "packcc")
-    (version "1.8.0")
-    (home-page "https://github.com/arithy/packcc")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url home-page)
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0b25p7ri1l2l20awyknljfnj7r4rg7cf2x3bljijx5q6j8rxdcsg"))))
-    (build-system gnu-build-system)
-    (arguments
-     '(#:phases (modify-phases %standard-phases
-                  (delete 'configure)
-                  (add-before 'build 'chdir
-                    (lambda _
-                      (chdir "build/gcc")))
-                  (add-before 'check 'pre-check
-                    (lambda _
-                      (setenv "CC" "gcc")
-                      ;; The style tests are supposed to be skipped when
-                      ;; uncrustify is unavailable, but a stray version
-                      ;; check prevents it from working.  This can be
-                      ;; removed for future versions of PackCC.
-                      (substitute* "../../tests/style.d/style.bats"
-                        (("^[[:blank:]]+check_uncrustify_version")
-                         ""))))
-                  (replace 'install
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let ((out (assoc-ref outputs "out")))
-                        (install-file "release/bin/packcc"
-                                      (string-append out "/bin"))
-                        (install-file "../../README.md"
-                                      (string-append out "/share/doc/packcc"))))))))
-    (native-inputs
-     (list bats))
-    (synopsis "Packrat parser generator for C")
-    (description
-     "PackCC is a packrat parser generator for the C programming language.
-Its main features are:
-@itemize
-@item Generates a parser in C from a grammar described in a PEG.
-@item Gives your parser great efficiency by packrat parsing.
-@item Supports direct and indirect left-recursive grammar rules.
-@end itemize
-The grammar of your parser can be described in a @acronym{PEG, Parsing
-Expression Grammar}.  The PEG is a top-down parsing language, and is similar
-to the regular-expression grammar.  The PEG does not require tokenization to
-be a separate step, and tokenization rules can be written in the same way as
-any other grammar rules.")
-    (license license:expat)))
+;; Deprecated on 2026-06-24.
+(define-deprecated/public-alias packcc
+  (@ (gnu packages compiler-tools) packcc))
 
 (define-public sfsexp
   (package
