@@ -5328,18 +5328,21 @@ different kinds of sliders, and much more.")
     license:lgpl2.1 license:gpl3))))
 
 (define-public jkqtplotter
+  (let ((revision "0")            
+        ;; This is the tag v5.0.0-beta2.
+        (commit "b8cc2909f2498f7bb3ee1830151b3dc71bcf6375"))
   (package
     (name "jkqtplotter")
-    (version "4.0.3")
+    (version (git-version "4.0.3" revision commit))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/jkriege2/JKQtPlotter")
-             (commit (string-append "v" version))))
+             (commit commit)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0yi80d8w4l69siia5rvdzakyzkm7vbpfk6ffcwc6vm6z0i58m9cl"))))
+        (base32 "0lv202l9jg80z9ddn3ylkvgh4v3kwg8g0f4r1ydvd0xnnl6rijpq"))))
     (build-system qt-build-system)
     (inputs (list opencv qtsvg))
     (arguments
@@ -5357,7 +5360,7 @@ different kinds of sliders, and much more.")
      "JKQTPlotter is a library of function and data plotter classes for Qt.
 It includes a plotter widget and a LaTeX equation renderer and supports
 a variety of graphs and charts.")
-    (license license:lgpl2.1+)))
+    (license license:lgpl2.1+))))
 
 (define-public dotherside
   (package
