@@ -795,7 +795,7 @@ retrieve a YubiKey's serial number, and so forth.")
     (native-inputs
      (list python-pytest
            python-setuptools
-           swig-4.0))
+           swig-4.4))
     (home-page "https://github.com/LudovicRousseau/pyscard")
     (synopsis "Smart card library for Python")
     (description
