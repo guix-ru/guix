@@ -46,7 +46,6 @@
   #:use-module (guix deprecation)
   #:use-module ((guix diagnostics)
                 #:select (formatted-message define-with-syntax-properties))
-  #:use-module (guix fossil-download)
   #:autoload   (guix licenses) (license?)
   #:use-module (guix i18n)
   #:use-module (ice-9 match)
@@ -392,8 +391,6 @@ name of its URI."
          (uri->file-name head))
         ((? string? uri)
          (uri->file-name uri))
-        (($ <fossil-reference> uri check-in)
-         (fossil-file-name (basename uri) check-in))
         (else
          ;; git, svn, cvs, etc. reference
          #f))))
