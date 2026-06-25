@@ -8461,7 +8461,7 @@ over 100 user-created campaigns.")
                                       sdl-image)))
        ("python" ,python-2)))
     (native-inputs
-     (list swig-4.0))
+     (list swig-4.4))
     (home-page "https://kiki.sourceforge.net/")
     (synopsis "3D puzzle game")
     (description "Kiki the nano bot is a 3D puzzle game.  It is basically a
