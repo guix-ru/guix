@@ -205,7 +205,7 @@ online_wiggle test-lots)" port)))))
            intltool
            (libc-utf8-locales-for-target)
            pkg-config
-           swig-4.0
+           swig-4.4
            tzdata-for-tests))
     (inputs
      (list aqbanking
