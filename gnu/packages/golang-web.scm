@@ -4113,6 +4113,31 @@ capable of querying the current time from a remote NTP server as specified in
 library. It's an alternative fork of https://github.com/rcrowley/go-metrics.")
     (license license:bsd-2)))
 
+(define-public go-github-com-blevesearch-scorch-segment-api-v2
+  (package
+    (name "go-github-com-blevesearch-scorch-segment-api-v2")
+    (version "2.4.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/blevesearch/scorch_segment_api")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0pp7m8xl5a3b8lanxpcaxjp4vbl5hjf3vk68ync67k2bhw3f885a"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/blevesearch/scorch_segment_api/v2"))
+    (propagated-inputs
+     (list go-github-com-blevesearch-bleve-index-api
+           go-github-com-roaringbitmap-roaring-v2))
+    (home-page "https://github.com/blevesearch/scorch_segment_api")
+    (synopsis "Scorch Segment API")
+    (description "Scorch supports a pluggable Segment interface.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-bradenhilton-mozillainstallhash
   (package
     (name "go-github-com-bradenhilton-mozillainstallhash")
