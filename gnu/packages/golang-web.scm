@@ -8122,6 +8122,32 @@ projects.")
 the go-openapi and go-swagger projects.")
     (license license:asl2.0)))
 
+(define-public go-github-com-go-openapi-swag-stringutils
+  (package
+    (name "go-github-com-go-openapi-swag-stringutils")
+    (version "0.26.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-openapi/swag")
+              (commit (go-version->git-ref version #:subdir "stringutils"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0501r62xf03gzl00d7j7kwk15ssp3zikh9lq4899pyzyqfq2h8rk"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-openapi/swag/stringutils"
+      #:unpack-path "github.com/go-openapi/swag"))
+    (native-inputs
+     (list go-github-com-go-openapi-testify-v2))
+    (home-page "https://github.com/go-openapi/swag")
+    (synopsis "Helpers to search and process strings")
+    (description
+     "Package stringutils exposes helpers to search and process strings.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-go-openapi-swag-typeutils
   (package
     (name "go-github-com-go-openapi-swag-typeutils")
