@@ -66,13 +66,24 @@ Fossil check-in name.  Return #t on success, #f otherwise."
              (raise (condition (&message (message message))))))
           ((#f) uri))))))               ;local file
 
-(define* (fossil-fetch-url uri check-in file #:key (download-methods '()))
+(define* (fossil-fetch-url uri check-in file
+                           #:key
+                           (download-methods '())
+                           (disarchive-mirrors '())
+                           (hashes '()))
   "Fetch CHECK-IN from URI into a tarball FILE using url-fetch
 with the specified DOWNLOAD-METHODS.  CHECK-IN must be a valid
-Fossil check-in name.  Return #t on success, #f otherwise."
+Fossil check-in name.  Return #t on success, #f otherwise.
+
+DISARCHIVE-MIRRORS and HASHES are only used when 'disarchive
+is in DOWNLOAD_METHODS.  DISARCHIVE-MIRRORS must be a list of strings,
+and HASHES must be a list of symbol/bytevector pair."
   (and (memq (uri-scheme (string->uri-reference uri))
              '(http https))
        (parameterize ((%download-methods download-methods))
          (url-fetch (simple-format #f "~a/tarball/~a/~a"
                       uri check-in (strip-store-file-name file))
-                    file #:verify-certificate? #f))))
+                    file
+                    #:verify-certificate? #f
+                    #:disarchive-mirrors disarchive-mirrors
+                    #:hashes hashes))))

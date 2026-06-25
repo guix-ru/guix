@@ -26,6 +26,7 @@
 
 (define-module (guix fossil-download)
   #:use-module (guix build-system)
+  #:use-module ((guix download) #:select (%disarchive-mirrors))
   #:use-module (guix gexp)
   #:use-module (guix modules)
   #:use-module (guix monads)
@@ -83,9 +84,12 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
          (extensions (list
                       ;; For Disarchive and SWH:
                       (@* (gnu packages backup) disarchive)
+                      (@* (gnu packages guile) guile-bytestructures)
+                      (@* (gnu packages guile) guile-bzip2)
                       (@* (gnu packages gnupg) guile-gcrypt)
                       (@* (gnu packages tls) guile-gnutls)
                       (@* (gnu packages guile) guile-json-4)
+                      (@* (gnu packages guile) guile-lzma)
                       ;; For download-nar:
                       (@* (gnu packages guile) guile-lzlib)))
          (uri (fossil-reference-uri ref))
@@ -120,8 +124,11 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                        (or (download-nar #$output #:verify-certificate? #f)
                            (try other-download-methods)))
                       ((archive other-download-methods ...)
-                       (or (fossil-fetch-url #$uri #$check-in #$output
-                                             #:download-methods (list archive))
+                       (or (fossil-fetch-url
+                            #$uri #$check-in #$output
+                            #:download-methods (list archive)
+                            #:disarchive-mirrors '#$%disarchive-mirrors
+                            #:hashes '#$`((,hash-algo . ,hash)))
                            (try other-download-methods)))
                       (() #f))))))))
     (mlet %store-monad ((guile (package->derivation guile system)))
