@@ -11593,6 +11593,31 @@ also favors portability, and includes support for all POSIX systems.")
 library in go standard library.")
     (license license:expat)))
 
+(define-public go-github-com-gdgvda-cron
+  (package
+    (name "go-github-com-gdgvda-cron")
+    (version "0.7.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gdgvda/cron")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "05d8dglbqwravim5fd9s2454qyv64vy6bbs39x4l3bkwbhdfr08x"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/gdgvda/cron"))
+    (home-page "https://github.com/gdgvda/cron")
+    (synopsis "Cron library for Go")
+    (description
+     "Package cron implements a cron spec parser and job runner. This package
+provides an independent fork of the @code{https://github.com/robfig/cron}
+project,")
+    (license license:expat)))
+
 (define-public go-github-com-gedex-inflector
   (package
     (name "go-github-com-gedex-inflector")
