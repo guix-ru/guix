@@ -111,7 +111,7 @@
       (list latex2html
             pkg-config
             python-wrapper
-            swig-4.0)))
+            swig-4.4)))
     (inputs
      (list glib
            gtk+-2
