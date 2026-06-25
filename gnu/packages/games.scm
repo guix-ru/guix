@@ -5172,7 +5172,7 @@ Widgets, and allows users to create more.")
                                              "-" (package-version this-package)))
                      (invoke "python3" "run_tests.py" "-a")))))))
     (native-inputs
-     (list python swig-4.0 xorg-server-for-tests))
+     (list python swig-4.4 xorg-server-for-tests))
     (inputs
      (list sdl2
            sdl2-image
@@ -5184,7 +5184,7 @@ Widgets, and allows users to create more.")
            libvorbis
            boost-1.83
            fifechan
-           swig-4.0
+           swig-4.4
            python))
     (propagated-inputs
      (list python-future))
