@@ -1059,7 +1059,7 @@ implementing a Relying Party.")
      (list python-makefun
            python-poetry-core
            python-pytest
-           swig-4.0))
+           swig-4.4))
     (home-page "https://developers.yubico.com/yubikey-manager/")
     (synopsis "Command line tool and library for configuring a YubiKey")
     (description
