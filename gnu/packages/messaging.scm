@@ -2526,7 +2526,7 @@ QMatrixClient project.")
            olm
            openssl
            re2
-           spdlog-1.13
+           spdlog
            zlib))
     (native-inputs
      (list googletest pkg-config))
