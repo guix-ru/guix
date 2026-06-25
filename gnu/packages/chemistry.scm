@@ -408,33 +408,6 @@ and two-electron integrals for @acronym{GTO, Gaussian Type Function}s.")
 molecules.")
     (license license:expat)))
 
-(define-public mmtf-cpp
-  (package
-    (name "mmtf-cpp")
-    (version "1.1.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/rcsb/mmtf-cpp")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "0rs2f1ppgqz663c3m22p8wsq6z839bj59zy29chci46ypfhwv6ph"))))
-    (build-system cmake-build-system)
-    ;; Tests require the soon-to-be-deprecated version 1 of the catch-framework.
-    (arguments '(#:tests? #f))
-    ;; There is no support for modern msgpack versions yet (see:
-    ;; https://github.com/rcsb/mmtf-cpp/issues/44).
-    (propagated-inputs (list msgpack-3)) ;included by mmtf/structure_data.hpp
-    (home-page "https://mmtf.rcsb.org/")
-    (synopsis "C++ API for the Macromolecular Transmission Format")
-    (description "This package is a library for the
-@acronym{MMTF,macromolecular transmission format}, a binary encoding of
-biological structures.")
-    (license license:expat)))
-
 (define-public molequeue
   (package
     (name "molequeue")
