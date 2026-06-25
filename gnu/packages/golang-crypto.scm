@@ -286,6 +286,34 @@ in @url{https://www.rfc-editor.org/rfc/rfc9180.html RFC 9180}.")
 @url{https://csrc.nist.gov/pubs/sp/800/186/final, NIST SP 800-186}.")
     (license license:bsd-3)))
 
+(define-public go-github-com-42wim-sshsig
+  (package
+    (name "go-github-com-42wim-sshsig")
+    (version "0.0.0-20260317195500-b9f38cf0d432")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/42wim/sshsig")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wxbfcjjkn7399g73gxgj4f4631wl1a8s1kpbdwnafzzbyz9islf"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/42wim/sshsig"))
+    (propagated-inputs
+     (list go-golang-org-x-crypto))
+    (home-page "https://github.com/42wim/sshsig")
+    (synopsis "Armored SSH signatures in Go")
+    (description
+     "Package sshsig implements signing/verifying armored SSH signatures.  It
+may be used to sign data and verify signatures using SSH private keys or SSH
+agent.  It gives the same output as using @command{ssh-keygen}, eg when
+signing @code{ssh-keygen -Y sign -f keyfile -n namespace data}.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-99designs-keyring
   (package
     (name "go-github-com-99designs-keyring")
