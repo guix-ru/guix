@@ -928,6 +928,32 @@ Application Record Encoding} https://baremessages.org/ message format for
 Golang.")
     (license license:asl2.0)))
 
+(define-public go-github-com-6543-go-version
+  (package
+    (name "go-github-com-6543-go-version")
+    (version "1.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/6543/go-version")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0qlgwxhw9r2r88ap1m9q1hknn4g3xvcdpjgq14gswcqzd34pyg2v"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/6543/go-version"))
+    (native-inputs (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/6543/go-version")
+    (synopsis "Versioning Library for Go")
+    (description
+     "Package version provides functionality for parsing and comparing version
+strings.  It supports semantic versioning and includes methods for version
+comparison, manipulation, and formatting.")
+    (license license:mpl2.0)))
+
 (define-public go-github-com-a-h-parse
   (package
     (name "go-github-com-a-h-parse")
