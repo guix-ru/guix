@@ -677,7 +677,7 @@ parser definition into a C output.")
 (define-public llhttp-bootstrap
   (package
     (name "llhttp")
-    (version "9.3.0")
+    (version "9.4.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -686,8 +686,7 @@ parser definition into a C output.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0yz4ys94pjq2fs2pihpqjvmxj2mbpm8k5prlm445z4qlajzlr4kb"))
-              (patches (search-patches "llhttp-ponyfill-object-fromentries.patch"))
+                "0yb46qksyw0h14r1qp84xkk8zijfi661991288isivba61hijp2z"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -696,7 +695,7 @@ parser definition into a C output.")
                   (substitute* "src/llhttp/http.ts"
                     (("\\* as assert") "assert"))
                   (substitute* "Makefile"
-                    (("npx ts-node bin/generate.ts")
+                    (("node --import tsx bin/generate.ts")
                      "node bin/generate.js"))
                   #t))))
     (build-system gnu-build-system)
