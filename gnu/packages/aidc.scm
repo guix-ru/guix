@@ -212,7 +212,7 @@ integration of this capability into your own programs.")
               (invoke "sh" "-c"
                            (string-append "cp " source "/core/src/*.h "
                                                 #$output "/include/ZXing/")))))))
-    (native-inputs (list fmt-8 googletest pkg-config))
+    (native-inputs (list googletest pkg-config))
     (inputs (list libpng zint zlib))
     (synopsis "C++ port of ZXing")
     (description "ZXing-CPP is a barcode scanning library.")
