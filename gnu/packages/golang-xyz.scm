@@ -31391,6 +31391,34 @@ produces human-readable, logfmt-style output.")
 context for Go.")
     (license license:bsd-3)))
 
+(define-public go-go-bug-st-relaxed-semver
+  (package
+    (name "go-go-bug-st-relaxed-semver")
+    (version "0.15.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/bugst/relaxed-semver")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1q4fbs57bgfzqisf90dg90kl5m5gb97iqjqg9sng5hpgh81mcbvv"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.bug.st/relaxed-semver"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-gopkg-in-yaml-v3))
+    (home-page "https://go.bug.st/relaxed-semver")
+    (synopsis "go.bug.st/relaxed-semver")
+    (description
+     "This package provides a Go library for handling a superset of semantic
+versioning.")
+    (license license:bsd-3)))
+
 (define-public go-go-bug-st-serial
   (package
     (name "go-go-bug-st-serial")
