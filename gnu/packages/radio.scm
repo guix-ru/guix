@@ -1326,16 +1326,15 @@ DMR, NXDN, P25, etc.")
        (sha256
         (base32 "08qnirnwkxida1k4gdjm43jfvk2j32afcl0212kyb1ixw2gwc2wy"))))
     (build-system cmake-build-system)
-    (arguments (list #:tests? #f))
+    (arguments (list #:tests? #f))      ;no tests
     (native-inputs
      (list doxygen
            pkg-config
-           pybind11-2
+           pybind11
            python
-           python-numpy
-           python-six))
+           python-numpy))
     (inputs
-     (list boost-1.83
+     (list boost-1.88
            fftwf
            gmp
            gnuradio
