@@ -9309,6 +9309,21 @@ compressed JSON header blocks.
 @end itemize\n")
     (license license:expat)))
 
+(define-public nghttp2-for-node-lts
+  (package
+    (inherit nghttp2)
+    (version "1.69.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://github.com/nghttp2/nghttp2/"
+                           "releases/download/v" version "/"
+                           "nghttp2-" version ".tar.xz"))
+       (sha256
+        (base32
+         "1b88wp8ghfpnlpbqzsbwwylry86qzwwl33v5w2yzcmicxjv29cqz"))))
+    (properties '((hidden? . #t)))))
+
 (define-public nghttp3
   (package
     (name "nghttp3")
