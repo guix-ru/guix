@@ -11820,6 +11820,10 @@ play with up to four players simultaneously.  It has network support.")
 (define-public hedgewars
   (package
     (name "hedgewars")
+    ;; TODO: Delete phase 'import-control-dot-monad' on versions >1.0.3.
+    ;; TODO: Remove patch 'hedgewars-support-ffmpegv6' on versions >1.0.2.
+    ;; TODO: Remove patch 'hedgewars-fix-pascalbasic-name-conflict'
+    ;; on versions >1.0.3.
     (version "1.0.2")
     (source (origin
               (method url-fetch)
@@ -11827,17 +11831,38 @@ play with up to four players simultaneously.  It has network support.")
                                   "hedgewars-src-" version ".tar.bz2"))
               (sha256
                (base32
-                "04pjpkjhpy720n803gv35iygmjdvsrmw13mih4ympjnqbgjfa7r0"))))
+                "04pjpkjhpy720n803gv35iygmjdvsrmw13mih4ympjnqbgjfa7r0"))
+              (patches
+               (search-patches "hedgewars-fix-pascalbasic-name-conflict.patch"
+                               "hedgewars-support-ffmpegv6.patch"))))
     (build-system qt-build-system)
     (arguments
      (list
       ;; XXX: Engine is built as Pascal source code, requiring Free Pascal
       ;; Compiler, which we haven't packaged yet.  With the flag below, we use
       ;; a Pascal to C translator and Clang instead.
-      #:configure-flags #~(list "-DBUILD_ENGINE_C=ON"
-                                "-Dhaskell_flags=-dynamic;-fPIC")
+      #:configure-flags
+      #~'("-DBUILD_ENGINE_C=ON"
+          "-DNOVERSIONINFOUPDATE=ON"
+          "-Dhaskell_flags=-dynamic;-fPIC")
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'import-control-dot-monad
+            (lambda _
+              (with-directory-excursion "gameServer"
+                (substitute* '("ClientIO.hs"
+                               "HandlerUtils.hs"
+                               "HWProtoChecker.hs"
+                               "HWProtoCore.hs"
+                               "HWProtoLobbyState.hs"
+                               "HandlerUtils.hs"
+                               "ServerState.hs"
+                               "Votes.hs"
+                               "../tools/pas2c/Pas2C.hs")
+                  ;; All files define `import Control.Monad.{something}`.
+                  ;; Our symbols are in Control.Monad now as well.
+                  (("import Control\\.Monad" all)
+                   (string-append all "\n" "import Control.Monad"))))))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
@@ -11851,7 +11876,7 @@ play with up to four players simultaneously.  It has network support.")
                     (string-append "../hedgewars-src-" #$version)
                   (install-file "misc/hedgewars.png" icons))))))))
     (inputs
-     (list ffmpeg-4
+     (list ffmpeg
            freeglut
            ghc-entropy
            ghc-hslogger

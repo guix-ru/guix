@@ -1,0 +1,51 @@
+From ab3fac1e3b354890a3925235881673b97691dba2 Mon Sep 17 00:00:00 2001
+From: unc0rr <unc0rr@gmail.com>
+Date: Fri, 16 Jun 2023 08:10:45 +0200
+Subject: [PATCH] Fix pas2c build erroring after parsec added function we
+ already define
+
+---
+ tools/pas2c/PascalBasics.hs       | 2 +-
+ tools/pas2c/PascalParser.hs       | 2 +-
+ tools/pas2c/PascalPreprocessor.hs | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tools/pas2c/PascalBasics.hs b/tools/pas2c/PascalBasics.hs
+index f4eba72f87..eaf4d596db 100644
+--- a/tools/pas2c/PascalBasics.hs
++++ b/tools/pas2c/PascalBasics.hs
+@@ -2,7 +2,7 @@
+ module PascalBasics where
+ 
+ import Text.Parsec.Combinator
+-import Text.Parsec.Char
++import Text.Parsec.Char hiding (string')
+ import Text.Parsec.Prim
+ import Text.Parsec.Token
+ import Text.Parsec.Language
+diff --git a/tools/pas2c/PascalParser.hs b/tools/pas2c/PascalParser.hs
+index 2edd7a2479..c97bb359aa 100644
+--- a/tools/pas2c/PascalParser.hs
++++ b/tools/pas2c/PascalParser.hs
+@@ -4,7 +4,7 @@ module PascalParser (
+     )
+     where
+ 
+-import Text.Parsec
++import Text.Parsec hiding (string')
+ import Text.Parsec.Token
+ import Text.Parsec.Expr
+ import Control.Monad
+diff --git a/tools/pas2c/PascalPreprocessor.hs b/tools/pas2c/PascalPreprocessor.hs
+index 4db8eaa8ae..93a176209c 100644
+--- a/tools/pas2c/PascalPreprocessor.hs
++++ b/tools/pas2c/PascalPreprocessor.hs
+@@ -1,7 +1,7 @@
+ {-# LANGUAGE ScopedTypeVariables #-}
+ module PascalPreprocessor where
+ 
+-import Text.Parsec
++import Text.Parsec hiding (string')
+ import Control.Monad.IO.Class
+ import Control.Monad
+ import System.IO
