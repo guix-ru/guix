@@ -1853,7 +1853,7 @@ channels.")
 (define-public exiv2
   (package
     (name "exiv2")
-    (version "0.28.7")
+    (version "0.28.8")
     (source
      (origin
        (method git-fetch)
@@ -1862,7 +1862,7 @@ channels.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1l0f8dijv4r09fqj9cas7bv2y6xdnvy4ch1agc80nwyk726czfbb"))))
+        (base32 "1jj88acjqs8l2s8av1b2mmmh7aha9js7pmx0r288mnsfs2abw1zm"))))
     (build-system cmake-build-system)
     (arguments
      (list
