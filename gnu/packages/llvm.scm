@@ -2349,22 +2349,21 @@ C/C++/Obj-C code according to a set of style options, see
 
 (define-public emacs-clang-rename
   (package
-    (inherit clang)
+    (inherit clang-19)
     (name "emacs-clang-rename")
     (build-system emacs-build-system)
     (inputs
-     (list clang))
+     (list clang-19))
     (propagated-inputs '())
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'configure
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let ((clang-rename (search-input-file inputs "/bin/clang-rename")))
-               (copy-file "tools/clang-rename/clang-rename.el" "clang-rename.el")
-               (emacs-substitute-variables "clang-rename.el"
-                 ("clang-rename-binary"
-                  clang-rename))))))))
+     (list #:lisp-directory "clang/tools/clang-rename"
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'configure
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((clang-rename (search-input-file inputs "/bin/clang-rename")))
+                     (emacs-substitute-variables "clang-rename.el"
+                       ("clang-rename-binary" clang-rename))))))))
     (synopsis "Rename every occurrence of a symbol using clang-rename")
     (description "This package renames every occurrence of a symbol at point
 using @code{clang-rename}.")))
