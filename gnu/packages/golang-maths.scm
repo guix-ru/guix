@@ -3,6 +3,7 @@
 ;;; Copyright © 2024 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2025 IliaLuetin <antonstimmer@gmx.de>
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
+;;; Copyright © 2026 Orahcio Felício de Sousa <orahcio@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -29,6 +30,7 @@
   #:use-module (gnu packages)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
+  #:use-module (gnu packages golang-check)
   #:use-module (gnu packages golang-compression))
 
 ;;; Commentary:
@@ -561,6 +563,31 @@ Features:
 rounding for conversions.  IEEE 754-2008 refers to this 16-bit floating-point
 format as binary16.")
     (license license:expat)))
+
+(define-public go-go-bug-st-f
+  (package
+    (name "go-go-bug-st-f")
+    (version "0.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/bugst/go-algorithms")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0nrck5g8c4wb96y0vvqbgvm0zq6aqf80ac97a7ab4qf05d940l9k"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "go.bug.st/f"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://go.bug.st/f")
+    (synopsis "Basic set of algoritms in Go")
+    (description
+     "Package f is a Golang library implementing some basic algorithms.")
+    (license license:bsd-3)))
 
 (define-public go-gonum-org-v1-gonum
   (package
