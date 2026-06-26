@@ -63,14 +63,29 @@
               (lambda _
                 (let* ((files-rx (make-regexp "\\.(c|h|md)$"))
                        (include-file? (cut regexp-exec files-rx <>))
-                       (deprecated-output (string-append #$output "/deprecated")))
+                       (deprecated-output (string-append #$output "/deprecated"))
+                       (pkgconfig (string-append #$output "/lib/pkgconfig"))
+                       (pc (string-append pkgconfig "/stb.pc")))
                   (for-each (cut install-file <> #$output)
                             (scandir "." include-file?))
                   (mkdir-p deprecated-output)
                   (with-directory-excursion "deprecated"
                     (for-each (cut install-file <> deprecated-output)
                               (scandir "." include-file?)))
-                  #t))))))
+                  ;; Create stb.pc.
+                  (mkdir-p pkgconfig)
+                  (call-with-output-file pc
+                    (lambda (port)
+                      (format port
+                              "prefix=~a
+includedir=${prefix}
+
+Name: stb
+Version: ~a
+Description: ~a
+Cflags: -I${includedir}~%"
+                             #$output #$version
+                             #$(package-synopsis this-package))))))))))
       (synopsis "Single file libraries for C/C++")
       (description
        "This package contains a variety of small independent libraries for
