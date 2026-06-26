@@ -838,7 +838,7 @@ configuration changes, e.g. after splitting or deleting a window.")
 (define-public emacs-ben
   (package
     (name "emacs-ben")
-    (version "0.12.12")
+    (version "0.12.13")
     (source
      (origin
        (method git-fetch)
@@ -847,7 +847,7 @@ configuration changes, e.g. after splitting or deleting a window.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "05ls9sdydwnz2sifakk1jww68dkv0pinj25mpqw4j11kh48s7cm7"))))
+        (base32 "1rzs21l032awcpyq7alh2xy7ibkzqlhmph9jx8rbs6ml8wzyc0l6"))))
     (build-system emacs-build-system)
     (arguments
      (list
@@ -863,14 +863,7 @@ configuration changes, e.g. after splitting or deleting a window.")
               (emacs-substitute-variables "ben.el"
                 ("ben-direnv-executable"
                  #$(file-append (this-package-input "direnv")
-                                "/bin/direnv")))))
-          (add-after 'unpack 'skip-failing-test
-            (lambda _
-              (substitute* "ben-tests.el"
-                (("\\(ert-deftest ben-eshell-updates-environment-when-changing-directory .*" all)
-                 (string-append all " (skip-unless nil)"))
-                (("\\(ert-deftest ben-masks-global-var-when-overridden .*" all)
-                 (string-append all " (skip-unless nil)"))))))))
+                                "/bin/direnv"))))))))
     (inputs (list direnv))
     (propagated-inputs (list emacs-inheritenv))
     (home-page "https://codeberg.org/pastor/ben.el")
