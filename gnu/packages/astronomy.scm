@@ -2033,6 +2033,60 @@ R. Seaman's protocol}
 software from Stark Labs.")
       (license license:bsd-3)))
 
+(define-public planetary-system-stacker
+  (package
+    (name "planetary-system-stacker")
+    (version "0.9.8")
+    ;; There is no tag for releases after 0.8.31; this commit corresponds to
+    ;; version 0.9.8.
+    (properties
+     '((commit . "304952a8ac8e991e111e3fe2dba95a6ca4304b4e")
+       (revision . "0")))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Rolf-Hempel/PlanetarySystemStacker")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ngzmr8b7xavivw76xfdqsgmi0k7n7qwmvqqawrdl7ygs5p2mnil"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #false                   ;none included
+      #:phases
+      '(modify-phases %standard-phases
+         (add-after 'unpack 'compatibility
+           (lambda _
+             (substitute* "planetary_system_stacker/planetary_system_stacker.py"
+               (("import pip") "")
+               (("pip.__version__") "''"))))
+         (add-after 'unpack 'relax-requirements
+           (lambda _
+             (substitute* "setup.py"
+               (("numpy <.*'") "numpy'")
+               (("'opencv-python'") "") ;not detected, but it's available
+               ((", <3.7'") "'")))))))
+    (inputs
+     (list opencv
+           python-astropy
+           python-matplotlib
+           python-numpy
+           python-pyqt
+           python-psutil
+           python-scipy
+           python-scikit-image))
+    (home-page "https://github.com/Rolf-Hempel/PlanetarySystemStacker")
+    (synopsis
+     "Stack frames of planetary system objects to produce a sharp image")
+    (description
+     "This software lets you produce a sharp image of a planetary system
+object (moon, sun, planets) from many seeing-affected frames using the \"lucky
+imaging\" technique.  Input to the program can be either video files or
+directories containing still images.")
+    (license license:gpl3)))
+
 (define-public psfex
   (package
     (name "psfex")
