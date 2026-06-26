@@ -25040,18 +25040,18 @@ the center of the screen and not at the bottom.")
 (define-public emacs-posframe
   (package
     (name "emacs-posframe")
-    (version "1.5.1")
+    (version "1.5.2")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "https://elpa.gnu.org/packages/"
-                           "posframe-" version ".tar"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/tumashu/posframe")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1g1pcf83w4fv299ykvx7b93kxkc58fkr6yk39sxny5g16d4gl80g"))))
+        (base32 "10a6n3pgh36j3smizgh48p2bbi680dsdssz1563ijxj01cy2b0hv"))))
     (build-system emacs-build-system)
-    ;; emacs-minimal does not include the function font-info.
-    (arguments
-     `(#:emacs ,emacs))
+    (arguments (list #:tests? #f))      ;no tests
     (home-page "https://github.com/tumashu/posframe")
     (synopsis "Pop a posframe (a child frame) at point")
     (description
