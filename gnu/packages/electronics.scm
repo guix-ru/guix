@@ -850,12 +850,12 @@ The engine is designed to do true mixed-mode simulation.")
   ;; The last release is more than 2 years old, and there are improvements in
   ;; the master branch, such as GTK 4 support: pick the latest commit that
   ;; passes their CI.
-  (let ((commit "36638f96434d189a1a633ee3a32158ad8bc7cd64")
-        (revision "1"))
+  (let ((commit "7d7b4db9e2f5485afe2aeeab0ad112f5b6a9b94b")
+        (revision "0"))
     (package
       (name "gtkwave")
       ;; The version string can be found in meson.build.
-      (version (git-version "3.4.0" revision commit))
+      (version (git-version "4.0.0" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -864,7 +864,7 @@ The engine is designed to do true mixed-mode simulation.")
                 (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0yrgdw9f1wb5bzxmijb58l0p5dxpihzq3zk228hjdm625x0swp6g"))))
+          (base32 "18k3axnnpj0zfmwfg6anm09niyyzv7323m7yppm19xz4w7y9chll"))))
       (build-system meson-build-system)
       (arguments (list #:glib-or-gtk? #t))
       (native-inputs (list desktop-file-utils
