@@ -1025,6 +1025,44 @@ that implements several sorting algorithms.  It is configured using
 macros and supports user-defined types.")
     (license license:expat))))
 
+(define-public demumble
+  (package
+    (name "demumble")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/nico/demumble")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1kgk1zf2amd6jgbj8264i74izqj4ckh43z62v8xz2rvy8h0wqpyq"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                ;; Test script assumes binary to be available in same dir.
+                (symlink (in-vicinity #$source "demumble_test.py")
+                         "demumble_test.py")
+                (invoke "python3" "demumble_test.py"))))
+          ;; No 'install' target in CMakeLists.txt
+          (replace 'install
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((bin (in-vicinity #$output "bin")))
+                (install-file "demumble" bin)))))))
+    (native-inputs (list python-minimal))
+    (home-page "https://github.com/nico/demumble")
+    (synopsis "Demangles both Itanium and Visual Studio symbols")
+    (description "This package provides a demangler for symbol names.
+Demangling refers to the process of translating @acronym{ABI, application binary
+interface} identifiers back to their source code equivalents.")
+    (license license:asl2.0)))
+
 (define-public sparse
   (package
     (name "sparse")
