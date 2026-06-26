@@ -194,12 +194,12 @@ GnuPG's default/configured one.  The key is added to KEYRING."
     (mkdir-p (dirname keyring))
     (call-with-output-file keyring (const #t))) ;create an empty keybox
 
-  (let* ((keyserver-flags (if server '("--keyserver" server) '()))
+  (let* ((keyserver-flags (if server  `("--keyserver" ,server) '()))
          (default-flags (list "--no-default-keyring"
                               "--keyring" keyring
                               "--recv-keys" fingerprint/key-id))
          (gpg-flags (append keyserver-flags default-flags))
-         (pid (spawn (%gpg-command) gpg-flags)))
+         (pid (spawn (%gpg-command) (cons (%gpg-command) gpg-flags))))
         (match (waitpid pid)
           ((_ . status)
            (zero? status)))))
