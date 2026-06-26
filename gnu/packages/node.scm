@@ -747,14 +747,14 @@ source files.")
 (define-public node-lts
   (package
     (inherit node-bootstrap)
-    (version "24.16.0")
+    (version "24.18.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nodejs.org/dist/v" version
                                   "/node-v" version ".tar.gz"))
               (sha256
                (base32
-                "0j25mpkmdjn565swb6g4x7myd6k48vfsijnwdpx59jvn70pd64gm"))
+                "1dvy8y51qad7gx5fhlzbfrmav5c9rlasckgxd7n3k1qxnikq0d68"))
               (modules '((guix build utils)))
               (snippet
                '(begin
@@ -783,8 +783,7 @@ source files.")
                               "deps/llhttp"
                               "deps/uv"
                               "deps/zlib"
-                              "deps/zstd"))))
-              (patches (search-patches "node-fix-eventloopdelay-test.patch"))))
+                              "deps/zstd"))))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags configure-flags)
@@ -962,7 +961,7 @@ source files.")
       brotli
       icu4c-76
       libuv-for-node-lts
-      `(,nghttp2 "lib")
+      `(,nghttp2-for-node-lts "lib")
       openssl
       zlib
                                         ; ngtcp2? nghttp3?
@@ -983,7 +982,7 @@ source files.")
            brotli
            ngtcp2
            nghttp3
-           `(,nghttp2 "lib")
+           `(,nghttp2-for-node-lts "lib")
            openssl
            zlib
            `(,zstd-1.5.7 "lib")))
