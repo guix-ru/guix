@@ -1,0 +1,20 @@
+Use the system-wide installed nanobind instead of vendoring it via Git submodules.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 92eab9d..3bc8b0d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -44,8 +44,11 @@ add_definitions(
+   -DSWIFT_STDLIB_HAS_TYPE_PRINTING=1
+ )
+ 
+-# finding nanobind
+-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/nanobind)
++# See https://nanobind.readthedocs.io/en/latest/building.html#finding-nanobind
++execute_process(
++  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
++  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
++find_package(nanobind CONFIG REQUIRED)
+ 
+ nanobind_add_module(
+ 	pydemumble

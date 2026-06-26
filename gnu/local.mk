@@ -2146,6 +2146,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-onnx-asr-0.10.2-bundled-parakeet-model.patch	\
   %D%/packages/patches/python-random2-getrandbits-test.patch		\
   %D%/packages/patches/python-pillow-use-zlib-1.3.patch	\
+  %D%/packages/patches/python-pydemumble-system-nanobind.patch	\
   %D%/packages/patches/python-pydocstyle-add-support-for-pep701.patch	\
   %D%/packages/patches/python-pynvim-fix-test-command-error.patch	\
   %D%/packages/patches/python-pypytools-python-3-fixes.patch	\
