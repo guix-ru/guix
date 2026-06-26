@@ -1712,17 +1712,16 @@ analyzer (FFT) and frequency sweep plot.")
 (define-public capstone
   (package
     (name "capstone")
-    (version "5.0.1")
+    (version "5.0.3")
     (source (origin
               (method git-fetch)
-              (patches (search-patches "capstone-fix-python-constants.patch"))
               (uri (git-reference
                     (url "https://github.com/capstone-engine/capstone")
                     (commit version)))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1j4a6w8p3z5qrkzf0h5aklrnlpvscv6nlq7d3abbpxlyqvk8pach"))))
+                "0fv8j1nzzbc5x9pg90641gpmlmp9h85wcg3l6258drk761rp979d"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f
@@ -1765,8 +1764,11 @@ bindings for Python, Java, OCaml and more.")
              ;; This substitution tells python-capstone where to find the
              ;; library.
              (substitute* "capstone/__init__.py"
-               (("pkg_resources.resource_filename.*")
-                (format #f "'~a/lib',~%" #$(this-package-input "capstone"))))))
+               (("resources\\.files\\(__name__\\)")
+                (string-append "PurePath(\"" #$(this-package-input "capstone") "\")")))
+             ;; Fix the path to the tests scripts in the Makefile.
+             (substitute* "Makefile"
+               (("./\\$\\$t") "./tests/$$t"))))
          (replace 'check
            (lambda* (#:key tests? #:allow-other-keys)
              (when tests?
