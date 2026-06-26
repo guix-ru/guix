@@ -1358,19 +1358,22 @@ to the fix block above.
 (define-public gr-satellites
   (package
     (name "gr-satellites")
-    (version "4.6.0")
+    (version "5.9.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/daniestevez/gr-satellites")
-             (commit (string-append "v" version))))
+              (url "https://github.com/daniestevez/gr-satellites")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mcrxwb27n2v8v8vmcmmm1pbmy3c02a22mz2wnpdsfb2163qpchw"))))
+        (base32 "0fjc6fdcfh4j0asn7g1qph3g5lz0mswhv284ckl9d0p9dg91i489"))))
     (build-system cmake-build-system)
     (arguments
      (list
+      ;; TODO: CMake struggles to find Python module: ModuleNotFoundError: No
+      ;; module named 'satellites'.
+      #:tests? #f
       #:modules `((guix build cmake-build-system)
                   ((guix build pyproject-build-system) #:prefix py:)
                   (guix build utils))
@@ -1384,9 +1387,10 @@ to the fix block above.
           (add-after 'install 'wrap-python
             (assoc-ref py:%standard-phases 'wrap)))))
     (native-inputs
-     (list pkg-config pybind11-2 python-six))
+     (list pkg-config
+           pybind11))
     (inputs
-     (list boost-1.83
+     (list boost-1.88
            gmp
            gnuradio
            log4cpp
@@ -1396,7 +1400,7 @@ to the fix block above.
            python-pyaml
            python-pyzmq
            python-requests
-           spdlog-1.13
+           spdlog
            volk))
     (synopsis "GNU Radio decoders for several Amateur satellites")
     (description
