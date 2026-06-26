@@ -12,7 +12,7 @@
 ;;; Copyright © 2022 Sheng Yang <styang@fastmail.com>
 ;;; Copyright © 2022 Greg Hogan <code@greghogan.com>
 ;;; Copyright © 2022, 2025 Ryan Tolboom <ryan@using.tech>
-;;; Copyright © 2023 Sharlatan Hellseher <sharlatanus@gmail.com>
+;;; Copyright © 2023-2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2023, 2025 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2024 Andy Tai <atai@atai.org>
 ;;; Copyright © 2024 Noisytoot <ron@noisytoot.org>
@@ -1414,7 +1414,7 @@ satellites.")
 (define-public gqrx
   (package
     (name "gqrx")
-    (version "2.17.6")
+    (version "2.17.7")
     (source
      (origin
        (method git-fetch)
@@ -1423,26 +1423,26 @@ satellites.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17ddhxkh9rcfzahv88knfs895sjihj7j8ag1kwjfzdm80drhlagz"))))
+        (base32 "0vsg39b8m1rq7l4krwnkayiqljn3dgfya124gch48dk7kb38iwms"))))
     (build-system qt-build-system)
     (native-inputs
      (list pkg-config))
     (inputs
      (list alsa-lib
-           boost-1.83
+           boost-1.88
            fftwf
            gmp
            gnuradio
            gr-iqbal
            gr-osmosdr
-           jack-1
+           jack-2
            libsndfile
            log4cpp
            portaudio
            pulseaudio
-           qtbase-5
-           qtsvg-5
-           qtwayland-5
+           qtbase
+           qtsvg
+           qtwayland
            spdlog
            volk))
     (arguments
