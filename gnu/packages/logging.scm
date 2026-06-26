@@ -120,11 +120,11 @@ platform-specific code.")
 
 (define-public logmich
   ;; XXX: Does not release anymore.
-  (let ((commit "0cc475efc10c6786d1d805c997fab1d7da60252a")
-        (revision "0"))
+  (let ((commit "2610fad6768e5b493b52ff08d60d1eb8825f1ab6")
+        (revision "1"))
     (package
       (name "logmich")
-      (version (git-version "0.2.0" revision commit))
+      (version (git-version "0.1.0" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -133,7 +133,7 @@ platform-specific code.")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1q7dkw3sw2578kx4vf646hzzlca82rnprbvc1bp2nf218id8n326"))))
+          (base32 "02bnnrz0fh216pyn05axhizkmglsyfc29qry4s928dyy4spypynq"))))
       (build-system cmake-build-system)
       (arguments
        (list
