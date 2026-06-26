@@ -236,6 +236,63 @@ management tool that embeds issues, comments, and more as objects in a git
 repository.")
     (license license:gpl3+)))
 
+(define-public gtimelog
+  (package
+    (name "gtimelog")
+    (version "0.12.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/gtimelog/gtimelog")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1k6fjvi7f3w0b8208im02y7b25sb9v1nvcl72xbqfnnr16080lin"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-backend
+      #~'custom
+      #:test-flags
+      #~(list "runtests")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'create-entrypoints 'wrap
+            (lambda _
+              (wrap-program (string-append #$output "/bin/gtimelog")
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH"))))))
+          (add-after 'wrap 'install-icon
+            (lambda _
+              (let ((pixmaps (string-append #$output "/share/pixmaps")))
+                (mkdir-p pixmaps)
+                (copy-file "src/gtimelog/gtimelog-large.png"
+                           (string-append pixmaps "/gtimelog-large.png")))))
+          (add-after 'install-icon 'create-desktop-entry-file
+            (lambda _
+              (make-desktop-entry-file (string-append #$output
+                                        "/share/applications/gtimelog.desktop")
+                                       #:name "GTimeLog"
+                                       #:comment
+                                       "Track and time daily activities"
+                                       #:exec (string-append #$output
+                                                             "/bin/gtimelog")
+                                       #:startup-notify #t
+                                       #:icon (string-append #$output
+                                               "/share/pixmaps/gtimelog-large.png")
+                                       #:categories "Utility"))))))
+    (inputs (list bash-minimal gtk+ libsecret libsoup python-pygobject))
+    (native-inputs (list gobject-introspection python-freezegun
+                         python-setuptools))
+    (home-page "https://gtimelog.org/")
+    (synopsis "Gtk+ time tracking application")
+    (description
+     "GTimeLog provides a time tracking application
+to allow the user to track what they work on during the day and
+how long they spend doing it.")
+    (license license:gpl3)))
+
 (define-public annextimelog
   (package
     (name "annextimelog")
