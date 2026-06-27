@@ -1073,7 +1073,7 @@ stream.  Remote control of the module is possible over HTTP.")
                                                   "/etc/nginx/modules")))
                   (install-file "objs/ngx_http_headers_more_filter_module.so"
                                 modules-dir))))
-            (delete 'fix-root-dirs)
+            (delete 'move-html-doc)
             (delete 'install-man-page)))))
     (home-page "https://github.com/openresty/headers-more-nginx-module")
     (synopsis "Set, add, and clear input and output headers in NGINX http servers")
