@@ -483,10 +483,11 @@ POP3/POP3-S as well as CalDAV and CardDAV.")
            #:configure-flags
            #~(list "--sysconfdir=/etc"
                    "--disable-static"
+                   "--disable-debug"
 
                    ;; Specify path to sendmail setuid binary, which otherwise
                    ;; defaults to /usr/sbin/sendmail
-                   "CFLAGS=-DPATH_SENDMAIL=\\\"/run/setuid-programs/sendmail\\\""
+                   "CPPFLAGS=-DPATH_SENDMAIL=\\\"/run/setuid-programs/sendmail\\\""
                    ;; Add "/X.Y" to the installation directory.
                    (string-append "--with-guile-site-dir="
                                   #$output
