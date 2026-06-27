@@ -9611,6 +9611,35 @@ something with a bit more flair than the Modus themes.")
     (license (list license:gpl3+
                    license:fdl1.3+))))
 
+(define-public emacs-efar
+  ;; Upstream git repo tagged 1.29, but master tip is labeled 1.33 in source
+  ;; code.
+  (let ((commit "78618a6cd9fe7d46c3728db3589d1fe50f7c1c6b")
+        (revision "0"))
+    (package
+      (name "emacs-efar")
+      (version (git-version "1.33" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/suntsov/efar")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1dl7nfsg6ya1lvn1mjvask75x73vinxbpg5hxiqmif27gdi68qc1"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list
+        #:tests? #f))                   ; No tests.
+      (home-page "https://github.com/suntsov/efar")
+      (synopsis "FAR-like file manager for Emacs")
+      (description
+        "This package provides an orthodox file manager inspired by
+@url{https://farmanager.com/, FAR}.")
+      (license license:gpl2+))))
+
 (define-public emacs-doric-themes
   (package
     (name "emacs-doric-themes")
