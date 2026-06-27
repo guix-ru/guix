@@ -4188,6 +4188,7 @@ topology configuration files that can be used for specific audio hardware.")
            alsa-ucm-conf
            alsa-topology-conf
            libtool))
+    (supported-systems (remove target-hurd? %supported-systems))
     (home-page "https://www.alsa-project.org/wiki/Main_Page")
     (synopsis "The Advanced Linux Sound Architecture libraries")
     (description
