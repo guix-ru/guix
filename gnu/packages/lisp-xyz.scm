@@ -23177,7 +23177,7 @@ latitude/longitude and MGRS.")
 (define-public sbcl-misc-extensions
   (package
     (name "sbcl-misc-extensions")
-    (version "4.2.3")
+    (version "4.2.4")
     (source
      (origin
        (method git-fetch)
@@ -23186,8 +23186,7 @@ latitude/longitude and MGRS.")
              (commit (string-append "v" version))))
        (file-name (git-file-name "cl-misc-extensions" version))
        (sha256
-        (base32
-         "0q46hr75kzrqwg83f05ymxfd9k6dky6mm3c05xm8b2ryywhikzf7"))))
+        (base32 "1h4m2cyjfbrgmqaa4xhs2xdv36wsdxqwi4srvzp2jrf4m1kjgbym"))))
     (build-system asdf-build-system/sbcl)
     (synopsis "Collection of small macros and extensions for Common Lisp")
     (description
