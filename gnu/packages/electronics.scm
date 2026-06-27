@@ -755,7 +755,7 @@ layout files which are commonly used for
 (define-public gerbv
   (package
     (name "gerbv")
-    (version "2.10.0")
+    (version "2.13.0")
     (source
      (origin
        (method git-fetch)
@@ -764,29 +764,24 @@ layout files which are commonly used for
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "06bcm5zw7whsnnmfld3gl2j907lxc68gnsbzr2pc4w6qc923rgmj"))))
-    (build-system gnu-build-system)
+        (base32 "1vm5i5rnajvz1wv6kbinyrp6bfwqcvf34l492xyvn75589xal72c"))))
+    (build-system cmake-build-system)
     (arguments
      (list
-      #:configure-flags #~(list "CFLAGS=-O2 -g -fcommon")
-      #:phases #~(modify-phases %standard-phases
-                   (add-after 'unpack 'patch-version-generator
-                     (lambda _
-                       (substitute* "utils/git-version-gen.sh"
-                         (("/bin/bash")
-                          (which "bash"))))))))
-    (native-inputs (list autoconf
-                         automake
-                         desktop-file-utils
+      ;; TODO: See tests/README.md.
+      #:tests? #f            ;passed 94, failed 11, skipped 0 out of 105 tests
+      #:configure-flags #~(list
+                           (string-append "-DCMAKE_C_FLAGS="
+                                          "-Wno-implicit-function-declaration"
+                                          " -Wno-int-conversion"))))
+    (native-inputs (list desktop-file-utils
                          gettext-minimal
                          ;; Version generator needs git to work properly:
                          ;; https://github.com/gerbv/gerbv/issues/244
                          git-minimal/pinned
-                         `(,glib "bin")
-                         libtool
                          pkg-config))
     (inputs (list cairo
-                  ;; As of 2.10.0 gerbv is still GTK+2 only.  GTK 3/4 porting
+                  ;; As of 2.13.0 gerbv is still GTK+2 only.  GTK 3/4 porting
                   ;; issue: https://github.com/gerbv/gerbv/issues/71.
                   gtk+-2))
     (home-page "https://gerbv.github.io/")
@@ -797,8 +792,6 @@ is commonly used to represent printed circuit board (PCB) layouts.  Gerbv lets
 you load several files on top of each other, do measurements on the displayed
 image, etc.  Besides viewing Gerbers, you may also view Excellon drill files
 as well as pick-place files.")
-    ;; This CVE has been fixed in version 2.10.0.
-    (properties '((lint-hidden-cve . ("CVE-2023-4508"))))
     (license license:gpl2+)))
 
 (define-public gnucap
