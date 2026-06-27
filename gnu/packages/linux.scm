@@ -7554,6 +7554,7 @@ Ridge, Joliet, and zisofs.")
            autoconf
            automake
            libtool))
+    (supported-systems (remove target-hurd? %supported-systems))
     (home-page "https://www.nico.schottelius.org/software/gpm/")
     (synopsis "Mouse support for the Linux console")
     (description
