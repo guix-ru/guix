@@ -47,7 +47,9 @@
  (entry (commit "2949c187f600841cdcddfc4f955506b34b79244f")
         (title
          (en "@command{pull} and @command{time-machine} can select or exclude
-channels to update"))
+channels to update")
+         (de "Für @command{pull} und @command{time-machine} kann man zu
+aktualisierende Kanäle auswählen oder ausschließen"))
         (body
          (en "The @command{guix pull} and @command{guix time-machine} can now
 be optionally passed @option{--select} (@option{-e}) or
@@ -66,7 +68,27 @@ To update all but the @code{guix} channel, one could do as follows:
 guix pull -x guix
 @end example
 
-See @samp{info \"(guix)Invoking guix pull\"} for more information.")))
+See @samp{info \"(guix)Invoking guix pull\"} for more information.")
+         (de "Bei den Befehlen @command{guix pull} und @command{guix
+time-machine} kann jetzt optional @option{--select} (@option{-e}) oder
+@option{--exclude} (@option{-x}) übergeben werden, um zu bestimmen, welche
+Kanäle aktualisiert werden.
+
+Zum Beispiel werden mit folgendem Befehl die Kanäle @code{guix-science} und
+@code{guix-past} aktualisiert, aber Guix auf dem aktuellen Commit gehalten.
+
+@example
+guix pull -e guix-science -e guix-past
+@end example
+
+Alle außer dem Kanal @code{guix} zu aktualisieren, geht so:
+
+@example
+guix pull -x guix
+@end example
+
+Siehe @samp{info \"(guix.de)Aufruf von guix pull\"} für weitere
+Informationen.")))
 
  (entry (commit "86776ccd30bb44eb856fcf3a14a8338f38fe1367")
         (title
