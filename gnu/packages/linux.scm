@@ -529,7 +529,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 
 ;; The current "mainline" kernel.
 
-(define-public linux-libre-7.0-version "7.0.13")
+(define-public linux-libre-7.0-version "7.0.14")
 (define-public linux-libre-7.0-gnu-revision "gnu")
 (define deblob-scripts-7.0
   (linux-libre-deblob-scripts
@@ -539,7 +539,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "0a7572zw5y3k4gs4p3h5w0s9bhd63pdjxz6vxbr96sq6r8b6k02n")))
 (define-public linux-libre-7.0-pristine-source
   (let ((version linux-libre-7.0-version)
-        (hash (base32 "04wrz38ldls7pv1yxa1m7p2hqn1731l93xnz93fs7b0nyz8fv09w")))
+        (hash (base32 "160ggaq9rh50a39gz02fpia8maq85bwxhqlwsc03yafjhjvrk6fy")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-7.0)))
