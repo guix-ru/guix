@@ -39,7 +39,7 @@
 
 (define-module (guix licenses)
   #:use-module (srfi srfi-9)
-  #:export (license? license-name license-uri license-comment
+  #:export (license license? license-name license-uri license-comment
             afl2.1 afl3.0
             agpl1 agpl3 agpl3+
             apsl2
