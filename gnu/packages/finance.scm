@@ -2141,13 +2141,13 @@ from account statements and other documents and for managing documents.")
 (define-public fava
   (package
     (name "fava")
-    (version "1.30.12")
+    (version "1.30.14")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "fava" version))
        (sha256
-        (base32 "0ic1vvirxqspamnidbrra9b9qgv8ilcpga7ympf0arn36mb191vw"))))
+        (base32 "1jhp1iqkyplgpzsnjipz9gwsnxmki3nl8yjhv4vszzw01h9rr6c9"))))
     (build-system pyproject-build-system)
     (propagated-inputs
      (list beancount
