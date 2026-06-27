@@ -826,7 +826,6 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
 
 ;; 2026-06-20
 (define-deprecated-package catch2-3 catch2-3.5)
-(define-deprecated-package catch2-3.15 catch2)
 
 (define-public cmocka
   (package
