@@ -25393,19 +25393,20 @@ It has extensive support for Guix, among others:
 
 (define-public sbcl-overlord
   ;; No release.
-  (let ((commit "a8f37b321a8aae1652fc50b78e74e57c771cc763"))
+  (let ((commit "0b5bbbb640122587571e63327a29d248bb67fad3")
+        (revision "2"))
     (package
       (name "sbcl-overlord")
-      (version (git-version "0.0.0" "1" commit))
+      (version (git-version "0.0.0" revision commit))
       (source
        (origin
          (method git-fetch)
          (uri (git-reference
                (url "https://github.com/ruricolist/overlord/")
                (commit commit)))
-         (file-name (git-file-name name version))
+         (file-name (git-file-name "cl-overlord" version))
          (sha256
-          (base32 "1maqm53yhlhaa3cka8xcc4sq24ifrr4y3y0s5dyyn682xsh14hb4"))))
+          (base32 "030vbpjwsgxj9z8lhjhlmb4i68nkp7knqzsgvw6hhpxg2vl0dbbs"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-babel
