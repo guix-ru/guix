@@ -64,6 +64,7 @@
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
 ;;; Copyright © 2026 Daniel Martins <email@danielfm.me>
 ;;; Copyright © 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;;; Copyright © 2026 Evgeny Pisemsky <mail@pisemsky.site>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -3708,18 +3709,21 @@ with applications that support them (e.g. PulseAudio).")
   (package
     (name "liblo")
     (version "0.31")
-    (source (origin
-             (method url-fetch)
-             (uri (string-append "mirror://sourceforge/liblo/liblo/" version
-                                 "/liblo-" version ".tar.gz"))
-             (sha256
-              (base32
-               "0l67rkdhfa8cffa0nynql3lh2xlbn1454h6qxhjddp1029p48krb"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/radarsat1/liblo")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "124c4mviqwxzzi59czk80qkdd8yi69wn46psrsqj49dz5xgn2w4s"))))
     (build-system gnu-build-system)
     (arguments
-     `(;; liblo test FAILED
-       ;; liblo server error 19 in setsockopt(IP_ADD_MEMBERSHIP): No such device
-       #:tests? #f))
+     (list
+      #:configure-flags
+      #~(list "--disable-network-tests")))
+    (native-inputs (list autoconf automake libtool))
     (home-page "https://liblo.sourceforge.net")
     (synopsis "Implementation of the Open Sound Control protocol")
     (description
