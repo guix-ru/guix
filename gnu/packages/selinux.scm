@@ -48,7 +48,8 @@
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages swig)
-  #:use-module (gnu packages xml))
+  #:use-module (gnu packages xml)
+  #:use-module (srfi srfi-1))
 
 ;; Update the SELinux packages together!
 
@@ -183,6 +184,7 @@ module into a binary representation.")
     ;; These inputs are only needed for the pywrap phase.
     (native-inputs
      (list pkg-config python-setuptools swig-4.0))
+    (supported-systems (remove target-hurd? %supported-systems))
     (synopsis "SELinux core libraries and utilities")
     (description
      "The libselinux library provides an API for SELinux applications to get
