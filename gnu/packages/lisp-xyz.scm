@@ -17550,7 +17550,7 @@ of the files and the line numbers where they were found.")
 (define-public sbcl-fset
   (package
     (name "sbcl-fset")
-    (version "1.4.0")
+    (version "2.4.5")
     (source
      (origin
        (method git-fetch)
@@ -17559,10 +17559,17 @@ of the files and the line numbers where they were found.")
              (commit (string-append "v" version))))
        (file-name (git-file-name "cl-fset" version))
        (sha256
-        (base32 "16a3g9av8rvhvnhv5vfq2shim7b7i062wzyz6xwjk9sp9q9bqlva"))))
+        (base32 "0xxxm8rskv2ds1s329jh97qcbqla6yby9g825nbycyb71x5bgljj"))))
     (build-system asdf-build-system/sbcl)
     (inputs
-     (list sbcl-misc-extensions sbcl-mt19937 sbcl-named-readtables))
+     (list sbcl-alexandria
+           sbcl-iterate
+           sbcl-jzon
+           sbcl-misc-extensions
+           sbcl-mt19937
+           sbcl-named-readtables))
+    (arguments
+     '(#:asd-systems '("fset" "fset/iterate" "fset/jzon")))
     (synopsis "Functional set-theoretic collections library")
     (description
      "FSet is a functional set-theoretic collections library for Common Lisp.
@@ -17571,7 +17578,7 @@ modifying an existing one in place.  Set-theoretic means that collections may
 be nested arbitrarily with no additional programmer effort; for instance, sets
 may contain sets, maps may be keyed by sets, etc.")
     (home-page "https://common-lisp.net/project/fset/Site/index.html")
-    (license license:llgpl)))
+    (license license:bsd-2)))
 
 (define-public cl-fset
   (sbcl-package->cl-source-package sbcl-fset))
@@ -17583,8 +17590,9 @@ may contain sets, maps may be keyed by sets, etc.")
   (package
     (inherit (sbcl-package->ecl-package sbcl-fset))
     (arguments
-     ;; Tests fails on ECL with "The function FSET::MAKE-CHAR is undefined".
-     '(#:tests? #f))))
+     (substitute-keyword-arguments arguments
+       ;; Some fset/jzon test fails on ECL.
+       ((#:tests? _ #f) #f)))))
 
 (define-public sbcl-function-cache
   (package
