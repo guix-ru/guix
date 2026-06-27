@@ -824,9 +824,6 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
                (base32
                 "11yla93vm2896fzhm3fz8lk3y3iz5iy7vd6wa7wnwvhsfd2dbfq3"))))))
 
-;; 2026-06-20
-(define-deprecated-package catch2-3 catch2-3.5)
-
 (define-public cmocka
   (package
     (name "cmocka")
