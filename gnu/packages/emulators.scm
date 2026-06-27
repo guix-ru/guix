@@ -3266,14 +3266,16 @@ that compiles to WebAssembly.")
 (define-public scummvm
   (package
     (name "scummvm")
-    (version "2026.2.0")
+    (version "2026.3.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "https://downloads.scummvm.org/frs/scummvm/" version
-                           "/scummvm-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/scummvm/scummvm")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1wv0z9c4dnjywgla9zhbkgnzahj829ybvcx9jw67hdmagnbys42f"))))
+        (base32 "0p1swai3b115hwwvkwxqmhn0ikpj1vzw8dwwqrjxam2ig21ihlf0"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -3282,15 +3284,11 @@ that compiles to WebAssembly.")
       #:phases
       #~(modify-phases %standard-phases
           (replace 'configure
-            ;; configure does not work followed by both "SHELL=..." and
-            ;; "CONFIG_SHELL=..."; set environment variables instead
-            (lambda* (#:key inputs configure-flags #:allow-other-keys)
-              (let ((bash (search-input-file inputs "/bin/bash"))
-                    (flags `(,(string-append "--prefix=" #$output)
-                             ,@configure-flags)))
-                (setenv "SHELL" bash)
-                (setenv "CONFIG_SHELL" bash)
-                (apply invoke "./configure" flags)))))))
+            ;; configure does not recognize "SHELL=..." and "CONFIG_SHELL=...".
+            (lambda* (#:key configure-flags #:allow-other-keys)
+              (apply invoke "./configure"
+                     (string-append "--prefix=" #$output)
+                     configure-flags))))))
     (native-inputs
      (list nasm pkg-config))
     (inputs
@@ -3319,7 +3317,16 @@ classic graphical point-and-click adventure games, provided you
 already have their data files.  The clever part about this: ScummVM
 just replaces the executables shipped with the games, allowing you to
 play them on systems for which they were never designed!")
-    (license license:gpl2+)))
+    ;; See LICENSES/ for comprehensive licensing.
+    (license (list license:boost1.0     ;engines/twp/clipper/clipper.*
+                   license:expat        ;graphics/opengl/glad.h and others
+                   license:mpl2.0       ;engines/director/lingo/lingodec/
+                   license:isc          ;all .patchr files
+                   ;; TODO: unbundle these fonts:
+                   license:silofl1.1    ;gui/themes/fonts/
+                   ;; Most files are gpl3+, see headers for which use lgpl2.1.
+                   license:gpl3+
+                   license:lgpl2.1))))
 
 (define-public libticables2
   (package
