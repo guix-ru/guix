@@ -25709,7 +25709,7 @@ with Eglot.")
 (define-public emacs-jabber
   (package
     (name "emacs-jabber")
-    (version "0.10.6")
+    (version "0.11.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -25718,7 +25718,7 @@ with Eglot.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0d0rl5rhx73safq95212c4qlmds3sa1mc79ji4p2v974m43x9d89"))))
+                "10ci5parlck7d13wz7xf03wypg0gh68bqk3vbngnbrv5pkg9x8ic"))))
     (build-system emacs-build-system)
     (arguments
      (list
@@ -25746,7 +25746,7 @@ with Eglot.")
               ;; environment but fail inside it.
               (define skip "\n  (skip-unless nil)")
               (substitute*
-                  "../tests/jabber-disco-tests.el"
+                  "../tests/jabber-test-disco.el"
                 ((".*query-if-needed-cache-miss \\(\\)"
                   all)
                  (string-append all skip))
@@ -25756,12 +25756,18 @@ with Eglot.")
               (substitute*
                   (string-append
                    "../tests/"
-                   "jabber-message-correct-tests.el")
+                   "jabber-test-message-correct.el")
                 ((".*correct-last-uses-original-id \\(\\)"
                   all)
                  (string-append all skip))
                 ((".*mam-syncing-skipped.*dispatch \\(\\)"
                   all)
+                 (string-append all skip)))
+              (substitute*
+                  "../tests/jabber-test-reactions.el"
+                ((".*handle-carbon-wrapped-update \\(\\)" all)
+                 (string-append all skip))
+                ((".*handle-sent-carbon-uses-carbon-buffer \\(\\)" all)
                  (string-append all skip))))))))
     (native-inputs
      (list pkg-config
@@ -25769,11 +25775,11 @@ with Eglot.")
              (method git-fetch)
              (uri (git-reference
                     (url "https://github.com/mierenhoop/picomemo")
-                    (commit "1.1.0")))
+                    (commit "b156667e922a8c518746629719e4348b6a46d84d")))
              (file-name "emacs-jabber-picomemo")
              (sha256
               (base32
-               "044xd1gn9lpd5yrb3c1lmvqsc1chbkhd3vnh7800hxn23a0hxbzj")))))
+               "0462mmqv6499lrp19sz5y7h1s5z0mflaphrdgndy6n0mhn03bcjm")))))
     (inputs (list mbedtls))
     (propagated-inputs (list emacs-fsm emacs-keymap-popup))
     (home-page "https://thanosapollo.org/projects/jabber/")
