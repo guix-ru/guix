@@ -3235,32 +3235,32 @@ leveraging built-in functionality.")
                    license:fdl1.3+)))) ; GFDLv1.3+ for the manual
 
 (define-public emacs-meyvn
-  (let ((commit "8d00ada6daa5617fa60f76e0be2cf2f5d1babcf9")) ;version bump
-    (package
-      (name "emacs-meyvn")
-      (version "1.7")
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/danielsz/meyvn-el")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "0ncilsn0ih01w6hjdn529jkapiv4nnkway07j2b5fndkrlgk2ry4"))))
-      (build-system emacs-build-system)
-      (propagated-inputs (list emacs-cider
-                               emacs-dash
-                               emacs-geiser
-                               emacs-parseclj
-                               emacs-parseedn
-                               emacs-projectile
-                               emacs-s))
-      (home-page "https://github.com/danielsz/meyvn-el")
-      (synopsis "Emacs client for the Meyvn build tool")
-      (description
-       "This package provides an Emacs client for the @url{https://meyvn.org, Meyvn} build tool.")
-      (license license:gpl3+))))
+  (package
+    (name "emacs-meyvn")
+    (version "1.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/danielsz/meyvn-el")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0qm7qz3w9pm1820xk8h2kga5g1c31fxc7jr1bzcl79mqvjhw351x"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f))      ;no tests
+    (propagated-inputs (list emacs-cider
+                             emacs-dash
+                             emacs-geiser
+                             emacs-parseclj
+                             emacs-parseedn
+                             emacs-s))
+    (home-page "https://github.com/danielsz/meyvn-el")
+    (synopsis "Emacs client for the Meyvn build tool")
+    (description
+     "This package provides an Emacs client for the @url{https://meyvn.org,
+Meyvn} build tool.")
+    (license license:gpl3+)))
 
 (define-public emacs-affe
   (package
