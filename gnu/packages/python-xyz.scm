@@ -17166,6 +17166,38 @@ use of the Meson build system.")
 ;;; Deprecated on 2026-03-02.
 (define-deprecated-package meson-python python-meson)
 
+(define-public python-mfusepy
+  (package
+    (name "python-mfusepy")
+    (version "3.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mxmlnkn/mfusepy")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "04vsmmh1zpy8cxxrj9dqiqajisn95skg3wqr8dgqck25780v3c4k"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-setuptools))
+    (inputs (list fuse))
+    (arguments
+     (list
+      #:tests? #f                       ; Tests require fuse kernel module
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'embed-libfuse
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "mfusepy.py"
+                (("^(_libfuse_path = )os\\.environ\\.get.+$" _ pre)
+                 (format #f "~a\"~a\"\n"
+                         pre (search-input-file inputs "/lib/libfuse3.so")))))))))
+    (home-page "https://github.com/mxmlnkn/mfusepy")
+    (synopsis "Ctypes bindings for the high-level API in libfuse 2 and 3")
+    (description "Ctypes bindings for the high-level API in libfuse 2 and 3.")
+    (license license:isc)))
+
 (define-public python-mccabe
   (package
     (name "python-mccabe")
