@@ -3097,6 +3097,44 @@ networks.")
     (description "This package contains models and schemas used by Safety.")
     (license license:expat)))
 
+(define-public python-scverse-misc
+  (package
+    (name "python-scverse-misc")
+    (version "0.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/scverse/scverse-misc")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "14gqrafilfzlc9rydz90rifs48icqvdqa80qsfsmhrwv25mwwjry"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      ;; Optinal tests, Pydantic fails to validate inputs.
+      #~(list "--deselect=tests/settings/test_runtime.py::test_dotenv[2]"
+              "--deselect=tests/settings/test_runtime.py::test_dotenv[4]")))
+    (native-inputs
+     (list python-hatch-vcs
+           python-hatchling
+           python-pytest
+           python-pyyaml))
+    (propagated-inputs
+     (list python-session-info2
+           python-typing-extensions
+           ;; [optional]
+           python-dotenv
+           python-pydantic-settings))
+    (home-page "https://github.com/scverse/scverse-misc")
+    (synopsis "Miscellaneous utility code used by scverse packages")
+    (description
+     "This package provides miscellaneous utility code used by scverse
+packages.")
+    (license license:bsd-3)))
+
 (define-public python-senf
   (package
     (name "python-senf")
