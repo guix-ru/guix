@@ -2026,7 +2026,7 @@ accounting application.")
 (define-public beancount
   (package
     (name "beancount")
-    (version "3.2.0")
+    (version "3.2.3")
     (source
      (origin
        (method git-fetch)
@@ -2035,7 +2035,7 @@ accounting application.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0830wx1brzq74kf3m4dzc015n4922qmvvw9n89fkcbc3d5swi8n4"))))
+        (base32 "17v3gb4q0655dw7zylrnyzzs2br4x4xz3pc35sg51zjjpbfz2kr3"))))
     (arguments
      (list
       #:test-flags
@@ -2131,7 +2131,6 @@ it can easily generate custom reports specific to accounting purposes.")
            python-magic))
     (native-inputs
      (list python-setuptools
-           python-wheel
            python-pytest))
     (home-page "https://github.com/beancount/beangulp")
     (synopsis "Library to facilitate importing data into a Beancount ledger.")
