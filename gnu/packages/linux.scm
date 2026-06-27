@@ -4199,16 +4199,15 @@ Linux-based operating system.")
 (define-public alsa-utils
   (package
     (name "alsa-utils")
-    (version "1.2.15.2")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/alsa-project/alsa-utils")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1mlvzvz7npdvprlq1ff9pg3awsdvv3czv7wchfm96jflhks3pnsm"))))
+    (version "1.2.11")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://www.alsa-project.org/files/pub/utils/"
+                    name "-" version ".tar.bz2"))
+              (sha256
+               (base32
+                "19r8qi6b7sd2p1mhxfqrp18wrgjw5s6rp5ygimb1w59zi0xcmils"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -4232,9 +4231,8 @@ Linux-based operating system.")
     (home-page "http://www.alsa-project.org/")
     (synopsis "Utilities for the Advanced Linux Sound Architecture (ALSA)")
     (description
-     "@acronym{ALSA, Advanced Linux Sound Architecture} provides audio and
-@acronym{MIDI, Musical Instrument Digital Interface} functionality to the
-Linux-based operating system.")
+     "The Advanced Linux Sound Architecture (ALSA) provides audio and
+MIDI functionality to the Linux-based operating system.")
 
     ;; This is mostly GPLv2+ but a few files such as 'alsactl.c' are
     ;; GPLv2-only.
