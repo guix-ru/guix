@@ -1361,6 +1361,36 @@ implemented in pure Python, and most of them are also implemented in C.")
 packaging tasks.")
     (license license:expat)))
 
+(define-public python-donfig
+  (package
+    (name "python-donfig")
+    (version "0.8.1.post1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pytroll/donfig")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0hp6v9lh4gaym48ljvpb00cgcwssj306ypyszha2rlwb7mkknmj6"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-cloudpickle
+           python-pytest
+           python-setuptools
+           python-versioneer))
+    (propagated-inputs
+     (list python-pyyaml))
+    (home-page "https://github.com/pytroll/donfig")
+    (synopsis "Python package for configuring a python package")
+    (description
+     "Donfig is a Python library meant to make configuration easier for other
+python packages.  Donfig can be configured programmatically, by environment
+variables, or from YAML files in standard locations.  The below examples show
+the basics of using donfig.")
+    (license license:expat)))
+
 (define-public python-duet
   (package
     (name "python-duet")
