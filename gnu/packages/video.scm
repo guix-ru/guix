@@ -6442,7 +6442,7 @@ transitions, and effects and then export your film to many common formats.")
 (define-public shotcut
   (package
     (name "shotcut")
-    (version "26.4.30")
+    (version "26.6.25")
     (source
      (origin
        (method git-fetch)
@@ -6451,7 +6451,7 @@ transitions, and effects and then export your film to many common formats.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1byj9j5pzby6gx4kh4jzvd1xg3wpsx3hijpml4cxyqan99vvndd8"))))
+        (base32 "1c30i88byb8j5pgnn7p4dqw4476r4ax5qf3k6m28f2blc3fqsml8"))))
     (build-system qt-build-system)
     (arguments
      (list
