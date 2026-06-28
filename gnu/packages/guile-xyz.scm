@@ -1422,23 +1422,27 @@ It can be used to access and modify metadata for audio files.")
 (define-public guile-syntax-highlight
   (package
     (name "guile-syntax-highlight")
-    (version "0.2.0")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://files.dthompson.us/"
-                                  "guile-syntax-highlight/"
-                                  "guile-syntax-highlight-"
-                                  version ".tar.gz"))
-              (sha256
-               (base32
-                "0q4nz10l66hx1lyf83qyhkkz1bi6i860662a7kslc4d61w08qnk9"))))
+    (version "0.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://git.dthompson.us/guile-syntax-highlight.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0v5yash02fpgxmzsrmkx3jafj3v9sy3asyizjsn62c3j9774a1gh"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config))
-    (inputs
-     (list guile-3.0))
+    (arguments
+     (list
+      #:make-flags
+      #~(list "GUILE_AUTO_COMPILE=0") ;Silence guild
+      #:parallel-build? #f)) ;Does not work
+    (native-inputs (list autoconf automake pkg-config))
+    (inputs (list guile-3.0))
     (synopsis "General-purpose syntax highlighter for GNU Guile")
-    (description "Guile-syntax-highlight is a general-purpose syntax
+    (description
+     "Guile-syntax-highlight is a general-purpose syntax
 highlighting library for GNU Guile.  It can parse code written in various
 programming languages into a simple s-expression that can be converted to
 HTML (via SXML) or any other format for rendering.")
