@@ -4235,8 +4235,8 @@ way as basic integer types.")
     (license license:boost1.0))))
 
 (define-public swell
-  (let ((commit "3024ec8e000f769454b5ee4ac927dc5cecfc6a6b")
-        (revision "0"))
+  (let ((commit "599228ffee6ad8d02122a171e0e79271b24abbd3")
+        (revision "1"))
     (package
       (name "swell")
       (version (git-version "0" revision commit)) ;no tags
@@ -4249,7 +4249,7 @@ way as basic integer types.")
          (file-name (git-file-name "wdl" version))
          (sha256
           (base32
-           "1ssp5rwn224g01jj9k273q80w2q1qfj1vzgqvk3lfjrjga0jaj4w"))
+           "0nfnapl520k9ls16km3yh0jrh4jvxg1x06gm4rq8zgcm02pxbbrd"))
          (modules '((guix build utils)))
          (snippet
           '(with-directory-excursion "WDL"
