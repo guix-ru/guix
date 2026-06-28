@@ -598,17 +598,18 @@ as created by Podman, CRI-O and containerd.")))
 (define-public crun
   (package
     (name "crun")
-    (version "1.27.1")
+    (version "1.28")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append
-             "https://github.com/containers/crun/releases/download/"
-             version
-             "/crun-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/containers/crun")
+              (commit version)
+              (recursive? #t)))
        (sha256
         (base32
-         "1w782s95f3xvw3fb66l2ciqkqsg4bk7n9ph31jmvn669ap272ymy"))))
+         "0dcs1bq6wa4pammwglynck553pwx3lsf2jzyn1a0cdr6yb8qf87p"))
+       (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -616,6 +617,14 @@ as created by Podman, CRI-O and containerd.")))
       #:tests? #f ; XXX: needs /sys/fs/cgroup mounted
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'git-version-h
+            (lambda _
+              (call-with-output-file "git-version.h"
+                (lambda (port)
+                  (format
+                   port
+                   "#ifndef GIT_VERSION\n# define GIT_VERSION ~s\n#endif"
+                   #$version)))))
           (add-after 'unpack 'fix-tests
             (lambda _
               (substitute* (find-files "tests" "\\.(c|py)")
@@ -625,7 +634,8 @@ as created by Podman, CRI-O and containerd.")))
                 (("\"sd-notify\" : test_sd_notify,") "")
                 (("\"sd-notify-file\" : test_sd_notify_file,") "")))))))
     (inputs
-     (list libcap
+     (list json-c
+           libcap
            libseccomp
            yajl))
     (native-inputs
@@ -634,7 +644,7 @@ as created by Podman, CRI-O and containerd.")))
            git-minimal/pinned
            libtool
            pkg-config
-           python-3))
+           python-minimal-wrapper))
     (home-page "https://github.com/containers/crun")
     (synopsis "Open Container Initiative (OCI) Container runtime")
     (description
