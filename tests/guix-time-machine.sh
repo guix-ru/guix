@@ -32,7 +32,7 @@ EOF
 
 # This must fail: 'system' is not among the available bindings in the
 # evaluation sandbox.
-guix time-machine -C "$channels_file" && echo false
+guix time-machine -C "$channels_file" && false
 
 cat > "$channels_file" <<EOF
 (use-modules (system foreign))
@@ -40,7 +40,7 @@ cat > "$channels_file" <<EOF
 EOF
 
 # Likewise, 'use-modules' is not available.
-guix time-machine -C "$channels_file" && echo false
+guix time-machine -C "$channels_file" && false
 
 # Get 'time-machine' to download a channel file with an untrusted channel.
 # Check that this fails with a "'guix' is not trusted" message.
