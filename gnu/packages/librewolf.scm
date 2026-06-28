@@ -123,16 +123,17 @@
   ;; everything.
   ;;
   ;; ex:
-  ;; tar xf /gnu/store/...-firefox-123.4.source.tar.xz -O \
-  ;;     firefox-123.4/browser/locales/l10n-changesets.json | grep revision
-  (let ((commit "9929bc50607f8c2aac9db5329a596997eee1cabb"))
+  ;; tar xf /gnu/store/...-firefox-123.4.source.tar.xz --wildcards -O \
+  ;;     firefox-*/browser/locales/l10n-changesets.json \
+  ;;     | grep revision | sort | uniq
+  (let ((commit "ec0a48f0301f2c82c2d3fe9fbe07e30869bb345b"))
     (origin
       (method git-fetch)
       (uri (git-reference
             (url "https://github.com/mozilla-l10n/firefox-l10n.git")
             (commit commit)))
       (file-name (git-file-name "firefox-l10n" commit))
-      (sha256 (base32 "1ka78jhbhgvxby29q7ni5lim5c4977qdixd50cylnvb4807cli6l")))))
+      (sha256 (base32 "0f4h8dwih1gv9s0bkiaqv3dy066n5yfydr1aa7s6hl2h1rc51plg")))))
 
 (define* (make-librewolf-source #:key version firefox-hash librewolf-hash l10n)
   (let* ((ff-src (firefox-source-origin
