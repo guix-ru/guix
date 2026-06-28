@@ -1236,7 +1236,7 @@ To get @code{podman machine} working, install @code{qemu-minimal}, and
 (define-public podman-compose
   (package
     (name "podman-compose")
-    (version "1.5.0")
+    (version "1.6.0")
     (source
      (origin
        (method git-fetch)
@@ -1245,7 +1245,7 @@ To get @code{podman machine} working, install @code{qemu-minimal}, and
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "08pz9axvgfyr0jd8rlndmhh8147s864mz17ng6qs07831g9ylj80"))))
+        (base32 "0lp4s7j1dwrnl8r9k93kd0396jwy0rkyq545ca88d90nyrjwniff"))))
     (build-system pyproject-build-system)
     (arguments
      (list
