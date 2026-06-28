@@ -1532,6 +1532,9 @@ language, ADMS transforms Verilog-AMS code into other target languages.")
 
 (define-public arduino-cli
   (package
+    (properties
+     '((release-commit . "01f3d4f2ba7c2eaafb5dc710c8a1903af7762fea")
+       (release-date . "2026-06-05T09:39:33Z")))
     (name "arduino-cli")
     (version "1.5.1")
     (source
@@ -1549,6 +1552,16 @@ language, ADMS transforms Verilog-AMS code into other target languages.")
       #:go go-1.26
       #:install-source? #f
       #:import-path "github.com/arduino/arduino-cli"
+      #:build-flags
+       #~(let ((base "github.com/arduino/arduino-cli/internal/"))
+           (list (format #f "-ldflags=-X ~s -X ~s -X ~s"
+                         (string-append base "version.versionString="
+                                        "v" #$version)
+                         (string-append base "version.commit="
+                                        (string-take
+                                          #$(assoc-ref properties 'release-commit) 7))
+                         (string-append base "version.date="
+                                        #$(assoc-ref properties 'release-date)))))
       ;; List tests which need no internet resource
       ;; Skiping
       ;; internal/arduino/monitor
