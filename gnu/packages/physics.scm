@@ -1084,7 +1084,7 @@ eigenvectors, and structure factors.")
 (define-public mantid
   (package
     (name "mantid")
-    (version "6.14.0.3")
+    (version "6.16.0")
     (source
      (origin
        (method git-fetch)
@@ -1093,7 +1093,7 @@ eigenvectors, and structure factors.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0d41wcwv8kpka086gqz3ywdbrrbkxpaxfq7hhgqf3w8f2n6jilw5"))
+        (base32 "1nmkcrdba6x2fc04fgykc7iwfpqldbwrfsbvwlrfa03d5gb522ac"))
        (patches
         (search-patches "mantid-openmp-cleanup.patch"))))
     (build-system qt-build-system)
@@ -1121,14 +1121,6 @@ eigenvectors, and structure factors.")
                   (ice-9 textual-ports))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-tests
-            (lambda _
-              (substitute* '("Framework/PythonInterface/test/python/mantid/kernel/ConfigServiceTest.py"
-                             "qt/python/mantidqtinterfaces/test/Muon/grouping_tab/grouping_tab_presenter_test.py"
-                             "qt/python/mantidqtinterfaces/test/Muon/muon_context_test.py"
-                             "qt/python/mantidqtinterfaces/test/Muon/muon_context_with_frequency_test.py")
-                (("assert_\\(not") "assertFalse(")
-                (("assert_") "assertTrue"))))
           (add-after 'unpack 'fix-boost-system
             (lambda _
               ;; Enable core dumps.
@@ -1423,7 +1415,7 @@ import matplotlib.pyplot as plt"))
             (lambda _
               (system "Xvfb :99 -screen 0 1024x768x24 &")
               (setenv "DISPLAY" ":99")
-              (setenv "MPLBACKEND" "Qt5Agg")))
+              (setenv "MPLBACKEND" "Agg")))
           ;; Exclude tests that require external data files (not available
           ;; in the build sandbox without network access).  We exclude
           ;; specific tests that use FileFinder/Load to access external
@@ -1461,6 +1453,7 @@ import matplotlib.pyplot as plt"))
                           "AlgorithmsTest_AppendSpectraTest" ; needs external data
                           "AlgorithmsTest_ApplyCalibrationTest" ; needs external data
                           "AlgorithmsTest_ApplyTransmissionCorrectionTest" ; needs external data
+                          "AlgorithmsTest_CalculateEfficiencyTest" ; needs external data
                           "AlgorithmsTest_CalculateTransmissionTest" ; needs external data
                           "AlgorithmsTest_ChangeBinOffsetTest" ; needs external data
                           "AlgorithmsTest_CloneWorkspaceTest" ; needs external data
@@ -1597,6 +1590,7 @@ import matplotlib.pyplot as plt"))
                           "DataHandlingTest_LoadNexusTest" ; needs external data
                           "DataHandlingTest_LoadPDFgetNFileTest" ; needs external data
                           "DataHandlingTest_LoadPLNTest" ; needs external data
+                          "DataHandlingTest_LoadPLNnxsTest" ; needs external data
                           "DataHandlingTest_LoadPreNexusMonitorsTest" ; needs external data
                           "DataHandlingTest_LoadPreNexusTest" ; needs external data
                           "DataHandlingTest_LoadQKKTest" ; needs external data
@@ -1903,6 +1897,7 @@ import matplotlib.pyplot as plt"))
                           "python.scripts.AbinsLoadPhonopyTest.AbinsLoadPhonopyTest"
                           "python.scripts.AbinsLoadVASPTest.AbinsLoadVASPTest" ; needs external data
                           "python.scripts.AbinsPowderCalculatorTest.AbinsPowderCalculatorTest"
+                          "python.algorithms.PEARLTransfitV2Test.PEARLTransfitV2Test" ; needs external data
                           "python.IsisPowder.ISISPowderGemOutputTest.ISISPowderGemOutputTest" ; needs external data
                           "python.IsisPowder.ISISPowderRunDetailsTest.ISISPowderRunDetailsTest" ; needs external data
                           "python.SANS.SANSReducerTest.SANSReducerTest" ; needs external data
@@ -1965,7 +1960,7 @@ import matplotlib.pyplot as plt"))
                          '()))))))))
     (native-inputs
      (list cmake googletest pkg-config python-pytz python-setuptools python-wrapper
-           xorg-server-for-tests))
+           xorg-server-for-tests python-tzdata))
     (inputs
      (list boost
            eigen
