@@ -703,7 +703,8 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
   (source-with-patches linux-libre-7.1-pristine-source
                        (append
                         (list %linux-libre-arm-export-__sync_icache_dcache-patch)
-                        (search-patches "linux-shmem-hurd-xattr.patch"))))
+                        (search-patches "linux-shmem-hurd-xattr.patch"
+                                        "linux-libre-fix-arm64-bin-sh.patch"))))
 
 (define-public linux-libre-7.0-source
   (source-with-patches linux-libre-7.0-pristine-source
