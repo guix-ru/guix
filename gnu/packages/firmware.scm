@@ -9,7 +9,7 @@
 ;;; Copyright © 2020 Jakub Kądziołka <kuba@kadziolka.net>
 ;;; Copyright © 2020, 2021, 2022 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2021 Petr Hodina <phodina@protonmail.com>
-;;; Copyright © 2021, 2022, 2023, 2025 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2021-2023, 2025-2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2023 Hilton Chain <hako@ultrarare.space>
 ;;; Copyright © 2023 Foundation Devices, Inc. <hello@foundationdevices.com>
 ;;; Copyright © 2023, 2024 Zheng Junjie <873216071@qq.com>
@@ -1720,8 +1720,7 @@ keyboard definition in KEYBOARD-SOURCE-DIRECTORY."
                          (string-replace-substring keymap "_" "-")))
     ;; Note: When updating this package, make sure to also update the commit
     ;; used for the LUFA submodule in the 'copy-lufa-source' phase below.
-    ;; Note: If you update this you WILL lose support for ergodox.
-    (version "0.22.3")
+    (version "0.33.8")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1730,9 +1729,7 @@ keyboard definition in KEYBOARD-SOURCE-DIRECTORY."
               (file-name (git-file-name "qmk-firmware" version))
               (sha256
                (base32
-                "0s1lcnv7cddpn768p7mrc5bkxhx0ba5p77ya007dnkbk36c33d0w"))
-              (patches
-               (search-patches "qmk-firmware-fix-hacker-dvorak.patch"))))
+                "0sz3m7xgqvcsjwm8wpcghdakf2c1qczidm6l6p5icbz3wphvd3ar"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -1760,7 +1757,7 @@ keyboard definition in KEYBOARD-SOURCE-DIRECTORY."
           (add-after 'unpack 'copy-lufa-source
             ;; QMK carries a custom fork of LUFA as a git submodule; make sure
             ;; the same commit is used (see:
-            ;; https://github.com/qmk/qmk_firmware/tree/master/lib).
+            ;; <https://github.com/qmk/qmk_firmware/tree/master/lib>).
             (lambda _
               (copy-recursively
                #$(let ((commit "549b97320d515bfca2f95c145a67bd13be968faa"))
@@ -1838,63 +1835,6 @@ Layer 2 contains multimedia and mouse keys.  See the
 keymap definition, or the
 @url{https://configure.ergodox-ez.com/ergodox-ez/layouts/JwwW/latest/0,
 ErgoDox EZ Configurator} page."))
-
-(define-public qmk-firmware-ergodox-ez-dvorak-42-key
-  (make-qmk-firmware "ergodox_ez" "dvorak_42_key" #:description "\
-This is a Dvorak-based layout for the ErgoDox EZ.  Its basic key layout is
-similar to the Atreus @samp{dvorak_42_key} layout; in fact this layout was
-created for seamless switching between the ErgoDox EZ and Atreus keyboards.
-On the base layer, the keys that don't exist on the Atreus are mapped to MEH
-shortcuts and can be interpreted by your window managher.  This layout only
-makes use of the 42 keys that the Atreus also has for the main functionality.
-See the @file{keyboards/atreus/keymaps/dvorak_42_key/keymap.c} source file for
-the keymap definition."))
-
-(define-public qmk-firmware-ergodox-ez-hacker-dvorak
-  (make-qmk-firmware "ergodox_ez" "hacker_dvorak" #:description "\
-This is a Dvorak layout for the ErgoDox EZ.  It is inspired by the
-@url{https://www.kaufmann.no/roland/dvorak, Programmer Dvorak}.  The operating
-system keyboard layout should be set to US for this keymap to function
-normally.  It defines 10 layers:
-@enumerate
-@item Dvorak
-@item Querty
-@item Gaming
-@item Arrows
-@item Mouse
-@item Numpad
-@item Hyper Fn
-@item Media Fn
-@item Meh Fn
-@item Meh Fn +
-@end enumerate
-The complete keymap can be inspected at the ErgoDox EZ Configurator web site:
-@url{https://configure.ergodox-ez.com/ergodox-ez/layouts/Wadz/latest/0}."))
-
-(define-public qmk-firmware-ergodox-ez-dvorak
-  (make-qmk-firmware
-   "ergodox_ez" "dvorak" #:description
-   "This is a rather plain Dvorak layout for the ErgoDox EZ, containing
-function and symbols on layer 1 and media and and mouse keys on layer 2.  See
-the @file{layouts/community/ergodox/dvorak/keymap.c} source file for the
-keymap definition."))
-
-(define-public qmk-firmware-ergodox-ez-dvorak-emacs
-  (make-qmk-firmware
-   "ergodox_ez" "dvorak_emacs" #:description
-   "This is a Dvorak-based keymap optimized for Emacs usage, with the
-frequently used Control and Meta (Alt) keys mapped to the thumb buttons.  It
-contains a single extra layer that includes function and multimedia keys.  A
-graphical representation of the keymap is available in the
-@file{layouts/community/ergodox/dvorak_emacs/readme.md} source file."))
-
-(define-public qmk-firmware-ergodox-ez-dvorak-emacs-software
-  (make-qmk-firmware
-   "ergodox_ez" "dvorak_emacs_software" #:description
-   "This is the same layout as that of the
-@code{qmk-firmware-ergodox-ez-dvorak-emacs}, but designed to be used with a
-Dvorak-configured operating system (instead of a US QWERTY one, which is the
-default assumption for QMK firmware keymaps)."))
 
 (define-public qmk-udev-rules
   (package

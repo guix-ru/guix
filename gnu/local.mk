@@ -2325,7 +2325,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/qtscript-disable-tests.patch		\
   %D%/packages/patches/quagga-reproducible-build.patch          \
   %D%/packages/patches/quilt-grep-compat.patch 			\
-  %D%/packages/patches/qmk-firmware-fix-hacker-dvorak.patch 	\
   %D%/packages/patches/qtwayland-update-wayland-xml.patch	\
   %D%/packages/patches/qtwayland-5.15.18-0001-client-announce-an-output-after-receiving-more-compl.patch	\
   %D%/packages/patches/qtwayland-5.15.18-0002-fix-issue-with-repeated-window-size-changes.patch	\
