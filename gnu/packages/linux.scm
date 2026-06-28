@@ -1535,6 +1535,52 @@ Linux kernel.  It has been modified to remove all non-free binary blobs.")
                         ("CONFIG_VHOST_VDPA" . m))
                       (default-extra-linux-options linux-libre-lts-version))))
 
+(define-public reform-debian-packages-for-7.1
+  (package
+    (name "reform-debian-packages")
+    (version "2023-07-10-641-gdee9f5f") ;from git describe
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://source.mnt.re/reform/reform-debian-packages.git")
+             (commit "dee9f5fbf90369afda885435847766bebc9fa074")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02mr0mj8d5swnhqah0m8h6y2v2afrjkgkhnc27wcmqafx0hwvsk8"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan
+      #~'(("linux/patches7.1/" "/patches7.1")
+          ("linux/" "/dts/amlogic"
+           #:include-regexp ("meson.*\\.dts$"))
+          ("linux/" "/dts/freescale"
+           #:include-regexp ("imx8.*\\.dts$"))
+          ("linux/" "/dts/freescale"
+           #:include-regexp ("fsl.*\\.dts$"))
+          ("linux/" "/dts/rockchip"
+           #:include-regexp ("rk3588.*\\.dts$"))
+          ("linux/" "/dts/qcom"
+           #:include-regexp ("qcs.*\\.dts$"))
+          ("linux/" "/dts/qcom"
+           #:include-regexp ("qcs.*\\.dtsi$"))
+          ("linux/config" "config"))))
+    (home-page "https://source.mnt.re/reform/reform-debian-packages")
+    (synopsis
+     "Linux kernel patches and device-trees used for MNT Reform systems")
+    (description
+     "Linux kernel patches and device-trees used for the MNT Reform systems")
+    (license (list
+              (license:fsf-free "file://filter-output"
+                                "https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Other-Files.html")
+              license:bsd-2
+              license:expat
+              license:gpl2
+              license:gpl2+
+              license:gpl3
+              license:x11))))
+
 (define-public reform-debian-packages-for-7.0
   (package
     (name "reform-debian-packages")
