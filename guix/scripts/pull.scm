@@ -759,7 +759,7 @@ Return true when there is more package info to display."
   "Return the user's trusted channels, either those in
 ~/.config/guix/trusted-channels.scm or those currently used."
   (define file
-    (string-append (config-directory) "/trusted-channels.scm"))
+    (string-append (config-directory #:ensure? #f) "/trusted-channels.scm"))
 
   (if (file-exists? file)
       (load* file %safe-channel-bindings #:isolated? #t)
@@ -894,7 +894,7 @@ transformations specified in OPTS (resulting from '--url', '--commit', or
     (assoc-ref opts 'ignore-channel-files?))
 
   (define default-file
-    (string-append (config-directory) "/channels.scm"))
+    (string-append (config-directory #:ensure? #f) "/channels.scm"))
 
   (define global-file
     (string-append %sysconfdir "/guix/channels.scm"))
