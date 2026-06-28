@@ -5761,94 +5761,27 @@ disk utilization, priority, username, state, and exit code.")
      `((release-monitoring-url . "https://www.atoptool.nl/downloadatop.php")))
     (license license:gpl2+)))
 
-;; TODO: Pack u-root for: forth, and some tests.
 (define-public fiano
-   (package
-     (name "fiano")
+  (package
+    (name "fiano")
     ;; The versioning count has been changed since commit <2021-12-01>
     ;; 1eb599564549691603589219c2be34f966a32ff1.
     (version "1.2.0")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/linuxboot/fiano.git")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0s5fx4lhgb68qbx4ql34rcm678qdf0c4xl97bgc8dx9xwwqifza1"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/linuxboot/fiano")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0s5fx4lhgb68qbx4ql34rcm678qdf0c4xl97bgc8dx9xwwqifza1"))))
     (build-system go-build-system)
     (arguments
      (list
       #:install-source? #f
-      #:import-path "github.com/linuxboot/fiano"
-      #:phases
-      #~(modify-phases %standard-phases
-          ;; XXX: Replace this part when it's implemented in go-build-system.
-          (replace 'build
-            (lambda* (#:key import-path #:allow-other-keys)
-              (for-each
-               (lambda (cmd)
-                 (invoke "go" "build" "-v" "-x" "-ldflags=-s -w" "-trimpath"
-                         (string-append import-path "/cmds/" cmd)))
-               (list "cbfs"
-                     "create-ffs"
-                     "fittool"
-                     "fmap"
-                     "fspinfo"
-                     "glzma"
-                     "guid2english"
-                     "microcode"
-                     "utk"))))
-          (replace 'check
-            (lambda* (#:key import-path tests? #:allow-other-keys)
-              (when tests?
-                (for-each
-                 (lambda (dir)
-                   (invoke "go" "test" "-v"
-                           (string-append import-path dir "/...")))
-                 (list "/pkg/bytes"
-                       "/pkg/amd"
-                       "/pkg/cbfs"
-                       "/pkg/compression"
-                       "/pkg/fmap"
-                       "/pkg/fsp"
-                       "/pkg/guid"
-                       "/pkg/guid2english"
-                       "/pkg/intel"
-                       "/pkg/knownguids"
-                       "/pkg/log"
-                       "/pkg/uefi"
-                       "/pkg/unicode"
-                       "/pkg/utk"
-                       "/pkg/visitors"
-                       "/cmds/cbfs"
-                       "/cmds/create-ffs"
-                       ;; TODO: Not packed yet in Guix, long journey:
-                       ;; - github.com/u-root/u-root
-                       ;;
-                       ;; "/cmds/fmap"
-                       ;; "/cmds/fittool"
-                       "/cmds/fspinfo"
-                       "/cmds/glzma"
-                       "/cmds/guid2english"
-                       "/cmds/microcode"
-                       "/cmds/utk")))))
-          (replace 'install
-            (lambda _
-              (let ((bindir (string-append #$output "/bin")))
-                (for-each
-                 (lambda (cmd)
-                   (install-file cmd bindir))
-                 (list "cbfs"
-                       "create-ffs"
-                       "fittool"
-                       "fmap"
-                       "fspinfo"
-                       "glzma"
-                       "guid2english"
-                       "microcode"
-                       "utk"))))))))
+      #:import-path "github.com/linuxboot/fiano/cmds/..."
+      #:unpack-path "github.com/linuxboot/fiano"))
     (inputs
      (list go-github-com-dustin-go-humanize
            go-github-com-fatih-camelcase
@@ -5860,9 +5793,10 @@ disk utilization, priority, username, state, and exit code.")
            go-github-com-spf13-pflag
            go-github-com-stretchr-testify
            go-github-com-tjfoc-gmsm
+           go-github-com-u-root-u-root
            go-github-com-ulikunitz-xz
            go-github-com-xaionaro-go-bytesextra
-           go-github-com-xaionaro-gosrc
+           go-github-com-xaionaro-go-gosrc
            go-golang-org-x-text))
     (home-page "https://github.com/linuxboot/fiano")
     (synopsis "UEFI image editor")
