@@ -29146,6 +29146,40 @@ Merkle tree} implementation in Golang.")
 stopped.")
     (license license:expat)))
 
+(define-public go-github-com-u-root-gobusybox-src
+  (package
+    (name "go-github-com-u-root-gobusybox-src")
+    (version "0.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/u-root/gobusybox")
+              (commit (go-version->git-ref version #:subdir "src"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1jp4z7abxlqgvg8ig25m2l7my215r7hf1smqvw26qfaak6zc9xim"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/u-root/gobusybox/src"
+      #:unpack-path "github.com/u-root/gobusybox"
+      #:test-flags #~(list "-skip" "TestResolve")))     ;needs GO111MODULE=on
+    (propagated-inputs
+     (list go-github-com-dustin-go-humanize
+           go-github-com-hashicorp-go-version
+           go-github-com-u-root-uio
+           go-golang-org-x-exp
+           go-golang-org-x-tools
+           go-mvdan-cc-sh-v3))
+    (home-page "https://github.com/u-root/gobusybox")
+    (synopsis "Tools for compiling many Go commands into one binary")
+    (description
+     "This package provides a source module for tools compiling many Go
+commands into one binary.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-u-root-u-root
   (package
     (name "go-github-com-u-root-u-root")
