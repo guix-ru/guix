@@ -30465,11 +30465,11 @@ edges and self-loops are not permitted.
 (including private/unexported) of a structure.")
     (license license:cc0)))
 
-(define-public go-github-com-xaionaro-gosrc
+(define-public go-github-com-xaionaro-go-gosrc
   (let ((commit "3fdf8476a735bd7ddd90579862e2e548787b17b6")
         (revision "0"))
     (package
-      (name "go-github-com-xaionaro-gosrc")
+      (name "go-github-com-xaionaro-go-gosrc")
       (version (git-version "0.0.0" revision commit))
       (source
        (origin
@@ -30496,6 +30496,10 @@ edges and self-loops are not permitted.
 a source code. Initially the package was written to simplify code
 generation.")
       (license license:cc0))))
+
+;; XXX: Deprecated on <2026-06-28>
+(define-deprecated-package go-github-com-xaionaro-gosrc
+  go-github-com-xaionaro-go-gosrc)
 
 (define-public go-github-com-xdg-go-stringprep
   (package
