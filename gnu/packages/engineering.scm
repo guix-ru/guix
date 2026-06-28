@@ -1551,6 +1551,10 @@ language, ADMS transforms Verilog-AMS code into other target languages.")
      (list
       #:go go-1.26
       #:install-source? #f
+      #:modules
+      '((guix build go-build-system)
+        (guix build utils)
+        (ice-9 match))
       #:import-path "github.com/arduino/arduino-cli"
       #:build-flags
        #~(let ((base "github.com/arduino/arduino-cli/internal/"))
@@ -1601,49 +1605,72 @@ language, ADMS transforms Verilog-AMS code into other target languages.")
               "internal/cli/lib"
               "internal/cli/monitor"
               "internal/orderedmap"
-              "pkg/fqbn")))
+              "pkg/fqbn")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-shell-completions
+            (lambda* (#:key native-inputs #:allow-other-keys)
+              (for-each
+                (match-lambda
+                  ((shell . path)
+                   (mkdir-p (in-vicinity #$output (dirname path)))
+                   (let ((binary
+                           (if #$(%current-target-system)
+                               (search-input-file native-inputs "bin/arduino-cli")
+                               (in-vicinity #$output "bin/arduino-cli"))))
+                     (with-output-to-file (in-vicinity #$output path)
+                       (lambda _
+                         (setenv "HOME" (getcwd))
+                         (invoke binary "completion" shell))))))
+                '(("bash" . "share/bash-completion/completions/arduino-cli")
+                  ("fish" . "share/fish/vendor_completions.d/arduino-cli.fish")
+                  ("zsh"  . "share/zsh/site-functions/_arduino-cli"))))))))
     (native-inputs
-     (list go-fortio-org-safecast
-           go-github-com-arduino-go-paths-helper
-           go-github-com-arduino-go-properties-orderedmap
-           go-github-com-arduino-go-serial-utils
-           go-github-com-arduino-go-timeutils
-           go-github-com-arduino-go-win32-utils
-           go-github-com-arduino-pluggable-discovery-protocol-handler
-           go-github-com-arduino-pluggable-monitor-protocol-handler
-           go-github-com-cmaglie-pb
-           go-github-com-codeclysm-extract
-           go-github-com-djherbis-buffer
-           go-github-com-djherbis-nio
-           go-github-com-fatih-color
-           go-github-com-go-git-go-git-v5
-           go-github-com-gofrs-uuid-v5
-           go-github-com-leonelquinteros-gotext
-           go-github-com-marcinbor85-gohex
-           go-github-com-mattn-go-colorable
-           go-github-com-mattn-go-isatty
-           go-github-com-protonmail-go-crypto
-           go-github-com-rifflock-lfshook
-           go-github-com-rogpeppe-go-internal
-           go-github-com-schollz-closestmatch
-           go-github-com-sirupsen-logrus
-           go-github-com-spf13-cobra
-           go-github-com-spf13-viper
-           go-github-com-stretchr-testify
-           go-github-com-xeipuuv-gojsonschema
-           go-go-bug-st-cleanup
-           go-go-bug-st-downloader
-           go-go-bug-st-f
-           go-go-bug-st-relaxed-semver
-           go-go-bug-st-testifyjson
-           go-golang-org-x-sys
-           go-golang-org-x-term
-           go-golang-org-x-text
-           go-google-golang-org-genproto-googleapis-rpc
-           go-google-golang-org-grpc
-           go-google-golang-org-protobuf
-           go-gopkg-in-yaml-v3
-           go-github-com-mailru-easyjson))
+     (append
+      (if (%current-target-system)
+          (list this-package)
+          '())
+      (list go-fortio-org-safecast
+            go-github-com-arduino-go-paths-helper
+            go-github-com-arduino-go-properties-orderedmap
+            go-github-com-arduino-go-serial-utils
+            go-github-com-arduino-go-timeutils
+            go-github-com-arduino-go-win32-utils
+            go-github-com-arduino-pluggable-discovery-protocol-handler
+            go-github-com-arduino-pluggable-monitor-protocol-handler
+            go-github-com-cmaglie-pb
+            go-github-com-codeclysm-extract
+            go-github-com-djherbis-buffer
+            go-github-com-djherbis-nio
+            go-github-com-fatih-color
+            go-github-com-go-git-go-git-v5
+            go-github-com-gofrs-uuid-v5
+            go-github-com-leonelquinteros-gotext
+            go-github-com-marcinbor85-gohex
+            go-github-com-mattn-go-colorable
+            go-github-com-mattn-go-isatty
+            go-github-com-protonmail-go-crypto
+            go-github-com-rifflock-lfshook
+            go-github-com-rogpeppe-go-internal
+            go-github-com-schollz-closestmatch
+            go-github-com-sirupsen-logrus
+            go-github-com-spf13-cobra
+            go-github-com-spf13-viper
+            go-github-com-stretchr-testify
+            go-github-com-xeipuuv-gojsonschema
+            go-go-bug-st-cleanup
+            go-go-bug-st-downloader
+            go-go-bug-st-f
+            go-go-bug-st-relaxed-semver
+            go-go-bug-st-testifyjson
+            go-golang-org-x-sys
+            go-golang-org-x-term
+            go-golang-org-x-text
+            go-google-golang-org-genproto-googleapis-rpc
+            go-google-golang-org-grpc
+            go-google-golang-org-protobuf
+            go-gopkg-in-yaml-v3
+            go-github-com-mailru-easyjson)))
     (home-page "https://github.com/arduino/arduino-cli")
     (synopsis "Tools to manage Arduino compatible boards")
     (description
