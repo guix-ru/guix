@@ -1113,7 +1113,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
 (define-public podman
   (package
     (name "podman")
-    (version "5.8.3")
+    (version "5.8.4")
     (outputs '("out" "docker"))
     (properties
      `((output-synopsis "docker" "docker alias for podman")
@@ -1126,7 +1126,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
              (url "https://github.com/podman-container-tools/podman")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "16yxq45pqwg1l504bgsflcxfhiziaxlq8544pr20n26wcil5wbii"))
+        (base32 "1d7swfixvfl5y9ynm32yz2dfkhgj6c49f331xx5zv2jajlqjs4ff"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
@@ -1145,11 +1145,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
           (add-after 'unpack 'set-env
             (lambda _
               ;; When running go, things fail because HOME=/homeless-shelter.
-              (setenv "HOME" "/tmp")
-              ;; Required for detecting btrfs in hack/btrfs* due to bug in GNU
-              ;; Make <4.4 causing CC not to be propagated into $(shell ...)
-              ;; calls.  Can be removed once we update to >4.3.
-              (setenv "CC" #$(cc-for-target))))
+              (setenv "HOME" "/tmp")))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
@@ -1220,7 +1216,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
      (list grep
            bats
            git-minimal/pinned
-           go-1.25
+           go
            go-md2man
            gettext-minimal ; for envsubst
            mandoc
