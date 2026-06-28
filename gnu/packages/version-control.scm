@@ -4831,12 +4831,6 @@ TkDiff is included for browsing and merging your changes.")
        (sha256
         (base32
          "03sjxscj7pkldvwcvlqi6k79rcxkd2fyy1rjvpwyp4jgni5kddkx"))
-       ;; TODO: Remove when updating to 2.47.0.
-       (modules '((guix build utils)))
-       (snippet
-        #~(substitute* "t/t9390-filter-repo.sh"
-            (("(test_expect_success) ('--version')" _ prefix suffix)
-             (string-append prefix " IN_FILTER_REPO_CLONE " suffix))))
        ;; Modified from <https://github.com/newren/git-filter-repo/pull/477>.
        ;; Used with 'unpack-git-source phase.
        (patches
@@ -4875,6 +4869,17 @@ TkDiff is included for browsing and merging your changes.")
                   (rename-file "asciidoc.conf.in" "asciidoc.conf"))
                 (chdir old-path)
                 (delete-file-recursively "git-source"))))
+          (add-after 'unpack-git-source 'fix-t9390
+            ;; TODO: Remove when updating to 2.47.0.
+            (lambda _
+              (substitute* "t/t9390-filter-repo.sh"
+                (("(test_expect_success) ('--version')" _ prefix suffix)
+                 (string-append prefix " IN_FILTER_REPO_CLONE " suffix)))))
+          (add-after 'unpack-git-source 'fix-t9391
+            (lambda* (#:key inputs native-inputs #:allow-other-keys)
+              (substitute* "t/t9391-filter-repo-lib-usage.sh"
+                (("/bin/bash")
+                 (search-input-file (or native-inputs inputs) "/bin/bash")))))
           (add-before 'build 'set-pythondir
             (lambda* (#:key inputs outputs #:allow-other-keys)
               (substitute* "Makefile"
@@ -4885,8 +4890,6 @@ TkDiff is included for browsing and merging your changes.")
               (apply invoke "make" "doc" make-flags)))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
-              (substitute* "t/t9391-filter-repo-lib-usage.sh"
-                (("/bin/bash") (which "bash")))
               (when tests?
                 (invoke "t/run_tests")))))))
     (native-inputs
