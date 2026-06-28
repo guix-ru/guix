@@ -4839,7 +4839,8 @@ TkDiff is included for browsing and merging your changes.")
              (string-append prefix " IN_FILTER_REPO_CLONE " suffix))))
        ;; Modified from <https://github.com/newren/git-filter-repo/pull/477>.
        ;; Used with 'unpack-git-source phase.
-       (patches (search-patches "git-filter-repo-generate-doc.patch"))))
+       (patches
+        (search-patches "git-filter-repo-2.38.0-generate-doc.patch"))))
     (build-system gnu-build-system)
     (arguments
      (list
