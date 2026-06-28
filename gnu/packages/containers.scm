@@ -1274,7 +1274,7 @@ being rootless and not requiring any daemon to be running.")
 (define-public buildah
   (package
     (name "buildah")
-    (version "1.43.1")
+    (version "1.44.0")
     (source
      (origin
        (method git-fetch)
@@ -1282,7 +1282,7 @@ being rootless and not requiring any daemon to be running.")
              (url "https://github.com/containers/buildah")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "00x4ja5n49jmkmiv54mmkihks9pnjnna7s7py57in6pc9g85xj2y"))
+        (base32 "0khn8vxd9m6mqfx079diry8g9jyjc3dxflx5wa7lk2kqmsazj6zx"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
@@ -1347,7 +1347,7 @@ being rootless and not requiring any daemon to be running.")
                   lvm2))
     (native-inputs
      (list bats
-           go-1.24
+           go
            go-md2man
            pkg-config))
     (synopsis "Build @acronym{OCI, Open Container Initiative} images")
