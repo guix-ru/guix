@@ -2961,6 +2961,45 @@ role, and your gender.")
      (license:fsdg-compatible
       "https://nethack.org/common/license.html"))))
 
+(define-public nethack-qt
+  (package
+    (inherit nethack)
+    (name "nethack-qt")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:imported-modules imported-modules %default-gnu-imported-modules)
+        `(,@%qt-build-system-modules ,@imported-modules))
+       ((#:modules modules '((guix build utils)
+                             (guix build gnu-build-system)))
+        `(((guix build qt-build-system) #:prefix qt:)
+          ,@modules))
+       ((#:make-flags flags)
+        #~(cons* "WANT_WIN_QT6=1"
+                 "WANT_DEFAULT=Qt"
+                 #$flags))
+       ((#:phases phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'fix-qt-dir-nonsense
+              (lambda _
+                (substitute* '("sys/unix/hints/linux.500")
+                  (("(QTDIR=)[^\n]+" _ f)
+                   (string-append f #$(this-package-input "qtbase"))))))
+            (add-after 'make-writable-hackdir 'rename-binary
+              (lambda _
+                (with-directory-excursion #$output
+                  ;; Allows parallel installation with nethack.
+                  (rename-file "bin/nethack"
+                               "bin/nethack-qt"))))
+            (add-after 'rename-binary 'qt-wrap
+              (lambda args
+                (apply (assoc-ref qt:%standard-phases 'qt-wrap)
+                       #:qtbase #$(this-package-input "qtbase")
+                       args)))))))
+    (inputs
+     (modify-inputs inputs
+       (prepend qtbase qtmultimedia)))
+    (synopsis "Classic dungeon crawl game (Qt interface)")))
+
 (define-public netpanzer
   (package
     (name "netpanzer")
