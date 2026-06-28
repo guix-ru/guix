@@ -349,6 +349,14 @@ This package is part of the KDE networking module.")
                               (("kdeconnectd")
                                (string-append #$output "/bin/kdeconnectd"))))))
            #:tests? #f)) ; tests fail hard in our build environment
+    ;; These packages are required by the QML modules.
+    (propagated-inputs
+     (list kconfig
+           kdeclarative
+           kirigami
+           libplasma
+           qtbase          ;for QML_IMPORT_PATH
+           qtdeclarative))
     (native-inputs
      (list extra-cmake-modules
            kdoctools
@@ -366,7 +374,6 @@ This package is part of the KDE networking module.")
            ki18n
            kiconthemes
            kio
-           kirigami
            kirigami-addons
            kitemmodels
            knotifications
@@ -380,9 +387,7 @@ This package is part of the KDE networking module.")
            pulseaudio-qt
            qca-qt6
            qqc2-desktop-style
-           qtbase
            qtconnectivity
-           qtdeclarative
            qtmultimedia
            qtwayland
            qtsvg
