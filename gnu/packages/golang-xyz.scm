@@ -29206,7 +29206,8 @@ commands into one binary.")
       #:import-path "github.com/u-root/u-root"
       #:test-subdirs
       ;; XXX: Remove when all inputs are packaged.
-      #~(list "cmds/core/basename"
+      #~(list "cmds/core/backoff"
+              "cmds/core/basename"
               "cmds/core/cat"
               "cmds/core/chmod"
               "cmds/core/comm"
@@ -29214,8 +29215,10 @@ commands into one binary.")
               "cmds/core/cpio"
               "cmds/core/date"
               "cmds/core/df"
+              "cmds/core/dhclient"
               "cmds/core/dirname"
               "cmds/core/echo"
+              "cmds/core/false"
               "cmds/core/find"
               "cmds/core/free"
               "cmds/core/gpgv"
@@ -29251,6 +29254,7 @@ commands into one binary.")
            go-github-com-sirupsen-logrus
            go-github-com-spf13-pflag
            go-github-com-tklauser-go-sysconf
+           go-github-com-u-root-gobusybox-src
            go-github-com-u-root-uio
            go-github-com-ulikunitz-xz
            go-github-com-vishvananda-netlink
@@ -29282,7 +29286,6 @@ commands into one binary.")
            ;; go-github-com-therootcompany-xz
            ;; go-github-com-u-root-cpu
            ;; go-github-com-u-root-cpuid
-           ;; go-github-com-u-root-gobusybox-src
            ;; go-github-com-u-root-iscsinl
            ;; go-github-com-u-root-mkuimage
            ;; go-github-com-vtolstov-go-ioctl
