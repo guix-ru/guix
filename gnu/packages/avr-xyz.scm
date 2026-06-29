@@ -51,7 +51,7 @@
 (define-public simavr
   (package
     (name "simavr")
-    (version "1.7")
+    (version "1.8")
     (source
      (origin
        (method git-fetch)
@@ -59,7 +59,7 @@
              (url "https://github.com/buserror/simavr")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "0njz03lkw5374x1lxrq08irz4b86lzj2hibx46ssp7zv712pq55q"))
+        (base32 "1hdcfhqki5cvfsapgfgk9fz7rrwy3c5742ks4mnh72r4asbp3kal"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
