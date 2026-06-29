@@ -544,6 +544,16 @@
 ;;; url-fetch->git-fetch transformation
 ;;;
 
+(define %temporary-repository-file-name-too-long?
+  ;; Whether the file name of the repository created by
+  ;; 'with-temporary-git-repository' would be "too long."  If it is too long
+  ;; --e.g,
+  ;; file:///tmp/guix-build-guix-1.5.0-3.17ec386.drv-0/guix-directory.lhhGOq--,
+  ;; the indentation rules differ, which would cause test failures below.
+  (> (string-length (or (getenv "TMPDIR") "/tmp")) 30))
+
+(when %temporary-repository-file-name-too-long?
+  (test-skip 1))
 (test-equal "url-fetch->git-fetch, basic transformation"
   `((origin
       (method git-fetch)
@@ -587,6 +597,8 @@
                 (read-package-field (@ (my-packages-0) my-coreutils-0) 'source 8)))))
     "0"))
 
+(when %temporary-repository-file-name-too-long?
+  (test-skip 1))
 (test-equal "url-fetch->git-fetch, preserved field"
   `((origin
       (method git-fetch)
