@@ -5068,6 +5068,10 @@ policies, and so on.
       '(list "--"
              ;; Different order of fields in expected vs actual JSON
              "--skip=commands::utility::rad_config")
+      #:modules
+      '((guix build cargo-build-system)
+        (guix build utils)
+        (ice-9 match))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'setenv
@@ -5076,6 +5080,23 @@ policies, and so on.
               (setenv "LIBGIT2_NO_VENDOR" "1")
               (setenv "HOME" (getcwd))
               (setenv "TMPDIR" "/tmp")))
+          (add-after 'install 'install-completions
+            (lambda* (#:key native-inputs #:allow-other-keys)
+              (for-each
+               (match-lambda
+                 ((shell . path)
+                 (mkdir-p (in-vicinity #$output (dirname path)))
+                  (let ((binary
+                         #$@(if (%current-target-system)
+                                #~((search-input-file native-inputs "bin/rad"))
+                                #~((in-vicinity #$output "bin/rad")))))
+                    (with-output-to-file (in-vicinity #$output path)
+                      (lambda _
+                        (invoke binary "completion" shell))))))
+               '(("bash"   . "share/bash-completion/completions/rad")
+                 ("elvish" . "share/elvish/lib/rad")
+                 ("fish"   . "share/fish/vendor_completions.d/rad.fish")
+                 ("zsh"    . "share/zsh/site-functions/_rad")))))
           #$@(if (this-package-native-input "ruby-asciidoctor")
                  #~((add-before 'build 'build-doc
                       (lambda _
@@ -5091,6 +5112,9 @@ policies, and so on.
      (append
       (if (supported-package? ruby-asciidoctor)
           (list ruby-asciidoctor)
+          '())
+      (if (%current-target-system)
+          (list this-package)
           '())
       (list pkg-config
             ;; for test
