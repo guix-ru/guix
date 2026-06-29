@@ -32020,11 +32020,11 @@ time is being spent during Emacs startup in order to optimize startup time.")
 
 (define-public emacs-magit-difftastic
   ;; No release tag.
-  (let ((commit "1e2a1f60288341893a9d21d8a900739be9f34e40")
+  (let ((commit "925cc8f8d7a6a6d110989148892fde20d5929a1f")
         (revision "0"))
     (package
       (name "emacs-magit-difftastic")
-      (version (git-version "0.0.0" revision commit))
+      (version (git-version "0.1.0" revision commit))
       (source (origin
                 (method git-fetch)
                 (uri (git-reference
@@ -32033,7 +32033,7 @@ time is being spent during Emacs startup in order to optimize startup time.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "1g2jqczijjyxkindbi7xw4k3g3qvvzgf3mwn6nbbs2jpa03ypx1s"))))
+                  "1ci8ig67ci6f3n24g9fzfsjwnx1j6l4v037wgpg4vg7h8pdd1b5j"))))
       (build-system emacs-build-system)
       (arguments
        (list
@@ -32041,7 +32041,7 @@ time is being spent during Emacs startup in order to optimize startup time.")
         #~(list "emacs" "--batch"
                 "-l" "test/magit-difftastic-test.el"
                 "-f" "ert-run-tests-batch-and-exit")))
-      (propagated-inputs (list emacs-difftastic))
+      (propagated-inputs (list emacs-difftastic emacs-magit))
       (home-page "https://github.com/rschmukler/magit-difftastic")
       (synopsis "Difftastic integration for Magit")
       (description "Magit-difftastic render diffs with @command{difftastic}
