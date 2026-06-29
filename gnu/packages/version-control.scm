@@ -4821,7 +4821,7 @@ TkDiff is included for browsing and merging your changes.")
 (define-public git-filter-repo
   (package
     (name "git-filter-repo")
-    (version "2.45.0")
+    (version "2.47.0")
     (source
      (origin
        (method git-fetch)
@@ -4831,11 +4831,12 @@ TkDiff is included for browsing and merging your changes.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "03sjxscj7pkldvwcvlqi6k79rcxkd2fyy1rjvpwyp4jgni5kddkx"))
+         "15gwl1gax7rxwjd7q4az25xc1wmmxd1f5q63wkv4n9dab6i4ighx"))
        ;; Modified from <https://github.com/newren/git-filter-repo/pull/477>.
        ;; Used with 'unpack-git-source phase.
        (patches
-        (search-patches "git-filter-repo-2.38.0-generate-doc.patch"))))
+        (search-patches "git-filter-repo-2.38.0-generate-doc.patch"
+                        "git-filter-repo-2.47.0-dont-crash-on-multiline-stuff.patch"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -4866,12 +4867,6 @@ TkDiff is included for browsing and merging your changes.")
                   (rename-file "asciidoc.conf.in" "asciidoc.conf"))
                 (chdir old-path)
                 (delete-file-recursively "git-source"))))
-          (add-after 'unpack-git-source 'fix-t9390
-            ;; TODO: Remove when updating to 2.47.0.
-            (lambda _
-              (substitute* "t/t9390-filter-repo.sh"
-                (("(test_expect_success) ('--version')" _ prefix suffix)
-                 (string-append prefix " IN_FILTER_REPO_CLONE " suffix)))))
           (add-after 'unpack-git-source 'fix-t9391
             (lambda* (#:key inputs native-inputs #:allow-other-keys)
               (substitute* "t/t9391-filter-repo-lib-usage.sh"

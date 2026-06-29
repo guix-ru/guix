@@ -1463,6 +1463,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/gimp-fix-metadata-editor.patch		\
   %D%/packages/patches/gimp-fix-tiff-load.patch			\
   %D%/packages/patches/git-filter-repo-2.38.0-generate-doc.patch	\
+  %D%/packages/patches/git-filter-repo-2.47.0-dont-crash-on-multiline-stuff.patch	\
   %D%/packages/patches/gklib-suitesparse.patch			\
   %D%/packages/patches/glib-appinfo-watch.patch			\
   %D%/packages/patches/glib-skip-failing-test.patch		\
