@@ -1113,12 +1113,10 @@ Its main purpose is to support the key usage by @code{docker-init}:
 (define-public podman
   (package
     (name "podman")
-    (version "5.8.4")
+    (version "6.0.0")
     (outputs '("out" "docker"))
     (properties
-     `((output-synopsis "docker" "docker alias for podman")
-       ;; XXX: Addressed already.
-       (lint-hidden-cve . ("CVE-2022-2989"))))
+     `((output-synopsis "docker" "docker alias for podman")))
     (source
      (origin
        (method git-fetch)
@@ -1126,7 +1124,7 @@ Its main purpose is to support the key usage by @code{docker-init}:
              (url "https://github.com/podman-container-tools/podman")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "1d7swfixvfl5y9ynm32yz2dfkhgj6c49f331xx5zv2jajlqjs4ff"))
+        (base32 "1i15j9zhzh42nh834k0wi1g9ap3fd8dvm52jzdflycpwv29z9m3i"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
@@ -1188,19 +1186,14 @@ Its main purpose is to support the key usage by @code{docker-init}:
                    ,(string-append #$procps         "/bin") ; ps
                    "/run/privileged/bin")))))
           (add-after 'install 'install-docker
-            (lambda* (#:key outputs #:allow-other-keys)
-              (let* ((docker (assoc-ref outputs "docker")))
-                ;; So it picks podman of the other output.
-                (let ((bin-dir (string-append (assoc-ref outputs "out")
-                                              "/bin")))
-                  (substitute* "docker/docker.in"
-                   (("[$][{]BINDIR[}]") bin-dir)
-                   (("[$][{]ETCDIR[}]") "/etc")))
-                (invoke "make" "install.docker"
-                        (string-append "PREFIX=" (assoc-ref outputs "docker"))
-                        (string-append "ETCDIR="
-                                       (string-append (assoc-ref outputs "docker")
-                                                      "/etc"))))))
+            (lambda _
+              ;; So it picks podman of the other output.
+              (substitute* "docker/docker.in"
+                (("[$][{]BINDIR[}]") (string-append #$output "/bin"))
+                (("[$][{]ETCDIR[}]") "/etc"))
+              (invoke "make" "install.docker"
+                      (string-append "PREFIX=" #$output:docker)
+                      (string-append "ETCDIR=" #$output:docker "/etc"))))
           (add-after 'install 'install-completions
             (lambda _
               (invoke "make" "install.completions"
