@@ -5539,7 +5539,7 @@ elogind's uaccess feature.")
 (define-public jc
   (package
     (name "jc")
-    (version "1.25.6")
+    (version "1.25.7")
     (source
      (origin
        ;; The PyPI tarball lacks the test suite.
@@ -5549,7 +5549,7 @@ elogind's uaccess feature.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bpna1hfwigv9r3i1xafl96jlj4335hrjq5rkrgh2nzc57453bly"))))
+        (base32 "05fcif1midcqvj93msn1mpllqdni3fr0iz1ab56w589rwr3w1rva"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:phases
@@ -5562,8 +5562,7 @@ elogind's uaccess feature.")
                      (("America/Los_Angeles") "PST8PDT")))))))
     (native-inputs
      (list python-pytest
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (propagated-inputs
      (list python-pygments
            python-ruamel.yaml
