@@ -44326,6 +44326,41 @@ can specify how popup-displaying functions occupy the screen.")
     (home-page "https://depp.brause.cc/shackle")
     (license license:gpl3+)))
 
+(define-public emacs-shadowenv
+  ;; No public release. Version string taken from source code.
+  (let ((commit "2b8383b54cac9edf8204050d2a8d70a0e6f0d972")
+        (revision "1"))
+    (package
+      (name "emacs-shadowenv")
+      (version (git-version "0.11.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/Shopify/shadowenv.el")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0b3289jm7rsm3wnxmb6975vwmhzlhb4v5ak6a9imr82h31pj18ga"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list
+        #:tests? #f                     ; No tests.
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'set-shadowenv-location
+              (lambda* (#:key inputs #:allow-other-keys)
+                (emacs-substitute-variables "shadowenv.el"
+                  ("shadowenv-binary-location"
+                   (search-input-file inputs "/bin/shadowenv"))))))))
+      (inputs (list shadowenv))
+      (home-page "https://github.com/Shopify/shadowenv.el")
+      (synopsis "Shadowenv integration for emacs")
+      (description
+       "This package provides @code{shadowenv} integration for emacs,
+including per-buffer environment shadowing and eshell integration.")
+      (license license:expat))))
+
 (define-public emacs-showtip
   (let ((commit "930da302809a4257e8d69425455b29e1cc91949b")
         (revision "0"))
