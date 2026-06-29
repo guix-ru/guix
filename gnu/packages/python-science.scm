@@ -1919,6 +1919,35 @@ declarative way.  It is built on top of Matplotlib and provides a high-level
 API for you to puzzle different visualizations together like logo.")
     (license license:expat)))
 
+(define-public python-maxent-disaggregation
+  (package
+    (name "python-maxent-disaggregation")
+    (version "1.3.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jakobsarthur/maxent_disaggregation")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0iqvgm5vcaj34wgbiyq6f7kqqyyvvj8wlc2fjanrsgnyp7imnvjd"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-corner
+           python-matplotlib
+           python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list nlopt python-numpy
+           python-scipy))
+    (home-page "https://github.com/jakobsarthur/maxent_disaggregation")
+    (synopsis "Propagate uncertainty when disaggregating data")
+    (description
+     "This package provides tooling to help with the propagation of
+uncertainty when disaggregating data, using the maximum entropy principle.")
+    (license license:expat)))
+
 (define-public python-meshzoo
   (package
     (name "python-meshzoo")
