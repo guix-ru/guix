@@ -3942,13 +3942,6 @@ email header.")
       #:tests? (not (%current-target-system)) ; git path is hardcoded.
       #:phases
       #~(modify-phases %standard-phases
-          ;; INFO: phase `sanity-check' fails with the following message:
-          ;; . . .
-          ;; ...checking requirements: ERROR: b4==<version>
-          ;; DistributionNotFound(Requirement.parse('git-filter-repo<3.0,>=2.30'),
-          ;; {'b4'})
-          ;; This should rather be fixed in git-filter-repo.
-          (delete 'sanity-check)
           ;; This ensures git is present when called.
           (add-after 'unpack 'hardcode-git-bin
             (lambda* (#:key inputs #:allow-other-keys)
