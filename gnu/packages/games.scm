@@ -10570,7 +10570,7 @@ your score gets higher, you level up and the blocks fall faster.")
 (define-public endless-sky
   (package
     (name "endless-sky")
-    (version "0.10.16")
+    (version "0.11.2")
     (source
      (origin
        (method git-fetch)
@@ -10579,7 +10579,7 @@ your score gets higher, you level up and the blocks fall faster.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1dk25wgbl385dwplq2a6wsdv53q6pylrqqkqrmvn59z7sd8vjywr"))))
+        (base32 "1ck667v7q90a7sinn1xjlyd4s3n0zwxagd853vspwd22v1imm823"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags #~(list "-DES_USE_VCPKG=0"
