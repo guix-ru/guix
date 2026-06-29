@@ -4835,18 +4835,14 @@ TkDiff is included for browsing and merging your changes.")
        ;; Used with 'unpack-git-source phase.
        (patches
         (search-patches "git-filter-repo-2.38.0-generate-doc.patch"))))
-    (build-system gnu-build-system)
+    (build-system pyproject-build-system)
     (arguments
      (list
-      #:imported-modules %pyproject-build-system-modules
       #:modules
-      '((guix build gnu-build-system)
-        ((guix build pyproject-build-system) #:select (site-packages))
+      '(((guix build gnu-build-system) #:prefix gnu:)
+        (guix build pyproject-build-system)
         (guix build utils)
         (srfi srfi-26))
-      #:make-flags
-      #~(list (string-append "prefix=" #$output)
-              (string-append "VERSION=" #$(package-version this-package)))
       #:phases
       #~(modify-phases %standard-phases
           (delete 'configure)
@@ -4885,9 +4881,17 @@ TkDiff is included for browsing and merging your changes.")
               (substitute* "Makefile"
                 (("(pythondir = ).*" _ pre)
                  (string-append pre (site-packages inputs outputs))))))
-          (replace 'build
-            (lambda* (#:key make-flags #:allow-other-keys)
-              (apply invoke "make" "doc" make-flags)))
+          (add-after 'build 'build-doc
+            (lambda _
+              (invoke "make" "doc"
+                      (string-append "prefix=" #$output)
+                      (string-append "VERSION=" #$version))))
+          (add-after 'install 'install-doc
+            (lambda _
+              (let ((man1 (string-append #$output "/share/man/man1")))
+                (copy-recursively "Documentation/man1" man1))))
+          (add-after 'install-doc 'compress-documentation
+            (assoc-ref gnu:%standard-phases 'compress-documentation))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests?
@@ -4899,6 +4903,8 @@ TkDiff is included for browsing and merging your changes.")
            libxml2                        ;for XML_CATALOG_FILES
            xmlto
            perl
+           python-setuptools
+           python-setuptools-scm
            rsync))
     (inputs (list python))                ;for the shebang
     (home-page "https://github.com/newren/git-filter-repo")
