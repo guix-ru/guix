@@ -2201,8 +2201,8 @@ enhancements for envelope budgeting.")
     (license license:expat)))
 
 (define-public emacs-beancount
-  (let ((commit "8a564f5a26e6245860188ebf71db0262dd78e068")
-        (revision "0"))
+  (let ((commit "37648f983ff42426b1f364831ce7d2d0d735686b")
+        (revision "1"))
     (package
       (name "emacs-beancount")
       (version (git-version "0.9.0" revision commit))
@@ -2213,7 +2213,7 @@ enhancements for envelope budgeting.")
                 (url "https://github.com/beancount/beancount-mode")
                 (commit commit)))
          (sha256
-          (base32 "0affr04pa9gi9ddv1jqf7nwnpira7wdlm8aa293xqlzlb93bgfv2"))
+          (base32 "15qx09pb3p3hnsshy1kvcnxx1lgpyyw532sv7q9lgg0qzp57q1av"))
          (file-name (git-file-name name version))))
       (build-system emacs-build-system)
       (arguments
