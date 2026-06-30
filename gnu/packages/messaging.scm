@@ -97,6 +97,7 @@
   #:use-module (gnu packages erlang-xyz)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages gperf)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
@@ -155,6 +156,7 @@
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages stb)
   #:use-module (gnu packages tcl)
+  #:use-module (gnu packages telegram)
   #:use-module (gnu packages telephony)
   #:use-module (gnu packages texinfo)
   #:use-module (gnu packages textutils)
@@ -884,6 +886,98 @@ between users and to highlight messages.  It checks spelling using available
 dictionaries.  HexChat can be extended with multiple addons.")
     (home-page "https://hexchat.net/")
     (license license:gpl2+)))
+
+(define-public nchat
+  (package
+    (name "nchat")
+    (version "5.18.20")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/d99kris/nchat")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "014g7vc32dpdjljj1ahph52zjhll1sn1qx5dki3nkvvaijis696l"))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils))
+            (for-each (lambda (file)
+                        (delete-file-recursively file))
+                      (list "lib/tgchat/ext"
+                            "lib/wmchat/go"
+                            "lib/sgchat/go/ext"))
+            ;; Remove ext path and install references from it, finally
+            ;; rename reference to the system tdlib
+            (substitute* "lib/tgchat/CMakeLists.txt"
+              (("add_subdirectory\\(ext/td.*\\)" all)
+               (string-append "# " all))
+              (("install\\(FILES .*\\)" all)
+               (string-append "# " all))
+              (("tdclientshared") "tdclient"))
+            ;; Remove go path and make reference to system libcgowm
+            (substitute* "lib/wmchat/CMakeLists.txt"
+              (("add_subdirectory\\(go\\)" all)
+               (string-append "# " all))
+              (("add_dependencies\\(wmchat.*\\)" all)
+               (string-append "# " all))
+              (("(target.*\\(wmchat ).*ncutil/src\"\\)" all first)
+               (string-append all "\n" first
+                              "PUBLIC ${CGOWM_LIBRARY_INCLUDE_DIR})\n"))
+              (("WMCHAT_GOLIB(\\} ncutil)" all first)
+               (string-append "CGOWM_LIBRARY" first)))
+            (substitute* "lib/wmchat/src/wmchat.cpp"
+              (("\"(libcgowm.h)\"" all first)
+               (string-append "<" first ">")))))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;No tests.
+      ;; TODO: Enable Signal -DHAS_SIGNAL=ON
+      #:configure-flags
+      #~(list "-DHAS_DUMMY=OFF"         ;DUMMY is used just for development
+              (string-append "-DCGOWM_LIBRARY="
+                             (search-input-file %build-inputs
+                                                "lib/libcgowm.so"))
+              (string-append "-DCGOWM_INCLUDE_DIR="
+                             (search-input-file %build-inputs
+                                                "include/libcgowm.h")))))
+    (native-inputs
+     (list go
+           go-github-com-d99kris-nchat-lib-wmchat-go ;for whatsapp
+           gperf
+           pkg-config))
+    (inputs
+     (list ncurses
+           openssl
+           sqlite
+           tdlib
+           zlib))
+    (home-page "https://github.com/d99kris/nchat")
+    (synopsis "Terminal-based messaging client")
+    (description "Multi-protocol terminal-based messaging client for Linux
+with support for Telegram and WhatsApp.
+
+Features:
+@itemize
+@item Send and receive markdown formatted messages;
+@item Reply, delete, edit and forward messages;
+@item Mention users in group chats;
+@item Send and display message reactions;
+@item View and save media (documents, photos, videos);
+@item Show message read and edited indicators;
+@item Show user status (online, away, typing);
+@item Jump to next unread chat;
+@item Archive, pin and delete chats;
+@item Search messages within a chat;
+@item List dialogs for chats, contacts, emojis, files;
+@item Message history cache with text export;
+@item Desktop notifications for new messages;
+@item Toggle textized vs. graphical emojis;
+@item Customizable themes and key bindings.
+@end itemize")
+    (license license:expat)))
 
 (define-public ngircd
   (package
