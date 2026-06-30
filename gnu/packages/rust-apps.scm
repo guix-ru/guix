@@ -4792,7 +4792,7 @@ Full featured offline client with caching support.")
      "@command{uv} is a high-performance Python package and project manager
 written in Rust, known for its execution speed and compatibility with existing
 tools.")
-    (license (list license:asl2.0 license:expat))))
+    (license (list license:asl2.0 license:expat)))) ;dual-licensed
 
 (define-public git-absorb
   (package
