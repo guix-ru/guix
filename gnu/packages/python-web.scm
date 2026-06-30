@@ -1839,13 +1839,13 @@ Some things HTTP Core does do:
                 (("\\.uv-dynamic-versioning") ".vcs")))))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list python-pytest
+     (list python-chardet
            python-hatch-fancy-pypi-readme
            python-hatch-vcs
            python-hatchling
+           python-pytest
            python-trustme
-           python-uvicorn
-           python-chardet))
+           python-uvicorn))
     (propagated-inputs
      (list python-anyio
            python-httpcore2
