@@ -3279,22 +3279,24 @@ GUI for sigrok.")
                 (invoke "tclsh"
                         (string-append #$(this-package-native-input "nvc")
                                        "/test/test-osvvm.tcl")))))
-          (add-after 'unpack 'build
+          (add-after 'install 'build
             (lambda _
-              (call-with-output-file "build.tcl"
-                (lambda (port)
-                  (format port "source Scripts/StartNVC.tcl;\n")
-                  (format port "include osvvm/osvvm.pro;\n")
-                  (format port "include Common/build.pro;\n")
-                  (format port "include UART/build.pro\n")
-                  (format port "include AXI4/build.pro")))
-              (invoke "tclsh" "build.tcl")
-              (copy-recursively
-               (string-append "VHDL_LIBS/" "NVC-" #$(package-version nvc))
-               (string-append #$output "/share/osvvm/work/Compiled"))
-              (copy-recursively
-               (string-append "VHDL_LIBS/" "NVC-" #$(package-version nvc))
-               (string-append #$output:osvvm "/share/osvvm/osvvm/Compiled")))))))
+              (define (_build dir)
+                (chdir dir)
+                (call-with-output-file "build.tcl"
+                  (lambda (port)
+                    (format port "source Scripts/StartNVC.tcl;\n")
+                    (format port "include osvvm/osvvm.pro;\n")
+                    (format port "include Common/build.pro;\n")
+                    (format port "include UART/build.pro\n")))
+                (invoke "tclsh" "build.tcl")
+                (rename-file
+                 (string-append "VHDL_LIBS/" "NVC-" #$(package-version nvc))
+                 "Compiled")
+                (for-each delete-file-recursively
+                          (list "OsvvmTemp_NVC" "VHDL_LIBS")))
+              (_build (string-append #$output "/share/osvvm/work"))
+              (_build (string-append #$output:osvvm "/share/osvvm/osvvm")))))))
     (native-inputs
      (list nvc tcl tcllib which))
     (native-search-paths
