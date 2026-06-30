@@ -102,7 +102,7 @@
 (define-public transmission
   (package
     (name "transmission")
-    (version "4.1.2")
+    (version "4.1.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -114,7 +114,7 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "02brbjwmpn26igwg2a8cwz5a9d8cl8im1xgd6zi4i13a8lgym3ql"))
+                "0h90lpmhj30xj5fbmhxrsnw2rd3cph3ls1rcwhr4vmpyrs0kszp3"))
               (modules '((guix build utils)))
               (snippet
                #~(begin
