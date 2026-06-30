@@ -1330,16 +1330,9 @@ documentation in the TeX format."
                 (lambda* (#:key inputs #:allow-other-keys)
                   ;; Build complete TeX Live tree in #$output, barring the
                   ;; files going to be regenerated.
-                  (let ((texlive-outputs
-                         (filter-map
-                          (match-lambda
-                            (`(,label . ,dir)
-                             (and (string-prefix? "texlive-" label)
-                                  dir)))
-                          inputs)))
-                    (union-build #$output texlive-outputs
-                                 #:create-all-directories? #t
-                                 #:log-port (%make-void-port "w")))
+                  (union-build #$output inputs
+                               #:create-all-directories? #t
+                               #:log-port (%make-void-port "w"))
                   ;; Remove files that are going to be regenerated.
                   (with-directory-excursion
                       (string-append #$output "/share/texmf-dist")
