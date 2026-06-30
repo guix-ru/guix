@@ -3278,7 +3278,23 @@ GUI for sigrok.")
                 (setenv "OSVVM_MUST_BUILD" (getcwd))
                 (invoke "tclsh"
                         (string-append #$(this-package-native-input "nvc")
-                                       "/test/test-osvvm.tcl"))))))))
+                                       "/test/test-osvvm.tcl")))))
+          (add-after 'unpack 'build
+            (lambda _
+              (call-with-output-file "build.tcl"
+                (lambda (port)
+                  (format port "source Scripts/StartNVC.tcl;\n")
+                  (format port "include osvvm/osvvm.pro;\n")
+                  (format port "include Common/build.pro;\n")
+                  (format port "include UART/build.pro\n")
+                  (format port "include AXI4/build.pro")))
+              (invoke "tclsh" "build.tcl")
+              (copy-recursively
+               (string-append "VHDL_LIBS/" "NVC-" #$(package-version nvc))
+               (string-append #$output "/share/osvvm/work/Compiled"))
+              (copy-recursively
+               (string-append "VHDL_LIBS/" "NVC-" #$(package-version nvc))
+               (string-append #$output:osvvm "/share/osvvm/osvvm/Compiled")))))))
     (native-inputs
      (list nvc tcl tcllib which))
     (native-search-paths
@@ -3318,6 +3334,7 @@ verification.")
         #f)
        ((#:phases phases #~%standard-phases)
         #~(modify-phases #$phases
+            (delete 'build)
             (delete 'fix-scripts)))))))
 
 (define-public pyspice
