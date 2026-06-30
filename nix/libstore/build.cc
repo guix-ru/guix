@@ -3370,7 +3370,10 @@ void DerivationGoal::registerOutputs()
         assert(false); // shouldn't happen
     }
 
-    if (settings.keepFailed) {
+    /* Rename the built package when doing multiple rounds, but
+       don't move the package when running in check mode, since
+       that would remove the valid package from the store. */
+    if (settings.keepFailed && buildMode != bmCheck) {
         for (auto & i : drv.outputs) {
             Path prev = i.second.path + checkSuffix;
             if (pathExists(prev)) deletePath(prev);

@@ -1702,7 +1702,8 @@ System: x86_64-linux~%"
            (begin
              (guard (c ((store-protocol-error? c)
                         (pk 'determinism-exception c)
-                        (and (not (zero? (store-protocol-error-status c)))
+                        (and (valid-path? store file) ;must still be valid
+                             (not (zero? (store-protocol-error-status c)))
                              (string-contains (store-protocol-error-message c)
                                               "deterministic"))))
                ;; This one will produce a different result.  Since we're in
@@ -1710,6 +1711,34 @@ System: x86_64-linux~%"
                (build-things store (list (derivation-file-name drv))
                              (build-mode check))
                #f))))))
+
+(test-equal "build-things, check mode + keep-failed"
+  '(#t #t)
+  (with-store store
+    (let* ((drv  (build-expression->derivation
+                  store "deterministic-thing-to-check"
+                  `(let ((out (assoc-ref %outputs "out")))
+                     (call-with-output-file out
+                       (lambda (port)
+                         (display ,(let ((now (gettimeofday)))
+                                     (+ (car now) (cdr now)))
+                                  port))))
+                  #:guile-for-build
+                  (package-derivation
+                   store %bootstrap-guile (%current-system))))
+           (file (derivation->output-path drv)))
+      (and (build-things store (list (derivation-file-name drv)))
+           (valid-path? store file)
+           (begin
+             ;; This would trigger accidental deletion of FILE.
+             (set-build-options store
+                                #:keep-failed? #t
+                                #:keep-going? #t
+                                #:rounds 3)
+             (build-things store (list (derivation-file-name drv))
+                           (build-mode check))
+             (list (valid-path? store file)
+                   (file-exists? file)))))))
 
 (test-assert "build-succeeded trace in check mode"
   (string-contains
