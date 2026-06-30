@@ -433,8 +433,8 @@ SNS, Gotify, etc.")
         (base32 "1f4ids6sxwmz89yj98z0qc4qvfkklh0psbxv5px39k807g9aq7p2"))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list python-pytest
-           python-pdm-backend))
+     (list python-pdm-backend
+           python-pytest))
     (propagated-inputs
      (list python-anyio
            python-sniffio
@@ -448,11 +448,7 @@ SNS, Gotify, etc.")
 The main goal of Asyncer is to improve developer experience by providing
 better support for autocompletion and inline errors in the editor, and more
 certainty that the code is bug-free by providing better support for type
-checking tools like mypy.
-
-Asyncer also tries to improve convenience and simplicity when working with
-async code mixed with regular blocking code, allowing to use them together in
-a simpler way... again, under my very subjective point of view.")
+checking tools like mypy.")
     (license license:expat)))
 
 (define-public python-asyncudp
