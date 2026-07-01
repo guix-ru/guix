@@ -1768,6 +1768,7 @@ operate properly.")
   (package
     (name "ffmpeg")
     (version "8.1.1")
+    (replacement ffmpeg-8.1.2)
     (source (origin
               (method url-fetch)
               (uri (string-append "https://ffmpeg.org/releases/ffmpeg-"
@@ -2000,6 +2001,18 @@ operate properly.")
 convert and stream audio and video.  It includes the libavcodec
 audio/video codec library.")
     (license license:gpl2+)))
+
+(define-public ffmpeg-8.1.2
+  (package
+    (inherit ffmpeg)
+    (version "8.1.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
+                           ".tar.xz"))
+       (sha256
+        (base32 "0k2jggcp8akl64i0id5ba64ghancx422zbj5igk13hzhgdgfnjs6"))))))
 
 (define-public ffmpeg-6
   (package
