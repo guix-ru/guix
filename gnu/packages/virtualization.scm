@@ -2468,83 +2468,8 @@ main monitor/GPU.")
 ;; XXX: Deprecated on <2026-07-01>.
 (define-deprecated/public-alias runc (@ (gnu packages containers) runc))
 
-(define-public umoci
-  (package
-    (name "umoci")
-    (version "0.6.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/opencontainers/umoci")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0m50x2q2h34g6sh786blf8r9wh098yzgwnicdlx0cgsqqwjsn0ia"))
-       (snippet
-        #~(begin
-            (use-modules (guix build utils))
-            (delete-file-recursively "vendor")))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:install-source? #f
-      #:import-path "github.com/opencontainers/umoci/cmd/umoci"
-      #:unpack-path "github.com/opencontainers/umoci"
-      #:test-flags
-      ;; Two tests fail with error: unpack config.json: convert spec to
-      ;; rootless: inspecting mount flags of /etc/resolv.conf: no such file or
-      ;; directory
-      #~(list "-skip" (string-append "TestUnpackManifestCustomLayer"
-                                     "|TestUnpackStartFromDescriptor"))
-      #:test-subdirs #~(list "../../...")       ;test the whole library
-      #:build-flags
-      #~(list (string-append "-ldflags="
-                             "-X github.com/opencontainers/umoci.version="
-                             #$version))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'install 'build-and-install-man-pages
-            (lambda* (#:key unpack-path #:allow-other-keys)
-              (with-directory-excursion
-                  (string-append "src/" unpack-path "/doc/man")
-                (mkdir-p (string-append #$output "/share/man/man1"))
-                (for-each
-                 (lambda (file)
-                   (let* ((file (string-drop-right file 3))      ;cut .md
-                          (in-md (string-append file ".md"))
-                          (out-man (string-append #$output
-                                                  "/share/man/man1/" file)))
-                     (invoke "go-md2man" "-in" in-md "-out" out-man)))
-                 (find-files "." "\\.md$"))))))))
-    (native-inputs
-     (list go-github-com-adalogics-go-fuzz-headers
-           go-github-com-apex-log
-           go-github-com-blang-semver-v4
-           go-github-com-containerd-platforms
-           go-github-com-cyphar-filepath-securejoin
-           go-github-com-cyphar-go-mtree
-           go-github-com-docker-go-units
-           go-github-com-klauspost-compress
-           go-github-com-klauspost-pgzip
-           go-github-com-moby-sys-user
-           go-github-com-moby-sys-userns
-           go-github-com-mohae-deepcopy
-           go-github-com-opencontainers-go-digest
-           go-github-com-opencontainers-image-spec
-           go-github-com-opencontainers-runtime-spec
-           go-github-com-rootless-containers-proto-go-proto
-           go-github-com-stretchr-testify
-           go-github-com-urfave-cli
-           go-golang-org-x-sys
-           go-google-golang-org-protobuf
-           go-md2man))
-    (home-page "https://umo.ci/")
-    (synopsis "Tool for modifying Open Container images")
-    (description
-     "@command{umoci} is a tool that allows for high-level modification of an
-Open Container Initiative (OCI) image layout and its tagged images.")
-    (license license:asl2.0)))
+;; XXX: Deprecated on <2026-07-01>.
+(define-deprecated/public-alias umoci (@ (gnu packages containers) umoci))
 
 ;; XXX: Deprecated on <2026-07-01>.
 (define-deprecated/public-alias skopeo (@ (gnu packages containers) skopeo))
