@@ -1,17 +1,22 @@
 ;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2018 宋文武 <iyzsong@envs.net>
+;;; Copyright © 2019 Leo Famulari <leo@famulari.name>
+;;; Copyright © 2021 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2021 Timmy Douglas <mail@timmydouglas.com>
+;;; Copyright © 2022 Michael Rohleder <mike@rohleder.de>
+;;; Copyright © 2022 Pierre Langlois <pierre.langlois@gmx.com>
 ;;; Copyright © 2022 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2022 Zhu Zihao <all_but_last@163.com>
-;;; Copyright © 2022 Michael Rohleder <mike@rohleder.de>
-;;; Copyright © 2023 Zongyuan Li <zongyuan.li@c0x0o.me>
+;;; Copyright © 2023 Hilton Chain <hako@ultrarare.space>
 ;;; Copyright © 2023 Ricardo Wurmus <rekado@elephly.net>
-;;; Copyright © 2024, 2025, 2026 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2023 Zongyuan Li <zongyuan.li@c0x0o.me>
+;;; Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2024 Foundation Devices, Inc. <hello@foundation.xyz>
 ;;; Copyright © 2024 Jean-Pierre De Jesus DIAZ <jean@foundation.xyz>
-;;; Copyright © 2025 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2024-2026 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2024-2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2025 Foster Hangdaan <foster@hangdaan.email>
 ;;; Copyright © 2026 Giacomo Leidi <therewasa@fishinthecalculator.me>
-;;; Copyright © 2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -78,7 +83,6 @@
   #:use-module (gnu packages rust-apps)
   #:use-module (gnu packages selinux)
   #:use-module (gnu packages version-control)
-  #:use-module (gnu packages virtualization)
   #:use-module (gnu packages web)
   #:use-module (gnu packages wget))
 
@@ -892,6 +896,82 @@ contents, and discovering ways to shrink the size of Docker/OCI image.")
 Guix machinery.")
     (home-page "https://codeberg.org/fishinthecalculator/guix-compose")
     (license license:gpl3+)))
+
+(define-public runc
+  (package
+    (name "runc")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/opencontainers/runc")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0midvxwmj4fvhy5mqv616bhlx39j0gd6y890adx7dnz5in506ym1"))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils))
+            (delete-file-recursively "vendor")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      ;; XXX: 20/139 tests fail due to missing /var, cgroups and apparmor in
+      ;; the build environment.
+      #:tests? #f
+      #:install-source? #f
+      #:import-path "github.com/opencontainers/runc"
+      #:phases
+      #~(modify-phases %standard-phases
+         (add-after 'unpack 'patch-source
+           (lambda* (#:key import-path #:allow-other-keys)
+             (substitute*  (string-append "src/" import-path "/Makefile")
+               (("/bin/bash") (which "bash")))))
+          (replace 'build
+            (lambda* (#:key import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (invoke "make" "all" "man"))))
+          (replace 'install
+            (lambda* (#:key import-path outputs #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (invoke "make" "install" "install-bash" "install-man"
+                        (string-append "PREFIX=" #$output))))))))
+    (native-inputs
+     (list go-github-com-checkpoint-restore-go-criu-v6
+           go-github-com-containerd-console
+           go-github-com-coreos-go-systemd-v22
+           go-github-com-cyphar-filepath-securejoin
+           go-github-com-docker-go-units
+           go-github-com-godbus-dbus-v5
+           go-github-com-moby-sys-capability
+           go-github-com-moby-sys-mountinfo
+           go-github-com-moby-sys-user
+           go-github-com-moby-sys-userns
+           go-github-com-mrunalp-fileutils
+           go-github-com-opencontainers-cgroups-0.0.1
+           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-selinux
+           go-github-com-seccomp-libseccomp-golang
+           go-github-com-sirupsen-logrus
+           go-github-com-urfave-cli
+           go-github-com-vishvananda-netlink
+           go-golang-org-x-net
+           go-golang-org-x-sys
+           go-google-golang-org-protobuf
+           go-md2man
+           pkg-config))
+    (inputs
+     (list libseccomp))
+    (synopsis "Open container initiative runtime")
+    (home-page "https://opencontainers.org/")
+    (description
+     "@command{runc} is a command line client for running applications
+packaged according to the
+@uref{https://github.com/opencontainers/runtime-spec/blob/master/spec.md, Open
+Container Initiative (OCI) format} and is a compliant implementation of the
+Open Container Initiative specification.")
+    (license license:asl2.0)))
 
 (define-public libslirp
   (package

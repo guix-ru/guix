@@ -188,6 +188,7 @@
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system ruby)
   #:use-module (guix build-system trivial)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -2464,81 +2465,8 @@ main monitor/GPU.")
     (supported-systems '("i686-linux" "x86_64-linux"))
     (license license:gpl2+)))
 
-(define-public runc
-  (package
-    (name "runc")
-    (version "1.3.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/opencontainers/runc")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0midvxwmj4fvhy5mqv616bhlx39j0gd6y890adx7dnz5in506ym1"))
-       (snippet
-        #~(begin
-            (use-modules (guix build utils))
-            (delete-file-recursively "vendor")))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      ;; XXX: 20/139 tests fail due to missing /var, cgroups and apparmor in
-      ;; the build environment.
-      #:tests? #f
-      #:install-source? #f
-      #:import-path "github.com/opencontainers/runc"
-      #:phases
-      #~(modify-phases %standard-phases
-         (add-after 'unpack 'patch-source
-           (lambda* (#:key import-path #:allow-other-keys)
-             (substitute*  (string-append "src/" import-path "/Makefile")
-               (("/bin/bash") (which "bash")))))
-          (replace 'build
-            (lambda* (#:key import-path #:allow-other-keys)
-              (with-directory-excursion (string-append "src/" import-path)
-                (invoke "make" "all" "man"))))
-          (replace 'install
-            (lambda* (#:key import-path outputs #:allow-other-keys)
-              (with-directory-excursion (string-append "src/" import-path)
-                (invoke "make" "install" "install-bash" "install-man"
-                        (string-append "PREFIX=" #$output))))))))
-    (native-inputs
-     (list go-github-com-checkpoint-restore-go-criu-v6
-           go-github-com-containerd-console
-           go-github-com-coreos-go-systemd-v22
-           go-github-com-cyphar-filepath-securejoin
-           go-github-com-docker-go-units
-           go-github-com-godbus-dbus-v5
-           go-github-com-moby-sys-capability
-           go-github-com-moby-sys-mountinfo
-           go-github-com-moby-sys-user
-           go-github-com-moby-sys-userns
-           go-github-com-mrunalp-fileutils
-           go-github-com-opencontainers-cgroups-0.0.1
-           go-github-com-opencontainers-runtime-spec
-           go-github-com-opencontainers-selinux
-           go-github-com-seccomp-libseccomp-golang
-           go-github-com-sirupsen-logrus
-           go-github-com-urfave-cli
-           go-github-com-vishvananda-netlink
-           go-golang-org-x-net
-           go-golang-org-x-sys
-           go-google-golang-org-protobuf
-           go-md2man
-           pkg-config))
-    (inputs
-     (list libseccomp))
-    (synopsis "Open container initiative runtime")
-    (home-page "https://opencontainers.org/")
-    (description
-     "@command{runc} is a command line client for running applications
-packaged according to the
-@uref{https://github.com/opencontainers/runtime-spec/blob/master/spec.md, Open
-Container Initiative (OCI) format} and is a compliant implementation of the
-Open Container Initiative specification.")
-    (license license:asl2.0)))
+;; XXX: Deprecated on <2026-07-01>.
+(define-deprecated/public-alias runc (@ (gnu packages containers) runc))
 
 (define-public umoci
   (package
