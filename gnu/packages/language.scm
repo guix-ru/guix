@@ -972,31 +972,37 @@ and manipulation.")
     (version "1.8.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://savannah/m17n/m17n-db-"
-                           version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://https.git.savannah.gnu.org/git/m17n/m17n-db.git")
+              (commit (string-append "REL-"
+                                     (string-replace-substring version
+                                                               "." "-")))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "0vfw7z9i2s9np6nmx1d4dlsywm044rkaqarn7akffmb6bf1j6zv5"))))
+        (base32 "0d43qrsc9fhk6f42bkvzzp8sycqpmav0vhs533k7p30nmvlwvq8m"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list gettext-minimal))
     (arguments
-     `(#:configure-flags
-       (list (string-append "--with-charmaps="
-                            (assoc-ref %build-inputs "libc")
-                            "/share/i18n/charmaps"))))
-    ;; With `guix lint' the home-page URI returns a small page saying
+     (list
+      #:configure-flags
+      #~(list (string-append "--with-charmaps="
+                             (search-input-directory %build-inputs
+                                                     "/share/i18n/charmaps")))))
+    (native-inputs
+     (list autoconf
+           automake
+           gettext-minimal))
+    ;; INFO: With `guix lint' the home-page URI returns a small page saying
     ;; that your browser does not handle frames. This triggers the "URI
     ;; returns suspiciously small file" warning.
     (home-page "https://www.nongnu.org/m17n/")
     (synopsis "Multilingual text processing library (database)")
-    (description "The m17n library realizes multilingualization of
-many aspects of applications.  The m17n library represents
-multilingual text as an object named M-text.  M-text is a string with
-attributes called text properties, and designed to substitute for
-string in C.  Text properties carry any information required to input,
-display and edit the text.
+    (description
+     "The m17n library realizes multilingualization of many aspects of
+applications.  The m17n library represents multilingual text as an object
+named M-text.  M-text is a string with attributes called text properties, and
+designed to substitute for string in C.  Text properties carry any information
+required to input, display and edit the text.
 
 This package contains the library database.")
     (license license:lgpl2.1+)))
