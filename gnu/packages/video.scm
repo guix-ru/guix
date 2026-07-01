@@ -2005,6 +2005,7 @@ audio/video codec library.")
   (package
     (inherit ffmpeg)
     (version "6.1.5")
+    (replacement ffmpeg-6.1.6)
     (source
      (origin
        (method url-fetch)
@@ -2026,6 +2027,18 @@ audio/video codec library.")
                              " -Wno-error=incompatible-pointer-types"
                              " -Wno-error=int-conversion")))))))
          (package-arguments ffmpeg)))))
+
+(define-public ffmpeg-6.1.6
+  (package
+    (inherit ffmpeg-6)
+    (version "6.1.6")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
+                           ".tar.xz"))
+       (sha256
+        (base32 "02ip0zsghyz09p0jv8ayqxrnkb3awirarh4jbppbxlwd09jb3z6l"))))))
 
 (define-public ffmpeg-5
   (package
