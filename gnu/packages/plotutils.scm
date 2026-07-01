@@ -92,7 +92,6 @@
            cmake-minimal
            emacs-minimal
            flex
-           ghostscript                  ;for tests
            libtool
            perl
            pkg-config
@@ -118,6 +117,7 @@
            eigen
            fftw
            freeglut
+           ghostscript                  ;tests and default gs
            glew
            glfw
            glm
@@ -178,12 +178,15 @@
           (replace 'bootstrap
             (lambda _
               (invoke "./autogen.sh")))
-          (add-before 'build 'patch-pdf-viewer
-            (lambda _
+          (add-before 'build 'change-default-settings
+            (lambda* (#:key inputs #:allow-other-keys)
               ;; Default to a free pdf viewer.
               (substitute* "settings.cc"
                 (("defaultPDFViewer=\"acroread\"")
-                 "defaultPDFViewer=\"gv\""))))
+                 "defaultPDFViewer=\"gv\"")
+                (("defaultGhostscript=\"gs\"")
+                 (format #f "defaultGhostscript=\"~a\""
+                         (search-input-file inputs "/bin/gs"))))))
           (add-before 'build 'setenv
             (lambda _
               (setenv "TEXMFVAR" "/tmp"))) ;for font shapes generation
