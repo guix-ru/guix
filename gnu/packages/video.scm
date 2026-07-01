@@ -2411,7 +2411,7 @@ It is usually a complement to @code{ffmpeg-normalize}.")
 (define-public ffmpeg-normalize
   (package
     (name "ffmpeg-normalize")
-    (version "1.37.8")
+    (version "1.41.0")
     (source
      (origin
        (method git-fetch)
@@ -2420,7 +2420,7 @@ It is usually a complement to @code{ffmpeg-normalize}.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1g5xz5mi2imrh592133f08vajk9936n4rdih1nm8xl08liibqrq1"))))
+        (base32 "0sv48vkrhdnchraai1sa30h45vnbicmjry3iwlmw888096jmkn92"))))
     (build-system pyproject-build-system)
     (arguments
      (list
