@@ -2830,7 +2830,9 @@ watch your CPU playing while enjoying a cup of tea!")
          "LIBS=-ltinfo"
          (string-append "CC=" #$(cc-for-target))
          (string-append "GREPPATH="
-                        (search-input-file %build-inputs "/bin/grep")))
+                        (search-input-file %build-inputs "/bin/grep"))
+         "WANT_WIN_CURSES=1"
+         "WANT_WIN_TTY=1")
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'configure 'do-not-change-to-hackdir
