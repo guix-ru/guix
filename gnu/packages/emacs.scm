@@ -46,6 +46,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages emacs)
+  #:use-module (guix deprecation)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -75,6 +76,7 @@
   #:use-module (gnu packages guile)
   #:use-module (gnu packages image)
   #:use-module (gnu packages imagemagick)
+  #:use-module (gnu packages language)  ; m17n-db, m17n-lib
   #:use-module (gnu packages toolkits)   ; motif
   #:use-module (gnu packages linux)     ; alsa-lib, gpm
   #:use-module (gnu packages mail)      ; for mailutils
@@ -856,95 +858,9 @@ Started in 2014 as a GSOC project, Guile-Emacs was resurrected in 2024.")
                   (call-with-output-file "lisp/finder-inf.el"
                     (lambda (port) (display port))))))))))))
 
-(define-public m17n-db
-  (package
-    (name "m17n-db")
-    (version "1.8.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "mirror://savannah/m17n/m17n-db-"
-                           version ".tar.gz"))
-       (sha256
-        (base32
-         "0vfw7z9i2s9np6nmx1d4dlsywm044rkaqarn7akffmb6bf1j6zv5"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     (list gettext-minimal))
-    (arguments
-     `(#:configure-flags
-       (list (string-append "--with-charmaps="
-                            (assoc-ref %build-inputs "libc")
-                            "/share/i18n/charmaps"))))
-    ;; With `guix lint' the home-page URI returns a small page saying
-    ;; that your browser does not handle frames. This triggers the "URI
-    ;; returns suspiciously small file" warning.
-    (home-page "https://www.nongnu.org/m17n/")
-    (synopsis "Multilingual text processing library (database)")
-    (description "The m17n library realizes multilingualization of
-many aspects of applications.  The m17n library represents
-multilingual text as an object named M-text.  M-text is a string with
-attributes called text properties, and designed to substitute for
-string in C.  Text properties carry any information required to input,
-display and edit the text.
-
-This package contains the library database.")
-    (license license:lgpl2.1+)))
-
-(define-public m17n-lib
-  (package
-    (name "m17n-lib")
-    (version "1.8.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "mirror://savannah/m17n/m17n-lib-"
-                           version ".tar.gz"))
-       (sha256
-        (base32
-         "0jp61y09xqj10mclpip48qlfhniw8gwy8b28cbzxy8hq8pkwmfkq"))
-       (patches (search-patches "m17n-lib-1.8.0-use-pkg-config-for-freetype.patch"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     (if (%current-target-system)
-         (list pkg-config
-               libtool
-               gettext-minimal
-               autoconf automake)
-         '()))
-    (inputs
-     (list fribidi
-           gd
-           libotf
-           libxft
-           libxml2
-           m17n-db))
-    (arguments
-     `(#:parallel-build? #f
-       ,@(if (%current-target-system)
-             '(#:phases
-               (modify-phases %standard-phases
-                 ;; AC_FUNC_MALLOC and AC_FUNC_REALLOC usually unneeded
-                 ;; see https://lists.gnu.org/archive/html/autoconf/2003-02/msg00017.html
-                 (add-after 'unpack 'fix-rpl_malloc
-                   (lambda _
-                     (substitute* "configure.ac"
-                       (("AC_FUNC_MALLOC") "")
-                       (("AC_FUNC_REALLOC") ""))
-                     ;; let bootstrap phase run.
-                     (delete-file "./configure")))))
-             '())))
-    ;; With `guix lint' the home-page URI returns a small page saying
-    ;; that your browser does not handle frames. This triggers the "URI
-    ;; returns suspiciously small file" warning.
-    (home-page "https://www.nongnu.org/m17n/")
-    (synopsis "Multilingual text processing library (runtime)")
-    (description "The m17n library realizes multilingualization of
-many aspects of applications.  The m17n library represents
-multilingual text as an object named M-text.  M-text is a string with
-attributes called text properties, and designed to substitute for
-string in C.  Text properties carry any information required to input,
-display and edit the text.
-
-This package contains the library runtime.")
-    (license license:lgpl2.1+)))
+;; INFO: Deprecated on 2026-07-24.
+(define-deprecated/public-alias m17n-db
+  (@ (gnu packages language) m17n-db))
+;; INFO: Deprecated on 2026-07-24.
+(define-deprecated/public-alias m17n-lib
+  (@ (gnu packages language) m17n-lib))

@@ -44,8 +44,10 @@
   #:use-module (gnu packages dbm)
   #:use-module (gnu packages dictionaries)
   #:use-module (gnu packages docbook)
-  #:use-module (gnu packages emacs)
+  #:use-module (gnu packages fontutils)
   #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages fribidi)
+  #:use-module (gnu packages gd)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
@@ -963,6 +965,99 @@ and manipulation.")
     (description
      "libskk is a library to deal with Japanese kana-to-kanji conversion method.")
     (license license:gpl3+)))
+
+(define-public m17n-db
+  (package
+    (name "m17n-db")
+    (version "1.8.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://savannah/m17n/m17n-db-"
+                           version ".tar.gz"))
+       (sha256
+        (base32
+         "0vfw7z9i2s9np6nmx1d4dlsywm044rkaqarn7akffmb6bf1j6zv5"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (list gettext-minimal))
+    (arguments
+     `(#:configure-flags
+       (list (string-append "--with-charmaps="
+                            (assoc-ref %build-inputs "libc")
+                            "/share/i18n/charmaps"))))
+    ;; With `guix lint' the home-page URI returns a small page saying
+    ;; that your browser does not handle frames. This triggers the "URI
+    ;; returns suspiciously small file" warning.
+    (home-page "https://www.nongnu.org/m17n/")
+    (synopsis "Multilingual text processing library (database)")
+    (description "The m17n library realizes multilingualization of
+many aspects of applications.  The m17n library represents
+multilingual text as an object named M-text.  M-text is a string with
+attributes called text properties, and designed to substitute for
+string in C.  Text properties carry any information required to input,
+display and edit the text.
+
+This package contains the library database.")
+    (license license:lgpl2.1+)))
+
+(define-public m17n-lib
+  (package
+    (name "m17n-lib")
+    (version "1.8.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://savannah/m17n/m17n-lib-"
+                           version ".tar.gz"))
+       (sha256
+        (base32
+         "0jp61y09xqj10mclpip48qlfhniw8gwy8b28cbzxy8hq8pkwmfkq"))
+       (patches (search-patches "m17n-lib-1.8.0-use-pkg-config-for-freetype.patch"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (if (%current-target-system)
+         (list pkg-config
+               libtool
+               gettext-minimal
+               autoconf automake)
+         '()))
+    (inputs
+     (list fribidi
+           gd
+           libotf
+           libxft
+           libxml2
+           m17n-db))
+    (arguments
+     `(#:parallel-build? #f
+       ,@(if (%current-target-system)
+             '(#:phases
+               (modify-phases %standard-phases
+                 ;; AC_FUNC_MALLOC and AC_FUNC_REALLOC usually unneeded
+                 ;; see https://lists.gnu.org/archive/html/autoconf/2003-02/msg00017.html
+                 (add-after 'unpack 'fix-rpl_malloc
+                   (lambda _
+                     (substitute* "configure.ac"
+                       (("AC_FUNC_MALLOC") "")
+                       (("AC_FUNC_REALLOC") ""))
+                     ;; let bootstrap phase run.
+                     (delete-file "./configure")))))
+             '())))
+    ;; With `guix lint' the home-page URI returns a small page saying
+    ;; that your browser does not handle frames. This triggers the "URI
+    ;; returns suspiciously small file" warning.
+    (home-page "https://www.nongnu.org/m17n/")
+    (synopsis "Multilingual text processing library (runtime)")
+    (description "The m17n library realizes multilingualization of
+many aspects of applications.  The m17n library represents
+multilingual text as an object named M-text.  M-text is a string with
+attributes called text properties, and designed to substitute for
+string in C.  Text properties carry any information required to input,
+display and edit the text.
+
+This package contains the library runtime.")
+    (license license:lgpl2.1+)))
 
 (define-public mecab
   (package
