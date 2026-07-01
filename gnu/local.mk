@@ -2711,7 +2711,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/zig-0.15-fix-runpath.patch		\
   %D%/packages/patches/zig-0.16-fix-runpath.patch		\
   %D%/packages/patches/zuo-bin-sh.patch			\
-  %D%/packages/patches/zxing-cpp-1.2.0-gcc-14.patch	\
   %D%/packages/patches/zynaddsubfx-3.0.6-include-cstdint.patch	\
   %D%/packages/patches/zynaddsubfx-3.0.6-system-rtosc.patch
 
