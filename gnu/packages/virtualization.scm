@@ -2546,85 +2546,8 @@ main monitor/GPU.")
 Open Container Initiative (OCI) image layout and its tagged images.")
     (license license:asl2.0)))
 
-(define-public skopeo
-  (package
-    (name "skopeo")
-    (version "1.23.0")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/podman-container-tools/skopeo")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0l83k5gj5dx26wx200y61xcxxhxccwdqnj2r7xfs0h8fh56pmfvj"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     (list go
-           go-md2man
-           pkg-config))
-    (inputs
-     (list bash-minimal
-           btrfs-progs
-           eudev
-           libassuan
-           libselinux
-           libostree
-           lvm2
-           glib
-           gpgme))
-    (arguments
-     (list
-      #:make-flags
-      #~(list (string-append "CC=" #$(cc-for-target))
-              "PREFIX="
-              (string-append "DESTDIR=" #$output)
-              "GOGCFLAGS=-trimpath"
-              (string-append "GOMD2MAN=" #$go-md2man "/bin/go-md2man"))
-      #:tests? #f                       ; The tests require Docker
-      #:test-target "test-unit"
-      #:imported-modules
-      (source-module-closure `(,@%default-gnu-imported-modules
-                               (guix build go-build-system)))
-      #:phases
-      #~(modify-phases %standard-phases
-          (delete 'configure)
-          (add-after 'unpack 'set-env
-            (lambda _
-              ;; When running go, things fail because HOME=/homeless-shelter.
-              (setenv "HOME" "/tmp")
-              ;; Required for detecting btrfs in hack/btrfs* due to bug in GNU
-              ;; Make <4.4 causing CC not to be propagated into $(shell ...)
-              ;; calls.  Can be removed once we update to >4.3.
-              (setenv "CC" #$(cc-for-target))))
-          (add-after 'install 'wrap-skopeo
-            (lambda _
-              (wrap-program (string-append #$output "/bin/skopeo")
-                `("PATH" suffix
-                  ;; We need at least newuidmap, newgidmap and mount.
-                  ("/run/privileged/bin"))))))))
-    (home-page "https://github.com/podman-container-tools/skopeo")
-    (synopsis "Interact with container images and container image registries")
-    (description
-     "@command{skopeo} is a command line utility providing various operations
-with container images and container image registries.  It can:
-@enumerate
-
-@item Copy container images between various containers image stores,
-converting them as necessary.
-
-@item Convert a Docker schema 2 or schema 1 container image to an OCI image.
-
-@item Inspect a repository on a container registry without needlessly pulling
-the image.
-
-@item Sign and verify container images.
-
-@item Delete container images from a remote container registry.
-
-@end enumerate")
-    (license license:asl2.0)))
+;; XXX: Deprecated on <2026-07-01>.
+(define-deprecated/public-alias skopeo (@ (gnu packages containers) skopeo))
 
 (define-public ruby-vagrant-spec-helper-basic
   (package

@@ -1,11 +1,12 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2018 宋文武 <iyzsong@envs.net>
 ;;; Copyright © 2019 Leo Famulari <leo@famulari.name>
+;;; Copyright © 2020 Jelle Licht <jlicht@fsfe.org>
 ;;; Copyright © 2021 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2021 Timmy Douglas <mail@timmydouglas.com>
 ;;; Copyright © 2022 Michael Rohleder <mike@rohleder.de>
 ;;; Copyright © 2022 Pierre Langlois <pierre.langlois@gmx.com>
-;;; Copyright © 2022 Tobias Geerinckx-Rice <me@tobias.gr>
+;;; Copyright © 2019, 2021, 2022, 2024 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2022 Zhu Zihao <all_but_last@163.com>
 ;;; Copyright © 2023 Hilton Chain <hako@ultrarare.space>
 ;;; Copyright © 2023 Ricardo Wurmus <rekado@elephly.net>
@@ -13,9 +14,9 @@
 ;;; Copyright © 2024 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2024 Foundation Devices, Inc. <hello@foundation.xyz>
 ;;; Copyright © 2024 Jean-Pierre De Jesus DIAZ <jean@foundation.xyz>
-;;; Copyright © 2024-2026 Tomas Volf <~@wolfsden.cz>
 ;;; Copyright © 2024-2026 Sharlatan Hellseher <sharlatanus@gmail.com>
-;;; Copyright © 2025 Foster Hangdaan <foster@hangdaan.email>
+;;; Copyright © 2024-2026 Tomas Volf <~@wolfsden.cz>
+;;; Copyright © 2025, 2026 Foster Hangdaan <foster@hangdaan.email>
 ;;; Copyright © 2026 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -998,6 +999,86 @@ Open Container Initiative specification.")
      "libslirp is a user-mode networking library used by virtual machines,
 containers or various tools.")
     (license license:bsd-3)))
+
+(define-public skopeo
+  (package
+    (name "skopeo")
+    (version "1.23.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/podman-container-tools/skopeo")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0l83k5gj5dx26wx200y61xcxxhxccwdqnj2r7xfs0h8fh56pmfvj"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (list go
+           go-md2man
+           pkg-config))
+    (inputs
+     (list bash-minimal
+           btrfs-progs
+           eudev
+           libassuan
+           libselinux
+           libostree
+           lvm2
+           glib
+           gpgme))
+    (arguments
+     (list
+      #:make-flags
+      #~(list (string-append "CC=" #$(cc-for-target))
+              "PREFIX="
+              (string-append "DESTDIR=" #$output)
+              "GOGCFLAGS=-trimpath"
+              (string-append "GOMD2MAN=" #$go-md2man "/bin/go-md2man"))
+      #:tests? #f                       ; The tests require Docker
+      #:test-target "test-unit"
+      #:imported-modules
+      (source-module-closure `(,@%default-gnu-imported-modules
+                               (guix build go-build-system)))
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (add-after 'unpack 'set-env
+            (lambda _
+              ;; When running go, things fail because HOME=/homeless-shelter.
+              (setenv "HOME" "/tmp")
+              ;; Required for detecting btrfs in hack/btrfs* due to bug in GNU
+              ;; Make <4.4 causing CC not to be propagated into $(shell ...)
+              ;; calls.  Can be removed once we update to >4.3.
+              (setenv "CC" #$(cc-for-target))))
+          (add-after 'install 'wrap-skopeo
+            (lambda _
+              (wrap-program (string-append #$output "/bin/skopeo")
+                `("PATH" suffix
+                  ;; We need at least newuidmap, newgidmap and mount.
+                  ("/run/privileged/bin"))))))))
+    (home-page "https://github.com/podman-container-tools/skopeo")
+    (synopsis "Interact with container images and container image registries")
+    (description
+     "@command{skopeo} is a command line utility providing various operations
+with container images and container image registries.  It can:
+@enumerate
+
+@item Copy container images between various containers image stores,
+converting them as necessary.
+
+@item Convert a Docker schema 2 or schema 1 container image to an OCI image.
+
+@item Inspect a repository on a container registry without needlessly pulling
+the image.
+
+@item Sign and verify container images.
+
+@item Delete container images from a remote container registry.
+
+@end enumerate")
+    (license license:asl2.0)))
 
 (define-public slirp4netns
   (package
