@@ -30854,6 +30854,40 @@ dumping of JSON5 data structures.")
 Foundation maintained libraries.")
     (license license:expat)))
 
+(define-public python-frontmatter
+  (package
+    (name "python-frontmatter")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/eyeseast/python-frontmatter")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09kgl9kw96f1pyszqnm7slq1lw5nh4c8f59p6brz0ap2ydcfxykg"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:build-backend "setuptools.build_meta"))  ;requires uv_build
+    (native-inputs
+     (list python-hatchling
+           python-pyaml
+           python-pytest
+           python-setuptools
+           python-toml
+           python-types-pyyaml
+           python-types-toml))
+    (propagated-inputs (list python-pyyaml))
+    (home-page "https://github.com/eyeseast/python-frontmatter")
+    (synopsis "Parse and manage posts with YAML (or other) frontmatter")
+    (description
+     "This package offers a useful way to add arbitrary, structured metadata
+to text documents, regardless of type.  This is a small package to load and
+parse files (or just text) with YAML (or JSON, TOML or other) front matter.")
+    (license license:expat)))
+
 (define-public python-frozendict
   (package
     (name "python-frozendict")
