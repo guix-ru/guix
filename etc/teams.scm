@@ -1668,11 +1668,6 @@ the \"texlive\" importer."
                        "folaht")
   documentation)
 
-(define-member (person "Thanos Apollo"
-                       "public@thanosapollo.org"
-                       "thanosapollo")
-  vcs emacs)
-
 (define-member (person "Ashish SHUKLA"
                        "ashish.is@lostca.se"
                        "group")
