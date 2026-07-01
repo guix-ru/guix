@@ -672,6 +672,22 @@ This package also provides @samp{kdlpp}, a C++20 wrapper around @samp{ckdl}.")
 RPC system.  Think JSON, except binary.  Or think Protocol Buffers, except faster.")
     (license license:expat)))
 
+(define-public capnproto-clang
+  (package/inherit capnproto
+    (name "capnproto-clang")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:configure-flags flags #~'())
+        #~(cons* "-DCMAKE_C_COMPILER=clang"
+                 "-DCMAKE_CXX_COMPILER=clang++"
+                 "-DCMAKE_CXX_FLAGS=-std=c++20"
+                 #$flags))))
+    (native-inputs
+     (modify-inputs native-inputs
+       (prepend clang-22
+                lld-22
+                llvm-22)))))
+
 (define-public python-msgspec
   (package
     (name "python-msgspec")
