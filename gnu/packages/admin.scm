@@ -5551,14 +5551,25 @@ elogind's uaccess feature.")
         (base32 "05fcif1midcqvj93msn1mpllqdni3fr0iz1ab56w589rwr3w1rva"))))
     (build-system pyproject-build-system)
     (arguments
-     (list #:phases
-           #~(modify-phases %standard-phases
-               ;; XXX Guix's America/Los_Angeles time zone is somehow broken.
-               (add-before 'check 'hack-time-zone
-                 (lambda _
-                   (setenv "TZ" "PST8PDT")
-                   (substitute* (find-files "tests" "^test.*\\.py$")
-                     (("America/Los_Angeles") "PST8PDT")))))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; XXX Guix's America/Los_Angeles time zone is somehow broken.
+          (add-before 'check 'hack-time-zone
+            (lambda _
+              (setenv "TZ" "PST8PDT")
+              (substitute* (find-files "tests" "^test.*\\.py$")
+                (("America/Los_Angeles") "PST8PDT"))))
+          (add-before 'wrap 'install-completions
+            (lambda _
+              (define (install-completion option file)
+                (let ((jc (string-append #$output "/bin/jc"))
+                      (file (string-append #$output file)))
+                  (mkdir-p (dirname file))
+                  (with-output-to-file file
+                    (lambda _ (invoke jc option)))))
+              (install-completion "-B" "/share/bash-completion/completions/jc")
+              (install-completion "-Z" "/share/zsh/site-functions/_jc"))))))
     (native-inputs
      (list python-pytest
            python-setuptools))
