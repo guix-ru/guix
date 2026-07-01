@@ -56,6 +56,10 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Packages for electronic design automation, including electronic circuit
+;;; capture and simulation, printed circuit board design, chip design tools,
+;;; and electronic test and instrumentation software.
+
 (define-module (gnu packages electronics)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix build-system cargo)
@@ -105,13 +109,11 @@
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gperf)
   #:use-module (gnu packages graph)
-  #:use-module (gnu packages graphics)
   #:use-module (gnu packages graphviz)
   #:use-module (gnu packages groff)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages image)
-  #:use-module (gnu packages image-processing)
   #:use-module (gnu packages java)
   #:use-module (gnu packages libedit)
   #:use-module (gnu packages libffi)
@@ -341,47 +343,6 @@ formal verification.")
 formal verification.  This is the Yosyshq fork of ABC.")
     (license (license:non-copyleft "file:///copyright.txt"))))
 
-(define-public appcsxcad
-  (package
-    (name "appcsxcad")
-    (version "0.2.3")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/thliebig/AppCSXCAD")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "145awcsg4vl2xmrh5yf9fcasmghrai3x6ivgdxmrm1w3v9gyaccf"))))
-    (build-system qt-build-system)
-    (arguments
-     (list
-      #:qtbase qtbase ;for Qt 6
-      #:tests? #f)) ;No tests.
-    (inputs (list boost
-                  cgal
-                  csxcad
-                  eigen
-                  expat
-                  freetype
-                  gmp
-                  hdf5
-                  libjpeg-turbo
-                  libpng
-                  libtiff
-                  lz4
-                  openmpi
-                  qcsxcad
-                  tinyxml
-                  vtk))
-    (home-page "https://github.com/thliebig/AppCSXCAD")
-    (synopsis "Minimal GUI application for the @code{qcsxcad} library")
-    (description
-     "A minimal application for the @code{qcsxcad} library which is used to
-    describe geometrical objects and their physical and non-physical properties.")
-    (license license:gpl3)))
-
 (define-public apycula
   (package
     (name "apycula")
@@ -531,62 +492,6 @@ standard-cells.  It is compatible with @code{ngspice} and @code{Xyce}.")
      "@code{ciel} downloads and installs open-source PDKs which are used for
 chip design and @acronym{EDA, Electronic Design Automation}.")
     (license license:asl2.0)))
-
-(define-public csxcad
-  (package
-    (name "csxcad")
-    (version "0.6.3")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/thliebig/CSXCAD")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1c383zsv4fp40kmpawamfi9zg3b8x3d4m091ldwk15mii3467hp3"))))
-    (build-system cmake-build-system)
-    (arguments
-     (list
-      #:tests? #f ; No tests.
-      #:configure-flags
-      #~(list
-         (string-append "-DFPARSER_ROOT_DIR=" #$(this-package-input "fparser")))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-cmake-and-sources
-            (lambda _
-              (substitute* "CMakeLists.txt"
-                (("  system\n")
-                 "")
-                (("find_package\\(HDF5 1.8 COMPONENTS C HL REQUIRED\\)")
-                 "find_package(HDF5 REQUIRED COMPONENTS C HL)"))
-              ;; Fix missing `std::`.
-              ;; This is fixed in upstream already but not tagged.
-              (substitute* "src/CSPropDiscMaterial.cpp"
-                (("\tcout ")
-                 "\tstd::cout ")))))))
-    (inputs (list boost
-                  cgal
-                  eigen
-                  fparser
-                  hdf5
-                  gmp
-                  libjpeg-turbo
-                  libpng
-                  libtiff
-                  lz4
-                  mpfr
-                  openmpi
-                  tinyxml
-                  vtk
-                  zlib))
-    (home-page "https://github.com/thliebig/CSXCAD")
-    (synopsis "3D geometry library for C++")
-    (description
-     "@code{csxcad} is a C++ library to describe geometrical objects
-and their physical or non-physical properties for electromagnetics simulations.")
-    (license license:lgpl3+)))
 
 (define-public comedilib
   (package
@@ -2059,31 +1964,6 @@ management with library, schematic and board editors.")
       (license (list license:expat      ;libfst and fastlz-derived sources
                      license:bsd-2))))) ;for lz4-derived sources
 
-(define-public python-csxcad
-  (package
-    (inherit csxcad)
-    (name "python-csxcad")
-    (build-system pyproject-build-system)
-    (arguments
-     (list
-      ;; Tests are broken in v0.6.3.
-      ;; Check on update.
-      #:tests? #f
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'prepare-build
-            (lambda _
-              (chdir "./python")
-              (setenv "CSXCAD_INSTALL_PATH"
-                      #$(this-package-input "csxcad")))))))
-    (native-inputs (list python-minimal python-cython python-numpy
-                         python-setuptools))
-    (inputs (list csxcad fparser hdf5 python-numpy tinyxml))
-    (synopsis "Python bindings for @code{csxcad}")
-    (description "Library for describing geometrical objects and their
-physical and non-physical properties.")
-    (license license:lgpl3+)))
-
 (define-public python-lln-libparse
   (package
     (name "python-lln-libparse")
@@ -2795,66 +2675,6 @@ such as:
 @item Reads FZ (with key), BRD, BRD2, BDV and BV* formats.
 @end itemize")
     (license license:expat)))
-
-(define-public openems
-  (package
-    (name "openems")
-    (version "0.0.36")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/thliebig/openEMS")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1vxlknnji7kha0kabpjqh48i4r0rqlla9gcxhn69d0gcw76albmw"))))
-    (build-system cmake-build-system)
-    (arguments
-     (list
-      #:configure-flags
-      #~(list (string-append "-DCSXCAD_ROOT_DIR="
-                             #$(this-package-input "csxcad"))
-              (string-append "-DFPARSER_ROOT_DIR="
-                             #$(this-package-input "fparser")))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-cmake
-            (lambda _
-              (substitute* "CMakeLists.txt"
-                (("  system\n") "")
-                (("find_package\\(HDF5 1.8 COMPONENTS C HL REQUIRED\\)")
-                 "find_package(HDF5 1.8 REQUIRED)"))))
-          (delete 'check)
-          (add-after 'install 'check
-            (lambda* (#:key tests? source inputs #:allow-other-keys)
-              (when tests?
-                (let* ((testsuite (string-append source "/TESTSUITE"))
-                       (testsuite-tmp "/tmp/openEMS-TESTSUITE"))
-                  ;; Testsuite directory needs to be writable.
-                  (copy-recursively testsuite testsuite-tmp)
-                  (invoke "octave" "--no-gui" "--eval"
-                          (string-append
-                            "addpath('" #$output "/share/openEMS/matlab');"
-                            "addpath('"
-                            (search-input-directory inputs "share/CSXCAD/matlab")
-                            "');"
-                            ;; Work around bug in test script.
-                            "addpath('" testsuite-tmp "/helperscripts');"
-                            "run('" testsuite-tmp "/run_testsuite.m');")))))))))
-    (native-inputs (list cmake-minimal octave pkg-config))
-    (inputs (list boost
-                  csxcad
-                  fparser
-                  hdf5
-                  openmpi
-                  tinyxml
-                  vtk))
-    (home-page "https://www.openems.de")
-    (synopsis "Electromagnetic field solver")
-    (description "@code{OpenEMS} is an electromagnetic field solver using
-the @acronym{FDTD, Finite-Difference Time-Domain} method.")
-    (license license:gpl3+)))
 
 (define-public pcb-rnd
   (package
@@ -3681,44 +3501,6 @@ integrated circuit Hardware Description Language} and SystemVerilog
 parser library for Python.")
     (license license:expat)))
 
-(define-public python-openems
-  (package
-    (inherit openems)
-    (name "python-openems")
-    (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:tests? #f ; No tests.  Check again on package upgrade.
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-sources
-            ;; Check if this is still needed on upgrade.
-            (lambda _
-              (substitute* "python/openEMS/_nf2ff.pxd"
-                (("cimport cython.numeric")
-                 "import cython
-from cython cimport numeric"))))
-          (add-before 'build 'prepare-build
-            (lambda* _
-              (chdir "./python")
-              (setenv "CSXCAD_INSTALL_PATH"
-                      #$(this-package-input "csxcad"))
-              (setenv "OPENEMS_INSTALL_PATH"
-                      #$(this-package-input "openems")))))))
-    (native-inputs (list python-cython python-setuptools))
-    (inputs (list csxcad
-                  fparser
-                  openems
-                  python-csxcad
-                  python-hdf5storage
-                  python-numpy
-                  tinyxml))
-    (home-page "https://www.openems.de")
-    (synopsis "Python API for the electromagnetic field solver @code{OpenEMS}")
-    (description "@code{OpenEMS} is an electromagnetic field solver using
-the @acronym{FDTD, Finite-Difference Time-Domain} method.")
-    (license license:gpl3+)))
-
 (define-public python-pyrtl
   (package
     (name "python-pyrtl")
@@ -4397,71 +4179,6 @@ automated testing of HDL code.")
     ;; According to 'LICENSE.rst', VUnit itself is under MPL but two
     ;; subdirectories are under ASL.
     (license (list license:mpl2.0 license:asl2.0))))
-
-(define-public qcsxcad
-  (package
-    (name "qcsxcad")
-    (version "0.6.3")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/thliebig/QCSXCAD")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0ag1shyhsmfsvqm35fi2kfnbcngmln8rjsv88f97gyx9wiqc808y"))))
-    (build-system qt-build-system)
-    (arguments
-     (list
-      #:tests? #f ;No tests.
-      #:qtbase qtbase ;For Qt 6
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-sources
-            ;; Fix missing `std::`-prefix and missing include.
-            ;; This is fixed in upstream but not tagged with a version.
-            (lambda _
-              (substitute* "vtkInteractorStyleRubberBand2DPlane.cpp"
-                (("#include \"vtkCamera.h\"")
-                 "#include <iostream>\n#include \"vtkCamera.h\"")
-                (("\tcerr ")
-                 "\tstd::cerr "))
-              (substitute* "VTKPrimitives.cpp"
-                (("#include \"VTKPrimitives.h\"")
-                 "#include <iostream>\n#include \"VTKPrimitives.h\"")
-                (("\tcerr ")
-                 "\tstd::cerr ")
-                (("\tcout ")
-                 "\tstd::cout "))
-              (substitute* "QVTKStructure.cpp"
-                (("#include \"QVTKStructure.h\"")
-                 "#include <iostream>\n#include \"QVTKStructure.h\"")
-                (("\tcerr ")
-                 "\tstd::cerr ")
-                (("\tcout ")
-                 "\tstd::cout ")))))))
-    (inputs (list boost
-                  cgal
-                  csxcad
-                  eigen
-                  freetype
-                  gmp
-                  libjpeg-turbo
-                  libpng
-                  libtiff
-                  lz4
-                  openmpi
-                  qt5compat
-                  tinyxml
-                  vtk))
-    (home-page "https://github.com/thliebig/QCSXCAD")
-    (synopsis "GUI library for @code{csxcad}")
-    (description
-     "GUI library for @code{csxcad} --- a library for describing geometrical
-    objects and their properties.  This library is used in @code{appcsxcad}
-    which provides a standalone graphical frontend to @{csxcad}.")
-    (license license:lgpl3+)))
 
 (define-public qrouter
   (package

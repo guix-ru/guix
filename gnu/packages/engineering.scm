@@ -48,6 +48,7 @@
 ;;; Copyright © 2025 Remco van 't Veer <remco@remworks.net>
 ;;; Copyright © 2025-2026 bdunahu <bdunahu@operationnull.com>
 ;;; Copyright © 2026 Cayetano Santos <csantosb@inventati.org>
+;;; Copyright © 2026 Thomas Kramer <thomas@f-si.org>
 ;;; Copyright © 2026 Daniel Khodabakhsh <d@niel.khodabakh.sh>
 ;;; Copyright © 2026 Spencer King <spencer.king@wustl.edu>
 ;;; Copyright © 2026 Brent Wedderburn <mb@bean.za.net>
@@ -67,6 +68,10 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Packages for computer-aided engineering workflows, including CAD/CAM,
+;;; physical modeling and simulation, field solvers, manufacturing, robotics,
+;;; surveying, and engineering computation tools.
 
 (define-module (gnu packages engineering)
   #:use-module ((guix licenses) #:prefix license:)
@@ -600,6 +605,291 @@ multipole-accelerated algorithm.")
      "Fasthenry is an inductance extraction program based on a
 multipole-accelerated algorithm.")
     (license (license:non-copyleft #f "See induct.c."))))
+
+(define-public csxcad
+  (package
+    (name "csxcad")
+    (version "0.6.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/thliebig/CSXCAD")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1c383zsv4fp40kmpawamfi9zg3b8x3d4m091ldwk15mii3467hp3"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f ; No tests.
+      #:configure-flags
+      #~(list
+         (string-append "-DFPARSER_ROOT_DIR=" #$(this-package-input "fparser")))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-cmake-and-sources
+            (lambda _
+              (substitute* "CMakeLists.txt"
+                (("  system\n")
+                 "")
+                (("find_package\\(HDF5 1.8 COMPONENTS C HL REQUIRED\\)")
+                 "find_package(HDF5 REQUIRED COMPONENTS C HL)"))
+              ;; Fix missing `std::`.
+              ;; This is fixed in upstream already but not tagged.
+              (substitute* "src/CSPropDiscMaterial.cpp"
+                (("\tcout ")
+                 "\tstd::cout ")))))))
+    (inputs (list boost
+                  cgal
+                  eigen
+                  fparser
+                  hdf5
+                  gmp
+                  libjpeg-turbo
+                  libpng
+                  libtiff
+                  lz4
+                  mpfr
+                  openmpi
+                  tinyxml
+                  vtk
+                  zlib))
+    (home-page "https://github.com/thliebig/CSXCAD")
+    (synopsis "3D geometry library for C++")
+    (description
+     "@code{csxcad} is a C++ library to describe geometrical objects
+and their physical or non-physical properties for electromagnetics simulations.")
+    (license license:lgpl3+)))
+
+(define-public python-csxcad
+  (package
+    (inherit csxcad)
+    (name "python-csxcad")
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; Tests are broken in v0.6.3.
+      ;; Check on update.
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'prepare-build
+            (lambda _
+              (chdir "./python")
+              (setenv "CSXCAD_INSTALL_PATH"
+                      #$(this-package-input "csxcad")))))))
+    (native-inputs (list python-minimal python-cython python-numpy
+                         python-setuptools))
+    (inputs (list csxcad fparser hdf5 python-numpy tinyxml))
+    (synopsis "Python bindings for @code{csxcad}")
+    (description "Library for describing geometrical objects and their
+physical and non-physical properties.")
+    (license license:lgpl3+)))
+
+(define-public qcsxcad
+  (package
+    (name "qcsxcad")
+    (version "0.6.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/thliebig/QCSXCAD")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ag1shyhsmfsvqm35fi2kfnbcngmln8rjsv88f97gyx9wiqc808y"))))
+    (build-system qt-build-system)
+    (arguments
+     (list
+      #:tests? #f ;No tests.
+      #:qtbase qtbase ;For Qt 6
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-sources
+            ;; Fix missing `std::`-prefix and missing include.
+            ;; This is fixed in upstream but not tagged with a version.
+            (lambda _
+              (substitute* "vtkInteractorStyleRubberBand2DPlane.cpp"
+                (("#include \"vtkCamera.h\"")
+                 "#include <iostream>\n#include \"vtkCamera.h\"")
+                (("\tcerr ")
+                 "\tstd::cerr "))
+              (substitute* "VTKPrimitives.cpp"
+                (("#include \"VTKPrimitives.h\"")
+                 "#include <iostream>\n#include \"VTKPrimitives.h\"")
+                (("\tcerr ")
+                 "\tstd::cerr ")
+                (("\tcout ")
+                 "\tstd::cout "))
+              (substitute* "QVTKStructure.cpp"
+                (("#include \"QVTKStructure.h\"")
+                 "#include <iostream>\n#include \"QVTKStructure.h\"")
+                (("\tcerr ")
+                 "\tstd::cerr ")
+                (("\tcout ")
+                 "\tstd::cout ")))))))
+    (inputs (list boost
+                  cgal
+                  csxcad
+                  eigen
+                  freetype
+                  gmp
+                  libjpeg-turbo
+                  libpng
+                  libtiff
+                  lz4
+                  openmpi
+                  qt5compat
+                  tinyxml
+                  vtk))
+    (home-page "https://github.com/thliebig/QCSXCAD")
+    (synopsis "GUI library for @code{csxcad}")
+    (description
+     "GUI library for @code{csxcad} --- a library for describing geometrical
+    objects and their properties.  This library is used in @code{appcsxcad}
+    which provides a standalone graphical frontend to @{csxcad}.")
+    (license license:lgpl3+)))
+
+(define-public appcsxcad
+  (package
+    (name "appcsxcad")
+    (version "0.2.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/thliebig/AppCSXCAD")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "145awcsg4vl2xmrh5yf9fcasmghrai3x6ivgdxmrm1w3v9gyaccf"))))
+    (build-system qt-build-system)
+    (arguments
+     (list
+      #:qtbase qtbase ;for Qt 6
+      #:tests? #f)) ;No tests.
+    (inputs (list boost
+                  cgal
+                  csxcad
+                  eigen
+                  expat
+                  freetype
+                  gmp
+                  hdf5
+                  libjpeg-turbo
+                  libpng
+                  libtiff
+                  lz4
+                  openmpi
+                  qcsxcad
+                  tinyxml
+                  vtk))
+    (home-page "https://github.com/thliebig/AppCSXCAD")
+    (synopsis "Minimal GUI application for the @code{qcsxcad} library")
+    (description
+     "A minimal application for the @code{qcsxcad} library which is used to
+    describe geometrical objects and their physical and non-physical properties.")
+    (license license:gpl3)))
+
+(define-public openems
+  (package
+    (name "openems")
+    (version "0.0.36")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/thliebig/openEMS")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vxlknnji7kha0kabpjqh48i4r0rqlla9gcxhn69d0gcw76albmw"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list (string-append "-DCSXCAD_ROOT_DIR="
+                             #$(this-package-input "csxcad"))
+              (string-append "-DFPARSER_ROOT_DIR="
+                             #$(this-package-input "fparser")))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-cmake
+            (lambda _
+              (substitute* "CMakeLists.txt"
+                (("  system\n") "")
+                (("find_package\\(HDF5 1.8 COMPONENTS C HL REQUIRED\\)")
+                 "find_package(HDF5 1.8 REQUIRED)"))))
+          (delete 'check)
+          (add-after 'install 'check
+            (lambda* (#:key tests? source inputs #:allow-other-keys)
+              (when tests?
+                (let* ((testsuite (string-append source "/TESTSUITE"))
+                       (testsuite-tmp "/tmp/openEMS-TESTSUITE"))
+                  ;; Testsuite directory needs to be writable.
+                  (copy-recursively testsuite testsuite-tmp)
+                  (invoke "octave" "--no-gui" "--eval"
+                          (string-append
+                            "addpath('" #$output "/share/openEMS/matlab');"
+                            "addpath('"
+                            (search-input-directory inputs "share/CSXCAD/matlab")
+                            "');"
+                            ;; Work around bug in test script.
+                            "addpath('" testsuite-tmp "/helperscripts');"
+                            "run('" testsuite-tmp "/run_testsuite.m');")))))))))
+    (native-inputs (list cmake-minimal octave pkg-config))
+    (inputs (list boost
+                  csxcad
+                  fparser
+                  hdf5
+                  openmpi
+                  tinyxml
+                  vtk))
+    (home-page "https://www.openems.de")
+    (synopsis "Electromagnetic field solver")
+    (description "@code{OpenEMS} is an electromagnetic field solver using
+the @acronym{FDTD, Finite-Difference Time-Domain} method.")
+    (license license:gpl3+)))
+
+(define-public python-openems
+  (package
+    (inherit openems)
+    (name "python-openems")
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ; No tests.  Check again on package upgrade.
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-sources
+            ;; Check if this is still needed on upgrade.
+            (lambda _
+              (substitute* "python/openEMS/_nf2ff.pxd"
+                (("cimport cython.numeric")
+                 "import cython
+from cython cimport numeric"))))
+          (add-before 'build 'prepare-build
+            (lambda* _
+              (chdir "./python")
+              (setenv "CSXCAD_INSTALL_PATH"
+                      #$(this-package-input "csxcad"))
+              (setenv "OPENEMS_INSTALL_PATH"
+                      #$(this-package-input "openems")))))))
+    (native-inputs (list python-cython python-setuptools))
+    (inputs (list csxcad
+                  fparser
+                  openems
+                  python-csxcad
+                  python-hdf5storage
+                  python-numpy
+                  tinyxml))
+    (home-page "https://www.openems.de")
+    (synopsis "Python API for the electromagnetic field solver @code{OpenEMS}")
+    (description "@code{OpenEMS} is an electromagnetic field solver using
+the @acronym{FDTD, Finite-Difference Time-Domain} method.")
+    (license license:gpl3+)))
 
 (define-public fritzing
   (package
