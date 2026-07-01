@@ -1838,20 +1838,6 @@ MANIFEST contains the \"man-db\" package.  Otherwise, return #f."
 (define* (texlive-font-maps manifest #:optional system)
   "Return a derivation that builds the TeX Live font maps for the entries in
 MANIFEST."
-  (define entry->texlive-input
-    (match-lambda
-      (($ <manifest-entry> name version output thing deps)
-       (if (string-prefix? "texlive-" name)
-           (cons (gexp-input thing output)
-                 (append-map entry->texlive-input deps))
-           (append-map entry->texlive-input deps)))))
-  (define texlive-scripts-entry?
-    (match-lambda
-      (($ <manifest-entry> name version output thing deps)
-       (or (string=? "texlive-scripts" name)
-           (any texlive-scripts-entry? deps)))))
-  (define texlive-inputs
-    (append-map entry->texlive-input (manifest-entries manifest)))
   (define texlive-scripts
     (module-ref (resolve-interface '(gnu packages tex)) 'texlive-scripts))
   (define texlive-libkpathsea
@@ -1874,7 +1860,11 @@ MANIFEST."
           ;; that TeX live can resolve the parent and grandparent directories
           ;; correctly.  There might be a more elegant way to accomplish this.
           (union-build "/tmp/texlive"
-                       '#$texlive-inputs
+                       (filter (lambda (input)
+                                 (or (string-contains input "texlive-")
+                                     (file-exists?
+                                      (string-append input "/share/texmf-dist"))))
+                               '#$(manifest-inputs manifest))
                        #:create-all-directories? #t
                        #:log-port (%make-void-port "w"))
 
@@ -1962,7 +1952,8 @@ MANIFEST."
     ;; `texlive-scripts' brings essential files to generate font maps.
     ;; Therefore, it must be present in the profile.  This check prevents
     ;; incomplete modular TeX Live installations to generate errors.
-    (if (any texlive-scripts-entry? (manifest-entries manifest))
+    (if (any (entry-predicate (manifest-pattern (name "texlive-scripts")))
+             (manifest-transitive-entries manifest))
         (gexp->derivation "texlive-font-maps" build
                           #:system system
                           #:substitutable? #f
