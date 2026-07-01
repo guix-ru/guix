@@ -35061,6 +35061,59 @@ to:
 @code{unserialize} functions of PHP for Python.")
     (license license:bsd-3)))
 
+(define-public python-pycapnp
+  (package
+    (name "python-pycapnp")
+    (version "2.2.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/capnproto/pycapnp")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0vzz1s7zrp27dnsrppshrisbn054w56qbva3shbnwpkdcckw411j"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-force-system-capnp
+            (lambda _
+              (setenv "PIP_CONFIG_SETTINGS" "force-system-libcapnp=True")))
+          (add-after 'install 'copy-missing-schemas
+            (lambda _
+              (let* ((out #$output)
+                     (capnp-clang #$(this-package-input "capnproto-clang"))
+                     (site-pkgs (car (find-files (string-append out "/lib")
+                                                 "^site-packages$"
+                                                 #:directories? #t)))
+                     (target-dir (string-append site-pkgs "/capnp"))
+                     (schema-files (find-files
+                                    (string-append capnp-clang
+                                                   "/include/capnp")
+                                    "\\.capnp$")))
+                (for-each (lambda (file)
+                            (install-file file target-dir)) schema-files))))
+          ;; The 'sanity-check' phase fails with "ModuleNotFoundError: No
+          ;; module named 'schema_capnp'".  This module is generated
+          ;; dynamically via import hooks at runtime
+          (delete 'sanity-check))))
+    (native-inputs (list pkg-config
+                         python-cython
+                         python-jinja2
+                         python-pkgconfig
+                         python-pytest
+                         python-pytest-asyncio
+                         python-setuptools))
+    (inputs (list capnproto-clang))
+    (home-page "https://github.com/capnproto/pycapnp")
+    (synopsis "Cython wrapping of the C++ Cap'n Proto library")
+    (description
+     "This package provides a cython wrapping of the C++ Cap'n Proto library.")
+    (license license:bsd-2)))
+
 (define-public python-pydevtool
   (package
     (name "python-pydevtool")
