@@ -25217,7 +25217,7 @@ Meow’s motions.")
 (define-public emacs-xelb
   (package
     (name "emacs-xelb")
-    (version "0.22")
+    (version "0.23")
     (source
      (origin
        (method git-fetch)
@@ -25227,7 +25227,7 @@ Meow’s motions.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0q6jlz9yb1ijw4pqqw9ksy1pb6qhsvslh47n9i97489qzhvms6nd"))))
+         "12x6z6pp68mr058da9bpacn13g0232s24m1i6lapxj4f8cllbr35"))))
     (build-system emacs-build-system)
     ;; The following functions and variables needed by emacs-xelb are
     ;; not included in emacs-minimal:
