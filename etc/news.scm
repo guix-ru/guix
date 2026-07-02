@@ -44,6 +44,25 @@
 (channel-news
  (version 0)
 
+ (entry (commit "897832f374dcdc9eeaf19d01e70b9a92fccfc68c")
+        (title
+         (en "Several security issues fixed in Guix"))
+        (body
+         (en "Several security issues (four CVE numbers pending) have been
+identified in Guix.  These affect @code{guix substitute} and authentication of
+channels with attacker-controlled names in @command{guix pull} and
+@command{guix time-machine}.  These issues can lead to remote privilege
+escalation, store corruption, and local sensitive information disclosure.
+Details are forthcoming in a security advisory post on the Guix blog, with a
+draft available at @uref{https://codeberg.org/guix/artwork/pulls/58}.  The
+pull request @uref{https://codeberg.org/guix/guix/pulls/9665} has information
+on the commits fixing these issues.
+
+All users should immediately update their system, which will require
+reconfiguring and restarting @command{guix-daemon}.  Please note that due to
+these security issues affecting substitutes, there are additional
+considerations for updating; please see the security advisory.")))
+
  (entry (commit "2949c187f600841cdcddfc4f955506b34b79244f")
         (title
          (en "@command{pull} and @command{time-machine} can select or exclude
