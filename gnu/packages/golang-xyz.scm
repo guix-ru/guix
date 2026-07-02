@@ -10104,6 +10104,41 @@ Implements string conversion functionality for unit prefixes.
 generics.")
     (license license:bsd-3)))
 
+(define-public go-github-com-dsoprea-go-exif-v3
+  (package
+    (name "go-github-com-dsoprea-go-exif-v3")
+    (version "3.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dsoprea/go-exif")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0igqidxj8hd9hpp8f5cihs7zs883216v6drsxk5ymj0ngxgkbd4b"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/dsoprea/go-exif/v3"
+      #:unpack-path "github.com/dsoprea/go-exif"
+      #:test-flags #~(list "-vet=off"
+                           ;; main_test.go:102: Output not as expected:
+                           "-skip" "TestMain")))
+    (propagated-inputs
+     (list go-github-com-dsoprea-go-logging
+           go-github-com-dsoprea-go-utility-v2
+           go-github-com-golang-geo
+           go-github-com-jessevdk-go-flags
+           go-gopkg-in-yaml-v2))
+    (home-page "https://github.com/dsoprea/go-exif")
+    (synopsis "EXIF reader/writer in Go")
+    (description
+     "Package exif parses raw EXIF information given a block of raw EXIF data.
+It can also construct new EXIF information, and provides tools for doing so.
+This package is not involved with the parsing of particular file-formats.")
+    (license license:expat)))
+
 (define-public go-github-com-dsoprea-go-logging
   (package
     (name "go-github-com-dsoprea-go-logging")
