@@ -10191,6 +10191,33 @@ records/datasets.")
      "This package provides and alternative logging implementation for Go.")
     (license license:expat)))
 
+(define-public go-github-com-dsoprea-go-photoshop-info-format
+  (package
+    (name "go-github-com-dsoprea-go-photoshop-info-format")
+    (version "0.0.0-20200610045659-121dd752914d")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dsoprea/go-photoshop-info-format")
+             (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0q10rq015182f5vjrcb4bb4wckjbh70m2a6nfr6mbmcxs5gl0jr0"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/dsoprea/go-photoshop-info-format"))
+    (propagated-inputs (list go-github-com-dsoprea-go-logging))
+    (home-page "https://github.com/dsoprea/go-photoshop-info-format")
+    (synopsis "Minimal Photoshop format implementation in Go")
+    (description
+     "This package provides a minimal Photoshop format implementation to allow
+IPTC data to be extracted from a JPEG image.  This project primarily services
+@url{https://github.com/dsoprea/go-jpeg-image-structure,
+go-jpeg-image-structure}.")
+    (license license:expat)))
+
 (define-public go-github-com-dsoprea-go-utility-v2
   (package
     (name "go-github-com-dsoprea-go-utility-v2")
