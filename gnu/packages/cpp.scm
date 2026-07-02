@@ -1725,7 +1725,7 @@ a cooperatively interruptible thread that is joined upon destruction.")
 (define-public toml11
   (package
     (name "toml11")
-    (version "3.7.1")
+    (version "4.4.0")
     (source
      (origin
        (method git-fetch)
@@ -1734,7 +1734,7 @@ a cooperatively interruptible thread that is joined upon destruction.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "090i2qg88iknldxd6v2mh3jfvkdkwc5m38czhrbm58r3y835fy0y"))))
+        (base32 "0d15b50cf9jgvh3w99xh6crh03bn2dmv9bdyvzq6knsk2diql1dj"))))
     (build-system cmake-build-system)
     (arguments (list #:tests? #f))
     (home-page "https://github.com/ToruNiina/toml11")
