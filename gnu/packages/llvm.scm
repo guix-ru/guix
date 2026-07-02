@@ -1806,7 +1806,7 @@ components which highly leverage existing libraries in the larger LLVM Project."
     (source (llvm-monorepo version))
     (inputs (list llvm-22))))
 
-(define-public lld lld-14)
+(define-public lld lld-22)
 
 (define* (make-lld-wrapper lld #:key lld-as-ld?)
   "Return a LLD wrapper.  When LLD-AS-LD? is true, create a 'ld' symlink that
