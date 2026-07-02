@@ -7608,6 +7608,30 @@ supports middleware, routing groups, and URL parameters.")
 decompose request handling into many smaller layers.")
     (license license:expat)))
 
+(define-public go-github-com-go-chi-cors
+  (package
+    (name "go-github-com-go-chi-cors")
+    (version "1.2.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-chi/cors")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "06mq3ylfki3hfq1zq14xi2xac676w732rdiz1kgzlnmnc8yy1dmq"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-chi/cors"))
+    (home-page "https://github.com/go-chi/cors")
+    (synopsis "CORS @code{net/http} middleware for Go")
+    (description
+     "This package is @code{net/http} handler to handle CORS related requests
+as defined by @url{http://www.w3.org/TR/cors/}.")
+    (license license:expat)))
+
 (define-public go-github-com-go-fed-httpsig
   (package
     (name "go-github-com-go-fed-httpsig")
