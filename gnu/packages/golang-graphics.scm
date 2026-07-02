@@ -42,6 +42,34 @@
 ;;; Libraries:
 ;;;
 
+(define-public go-code-superseriousbusiness-org-go-png-image-structure-v2
+  (package
+    (name "go-code-superseriousbusiness-org-go-png-image-structure-v2")
+    (version "2.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url
+               "https://codeberg.org/superseriousbusiness/go-png-image-structure")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ibqhaqlflp7vj24f4q3g46y00lr8y9xp358ddfgsdg2sic95h2w"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.superseriousbusiness.org/go-png-image-structure/v2"))
+    (propagated-inputs
+     (list go-github-com-dsoprea-go-exif-v3
+           go-github-com-dsoprea-go-utility-v2))
+    (home-page "https://code.superseriousbusiness.org/go-png-image-structure")
+    (synopsis "Read/write PNGs as well as the EXIF in PNGs from Go")
+    (description
+     "This package implements reader and writer for PNG files and EXIF
+metadata in Go.")
+    (license license:expat)))
+
 (define-public go-github-com-diamondburned-gotk4
   (package
     (name "go-github-com-diamondburned-gotk4")
