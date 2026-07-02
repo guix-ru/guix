@@ -4905,7 +4905,7 @@ bindings (PySide, PySide2, PyQt4 and PyQt5).")
 (define-public qscintilla-qt5
   (package
     (name "qscintilla-qt5")
-    (version "2.13.4")
+    (version "2.14.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://www.riverbankcomputing.com/static"
@@ -4913,7 +4913,7 @@ bindings (PySide, PySide2, PyQt4 and PyQt5).")
                                   "/QScintilla_src-" version ".tar.gz"))
               (sha256
                (base32
-                "11lrhybp32nz1dxns4pxxd8rbj2gshva20zan0kg85p164gjc349"))))
+                "0kfx9hxd9a9h7cs3qby0lrbkj8hswxhq1k3clz5xz1cxrim3rqfz"))))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
