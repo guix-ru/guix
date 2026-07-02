@@ -1158,6 +1158,21 @@ in the style of communicating sequential processes (@dfn{CSP}).")
      ;; Go 1.26 and later requires Go 1.24.6+ as the bootstrap toolchain.
      (alist-replace "go" (list go-1.24) (package-native-inputs go-1.25)))))
 
+(define-public go-1.27
+  (package
+    (inherit go-1.26)
+    (name "go-next")
+    (version "1.27rc1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/golang/go")
+              (commit (string-append "go" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "00525w2zvx6s6jkc28cmklz5pwh6r1hj2ppymg9a5vi7qsqn071p"))))))
+
 ;;
 ;; Default Golang version used in guix/build-system/go.scm to build packages.
 ;;
@@ -1204,6 +1219,7 @@ in the style of communicating sequential processes (@dfn{CSP}).")
 (define-public go-std-1.24 (make-go-std go-1.24))
 (define-public go-std-1.25 (make-go-std go-1.25))
 (define-public go-std-1.26 (make-go-std go-1.26))
+(define-public go-std-1.27 (make-go-std go-1.27))
 
 ;;;
 ;;; Avoid adding new packages to the end of this file. To reduce the chances
