@@ -10104,6 +10104,32 @@ Implements string conversion functionality for unit prefixes.
 generics.")
     (license license:bsd-3)))
 
+(define-public go-github-com-dsoprea-go-logging
+  (package
+    (name "go-github-com-dsoprea-go-logging")
+    (version "0.0.0-20200710184922-b02d349568dd")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dsoprea/go-logging")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09lcp7ksljp2i8l05rr56iyaccqasljzll6f8mamw7pf7v70vkm9"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/dsoprea/go-logging"))
+    (propagated-inputs
+     (list go-github-com-go-errors-errors
+           go-golang-org-x-net))
+    (home-page "https://github.com/dsoprea/go-logging")
+    (synopsis "Logging system for Go")
+    (description
+     "This package provides and alternative logging implementation for Go.")
+    (license license:expat)))
+
 (define-public go-github-com-dustin-go-humanize
   (package
     (name "go-github-com-dustin-go-humanize")
