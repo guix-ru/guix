@@ -2814,6 +2814,66 @@ collaborators.")
 and summarizing @code{go test} output.")
     (license license:expat)))
 
+(define-public go-github-com-mgechev-revive
+  (package
+    (name "go-github-com-mgechev-revive")
+    (properties
+     '((release-commit . "815ffde4de8dcb31a2de91efd6c6795d75e24380")
+       (release-date . "2026-03-06T09:57:31.000Z")
+       (builder . "Guix")))
+    (version "1.15.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mgechev/revive")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zirws8wfnswzxqhpv6vjf5sc7i5yssf2zzypvhrsmk4lfn4bhyz"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "tools")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/mgechev/revive"
+      #:build-flags
+      #~(let ((base "github.com/mgechev/revive/"))
+          (list (format #f "-ldflags=-X ~s -X ~s -X ~s -X ~s"
+                        (string-append base "cli.version="
+                                       "v" #$version)
+                        (string-append base "cli.date="
+                                       #$(assoc-ref properties 'release-date))
+                        (string-append base "cli.commit="
+                                       (string-take
+                                        #$(assoc-ref properties 'release-commit) 7))
+                        (string-append base "cli.builtBy="
+                                       #$(assoc-ref properties 'builder)))))
+    #:test-flags
+    #~(list "-skip" "TestGetDevelopmentVersion|TestAll/unexported_return.go")))
+    (native-inputs
+     (list go-github-com-fatih-color
+           go-github-com-fatih-structtag
+           go-github-com-hashicorp-go-version
+           go-github-com-mgechev-dots
+           go-github-com-spf13-afero))
+    (propagated-inputs
+     (list go-codeberg-org-chavacava-garif
+           go-github-com-burntsushi-toml
+           go-golang-org-x-mod
+           go-golang-org-x-sync
+           go-golang-org-x-tools))
+    (home-page "https://revive.run/")
+    (synopsis "Drop-in replacement for @code{golint}")
+    (description
+     "This package provides a drop-in replacement of @command{golint} -
+@command{revive} a lint framework custom rules.")
+    (license license:expat)))
+
 (define-public go-github-com-mndrix-tap-go
   (package
     (name "go-github-com-mndrix-tap-go")
@@ -5528,6 +5588,21 @@ tool."))))
      (package-propagated-inputs go-github-com-ghostiam-protogetter))
     (propagated-inputs '())
     (inputs '())))
+
+(define-public revive
+  (package/inherit go-github-com-mgechev-revive
+    (name "revive")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:tests? _ #f) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:install-source? _ #t) #f)))
+    (native-inputs
+     (append
+      (package-native-inputs go-github-com-mgechev-revive)
+      (package-propagated-inputs go-github-com-mgechev-revive)))
+    (inputs '())
+    (propagated-inputs '())))
 
 (define-public unparam
   (package
