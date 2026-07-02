@@ -4902,9 +4902,9 @@ bindings (PySide, PySide2, PyQt4 and PyQt5).")
 @end itemize")
     (license license:bsd-3)))
 
-(define-public qscintilla
+(define-public qscintilla-qt5
   (package
-    (name "qscintilla")
+    (name "qscintilla-qt5")
     (version "2.13.4")
     (source (origin
               (method url-fetch)
@@ -4943,8 +4943,11 @@ and debugging source code.  These include support for syntax styling, error
 indicators, code completion and call tips.")
     (license license:gpl3+)))
 
+;; 2026-07-17
+(define-deprecated-package qscintilla qscintilla-qt5)
+
 (define-public python-qscintilla
-  (package/inherit qscintilla
+  (package/inherit qscintilla-qt5
     (name "python-qscintilla")
     (build-system pyproject-build-system)
     (arguments
@@ -4955,10 +4958,10 @@ indicators, code completion and call tips.")
                  (lambda _
                    (setenv "CFLAGS" (string-append
                                      "--qsci-include-dir"
-                                     #$(this-package-input "qscintilla")
+                                     #$(this-package-input "qscintilla-qt5")
                                      "/include"
                                      " --qsci-library-dir"
-                                     #$(this-package-input "qscintilla")
+                                     #$(this-package-input "qscintilla-qt5")
                                      "/lib"))))
                (add-after 'unpack 'prepare-build
                  (lambda _
@@ -4976,7 +4979,7 @@ indicators, code completion and call tips.")
     (native-inputs
      (list python-pyqt-builder qtbase-5))
     (inputs
-     (list python-pyqt python-sip qscintilla))
+     (list python-pyqt python-sip qscintilla-qt5))
     (description "QScintilla is a port to Qt of Neil Hodgson's Scintilla C++
 editor control.  QScintilla includes features especially useful when editing
 and debugging source code.  These include support for syntax styling, error

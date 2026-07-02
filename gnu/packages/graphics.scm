@@ -476,7 +476,7 @@ objects!")
            libunwind
            libwebp
            python
-           qscintilla
+           qscintilla-qt5
            qtbase-5
            qtdeclarative-5
            qtmultimedia-5

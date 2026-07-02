@@ -3140,7 +3140,7 @@ ontinuous-time and discret-time expressions.")
                     python
                     python-numpy
                     python-pillow
-                    qscintilla
+                    qscintilla-qt5
                     qtbase-5
                     qtgamepad-5
                     qtmultimedia-5

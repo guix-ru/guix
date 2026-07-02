@@ -6213,7 +6213,7 @@ storage that supports JSON and array introspection.")
     (arguments
      (list #:configure-flags
            #~(list (string-append "-DQSCINTILLA_INCLUDE_DIR="
-                                  #$(this-package-input "qscintilla")
+                                  #$(this-package-input "qscintilla-qt5")
                                   "/include/Qsci")
                    "-DFORCE_INTERNAL_QCUSTOMPLOT=OFF"
                    "-DFORCE_INTERNAL_QHEXEDIT=OFF"
@@ -6221,7 +6221,7 @@ storage that supports JSON and array introspection.")
     (inputs
      (list qcustomplot-qt5
            qhexedit
-           qscintilla
+           qscintilla-qt5
            qtbase-5
            qtwayland-5
            sqlite))

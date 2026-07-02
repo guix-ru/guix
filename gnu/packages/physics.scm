@@ -1981,7 +1981,7 @@ import matplotlib.pyplot as plt"))
            python-qtpy
            python-pyqt5-sip
            python-pyqtwebengine
-           qscintilla
+           qscintilla-qt5
            qtbase-5
            qtsvg-5
            qttools-5

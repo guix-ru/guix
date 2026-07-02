@@ -4019,7 +4019,7 @@ SET\\(PYQT5_SIP_DIR \"\\$\\{Python_SITEARCH\\}/PyQt5/bindings\"\\)")
            python-six
            python-urllib3
            qca
-           qscintilla
+           qscintilla-qt5
            qt3d-5
            qtbase-5
            qtdeclarative-5

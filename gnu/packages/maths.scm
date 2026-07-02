@@ -3624,7 +3624,7 @@ script files.")
   (package (inherit octave-cli)
     (name "octave")
     (inputs
-     `(("qscintilla" ,qscintilla)
+     `(("qscintilla-qt5" ,qscintilla-qt5)
        ("qt" ,qtbase-5)
        ("qtwayland" ,qtwayland-5)
        ,@(package-inputs octave-cli)))
