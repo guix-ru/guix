@@ -10139,6 +10139,32 @@ It can also construct new EXIF information, and provides tools for doing so.
 This package is not involved with the parsing of particular file-formats.")
     (license license:expat)))
 
+(define-public go-github-com-dsoprea-go-iptc
+  (package
+    (name "go-github-com-dsoprea-go-iptc")
+    (version "0.0.0-20200610044640-bc9ca208b413")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dsoprea/go-iptc")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1956cd64wqg5vd3g4v1q1w3007f373nlqpwb5h7zapm2bp32ra70"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/dsoprea/go-iptc"))
+    (propagated-inputs
+     (list go-github-com-dsoprea-go-logging))
+    (home-page "https://github.com/dsoprea/go-iptc")
+    (synopsis "Parse IPTC metadata with Go")
+    (description
+     "This package provides a functionality to parse a series of IPTC
+records/datasets.")
+    (license license:expat)))
+
 (define-public go-github-com-dsoprea-go-logging
   (package
     (name "go-github-com-dsoprea-go-logging")
