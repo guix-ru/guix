@@ -310,6 +310,37 @@ and GCC’s decimal extension.")
 1-dimensional intervals, such as time ranges.")
     (license license:asl2.0)))
 
+(define-public go-github-com-google-go-units
+  (package
+    (name "go-github-com-google-go-units")
+    (version "0.0.0-20260624172601-62e5ee3ae5ce")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/google/go-units")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ia46mhvc7r1rd1i4hpn08hahqjgvqh0fzs8wrxnhhrfvr75plp4"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/google/go-units"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (home-page "https://github.com/google/go-units")
+    (synopsis "Go library for physical unit conversions")
+    (description
+     "This Go library represents physical units like length, area, speed, and
+temperature as typed floating point numbers.  Methods to convert between
+metric and @url{https://en.wikipedia.org/wiki/United_States_customary_units,
+US customary units} of measurement are provided on each type.  Additional
+units can be created by multiplying by const values and variables can be
+converted by casting.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-johncgriffin-overflow
   (package
     (name "go-github-com-johncgriffin-overflow")
