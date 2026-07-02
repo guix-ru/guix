@@ -15301,6 +15301,35 @@ verifying supply chain layout metadata, ensuring that each step in the
 software production process is performed by authorized parties.")
     (license license:asl2.0)))
 
+(define-public go-github-com-inbucket-html2text
+  (package
+    (name "go-github-com-inbucket-html2text")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/inbucket/html2text")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0da3xxzdvgwn04nm3cs0ad85ia8chx470npagyhl58d46iyk8w91"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/inbucket/html2text"))
+    (propagated-inputs
+     (list go-github-com-olekukonko-tablewriter
+           go-github-com-ssor-bom
+           go-golang-org-x-net))
+    (home-page "https://github.com/inbucket/html2text")
+    (synopsis "Convert HTML emails to text")
+    (description
+     "Converts HTML into text of the markdown-flavored variety. This is a
+permanent fork of the original @url{https://github.com/jaytaylor/html2text}
+package.")
+    (license license:expat)))
+
 (define-public go-github-com-influxdata-cron
   (package
     (name "go-github-com-influxdata-cron")
