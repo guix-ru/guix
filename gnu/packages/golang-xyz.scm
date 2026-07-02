@@ -10130,6 +10130,35 @@ generics.")
      "This package provides and alternative logging implementation for Go.")
     (license license:expat)))
 
+(define-public go-github-com-dsoprea-go-utility-v2
+  (package
+    (name "go-github-com-dsoprea-go-utility-v2")
+    (version "2.0.0-20221003172846-a3e1774ef349")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dsoprea/go-utility")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ji6dz8w1fr9cxbvhymwma3i7z0y2pwl88pd25yvdwndrvm5ky0c"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      ;; Cycles with go-github-com-dsoprea-go-exif-v3. 
+      #:skip-build? #t
+      #:tests? #f
+      #:import-path "github.com/dsoprea/go-utility/v2"
+      #:unpack-path "github.com/dsoprea/go-utility"))
+    (propagated-inputs
+     (list go-github-com-dsoprea-go-logging
+           go-github-com-golang-geo))
+    (home-page "https://github.com/dsoprea/go-utility")
+    (synopsis "Reusable tools for Go")
+    (description "This package provides misc utilities for Golang.")
+    (license license:expat)))
+
 (define-public go-github-com-dustin-go-humanize
   (package
     (name "go-github-com-dustin-go-humanize")
