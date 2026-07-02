@@ -38718,14 +38718,14 @@ Debug server.")
 (define-public emacs-forth-mode
   (package
     (name "emacs-forth-mode")
-    (version "0.2")
+    (version "0.3")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://elpa.nongnu.org/nongnu/forth-mode-"
                                   version ".tar"))
               (sha256
                (base32
-                "04xcvjzvl4pgx48l2pzil7s2iqqbf86z57wv76ahp4sd1xigpfqc"))))
+                "1xhx5dcna0r6b9l9svqlvhqrhnd4678ifzbn5mzf34y09kq7djl2"))))
     (build-system emacs-build-system)
     (arguments
      (list #:tests? #f)) ; There is no test suite in this release.
