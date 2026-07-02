@@ -3000,7 +3000,7 @@ from R7RS, which allows most R7RS code to run on R6RS implementations.")
 (define-public asdf-vm
   (package
     (name "asdf-vm")
-    (version "0.18.0")
+    (version "0.19.0")
     (source
      (origin
        (method git-fetch)
@@ -3009,7 +3009,7 @@ from R7RS, which allows most R7RS code to run on R6RS implementations.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09p4d41l3f0dzm4bdvb45lxzsvlh3b99rgbdv8rk6jj84hr7w5q4"))))
+        (base32 "0h8rrn5q13wriynh2visxkral2svd8vfflk6s8hyc20ss2pwshar"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -3032,8 +3032,9 @@ from R7RS, which allows most R7RS code to run on R6RS implementations.")
               "../../internal/toolversions")))
     (native-inputs
      (list go-github-com-go-git-go-git-v5
+           go-github-com-mgechev-revive
            go-github-com-otiai10-copy
-           go-github-com-rogpeppe-go-internal
+           go-github-com-rogpeppe-go-internal-1.14
            go-github-com-stretchr-testify
            go-github-com-urfave-cli-v3
            go-golang-org-x-sys
