@@ -1250,7 +1250,7 @@ communicating with LLM agents.")
 (define-public emacs-agent-shell
   (package
     (name "emacs-agent-shell")
-    (version "0.56.1")
+    (version "0.57.1")
     (source
      (origin
        (method git-fetch)
@@ -1259,7 +1259,7 @@ communicating with LLM agents.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15pw3hsz8abxgbzmg0r7nycmzx4fxx771alw4cyzx0zr0hfk7r53"))))
+        (base32 "0hmr8537zwkff5acdwx56qys3cp9xpj5b5kr0rhv2kgwz3idw2rq"))))
     (build-system emacs-build-system)
     (arguments
      (list
@@ -1288,7 +1288,10 @@ communicating with LLM agents.")
                 (((string-append
                    "\\(ert-deftest agent-shell-viewport-"
                    "initialize-rerenders-header-position-test .*") all)
-                 (string-append all "(skip-unless nil)\n"))))))))
+                 (string-append all "(skip-unless nil)\n")))))
+          (add-before 'check 'set-home
+            (lambda _
+              (setenv "HOME" (getenv "TMPDIR")))))))
     (native-inputs (list git-minimal/pinned))
     (propagated-inputs (list emacs-shell-maker emacs-acp))
     (home-page "https://github.com/xenodium/agent-shell")
