@@ -4902,9 +4902,9 @@ bindings (PySide, PySide2, PyQt4 and PyQt5).")
 @end itemize")
     (license license:bsd-3)))
 
-(define-public qscintilla-qt5
+(define-public qscintilla-qt6
   (package
-    (name "qscintilla-qt5")
+    (name "qscintilla-qt6")
     (version "2.14.1")
     (source (origin
               (method url-fetch)
@@ -4934,7 +4934,7 @@ bindings (PySide, PySide2, PyQt4 and PyQt5).")
                  (("\\$\\$\\[QT_HOST_DATA\\]")
                  (string-append out "/lib/qt$${QT_MAJOR_VERSION}")))
                (invoke "qmake")))))))
-    (native-inputs (list qtbase-5))
+    (native-inputs (list qtbase))
     (home-page "https://www.riverbankcomputing.co.uk/software/qscintilla/intro")
     (synopsis "Qt port of the Scintilla C++ editor control")
     (description "QScintilla is a port to Qt of Neil Hodgson's Scintilla C++
@@ -4942,6 +4942,12 @@ editor control.  QScintilla includes features especially useful when editing
 and debugging source code.  These include support for syntax styling, error
 indicators, code completion and call tips.")
     (license license:gpl3+)))
+
+(define-public qscintilla-qt5
+  (package
+    (inherit qscintilla-qt6)
+    (name "qscintilla-qt5")
+    (native-inputs (list qtbase-5))))
 
 ;; 2026-07-17
 (define-deprecated-package qscintilla qscintilla-qt5)
