@@ -1090,6 +1090,44 @@ a low-level API for the majority of PKWARE's and Info-ZIP's extra fields.")
 such extracting RPM header and CPIO content.")
     (license license:asl2.0)))
 
+(define-public go-github-com-savetherbtz-zstd-seekable-format-go-pkg
+  (package
+    (name "go-github-com-savetherbtz-zstd-seekable-format-go-pkg")
+    (version "0.10.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/SaveTheRbtz/zstd-seekable-format-go")
+              (commit (go-version->git-ref version #:subdir "pkg"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "01xdwqk9281jk4jz7kqr2crqb2nmrlmv8wz2n155433gd1gb4g3f"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/SaveTheRbtz/zstd-seekable-format-go/pkg"
+      #:unpack-path "github.com/SaveTheRbtz/zstd-seekable-format-go"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-cespare-xxhash-v2
+           go-github-com-klauspost-compress
+           go-golang-org-x-sync))
+    (home-page "https://github.com/SaveTheRbtz/zstd-seekable-format-go")
+    (synopsis "Writes and reads streams using the Zstandard seekable format")
+    (description
+     "A seekable stream is a valid Zstandard stream made from one or more
+compressed frames followed by a final skippable frame containing a seek table.
+Standard Zstandard decoders can read the stream from the beginning, while
+Reader uses the seek table to serve @code{Read}, @code{ReadAt}, and
+@code{Seek} calls by uncompressed byte offset and exposes the parsed metadata
+through @code{Reader.SeekTable}.
+
+The package accepts small encoder and decoder interfaces and is tested with
+@url{github.com/klauspost/compress/zstd}.")
+    (license license:expat)))
+
 (define-public go-github-com-sorairolake-lzip-go
   (package
     (name "go-github-com-sorairolake-lzip-go")
