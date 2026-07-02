@@ -285,6 +285,36 @@ and GCC’s decimal extension.")
          (package-arguments go-github-com-cockroachdb-apd)
        ((#:import-path _) "github.com/cockroachdb/apd/v3")))))
 
+(define-public go-github-com-golang-geo
+  (package
+    (name "go-github-com-golang-geo")
+    (version "0.0.0-20260625163123-7c0e84413537")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/golang/geo")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1v1da21wzkj148kvn2vwa4lrnsafha97j20nlav8nbp2azrhjrh0"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/golang/geo"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (propagated-inputs
+     (list go-github-com-google-go-units))
+    (home-page "https://github.com/golang/geo")
+    (synopsis "S2 geometry library in Go")
+    (description
+     "S2 is a library for spherical geometry that aims to have the same
+robustness,flexibility, and performance as the best planar geometry
+libraries.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-google-go-intervals
   (package
     (name "go-github-com-google-go-intervals")
