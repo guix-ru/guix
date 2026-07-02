@@ -451,13 +451,19 @@ argument and returning an alist."
             (package->manifest-entry package
                                      #:properties (properties package)))
            ((thing output)
-            (if inferiors-loaded?
-                ((inferior->entry) thing output)
+            (or (and inferiors-loaded?
+                     (catch 'wrong-type-arg
+                       (lambda ()
+                         ((inferior->entry) thing output))
+                       (const #f)))
                 (throw 'wrong-type-arg 'packages->manifest
                        "Wrong package object: ~S" (list thing) (list thing))))
            (thing
-            (if inferiors-loaded?
-                ((inferior->entry) thing)
+            (or (and inferiors-loaded?
+                     (catch 'wrong-type-arg
+                       (lambda ()
+                         ((inferior->entry) thing))
+                       (const #f)))
                 (throw 'wrong-type-arg 'packages->manifest
                        "Wrong package object: ~S" (list thing) (list thing)))))
          packages)
