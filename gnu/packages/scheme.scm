@@ -1382,7 +1382,7 @@ application.")
 (define-public loko-scheme
   (package
     (name "loko-scheme")
-    (version "0.12.2")
+    (version "0.13.0")
     (source
      (origin
        (method git-fetch)
@@ -1390,7 +1390,7 @@ application.")
              (url "https://gitlab.com/weinholt/loko")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "05fl1y024rsixaw991zavaq370nazndqrxr05lcmw8293dvrhhfa"))
+        (base32 "1hmjmsli2y8wk1whcmk5xylylfrzz33hnzkwbxqwm7mslmd9dagj"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
@@ -1425,8 +1425,7 @@ application.")
                 (("/bin/sh") (which "sh")))
               (substitute* "scheme-wrapper"
                 (("which ")
-                 "command -v "))
-              #t)))))
+                 "command -v ")))))))
     (native-inputs
      (list akku
            chez-scheme
