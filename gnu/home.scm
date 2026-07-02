@@ -40,6 +40,7 @@
             home-environment-packages
             home-environment-user-services
             home-environment-essential-services
+            home-environment-default-essential-services
             home-environment-services
             home-environment-location
 
