@@ -42,6 +42,38 @@
 ;;; Libraries:
 ;;;
 
+(define-public go-code-superseriousbusiness-org-exif-terminator
+  (package
+    (name "go-code-superseriousbusiness-org-exif-terminator")
+    (version "0.11.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/superseriousbusiness/exif-terminator")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1hq27gchyalz9j39z15xw9yianxwzdrwphv5cvcnr55n0fcgqbb6"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.superseriousbusiness.org/exif-terminator"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-code-superseriousbusiness-org-go-jpeg-image-structure-v2
+           go-code-superseriousbusiness-org-go-png-image-structure-v2
+           go-github-com-dsoprea-go-exif-v3
+           go-github-com-dsoprea-go-logging
+           go-golang-org-x-image))
+    (home-page "https://code.superseriousbusiness.org/exif-terminator")
+    (synopsis "Terminate EXIF data from images")
+    (description
+     "@code{exif-terminator} removes exif data from images (JPEG and PNG
+currently supported) in a streaming manner.")
+    (license license:agpl3)))
+
 (define-public go-code-superseriousbusiness-org-go-jpeg-image-structure-v2
   (package
     (name "go-code-superseriousbusiness-org-go-jpeg-image-structure-v2")
