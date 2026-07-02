@@ -20290,6 +20290,35 @@ principles from high-performance libraries in other languages (such as
 @url{https://www.freedesktop.org/software/systemd/man/sd_notify.html}.")
     (license license:expat)))
 
+(define-public go-github-com-mgechev-dots
+  (package
+    (name "go-github-com-mgechev-dots")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mgechev/dots")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "10ic3x36r136q3qi9x93vslz7mvjpdvnl45n910pamjdrpi10c16"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/mgechev/dots"
+      #:test-flags
+      ;; Matched different number of files.
+      #~(list "-skip" "TestPackageWildcard|TestResolvePackages")))
+    (home-page "https://github.com/mgechev/dots")
+    (synopsis "Wildcard file matching in Go")
+    (description
+     "@code{dots} is a Go package that provides advanced wildcard file and
+package matching, similar to the behavior used by tools like @code{go test}
+and @code{golint}.  It helps to easily resolve file paths and packages using
+patterns with @code{...} wildcards, and supports flexible exclusion rules.")
+    (license license:expat)))
+
 (define-public go-github-com-mgutz-ansi
   (package
     (name "go-github-com-mgutz-ansi")
