@@ -475,6 +475,30 @@ time dependencies in tests.")
 @url{https://github.com/syndtr/goleveldb, go-leveldb}.")
     (license license:expat)))
 
+(define-public go-code-forgejo-org-go-chi-captcha
+  (package
+    (name "go-code-forgejo-org-go-chi-captcha")
+    (version "1.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://code.forgejo.org/go-chi/captcha.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0grjx943kv8xs5dds6xf1gzachypbhpxxbvgpfj4lkxav8yqrds4"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.forgejo.org/go-chi/captcha"))
+    (home-page "https://code.forgejo.org/go-chi/captcha")
+    (synopsis "Generation and verification of image CAPTCHAs in Go")
+    (description
+     "Package captcha implements generation and verification of image and
+audio CAPTCHAs.  This is a fork of @url{https://github.com/dchest/captcha}.")
+    (license license:expat)))
+
 (define-public go-code-rocketnine-space-tslocum-cbind
   (package
     (name "go-code-rocketnine-space-tslocum-cbind")
