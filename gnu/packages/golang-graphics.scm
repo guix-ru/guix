@@ -42,6 +42,41 @@
 ;;; Libraries:
 ;;;
 
+(define-public go-code-superseriousbusiness-org-go-jpeg-image-structure-v2
+  (package
+    (name "go-code-superseriousbusiness-org-go-jpeg-image-structure-v2")
+    (version "2.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url
+               "https://codeberg.org/superseriousbusiness/go-jpeg-image-structure")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "03g9qbd7z6vrm8y1159xmz8h3fwr79k33j7ipwqpvxhm7sfbfrin"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.superseriousbusiness.org/go-jpeg-image-structure/v2"
+      #:test-flags
+      ;; XMP data is not correct.
+      #~(list "-skip" "TestSegmentList_FindXmp|TestSegment_FormattedXmp")))
+    (propagated-inputs
+     (list go-github-com-dsoprea-go-exif-v3
+           go-github-com-dsoprea-go-iptc
+           go-github-com-dsoprea-go-logging
+           go-github-com-dsoprea-go-photoshop-info-format
+           go-github-com-dsoprea-go-utility-v2
+           go-github-com-go-xmlfmt-xmlfmt))
+    (home-page "https://code.superseriousbusiness.org/go-jpeg-image-structure")
+    (synopsis "Parse JPEG data into segments for Go")
+    (description
+     "This packages provides functions to parse raw JPEG data into individual
+segments of data.")
+    (license license:expat)))
+
 (define-public go-code-superseriousbusiness-org-go-png-image-structure-v2
   (package
     (name "go-code-superseriousbusiness-org-go-png-image-structure-v2")
