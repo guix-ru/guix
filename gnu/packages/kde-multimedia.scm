@@ -363,13 +363,13 @@ This package is part of the KDE multimedia module.")
 (define-public haruna
   (package
     (name "haruna")
-    (version "1.7.1")
+    (version "1.8.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://kde/stable/haruna/" version
                                   "/haruna-" version ".tar.xz"))
               (sha256
-               (base32 "1qh64h223h4wnzr8k2qw51703lw289vklskkpmd5zmmra5qp36mj"))))
+               (base32 "0jsbzi4ni3aypsb2faj0n85y0qikhrzh3hwrd1hdm4hj2vim9w81"))))
     (build-system qt-build-system)
     (arguments
      (list #:qtbase qtbase
@@ -399,11 +399,13 @@ This package is part of the KDE multimedia module.")
            kiconthemes
            kio
            kirigami
+           kitemmodels
            kwindowsystem
            mpvqt
            qqc2-desktop-style
            sonnet
            qt5compat
+           qtshadertools
            qtwayland
            yt-dlp))
     (home-page "https://haruna.kde.org/")
