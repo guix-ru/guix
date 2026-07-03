@@ -1747,7 +1747,8 @@ an embedded event driven algorithm.")
           (add-after 'unpack 'relax-requirements
             (lambda _
               (substitute* "pyproject.toml"
-                (("click>=8,<8.3") "click>=8"))))
+                (("click>=8,<8.3") "click>=8")
+                (("rich>=12,<15") "rich"))))
           (add-after 'compress-documentation 'wrap-program
             (lambda _
               (wrap-program (string-append #$output "/bin/librelane")
@@ -1787,7 +1788,6 @@ an embedded event driven algorithm.")
            python-klayout
            python-lln-libparse
            python-lxml
-           python-pcpp
            python-psutil
            python-pyyaml
            python-rapidfuzz
