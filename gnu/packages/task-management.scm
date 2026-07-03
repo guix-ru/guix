@@ -282,9 +282,13 @@ repository.")
                                        #:icon (string-append #$output
                                                "/share/pixmaps/gtimelog-large.png")
                                        #:categories "Utility"))))))
-    (inputs (list bash-minimal gtk+ libsecret libsoup python-pygobject))
-    (native-inputs (list gobject-introspection python-freezegun
-                         python-setuptools))
+    (inputs (list bash-minimal
+                  gobject-introspection
+                  gtk+
+                  libsecret
+                  libsoup
+                  python-pygobject))
+    (native-inputs (list python-freezegun python-setuptools))
     (home-page "https://gtimelog.org/")
     (synopsis "Gtk+ time tracking application")
     (description
