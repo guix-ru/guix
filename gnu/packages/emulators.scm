@@ -4008,6 +4008,14 @@ target_link_libraries\\(PCSX2_FLAGS INTERFACE vulkan-headers\\)") ""))
           (replace 'check
             (lambda* (#:key tests? #:allow-other-keys)
               (when tests? (invoke "ninja" "unittests"))))
+          (add-after 'unpack 'install-desktop
+            (lambda _
+              (let ((desktop
+                     ".github/workflows/scripts/linux/pcsx2-qt.desktop"))
+                (substitute* desktop
+                  (("pcsx2-qt") (string-append #$output "/bin/pcsx2-qt")))
+                (install-file
+                 desktop (string-append #$output "/share/applications")))))
           (add-after 'install 'install-patches
             (lambda _
               (symlink
