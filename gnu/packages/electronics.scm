@@ -658,7 +658,7 @@ individual low-level driver modules.")
             (assoc-ref py:%standard-phases 'wrap)))))
     (native-inputs
      ;; Same clang version as in yosys.
-     (list clang-21 python-minimal-wrapper python-sphinx texinfo yosys))
+     (list clang python-minimal-wrapper python-sphinx texinfo yosys))
     (inputs
      (list python-click python-json5 readline))
     (home-page "https://yosyshq.readthedocs.io/projects/eqy/en/latest/")
