@@ -5512,7 +5512,7 @@ parallel computing platforms.  It also supports serial execution.")
                 #$output:doc "/share/info/yosyshqyosys-figures")))))))
     (native-inputs
      (list bison
-           clang-21
+           clang
            cmake-minimal
            cxxopts ;header-only library
            flex
