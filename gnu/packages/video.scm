@@ -2816,6 +2816,35 @@ NuppelVideo, FLI, YUV4MPEG, FILM, RoQ, PVA files.  One can watch VideoCD,
 SVCD, DVD, 3ivx, DivX 3/4/5, WMV and H.264 movies.")
     (license license:gpl2)))
 
+(define-public mpc-qt
+  (package
+    (name "mpc-qt")
+    (version "26.01")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mpc-qt/mpc-qt")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1h94yk3xf1cz9n8cx5qkczhpzya29hwnqn9d1dvmlli578zrs05n"))))
+    (build-system qt-build-system)
+    (arguments (list #:qtbase qtbase
+                     #:tests? #f)) ; No tests.
+    (native-inputs (list pkgconf qttools))
+    (inputs (list mpv qtsvg))
+    (home-page "https://mpc-qt.github.io/")
+    (synopsis
+     "Qt reproduction of @acronym{MPC-HC, Media Player Classic Home Cinema}")
+    (description
+     "@acronym{MPC-QT, Media Player Classic Qute Theater} is a
+re-implementation of @acronym{MPC-HC, Media Player Classic Home Cinema} using
+Qt and libmpv.  Features include multiple playlist tracking, an editable
+queue, playlist searching, refined screenshots, a custom metadata display, and
+in-program custom styling.")
+    (license license:gpl2+)))
+
 (define-public mpv
   (package
     (name "mpv")
