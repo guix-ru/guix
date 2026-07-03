@@ -31,6 +31,12 @@
 
 ;; Test the (guix git) tools.
 
+(define (git . args)
+  (let* ((pipe (apply open-pipe* OPEN_READ (git-command) args))
+         (str  (string-trim-right (get-string-all pipe))))
+    (close-pipe pipe)
+    str))
+
 (test-begin "git")
 
 (test-assert "commit-difference, linear history"
@@ -248,41 +254,27 @@
            (commit "Second commit")
            (tag "v1.1" "release-1.1")
            (checkout "master"))
-       (let* ((tag   (let* ((pipe (open-pipe* OPEN_READ (git-command)
-                                              "-C" directory
-                                              "rev-parse" "v1.1^{}"))
-                            (str  (get-string-all pipe)))
-                       (close-pipe pipe)
-                       (string-trim-right str)))
+       (let* ((tag    (git "-C" directory
+                           "rev-parse" "v1.1^{}"))
               (cached-directory commit relation
                                 (update-cached-checkout directory
                                                         #:ref '(tag . "v1.1")
                                                         #:cache-directory cache))
-              (head   (let* ((pipe (open-pipe* OPEN_READ (git-command)
-                                               "-C" cached-directory
-                                               "rev-parse" "HEAD"))
-                             (str  (get-string-all pipe)))
-                        (close-pipe pipe)
-                        (string-trim-right str))))
+              (head   (git "-C" cached-directory
+                           "rev-parse" "HEAD")))
          (and (string=? commit head)
               (string=? tag    head)))))))
 
 (test-assert "update-cached-checkout, recursive submodules follow ref"
   (call-with-temporary-directory
    (lambda (cache)
-     (define (git-output . args)
-       (let* ((pipe (apply open-pipe* OPEN_READ (git-command) args))
-              (str  (string-trim-right (get-string-all pipe))))
-         (close-pipe pipe)
-         str))
-
      (with-temporary-git-repository sub
          '((add "file.txt" "v1\n")
            (commit "submodule v1")
            (add "file.txt" "v2\n")
            (commit "submodule v2"))
-       (let ((sub-v1 (git-output "-C" sub "rev-parse" "HEAD~1"))
-             (sub-v2 (git-output "-C" sub "rev-parse" "HEAD")))
+       (let ((sub-v1 (git "-C" sub "rev-parse" "HEAD~1"))
+             (sub-v2 (git "-C" sub "rev-parse" "HEAD")))
          (with-temporary-git-repository main
              `((add "root.txt" "root\n")
                (commit "root")
@@ -300,17 +292,15 @@
                              (update-cached-checkout main
                                                      #:recursive? #t
                                                      #:cache-directory cache))
-                  (head-cached1 (git-output "-C"
-                                            (in-vicinity checkout1 "modules/sub")
-                                            "rev-parse" "HEAD"))
+                  (head-cached1  (git "-C" (in-vicinity checkout1 "modules/sub")
+                                      "rev-parse" "HEAD"))
                   (checkout2 commit2 relation2
                              (update-cached-checkout main
                                                      #:recursive? #t
                                                      #:ref '(branch . "release")
                                                      #:cache-directory cache))
-                  (head-cached2 (git-output "-C"
-                                            (in-vicinity checkout2 "modules/sub")
-                                            "rev-parse" "HEAD")))
+                  (head-cached2  (git "-C" (in-vicinity checkout2 "modules/sub")
+                                      "rev-parse" "HEAD")))
              (and
               (string=? sub-v1 head-cached1)
               (string=? sub-v2 head-cached2)))))))))
@@ -348,28 +338,20 @@
            (commit "Second commit")
            (tag "v1.1" "release-1.1")
            (checkout "master"))
-       (let* ((tag-directory   (let* ((pipe (open-pipe* OPEN_READ (git-command)
-                                                        "-C" directory
-                                                        "rev-parse" "v1.1"))
-                                      (str  (get-string-all pipe)))
-                                 (close-pipe pipe)
-                                 (string-trim-right str)))
+       (let* ((tag-directory  (git "-C" directory
+                                   "rev-parse" "v1.1"))
               (cached-directory commit relation
                                 (update-cached-checkout directory
                                                         #:ref '(symref . "refs/tags/v1.1")
                                                         #:cache-directory cache))
-              (head-cached   (let* ((pipe (open-pipe* OPEN_READ (git-command)
-                                                      "-C" cached-directory
-                                                      ;; switch-to-ref doesn't dereference the Git object,
-                                                      ;; thus it points to a Git tag object.
-                                                      ;; And HEAD points to a Git commit object.
-                                                      ;; Hence, the check is against Git tag objects.
-                                                      ;; For the difference see:
-                                                      ;;   git show-ref --dereference v1.1
-                                                      "rev-parse" "v1.1"))
-                                    (str  (get-string-all pipe)))
-                               (close-pipe pipe)
-                               (string-trim-right str))))
+              (head-cached    (git "-C" cached-directory
+                                   ;; switch-to-ref doesn't dereference the Git object,
+                                   ;; thus it points to a Git tag object.
+                                   ;; And HEAD points to a Git commit object.
+                                   ;; Hence, the check is against Git tag objects.
+                                   ;; For the difference see:
+                                   ;;   git show-ref --dereference v1.1
+                                   "rev-parse" "v1.1")))
          (and (string=? commit        head-cached)
               (string=? tag-directory head-cached)))))))
 
@@ -387,22 +369,14 @@
            (tag "v1.1" "release-1.1")
            (symbolic-ref "refs/pull/1/head" "refs/heads/develop")
            (checkout "master"))
-       (let* ((head-directory   (let* ((pipe (open-pipe* OPEN_READ (git-command)
-                                                         "-C" directory
-                                                         "rev-parse" "refs/pull/1/head"))
-                                       (str  (get-string-all pipe)))
-                                  (close-pipe pipe)
-                                  (string-trim-right str)))
+       (let* ((head-directory   (git "-C" directory
+                                    "rev-parse" "refs/pull/1/head"))
               (cached-directory commit relation
                                 (update-cached-checkout directory
                                                         #:ref '(symref . "refs/pull/1/head")
                                                         #:cache-directory cache))
-              (head-cached   (let* ((pipe (open-pipe* OPEN_READ (git-command)
-                                                      "-C" cached-directory
-                                                      "rev-parse" "HEAD"))
-                                    (str  (get-string-all pipe)))
-                               (close-pipe pipe)
-                               (string-trim-right str))))
+              (head-cached      (git "-C" cached-directory
+                                     "rev-parse" "HEAD")))
          (and (string=? commit      head-directory)
               (string=? head-cached head-directory)))))))
 
