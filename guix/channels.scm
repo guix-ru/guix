@@ -370,21 +370,22 @@ cache."
     (unless (or (string-null? name)
                 (string-contains name "/")
                 (not (file-exists? cache-dir)))
-      (define cache
-        (string-append cache-dir "/authentication/"))
+      (let ()                           ;for guile 3.0.9 compatibility
+        (define cache
+          (string-append cache-dir "/authentication/"))
 
-      (define old-cache-key
-        (string-append "channels/" name))
+        (define old-cache-key
+          (string-append "channels/" name))
 
-      (define new-cache-key
-        (channel-introduction-first-signed-commit
-         (channel-introduction channel)))
+        (define new-cache-key
+          (channel-introduction-first-signed-commit
+           (channel-introduction channel)))
 
-      (catch 'system-error
-        (lambda ()
-          (link (string-append cache old-cache-key)
-                (string-append cache new-cache-key)))
-        (const #f)))))
+        (catch 'system-error
+          (lambda ()
+            (link (string-append cache old-cache-key)
+                  (string-append cache new-cache-key)))
+          (const #f))))))
 
 (define* (authenticate-channel channel checkout commit
                                #:key (keyring-reference-prefix "origin/"))
