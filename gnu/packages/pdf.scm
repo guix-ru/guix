@@ -1403,11 +1403,17 @@ using a stylus.")
             (assoc-ref glib-or-gtk:%standard-phases
                        'generate-gdk-pixbuf-loaders-cache-file))
           (add-after 'glib-or-gtk-wrap 'wrap-gdk-pixbuf
-            ;; This phase is necessary for xournalpp to load SVG icons.
-            (lambda _
-              (let ((pixbuf-module-file (getenv "GDK_PIXBUF_MODULE_FILE")))
+            ;; This phase is necessary for xournalpp to load SVG icons and
+            ;; access gtksourceview-4/styles.
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let ((pixbuf-module-file (getenv "GDK_PIXBUF_MODULE_FILE"))
+                    (gtksourceview-4-resources
+                     (dirname
+                      (search-input-directory inputs "share/gtksourceview-4"))))
                 (wrap-program (string-append #$output "/bin/xournalpp")
-                  `("GDK_PIXBUF_MODULE_FILE" = (,pixbuf-module-file)))))))))
+                  `("GDK_PIXBUF_MODULE_FILE" = (,pixbuf-module-file))
+                  `("XDG_DATA_DIRS" ":" prefix
+                    (,gtksourceview-4-resources)))))))))
     (native-inputs
      (list cppunit
            gettext-minimal
@@ -1419,6 +1425,7 @@ using a stylus.")
     (inputs
      (list adwaita-icon-theme
            alsa-lib
+           bash-minimal
            gtk+
            gtksourceview-4
            (librsvg-for-system)
