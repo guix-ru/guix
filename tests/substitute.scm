@@ -38,6 +38,7 @@
   #:use-module (rnrs bytevectors)
   #:use-module (rnrs io ports)
   #:use-module (web uri)
+  #:use-module (ice-9 match)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 binary-ports)
   #:use-module (srfi srfi-11)
@@ -65,7 +66,7 @@ it writes to GUIX-WARNING-PORT a messages that matches ERROR-RX."
 
 (define (request-substitution item destination)
   "Run 'guix substitute --substitute' to fetch ITEM to DESTINATION."
-  (false-if-exception (delete-file destination))
+  (false-if-exception (delete-file-recursively destination))
   (with-input-from-string (string-append "substitute " item " "
                                          destination "\n")
     (lambda ()
@@ -143,6 +144,29 @@ version identifier.."
   ;; <https://www.rfc-editor.org/rfc/rfc5737>.
   "http://203.0.113.1")
 
+(define (directory-nar-sha256 string)
+  "Compute the sha256 of the nar of a directory containing a single regular
+file named \"foo\" containing STRING."
+  (sha256 (call-with-output-bytevector
+           (lambda (port)
+             (let ((bv (string->utf8 string)))
+               (call-with-input-bytevector
+                bv
+                (lambda (contents)
+                  (write-file-tree "root" port
+                                   #:file-type+size
+                                   (match-lambda
+                                     ("root"
+                                      (values 'directory #f))
+                                     ("root/foo"
+                                      (values 'regular
+                                              (bytevector-length
+                                               bv))))
+                                   #:file-port
+                                   (const contents)
+                                   #:directory-entries
+                                   (const '("foo"))))))))))
+
 (define (plain-file-nar-sha256 string)
   (sha256 (call-with-output-bytevector
            (lambda (port)
@@ -172,9 +196,22 @@ References: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 Deriver: cccccccccccccccccccccccccccccccc-foo.drv
 System: mips64el-linux\n"))
 
+(define %narinfo/directory
+  (string-append "StorePath: " (%store-prefix)
+                 "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo
+URL: example.nar
+Compression: none
+NarHash: sha256:" (bytevector->nix-base32-string
+                   (directory-nar-sha256 "Substitutable data.")) "
+NarSize: 304
+References: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-baz
+Deriver: cccccccccccccccccccccccccccccccc-foo.drv
+System: mips64el-linux\n"))
+
 (define* (call-with-narinfo narinfo thunk
                             #:optional
-                            (narinfo-directory %main-substitute-directory))
+                            (narinfo-directory %main-substitute-directory)
+                            #:key directory?)
   "Call THUNK in a context where the directory at URL is populated with
 a file for NARINFO."
   (mkdir-p narinfo-directory)
@@ -195,9 +232,16 @@ a file for NARINFO."
           (cut display narinfo <>))
 
         ;; Prepare the nar.
-        (call-with-output-file
-            (string-append narinfo-directory "/example.out")
-          (cut display "Substitutable data." <>))
+        (let ((out (string-append narinfo-directory "/example.out")))
+          (when (file-exists? out)
+            (delete-file-recursively out))
+          (if directory?
+              (begin
+                (mkdir out)
+                (call-with-output-file (string-append out "/foo")
+                  (cut display "Substitutable data." <>)))
+              (call-with-output-file out
+                (cut display "Substitutable data." <>))))
         (call-with-output-file
             (string-append narinfo-directory "/example.nar")
           (cute write-file
@@ -214,6 +258,9 @@ a file for NARINFO."
 
 (define-syntax-rule (with-narinfo* narinfo directory body ...)
   (call-with-narinfo narinfo (lambda () body ...) directory))
+
+(define-syntax-rule (with-directory-narinfo narinfo body ...)
+  (call-with-narinfo narinfo (lambda () body ...) #:directory? #t))
 
 ;; Transmit these options to 'guix substitute'.
 (substitute-urls (list (getenv "GUIX_BINARY_SUBSTITUTE_URL")))
@@ -523,6 +570,24 @@ System: mips64el-linux\n")))
               (stat:perms (lstat "substitute-retrieved"))))
       (lambda ()
         (false-if-exception (delete-file "substitute-retrieved"))))))
+
+(test-equal "substitute, authorized key, directory"
+  '("Substitutable data." 1 #o555)
+  (with-directory-narinfo (string-append %narinfo/directory "Signature: "
+                                         (signature-field %narinfo/directory))
+    (dynamic-wind
+      (const #t)
+      (lambda ()
+        (request-substitution (string-append (%store-prefix)
+                                             "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo")
+                              "substitute-retrieved")
+        (list (call-with-input-file "substitute-retrieved/foo" get-string-all)
+              (stat:mtime (lstat "substitute-retrieved"))
+              (stat:perms (lstat "substitute-retrieved"))))
+      (lambda ()
+        ;; Needs to be writable to be deleted
+        (false-if-exception (chmod "substitute-retrieved" #o755))
+        (false-if-exception (delete-file-recursively "substitute-retrieved"))))))
 
 (test-equal "substitute, authorized key, first substitute URL is unroutable"
   '("Substitutable data." 1 #o444)

@@ -638,6 +638,39 @@ delete it when leaving the dynamic extent of this call."
       (lambda ()
         (false-if-exception (delete-file-recursively tmp-dir))))))
 
+(define (rename-file* from to)
+  "Like `rename-file', but temporarily make FROM user-writable if it is an
+unwritable directory, restoring its original permissions afterward.
+
+This requires that, in the case that FROM is a directory, it is readable."
+  (let ((st (lstat from)))
+    (match (stat:type st)
+      ('directory
+       (catch 'system-error
+         (lambda ()
+           (rename-file from to))
+         (lambda args
+           (cond
+            ((= (system-error-errno args) EACCES)
+             ;; Assume it's because FROM is not writable.  Open FROM
+             ;; so we can use fchmod instead of risking following a symbolic
+             ;; link.
+             (call-with-port (open from (logior
+                                         ;; XXX: requires that FROM is
+                                         ;; readable.
+                                         O_RDONLY
+                                         O_NOFOLLOW
+                                         O_DIRECTORY))
+               (lambda (port)
+                 ;; stat again using fstat this time just in case what we
+                 ;; opened isn't the directory we originally lstat'ed.
+                 (let ((perms (stat:perms (stat port))))
+                   (chmod port (logior perms #o200))
+                   (rename-file from to)
+                   (chmod port perms)))))
+            (else (apply throw args))))))
+      (_ (rename-file from to)))))
+
 (define-command (guix-substitute . args)
   (category internal)
   (synopsis "implement the build daemon's substituter protocol")
@@ -747,7 +780,7 @@ delete it when leaving the dynamic extent of this call."
                                  (lambda ()
                                    (delete-file-recursively destination))
                                  (const #f))
-                               (rename-file temp-destination destination))
+                               (rename-file* temp-destination destination))
                              (values narinfo expected-hash actual-hash)))))))
 
                  (if expected-hash
