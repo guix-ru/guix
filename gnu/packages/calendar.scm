@@ -273,15 +273,13 @@ data units.")
 (define-public khal
   (package
     (name "khal")
-    ;; TODO: The latest version requires fresh pytz module and fails with
-    ;; error: E AttributeError: module 'icalendar' has no attribute 'use_pytz'
-    (version "0.12.0")
+    (version "0.14.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "khal" version))
        (sha256
-        (base32 "1gxrhfr4kv5mij75nzjgj69wcssbx4dfbky196w6b4nh3v7nm2pf"))))
+        (base32 "0v7135sssw24gk3sldsd3gx76jk0zpcpwqc9zzh9ia5p0hr29pqh"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -294,36 +292,32 @@ data units.")
               (invoke "make" "--directory=doc/" "man")
               (install-file "doc/build/man/khal.1"
                             (string-append #$output "/share/man/man1")))))))
-    (native-inputs
-     (list python-freezegun
-           python-packaging
-           python-pytest
-           python-setuptools
-           python-setuptools-scm
-           python-sphinx
-           python-sphinxcontrib-newsfeed
-           python-wheel))
-    (inputs
-     (list python-aiohttp
-           python-atomicwrites
-           python-click
-           python-click-log
-           python-configobj
-           python-dateutil
-           python-icalendar
-           python-pytz
-           python-pyxdg
-           python-setproctitle
-           python-tzlocal
-           python-urwid
-           vdirsyncer))
+    (native-inputs (list python-aiohttp ;for vdirsyncer (doesn't propagate inputs)
+                         python-freezegun
+                         python-hypothesis
+                         python-packaging
+                         python-pytest
+                         python-setuptools
+                         python-setuptools-scm
+                         python-sphinxfeed
+                         vdirsyncer))
+    (inputs (list python-click
+                  python-click-log
+                  python-configobj
+                  python-dateutil
+                  python-icalendar
+                  python-pytz
+                  python-pyxdg
+                  python-setproctitle
+                  python-tzlocal
+                  python-urwid))
     (home-page "https://lostpackets.de/khal/")
     (synopsis "Console calendar program")
     (description
      "Khal is a standards based console calendar program, able to synchronize
 with CalDAV servers through vdirsyncer.  It includes both a @acronym{CLI,
 command-line interface} and a @acronym{TUI, textual user interface} named
-'ikhal'.")
+@code{ikhal}.")
     (license license:expat)))
 
 (define-public remind
