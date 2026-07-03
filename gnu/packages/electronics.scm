@@ -2696,7 +2696,7 @@ Automation}, portable and vendor neutral FPGA place and route tool.")
     (inputs
      (list jansson
            libffi
-           llvm-13
+           llvm
            readline
            tcl
            `(,zstd "lib")))
