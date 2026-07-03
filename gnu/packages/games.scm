@@ -13459,7 +13459,7 @@ play; it will look for them at @file{~/.local/share/fheroes2} folder.")
 (define-public vcmi
   (package
     (name "vcmi")
-    (version "1.7.3")
+    (version "1.7.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -13468,7 +13468,7 @@ play; it will look for them at @file{~/.local/share/fheroes2} folder.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "18rvq99kpnlncw2ndjgbwv5ria1ag3vvwmgmkwn4w3yj5dzp4z5k"))
+                "1sf04hv73ssiznks8pf4q7ny9y17zxsf8mqwln8dq1w2kp8rb87s"))
               (patches (search-patches "vcmi-disable-privacy-breach.patch"))))
     (build-system cmake-build-system)
     (arguments
@@ -13484,6 +13484,7 @@ play; it will look for them at @file{~/.local/share/fheroes2} folder.")
            ffmpeg
            fmt
            fuzzylite
+           gettext-minimal
            ;; googletest ; needed for tests, but tests are disabled
            libxkbcommon
            libsquish

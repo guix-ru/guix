@@ -3,14 +3,20 @@ From: Johannes Schauer <josch@debian.org>
 Subject: do not check remote repositories on startup by default
 Forwarded: not-needed
 
+diff --git a/config/schemas/settings.json b/config/schemas/settings.json
+index 86c43b1b6..b3d493233 100644
 --- a/config/schemas/settings.json
 +++ b/config/schemas/settings.json
-@@ -401,11 +401,11 @@
+@@ -749,7 +749,7 @@
  				},
  				"autoCheckRepositories" : {
  					"type" : "boolean",
 -					"default" : true
 +					"default" : false
+ 				},
+ 				"fullModExtraction" : {
+ 					"type" : "boolean",
+@@ -757,7 +757,7 @@
  				},
  				"updateOnStartup" : {
  					"type" : "boolean",
