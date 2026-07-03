@@ -2138,6 +2138,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-hdmedians-replace-nose.patch	\
   %D%/packages/patches/python-holodeck-cython-3-compat.patch	\
   %D%/packages/patches/python-jinja2-fragments-modify-conftest-py.patch	\
+  %D%/packages/patches/python-klaus-support-python-3.12.patch	\
   %D%/packages/patches/python-louvain-fix-test.patch		\
   %D%/packages/patches/python-mohawk-pytest.patch	\
   %D%/packages/patches/python-msal-requests.patch	\

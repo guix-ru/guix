@@ -871,7 +871,9 @@ everything from small to very large projects with speed and efficiency.")
               (uri (pypi-uri "klaus" version))
               (sha256
                (base32
-                "1w6sl15llnkcg7kmnpn64awdiis061q2gijnhdx0ng7z4p1glapl"))))
+                "1w6sl15llnkcg7kmnpn64awdiis061q2gijnhdx0ng7z4p1glapl"))
+              (patches
+               (search-patches "python-klaus-support-python-3.12.patch"))))
     (build-system pyproject-build-system)
     (arguments
      (list

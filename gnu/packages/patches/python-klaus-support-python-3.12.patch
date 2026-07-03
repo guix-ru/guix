@@ -1,0 +1,54 @@
+From 0dacec59248446c3dbadcb83e23bbddcd9ce94db Mon Sep 17 00:00:00 2001
+From: fin444 <fin444@users.noreply.github.com>
+Date: Mon, 15 Jul 2024 07:00:12 -0400
+Subject: [PATCH] python 3.12 support (#334)
+
+---
+ klaus/contrib/app_args.py | 11 ++++++++++-
+ setup.py                  | 13 -------------
+ 2 files changed, 10 insertions(+), 14 deletions(-)
+
+diff --git a/klaus/contrib/app_args.py b/klaus/contrib/app_args.py
+index 7ee56891..ba02e53e 100644
+--- a/klaus/contrib/app_args.py
++++ b/klaus/contrib/app_args.py
+@@ -1,5 +1,14 @@
+ import os
+-from distutils.util import strtobool
++
++
++def strtobool(val):
++    val = val.lower()
++    if val in ("y", "yes", "t", "true", "on", "1"):
++        return 1
++    elif val in ("n", "no", "f", "false", "off", "0"):
++        return 0
++    else:
++        raise ValueError(f"invalid truth value {val!r}")
+ 
+ 
+ def get_args_from_env():
+diff --git a/setup.py b/setup.py
+index b06a45f2..2d1f594c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -4,19 +4,6 @@
+ 
+ long_description = open(os.path.join(os.path.dirname(__file__), "README.rst")).read()
+ 
+-
+-def install_data_files_hack():
+-    # This is a clever hack to circumvent distutil's data_files
+-    # policy "install once, find never". Definitely a TODO!
+-    # -- https://groups.google.com/group/comp.lang.python/msg/2105ee4d9e8042cb
+-    from distutils.command.install import INSTALL_SCHEMES
+-
+-    for scheme in INSTALL_SCHEMES.values():
+-        scheme["data"] = scheme["purelib"]
+-
+-
+-install_data_files_hack()
+-
+ requires = [
+     "flask",
+     "Werkzeug>=0.15.0",
