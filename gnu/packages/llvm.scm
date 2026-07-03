@@ -2362,6 +2362,7 @@ C/C++/Obj-C code according to a set of style options, see
     (propagated-inputs '())
     (arguments
      (list #:lisp-directory "clang/tools/clang-rename"
+           #:tests? #f                  ;no tests
            #:phases
            #~(modify-phases %standard-phases
                (add-after 'unpack 'configure
