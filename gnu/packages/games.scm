@@ -1356,51 +1356,14 @@ high a score as possible.")
               "LOCALIZE=1" "LANGUAGES=all")
       #:phases
       #~(modify-phases %standard-phases
-          (delete 'configure)
-          ;; Apparently we can't do make on both tiles and a console version at
-          ;; the same time anymore, so we have to either "make clean" between
-          ;; builds or do some other hackery.  See:
-          ;;   https://github.com/CleverRaven/Cataclysm-DDA/issues/42598#issuecomment-667702746
-          (add-after 'install 'make-clean-pre-tiles
-            (lambda* (#:key make-flags outputs #:allow-other-keys)
-              ;; During cleaning, "zstd.a" file is now removed but no recreated
-              ;; during the next make run and is found missing later in the
-              ;; build process.  Avoid cleaning that file.
-              ;;
-              ;; This basically reverts upstream commit
-              ;; f61d9d2114a6b5997f399c84872dab1f1f2310b9
-              ;; (<https://github.com/CleverRaven/Cataclysm-DDA/pull/84922>).
-              (substitute* "Makefile"
-                ((" zstd\\.a") ""))
-              ;; Change prefix directory and enable tile graphics and sound.
-              (invoke "make" "clean")))
-          (add-after 'make-clean-pre-tiles 'build-tiles
-            (lambda* (#:key make-flags outputs #:allow-other-keys)
-              ;; Change prefix directory and enable tile graphics and sound.
-              (apply invoke "make" "TILES=1" "SOUND=1"
-                     (string-append "PREFIX=" #$output:tiles)
-                     (cdr make-flags))))
-          (add-after 'build-tiles 'install-tiles
-            (lambda* (#:key make-flags outputs #:allow-other-keys)
-              (apply invoke "make" "install" "TILES=1" "SOUND=1"
-                     (string-append "PREFIX=" #$output:tiles)
-                     (cdr make-flags)))))
+          (delete 'configure))
       ;; TODO: Add libtap++ from https://github.com/cbab/libtappp as a native
       ;;       input in order to support tests.
       #:tests? #f))
-    (outputs '("out"
-               "tiles"))                ;for tile graphics and sound support
     (native-inputs
      (list astyle gcc-13 gettext-minimal pkg-config))
     (inputs
-     (list freetype
-           libogg
-           libvorbis
-           ncurses
-           sdl2
-           sdl2-image
-           sdl2-ttf
-           sdl2-mixer))
+     (list freetype ncurses))
     (home-page "https://cataclysmdda.org/")
     (synopsis "Survival horror roguelike video game")
     (description
@@ -1413,6 +1376,30 @@ powerful monstrosities, from zombies to giant insects to killer robots and
 things far stranger and deadlier, and against the others like yourself, that
 want what you have.")
     (license license:cc-by-sa3.0)))
+
+(define-public cataclysm-dda-tiles
+  (package
+    (inherit cataclysm-dda)
+    (name "cataclysm-dda-tiles")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:make-flags flags)
+        #~(cons* "TILES=1" "SOUND=1" #$flags))))
+    (inputs
+     (modify-inputs inputs
+       (delete "ncurses")
+       (append libogg
+               libvorbis
+               sdl2
+               sdl2-image
+               sdl2-mixer
+               sdl2-ttf)))
+    (synopsis
+     (string-append (package-synopsis cataclysm-dda)
+                    ", with graphics and sound"))
+    (description
+     (string-append (package-description cataclysm-dda)
+                    "\n\nThis package includes graphical tiles and sound."))))
 
 (define-public cockatrice
   (let ((release-date "2026-05-23"))
