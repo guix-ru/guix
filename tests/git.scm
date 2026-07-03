@@ -296,24 +296,24 @@
                (submodule-checkout "modules/sub" ,sub-v2)
                (commit "release uses submodule v2")
                (checkout "primary"))
-           (let ((checkout1 commit1 relation1
+           (let* ((checkout1 commit1 relation1
                              (update-cached-checkout main
                                                      #:recursive? #t
-                                                     #:cache-directory cache)))
+                                                     #:cache-directory cache))
+                  (head-cached1 (git-output "-C"
+                                            (in-vicinity checkout1 "modules/sub")
+                                            "rev-parse" "HEAD"))
+                  (checkout2 commit2 relation2
+                             (update-cached-checkout main
+                                                     #:recursive? #t
+                                                     #:ref '(branch . "release")
+                                                     #:cache-directory cache))
+                  (head-cached2 (git-output "-C"
+                                            (in-vicinity checkout2 "modules/sub")
+                                            "rev-parse" "HEAD")))
              (and
-              (string=? sub-v1
-                        (git-output "-C"
-                                    (in-vicinity checkout1 "modules/sub")
-                                    "rev-parse" "HEAD"))
-              (let ((checkout2 commit2 relation2
-                                (update-cached-checkout main
-                                                        #:recursive? #t
-                                                        #:ref '(branch . "release")
-                                                        #:cache-directory cache)))
-                (string=? sub-v2
-                          (git-output "-C"
-                                      (in-vicinity checkout2 "modules/sub")
-                                      "rev-parse" "HEAD")))))))))))
+              (string=? sub-v1 head-cached1)
+              (string=? sub-v2 head-cached2)))))))))
 
 (test-assert "update-cached-checkout, untracked files removed"
   (call-with-temporary-directory
