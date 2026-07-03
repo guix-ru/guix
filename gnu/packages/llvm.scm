@@ -629,7 +629,8 @@ output), and Binutils.")
     ("21.1.8" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))
     ("22.1.8" . ("clang-18.0-libc-search-path.patch"
-                 "clang-17.0-link-dsymutil-latomic.patch"))))
+                 "clang-17.0-link-dsymutil-latomic.patch"
+                 "llvm-22-cfloat128-detection.patch"))))
 
 (define (llvm-monorepo version)
   (origin
