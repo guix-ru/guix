@@ -21,6 +21,7 @@
 ;;; Copyright © 2024 Troy Figiel <troy@troyfigiel.com>
 ;;; Copyright © 2021 Maxime Devos <maximedevos@telenet.be>
 ;;; Copyright © 2026 Yan Abu Arab <yanabuarab@gmail.com>
+;;; Copyright © 2026 Julian Flake <julian@flake.de>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -788,6 +789,31 @@ issue tracker.  This includes roles for linking to issues, pull requests and
 user profiles.  Support for GitHub is built-in, but other services can also be
 supported with @code{sphinx-issues}.")
     (license license:expat)))
+
+(define-public python-sphinxfeed
+  (package
+    (name "python-sphinxfeed")
+    (version "0.3.6")
+    (home-page "https://github.com/lsaffre/sphinxfeed")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/lsaffre/sphinxfeed")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1wqrh01pbqlrm1kixyzaqdjggs02339y849x0lm115wl6q9vq56s"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-hatchling python-pytest))
+    (propagated-inputs (list python-dateutil python-feedgen python-sphinx))
+    (synopsis "Sphinx extension for generating RSS feeds")
+    (description
+     "This Sphinx extension is a fork of Fergus Doyle's sphinxfeed package
+which itself is derived from Dan Mackinlay's sphinxcontrib.feed package.  It
+relies on Lars Kiesow's python-feedgen package instead of the defunct
+feedformatter package or of Django utils to generate the feed.")
+    (license license:bsd-2)))
 
 (define-public python-sphinx-tabs
   (package
