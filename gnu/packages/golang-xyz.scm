@@ -12532,6 +12532,52 @@ with the order of keys maintained
 @end itemize")
     (license license:asl2.0)))
 
+(define-public go-github-com-go-openapi-swag-yamlutils
+  (package
+    (name "go-github-com-go-openapi-swag-yamlutils")
+    (version "0.27.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-openapi/swag")
+              (commit (go-version->git-ref version #:subdir "yamlutils"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0rg5q7xif4gmhc99kkgvnz03d0d0z2vanyv8xa4myn6ykvacw458"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (with-directory-excursion directory
+                (let* ((pred (negate (cut member <>
+                                          (cons* "." ".." preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (cut delete-file-recursively <>) items))))
+            (delete-all-but "." "yamlutils")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-openapi/swag/yamlutils"
+      #:unpack-path "github.com/go-openapi/swag"
+      #:embed-files #~(list "^.*\\.yaml$")))
+    (native-inputs
+     (list go-github-com-go-openapi-testify-enable-yaml-v2
+           go-github-com-go-openapi-swag-jsonutils-fixtures-test
+           go-github-com-go-openapi-testify-v2))
+    (propagated-inputs
+     (list go-github-com-go-openapi-swag-conv
+           go-github-com-go-openapi-swag-jsonutils
+           go-github-com-go-openapi-swag-typeutils
+           go-go-yaml-in-yaml-v3))
+    (home-page "https://github.com/go-openapi/swag")
+    (synopsis "Utilities to work with YAML documents")
+    (description
+     "Package yamlutils provides utilities to work with YAML documents.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-go-playground-locales
   (package
     (name "go-github-com-go-playground-locales")
