@@ -8200,7 +8200,7 @@ the go-openapi and go-swagger projects.")
 (define-public go-github-com-go-openapi-swag-typeutils
   (package
     (name "go-github-com-go-openapi-swag-typeutils")
-    (version "0.24.0")
+    (version "0.27.0")
     (source
      (origin
        (method git-fetch)
@@ -8209,13 +8209,11 @@ the go-openapi and go-swagger projects.")
               (commit (go-version->git-ref version #:subdir "typeutils"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0p1k008zh6s1v55fi83v8ihldsvknf0wmwmc6i2ks0vw5gbwmaam"))
+        (base32 "0rg5q7xif4gmhc99kkgvnz03d0d0z2vanyv8xa4myn6ykvacw458"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
             ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - github.com/go-openapi/swag/conv
             (for-each delete-file-recursively
                       (list "cmdutils" "conv" "fileutils" "jsonname"
                             "jsonutils" "loading" "mangling" "netutils"
@@ -8226,7 +8224,7 @@ the go-openapi and go-swagger projects.")
       #:import-path "github.com/go-openapi/swag/typeutils"
       #:unpack-path "github.com/go-openapi/swag"))
     (native-inputs
-     (list go-github-com-stretchr-testify))
+     (list go-github-com-go-openapi-testify-v2))
     (home-page "https://github.com/go-openapi/swag")
     (synopsis "Type checking utilities for go-openapi")
     (description
