@@ -789,6 +789,27 @@ and has round-trip loaders and dumpers.  It supports comments.  Block
 style and key ordering are kept, so you can diff the source.")
     (license license:expat)))
 
+(define-public python-ruamel.yaml.string
+  (package
+    (name "python-ruamel.yaml.string")
+    (version "0.1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "ruamel.yaml.string" version))
+       (sha256
+        (base32 "0l23g04mfhaqrrbcxx2id08gpgjf8xc6yxcbsc2c0iax0p6fsyks"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:tests? #f))      ;no tests
+    (propagated-inputs (list python-ruamel.yaml))
+    (native-inputs (list python-setuptools))
+    (home-page "https://sourceforge.net/projects/ruamel-yaml-string/")
+    (synopsis "Dump to string methods for ruamel.yaml")
+    (description
+     "This package provides two dump_to_string/dumps methods that returns YAML
+document as string.")
+    (license license:expat)))
+
 (define-public python-ruamel.yaml-0.16
   (package
     (inherit python-ruamel.yaml)
