@@ -35,7 +35,7 @@
 ;; Copyright © 2025 Steve George <steve@futurile.net>
 ;; Copyright © 2026 Noé Lopez <noelopez@free.fr>
 ;; Copyright © 2026 Sergio Pastor Pérez <sergio.pastorperez@gmail.com>
-
+;; Copyright © 2026 Andreas Enge <andreas@enge.fr>
 ;;
 ;; Copying and distribution of this file, with or without modification, are
 ;; permitted in any medium without royalty provided the copyright notice and
@@ -43,6 +43,48 @@
 
 (channel-news
  (version 0)
+
+
+ (entry (commit "02bea7700255bc16b2ee2212be878cf2c792884e")
+        (title
+         (en "Removal of encryption methods from plasma-vault")
+         (de "Alte Chiffriermethoden wurden von plasma-vault entfernt")
+         (fr "Enlèvement d'anciennes méthodes de chiffrement
+de plasma-vault"))
+        (body
+         (en "The outdated encryption methods cryfs and encfs have been
+removed from plasma-vault.  For new vaults, it is recommended to use
+gocryptfs.  For accessing existing vaults created with the deprecated
+encryption methods, please use @command{guix time-machine}.")
+         (de "Die nicht mehr zeitgemäßen Kryptobibliotheken cryfs und
+encfs wurden von plasma-vault entfernt.  Für neue verschlüsselte Dateien
+wird das weiter bestehende gocryptfs empfohlen.  Um bestehende Dateien
+zu entschlüsseln, die mit den entfernten Chiffriermethoden erstellt
+wurden, benutzen Sie bitte @command{guix time-machine}.")
+         (fr "Les méthodes de chiffrement cryfs et encfs ont été enlevé
+de plasma-vault.  Dans l'avenir, il est recommandé d'utiliser gocryptfs
+pour créer des fichiers chiffrés.  Pour pouvoir accéder à des fichiers
+existants chiffrés avec les anciennes approches, veuillez utiliser
+@command{guix time-machine}.")))
+
+ (entry (commit "897832f374dcdc9eeaf19d01e70b9a92fccfc68c")
+        (title
+         (en "Several security issues fixed in Guix"))
+        (body
+         (en "Several security issues (four CVE numbers pending) have been
+identified in Guix.  These affect @code{guix substitute} and authentication of
+channels with attacker-controlled names in @command{guix pull} and
+@command{guix time-machine}.  These issues can lead to remote privilege
+escalation, store corruption, and local sensitive information disclosure.
+Details are forthcoming in a security advisory post on the Guix blog, with a
+draft available at @uref{https://codeberg.org/guix/artwork/pulls/58}.  The
+pull request @uref{https://codeberg.org/guix/guix/pulls/9665} has information
+on the commits fixing these issues.
+
+All users should immediately update their system, which will require
+reconfiguring and restarting @command{guix-daemon}.  Please note that due to
+these security issues affecting substitutes, there are additional
+considerations for updating; please see the security advisory.")))
 
  (entry (commit "897832f374dcdc9eeaf19d01e70b9a92fccfc68c")
         (title
