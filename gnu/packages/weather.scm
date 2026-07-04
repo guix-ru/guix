@@ -124,7 +124,7 @@ export WEATHER_CLI_API=@var{your OpenWeatherMap API key}
 (define-public meteo-qt
   (package
     (name "meteo-qt")
-    (version "4.2")
+    (version "4.3")
     (source
      (origin
        (method git-fetch)
@@ -133,7 +133,7 @@ export WEATHER_CLI_API=@var{your OpenWeatherMap API key}
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1cvmh5rq50dncd2fmp4amjb2hhl2mryb2ywg0zdzhz89dkjq0kdk"))))
+        (base32 "1dl2hykd1fijp504j50yqafwzf7c3rn53gij1c789zsmfmrbkhcj"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -149,8 +149,7 @@ export WEATHER_CLI_API=@var{your OpenWeatherMap API key}
                 (("/usr") #$output)
                 (("^.+lrelease-pro-qt6.+$") "")
                 (("^.+meteo_qt/translations.+$") "")))))))
-    (native-inputs (list python-pyqt-6 python-setuptools))
-    (propagated-inputs (list python-lxml python-pyqt-6 python-sip))
+    (propagated-inputs (list python-lxml python-pyqt-6))
     (home-page "https://github.com/dglent/meteo-qt")
     (synopsis "Weather application for the system tray")
     (description
