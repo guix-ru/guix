@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guix manual checkout\n"
 "Report-Msgid-Bugs-To: bug-guix@gnu.org\n"
-"POT-Creation-Date: 2026-04-24 03:18+0000\n"
+"POT-Creation-Date: 2026-07-04 03:18+0000\n"
 "PO-Revision-Date: 2025-12-03 14:14+0000\n"
 "Last-Translator: pelzflorian <pelzflorian@noreply.codeberg.org>\n"
 "Language-Team: Korean <https://translate.codeberg.org/projects/guix/documentation-cookbook/ko/>\n"
@@ -33,9 +33,6 @@ msgstr "Guix 쿡북: (guix-cookbook.ko)"
 
 msgid "Tutorials and examples for GNU Guix."
 msgstr "GNU Guix를 위한 개인 학습과 예제."
-
-msgid "Tutorials and examples for using the GNU Guix Functional Package Manager"
-msgstr "GNU Guix 기능적인 꾸러미 매니저 사용하기를 위한 개인학습과 예제"
 
 msgid "The GNU Guix Developers"
 msgstr "GNU Guix 개발자"
@@ -733,9 +730,6 @@ msgstr "출력"
 
 msgid "Build system arguments"
 msgstr "시스템 인수를 구성합니다"
-
-msgid "translate into"
-msgstr "번역합니다"
 
 msgid "Code staging"
 msgstr "코드 스테이징"

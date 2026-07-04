@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guix-manual 1.2.0-pre3\n"
 "Report-Msgid-Bugs-To: bug-guix@gnu.org\n"
-"POT-Creation-Date: 2026-05-26 03:18+0000\n"
-"PO-Revision-Date: 2026-05-08 15:42+0000\n"
+"POT-Creation-Date: 2026-06-21 03:18+0000\n"
+"PO-Revision-Date: 2026-06-22 15:13+0000\n"
 "Last-Translator: pelzflorian <pelzflorian@noreply.codeberg.org>\n"
 "Language-Team: German <https://translate.codeberg.org/projects/guix/documentation-manual/de/>\n"
 "Language: de\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.17.1\n"
+"X-Generator: Weblate 2026.6.1\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 
 msgid "Contributing"
@@ -267,15 +267,6 @@ msgstr "Authentifizieren, eines Guix-Checkouts"
 msgid "How do you ensure that you obtained a genuine copy of the repository? To do that, run @command{guix git authenticate}, passing it the commit and OpenPGP fingerprint of the @dfn{channel introduction} (@pxref{Invoking guix git authenticate}):"
 msgstr "Doch wie können Sie sichergehen, dass sie eine unverfälschte Kopie des Repositorys erhalten haben? Dazu müssen Sie @command{guix git authenticate} ausführen, wobei Sie den Commit und den OpenPGP-Fingerabdruck der @dfn{Kanaleinführung} angeben (siehe @ref{Invoking guix git authenticate}):"
 
-msgid ""
-"git fetch origin keyring:keyring\n"
-"guix git authenticate 9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-msgstr ""
-"git fetch origin keyring:keyring\n"
-"guix git authenticate 9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-
 msgid "This command completes with exit code zero on success; it prints an error message and exits with a non-zero code otherwise."
 msgstr "Dieser Befehl gibt bei Erfolg am Ende null als Exit-Status zurück, ansonsten wird eine Fehlermeldung ausgegeben und ein anderer Exit-Status zurückgegeben."
 
@@ -386,15 +377,6 @@ msgstr "Falls etwas fehlschlägt, werfen Sie einen Blick auf die Installationsan
 msgid "From there on, you can authenticate all the commits included in your checkout by running:"
 msgstr "Von da an können Sie alle Commits in Ihrem Checkout authentifizieren, indem Sie dies ausführen:"
 
-msgid ""
-"guix git authenticate \\\n"
-"  9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-msgstr ""
-"guix git authenticate \\\n"
-"  9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-
 msgid "The first run takes a couple of minutes, but subsequent runs are faster.  On subsequent runs, you can run the command without any arguments since the @dfn{introduction} (the commit ID and OpenPGP fingerprints above)  will have been recorded@footnote{This requires a recent version of Guix, from May 2024 or more recent.}:"
 msgstr "Der erste Durchlauf dauert einige Minuten, aber spätere Durchläufe gehen schneller. Bei späteren Durchläufen brauchen Sie keine Argumente anzugeben, denn die @dfn{Einführung} (die Commit-ID und OpenPGP-Fingerabdrücke oben) ist gespeichert worden@footnote{Das gilt für neue Versionen von Guix ab Mai 2024 oder neuer.}:"
 
@@ -489,9 +471,6 @@ msgstr "make check SCM_LOG_DRIVER_FLAGS=\"--brief=no --show-duration=yes\"\n"
 msgid "@xref{Parallel Test Harness,,,automake,GNU Automake} for more information about the Automake Parallel Test Harness."
 msgstr "Siehe @ref{Parallel Test Harness,,,automake,GNU Automake} für mehr Informationen über den parallelen Testrahmen von Automake."
 
-msgid "Upon failure, please email @email{bug-guix@@gnu.org} and attach the @file{test-suite.log} file.  Please specify the Guix version being used as well as version numbers of the dependencies (@pxref{Requirements}) in your message."
-msgstr "Kommt es zum Fehlschlag, senden Sie bitte eine E-Mail an @email{bug-guix@@gnu.org} und fügen Sie die Datei @file{test-suite.log} als Anhang bei. Bitte geben Sie dabei in Ihrer Nachricht die benutzte Version von Guix an sowie die Versionsnummern der Abhängigkeiten (siehe @ref{Requirements})."
-
 msgid "Guix also comes with a whole-system test suite that tests complete Guix System instances.  It can only run on systems where Guix is already installed, using:"
 msgstr "Guix wird auch mit einem Testkatalog für das ganze System ausgeliefert, der vollständige Instanzen des „Guix System“-Betriebssystems testet. Er kann nur auf Systemen benutzt werden, auf denen Guix bereits installiert ist, mit folgendem Befehl:"
 
@@ -509,9 +488,6 @@ msgstr "Diese Systemtests sind in den @code{(gnu tests …)}-Modulen definiert. 
 
 msgid "If you encounter an error like:"
 msgstr "Wenn Sie eine Fehlermeldung wie diese sehen:"
-
-msgid "Again in case of test failures, please send @email{bug-guix@@gnu.org} all the details."
-msgstr "Auch hier gilt: Falls Testfehler auftreten, senden Sie bitte alle Details an @email{bug-guix@@gnu.org}."
 
 msgid "In order to keep a sane working environment, you will find it useful to test the changes made in your local source tree checkout without actually installing them.  So that you can distinguish between your ``end-user'' hat and your ``motley'' costume."
 msgstr "Um eine gesunde Arbeitsumgebung zu erhalten, ist es hilfreich, die im lokalen Quellbaum vorgenommenen Änderungen zunächst zu testen, ohne sie tatsächlich zu installieren. So können Sie zwischen Ihrem Endnutzer-„Straßenanzug“ und Ihrem „Faschingskostüm“ unterscheiden."
@@ -1975,11 +1951,8 @@ msgstr "Git-Konfiguration"
 msgid "If you have not done so already, you may wish to set a name and email that will be associated with your commits (@pxref{telling git your name, , Telling Git your name, git, Git User Manual}).  If you wish to use a different name or email just for commits in this repository, you can use @command{git config --local}, or edit @file{.git/config} in the repository instead of @file{~/.gitconfig}."
 msgstr "Wenn es noch nicht geschehen ist, wollen Sie vielleicht den Namen und die E-Mail-Adresse festlegen, mit der Ihre Commits ausgestellt werden (siehe @ref{telling git your name, , Telling Git your name, git, Git-Benutzerhandbuch}). Wenn Sie einen anderen Namen oder eine andere E-Mail-Adresse nur für Commits in diesem Repository verwenden möchten, können Sie @command{git config --local} benutzen oder Änderungen in der Datei @file{.git/config} im Repository statt in @file{~/.gitconfig} durchführen."
 
-msgid "commit-msg hook"
-msgstr "commit-msg, Hook"
-
-msgid "Other important Git configuration will automatically be configured when building the project (@pxref{Building from Git}).  A @file{.git/hooks/commit-msg} hook will be installed that embeds @samp{Change-Id} Git @emph{trailers} in your commit messages for traceability purposes.  It is important to preserve these when editing your commit messages, particularly if a first version of your proposed changes was already submitted for review.  If you have a @file{commit-msg} hook of your own you would like to use with Guix, you can place it under the @file{.git/hooks/commit-msg.d/} directory."
-msgstr "Weitere wichtige Git-Einstellungen werden automatisch vorgenommen, wenn Sie das Projekt kompilieren (siehe @ref{Building from Git}). Ein Hook @file{.git/hooks/commit-msg} wird installiert, durch den die Git-Anhangszeile @samp{Change-Id} in Ihre Commit-Nachrichten eingefügt wird, um den Zusammenhang nachvollziehen zu können. Bitte behalten Sie diese bei, wenn Sie Ihre Commit-Nachrichten nachbearbeiten, vor allem, wenn Sie bereits eine erste Fassung der von Ihnen vorgeschlagenen Änderungen zur Überprüfung eingereicht haben. Wenn Sie einen eigenen @file{commit-msg}-Hook mit Guix verwenden möchten, können Sie ihn im Verzeichnis @file{.git/hooks/commit-msg.d/} unterbringen."
+msgid "Other important Git configuration will automatically be configured when building the project (@pxref{Building from Git})."
+msgstr "Andere wichtige Einstellungen für Git werden automatisch eingestellt, wenn Sie das Projekt kompilieren (siehe @ref{Building from Git})."
 
 msgid "This section describes how the Guix project tracks its bug reports, patch submissions and topic branches."
 msgstr "Dieser Abschnitt beschreibt, wie das Guix-Projekt Fehlerberichte, eingereichte Patches und Topic-Branches verwaltet."
@@ -1996,20 +1969,11 @@ msgstr "Umgang mit Patches und Branches"
 msgid "How changes to Guix are managed."
 msgstr "Wie mit Änderungen für Guix verfahren wird."
 
-msgid "Debbugs User Interfaces"
-msgstr "Debbugs-Benutzerschnittstellen"
-
-msgid "Ways to interact with Debbugs."
-msgstr "Möglichkeiten, mit Debbugs umzugehen."
-
 msgid "Cuirass Build Notifications"
 msgstr "Cuirass-Benachrichtigungen"
 
 msgid "Be alerted of any breakage via RSS feeds."
 msgstr "Alarm per RSS-Feed, wenn Erstellungen fehlschlagen."
-
-msgid "Debbugs, issue tracking system"
-msgstr "Debbugs, System zum Überblicken gemeldeter Fehler"
 
 msgid "branching strategy"
 msgstr "Branching-Strategie"
@@ -2043,136 +2007,6 @@ msgstr "Normalerweise verfährt man nach dem Prinzip: „Was zuerst kommt, merge
 
 msgid "Once a branch is at the front of the queue, wait until sufficient time has passed for the build farms to have processed the changes, and for the necessary testing to have happened.  For example, you can check @indicateurl{https://qa.guix.gnu.org/branch/@var{branch}} to see information on some builds and substitute availability."
 msgstr "Sobald ein Branch in der Reihenfolge vorne steht, warten Sie darauf, dass genügend Zeit verstrichen ist, damit die Erstellungfarm die Änderungen verarbeitet hat und die notwendige Überprüfung stattfinden konnte. Sie können zum Beispiel auf @indicateurl{https://qa.guix.gnu.org/branch/@var{Branch}} Informationen zu neuen Erstellungen und zur Substitutverfügbarkeit sehen."
-
-msgid "Warning"
-msgstr "Warnung"
-
-msgid "Web interface"
-msgstr "Weboberfläche"
-
-msgid "A web interface (actually @emph{two} web interfaces!) are available to browse issues:"
-msgstr "Ihnen steht eine Weboberfläche (tatsächlich sogar @emph{zwei} Weboberflächen!) zur Verfügung, um die Fehlerdatenbank zu durchsuchen:"
-
-msgid "@url{https://bugs.gnu.org/guix} lists bug reports;"
-msgstr "Auf @url{https://bugs.gnu.org/guix} werden gemeldete Fehler aufgeführt,"
-
-msgid "@url{https://bugs.gnu.org/guix-patches} lists patch submissions."
-msgstr "auf @url{https://bugs.gnu.org/guix-patches} eingereichte Patches."
-
-msgid "To view discussions related to issue number @var{n}, go to @indicateurl{https://issues.guix.gnu.org/@var{n}} or @indicateurl{https://bugs.gnu.org/@var{n}}."
-msgstr "Um Diskussionen zum Fehler mit Fehlernummer @var{n} einzusehen, schauen Sie auf @indicateurl{https://issues.guix.gnu.org/@var{n}} oder @indicateurl{https://bugs.gnu.org/@var{n}}."
-
-msgid "Command-Line Interface"
-msgstr "Befehlszeilenschnittstelle"
-
-msgid "mumi command-line interface"
-msgstr "mumi-Befehlszeilenschnittstelle"
-
-msgid "To use the mumi command-line interface, navigate to a local clone of the Guix git repository, and drop into a shell with mumi, git and git:send-email installed."
-msgstr "Um die mumi-Befehlszeilenschnittstelle zu nutzen, begeben Sie sich in einen lokalen Klon von Guix’ Git-Repository, und starten Sie eine Shell, in die Sie mumi, git und git:send-email installieren."
-
-msgid ""
-"$ cd guix\n"
-"~/guix$ guix shell mumi git git:send-email\n"
-msgstr ""
-"$ cd guix\n"
-"~/guix$ guix shell mumi git git:send-email\n"
-
-msgid "To search for issues, say all open issues about \"zig\", run"
-msgstr "Um Fehlerberichte zu suchen, etwa alle offenen Fehlerberichte zu \"zig\", führen Sie aus:"
-
-msgid ""
-"~/guix [env]$ mumi search zig is:open\n"
-"\n"
-msgstr ""
-"~/guix [env]$ mumi search zig is:open\n"
-"\n"
-
-msgid ""
-"#60889 Add zig-build-system\n"
-"opened on 17 Jan 17:37 Z by Ekaitz Zarraga\n"
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-"#39136 [PATCH] gnu: services: Add endlessh.\n"
-"opened on 14 Jan 2020 21:21 by Nicol? Balzarotti\n"
-"#60424 [PATCH] gnu: Add python-online-judge-tools\n"
-"opened on 30 Dec 2022 07:03 by gemmaro\n"
-"#45601 [PATCH 0/6] vlang 0.2 update\n"
-"opened on  1 Jan 2021 19:23 by Ryan Prior\n"
-msgstr ""
-"#60889 Add zig-build-system\n"
-"opened on 17 Jan 17:37 Z by Ekaitz Zarraga\n"
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-"#39136 [PATCH] gnu: services: Add endlessh.\n"
-"opened on 14 Jan 2020 21:21 by Nicol? Balzarotti\n"
-"#60424 [PATCH] gnu: Add python-online-judge-tools\n"
-"opened on 30 Dec 2022 07:03 by gemmaro\n"
-"#45601 [PATCH 0/6] vlang 0.2 update\n"
-"opened on  1 Jan 2021 19:23 by Ryan Prior\n"
-
-msgid "Pick an issue and make it the \"current\" issue."
-msgstr "Wählen Sie einen Fehlerbericht und markieren Sie ihn als aktuell („current“)."
-
-msgid ""
-"~/guix [env]$ mumi current 61036\n"
-"\n"
-msgstr ""
-"~/guix [env]$ mumi current 61036\n"
-"\n"
-
-msgid ""
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-msgstr ""
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-
-msgid ""
-"~/guix [env]$ git format-patch origin/master\n"
-"~/guix [env]$ mumi send-email foo.patch bar.patch\n"
-msgstr ""
-"~/guix [env]$ git format-patch origin/master\n"
-"~/guix [env]$ mumi send-email foo.patch bar.patch\n"
-
-msgid "Note that you do not have to pass in @samp{--to} or @samp{--cc} arguments to @command{git format-patch}.  @command{mumi send-email} will put them in correctly when sending the patches."
-msgstr "Wir weisen darauf hin, dass Sie weder @samp{--to} noch @samp{--cc} als Argumente an @command{git format-patch} übergeben müssen. @command{mumi send-email} sorgt dafür, dass sie beim Abschicken von Patches richtig eingetragen werden."
-
-msgid "To open a new issue, run"
-msgstr "Um einen neuen Fehlerbericht zu öffnen, führen Sie aus:"
-
-msgid "~/guix [env]$ mumi new\n"
-msgstr "~/guix [env]$ mumi new\n"
-
-msgid "@command{mumi send-email} is really a wrapper around @command{git send-email} that automates away all the nitty-gritty of sending patches.  It uses the current issue state to automatically figure out the correct @samp{To} address to send to, other participants to @samp{Cc}, headers to add, etc."
-msgstr "@command{mumi send-email} ist eigentlich ein Wrapper um @command{git send-email}, mit dem die harten Details beim Patchversand wegautomatisiert werden. Dabei wird der als „current“ markierte Fehlerbericht analysiert, um automatisch die richtige @samp{To}-Adresse des Empfängers und die in @samp{Cc} stehenden anderen Teilnehmer sowie die Kopfzeilen, die hinzugefügt werden müssen, zu finden, und Ähnliches."
-
-msgid "Also note that, unlike @command{git send-email}, @command{mumi send-email} works perfectly well with single and multiple patches alike.  It automates away the debbugs dance of sending the first patch, waiting for a response from debbugs and sending the remaining patches.  It does so by sending the first patch, polling the server for a response, and then sending the remaining patches.  This polling can unfortunately take a few minutes.  So, please be patient."
-msgstr "Außerdem sollten Sie wissen, dass anders als bei @command{git send-email} für @command{mumi send-email} sowohl einzelne als auch mehrere Patches direkt verschickt werden können. Das Debbugs-Prozedere, wo eigentlich erst ein erster Patch geschickt, auf Antwort von Debbugs gewartet und dann die übrigen Patches geschickt werden, geschieht im Hintergrund. Intern wird mumi den ersten Patch schicken, mit Polling die Antwort des Servers abwarten und die restlichen Patches schicken. Leider kann das Polling mehrere Minuten in Anspruch nehmen. Gedulden Sie sich bitte."
-
-msgid "Emacs Interface"
-msgstr "Emacs-Schnittstelle"
-
-msgid "If you use Emacs, you may find it more convenient to interact with issues using @file{debbugs.el}, which you can install with:"
-msgstr "Wenn Sie Emacs benutzen, finden Sie es vielleicht bequemer, sich durch Nutzung von @file{debbugs.el} mit Fehlern zu befassen, was Sie mit folgendem Befehl installieren können:"
-
-msgid "guix install emacs-debbugs\n"
-msgstr "guix install emacs-debbugs\n"
-
-msgid "For example, to list all open issues on @code{guix-patches}, hit:"
-msgstr "Um zum Beispiel alle noch ausstehenden, „offenen“ Fehler bezüglich @code{guix-patches} anzusehen, geben Sie dies ein:"
-
-msgid "@kbd{C-u} @kbd{M-x} debbugs-gnu @kbd{RET} @kbd{RET} guix-patches @kbd{RET} n y\n"
-msgstr "@kbd{C-u} @kbd{M-x} debbugs-gnu @kbd{RET} @kbd{RET} guix-patches @kbd{RET} n y\n"
-
-msgid "For a more convenient (shorter) way to access both the bugs and patches submissions, you may want to configure the @code{debbugs-gnu-default-packages} and @code{debbugs-gnu-default-severities} Emacs variables (@pxref{Minor Mode,,, debbugs-ug, The Debbugs User Guide})."
-msgstr "Um einen bequemeren (schnelleren) Zugang zu Bugs wie auch eingereichten Patches zu bekommen, empfehlen wir, die Emacs-Variablen @code{debbugs-gnu-default-packages} und @code{debbugs-gnu-default-severities} einzustellen (siehe @ref{Minor Mode,,, debbugs-ug, Debbugs-Benutzerhandbuch})."
-
-msgid "To search for bugs, @samp{@kbd{M-x} debbugs-gnu-guix-search} can be used."
-msgstr "Zur Suche nach Bugs können Sie @samp{@kbd{M-x} debbugs-gnu-guix-search} verwenden."
-
-msgid "@xref{Top,,, debbugs-ug, Debbugs User Guide}, for more information on this nifty tool!"
-msgstr "Siehe @ref{Top,,, debbugs-ug, Debbugs User Guide} für weitere Informationen zu diesem raffinierten Werkzeug."
 
 msgid "build event notifications, RSS feed"
 msgstr "Erstellungsereignisse, Benachrichtigung per RSS-Feed"
@@ -2213,23 +2047,6 @@ msgstr "Jeder dieser RSS-Einträge verweist dabei auf die Details-Seite der ents
 
 msgid "teams"
 msgstr "Teams"
-
-msgid ""
-"$ git send-email --to=@var{ISSUE_NUMBER}@@debbugs.gnu.org \\\n"
-"  --header-cmd='etc/teams.scm cc-mentors-header-cmd' *.patch\n"
-msgstr ""
-"$ git send-email --to=@var{FEHLERNUMMER}@@debbugs.gnu.org \\\n"
-"  --header-cmd='etc/teams.scm cc-mentors-header-cmd' *.patch\n"
-
-msgid "The appropriate team or teams can also be inferred from the modified files.  For instance, if you want to send the two latest commits of the current Git repository to review, you can run:"
-msgstr "Das zuständige Team kann auch automatisch anhand der geänderten Dateien ermittelt werden. Wenn Sie zum Beispiel für die letzten zwei Commits im aktuellen Git-Repository um Überprüfung bitten möchten, führen Sie dies aus:"
-
-msgid ""
-"$ guix shell -D guix\n"
-"[env]$ git send-email --to=@var{ISSUE_NUMBER}@@debbugs.gnu.org -2\n"
-msgstr ""
-"$ guix shell -D guix\n"
-"[env]$ git send-email --to=@var{FEHLERNUMMER}@@debbugs.gnu.org -2\n"
 
 msgid "consensus seeking"
 msgstr "Konsensfindung"
@@ -2454,9 +2271,6 @@ msgstr "package-removal-policy"
 
 msgid "Package removal"
 msgstr "Paketentfernung"
-
-msgid "Package upgrade"
-msgstr "Paketaktualisierung"
 
 msgid "service deprecation"
 msgstr "veraltet, Dienste"
@@ -4533,6 +4347,9 @@ msgstr ""
 "          -c \"Guix-Daemon-Benutzer zur Privilegientrennung\" \\\n"
 "          --system guix-daemon\n"
 
+msgid "Warning"
+msgstr "Warnung"
+
 msgid "If the @command{nologin} binary is not found by @command{which nologin}, you may need to specify its path manually.  This will usually be @file{/sbin/nologin} or @file{/usr/sbin/nologin}."
 msgstr "Wenn das Programm @command{nologin} mit @command{which nologin} nicht gefunden werden kann, müssen Sie vielleicht seinen Pfad manuell angeben. Normalerweise lautet er @file{/sbin/nologin} oder @file{/usr/sbin/nologin}."
 
@@ -6032,9 +5849,6 @@ msgid ""
 msgstr ""
 "mkswap /dev/sda3\n"
 "swapon /dev/sda3\n"
-
-msgid "Alternatively, you may use a swap file.  For example, assuming that in the new system you want to use the file @file{/swapfile} as a swap file, you would run@footnote{This example will work for many types of file systems (e.g., ext4).  However, for copy-on-write file systems (e.g., btrfs), the required steps may be different.  For details, see the manual pages for @command{mkswap} and @command{swapon}.}:"
-msgstr "Alternativ können Sie eine Swap-Datei benutzen. Angenommen, Sie wollten die Datei @file{/swapdatei} im neuen System als eine Swapdatei benutzen, dann müssten Sie Folgendes ausführen@footnote{Dieses Beispiel wird auf vielen Arten von Dateisystemen funktionieren (z.B.@: auf ext4). Auf Dateisystemen mit Copy-on-Write (wie z.B.@: btrfs) können sich die nötigen Schritte unterscheiden. Details finden Sie in der Dokumentation auf den Handbuchseiten von @command{mkswap} und @command{swapon}.}:"
 
 msgid ""
 "# This is 10 GiB of swap space.  Adjust \"count\" to change the size.\n"
@@ -7904,6 +7718,9 @@ msgstr "-q"
 msgid "Inhibit loading of the user and system channel files, @file{~/.config/guix/channels.scm} and @file{/etc/guix/channels.scm}."
 msgstr "Unterdrückt das Laden der Kanaldatei des Benutzers @file{~/.config/guix/channels.scm} und der systemweiten Kanaldatei @file{/etc/guix/channels.scm}."
 
+msgid "-x"
+msgstr "-x"
+
 msgid "channel news"
 msgstr "Neuigkeiten über Kanäle"
 
@@ -8069,6 +7886,9 @@ msgstr "Anstelle von @command{guix time-machine -q} können Sie daher auch den f
 
 msgid "guix time-machine -C <(echo %default-channels) @dots{}\n"
 msgstr "guix time-machine -C <(echo %default-channels) …\n"
+
+msgid "--exclude"
+msgstr "--exclude"
 
 msgid "Note that @command{guix time-machine} can trigger builds of channels and their dependencies, and these are controlled by the standard build options (@pxref{Common Build Options})."
 msgstr "Beachten Sie, dass durch @command{guix time-machine} Erstellungen von Kanälen und deren Abhängigkeiten ausgelöst werden können, welche durch die gemeinsamen Erstellungsoptionen gesteuert werden können (siehe @ref{Common Build Options})."
@@ -9215,7 +9035,7 @@ msgstr "Wir betonen, dass Sie auch das zu Grunde liegende @code{python}-Paket in
 msgid "shebang, for @command{guix shell}"
 msgstr "Shebang, bei @command{guix shell}"
 
-msgid "@command{guix shell} can be also be used as a script interpreter, also known as @dfn{shebang}.  Here is an example self-contained Python script making use of this feature:"
+msgid "@command{guix shell} can also be used as a script interpreter, also known as @dfn{shebang}.  Here is an example self-contained Python script making use of this feature:"
 msgstr "@command{guix shell} kann auch als Skript-Interpretierer dienen; man spricht auch von einem @dfn{Shebang}. Hier ist ein Beispiel, wie es in einem eigenständigen Python-Skript benutzt werden kann:"
 
 msgid ""
@@ -9467,16 +9287,6 @@ msgstr "-E @var{Regexp}"
 
 msgid "When used alongside @option{--pure}, preserve the environment variables matching @var{regexp}---in other words, put them on a ``white list'' of environment variables that must be preserved.  This option can be repeated several times."
 msgstr "Wenn das hier zusammen mit @option{--pure} angegeben wird, bleiben die zum regulären Ausdruck @var{Regexp} passenden Umgebungsvariablen erhalten@tie{}– mit anderen Worten werden sie auf eine „weiße Liste“ von Umgebungsvariablen gesetzt, die erhalten bleiben müssen. Diese Befehlszeilenoption kann mehrmals wiederholt werden."
-
-msgid ""
-"guix shell --pure --preserve=^SLURM openmpi @dots{} \\\n"
-"  -- mpirun @dots{}\n"
-msgstr ""
-"guix shell --pure --preserve=^SLURM openmpi …@: \\\n"
-"  -- mpirun …\n"
-
-msgid "This example runs @command{mpirun} in a context where the only environment variables defined are @env{PATH}, environment variables whose name starts with @samp{SLURM}, as well as the usual ``precious'' variables (@env{HOME}, @env{USER}, etc.)."
-msgstr "In diesem Beispiel wird @command{mpirun} in einem Kontext ausgeführt, in dem die einzig definierten Umgebungsvariablen @env{PATH} und solche sind, deren Name mit @samp{SLURM} beginnt, sowie die üblichen besonders „kostbaren“ Variablen (@env{HOME}, @env{USER}, etc.)."
 
 msgid "--search-paths"
 msgstr "--search-paths"
@@ -9851,6 +9661,9 @@ msgid ""
 msgstr ""
 "guix environment --pure --preserve=^SLURM --ad-hoc openmpi …@: \\\n"
 "  -- mpirun …\n"
+
+msgid "This example runs @command{mpirun} in a context where the only environment variables defined are @env{PATH}, environment variables whose name starts with @samp{SLURM}, as well as the usual ``precious'' variables (@env{HOME}, @env{USER}, etc.)."
+msgstr "In diesem Beispiel wird @command{mpirun} in einem Kontext ausgeführt, in dem die einzig definierten Umgebungsvariablen @env{PATH} und solche sind, deren Name mit @samp{SLURM} beginnt, sowie die üblichen besonders „kostbaren“ Variablen (@env{HOME}, @env{USER}, etc.)."
 
 msgid "For containers, link the environment profile to @file{~/.guix-profile} within the container and set @code{GUIX_ENVIRONMENT} to that.  This is equivalent to making @file{~/.guix-profile} a symlink to the actual profile within the container.  Linking will fail and abort the environment if the directory already exists, which will certainly be the case if @command{guix environment} was invoked in the user's home directory."
 msgstr "Bei isolierten Umgebungen („Containern“) wird das Umgebungsprofil im Container als @file{~/.guix-profile} verknüpft und @file{~/.guix-profile} dann in @code{GUIX_ENVIRONMENT} gespeichert. Das ist äquivalent dazu, @file{~/.guix-profile} im Container zu einer symbolischen Verknüpfung auf das tatsächliche Profil zu machen. Wenn das Verzeichnis bereits existiert, schlägt das Verknüpfen fehl und die Umgebung wird nicht hergestellt. Dieser Fehler wird immer eintreten, wenn @command{guix environment} im persönlichen Verzeichnis des Benutzers aufgerufen wurde."
@@ -10791,8 +10604,8 @@ msgstr "license"
 msgid "license, of packages"
 msgstr "Lizenz, von Paketen"
 
-msgid "The license of the package; a value from @code{(guix licenses)}, or a list of such values."
-msgstr "Die Lizenz des Pakets; benutzt werden kann ein Wert aus dem Modul @code{(guix licenses)} oder eine Liste solcher Werte."
+msgid "uri"
+msgstr "uri"
 
 msgid "home-page"
 msgstr "home-page"
@@ -10973,9 +10786,6 @@ msgstr "{Datentyp} origin"
 
 msgid "This is the data type representing a source code origin."
 msgstr "Mit diesem Datentyp wird ein Ursprung, von dem Quellcode geladen werden kann, beschrieben."
-
-msgid "uri"
-msgstr "uri"
 
 msgid "An object containing the URI of the source.  The object type depends on the @code{method} (see below).  For example, when using the @var{url-fetch} method of @code{(guix download)}, the valid @code{uri} values are: a URL represented as a string, or a list thereof."
 msgstr "Ein Objekt, was die URI des Quellcodes enthält. Der Objekttyp hängt von der @code{Methode} ab (siehe unten). Zum Beispiel sind, wenn die @var{url-fetch}-Methode aus @code{(guix download)} benutzt wird, die gültigen Werte für @code{uri}: eine URL dargestellt als Zeichenkette oder eine Liste solcher URLs."
@@ -14816,7 +14626,7 @@ msgid "Caveat"
 msgstr "Einschränkung"
 
 msgid "It is important to distinguish between modules available in the build environment and modules in scope.  The @code{with-imported-modules} form pulls modules in the build environment of the gexp but it does @emph{not} import them.  To do so, you still need to use @code{use-modules} in the gexp:"
-msgstr "Wichtig ist, dass Sie zwischen in die Erstellungsumgebung importierten Modulen und sichtbaren Modulen unterscheiden. Die @code{with-imported-modules}-Form holt Module in die Erstellungsumgebung des G-Ausdrucks, importiert Sie jedoch @emph{nicht}. Dazu müssen Sie sie zusätzlich mit @code{use-modules} innerhalb des G-Ausdrucks nutzbar machen:"
+msgstr "Wichtig ist, dass Sie zwischen in die Erstellungsumgebung importierten Modulen und sichtbaren Modulen unterscheiden. Die @code{with-imported-modules}-Form holt Module in die Erstellungsumgebung des G-Ausdrucks, importiert sie jedoch @emph{nicht}. Dazu müssen Sie sie zusätzlich mit @code{use-modules} innerhalb des G-Ausdrucks nutzbar machen:"
 
 msgid ""
 "(with-imported-modules '((guix build utils))\n"
@@ -15516,9 +15326,6 @@ msgstr ""
 
 msgid "The full list of REPL commands can be seen by typing @code{,help guix} and is given below for reference."
 msgstr "Die vollständige Liste der REPL-Befehle bekommen Sie zu sehen, wenn Sie @code{,help guix} eingeben. Hier eine Referenz:"
-
-msgid "{REPL command} build @var{object}"
-msgstr "{REPL-Befehl} build @var{Objekt}"
 
 msgid "Lower @var{object} and build it if it's not already built, returning its output file name(s)."
 msgstr "Das @var{Objekt} herunterbrechen und erstellen, wenn es noch nicht erstellt ist. Als Ergebnis zurückgeliefert wird der Dateiname jeder Ausgabe."
@@ -16616,9 +16423,6 @@ msgstr "Die Prüfsumme der Datei oder des Verzeichnisses als Git-Baumstruktur be
 msgid "--exclude-vcs"
 msgstr "--exclude-vcs"
 
-msgid "-x"
-msgstr "-x"
-
 msgid "When combined with @option{--recursive}, exclude version control system directories (@file{.bzr}, @file{.git}, @file{.hg}, etc.)."
 msgstr "Wenn dies zusammen mit der Befehlszeilenoption @option{--recursive} angegeben wird, werden Verzeichnisse zur Versionskontrolle (@file{.bzr}, @file{.git}, @file{.hg}, etc.)@: vom Archiv ausgenommen."
 
@@ -17091,9 +16895,6 @@ msgstr "Mit dem npm-binary-Importer können Sie auch eine Version als Zeichenket
 
 msgid "guix import npm-binary buffer-crc32@@1.0.0\n"
 msgstr "guix import npm-binary buffer-crc32@@1.0.0\n"
-
-msgid "Generated package expressions skip the build step of the @code{node-build-system}. As such, generated package expressions often refer to transpiled or generated files, instead of being built from source."
-msgstr "Die erzeugten Paketausdrücke überspringen den build-Schritt des @code{node-build-system}. Damit beziehen sich erzeugte Paketausdrücke oft auf transpilierte oder generierte Dateien, statt sie aus ihrem Quellcode zu erstellen."
 
 msgid "opam"
 msgstr "opam"
@@ -18096,9 +17897,6 @@ msgstr "-c"
 
 msgid "Only enable the checkers specified in a comma-separated list using the names returned by @option{--list-checkers}."
 msgstr "Nur die Prüfer aktivieren, die hiernach in einer kommagetrennten Liste aus von @option{--list-checkers} aufgeführten Prüfern vorkommen."
-
-msgid "--exclude"
-msgstr "--exclude"
 
 msgid "Only disable the checkers specified in a comma-separated list using the names returned by @option{--list-checkers}."
 msgstr "Nur die Prüfer deaktivieren, die hiernach in einer kommagetrennten Liste aus von @option{--list-checkers} aufgeführten Prüfern vorkommen."
@@ -20450,8 +20248,8 @@ msgstr "@code{shepherd-requirements} (Vorgabe: @code{'()})"
 msgid "This is a list of symbols denoting Shepherd requirements that must be met before mounting the file system."
 msgstr "Eine Liste von Symbolen, die Shepherd-Voraussetzungen benennen, die erfüllt sein müssen, um dieses Dateisystem einzubinden."
 
-msgid "As an example, an NFS file system would typically have a requirement for @code{networking}.  In some situations, requiring @code{networking} might not be sufficient as @code{networking} being marked as started does @emph{not} imply the network has already been configured and in working order (for example, when using @code{dhcp-client-service-type}).  For such cases, adding a requirement on a custom @code{network-online} service may be necessary.  A sample @code{network-online} one-shot Shepherd service implementation is provided below:"
-msgstr "Zum Beispiel würde für ein NFS-Dateisystem normalerweise @code{networking} als Abhängigkeit angegeben. In manchen Situationen genügt das allerdings @emph{nicht}, weil trotz einem als gestartet markierten @code{networking} das Netzwerk vielleicht @emph{nicht} unbedingt bereits konfiguriert wurde oder ordentlich funktioniert (zum Beispiel wenn @code{dhcp-client-service-type} benutzt wird). In solchen Fällen kann es erforderlich sein, dass Sie hier eine Abhängigkeit von einem eigenen @code{network-online}-Dienst angeben. Ein Beispiel, wie Sie @code{network-online} als einmalig ausgeführten („one-shot“) Shepherd-Dienst implementieren, folgt:"
+msgid "As an example, an NFS file system would typically have a requirement for @code{networking}.  In some situations, requiring @code{networking} might not be sufficient as @code{networking} being marked as started does @emph{not} imply the network has already been configured and in working order (for example, when using @code{dhcpcd-service-type}).  For such cases, adding a requirement on a custom @code{network-online} service may be necessary.  A sample @code{network-online} one-shot Shepherd service implementation is provided below:"
+msgstr "Zum Beispiel würde für ein NFS-Dateisystem normalerweise @code{networking} als Abhängigkeit angegeben. In manchen Situationen genügt das allerdings @emph{nicht}, weil trotz einem als gestartet markierten @code{networking} das Netzwerk vielleicht @emph{nicht} unbedingt bereits konfiguriert wurde oder ordentlich funktioniert (zum Beispiel wenn @code{dhcpcd-service-type} benutzt wird). In solchen Fällen kann es erforderlich sein, dass Sie hier eine Abhängigkeit von einem eigenen @code{network-online}-Dienst angeben. Ein Beispiel, wie Sie @code{network-online} als einmalig ausgeführten („one-shot“) Shepherd-Dienst implementieren, folgt:"
 
 msgid ""
 "(simple-service 'network-online shepherd-root-service-type\n"
@@ -24258,54 +24056,6 @@ msgstr "%qemu-static-networking"
 msgid "This is the @code{static-networking} record representing network setup when using QEMU's user-mode network stack on @code{eth0} (@pxref{Using the user mode network stack,,, qemu, QEMU Documentation})."
 msgstr "Dies ist das @code{static-networking}-Verbundsobjekt, das für eine Netzwerkeinrichtung mit QEMUs als Nutzer ausgeführtem Netzwerkstapel („User-Mode Network Stack“) auf dem Gerät @code{eth0} steht (siehe @ref{Using the user mode network stack,,, qemu, QEMU-Dokumentation})."
 
-msgid "DHCP, networking service"
-msgstr "DHCP, Netzwerkdienst"
-
-msgid "dhcp-client-service-type"
-msgstr "dhcp-client-service-type"
-
-msgid "This is the type of services that run @var{dhclient}, the ISC Dynamic Host Configuration Protocol (DHCP) client."
-msgstr "Dies ist der Diensttyp für den Dienst, der @var{dhclient} ausführt, den Client des ISC für das „Dynamic Host Configuration Protocol“ (DHCP)."
-
-msgid "{Data Type} dhcp-client-configuration"
-msgstr "{Datentyp} dhcp-client-configuration"
-
-msgid "Data type representing the configuration of the ISC DHCP client service."
-msgstr "Der Datentyp, der die Konfiguration des Dienstes für den ISC-DHCP-Client repräsentiert."
-
-msgid "@code{package} (default: @code{isc-dhcp})"
-msgstr "@code{package} (Vorgabe: @code{isc-dhcp})"
-
-msgid "The ISC DHCP client package to use."
-msgstr "Das ISC-DHCP-Client-Paket, was benutzt werden soll."
-
-msgid "@code{interfaces} (default: @code{'all})"
-msgstr "@code{interfaces} (Vorgabe: @code{'all})"
-
-msgid "Either @code{'all} or the list of interface names that the ISC DHCP client should listen on---e.g., @code{'(\"eno1\")}."
-msgstr "Geben Sie entweder @code{'all} an oder die Liste der Namen der Schnittstellen, auf denen der ISC-DHCP-Client lauschen soll@tie{}– z.B.@: @code{'(\"eno1\")}."
-
-msgid "When set to @code{'all}, the ISC DHCP client listens on all the available non-loopback interfaces that can be activated.  Otherwise the ISC DHCP client listens only on the specified interfaces."
-msgstr "Wenn es auf @code{'all} gesetzt ist, wird der ISC-DHCP-Client auf allen verfügbaren Netzwerkschnittstellen außer „loopback“, die aktiviert werden können, lauschen. Andernfalls lauscht der ISC-DHCP-Client nur auf den angegebenen Schnittstellen."
-
-msgid "@code{config-file} (default: @code{#f})"
-msgstr "@code{config-file} (Vorgabe: @code{#f})"
-
-msgid "The configuration file for the ISC DHCP client."
-msgstr "Die Konfigurationsdatei für den ISC-DHCP-Client."
-
-msgid "@code{version} (default: @code{\"4\"})"
-msgstr "@code{version} (Vorgabe: @code{\"4\"})"
-
-msgid "@code{shepherd-provision} (default: @code{'(networking)})"
-msgstr "@code{shepherd-provision} (Vorgabe: @code{'(networking)})"
-
-msgid "This option can be used to provide a list of symbols naming Shepherd services that this service will depend on, such as @code{'wpa-supplicant} or @code{'iwd} if you require authenticated access for encrypted WiFi or Ethernet networks."
-msgstr "Mit dieser Option können Sie als eine Liste von Symbolen zusätzliche Shepherd-Dienste benennen, von welchen dieser Dienst abhängen soll. Beispielsweise geben Sie hier @code{'wpa-supplicant} oder @code{'iwd} an, wenn Sie Ihren Rechner gegenüber verschlüsselten WLAN- oder Ethernet-Netzwerken authentisieren müssen."
-
-msgid "Likewise, @code{shepherd-provision} is a list of Shepherd service names (symbols) provided by this service.  You might want to change the default value if you intend to run several ISC DHCP clients, only one of which provides the @code{networking} Shepherd service."
-msgstr "Ebenso können Sie mit @code{shepherd-provision} eine Liste von Namen von Shepherd-Diensten angeben (als Symbole), die durch diesen Dienst bereitgestellt werden. Sie könnten vom Vorgabewert abweichen wollen, wenn Sie mehrere ISC-DHCP-Clients auszuführen planen, von denen nur einer den Shepherd-Dienst @code{networking} bereitstellt."
-
 msgid "DHCPCD, networking service"
 msgstr "DHCPCD, Netzwerkdienst"
 
@@ -24426,6 +24176,9 @@ msgstr "@code{connman} (Vorgabe: @var{connman})"
 
 msgid "The connman package to use."
 msgstr "Das zu verwendende Connman-Paket."
+
+msgid "This option can be used to provide a list of symbols naming Shepherd services that this service will depend on, such as @code{'wpa-supplicant} or @code{'iwd} if you require authenticated access for encrypted WiFi or Ethernet networks."
+msgstr "Mit dieser Option können Sie als eine Liste von Symbolen zusätzliche Shepherd-Dienste benennen, von welchen dieser Dienst abhängen soll. Beispielsweise geben Sie hier @code{'wpa-supplicant} oder @code{'iwd} an, wenn Sie Ihren Rechner gegenüber verschlüsselten WLAN- oder Ethernet-Netzwerken authentisieren müssen."
 
 msgid "@code{disable-vpn?} (default: @code{#f})"
 msgstr "@code{disable-vpn?} (Vorgabe: @code{#f})"
@@ -24589,6 +24342,9 @@ msgstr "@code{interface} (Vorgabe: @code{#f})"
 msgid "If this is set, it must specify the name of a network interface that WPA supplicant will control."
 msgstr "Wenn dieses Feld gesetzt ist, muss es den Namen einer Netzwerkschnittstelle angeben, die von WPA Supplicant verwaltet werden soll."
 
+msgid "@code{config-file} (default: @code{#f})"
+msgstr "@code{config-file} (Vorgabe: @code{#f})"
+
 msgid "Optional configuration file to use."
 msgstr "Optionale Konfigurationsdatei."
 
@@ -24684,11 +24440,17 @@ msgstr ""
 msgid "{Data Type} dhcpd-configuration"
 msgstr "{Datentyp} dhcpd-configuration"
 
+msgid "@code{package} (default: @code{isc-dhcp})"
+msgstr "@code{package} (Vorgabe: @code{isc-dhcp})"
+
 msgid "The package that provides the DHCP daemon.  This package is expected to provide the daemon at @file{sbin/dhcpd} relative to its output directory.  The default package is the @uref{https://www.isc.org/dhcp/, ISC's DHCP server}."
 msgstr "Das Paket, das den DHCP-Daemon zur Verfügung stellt. Von diesem Paket wird erwartet, dass es den Daemon unter dem Pfad @file{sbin/dhcpd} relativ zum Verzeichnis der Paketausgabe bereitstellt. Das vorgegebene Paket ist @uref{https://www.isc.org/dhcp/, der DHCP-Server vom ISC}."
 
 msgid "The configuration file to use.  This is required.  It will be passed to @code{dhcpd} via its @code{-cf} option.  This may be any ``file-like'' object (@pxref{G-Expressions, file-like objects}).  See @code{man dhcpd.conf} for details on the configuration file syntax."
 msgstr "Die Konfigurationsdatei, die benutzt werden soll. Sie @emph{muss} angegeben werden und wird an @code{dhcpd} mittels seiner Befehlszeilenoption @code{-cf} übergeben. Ein beliebiges „dateiartiges“ Objekt kann dafür angegeben werden (siehe @ref{G-Expressions, dateiartige Objekte}). Siehe @code{man dhcpd.conf} für Details, welcher Syntax die Konfigurationsdatei genügen muss."
+
+msgid "@code{version} (default: @code{\"4\"})"
+msgstr "@code{version} (Vorgabe: @code{\"4\"})"
 
 msgid "The DHCP version to use.  The ISC DHCP server supports the values ``4'', ``6'', and ``4o6''.  These correspond to the @code{dhcpd} program options @code{-4}, @code{-6}, and @code{-4o6}.  See @code{man dhcpd} for details."
 msgstr "Die DHCP-Version, die benutzt werden soll. Der ISC-DHCP-Server unterstützt die Werte „4“, „6“ und „4o6“. Das Feld entspricht den Befehlszeilenoptionen @code{-4}, @code{-6} und @code{-4o6} von @code{dhcpd}. Siehe @code{man dhcpd} für Details."
@@ -29983,7 +29745,7 @@ msgid ""
 "         (postgresql-configuration\n"
 "          (config-file\n"
 "           (postgresql-config-file\n"
-"            (log-destination \"stderr\")\n"
+"            (log-destination \"csvlog,stderr\")\n"
 "            (hba-file\n"
 "             (plain-file \"pg_hba.conf\"\n"
 "                         \"\n"
@@ -30002,7 +29764,7 @@ msgstr ""
 "         (postgresql-configuration\n"
 "          (config-file\n"
 "           (postgresql-config-file\n"
-"            (log-destination \"stderr\")\n"
+"            (log-destination \"csvlog,stderr\")\n"
 "            (hba-file\n"
 "             (plain-file \"pg_hba.conf\"\n"
 "                         \"\n"
@@ -30017,8 +29779,8 @@ msgstr ""
 "               (\"logging_collector\"             #t)\n"
 "               (\"log_directory\"                 \"/var/log/postgresql\")))))))\n"
 
-msgid "@code{log-destination} (default: @code{\"syslog\"})"
-msgstr "@code{log-destination} (Vorgabe: @code{\"syslog\"})"
+msgid "@code{log-destination} (default: @code{\"stderr\"})"
+msgstr "@code{log-destination} (Vorgabe: @code{\"stderr\"})"
 
 msgid "@code{hba-file} (default: @code{%default-postgres-hba})"
 msgstr "@code{hba-file} (Vorgabe: @code{%default-postgres-hba})"
@@ -34746,7 +34508,7 @@ msgid ""
 "  (services\n"
 "    (cons*\n"
 "      (service nslcd-service-type)\n"
-"      (service dhcp-client-service-type)\n"
+"      (service dhcpcd-service-type)\n"
 "      %base-services))\n"
 "  (name-service-switch\n"
 "   (let ((services (list (name-service (name \"db\"))\n"
@@ -34768,7 +34530,7 @@ msgstr ""
 "  (services\n"
 "    (cons*\n"
 "      (service nslcd-service-type)\n"
-"      (service dhcp-client-service-type)\n"
+"      (service dhcpcd-service-type)\n"
 "      %base-services))\n"
 "  (name-service-switch\n"
 "   (let ((services (list (name-service (name \"db\"))\n"
@@ -36716,7 +36478,7 @@ msgid "A simple services setup for nginx with php can look like this:"
 msgstr "Eine einfache Art, die Dienste für nginx mit PHP einzurichten, kann so aussehen:"
 
 msgid ""
-"(services (cons* (service dhcp-client-service-type)\n"
+"(services (cons* (service dhcpcd-service-type)\n"
 "                 (service php-fpm-service-type)\n"
 "                 (service nginx-service-type\n"
 "                          (nginx-server-configuration\n"
@@ -36729,7 +36491,7 @@ msgid ""
 "                           (ssl-certificate-key #f)))\n"
 "                 %base-services))\n"
 msgstr ""
-"(services (cons* (service dhcp-client-service-type)\n"
+"(services (cons* (service dhcpcd-service-type)\n"
 "                 (service php-fpm-service-type)\n"
 "                 (service nginx-service-type\n"
 "                          (nginx-server-configuration\n"
@@ -47480,7 +47242,7 @@ msgid ""
 "                        (type \"ext4\"))\n"
 "                       %base-file-systems))\n"
 "   (services\n"
-"    (append (list (service dhcp-client-service-type)\n"
+"    (append (list (service dhcpcd-service-type)\n"
 "                  (service openssh-service-type\n"
 "                           (openssh-configuration\n"
 "                            (permit-root-login #t)\n"
@@ -47502,7 +47264,7 @@ msgstr ""
 "                        (type \"ext4\"))\n"
 "                       %base-file-systems))\n"
 "   (services\n"
-"    (append (list (service dhcp-client-service-type)\n"
+"    (append (list (service dhcpcd-service-type)\n"
 "                  (service openssh-service-type\n"
 "                           (openssh-configuration\n"
 "                            (permit-root-login #t)\n"
@@ -47786,8 +47548,8 @@ msgstr "-drive if=none,file=/tmp/qemu-image,id=myhd"
 msgid "Use our QCOW image, the @file{guix-system-vm-image-@value{VERSION}.x86_64-linux.qcow2} file, as the backing store of the ``myhd'' drive."
 msgstr "Unser QCOW-Abbild in der Datei @file{guix-system-vm-image-@value{VERSION}.x86_64-linux.qcow2} soll als Inhalt des „myhd“-Laufwerks herhalten."
 
-msgid "The default @command{run-vm.sh} script that is returned by an invocation of @command{guix system vm} does not add a @command{-nic user} flag by default.  To get network access from within the vm add the @code{(dhcp-client-service)} to your system definition and start the VM using @command{$(guix system vm config.scm) -nic user}.  An important caveat of using @command{-nic user} for networking is that @command{ping} will not work, because it uses the ICMP protocol.  You'll have to use a different command to check for network connectivity, for example @command{guix download}."
-msgstr "Das voreingestellte @command{run-vm.sh}-Skript, das durch einen Aufruf von @command{guix system vm} erzeugt wird, fügt keine Befehlszeilenoption @command{-nic user} an. Um innerhalb der virtuellen Maschine Netzwerkzugang zu haben, fügen Sie den @code{(dhcp-client-service)} zu Ihrer Systemdefinition hinzu und starten Sie die VM mit @command{$(guix system vm config.scm) -nic user}. Erwähnt werden sollte der Nachteil, dass bei Verwendung von @command{-nic user} zur Netzanbindung der @command{ping}-Befehl @emph{nicht} funktionieren wird, weil dieser das ICMP-Protokoll braucht. Sie werden also einen anderen Befehl benutzen müssen, um auszuprobieren, ob Sie mit dem Netzwerk verbunden sind, zum Beispiel @command{guix download}."
+msgid "The default @command{run-vm.sh} script that is returned by an invocation of @command{guix system vm} does not add a @command{-nic user} flag by default.  To get network access from within the vm add the @code{(dhcpcd-service-type)} to your system definition and start the VM using @command{$(guix system vm config.scm) -nic user}.  An important caveat of using @command{-nic user} for networking is that @command{ping} will not work, because it uses the ICMP protocol.  You'll have to use a different command to check for network connectivity, for example @command{guix download}."
+msgstr "Das voreingestellte @command{run-vm.sh}-Skript, das durch einen Aufruf von @command{guix system vm} erzeugt wird, fügt keine Befehlszeilenoption @command{-nic user} an. Um innerhalb der virtuellen Maschine Netzwerkzugang zu haben, fügen Sie den @code{(dhcpcd-service-type)} zu Ihrer Systemdefinition hinzu und starten Sie die VM mit @command{$(guix system vm config.scm) -nic user}. Erwähnt werden sollte der Nachteil, dass bei Verwendung von @command{-nic user} zur Netzanbindung der @command{ping}-Befehl @emph{nicht} funktionieren wird, weil dieser das ICMP-Protokoll braucht. Sie werden also einen anderen Befehl benutzen müssen, um auszuprobieren, ob Sie mit dem Netzwerk verbunden sind, zum Beispiel @command{guix download}."
 
 msgid "Connecting Through SSH"
 msgstr "Verbinden über SSH"
@@ -47807,8 +47569,8 @@ msgstr "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 10022
 msgid "The @command{-p} tells @command{ssh} the port you want to connect to.  @command{-o UserKnownHostsFile=/dev/null} prevents @command{ssh} from complaining every time you modify your @command{config.scm} file and the @command{-o StrictHostKeyChecking=no} prevents you from having to allow a connection to an unknown host every time you connect."
 msgstr "Mit @command{-p} wird @command{ssh} der Port mitgeteilt, über den eine Verbindung hergestellt werden soll. @command{-o UserKnownHostsFile=/dev/null} verhindert, dass @command{ssh} sich bei jeder Modifikation Ihrer @command{config.scm}-Datei beschwert, ein anderer bekannter Rechner sei erwartet worden, und @command{-o StrictHostKeyChecking=no} verhindert, dass Sie die Verbindung zu unbekannten Rechnern jedes Mal bestätigen müssen, wenn Sie sich verbinden."
 
-msgid "If you find the above @samp{hostfwd} example not to be working (e.g., your SSH client hangs attempting to connect to the mapped port of your VM), make sure that your Guix System VM has networking support, such as by using the @code{dhcp-client-service-type} service type."
-msgstr "Wenn dieses Beispiel zu @samp{hostfwd} bei Ihnen nicht funktioniert (weil z.B.@: sich Ihr SSH-Client aufhängt, wenn Sie versuchen, sich mit dem zugeordneten Port auf Ihrer VM zu verbinden), dann überprüfen Sie nochmal, ob Ihre Guix-System-VM auch mit Netzwerkunterstützung konfiguriert wurde, also etwas wie der Diensttyp @code{dhcp-client-service-type} angegeben wurde."
+msgid "If you find the above @samp{hostfwd} example not to be working (e.g., your SSH client hangs attempting to connect to the mapped port of your VM), make sure that your Guix System VM has networking support, such as by using the @code{dhcpcd-service-type} service type."
+msgstr "Wenn dieses Beispiel zu @samp{hostfwd} bei Ihnen nicht funktioniert (weil z.B.@: sich Ihr SSH-Client aufhängt, wenn Sie versuchen, sich mit dem zugeordneten Port auf Ihrer VM zu verbinden), dann überprüfen Sie nochmal, ob Ihre Guix-System-VM auch mit Netzwerkunterstützung konfiguriert wurde, also etwas wie der Diensttyp @code{dhcpcd-service-type} angegeben wurde."
 
 msgid "Using @command{virt-viewer} with Spice"
 msgstr "@command{virt-viewer} mit Spice benutzen"
@@ -49922,9 +49684,6 @@ msgstr "@code{guix-defaults?} (Vorgabe: @code{#t}) (Typ: Boolescher-Ausdruck)"
 msgid "Association list of environment variables to set for the Bash session.  The rules for the @code{home-environment-variables-service-type} apply here (@pxref{Essential Home Services}).  The contents of this field will be added after the contents of the @code{bash-profile} field."
 msgstr "Eine assoziative Liste der Umgebungsvariablen, die für die Bash-Sitzung gesetzt sein sollen. Dieselben Regeln wie für den @code{home-environment-variables-service-type} gelten auch hier (siehe @ref{Essential Home Services}). Der Inhalt dieses Felds wird anschließend an das, was im @code{bash-profile}-Feld steht, angefügt."
 
-msgid "Association list of aliases to set for the Bash session.  The aliases will be defined after the contents of the @code{bashrc} field has been put in the @file{.bashrc} file.  The alias will automatically be quoted, so something like this:"
-msgstr "Assoziative Liste der Alias-Namen, welche für die Bash-Sitzung eingerichtet werden sollen. Die Alias-Namen werden nach dem Inhalt des @code{bashrc}-Feldes in der Datei @file{.bashrc} definiert. Jeder Alias-Name steht automatisch in Anführungszeichen, d.h.@: ein Eintrag wie:"
-
 msgid "'((\"ls\" . \"ls -alF\"))\n"
 msgstr "'((\"ls\" . \"ls -alF\"))\n"
 
@@ -49933,9 +49692,6 @@ msgstr "wird zu"
 
 msgid "alias ls=\"ls -alF\"\n"
 msgstr "alias ls=\"ls -alF\"\n"
-
-msgid "List of file-like objects, which will be added to @file{.bash_profile}.  Used for executing user's commands at start of login shell (In most cases the shell started on tty just after login).  @file{.bash_login} won't be ever read, because @file{.bash_profile} always present."
-msgstr "Eine Liste dateiartiger Objekte, die in @file{.bash_profile} eingefügt werden. Damit können benutzereigene Befehle beim Start der Login-Shell ausgeführt werden. (In der Regel handelt es sich um die Shell, die gestartet wird, direkt nachdem man sich auf der Konsole (TTY) anmeldet.) @file{.bash_login} wird niemals gelesen, weil @file{.bash_profile} immer existiert."
 
 msgid "List of file-like objects, which will be added to @file{.bashrc}.  Used for executing user's commands at start of interactive shell (The shell for interactive usage started by typing @code{bash} or by terminal app or any other program)."
 msgstr "Eine Liste dateiartiger Objekte, die in @file{.bashrc} eingefügt werden. Damit können benutzereigene Befehle beim Start einer interaktiven Shell ausgeführt werden. (Interaktive Shells sind Shells für interaktive Nutzung, die man startet, indem man @code{bash} eintippt oder die durch Terminal-Anwendungen oder andere Programme gestartet werden.)"

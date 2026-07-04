@@ -52,7 +52,6 @@ info_TEXINFOS = %D%/guix.texi			\
   %D%/guix-cookbook.ru.texi			\
   %D%/guix-cookbook.sk.texi			\
   %D%/guix-cookbook.sv.texi			\
-  %D%/guix-cookbook.ta.texi			\
   %D%/guix-cookbook.zh_CN.texi
 
 %C%_guix_TEXINFOS = \

@@ -2,7 +2,7 @@
 # Modified by Ludovic Courtès <ludo@gnu.org> for the GNU Guix manual.
 # Further modified by Tomas Volf <~@wolfsden.cz>.
 
-htmlxrefversion=2026-02-23.07; # UTC
+htmlxrefversion=2026-07-04.11; # UTC
 
 # Override URLs of manuals provided by the Documentation Center.
 
@@ -504,8 +504,6 @@ GUIX_COOKBOOK = ${GUIX_ROOT}/cookbook
  guix-cookbook.sk	node    ${GUIX_COOKBOOK}/sk/html_node/
  guix-cookbook.sv	mono    ${GUIX_COOKBOOK}/sv/guix-cookbook.sv.html
  guix-cookbook.sv	node    ${GUIX_COOKBOOK}/sv/html_node/
- guix-cookbook.ta	mono    ${GUIX_COOKBOOK}/ta/guix-cookbook.ta.html
- guix-cookbook.ta	node    ${GUIX_COOKBOOK}/ta/html_node/
  guix-cookbook		mono    ${GUIX_COOKBOOK}/en/guix-cookbook.html
  guix-cookbook		node	${GUIX_COOKBOOK}/en/html_node/
  guix-cookbook.zh_CN	mono    ${GUIX_COOKBOOK}/zh-cn/guix-cookbook.zh_CN.html

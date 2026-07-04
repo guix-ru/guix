@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guix manual checkout\n"
 "Report-Msgid-Bugs-To: bug-guix@gnu.org\n"
-"POT-Creation-Date: 2026-05-18 03:18+0000\n"
+"POT-Creation-Date: 2026-07-04 03:18+0000\n"
 "PO-Revision-Date: 2026-05-27 14:28+0000\n"
 "Last-Translator: pelzflorian <pelzflorian@noreply.codeberg.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.codeberg.org/projects/guix/documentation-cookbook/zh_Hans/>\n"
@@ -28,9 +28,6 @@ msgstr ""
 msgid "GNU Guix Cookbook"
 msgstr "GNU Guix 烹饪书"
 
-msgid "Copyright @copyright{} 2019, 2022 Ricardo Wurmus@* Copyright @copyright{} 2019 Efraim Flashner@* Copyright @copyright{} 2019 Pierre Neidhardt@* Copyright @copyright{} 2020 Oleg Pykhalov@* Copyright @copyright{} 2020 Matthew Brooks@* Copyright @copyright{} 2020 Marcin Karpezo@* Copyright @copyright{} 2020 Brice Waegeneire@* Copyright @copyright{} 2020 André Batista@* Copyright @copyright{} 2020 Christine Lemmer-Webber@* Copyright @copyright{} 2021 Joshua Branson@* Copyright @copyright{} 2022, 2023 Maxim Cournoyer@* Copyright @copyright{} 2023--2026 Ludovic Courtès@* Copyright @copyright{} 2023 Thomas Ieong@* Copyright @copyright{} 2024 Florian Pelz@* Copyright @copyright{} 2025 45mg@* Copyright @copyright{} 2023 Marek Felšöci@* Copyright @copyright{} 2023 Konrad Hinsen@* Copyright @copyright{} 2023 Philippe Swartvagher@*"
-msgstr "Copyright @copyright{} 2019, 2022 Ricardo Wurmus@* Copyright @copyright{} 2019 Efraim Flashner@* Copyright @copyright{} 2019 Pierre Neidhardt@* Copyright @copyright{} 2020 Oleg Pykhalov@* Copyright @copyright{} 2020 Matthew Brooks@* Copyright @copyright{} 2020 Marcin Karpezo@* Copyright @copyright{} 2020 Brice Waegeneire@* Copyright @copyright{} 2020 André Batista@* Copyright @copyright{} 2020 Christine Lemmer-Webber@* Copyright @copyright{} 2021 Joshua Branson@* Copyright @copyright{} 2022, 2023 Maxim Cournoyer@* Copyright @copyright{} 2023--2026 Ludovic Courtès@* Copyright @copyright{} 2023 Thomas Ieong@* Copyright @copyright{} 2024 Florian Pelz@* Copyright @copyright{} 2025 45mg@* Copyright @copyright{} 2023 Marek Felšöci@* Copyright @copyright{} 2023 Konrad Hinsen@* Copyright @copyright{} 2023 Philippe Swartvagher@*"
-
 msgid "Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the license is included in the section entitled ``GNU Free Documentation License''."
 msgstr "现允许根据 GNU 自由文档许可证第 1.3 版或自由软件基金会发布的任何更高版本的条款复制、分发和（或）修改本文件；没有不可变小节，没有封面文字，也没有封底文字。此许可证的副本包含在标题为“GNU 自由文档许可证”的部分内。"
 
@@ -43,9 +40,6 @@ msgstr "Guix 烹饪书: (guix-cookbook.zh_CN)"
 msgid "Tutorials and examples for GNU Guix."
 msgstr "GNU Guix 的教程和示例。"
 
-msgid "Tutorials and examples for using the GNU Guix Functional Package Manager"
-msgstr "GNU Guix 功能性包管理器使用教程与示例"
-
 msgid "The GNU Guix Developers"
 msgstr "GNU Guix 开发者"
 
@@ -55,7 +49,7 @@ msgstr "Top"
 msgid "This document presents tutorials and detailed examples for GNU@tie{}Guix, a functional package management tool written for the GNU system.  Please @pxref{Top,,, guix, GNU Guix reference manual} for details about the system, its API, and related concepts."
 msgstr "本文档提供 GNU@tie{}Guix 的教程与详细示例——这是一款专为 GNU 系统编写的功能性包管理工具。关于系统架构、应用程序接口及相关概念的具体说明，敬请查阅 @pxref{Top,,, guix.zh_CN, GNU Guix 参考手册}。"
 
-msgid "This manual is also available in Simplified Chinese (@pxref{Top,,, guix-cookbook.zh_CN, GNU Guix 烹饪书}), French (@pxref{Top,,, guix-cookbook.fr, Livre de recettes de GNU Guix}), German (@pxref{Top,,, guix-cookbook.de, GNU-Guix-Kochbuch}), Korean (@pxref{Top,,, guix-cookbook.ko, GNU Guix 쿡북}), Spanish (@pxref{Top,,, guix-cookbook.es, Libro de recetas de GNU Guix}), Italian (@pxref{Top,,, guix-cookbook.it, Ricettario di GNU Guix}), Brazilian Portuguese (@pxref{Top,,, guix-cookbook.pt_BR, Livro de receitas do GNU Guix}), Russian (@pxref{Top,,, guix-cookbook.ru, GNU Guix Рецепты}), Slovak (@pxref{Top,,, guix-cookbook.sk, Receptár GNU Guix}), Swedish (@pxref{Top,,, guix-cookbook.sv, Kokbok för GNU Guix}), and Tamil (@pxref{Top,,, guix-cookbook.ta, GNU Guix கையேடு}).  If you would like to translate this document in your native language, consider joining @uref{https://translate.codeberg.org/projects/guix/documentation-cookbook, Weblate} (@pxref{Translating Guix,,, guix, GNU Guix Reference Manual})."
+msgid "This manual is also available in Simplified Chinese (@pxref{Top,,, guix-cookbook.zh_CN, GNU Guix 烹饪书}), French (@pxref{Top,,, guix-cookbook.fr, Livre de recettes de GNU Guix}), German (@pxref{Top,,, guix-cookbook.de, GNU-Guix-Kochbuch}), Korean (@pxref{Top,,, guix-cookbook.ko, GNU Guix 쿡북}), Spanish (@pxref{Top,,, guix-cookbook.es, Libro de recetas de GNU Guix}), Italian (@pxref{Top,,, guix-cookbook.it, Ricettario di GNU Guix}), Brazilian Portuguese (@pxref{Top,,, guix-cookbook.pt_BR, Livro de receitas do GNU Guix}), Russian (@pxref{Top,,, guix-cookbook.ru, GNU Guix Рецепты}), Slovak (@pxref{Top,,, guix-cookbook.sk, Receptár GNU Guix}), and Swedish (@pxref{Top,,, guix-cookbook.sv, Kokbok för GNU Guix}).  If you would like to translate this document in your native language, consider joining @uref{https://translate.codeberg.org/projects/guix/documentation-cookbook, Weblate} (@pxref{Translating Guix,,, guix, GNU Guix Reference Manual})."
 msgstr "这个用户手册还提供英语版（@pxref{Top,,, guix-cookbook, GNU Guix Cookbook}）、法语版（@pxref{Top,,, guix-cookbook.fr, Livre de recettes de GNU Guix}）、德语版（@pxref{Top,,, guix-cookbook.de, GNU-Guix-Kochbuch}）、朝鲜语版 (@pxref{Top,,, guix-cookbook.ko, GNU Guix 쿡북})、西班牙语版（@pxref{Top,,, guix-cookbook.es, Libro de recetas de GNU Guix}）、意大利语版（@pxref{Top,,, guix-cookbook.it, Ricettario di GNU Guix}）、巴西葡萄牙语版（@pxref{Top,,, guix-cookbook.pt_BR, Livro de receitas do GNU Guix}）、俄语版（@pxref{Top,,, guix-cookbook.ru, GNU Guix Рецепты}）、斯洛伐克语版（@pxref{Top,,, guix-cookbook.sk, Receptár GNU Guix}）、瑞典语版（@pxref{Top,,, guix-cookbook.sv, Kokbok för GNU Guix}）与泰米尔语版（@pxref{Top,,, guix-cookbook.ta, GNU Guix கையேடு}）。如果你想把它翻译成你的母语，请考虑加入 @uref{https://translate.codeberg.org/projects/guix/documentation-cookbook, Weblate}（@pxref{翻译 Guix,,, guix.zh_CN, GNU Guix参考手册}）。"
 
 msgid "Scheme tutorials"

@@ -17,16 +17,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guix manual checkout\n"
 "Report-Msgid-Bugs-To: bug-guix@gnu.org\n"
-"POT-Creation-Date: 2026-05-26 03:18+0000\n"
-"PO-Revision-Date: 2026-05-23 18:50+0000\n"
-"Last-Translator: barm1 <barm1@noreply.codeberg.org>\n"
+"POT-Creation-Date: 2026-06-21 03:18+0000\n"
+"PO-Revision-Date: 2026-06-22 15:13+0000\n"
+"Last-Translator: pelzflorian <pelzflorian@noreply.codeberg.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.codeberg.org/projects/guix/documentation-manual/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 2026.5\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 msgid "Contributing"
 msgstr "Contribuindo"
@@ -272,15 +272,6 @@ msgstr "autenticação, de um checkout Guix"
 msgid "How do you ensure that you obtained a genuine copy of the repository? To do that, run @command{guix git authenticate}, passing it the commit and OpenPGP fingerprint of the @dfn{channel introduction} (@pxref{Invoking guix git authenticate}):"
 msgstr "Como você garante que obteve uma cópia genuína do repositório? Para fazer isso, execute @command{guix git authenticate}, passando a ele o commit e a impressão digital OpenPGP do @dfn{introdução ao canal} (@pxref{Invoking guix git authenticate}):"
 
-msgid ""
-"git fetch origin keyring:keyring\n"
-"guix git authenticate 9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-msgstr ""
-"git fetch origin keyring:keyring\n"
-"guix git authenticate 9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-
 msgid "This command completes with exit code zero on success; it prints an error message and exits with a non-zero code otherwise."
 msgstr "Este comando é concluído com um código de saída zero em caso de sucesso; caso contrário, ele imprime uma mensagem de erro e sai com um código diferente de zero."
 
@@ -394,15 +385,6 @@ msgstr "Se alguma coisa falhar, dê uma olhada nas instruções de instalação 
 msgid "From there on, you can authenticate all the commits included in your checkout by running:"
 msgstr "A partir daí, você pode autenticar todos os commits incluídos no seu checkout executando:"
 
-msgid ""
-"guix git authenticate \\\n"
-"  9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-msgstr ""
-"guix git authenticate \\\n"
-"  9edb3f66fd807b096b48283debdcddccfea34bad \\\n"
-"  \"BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA\"\n"
-
 msgid "The first run takes a couple of minutes, but subsequent runs are faster.  On subsequent runs, you can run the command without any arguments since the @dfn{introduction} (the commit ID and OpenPGP fingerprints above)  will have been recorded@footnote{This requires a recent version of Guix, from May 2024 or more recent.}:"
 msgstr "A primeira execução leva alguns minutos, mas as execuções subsequentes são mais rápidas. Em execuções subsequentes, você pode executar o comando sem argumentos, já que o @dfn{introduction} (o ID de confirmação e as impressões digitais do OpenPGP acima) terão sido registrados@footnote{Isso requer uma versão recente do Guix, de maio de 2024 ou mais recente.}:"
 
@@ -497,9 +479,6 @@ msgstr "make check SCM_LOG_DRIVER_FLAGS=\"--brief=no --show-duration=yes\"\n"
 msgid "@xref{Parallel Test Harness,,,automake,GNU Automake} for more information about the Automake Parallel Test Harness."
 msgstr "@xref{Parallel Test Harness,,,automake,GNU Automake} para mais informações sobre o Automake Parallel Test Harness."
 
-msgid "Upon failure, please email @email{bug-guix@@gnu.org} and attach the @file{test-suite.log} file.  Please specify the Guix version being used as well as version numbers of the dependencies (@pxref{Requirements}) in your message."
-msgstr "Em caso de falha, envie um e-mail para @email{bug-guix@@gnu.org} e anexe o arquivo @file{test-suite.log}. Por favor, especifique a versão do Guix que está sendo usada, bem como os números de versão das dependências (@pxref{Requirements}) em sua mensagem."
-
 msgid "Guix also comes with a whole-system test suite that tests complete Guix System instances.  It can only run on systems where Guix is already installed, using:"
 msgstr "O Guix também vem com um conjunto de testes de sistema completo que testa instâncias completas do Guix System. Ele só pode ser executado em sistemas nos quais o Guix já está instalado, usando:"
 
@@ -531,9 +510,6 @@ msgstr ""
 
 msgid "there may be inconsistencies in the work tree from previous builds.  To resolve this, try running @command{make clean-go} followed by @command{make}."
 msgstr "pode haver inconsistências na árvore de trabalho de compilações anteriores. Para resolver isso, tente executar @command{make clean-go} seguido por @command{make}."
-
-msgid "Again in case of test failures, please send @email{bug-guix@@gnu.org} all the details."
-msgstr "Novamente, em caso de falhas nos testes, por favor envie @email{bug-guix@@gnu.org} todos os detalhes."
 
 msgid "In order to keep a sane working environment, you will find it useful to test the changes made in your local source tree checkout without actually installing them.  So that you can distinguish between your ``end-user'' hat and your ``motley'' costume."
 msgstr "Para manter um ambiente de trabalho saudável, você achará útil testar as alterações feitas na árvore local de fontes sem realmente instalá-las. Para que você possa distinguir entre o seu chapéude ''usuário final'' e sua fantasia ''misturada''."
@@ -1992,12 +1968,6 @@ msgstr "Configuração do git"
 msgid "If you have not done so already, you may wish to set a name and email that will be associated with your commits (@pxref{telling git your name, , Telling Git your name, git, Git User Manual}).  If you wish to use a different name or email just for commits in this repository, you can use @command{git config --local}, or edit @file{.git/config} in the repository instead of @file{~/.gitconfig}."
 msgstr "Se você ainda não fez isso, você pode querer definir um nome e e-mail que serão associados aos seus commits (@pxref{telling git your name, , Telling Git your name, git, Git User Manual}). Se você quiser usar um nome ou e-mail diferente apenas para commits neste repositório, você pode usar @command{git config --local}, ou editar @file{.git/config} no repositório em vez de @file{~/.gitconfig}."
 
-msgid "commit-msg hook"
-msgstr "gancho commit-msg"
-
-msgid "Other important Git configuration will automatically be configured when building the project (@pxref{Building from Git}).  A @file{.git/hooks/commit-msg} hook will be installed that embeds @samp{Change-Id} Git @emph{trailers} in your commit messages for traceability purposes.  It is important to preserve these when editing your commit messages, particularly if a first version of your proposed changes was already submitted for review.  If you have a @file{commit-msg} hook of your own you would like to use with Guix, you can place it under the @file{.git/hooks/commit-msg.d/} directory."
-msgstr "Outras configurações importantes do Git serão configuradas automaticamente ao construir o projeto (@pxref{Building from Git}). Um hook @file{.git/hooks/commit-msg} será instalado, incorporando @samp{Change-Id} Git @emph{trailers} em suas mensagens de commit para fins de rastreabilidade. É importante preservá-los ao editar suas mensagens de commit, principalmente se uma primeira versão de suas alterações propostas já foi enviada para revisão. Se você tiver um hook @file{commit-msg} próprio que gostaria de usar com o Guix, pode colocá-lo no diretório @file{.git/hooks/commit-msg.d/}."
-
 msgid "This section describes how the Guix project tracks its bug reports, patch submissions and topic branches."
 msgstr "Esta seção descreve como o projeto Guix rastreia seus relatórios de bugs, envios de patches e ramificações de tópicos."
 
@@ -2013,20 +1983,11 @@ msgstr "Gerenciando Patches e Branches"
 msgid "How changes to Guix are managed."
 msgstr "Como as alterações no Guix são gerenciadas."
 
-msgid "Debbugs User Interfaces"
-msgstr "Interfaces de usuário do Debbugs"
-
-msgid "Ways to interact with Debbugs."
-msgstr "Maneiras de interagir com Debbugs."
-
 msgid "Cuirass Build Notifications"
 msgstr "Notificações de construção de Cuirass"
 
 msgid "Be alerted of any breakage via RSS feeds."
 msgstr "Seja alertado sobre qualquer quebra via feeds RSS."
-
-msgid "Debbugs, issue tracking system"
-msgstr "Debbugs, sistema de rastreamento de problemas"
 
 msgid "Bug reports (@dfn{issues}) and patch submissions (@dfn{pull requests})  are currently tracked at the @uref{https://codeberg.org/guix/guix, project's home at Codeberg}."
 msgstr "Submissão de bugs (@dfn{issues}) e envios de patches (@dfn{pull requests}) são atualmente monitorados no @uref{https://codeberg.org/guix/guix, a página inicial do projeto no Codeberg}."
@@ -2087,205 +2048,6 @@ msgstr "Uma vez que um branch esteja na frente da fila, espere até que tenha pa
 
 msgid "Once the branch has been merged, the issue should be closed and the branch deleted."
 msgstr "Depois que a ramificação for mesclada, o problema deverá ser fechado e a ramificação excluída."
-
-msgid "Warning"
-msgstr "Aviso"
-
-msgid "Web interface"
-msgstr "Interfaces web"
-
-msgid "mumi, web interface for issues"
-msgstr "mumi, interface web para issues"
-
-msgid "A web interface (actually @emph{two} web interfaces!) are available to browse issues:"
-msgstr "Uma interface web (na verdade @emph{duas} interfaces web!) está disponível para navegar pelos problemas:"
-
-msgid "@url{https://issues.guix.gnu.org} provides a pleasant interface powered by mumi@footnote{Mumi is a nice piece of software written in Guile, and you can help! See @url{https://codeberg.org/guix/mumi}.} to browse bug reports and patches, and to participate in discussions; mumi also has a command-line interface as we will see below;"
-msgstr "@url{https://issues.guix.gnu.org} fornece uma interface agradável alimentada por mumi@footnote{Mumi é um bom software escrito em Guile, e você pode ajudar! Veja @url{https://codeberg.org/guix/mumi}.} para navegar por relatórios de bugs e patches, e para participar de discussões; mumi também tem uma interface de linha de comando como veremos abaixo;"
-
-msgid "@url{https://bugs.gnu.org/guix} lists bug reports;"
-msgstr "@url{https://bugs.gnu.org/guix} lista relatórios de bugs;"
-
-msgid "@url{https://bugs.gnu.org/guix-patches} lists patch submissions."
-msgstr "@url{https://bugs.gnu.org/guix-patches} lista envios de patches."
-
-msgid "To view discussions related to issue number @var{n}, go to @indicateurl{https://issues.guix.gnu.org/@var{n}} or @indicateurl{https://bugs.gnu.org/@var{n}}."
-msgstr "Para visualizar discussões relacionadas ao problema número @var{n}, acesse @indicateurl{https://issues.guix.gnu.org/@var{n}} ou @indicateurl{https://bugs.gnu.org/@var{n}}."
-
-msgid "Command-Line Interface"
-msgstr "Interface de linha de comando"
-
-msgid "mumi command-line interface"
-msgstr "interface de linha de comando mumi"
-
-msgid "mumi am"
-msgstr "mumi am"
-
-msgid "mumi send-email"
-msgstr "mumi send-email"
-
-msgid "mumi www"
-msgstr "mumi www"
-
-msgid "Mumi also comes with a command-line interface that can be used to search existing issues, open new issues, compose replies, apply and send patches.  You do not need to use Emacs to use the mumi command-line client.  You interact with it only on the command-line."
-msgstr "O Mumi também vem com uma interface de linha de comando que pode ser usada para pesquisar problemas existentes, abrir novos problemas, compor respostas, aplicar e enviar patches. Você não precisa usar o Emacs para usar o cliente de linha de comando mumi. Você interage com ele apenas na linha de comando."
-
-msgid "To use the mumi command-line interface, navigate to a local clone of the Guix git repository, and drop into a shell with mumi, git and git:send-email installed."
-msgstr "Para usar a interface de linha de comando mumi, navegue até um clone local do repositório git Guix e entre em um shell com mumi, git e git:send-email instalados."
-
-msgid ""
-"$ cd guix\n"
-"~/guix$ guix shell mumi git git:send-email\n"
-msgstr ""
-"$ cd guix\n"
-"~/guix$ guix shell mumi git git:send-email\n"
-
-msgid "To search for issues, say all open issues about \"zig\", run"
-msgstr "Para procurar problemas, diga todos os problemas abertos sobre \"zig\", execute"
-
-msgid ""
-"~/guix [env]$ mumi search zig is:open\n"
-"\n"
-msgstr ""
-"~/guix [env]$ mumi search zig is:open\n"
-"\n"
-
-msgid ""
-"#60889 Add zig-build-system\n"
-"opened on 17 Jan 17:37 Z by Ekaitz Zarraga\n"
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-"#39136 [PATCH] gnu: services: Add endlessh.\n"
-"opened on 14 Jan 2020 21:21 by Nicol? Balzarotti\n"
-"#60424 [PATCH] gnu: Add python-online-judge-tools\n"
-"opened on 30 Dec 2022 07:03 by gemmaro\n"
-"#45601 [PATCH 0/6] vlang 0.2 update\n"
-"opened on  1 Jan 2021 19:23 by Ryan Prior\n"
-msgstr ""
-"#60889 Add zig-build-system\n"
-"opened on 17 Jan 17:37 Z by Ekaitz Zarraga\n"
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-"#39136 [PATCH] gnu: services: Add endlessh.\n"
-"opened on 14 Jan 2020 21:21 by Nicol? Balzarotti\n"
-"#60424 [PATCH] gnu: Add python-online-judge-tools\n"
-"opened on 30 Dec 2022 07:03 by gemmaro\n"
-"#45601 [PATCH 0/6] vlang 0.2 update\n"
-"opened on  1 Jan 2021 19:23 by Ryan Prior\n"
-
-msgid "Pick an issue and make it the \"current\" issue."
-msgstr "Escolha uma questão e torne-a a questão \"atual\"."
-
-msgid ""
-"~/guix [env]$ mumi current 61036\n"
-"\n"
-msgstr ""
-"~/guix [env]$ mumi current 61036\n"
-"\n"
-
-msgid ""
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-msgstr ""
-"#61036 [PATCH 0/3] Update zig to 0.10.1\n"
-"opened on 24 Jan 09:42 Z by Efraim Flashner\n"
-
-msgid "Once an issue is the current issue, you can open the issue in a web browser, compose replies, apply patches, send patches, etc. with short succinct commands."
-msgstr "Quando um problema é o problema atual, você pode abri-lo em um navegador da web, redigir respostas, aplicar patches, enviar patches, etc. com comandos curtos e sucintos."
-
-msgid "Open the issue in your web browser using"
-msgstr "Abra o problema no seu navegador da web usando"
-
-msgid "~/guix [env]$ mumi www\n"
-msgstr "~/guix [env]$ mumi www\n"
-
-msgid "Compose a reply using"
-msgstr "Redija uma resposta usando"
-
-msgid "~/guix [env]$ mumi compose\n"
-msgstr "~/guix [env]$ mumi compose\n"
-
-msgid "Compose a reply and close the issue using"
-msgstr "Redija uma resposta e feche o problema usando"
-
-msgid "~/guix [env]$ mumi compose --close\n"
-msgstr "~/guix [env]$ mumi compose --close\n"
-
-msgid "@command{mumi compose} opens your mail client by passing @samp{mailto:} URIs to @command{xdg-open}.  So, you need to have @command{xdg-open} set up to open your mail client correctly."
-msgstr "@command{mumi compose} abre seu cliente de e-mail passando URIs @samp{mailto:} para @command{xdg-open}. Então, você precisa ter @command{xdg-open} configurado para abrir seu cliente de e-mail corretamente."
-
-msgid "Apply the latest patchset from the issue using"
-msgstr "Aplique o patchset mais recente do problema usando"
-
-msgid "~/guix [env]$ mumi am\n"
-msgstr "~/guix [env]$ mumi am\n"
-
-msgid "You may also apply a patchset of a specific version (say, v3) using"
-msgstr "Você também pode aplicar um patchset de uma versão específica (digamos, v3) usando"
-
-msgid "~/guix [env]$ mumi am v3\n"
-msgstr "~/guix [env]$ mumi am v3\n"
-
-msgid "Or, you may apply a patch from a specific e-mail message.  For example, to apply the patch from the 4th message (message index starts from 0), run"
-msgstr "Ou você pode aplicar um patch de uma mensagem de e-mail específica. Por exemplo, para aplicar o patch da 4ª mensagem (o índice da mensagem começa em 0), execute"
-
-msgid "~/guix [env]$ mumi am @@4\n"
-msgstr "~/guix [env]$ mumi am @@4\n"
-
-msgid "@command{mumi am} is a wrapper around @command{git am}.  You can pass @command{git am} arguments to it after a @samp{--}.  For example, to add a Signed-off-by trailer, run"
-msgstr "@command{mumi am} é um wrapper em torno de @command{git am}. Você pode passar argumentos @command{git am} para ele depois de um @samp{--}. Por exemplo, para adicionar um trailer Signed-off-by, execute"
-
-msgid "~/guix [env]$ mumi am -- -s\n"
-msgstr "~/guix [env]$ mumi am -- -s\n"
-
-msgid "Create and send patches to the issue using"
-msgstr "Crie e envie patches para o problema usando"
-
-msgid ""
-"~/guix [env]$ git format-patch origin/master\n"
-"~/guix [env]$ mumi send-email foo.patch bar.patch\n"
-msgstr ""
-"~/guix [env]$ git format-patch origin/master\n"
-"~/guix [env]$ mumi send-email foo.patch bar.patch\n"
-
-msgid "Note that you do not have to pass in @samp{--to} or @samp{--cc} arguments to @command{git format-patch}.  @command{mumi send-email} will put them in correctly when sending the patches."
-msgstr "Observe que você não precisa passar os argumentos @samp{--to} ou @samp{--cc} para @command{git format-patch}. @command{mumi send-email} os inserirá corretamente ao enviar os patches."
-
-msgid "To open a new issue, run"
-msgstr "Para abrir um novo problema, execute"
-
-msgid "~/guix [env]$ mumi new\n"
-msgstr "~/guix [env]$ mumi new\n"
-
-msgid "and send an email (using @command{mumi compose}) or patches (using @command{mumi send-email})."
-msgstr "e enviar um e-mail (usando @command{mumi compose}) ou patches (usando @command{mumi send-email})."
-
-msgid "@command{mumi send-email} is really a wrapper around @command{git send-email} that automates away all the nitty-gritty of sending patches.  It uses the current issue state to automatically figure out the correct @samp{To} address to send to, other participants to @samp{Cc}, headers to add, etc."
-msgstr "@command{mumi send-email} é realmente um wrapper em torno de @command{git send-email} que automatiza todos os detalhes do envio de patches. Ele usa o estado atual do problema para descobrir automaticamente o endereço @samp{To} correto para enviar, outros participantes para @samp{Cc}, cabeçalhos para adicionar, etc."
-
-msgid "Also note that, unlike @command{git send-email}, @command{mumi send-email} works perfectly well with single and multiple patches alike.  It automates away the debbugs dance of sending the first patch, waiting for a response from debbugs and sending the remaining patches.  It does so by sending the first patch, polling the server for a response, and then sending the remaining patches.  This polling can unfortunately take a few minutes.  So, please be patient."
-msgstr "Observe também que, diferentemente de @command{git send-email}, @command{mumi send-email} funciona perfeitamente bem com patches únicos e múltiplos. Ele automatiza a dança dos debbugs de enviar o primeiro patch, esperar por uma resposta dos debbugs e enviar os patches restantes. Ele faz isso enviando o primeiro patch, sondando o servidor para uma resposta e, em seguida, enviando os patches restantes. Infelizmente, essa sondagem pode levar alguns minutos. Então, seja paciente."
-
-msgid "Emacs Interface"
-msgstr "Interfaces com Emacs"
-
-msgid "If you use Emacs, you may find it more convenient to interact with issues using @file{debbugs.el}, which you can install with:"
-msgstr "Se você usa o Emacs, pode achar mais conveniente interagir com problemas usando @file{debbugs.el}, que pode ser instalado com:"
-
-msgid "guix install emacs-debbugs\n"
-msgstr "guix install emacs-debbugs\n"
-
-msgid "For example, to list all open issues on @code{guix-patches}, hit:"
-msgstr "Por exemplo, para listar todos os problemas abertos em @code{guix-patches}, clique em:"
-
-msgid "@kbd{C-u} @kbd{M-x} debbugs-gnu @kbd{RET} @kbd{RET} guix-patches @kbd{RET} n y\n"
-msgstr "@kbd{C-u} @kbd{M-x} debbugs-gnu @kbd{RET} @kbd{RET} guix-patches @kbd{RET} n y\n"
-
-msgid "To search for bugs, @samp{@kbd{M-x} debbugs-gnu-guix-search} can be used."
-msgstr "Para procurar bugs, @samp{@kbd{M-x} debbugs-gnu-guix-search} pode ser usado."
-
-msgid "@xref{Top,,, debbugs-ug, Debbugs User Guide}, for more information on this nifty tool!"
-msgstr "@xref{Top,,, debbugs-ug, Guia do usuário do Debbugs}, para mais informações sobre esta ferramenta bacana!"
 
 msgid "build event notifications, RSS feed"
 msgstr "criar notificações de eventos, feed RSS"
@@ -2367,29 +2129,6 @@ msgstr ""
 "members:\n"
 "+ Charlie Smith <charlie@@example.org>\n"
 "@dots{}\n"
-
-msgid "mentoring"
-msgstr "mentoria"
-
-msgid "You can run the following command to have the Mentors team put in CC of a patch series:"
-msgstr "Você pode executar o seguinte comando para que a equipe Mentors coloque em CC uma série de patches:"
-
-msgid ""
-"$ git send-email --to=@var{ISSUE_NUMBER}@@debbugs.gnu.org \\\n"
-"  --header-cmd='etc/teams.scm cc-mentors-header-cmd' *.patch\n"
-msgstr ""
-"$ git send-email --to=@var{NÚMERO_DE_ISSÃO}@@debbugs.gnu.org \\\n"
-"  --header-cmd='etc/teams.scm cc-mentors-header-cmd' *.patch\n"
-
-msgid "The appropriate team or teams can also be inferred from the modified files.  For instance, if you want to send the two latest commits of the current Git repository to review, you can run:"
-msgstr "A equipe ou equipes apropriadas também podem ser inferidas a partir dos arquivos modificados. Por exemplo, se você quiser enviar os dois últimos commits do repositório Git atual para revisão, você pode executar:"
-
-msgid ""
-"$ guix shell -D guix\n"
-"[env]$ git send-email --to=@var{ISSUE_NUMBER}@@debbugs.gnu.org -2\n"
-msgstr ""
-"$ guix shell -D guix\n"
-"[env]$ git send-email --to=@var{NÚMERO_DE_ISSÃO}@@debbugs.gnu.org -2\n"
 
 msgid "teams, on Codeberg"
 msgstr "equipes, no Codeberg"
@@ -2660,9 +2399,6 @@ msgstr "depreciação de pacotes"
 msgid "Package name changes"
 msgstr "Mudança de nome de pacotes"
 
-msgid "When a package name changes, it must remain available under its old name for @b{at least one year}.  For example, @code{go-ipfs} was renamed to @code{kubo} following a decision made upstream; to communicate the name change to users, the package module provided this definition:"
-msgstr "Quando um nome de pacote muda, ele deve permanecer disponível sob seu nome antigo por @b{pelo menos um ano}. Por exemplo, @code{go-ipfs} foi renomeado para @code{kubo} após uma decisão tomada upstream; para comunicar a mudança de nome aos usuários, o módulo do pacote forneceu esta definição:"
-
 msgid "deprecated-package"
 msgstr "deprecated-package"
 
@@ -2675,23 +2411,8 @@ msgstr "package-removal-policy"
 msgid "Package removal"
 msgstr "Remoção de pacote"
 
-msgid "Packages whose upstream developers have declared as having reached ``end of life'' or being unmaintained may be removed; likewise, packages that have been @b{failing to build for two months or more} may be removed."
-msgstr "Pacotes cujos desenvolvedores originais declararam que atingiram o ``fim da vida útil'' ou não são mantidos podem ser removidos; da mesma forma, pacotes que estão @b{falhando na compilação por dois meses ou mais} podem ser removidos."
-
-msgid "If the package being removed is a ``leaf'' (no other packages depend on it), it may be removed after a @b{one-month review period} of the patch removing it (this applies even when the removal has additional motivations such as security problems affecting the package)."
-msgstr "Se o pacote que está sendo removido for um ``leaf'' (nenhum outro pacote depende dele), ele poderá ser removido após um @b{período de revisão de um mês} do patch que o removeu (isso se aplica mesmo quando a remoção tem motivações adicionais, como problemas de segurança que afetam o pacote)."
-
-msgid "When the package being removed is considered popular, whether or not it is a leaf, its deprecation must be announced as an entry in @code{etc/news.scm}."
-msgstr "Quando o pacote que está sendo removido é considerado popular, seja ou não uma folha, sua descontinuação deve ser anunciada como uma entrada em @code{etc/news.scm}."
-
-msgid "Package upgrade"
-msgstr "Atualização de pacote"
-
-msgid "In the case of packages with many dependents and/or many users, an upgrade may be treated like the @emph{removal} of the previous version."
-msgstr "No caso de pacotes com muitos dependentes e/ou muitos usuários, uma atualização pode ser tratada como a @emph{remoção} da versão anterior."
-
-msgid "Examples include major version upgrades of programming language implementations, as we've seen above with Python, and major upgrades of ``big'' libraries such as Qt or GTK."
-msgstr "Exemplos incluem grandes atualizações de versões de implementações de linguagens de programação, como vimos acima com Python, e grandes atualizações de bibliotecas ``grandes'' como Qt ou GTK."
+msgid "define-deprecated/public-alias"
+msgstr "define-deprecated/public-alias"
 
 msgid "service deprecation"
 msgstr "depreciação de serviço"
@@ -2704,9 +2425,6 @@ msgstr "Mudanças nos serviços para Guix Home e Guix System têm um impacto dir
 
 msgid "Renaming of variables related to service, home, or system configuration must be communicated for at least six months before removal using the @code{(guix deprecation)} mechanisms.  For example, renaming of @code{murmur-configuration} to @code{mumble-server-configuration} was communicated through a series of definitions like this one:"
 msgstr "A renomeação de variáveis relacionadas a configuração de serviço, home ou sistema deve ser comunicada por pelo menos seis meses antes da remoção usando os mecanismos @code{(guix deprecation)}. Por exemplo, a renomeação de @code{murmur-configuration} para @code{mumble-server-configuration} foi comunicada por meio de uma série de definições como esta:"
-
-msgid "define-deprecated/public-alias"
-msgstr "define-deprecated/public-alias"
 
 msgid ""
 "(define-deprecated/public-alias\n"
@@ -4689,6 +4407,9 @@ msgstr ""
 "          -c \"Guix daemon privilege separation user\" \\\n"
 "          --system guix-daemon\n"
 
+msgid "Warning"
+msgstr "Aviso"
+
 msgid "If the @command{nologin} binary is not found by @command{which nologin}, you may need to specify its path manually.  This will usually be @file{/sbin/nologin} or @file{/usr/sbin/nologin}."
 msgstr "Se o binário @command{nologin} não for encontrado por @command{which nologin}, você pode precisar especificar seu caminho manualmente. Normalmente, será @file{/sbin/nologin} ou @file{/usr/sbin/nologin}."
 
@@ -5983,9 +5704,6 @@ msgid ""
 msgstr ""
 "mkswap /dev/sda3\n"
 "swapon /dev/sda3\n"
-
-msgid "Alternatively, you may use a swap file.  For example, assuming that in the new system you want to use the file @file{/swapfile} as a swap file, you would run@footnote{This example will work for many types of file systems (e.g., ext4).  However, for copy-on-write file systems (e.g., btrfs), the required steps may be different.  For details, see the manual pages for @command{mkswap} and @command{swapon}.}:"
-msgstr "Alternativamente, você pode usar um arquivo de swap. Por exemplo, supondo que no novo sistema você queira usar o arquivo @file{/swapfile} como um arquivo de swap, você executaria @footnote{Este exemplo funcionará para muitos tipos de sistemas de arquivos (por exemplo, ext4). No entanto, para sistemas de arquivos copy-on-write (por exemplo, btrfs), as etapas necessárias podem ser diferentes. Para detalhes, veja as páginas do manual para @command{mkswap} e @command{swapon}.}:"
 
 msgid ""
 "# This is 10 GiB of swap space.  Adjust \"count\" to change the size.\n"
@@ -7792,6 +7510,9 @@ msgstr "-q"
 msgid "Inhibit loading of the user and system channel files, @file{~/.config/guix/channels.scm} and @file{/etc/guix/channels.scm}."
 msgstr "Inibir o carregamento dos arquivos de canal do usuário e do sistema, @file{~/.config/guix/channels.scm} e @file{/etc/guix/channels.scm}."
 
+msgid "-x"
+msgstr "-x"
+
 msgid "channel news"
 msgstr "canal de notícias"
 
@@ -8997,7 +8718,7 @@ msgstr "Note que é necessário incluir o pacote principal @code{python} neste c
 msgid "shebang, for @command{guix shell}"
 msgstr "shebang, para @command{guix shell}"
 
-msgid "@command{guix shell} can be also be used as a script interpreter, also known as @dfn{shebang}.  Here is an example self-contained Python script making use of this feature:"
+msgid "@command{guix shell} can also be used as a script interpreter, also known as @dfn{shebang}.  Here is an example self-contained Python script making use of this feature:"
 msgstr "@command{guix shell} também pode ser usado como um interpretador de script, também conhecido como @dfn{shebang}. Aqui está um exemplo de script Python autocontido fazendo uso desse recurso:"
 
 msgid "You may pass any @command{guix shell} option, but there's one caveat: the Linux kernel has a limit of 127 bytes on shebang length."
@@ -9237,16 +8958,6 @@ msgstr "-E @var{regexp}"
 
 msgid "When used alongside @option{--pure}, preserve the environment variables matching @var{regexp}---in other words, put them on a ``white list'' of environment variables that must be preserved.  This option can be repeated several times."
 msgstr "Quando usado junto com @option{--pure}, preserva as variáveis de ambiente que correspondem a @var{regexp}---em outras palavras, coloca-as em uma ``lista branca'' de variáveis de ambiente que devem ser preservadas. Esta opção pode ser repetida várias vezes."
-
-msgid ""
-"guix shell --pure --preserve=^SLURM openmpi @dots{} \\\n"
-"  -- mpirun @dots{}\n"
-msgstr ""
-"guix shell --pure --preserve=^SLURM openmpi @dots{} \\\n"
-"  -- mpirun @dots{}\n"
-
-msgid "This example runs @command{mpirun} in a context where the only environment variables defined are @env{PATH}, environment variables whose name starts with @samp{SLURM}, as well as the usual ``precious'' variables (@env{HOME}, @env{USER}, etc.)."
-msgstr "Este exemplo executa @command{mpirun} em um contexto onde as únicas variáveis de ambiente definidas são @env{PATH}, variáveis de ambiente cujo nome começa com @samp{SLURM}, bem como as variáveis ``preciosas'' usuais (@env{HOME}, @env{USER}, etc.)."
 
 msgid "--search-paths"
 msgstr "--search-paths"
@@ -9593,6 +9304,9 @@ msgid ""
 msgstr ""
 "guix environment --pure --preserve=^SLURM --ad-hoc openmpi @dots{} \\\n"
 "  -- mpirun @dots{}\n"
+
+msgid "This example runs @command{mpirun} in a context where the only environment variables defined are @env{PATH}, environment variables whose name starts with @samp{SLURM}, as well as the usual ``precious'' variables (@env{HOME}, @env{USER}, etc.)."
+msgstr "Este exemplo executa @command{mpirun} em um contexto onde as únicas variáveis de ambiente definidas são @env{PATH}, variáveis de ambiente cujo nome começa com @samp{SLURM}, bem como as variáveis ``preciosas'' usuais (@env{HOME}, @env{USER}, etc.)."
 
 msgid "For containers, link the environment profile to @file{~/.guix-profile} within the container and set @code{GUIX_ENVIRONMENT} to that.  This is equivalent to making @file{~/.guix-profile} a symlink to the actual profile within the container.  Linking will fail and abort the environment if the directory already exists, which will certainly be the case if @command{guix environment} was invoked in the user's home directory."
 msgstr "Para contêineres, vincule o perfil do ambiente a @file{~/.guix-profile} dentro do contêiner e defina @code{GUIX_ENVIRONMENT} para isso. Isso é equivalente a tornar @file{~/.guix-profile} uma ligação simbólica para o perfil real dentro do contêiner. A vinculação falhará e abortará o ambiente se o diretório já existir, o que certamente será o caso se @command{guix environment} foi invocado no diretório pessoal do usuário."
@@ -10436,8 +10150,8 @@ msgstr "license"
 msgid "license, of packages"
 msgstr "licença, de pacotes"
 
-msgid "The license of the package; a value from @code{(guix licenses)}, or a list of such values."
-msgstr "A licença do pacote; um valor de @code{(guix licenses)}, ou uma lista de tais valores."
+msgid "uri"
+msgstr "uri"
 
 msgid "home-page"
 msgstr "home-page"
@@ -10611,9 +10325,6 @@ msgstr "{Tipo de dados} origin"
 
 msgid "This is the data type representing a source code origin."
 msgstr "Este é o tipo de dado que representa a origem do código-fonte."
-
-msgid "uri"
-msgstr "uri"
 
 msgid "An object containing the URI of the source.  The object type depends on the @code{method} (see below).  For example, when using the @var{url-fetch} method of @code{(guix download)}, the valid @code{uri} values are: a URL represented as a string, or a list thereof."
 msgstr "Um objeto contendo o URI da fonte. O tipo de objeto depende do @code{method} (veja abaixo). Por exemplo, ao usar o método @var{url-fetch} de @code{(guix download)}, os valores válidos de @code{uri} são: uma URL representada como uma string, ou uma lista delas."
@@ -11488,9 +11199,6 @@ msgstr "none"
 msgid "git"
 msgstr "git"
 
-msgid "-x"
-msgstr "-x"
-
 msgid "pypi"
 msgstr "pypi"
 
@@ -12001,9 +11709,6 @@ msgstr "@code{device} (default: @code{#f})"
 
 msgid "{Data Type} network-link"
 msgstr "{Tipo de dados} network-link"
-
-msgid "{Data Type} dhcp-client-configuration"
-msgstr "{Tipo de dados} dhcp-client-configuration"
 
 msgid "NetworkManager"
 msgstr "NetworkManager"
