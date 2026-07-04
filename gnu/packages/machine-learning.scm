@@ -7345,7 +7345,7 @@ Brian 2 simulator.")
                   opencl-clhpp
                   opencl-icd-loader
                   opencv
-                  protobuf-3.20                  ;requires 3.19.0
+                  protobuf
                   pthreadpool
                   rapidjson                      ;requires 1.1.0
                   shaderc
