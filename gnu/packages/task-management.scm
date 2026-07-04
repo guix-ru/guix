@@ -180,7 +180,14 @@ following the Japanese kanban (boarding) style.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1s3y8ll2942d6my2wz6bbipram4l6brbwwfvp2nr8cchzrb23dl8"))))
+        (base32 "1s3y8ll2942d6my2wz6bbipram4l6brbwwfvp2nr8cchzrb23dl8"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; git-bug supports v2, remove when a fresh release is tagged.
+            (substitute* (find-files "." "\\.go$")
+              (("github.com/blevesearch/bleve")
+               "github.com/blevesearch/bleve/v2"))))))
     (build-system go-build-system)
     (arguments
      (list
@@ -203,7 +210,7 @@ following the Japanese kanban (boarding) style.")
            go-github-com-99designs-keyring
            go-github-com-araddon-dateparse
            go-github-com-awesome-gocui-gocui
-           go-github-com-blevesearch-bleve
+           go-github-com-blevesearch-bleve-v2
            go-github-com-dustin-go-humanize
            go-github-com-fatih-color
            go-github-com-go-git-go-billy-v5

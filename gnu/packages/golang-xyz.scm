@@ -3705,9 +3705,9 @@ based on murmurhash.")
               (delete-file-recursively
                (string-append "src/" import-path "/examples")))))))))
 
-(define-public go-github-com-blevesearch-bleve
+(define-public go-github-com-blevesearch-bleve-v2
   (package
-    (name "go-github-com-blevesearch-bleve")
+    (name "go-github-com-blevesearch-bleve-v2")
     (version "2.5.7")
     (source
      (origin
@@ -3725,7 +3725,7 @@ based on murmurhash.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/blevesearch/bleve"
+      #:import-path "github.com/blevesearch/bleve/v2"
       #:test-flags
       #~(list "-vet=off")))
     (native-inputs
@@ -3762,6 +3762,10 @@ based on murmurhash.")
      "Bleve is a Go library for indexing and searching text, numeric,
 geo-spatial and vector data.")
     (license license:asl2.0)))
+
+;; XXX: Deprecated on <2026-07-04>.
+(define-deprecated-package go-github-com-blevesearch-bleve
+  go-github-com-blevesearch-bleve-v2)
 
 (define-public go-github-com-blevesearch-bleve-index-api
   (package
