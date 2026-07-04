@@ -1898,6 +1898,20 @@ language, ADMS transforms Verilog-AMS code into other target languages.")
               "pkg/fqbn")
       #:phases
       #~(modify-phases %standard-phases
+          ;; Disable network release check for 'arduino-cli version'
+          ;; command, by removing the 'res'ponse variable and setting
+          ;; 'latestVersion' to empty string to simulate a no check
+          ;; behavior.
+          (add-after 'unpack 'disable-new-release-check
+            (lambda* (#:key import-path #:allow-other-keys)
+              (substitute*
+               (string-append
+                "src/" import-path "/internal/cli/version/version.go")
+               (("res, (err ):= .*$" all first)
+                (string-append "var " first "error\n"))
+               (("(latestVersion = )res\\.GetNewestVersion\\(\\)"
+                 all first)
+                (string-append first "\"\"")))))
           (add-after 'install 'install-shell-completions
             (lambda* (#:key native-inputs #:allow-other-keys)
               (for-each
