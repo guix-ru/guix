@@ -70,6 +70,7 @@
 ;;; Copyright © 2026 Nguyễn Gia Phong <cnx@loang.net>
 ;;; Copyright © 2026 Herman Rimm <herman@rimm.ee>
 ;;; Copyright © 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;;; Copyright © 2026 Cayetano Santos <csantosb@inventati.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -804,18 +805,22 @@ aliasing facilities to work just as they would on normal mail.")
   (package
     (name "mutt")
     (version "2.2.14")
-    (source (origin
-             (method url-fetch)
-             (uri (list
-                    (string-append "https://bitbucket.org/mutt/mutt/downloads/"
-                                   "mutt-" version ".tar.gz")
-                    (string-append "http://ftp.mutt.org/pub/mutt/mutt-"
-                                   version ".tar.gz")))
-             (sha256
-              (base32
-               "1vqlvqjlldcrkb4m5nl44my0rfw7wsvlkyb2dwyz8fhy95nznqni"))
-             (patches (search-patches "mutt-store-references.patch"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitlab.com/muttmua/mutt")
+              (commit (string-append
+                       "mutt-"
+                       (string-replace-substring version "." "-")
+                       "-rel"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1qmq4l8xrmgs3g2an5r6888ih7wrig7m2ib0dv4kajqlnk9bh54s"))
+       (patches (search-patches "mutt-store-references.patch"))))
     (build-system gnu-build-system)
+    (native-inputs
+     (list autoconf automake))
     (inputs
      (list cyrus-sasl
            gdbm
