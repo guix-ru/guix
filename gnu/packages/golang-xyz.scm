@@ -12473,6 +12473,65 @@ inflect English words, modify case style (Capitalize, camelCase, snake_case,
 etc.).")
     (license license:expat)))
 
+(define-public go-github-com-go-openapi-swag-jsonutils
+  (package
+    (name "go-github-com-go-openapi-swag-jsonutils")
+    (version "0.27.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-openapi/swag")
+              (commit (go-version->git-ref version #:subdir "jsonutils"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0rg5q7xif4gmhc99kkgvnz03d0d0z2vanyv8xa4myn6ykvacw458"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (with-directory-excursion directory
+                (let* ((pred (negate (cut member <>
+                                          (cons* "." ".." preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (cut delete-file-recursively <>) items))))
+            (delete-all-but "." "jsonutils")
+            ;; Submodules with their own go.mod files and packaged separately:
+            (delete-file-recursively "jsonutils/fixtures_test")
+            (delete-file-recursively "jsonutils/adapters/testintegration")
+            (delete-file-recursively "jsonutils/adapters/easyjson")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-openapi/swag/jsonutils"
+      #:unpack-path "github.com/go-openapi/swag"
+      #:embed-files #~(list "^.*\\.yaml$")))
+    (native-inputs
+     (list go-github-com-go-openapi-swag-jsonutils-fixtures-test
+           go-github-com-go-openapi-testify-v2))
+    (propagated-inputs
+     (list go-github-com-go-openapi-swag-conv
+           go-github-com-go-openapi-swag-typeutils))
+    (home-page "https://github.com/go-openapi/swag")
+    (synopsis "Tools to work with JSON in Go")
+    (description "Package jsonutils provides helpers to work with JSON.
+
+Features:
+@itemize
+@item a fast, simple @code{Concat} to concatenate (not merge) JSON objects and
+arrays
+@item @code{FromDynamicJSON} to convert a data structure into a dynamic JSON
+data structure
+@item @code{ReadJSON} and @code{WriteJSON} behave like @code{json.Unmarshal}
+and @code{json.Marshal}, with the ability to use another underlying
+serialization library through an @code{Adapter} configured at runtime
+@item a @code{JSONMapSlice} structure that may be used to store JSON objects
+with the order of keys maintained
+@end itemize")
+    (license license:asl2.0)))
+
 (define-public go-github-com-go-playground-locales
   (package
     (name "go-github-com-go-playground-locales")
