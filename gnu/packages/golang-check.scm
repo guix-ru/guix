@@ -1246,6 +1246,43 @@ ci-info} in Go.")
       (description "go-snaps is a Go implementation of Jest snapshot testing.")
       (license license:expat))))
 
+(define-public go-github-com-go-openapi-testify-enable-yaml-v2
+  (package
+    (name "go-github-com-go-openapi-testify-enable-yaml-v2")
+    (version "2.6.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-openapi/testify")
+              (commit (go-version->git-ref version #:subdir "enable/yaml"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "10p3pxgcag3xyp36w52m86b88lgj3hqbl9r7i4zyyfchkcf8nqkc"))
+       (modules '((guix build utils)))
+       (snippet
+        ;; It's a helper for go-build-system to compile import-path and
+        ;; unpack-path when it struggles to find module.
+        #~(begin
+            (mkdir "enable/yaml/v2")
+            (for-each (lambda (f)
+                        (rename-file f (string-append "enable/yaml/v2/" (basename f))))
+                      (find-files  "./enable/yaml"))))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-openapi/testify/enable/yaml/v2"
+      #:unpack-path "github.com/go-openapi/testify"))
+    (propagated-inputs
+     (list go-go-yaml-in-yaml-v3))
+    (home-page "https://github.com/go-openapi/testify")
+    (synopsis "[YAMLEq] capability in Go testify module")
+    (description
+     "Package yaml enables the
+@url{https://pkg.go.dev/github.com/go-openapi/testify/v2/assert#YAMLEq,
+YAMLEq} capability in testify.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-go-openapi-testify-v2
   (package
     (name "go-github-com-go-openapi-testify-v2")
