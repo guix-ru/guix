@@ -1969,6 +1969,11 @@ libpulse.")
                          (setenv "HOME" (getcwd))
                          (invoke "dbus-launch" "ctest"
                                  "--rerun-failed" "--output-on-failure")))))))
+    ;; These packages are required by the QML modules.
+    (propagated-inputs
+     (list kirigami
+           qtdeclarative
+           sonnet))
     (native-inputs
      (list extra-cmake-modules dbus pkg-config qttools))
     (inputs
@@ -1976,10 +1981,7 @@ libpulse.")
            kcolorscheme
            kconfig ; optional
            kcoreaddons
-           kiconthemes ; optional
-           kirigami
-           qtdeclarative
-           sonnet)) ; optional
+           kiconthemes))
     (home-page "https://community.kde.org/Frameworks")
     (synopsis "QtQuickControls2 style that integrates with the desktop")
     (description "This is a style for QtQuickControls2 which is using
