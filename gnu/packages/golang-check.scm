@@ -1246,6 +1246,50 @@ ci-info} in Go.")
       (description "go-snaps is a Go implementation of Jest snapshot testing.")
       (license license:expat))))
 
+(define-public go-github-com-go-openapi-swag-jsonutils-fixtures-test
+  (package
+    (name "go-github-com-go-openapi-swag-jsonutils-fixtures-test")
+    (version "0.27.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-openapi/swag")
+              (commit (go-version->git-ref version
+                                           #:subdir "jsonutils/fixtures_test"))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0rg5q7xif4gmhc99kkgvnz03d0d0z2vanyv8xa4myn6ykvacw458"))
+       (modules '((guix build utils)
+                  (ice-9 ftw)
+                  (srfi srfi-26)))
+       (snippet
+        #~(begin
+            (define (delete-all-but directory . preserve)
+              (with-directory-excursion directory
+                (let* ((pred (negate (cut member <>
+                                          (cons* "." ".." preserve))))
+                       (items (scandir "." pred)))
+                  (for-each (cut delete-file-recursively <>) items))))
+            (delete-all-but "jsonutils" "fixtures_test")
+            (delete-all-but "." "jsonutils")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-openapi/swag/jsonutils/fixtures_test"
+      #:unpack-path "github.com/go-openapi/swag"))
+    (native-inputs
+     (list go-github-com-go-openapi-testify-v2))
+    (propagated-inputs
+     (list go-github-com-go-openapi-testify-enable-yaml-v2
+           go-go-yaml-in-yaml-v3))
+    (home-page "https://github.com/go-openapi/swag")
+    (synopsis "Test [Harness] utility for Go")
+    (description
+     "Package fixtures exposes a test @code{[Harness]} utility to test JSON
+and YAML transformations.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-go-openapi-testify-enable-yaml-v2
   (package
     (name "go-github-com-go-openapi-testify-enable-yaml-v2")
