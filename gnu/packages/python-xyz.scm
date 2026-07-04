@@ -335,6 +335,43 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26))
 
+(define-public python-aenum
+  (package
+    (name "python-aenum")
+    (version "3.1.17")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ethanfurman/aenum")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0nygn64ydkvlpz9hw1f26z8w1dk7bws8qsirwkxyfw99vpbzlz3v"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix
+            (lambda _
+              (substitute* "aenum/_py2.py"
+                (("raise exc.*")
+                 "raise exc.with_traceback(tb)")))))
+      #:tests? #f))      ;no tests
+    (native-inputs (list python-setuptools))
+    (home-page "https://github.com/ethanfurman/aenum")
+    (synopsis
+     "Support for advanced enumerations, namedtuples and namedconstants")
+    (description
+     "AEnum is a set of symbolic names (members) bound to unique, constant
+values.  Within an enumeration, the members can be compared by identity, and
+the enumeration itself can be iterated over.  There is built-in support for
+unique values, multiple values, auto-numbering, and suspension of aliasing
+(members with the same value are not identical), plus the ability to have
+values automatically bound to attributes.")
+    (license license:bsd-3)))
+
 (define-public python-accumulation-tree
   ;; Only minor releases (0.x) are tagged, not patch versions.
   (let ((commit "3617051f952ce12385c015be8e3d052d1883f17a")
