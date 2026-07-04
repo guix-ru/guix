@@ -41156,13 +41156,13 @@ parsing (browser/HTTP) user agent strings.")
 (define-public python-userspacefs
   (package
     (name "python-userspacefs")
-    (version "3.1.1")
+    (version "3.2.1")
     (source
       (origin
         (method url-fetch)
         (uri (pypi-uri "userspacefs" version))
         (sha256
-         (base32 "0lfzgijza3p4wbrhlf8pzj89j7caj8x6aij78d4izppvq4kfjqs6"))))
+         (base32 "0n3mp9y1xgkl292m44i6xrkha2ffja1zrf5yaykz0yyvm85cfip4"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f  ;no tests
@@ -41173,9 +41173,9 @@ parsing (browser/HTTP) user agent strings.")
                    (substitute* "userspacefs/fusepy.py"
                      (("^_libfuse_path.*")
                       (string-append "_libfuse_path = '"
-                                     (search-input-file inputs "lib/libfuse.so")
+                                     (search-input-file inputs "lib/libfuse3.so")
                                      "'\n"))))))))
-    (inputs (list fuse-2))
+    (inputs (list fuse))
     (native-inputs (list python-setuptools))
     (propagated-inputs (list python-aiohttp python-typing-extensions))
     (home-page "https://thelig.ht/code/userspacefs/readme.html")
