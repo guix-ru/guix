@@ -116,12 +116,14 @@
   #:use-module (gnu packages hunspell)
   #:use-module (gnu packages ibus)
   #:use-module (gnu packages image)
+  #:use-module (gnu packages kde-frameworks)
   #:use-module (gnu packages language)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages libunwind)
   #:use-module (gnu packages libusb)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages lxqt)
   #:use-module (gnu packages man)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages networking)
@@ -3419,6 +3421,33 @@ interfaces.")
     (description
      "This package provides an @code{xdg-desktop-portal} backend for Hyprland.")
     (license license:bsd-3)))
+
+(define-public xdg-desktop-portal-lxqt
+  (package
+    (name "xdg-desktop-portal-lxqt")
+    (version "1.4.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/lxqt/xdg-desktop-portal-lxqt")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09fphfn1z0q92nqfcx11kx5nvm3vc1i1s1fxlm2lrmssfh34xnhs"))))
+    (build-system cmake-build-system)
+    (inputs (list qtbase kwindowsystem libfm-qt))
+    (propagated-inputs (list xdg-desktop-portal))
+    (arguments (list #:tests? #f)) ;No tests.
+    (home-page "https://github.com/lxqt/xdg-desktop-portal-lxqt")
+    (synopsis "LXQt implementations of XDG Desktop Portal interfaces")
+    (description "This package implments the following XDG Desktop Portal
+interfaces using LXQt's @code{libpcmanfm-qt}:
+@itemize
+@item Access
+@item FileChooser
+@end itemize")
+    (license license:lgpl2.1+)))
 
 (define-public xdg-desktop-portal-wlr
   (package
