@@ -12063,6 +12063,37 @@ killing a command.  All operations are safe to call from multiple
 goroutines.")
     (license license:expat)))
 
+(define-public go-github-com-go-co-op-gocron
+  (package
+    (name "go-github-com-go-co-op-gocron")
+    (version "1.37.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-co-op/gocron")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0dj5qw91k4gm7nrvgvacnvap8xg44862ybr7y3y07kf6ry0iqh7w"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-co-op/gocron"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-google-uuid
+           go-github-com-robfig-cron-v3
+           go-go-uber-org-atomic))
+    (home-page "https://github.com/go-co-op/gocron")
+    (synopsis "Go cron scheduling")
+    (description
+     "gocron is a job scheduling package which lets user run Go functions at
+pre-determined intervals.  This is a fork from
+{https://github.com/jasonlvhit/gocron}.")
+    (license license:expat)))
+
 ;; For delve@1.25.1
 (define-public go-github-com-go-delve-liner
   (hidden-package
