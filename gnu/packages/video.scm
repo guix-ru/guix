@@ -5892,6 +5892,36 @@ additional (audio and/or video) codecs, and can also be used to build basic
 RTSP or SIP clients and servers.")
     (license license:lgpl3+)))
 
+(define-public mediaextract
+  (package
+    (name "mediaextract")
+    (version "1.2.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/panzi/mediaextract")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0pvjn5hvviam7kfprsxh2dkm8ckx07aak5bv23fv1sd2syp80c05"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list #:tests? #f                  ;no tests
+           #:make-flags #~(list (string-append "PREFIX=" #$output))
+           #:phases #~(modify-phases %standard-phases
+                        (replace 'configure
+                          (lambda _
+                            (invoke "make" "builddir"))))))
+    (native-inputs (list help2man))
+    (home-page "https://panzi.github.io/mediaextract/")
+    (synopsis "Extracts media files that are embedded within other files")
+    (description
+     "This package extracts media files that are embedded within other binary
+formats.  It supports video, audio, text, and music tracker files.  It further
+allows customization of which types are extracted via command line flags.")
+    (license license:expat)))
+
 (define-public libdvbpsi
   (package
     (name "libdvbpsi")
