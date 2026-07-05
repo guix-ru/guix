@@ -46,7 +46,8 @@
 
  (entry (commit "897832f374dcdc9eeaf19d01e70b9a92fccfc68c")
         (title
-         (en "Several security issues fixed in Guix"))
+         (en "Several security issues fixed in Guix")
+         (de "Mehrere Sicherheitsprobleme in Guix behoben"))
         (body
          (en "Several security issues (four CVE numbers pending) have been
 identified in Guix.  These affect @code{guix substitute} and authentication of
@@ -61,7 +62,22 @@ on the commits fixing these issues.
 All users should immediately update their system, which will require
 reconfiguring and restarting @command{guix-daemon}.  Please note that due to
 these security issues affecting substitutes, there are additional
-considerations for updating; please see the security advisory.")))
+considerations for updating; please see the security advisory.")
+         (de "Mehrere Sicherheitsprobleme (deren vier CVE-Nummern stehen noch
+aus) wurden in Guix erkannt. Betroffen sind @code{guix substitute} und die
+Authentifizierung von Kanälen mit vom Angreifer kontrollierten Namen in
+@command{guix pull} und @command{guix time-machine}. Die Fehler machen entfernte
+Rechteausweitung, Beschädigung von Store-Dateien und das lokale Erbeuten
+sensibler Informationen möglich. Details werden in einem Blogeintrag als
+Sicherheitsempfehlung auf dem Guix-Blog bekanntgegeben, dessen Entwurf in
+@uref{https://codeberg.org/guix/artwork/pulls/58} verfügbar ist. Im Pull Request
+@uref{https://codeberg.org/guix/guix/pulls/9665} finden Sie Informationen über
+die Commits, mit denen die Probleme behoben wurden.
+
+Alle Benutzer sollten unmittelbar ihr System aktualisieren und dazu
+rekonfigurieren und @command{guix-daemon} neu starten. Bitte beachten Sie, dass
+weil die Sicherheitsprobleme Substitute betreffen, Sie dies vielleicht vor dem
+Aktualisieren bedenken möchten; siehe die Sicherheitsempfehlung.")))
 
  (entry (commit "2949c187f600841cdcddfc4f955506b34b79244f")
         (title
