@@ -26,7 +26,7 @@
 
 # If adding a language, update the following variables, and info_TEXINFOS.
 MANUAL_LANGUAGES = de es fr it pt_BR ru zh_CN
-COOKBOOK_LANGUAGES = de es fr it ko pt_BR ru sk sv ta zh_CN
+COOKBOOK_LANGUAGES = de es fr it ko pt_BR ru sk sv zh_CN
 
 # Arg1: A list of languages codes.
 # Arg2: The file name stem.
