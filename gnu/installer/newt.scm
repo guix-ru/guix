@@ -143,11 +143,11 @@ report it by email to ~a.") uploaded-name %guix-bug-report-address)
                           #:content command-output
                           #:buttons-spec
                           (list
-                           (cons "Ignore" (const #t))
-                           (cons "Abort"
+                           (cons (G_ "Ignore") (const #t))
+                           (cons (G_ "Abort")
                                  (lambda ()
                                    (abort-to-prompt 'installer-step 'abort)))
-                           (cons "Report"
+                           (cons (G_ "Report")
                                  (lambda ()
                                    (raise
                                     (condition

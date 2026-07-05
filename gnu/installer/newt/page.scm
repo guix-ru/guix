@@ -904,14 +904,14 @@ component ~a." argument))))))))
 
 (define* (run-dump-page base-dir file-choices)
   (define info-textbox
-    (make-reflowed-textbox -1 -1 "Please select files you wish to include in \
-the dump."
+    (make-reflowed-textbox -1 -1 (G_ "Please select files you wish to include in \
+the dump.")
                            50
                            #:flags FLAG-BORDER))
   (define components
     (map (match-lambda ((file . enabled)
                         (list
-                         (make-compact-button -1 -1 "Edit")
+                         (make-compact-button -1 -1 (G_ "Edit"))
                          (make-checkbox -1 -1 file (if enabled #\x #\ ) " x")
                          file)))
          file-choices))
@@ -932,12 +932,12 @@ the dump."
     (vertically-stacked-grid
      GRID-ELEMENT-COMPONENT info-textbox
      GRID-ELEMENT-SUBGRID sub-grid
-     GRID-ELEMENT-COMPONENT (make-button -1 -1 "Create")))
+     GRID-ELEMENT-COMPONENT (make-button -1 -1 (G_ "Create"))))
 
   (define form (make-form #:flags FLAG-NOF12))
 
   (add-form-to-grid grid form #t)
-  (make-wrapped-grid-window grid "Installer dump")
+  (make-wrapped-grid-window grid (G_ "Installer dump"))
 
   (define prompt-tag (make-prompt-tag))
 
