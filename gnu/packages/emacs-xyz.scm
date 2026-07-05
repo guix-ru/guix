@@ -1304,25 +1304,23 @@ powered by @uref{https://agentclientprotocol.com/, Agent Client Protocol} (ACP).
 (define-public emacs-geiser-guile
   (package
     (name "emacs-geiser-guile")
-    (version "0.28.3")
+    (version "0.28.5")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://gitlab.com/emacs-geiser/guile")
+             (url "https://codeberg.org/geiser/guile")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0i6drqz7cnx97bs5kprvb0hsg2h4bwkfdi61ajv43dqgb368jbff"))))
+        (base32 "0hvjc1s74ansn3c5pmizs9q234wz2h52y0070qg008i1vmqvymzp"))))
     (build-system emacs-build-system)
     (arguments
      (list
+      #:tests? #f                       ;no tests
       #:include #~(cons "^src/" %default-include)
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'make-info
-            (lambda _
-              (invoke "makeinfo" "--no-split" "geiser-guile.texi")))
           (add-after 'unpack 'patch-geiser-guile-binary
             (lambda* (#:key inputs #:allow-other-keys)
               (substitute* "geiser-guile.el"
