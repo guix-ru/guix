@@ -5496,7 +5496,7 @@ Euclid Consortium should be used.")
     (home-page "https://github.com/sncosmo/extinction")
     (synopsis "Fast interstellar dust extinction laws")
     (description
-     "This package provides a cython-optimized implementations of empirical dust
+     "This package provides a cython-optimized implementation of empirical dust
 exitinction laws found in the literature.")
     (license license:expat)))
 
@@ -6781,7 +6781,7 @@ observationally-derived galaxy merger catalogs.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 172 passed, 1 skipped, 9 deselected 
+      ;; tests: 172 passed, 1 skipped, 9 deselected
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'relax-requirements
