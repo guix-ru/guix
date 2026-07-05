@@ -943,5 +943,5 @@ prompting a pin from the user.")
                               mympd-accounts)
            (service-extension special-files-service-type
                               mympd-serialize-configuration)))
-   (description "Run myMPD, a frontend for MPD. (Music Player Daemon)")
+   (description "Run myMPD, a frontend for MPD (Music Player Daemon).")
    (default-value (mympd-configuration))))
