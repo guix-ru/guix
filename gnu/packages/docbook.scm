@@ -1128,6 +1128,10 @@ Detect the differences in markup between two SGML files.
                   (srfi srfi-26))
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'skip-test
+            (lambda _
+              (substitute* "test/refentry/Makefile.am"
+                (("VCR.\\w+") ""))))
           (add-before 'build 'clean
             (lambda _
               (invoke "make" "clean")))
