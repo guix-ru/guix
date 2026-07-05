@@ -3,6 +3,7 @@
 ;;; Copyright © 2020 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2021 Solene Rapenne <solene@perso.pw>
 ;;; Copyright © 2021 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2026 Tomás Ortín Fernández (quanrong) <quanrong@mailbox.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -35,7 +36,7 @@
 (define-public i2pd
   (package
     (name "i2pd")
-    (version "2.59.0")
+    (version "2.60.0")
     (source
      (origin
        (method git-fetch)
@@ -44,7 +45,7 @@
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "19siim9gn54560sv1cgvkd2ag4nzbmy3kzyzp0fx6mi0kqzj671w"))))
+        (base32 "0hwk8z709bp7lb0jdsk5ky6pr7jxyymxxl38dvbkk0vjdbabfl51"))))
     (build-system cmake-build-system)
     (native-inputs (list check pkg-config))
     (inputs
