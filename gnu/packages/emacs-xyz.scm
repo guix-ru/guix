@@ -1506,7 +1506,7 @@ a generic Scheme interaction mode for the GNU Emacs editor.")
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://gitlab.com/emacs-geiser/chez")
+             (url "https://codeberg.org/geiser/chez")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
