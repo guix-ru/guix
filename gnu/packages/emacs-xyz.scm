@@ -985,16 +985,16 @@ input via a small child-frame spawned at the position of the cursor.")
 (define-public emacs-geiser
   (package
     (name "emacs-geiser")
-    (version "0.32")
+    (version "0.33.1")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://gitlab.com/emacs-geiser/geiser")
+             (url "https://codeberg.org/geiser/geiser")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09dqwxa2h471xcyk5zncxzaz19gf8d5r83yhi425blf2r1ir7b34"))))
+        (base32 "0gyr7fky3jppk3vy44mq3lfwz0n7r0k6cxim7bdfp9qy8jqw1pr8"))))
     (build-system emacs-build-system)
     (arguments
      (list
