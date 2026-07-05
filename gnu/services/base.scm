@@ -4090,10 +4090,10 @@ elements of the list result in @code{#t} when applying PRED? on them."
    (string "loginctl poweroff")
    "Command to run when shutting down the device.")
   (gtk-theme
-   (string "Advaita")
+   (string "Adwaita")
    "GTK theme to use.")
   (icon-theme
-   (string "Advaita")
+   (string "Adwaita")
    "Icon theme to use.")
   (cursor-theme
    (string "Adwaita")

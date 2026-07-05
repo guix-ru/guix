@@ -22222,10 +22222,10 @@ Command to run when rebooting the device.
 @item @code{shutdown-command} (default: @code{"loginctl poweroff"}) (type: string)
 Command to run when shutting down the device.
 
-@item @code{gtk-theme} (default: @code{"Advaita"}) (type: string)
+@item @code{gtk-theme} (default: @code{"Adwaita"}) (type: string)
 GTK theme to use.
 
-@item @code{icon-theme} (default: @code{"Advaita"}) (type: string)
+@item @code{icon-theme} (default: @code{"Adwaita"}) (type: string)
 Icon theme to use.
 
 @item @code{cursor-theme} (default: @code{"Adwaita"}) (type: string)
