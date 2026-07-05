@@ -4185,15 +4185,22 @@ attempting to maintain ISTP compliance
   (package
     (name "python-cesium")
     (version "0.12.4")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "cesium" version))
-              (sha256
-               (base32
-                "0kfz2fgi2hnl1a9pz8nk0cr1vyk4c7cg1vmkpnwpgy7n44fkbxwa"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/cesium-ml/cesium")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0qmgixiasyv57xc5s6l62gvrcnywjqgzpwr9hwdrpx8awlf5zw9h"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      #:test-flags
+      ;; XXX: Current version might be not compatible with NumPy 2.4.6.
+      #~(list (string-append "--deselect=lib/python3.12/site-packages/"
+                             "cesium/tests/test_featurize.py::test_impute"))
       #:phases
       #~(modify-phases %standard-phases
           ;; The installed test files contain the /gnu/store location, not the
