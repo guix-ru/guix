@@ -779,6 +779,8 @@ by pressing the Exit button.~%~%")))
                     `((entire-encrypted
                        .
                        ,(G_ "Guided - using the entire disk with encryption"))))
+              ;; TRANSLATORS: This is an adjective about manually partitionning
+              ;; the disk, not a reference to the documentation manual
               (manual . ,(G_ "Manual"))))
            (result (run-listbox-selection-page
                     #:info-text (G_ "Please select a partitioning method.")
