@@ -1399,6 +1399,42 @@ disable the Gnome auto-suspend and screensaver.")
     (home-page "https://github.com/eonpatapon/gnome-shell-extension-caffeine")
     (license license:gpl2+)))
 
+(define-public gnome-shell-extension-chromaleon
+  (let ((revision "0")
+        (commit "c3b3a04057727472be75e7f889774dbb7dc1b134"))
+    (package
+      (name "gnome-shell-extension-chromaleon")
+      (version (git-version "0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://github.com/Fabito02/ChromaLeon.git")
+                       (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "04sl7f61ypiakkyh334kw1h8lvyay4wykx2q4r3vx924f0cvwfla"))))
+      (build-system copy-build-system)
+      (arguments
+       (list
+        #:install-plan
+        #~'(("." "share/gnome-shell/extensions/user-accent-colors@fabito02"
+             #:include-regexp
+             ("\\.css$" "\\.js(on)?$" "schemas" "assets" "locale")))
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'install 'compile-schemas
+              (lambda _
+                (with-directory-excursion "schemas"
+                  (invoke "glib-compile-schemas" ".")))))))
+      (native-inputs (list `(,glib "bin")))
+      (home-page "https://github.com/Fabito02/ChromaLeon")
+      (synopsis "Set the accent color based on the wallpaper")
+      (description "ChromaLeon is a GNOME Shell extension to change the GNOME
+Shell, Adwaita, and icon accent colors dynamically based on the
+current wallpaper.")
+      (license license:gpl3+))))
+
 (define-public gnome-shell-extension-hot-edge
   (package
     (name "gnome-shell-extension-hot-edge")
