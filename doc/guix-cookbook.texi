@@ -1693,7 +1693,7 @@ Reference Manual}):
 $ guix import crate cargo-audit
 @end example
 
-After manual editing, we'll have the following definiton:
+After manual editing, we'll have the following definition:
 
 @lisp
 (define-public cargo-audit
@@ -2114,7 +2114,7 @@ crates being imported. The last one will output the license information of all
 the dependent crates.
 
 If everything looks good, we can now replace the contents of the @code{niri}
-indentifier, located inside the @code{lookup-cargo-inputs} variable on the
+identifier, located inside the @code{lookup-cargo-inputs} variable on the
 bottom of the @file{gnu/packages/rust-crates.scm} module, with the newer updated
 crates by running the importer on the lockfile as follows:
 
@@ -2866,7 +2866,7 @@ configuration needs to be made on your Guix System to allow the use of a
 Yubico security key.  It is hoped the configuration can be useful for
 other security keys as well, with minor adjustments.
 
-@subsection Configuration for use as a two-factor authenticator (2FA)
+@subsection Configuration for use as a two-factor authentication (2FA)
 
 To be usable, the udev rules of the system should be extended with
 key-specific rules.  The following shows how to extend your udev rules
@@ -3070,7 +3070,7 @@ and dirty bash script […]”.
 Thanks to NetworkManager support for Wireguard we can connect to our VPN
 using @command{nmcli} command.  Up to this point this guide assumes that
 you're using Network Manager service provided by
-@code{%desktop-services}.  Ortherwise you need to adjust your services
+@code{%desktop-services}.  Otherwise you need to adjust your services
 list to load @code{network-manager-service-type} and reconfigure your
 Guix system.
 
@@ -3915,7 +3915,7 @@ indubitably dominated by a baffling smorgasbord of your neighbors' home
 automation gizmos.  This only needs to be done once:
 
 @example
-$ bluetoothctl 
+$ bluetoothctl
 [NEW] Controller 00:11:22:33:95:7F BlueZ 5.40 [default]
 
 [bluetooth]# power on
@@ -3946,12 +3946,12 @@ Pairing successful
 
 [CHG] Device AA:BB:CC:A4:AA:CD Connected: no
 
-[bluetooth]# 
+[bluetooth]#
 [bluetooth]# trust AA:BB:CC:A4:AA:CD
 [bluetooth]# [CHG] Device AA:BB:CC:A4:AA:CD Trusted: yes
 Changing AA:BB:CC:A4:AA:CD trust succeeded
 
-[bluetooth]# 
+[bluetooth]#
 [bluetooth]# connect AA:BB:CC:A4:AA:CD
 Attempting to connect to AA:BB:CC:A4:AA:CD
 [bluetooth]# [CHG] Device AA:BB:CC:A4:AA:CD RSSI: -63
@@ -5428,7 +5428,7 @@ field, along these lines:
 
 Here's what we changed compared to the previous section:
 
-@enumerate 
+@enumerate
 @item
 We added @code{(guix git-download)} to our set of imported modules, so
 we can use its @code{git-predicate} procedure.

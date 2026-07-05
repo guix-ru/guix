@@ -10682,7 +10682,7 @@ specify a list of file names to feed to the minifier.
 
 @defvar mix-build-system
 This is a variable exported by @code{guix build-system mix}.  It implements
-the standard build procedure used by Elixr programs with
+the standard build procedure used by Elixir programs with
 @url{https://hexdocs.pm/mix/Mix.html,Mix}, which consists
 of running @command{mix compile}, thereby creating bytecode.
 
@@ -22258,7 +22258,7 @@ respects the background color.
 Size of the background image.  It can be @code{"auto"} (for preserving
 the original size), @code{"cover"} (for resizing to fill while allowing
 to cut or to stretch), @code{"contain"} (for resizing to fit assuring
-the full visibility of the image), or a string of a number suffixed with
+the full visibility of the image), or a string of a number suffixed
 with @code{px} (to represent in pixels) or @code{%} (to represent in
 percentage).  It can also be a string of two such values separated by a
 whitespace, representing width and height respectively.
