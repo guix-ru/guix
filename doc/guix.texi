@@ -3,6 +3,11 @@
 
 @c %**start of header
 @setfilename guix.info
+@c TRANSLATORS:the following should be kept as-is. Also add a new line with
+@c TRANSLATORS:@documentlanguage <yourlanguagecode>
+@c TRANSLATORS:for instance, for Portuguese, you would do:
+@c TRANSLATORS:@documentencoding UTF-8
+@c TRANSLATORS:@documentlanguage pt
 @documentencoding UTF-8
 @settitle GNU Guix Reference Manual
 @c %**end of header
