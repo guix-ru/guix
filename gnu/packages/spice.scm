@@ -285,7 +285,7 @@ Internet and from a wide variety of machine architectures.")
 (define-public spice-vdagent
   (package
     (name "spice-vdagent")
-    (version "0.22.1")
+    (version "0.23.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -293,10 +293,7 @@ Internet and from a wide variety of machine architectures.")
                     "spice-vdagent-" version ".tar.bz2"))
               (sha256
                (base32
-                "18472sqr0gibzgzi48dpcbnvm78l05qrl5wv6xywqqj7r9dd3c4k"))
-              (patches
-               (search-patches
-                "spice-vdagent-monitor-size-calculation.patch"))))
+                "0h3aw43wzjkh6921xczmknyrkxal4dx0vwfnry567i4panyzkq33"))))
     (build-system gnu-build-system)
     (arguments
      `(#:configure-flags
