@@ -23,6 +23,7 @@
 (define-module (gnu packages connman)
   #:use-module (gnu packages)
   #:use-module (gnu packages admin)
+  #:use-module (gnu packages autotools)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages enlightenment)
@@ -39,6 +40,7 @@
   #:use-module (gnu packages vpn)
   #:use-module (guix build-system gnu)
   #:use-module (guix download)
+  #:use-module (guix git-download)
   #:use-module (guix gexp)
   #:use-module ((guix licenses) :prefix license:)
   #:use-module (guix packages)
@@ -50,11 +52,13 @@
     (version "1.44")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://kernel.org/linux/network/connman/"
-                           "connman-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.kernel.org/pub/scm/network/connman/connman.git")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1zvljllg8bsi8nznx3rqpwgy68gg0k6klwgzkrgpfav3441v1qib"))))
+        (base32 "1yxkxnmsyxp8g4yjmqvz3906r5pwnmm181xb5zk618wb4zlbm1pq"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -83,7 +87,10 @@
               (string-append "--with-dbusconfdir=" #$output "/etc")
               (string-append "--with-dbusdatadir=" #$output "/share"))))
     (native-inputs
-     (list pkg-config
+     (list autoconf
+           automake
+           libtool
+           pkg-config
            python-wrapper))
     (inputs
      (list dbus
