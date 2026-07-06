@@ -157,9 +157,9 @@
     "third_party/devtools-frontend/src/front_end/third_party/lit" ;BSD-3
     "third_party/devtools-frontend/src/front_end/third_party/marked" ;Expat, BSD-3
     "third_party/devtools-frontend/src/front_end/third_party/puppeteer" ;ASL2.0
-    "third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/esm/third_party"
+    "third_party/devtools-frontend/src/front_end/third_party/puppeteer/package/lib/third_party"
     "third_party/devtools-frontend/src/front_end/third_party/puppeteer\
-/package/lib/esm/third_party/mitt" ;Expat
+/package/lib/third_party/mitt" ;Expat
     "third_party/devtools-frontend/src/front_end/third_party/puppeteer/third_party/mitt" ; Expat
     "third_party/devtools-frontend/src/front_end/third_party/puppeteer/third_party/parsel" ; Expat
     "third_party/devtools-frontend/src/front_end/third_party/puppeteer/third_party/rxjs" ; ASL2.0
@@ -271,6 +271,7 @@
     "third_party/pdfium/third_party/libtiff" ;non-copyleft
     "third_party/pdfium/third_party/freetype/include/pstables.h" ;FreeType
     "third_party/perfetto" ;ASL2.0
+    "third_party/perfetto/protos/third_party/android" ;ASL2.0
     "third_party/perfetto/protos/third_party/chromium" ;BSD-3
     "third_party/perfetto/protos/third_party/pprof" ;ASL2.0
     "third_party/perfetto/protos/third_party/primes" ;ASL2.0
@@ -389,7 +390,7 @@
   ;; run the Blink performance tests, just remove everything to save ~70MiB.
   '("third_party/blink/perf_tests"))
 
-(define %chromium-version "149.0.7827.155")
+(define %chromium-version "150.0.7871.46")
 (define %ungoogled-revision (string-append %chromium-version "-1"))
 (define %debian-revision (string-append "debian/" %ungoogled-revision))
 
@@ -401,7 +402,7 @@
     (file-name (git-file-name "ungoogled-chromium" %ungoogled-revision))
     (sha256
      (base32
-      "099mbm39ab34jqz8yh1498lwadnhc4qm6202c4vxd69vnm7f4fzq"))))
+      "1gzwpzhghnvcgyql86awnp2fd3synj9w3szh3vmqkvkg98ym7rja"))))
 
 (define %debian-origin
   (origin
@@ -414,7 +415,7 @@
                                 ((_ version) version))))
     (sha256
      (base32
-      "0ki9ia8ii2l0jm2jhnp671nwjhqf9jdywddcs2lxk33fwif6y919"))))
+      "1nrw212mq6mk6imnh9a239x4d6zm772wl1ragamrl69gf5fsiwf9"))))
 
 (define (origin-file origin file)
   (computed-file
@@ -437,8 +438,18 @@
          "fixes/libcpp-headers.patch"
          "fixes/libpng-testonly.patch"
          "fixes/rust-clanglib.patch"
+         "llvm-19/0001-revert-v8-libm.patch"
+         "llvm-19/0002-revert-v8-libm.patch"
+         "llvm-19/0003-revert-v8-libm.patch"
+         "llvm-19/0004-revert-v8-libm.patch"
+         "llvm-19/0005-revert-v8-libm.patch"
+         "llvm-19/0007-revert-v8-libm.patch"
+         "llvm-19/0008-revert-v8-libm.patch"
+         "llvm-19/0009-revert-v8-libm.patch"
+         "llvm-19/0011-revert-v8-libm.patch"
          "llvm-19/clang19.patch"
          "llvm-19/clone-traits.patch"
+         "llvm-19/i18n-builder-enum.patch"
          "llvm-19/const-profile.patch"
          "llvm-19/iota.patch"
          "llvm-19/keyfactory.patch"
@@ -446,9 +457,14 @@
          "llvm-19/value-or.patch"
          "llvm-22/ignore-for-ubsan.patch"
          "system/openjpeg.patch"
+         "trixie/bindgen-boringssl.patch"
          "trixie/cookie-string-view.patch"
+         "trixie/node20-compat.patch"
          "trixie/nodejs-main.patch"
-         "trixie/revert-v8-sanitize.patch")))
+         "trixie/revert-v8-sanitize.patch"
+         "upstream/ar-path1.patch"
+         "upstream/ar-path2.patch"
+         "upstream/sysroot.patch")))
 
 (define %guix-patches
   (map (lambda (patch)
@@ -601,7 +617,7 @@
                                   %chromium-version "-lite.tar.xz"))
               (sha256
                (base32
-                "0qm8vpckcmsar1rnmx57a6nifaayzsa3slkazx5zsr5dwc5gsfaf"))
+                "1ilq7p7v3qazca7dxy16qnlpqd0fb2nqj47rk2pj1p3xqfklyrg2"))
               (modules '((guix build utils)))
               (snippet (force ungoogled-chromium-snippet))))
     (build-system gnu-build-system)
@@ -640,7 +656,6 @@
               "disable_fieldtrial_testing_config=true"
               "safe_browsing_mode=0"
               "enable_mdns=false"
-              "enable_reading_list=false"
               "enable_remoting=false"
               "enable_reporting=false"
               "enable_service_discovery=false"
