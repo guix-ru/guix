@@ -2926,7 +2926,7 @@ from streaming URLs.  It is a command-line wrapper for the libquvi library.")
         (base32 "1rk4q0fv9xs57fivjy5mxqkk5g7pvvvssxvalz6nwld2p84fz0dy"))))
     (build-system scons-build-system)
     (propagated-inputs
-     (list apr apr-util openssl-1.1))
+     (list apr apr-util openssl))
     (inputs
      (list ;; TODO: Fix build with gss.
            ;;("gss" ,gss)
