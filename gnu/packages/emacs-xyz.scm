@@ -17117,26 +17117,29 @@ work and provide clipboard action).")
     (license license:gpl3+)))
 
 (define-public emacs-hydra
-  (package
-    (name "emacs-hydra")
-    (version "0.15.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/abo-abo/hydra")
-              (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "0fapvhmhgc9kppf3bvkgry0cd7gyilg7sfvlscfrfjxpx4xvwsfy"))))
-    (build-system emacs-build-system)
-    (arguments
-     `(#:test-command '("make" "test")))
-    (home-page "https://github.com/abo-abo/hydra")
-    (synopsis "Make Emacs bindings that stick around")
-    (description
-     "This package can be used to tie related commands into a family of short
+  ;; Last release from 2019.
+  (let ((commit "59a2a45a35027948476d1d7751b0f0215b1e61aa")
+        (revision "0"))
+    (package
+      (name "emacs-hydra")
+      (version (git-version "0.15.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/abo-abo/hydra")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1mly1mw85n70g6wc68p772a0k1a6w7qsds66jp2qi3xp8179pl9s"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list #:test-command #~'("make" "test")))
+      (home-page "https://github.com/abo-abo/hydra")
+      (synopsis "Make Emacs bindings that stick around")
+      (description
+       "This package can be used to tie related commands into a family of short
 bindings with a common prefix---a Hydra.  Once you summon the Hydra (through
 the prefixed binding), all the heads can be called in succession with only a
 short extension.  Any binding that isn't the Hydra's head vanquishes the
@@ -17144,7 +17147,7 @@ Hydra.  Note that the final binding, besides vanquishing the Hydra, will still
 serve its original purpose, calling the command assigned to it.  This makes
 the Hydra very seamless; it's like a minor mode that disables itself
 automatically.")
-    (license license:gpl3+)))
+      (license license:gpl3+))))
 
 (define-public emacs-pretty-hydra
   (package
