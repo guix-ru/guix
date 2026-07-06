@@ -47,6 +47,7 @@
                 #:select (open-socket-for-uri
                           (open-connection-for-uri
                            . guix:open-connection-for-uri)
+                          default-connection-establishment-timeout
                           resolve-uri-reference))
   #:re-export (open-socket-for-uri)
   #:export (&http-get-error
@@ -107,7 +108,7 @@
                      (verify-certificate? #t)
                      (headers '((user-agent . "GNU Guile")))
                      (log-port (current-error-port))
-                     timeout)
+                     (timeout (default-connection-establishment-timeout)))
   "Return an input port containing the data at URI, and the HTTP response from
 the server.  If TEXT? is true, the data at URI is considered to be textual.
 Follow any HTTP redirection.  When BUFFERED? is #f, return an unbuffered port,

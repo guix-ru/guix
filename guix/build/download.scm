@@ -43,6 +43,7 @@
   #:export (%download-methods
             download-method-enabled?
 
+            default-connection-establishment-timeout
             open-socket-for-uri
             open-connection-for-uri
             http-fetch
@@ -384,7 +385,15 @@ host name without trailing dot."
    ((uri? uri-or-string) uri-or-string)
    (else (error "Invalid URI" uri-or-string))))
 
-(define* (open-socket-for-uri uri-or-string #:key timeout)
+(define default-connection-establishment-timeout
+  ;; Default value of the connection establishment timeout, in seconds, or #f
+  ;; to disable timeouts by default.
+  (make-parameter 30))
+
+(define* (open-socket-for-uri uri-or-string
+                              #:key
+                              (timeout
+                               (default-connection-establishment-timeout)))
   "Return an open input/output port for a connection to URI.  When TIMEOUT is
 not #f, it must be a (possibly inexact) number denoting the maximum duration
 in seconds to wait for the connection to complete; passed TIMEOUT, an
@@ -444,7 +453,8 @@ ETIMEDOUT error is raised."
 
 (define* (open-connection-for-uri uri
                                   #:key
-                                  timeout
+                                  (timeout
+                                   (default-connection-establishment-timeout))
                                   (verify-certificate? #t))
   "Like 'open-socket-for-uri', but also handle HTTPS connections.  When
 VERIFY-CERTIFICATE? is true, verify HTTPS server certificates."
