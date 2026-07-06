@@ -3647,8 +3647,10 @@ satellites.")
     (license license:gpl3)))
 
 (define-public chirp
-  (let ((commit "bc27f6653aa804a5c55a3a1b2244ee43a174854b")
-        (revision "4"))
+  ;; 0.4.0 (2014-03-19); upstream stopped publishing releases or apply version
+  ;; tags, use the latest commit from master HEAD.
+  (let ((commit "6ff333968aaed63ad3d483e9e6363f425974ba30")
+        (revision "5"))
     (package
       (name "chirp")
       (version (git-version "0.4.0" revision commit))
@@ -3656,54 +3658,45 @@ satellites.")
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://github.com/kk7ds/chirp")
-               (commit commit)))
+                (url "https://github.com/kk7ds/chirp")
+                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "15nly5j0f3h67pv6li6vrd56wmdnplanls867kf60r9vz0k4k0yd"))))
+          (base32 "1rhnp6wdrw8qpbjyrkbsf143j216hiqwpdj9wm1k6xxb6jjskyw1"))))
       (build-system pyproject-build-system)
+      (arguments
+       (list
+        ;; tests: 480 passed, 12 skipped, 5 deselected, 142 warnings
+        #:test-flags
+        ;; Ignore tests requiring network.
+        #~(list "-m" "not network"
+                "--deselect=tests/unit/test_network_sources.py::TestDMRMARC::test_marc_works"
+                ;; Integration tests require additional setup.
+                "tests/unit")
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'sanity-check 'pre-check
+              (lambda _
+                (setenv "CHIRP_TESTIMG" "")
+                (setenv "CHIRP_TESTS" "")
+                (setenv "HOME" "/tmp"))))))
       (native-inputs
-       (list python-mock
+       (list python-ddt
              python-pytest
-             python-pytest-mock
              python-pyyaml
-             python-setuptools
-             python-wheel))
+             python-setuptools))
       (inputs
-       (list python-future
-             python-importlib-resources
-             python-lark
+       (list python-lark
              python-pyserial
              python-requests
              python-suds
              python-wxpython
              python-yattag))
-      (arguments
-       (list
-        #:test-flags
-        #~(list ;; FIXME: These files error during collection.
-           "--ignore=tests/unit/test_csv.py"
-           "--ignore=tests/unit/test_wxui_radiothread.py"
-           ;; These tests are long and expensive.
-           "--ignore=tests/test_drivers.py"
-           ;; Ignore tests requiring network.
-           "-m" "not network"
-           "-k" (string-append
-                 ;; XXX: Tests likewise prefixed all have a RADIO_CLASS=None
-                 "not TestCase"
-                 " and not test_bitwise_errors"
-                 ;; XXX: Requires settings TLS certificates.
-                 " and not test_marc_works"))
-        #:phases
-        #~(modify-phases %standard-phases
-            (add-after 'build 'set-home-for-tests
-              (lambda _
-                (setenv "HOME" "/tmp"))))))
+      (home-page "https://chirp.danplanet.com")
       (synopsis "Cross-radio programming tool")
       (description "Chirp is a cross-radio programming tool.  It supports a
 growing list of radios across several manufacturers and allows transferring of
 memory contents between them.")
-      (home-page "https://chirp.danplanet.com")
       (license license:gpl3+))))
 
 (define-public qdmr
