@@ -112,7 +112,7 @@ system to use the host GPU to accelerate 3D rendering.")
 (define-public spice-protocol
   (package
     (name "spice-protocol")
-    (version "0.14.4")
+    (version "0.14.5")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -120,7 +120,7 @@ system to use the host GPU to accelerate 3D rendering.")
                     "spice-protocol-" version ".tar.xz"))
               (sha256
                (base32
-                "04nr2w6ymy5jinfi3lj6205yd5h0swss3ykxqk7l3m4z1mhvmzq4"))))
+                "1xygz5w2kkrr9qzj6lyc0dnc9zcnj7xxb6l9fps1k7g8yr4q9xds"))))
     (build-system meson-build-system)
     (arguments
      (list #:phases
