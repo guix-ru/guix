@@ -1,0 +1,14 @@
+Ensure that building of tests/libtest.so respects our LDFLAGS.
+
+diff -upr a/Makefile b/Makefile
+--- a/Makefile	2026-07-06 21:05:39.442671225 +0200
++++ b/Makefile	2026-07-06 21:07:01.478498796 +0200
+@@ -123,7 +123,7 @@ libpatch.so: $(OBJECTS)
+ 	$(QUIET_LINK) $(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LIBS)
+ 
+ tests/libtest.so: $(TOBJECTS)
+-	$(QUIET_LINK) $(CC) -shared -o $@ $^
++	$(QUIET_LINK) $(CC) $(LDFLAGS) -shared -o $@ $^
+ 
+ %.o: %.c
+ 	$(QUIET_CC) $(CC) $(CPPFLAGS) -MMD $(CFLAGS) -fPIC -c -o $@ $<

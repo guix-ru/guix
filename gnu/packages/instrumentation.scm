@@ -292,10 +292,17 @@ unsuspected lands of problems within packets.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1sx1sichnnqfi84z37gd04h41vpr8i2vg6yg0jkqxlrv3dys489a"))))
+                "1sx1sichnnqfi84z37gd04h41vpr8i2vg6yg0jkqxlrv3dys489a"))
+              (patches (search-patches "libpatch-respect-ldflags.patch"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:configure-flags
+     `(;; current binutils assumes an executable stack when assembly files
+       ;; are missing a .note.GNU-stack section. This, however, breaks other
+       ;; things in libpatch. Thus, we disable the executable stack explicitly.
+       ;;
+       ;; NATIVES= skips a flaky stress test.
+       #:make-flags `("LDFLAGS=-znoexecstack" "NATIVES=")
+       #:configure-flags
        (list
         (string-append
          "--target="

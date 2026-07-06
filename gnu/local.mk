@@ -1713,6 +1713,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/libguestfs-syms.patch            	\
   %D%/packages/patches/libinfinity-renew-test-certificate.patch \
   %D%/packages/patches/libmaus2-fix-gcc-13-require-include-cstdint.patch	\
+  %D%/packages/patches/libpatch-respect-ldflags.patch		\
   %D%/packages/patches/libportal-qt-6.9.patch                   \
   %D%/packages/patches/libretro-dolphin-emu-data.patch		\
   %D%/packages/patches/libretro-dolphin-emu-gc-font-tool.patch  \
