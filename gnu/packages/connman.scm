@@ -4,6 +4,7 @@
 ;;; Copyright © 2017 Clément Lassieur <clement@lassieur.org>
 ;;; Copyright © 2017 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2017, 2018, 2019, 2020 Tobias Geerinckx-Rice <me@tobias.gr>
+;;; Copyright © 2026 Anderson Torres <anderson.torres.8519@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -49,7 +50,7 @@
 (define-public connman
   (package
     (name "connman")
-    (version "1.44")
+    (version "2.0")
     (source
      (origin
        (method git-fetch)
@@ -58,7 +59,7 @@
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1yxkxnmsyxp8g4yjmqvz3906r5pwnmm181xb5zk618wb4zlbm1pq"))))
+        (base32 "1s2lamms9abjv0z7skhndnq8f9si99cajicyd57v09ibrn1irk2k"))))
     (build-system gnu-build-system)
     (arguments
      (list
