@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2010-2017, 2019, 2023 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2010-2017, 2019, 2023, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -96,8 +96,14 @@
 When TIMEOUT is a number, it is the (possibly inexact) maximum number of
 seconds to wait for the connection to succeed."
   (define (raise-error errno)
-    (throw 'system-error 'connect* "~A"
-           (list (strerror errno))
+    (throw 'system-error 'connect* "~A: ~A"
+           (list (cond ((= AF_INET (sockaddr:fam sockaddr))
+                        (inet-ntop AF_INET (sockaddr:addr sockaddr)))
+                       ((= AF_INET6 (sockaddr:fam sockaddr))
+                        (inet-ntop AF_INET6 (sockaddr:addr sockaddr)))
+                       (else
+                        (object->string sockaddr)))
+                 (strerror errno))
            (list errno)))
 
   (if timeout
