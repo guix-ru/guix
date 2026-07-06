@@ -143,7 +143,7 @@
                                (list this-package)
                                '())
                            (list autoconf libyaml)))
-    (inputs (append (list readline openssl-3.0 libffi ;to build fiddle
+    (inputs (append (list readline openssl libffi ;to build fiddle
                           gmp) ;to accelerate Bignum operations
                     (if (supported-package? rust)
                         (list rust) ;to build YJIT, ZJIT, and MMTk
