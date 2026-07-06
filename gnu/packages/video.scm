@@ -2051,7 +2051,9 @@ audio/video codec library.")
        (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
                            ".tar.xz"))
        (sha256
-        (base32 "02ip0zsghyz09p0jv8ayqxrnkb3awirarh4jbppbxlwd09jb3z6l"))))))
+        (base32 "02ip0zsghyz09p0jv8ayqxrnkb3awirarh4jbppbxlwd09jb3z6l"))
+       (patches (search-patches
+                 "ffmpeg-add-av_stream_get_first_dts-for-chromium.patch"))))))
 
 (define-public ffmpeg-5
   (package
