@@ -145,38 +145,62 @@ indicates that PATH is unavailable at CACHE-URL."
   ;; Set of names of unreachable hosts.
   (make-hash-table))
 
+(define %max-unreachability-caching-time
+  ;; Maximum duration in seconds during which host unreachability is cached in
+  ;; the process.
+  (* 15 60))
+
+(define (reachable? host)
+  "Return true unless HOST is known to be unreachable."
+  (match (hash-ref %unreachable-hosts host)
+    (#f #t)
+    (time
+     ;; If HOST's unreachability is cached, return #f, unless this was cached
+     ;; long ago.
+     (let ((age (- (time-second (current-time time-monotonic)) time)))
+       (if (>= age %max-unreachability-caching-time)
+           (begin
+             (hash-remove! %unreachable-hosts host)
+             #t)
+           #f)))))
+
 (define* (call-with-connection-error-handling uri proc)
   "Call PROC, and catch if a connection fails, print a warning and return #f."
   (define host
     (uri-host uri))
 
-  (catch #t
-    proc
-    (match-lambda*
-      (('getaddrinfo-error error)
-       (unless (hash-ref %unreachable-hosts host)
-         (hash-set! %unreachable-hosts host #t)   ;warn only once
-         (warning (G_ "~a: host not found: ~a~%")
-                  host (gai-strerror error)))
-       #f)
-      (('system-error . args)
-       (unless (hash-ref %unreachable-hosts host)
-         (hash-set! %unreachable-hosts host #t)
-         (warning (G_ "~a: connection failed: ~a~%") host
-                  (strerror
-                   (system-error-errno `(system-error ,@args)))))
-       #f)
-      (('gnutls-error error proc . rest)
-       (if (memq error (list error/premature-termination
-                             error/pull-error
-                             error/push-error))
-           (begin
-             (warning (G_ "~a: TLS connection failed: in ~a: ~a~%") host
-                      proc (error->string error))
-             #f)
-           (apply throw 'gnutls-error error proc rest)))
-      (args
-       (apply throw args)))))
+  (define (now)
+    (time-second (current-time time-monotonic)))
+
+  ;; If HOST is known to be unreachable, return #f.
+  (and (reachable? host)
+       (catch #t
+         proc
+         (match-lambda*
+           (('getaddrinfo-error error)
+            ;; Warn once and add HOST to the list of unreachable hosts.
+            (hash-set! %unreachable-hosts host (now))
+            (warning (G_ "~a: host not found: ~a~%")
+                     host (gai-strerror error))
+            #f)
+           (('system-error . args)
+            (unless (hash-ref %unreachable-hosts host)
+              (hash-set! %unreachable-hosts host (now))
+              (warning (G_ "~a: connection failed: ~a~%") host
+                       (strerror
+                        (system-error-errno `(system-error ,@args)))))
+            #f)
+           (('gnutls-error error proc . rest)
+            (if (memq error (list error/premature-termination
+                                  error/pull-error
+                                  error/push-error))
+                (begin
+                  (warning (G_ "~a: TLS connection failed: in ~a: ~a~%") host
+                           proc (error->string error))
+                  #f)
+                (apply throw 'gnutls-error error proc rest)))
+           (args
+            (apply throw args))))))
 
 (define (narinfo-request cache-url path)
   "Return an HTTP request for the narinfo of PATH at CACHE-URL."
