@@ -31,6 +31,7 @@
   #:use-module (guix store)
   #:use-module (guix gexp)
   #:use-module (guix colors)
+  #:autoload   (guix build download) (default-connection-establishment-timeout)
   #:use-module ((guix build syscalls) #:select (terminal-columns))
   #:use-module ((guix build utils) #:select (every*))
   #:use-module (guix substitutes)
@@ -612,6 +613,8 @@ SERVER.  Display information for packages with at least THRESHOLD dependents."
 
   (with-error-handling
     (parameterize ((current-terminal-columns (terminal-columns))
+
+                   (default-connection-establishment-timeout 10)
 
                    ;; Set grafting upfront in case the user's input depends on
                    ;; it (e.g., a manifest or code snippet that calls
