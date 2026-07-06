@@ -33316,35 +33316,6 @@ used to store and transmit information about computer malware and associated
 metadata.")
     (license license:bsd-2)))
 
-(define-public python-ailment
-  (package
-    (name "python-ailment")
-    ;; Must be the same version as python-angr.
-    (version "9.2.112")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (pypi-uri "ailment" version))
-       (sha256
-        (base32 "1rv8rwvdm7fc9mf8z5hqb54dsj0n7jlnwghd12ll0b2jmh2ix8mn"))))
-    (build-system pyproject-build-system)
-    (arguments
-     `(#:phases (modify-phases %standard-phases
-                  (replace 'check
-                    ;; Many tests are skipped due to cyclic dependencies.
-                    (lambda* (#:key tests? #:allow-other-keys)
-                      (when tests?
-                        (with-directory-excursion "tests"
-                          (invoke "python" "-m" "unittest"))))))))
-    (native-inputs (list python-setuptools python-wheel))
-    (home-page "https://github.com/angr/ailment")
-    (synopsis "The angr intermediate language")
-    (description
-     "This Python module implements an @acronym{IL, Intermediate Language},
-also known as @acronym{IR, Intermediate Representation}, used by the angr
-binary analysis platform.")
-    (license license:bsd-2)))
-
 (define-public python-cle
   (package
     (name "python-cle")
