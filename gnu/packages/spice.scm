@@ -215,7 +215,7 @@ which allows users to view a desktop computing environment.")
            ;; when building GNOME Boxes).
            cyrus-sasl
            gtk+
-           openssl-1.1
+           openssl
            opus
            libcacard
            libjpeg-turbo
