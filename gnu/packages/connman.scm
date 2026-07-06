@@ -21,16 +21,10 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages connman)
-  #:use-module (guix packages)
-  #:use-module (guix download)
-  #:use-module (guix build-system gnu)
-  #:use-module (guix gexp)
-  #:use-module (guix licenses)
-  #:use-module (guix utils)
   #:use-module (gnu packages)
   #:use-module (gnu packages admin)
-  #:use-module (gnu packages compression)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages compression)
   #:use-module (gnu packages enlightenment)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages linux)
@@ -42,7 +36,13 @@
   #:use-module (gnu packages readline)
   #:use-module (gnu packages samba)
   #:use-module (gnu packages tls)
-  #:use-module (gnu packages vpn))
+  #:use-module (gnu packages vpn)
+  #:use-module (guix build-system gnu)
+  #:use-module (guix download)
+  #:use-module (guix gexp)
+  #:use-module ((guix licenses) :prefix license:)
+  #:use-module (guix packages)
+  #:use-module (guix utils))
 
 (define-public connman
   (package
@@ -110,7 +110,7 @@ The plug-in approach allows for easy adaption and modification for various use
 cases.  Connman implements DNS resolving and caching, DHCP clients for both
 IPv4 and IPv6, link-local IPv4 address handling and tethering (IP connection
 sharing) to clients via USB, ethernet, WiFi, cellular and Bluetooth.")
-    (license gpl2)))
+    (license license:gpl2)))
 
 (define-public econnman
   (package
@@ -150,7 +150,7 @@ sharing) to clients via USB, ethernet, WiFi, cellular and Bluetooth.")
     (synopsis "Connman User Interface written using the EFL")
     (description
      "An EFL user interface for the @code{connman} connection manager.")
-    (license lgpl3)))
+    (license license:lgpl3)))
 
 (define-public cmst
   (package
@@ -198,4 +198,4 @@ sharing) to clients via USB, ethernet, WiFi, cellular and Bluetooth.")
     (description
      "Cmst is a Qt based frontend for the @code{connman} connection manager.
 This package also provides a systemtray icon.")
-    (license x11)))
+    (license license:x11)))
