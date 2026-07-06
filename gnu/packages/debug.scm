@@ -327,8 +327,8 @@ tool.")
 
 (define-public qemu-for-aflplusplus
   (let ((base qemu-minimal)
-        (commit "7c3bab75c4a9adaed78cefbe1468a6b49c363f58")
-        (revision "2"))
+        (commit "d4a7b70af4d387a9a57c743ef1827b2347aa7d7c")
+        (revision "3"))
     (hidden-package
      (package
        (inherit base)
@@ -342,7 +342,7 @@ tool.")
                               (recursive? #t)))
           (file-name (git-file-name name version))
           (sha256
-           (base32 "03352zbp73wgwyk25f26rw7h5yqyjp6fysl2n7nj32wp16vxmlza"))))
+           (base32 "1h1z1zfrcv2mns4vkfb4hmjlcci1m4ba51p5hml5pzmvn9dmfkj7"))))
        (arguments
         (substitute-keyword-arguments arguments
           ((#:configure-flags _ #~'())
