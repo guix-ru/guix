@@ -69,17 +69,17 @@
               "--enable-vpnc"
               "--localstatedir=/var"
               (string-append "--with-l2tp="
-                             #$(this-package-input "xl2tpd")
-                             "/sbin/xl2tpd")
+                             (search-input-file %build-inputs
+                                                "/sbin/xl2tpd"))
               (string-append "--with-openconnect="
-                             #$(this-package-input "openconnect")
-                             "/sbin/openconnect")
+                             (search-input-file %build-inputs
+                                                "/sbin/openconnect"))
               (string-append "--with-openvpn="
-                             #$(this-package-input "openvpn")
-                             "/sbin/openvpn")
+                             (search-input-file %build-inputs
+                                                "/sbin/openvpn"))
               (string-append "--with-vpnc="
-                             #$(this-package-input "vpnc")
-                             "/sbin/vpnc")
+                             (search-input-file %build-inputs
+                                                "/sbin/vpnc"))
               (string-append "--with-dbusconfdir=" #$output "/etc")
               (string-append "--with-dbusdatadir=" #$output "/share"))))
     (native-inputs
