@@ -49,38 +49,39 @@
     (name "connman")
     (version "1.44")
     (source
-      (origin
-        (method url-fetch)
-        (uri (string-append "mirror://kernel.org/linux/network/connman/"
-                            "connman-" version ".tar.xz"))
-        (sha256
-         (base32 "1zvljllg8bsi8nznx3rqpwgy68gg0k6klwgzkrgpfav3441v1qib"))))
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://kernel.org/linux/network/connman/"
+                           "connman-" version ".tar.xz"))
+       (sha256
+        (base32 "1zvljllg8bsi8nznx3rqpwgy68gg0k6klwgzkrgpfav3441v1qib"))))
     (build-system gnu-build-system)
     (arguments
-     (list #:configure-flags
-           #~(list "--enable-nmcompat"
-                   ;; PolKit doesn't need to be present at build time.
-                   "--enable-polkit"
-                   "--enable-iwd"
-                   "--enable-l2tp"
-                   "--enable-openconnect"
-                   "--enable-openvpn"
-                   "--enable-vpnc"
-                   "--localstatedir=/var"
-                   (string-append "--with-l2tp="
-                                  #$(this-package-input "xl2tpd")
-                                  "/sbin/xl2tpd")
-                   (string-append "--with-openconnect="
-                                  #$(this-package-input "openconnect")
-                                  "/sbin/openconnect")
-                   (string-append "--with-openvpn="
-                                  #$(this-package-input "openvpn")
-                                  "/sbin/openvpn")
-                   (string-append "--with-vpnc="
-                                  #$(this-package-input "vpnc")
-                                  "/sbin/vpnc")
-                   (string-append "--with-dbusconfdir=" #$output "/etc")
-                   (string-append "--with-dbusdatadir=" #$output "/share"))))
+     (list
+      #:configure-flags
+      #~(list "--enable-nmcompat"
+              ;; PolKit doesn't need to be present at build time.
+              "--enable-polkit"
+              "--enable-iwd"
+              "--enable-l2tp"
+              "--enable-openconnect"
+              "--enable-openvpn"
+              "--enable-vpnc"
+              "--localstatedir=/var"
+              (string-append "--with-l2tp="
+                             #$(this-package-input "xl2tpd")
+                             "/sbin/xl2tpd")
+              (string-append "--with-openconnect="
+                             #$(this-package-input "openconnect")
+                             "/sbin/openconnect")
+              (string-append "--with-openvpn="
+                             #$(this-package-input "openvpn")
+                             "/sbin/openvpn")
+              (string-append "--with-vpnc="
+                             #$(this-package-input "vpnc")
+                             "/sbin/vpnc")
+              (string-append "--with-dbusconfdir=" #$output "/etc")
+              (string-append "--with-dbusdatadir=" #$output "/share"))))
     (native-inputs
      (list pkg-config
            python-wrapper))
@@ -101,10 +102,11 @@
            vpnc
            wpa-supplicant
            xl2tpd))
-    (home-page "https://01.org/connman")
+    (home-page "https://git.kernel.org/pub/scm/network/connman/connman.git/about/")
     (synopsis "Connection management daemon")
-    (description "Connman provides a daemon for managing Internet connections.
-The Connection Manager is designed to be slim and to use as few resources as
+    (description
+     "Connman provides a daemon for managing Internet connections.  The
+Connection Manager is designed to be slim and to use as few resources as
 possible.  It is fully modular system that can be extended through plug-ins.
 The plug-in approach allows for easy adaption and modification for various use
 cases.  Connman implements DNS resolving and caching, DHCP clients for both
