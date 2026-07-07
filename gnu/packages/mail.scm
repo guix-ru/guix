@@ -1284,7 +1284,7 @@ repository and Maildir/IMAP as LOCAL repository.")
 (define-public emacs-mew
   (package
     (name "emacs-mew")
-    (version "6.10")
+    (version "6.11")
     (source
      (origin
        (method git-fetch)
@@ -1294,7 +1294,7 @@ repository and Maildir/IMAP as LOCAL repository.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "13ajr51yk2hcfiq532cayb0kvpdb3psf877cxl6qwx0pgaf1qm57"))))
+         "1xbdix7hn6i224gglpab43qqi5mkv356zf7gs9359vnwslfm5x6n"))))
     (build-system gnu-build-system)
     (arguments
      (let ((icon-dir  #~(string-append #$output "/share/mew")))
