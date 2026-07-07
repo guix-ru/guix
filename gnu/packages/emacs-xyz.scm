@@ -2722,7 +2722,7 @@ on stdout instead of using a socket as the Emacsclient does.")
 (define-public emacs-llama
   (package
     (name "emacs-llama")
-    (version "1.0.4")
+    (version "1.0.5")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -2731,7 +2731,7 @@ on stdout instead of using a socket as the Emacsclient does.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "07rjfjk01gd4jqk38wc0a2vrsk15p8sx0varqbhjdyns7w2xs1d7"))))
+                "1qya4drpfnr25lgpagxzi22llrvs9ysqgfhs3093ly2k4pi28nvk"))))
     (build-system emacs-build-system)
     (arguments
      (list #:test-command #~(list "emacs" "-Q" "--batch"
