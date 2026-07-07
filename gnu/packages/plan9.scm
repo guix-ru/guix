@@ -42,7 +42,7 @@
 (define-public 9pfs
   (package
     (name "9pfs")
-    (version "0.5")
+    (version "0.6")
     (source
      (origin
        (method git-fetch)
@@ -51,7 +51,7 @@
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1fxyrny1alsbg1dr2pav3sz85s3amxiizklj8p3wsfmw08hjhgrm"))))
+        (base32 "0qsy4dmiyh0xkdagb20lik9wmg8npvwf0xpv12ba2kp78zjlg7fc"))))
     (build-system gnu-build-system)
     (arguments
      (list #:tests? #f                  ;no tests
