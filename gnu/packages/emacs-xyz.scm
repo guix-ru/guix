@@ -1250,7 +1250,7 @@ communicating with LLM agents.")
 (define-public emacs-agent-shell
   (package
     (name "emacs-agent-shell")
-    (version "0.57.1")
+    (version "0.57.3")
     (source
      (origin
        (method git-fetch)
@@ -1259,7 +1259,7 @@ communicating with LLM agents.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0hmr8537zwkff5acdwx56qys3cp9xpj5b5kr0rhv2kgwz3idw2rq"))))
+        (base32 "16p2nxdgf3j0h7srs99xk7g5dg31a5xf90q5l41s2nc8www6vwsb"))))
     (build-system emacs-build-system)
     (arguments
      (list
