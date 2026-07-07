@@ -530,6 +530,24 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 
 ;; The current "mainline" kernel.
 
+(define-public linux-libre-7.1-version "7.1.3")
+(define-public linux-libre-7.1-gnu-revision "gnu")
+(define deblob-scripts-7.1
+  (linux-libre-deblob-scripts
+   linux-libre-7.1-version
+   linux-libre-7.1-gnu-revision
+   (base32 "0a14ymlj6ahfd5ch78hk9nx47ihglndq1h9hi9a4r9di469s5f8v")
+   (base32 "0b44346hhlnx5zgig7ki12v1ks7ghd3q5pvxi4294sh2xysiiw42")))
+(define-public linux-libre-7.1-pristine-source
+  (let ((version linux-libre-7.1-version)
+        (hash (base32 "1p6iknvzmd04alrf49zn8mxw863v0yzgznyckfhl4llgx1lc0hdy")))
+   (make-linux-libre-source version
+                            (%upstream-linux-source version hash)
+                            deblob-scripts-7.1)))
+
+;; The current "stable" kernels. That is, the most recently released major
+;; versions that are still supported upstream.
+
 (define-public linux-libre-7.0-version "7.0.14")
 (define-public linux-libre-7.0-gnu-revision "gnu")
 (define deblob-scripts-7.0
@@ -544,9 +562,6 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-7.0)))
-
-;; The current "stable" kernels. That is, the most recently released major
-;; versions that are still supported upstream.
 
 (define-public linux-libre-6.19-version "6.19.14")
 (define-public linux-libre-6.19-gnu-revision "gnu")
@@ -685,6 +700,13 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
     (patches (append (origin-patches source)
                      patches))))
 
+(define-public linux-libre-7.1-source
+  (source-with-patches linux-libre-7.1-pristine-source
+                       (append
+                        (list %linux-libre-arm-export-__sync_icache_dcache-patch)
+                        (search-patches "linux-shmem-hurd-xattr.patch"
+                                        "linux-libre-fix-arm64-bin-sh.patch"))))
+
 (define-public linux-libre-7.0-source
   (source-with-patches linux-libre-7.0-pristine-source
                        (append
@@ -812,6 +834,11 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
     (synopsis "GNU Linux-Libre kernel headers")
     (description "Headers of the Linux-Libre kernel.")
     (license license:gpl2)))
+
+(define-public linux-libre-headers-7.1
+  (make-linux-libre-headers* linux-libre-7.1-version
+                             linux-libre-7.1-gnu-revision
+                             linux-libre-7.1-source))
 
 (define-public linux-libre-headers-7.0
   (make-linux-libre-headers* linux-libre-7.0-version
@@ -1209,6 +1236,14 @@ Linux kernel.  It has been modified to remove all non-free binary blobs.")
 ;;;
 ;;; Generic kernel packages.
 ;;;
+
+(define-public linux-libre-7.1
+  (make-linux-libre* linux-libre-7.1-version
+                     linux-libre-7.1-gnu-revision
+                     linux-libre-7.1-source
+                     '("x86_64-linux" "i686-linux" "armhf-linux"
+                       "aarch64-linux" "powerpc64le-linux" "riscv64-linux")
+                     #:configuration-file kernel-config))
 
 (define-public linux-libre-7.0
   (make-linux-libre* linux-libre-7.0-version

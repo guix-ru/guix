@@ -1,0 +1,14 @@
+Patch out call to /bin/sh which is not available in the default build
+environment at that path.
+
+--- a/arch/arm64/tools/Makefile.orig      2026-06-28 12:17:59.215652903 -0700
++++ b/arch/arm64/tools/Makefile   2026-06-28 12:18:08.234849294 -0700
+@@ -19,7 +19,7 @@
+       cmd_gen_cpucaps = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
+
+ quiet_cmd_gen_kernel_hwcap = GEN     $@
+-      cmd_gen_kernel_hwcap = mkdir -p $(dir $@); /bin/sh -e $(real-prereqs) > $@
++      cmd_gen_kernel_hwcap = mkdir -p $(dir $@); sh -e $(real-prereqs) > $@
+
+ quiet_cmd_gen_sysreg = GEN     $@
+       cmd_gen_sysreg = mkdir -p $(dir $@); $(AWK) -f $(real-prereqs) > $@
