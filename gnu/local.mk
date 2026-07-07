@@ -1858,7 +1858,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/libcdio-glibc-compat.patch		\
   %D%/packages/patches/linphone-desktop-ispell.patch	\
   %D%/packages/patches/linphone-desktop-qtkeychain.patch	\
-  %D%/gnu/packages/patches/linux-libre-fix-arm64-bin-sh.patch	\
+  %D%/packages/patches/linux-libre-fix-arm64-bin-sh.patch	\
   %D%/packages/patches/linux-libre-infodocs-target.patch	\
   %D%/packages/patches/linux-libre-arm64-mnt-reform-revert-phy-rockchip-samsung.patch	\
   %D%/packages/patches/linux-libre-arm64-mnt-reform-revert-rk-samsung-hdptx.patch	\
