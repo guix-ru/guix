@@ -1267,6 +1267,30 @@ backwards-compatibility is mostly given.")
 unparser.")
     (license license:bsd-0)))
 
+(define-public go-codeberg-org-gusted-mcaptcha
+  (package
+    (name "go-codeberg-org-gusted-mcaptcha")
+    (version "0.0.0-20220723083913-4f3072e1d570")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/gusted/mcaptcha")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1d1lq5bff099i923b3r63fwzi72j3qmkmsj1p7ns3vy3lg8v9p0d"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "codeberg.org/gusted/mcaptcha"))
+    (home-page "https://codeberg.org/gusted/mcaptcha")
+    (synopsis "Go library to interact with mCaptcha")
+    (description
+     "@code{mCaptcha} is a Go library to interact with
+@url{https://github.com/mCaptcha/mCaptcha, mCaptcha}.")
+    (license license:expat)))
+
 (define-public go-codeberg-org-tslocum-gmitohtml
   (package
     (name "go-codeberg-org-tslocum-gmitohtml")
