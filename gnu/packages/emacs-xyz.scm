@@ -33326,7 +33326,7 @@ on drag distance.")
 (define-public emacs-mlscroll
   (package
     (name "emacs-mlscroll")
-    (version "0.2.3")
+    (version "0.2.4")
     (source
      (origin
        (method git-fetch)
@@ -33335,7 +33335,7 @@ on drag distance.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "00q0s1y8y4j9qyldbp9bwd7cqd5023wizlmsm7rkns5icf42hwbm"))))
+        (base32 "197k737a3dxfjakj4lzf09sasjd46nq7dk5c78bbjlzbjdpg3r53"))))
     (build-system emacs-build-system)
     (arguments (list #:tests? #f))      ; No tests.
     (home-page "https://github.com/jdtsmith/mlscroll")
