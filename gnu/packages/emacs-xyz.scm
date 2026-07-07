@@ -16186,7 +16186,7 @@ call.")
 (define-public emacs-consult-flycheck
   (package
     (name "emacs-consult-flycheck")
-    (version "1.1")
+    (version "1.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -16195,7 +16195,7 @@ call.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0ga6mqskgmq979nj6ri89x85chcfw0pxhx2vz1xgssz10hwpbla9"))))
+                "1n8n9wd4rn3x8kqyrlimb1hhm3nwgh7vawg7hjy63mfmvcfgrlqk"))))
     (build-system emacs-build-system)
     (propagated-inputs (list emacs-consult emacs-flycheck))
     (home-page "https://github.com/minad/consult-flycheck")
