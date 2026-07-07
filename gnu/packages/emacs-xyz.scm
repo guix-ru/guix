@@ -10595,7 +10595,7 @@ boxes, and more.")
 (define-public emacs-org-books
   (package
     (name "emacs-org-books")
-    (version "0.3.1")
+    (version "0.3.2")
     (source
      (origin
        (method git-fetch)
@@ -10605,7 +10605,7 @@ boxes, and more.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0nf5d5nc9x7sjg35hcjk19xspr6k722g60lmfrb855m4vxliril7"))))
+         "1j2yw6mpki3k5ak5ll93129y389gpbnl86y4c651gash3pd6k088"))))
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-dash
