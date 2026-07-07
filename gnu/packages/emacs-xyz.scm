@@ -35359,7 +35359,7 @@ modes and text viewing modes respectively.")
 (define-public emacs-adoc-mode
   (package
     (name "emacs-adoc-mode")
-    (version "0.8.0")
+    (version "0.9.0")
     (source
      (origin
        (method git-fetch)
@@ -35369,7 +35369,7 @@ modes and text viewing modes respectively.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0hjhjg9kdx849qbdhzryfv8c21h2xq02991hixykmxf1b2xv1y69"))))
+         "1d0r3nffpxzvshg72xp951fk4g8dyy7ynp6xvz65fbnsnw1sm7g7"))))
     (build-system emacs-build-system)
     (arguments
      (list
