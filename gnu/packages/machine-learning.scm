@@ -1080,7 +1080,7 @@ generation, etc.")
 (define-public whisper-cpp
   (package
     (name "whisper-cpp")
-    (version "1.8.6")                   ;keep in sync with ggml-for-whisper
+    (version "1.9.1")                   ;keep in sync with ggml-for-whisper
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1089,14 +1089,14 @@ generation, etc.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0akcmzy4krhdwrzv6y4d8gp02ir7dmfwv6glm6zhbdiq0g0za1w3"))))
+                "1mpmmqm83qy39a1zqphy059x2crzwll2j34ypgwwghy2ji6nc2xm"))))
     (build-system cmake-build-system)
     (arguments
      (list
       #:configure-flags
       #~(list "-DBUILD_SHARED_LIBS=ON"
               "-DWHISPER_SDL2=TRUE"
-              "-DWHISPER_FFMPEG=TRUE"
+              "-DWHISPER_COMMON_FFMPEG=TRUE"
               "-DWHISPER_USE_SYSTEM_GGML=ON")
       #:phases
       #~(modify-phases %standard-phases
@@ -1110,6 +1110,17 @@ generation, etc.")
                          (("LABELS \"large\"")
                           "DISABLED true")))))
                  '())
+          (add-after 'unpack 'fix-parakeet-test
+            (lambda _
+              ;; Unlike whisper-cli, test-parakeet does not load the
+              ;; dynamically loadable ggml backends, so it aborts with
+              ;; "GGML_ASSERT(device) failed" since our ggml is built
+              ;; with -DGGML_BACKEND_DL=ON.
+              (substitute* "tests/test-parakeet.cpp"
+                (("#include \"parakeet\\.h\"")
+                 "#include \"parakeet.h\"\n#include \"ggml-backend.h\"")
+                (("int main\\(\\) \\{")
+                 "int main() {\n    ggml_backend_load_all();"))))
           (add-after 'unpack 'skip-failing-vad-tests
             (lambda _
               (substitute* "tests/CMakeLists.txt"
