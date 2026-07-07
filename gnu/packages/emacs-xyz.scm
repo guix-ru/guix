@@ -809,31 +809,29 @@ files, provide Age encrypted authentication information out of
     (license license:gpl3+)))
 
 (define-public emacs-balanced-windows
-  (let ((commit "1da5354ad8a9235d13928e2ee0863f3642ccdd13")
-        (revision "0"))
-    (package
-      (name "emacs-balanced-windows")
-      (version (git-version "1.0.0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri
-          (git-reference
-            (url "https://github.com/wbolster/emacs-balanced-windows")
-            (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32
-           "1hsjg48jlfi6lc6izp9xcfqvxj7c0ivjrfsr2q3yv3s1iy2fz37l"))))
-      (build-system emacs-build-system)
-      (arguments (list #:tests? #f)) ;there are no tests
-      (home-page "https://github.com/wbolster/emacs-balanced-windows/")
-      (synopsis "Automatically balance Emacs windows")
-      (description
-       "This Emacs package provides a global minor mode to automatically
+  (package
+    (name "emacs-balanced-windows")
+    (version "1.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+          (url "https://github.com/wbolster/emacs-balanced-windows")
+          (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "081k5qdvjp3f9swnn45azsy233x9sza9y1qj7sy85bj7xcrmz82q"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f)) ;there are no tests
+    (home-page "https://github.com/wbolster/emacs-balanced-windows/")
+    (synopsis "Automatically balance Emacs windows")
+    (description
+     "This Emacs package provides a global minor mode to automatically
 balance windows (keeping them roughly the same size) whenever the window
 configuration changes, e.g. after splitting or deleting a window.")
-      (license license:bsd-3))))
+    (license license:bsd-3)))
 
 (define-public emacs-ben
   (package
