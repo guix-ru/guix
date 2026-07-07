@@ -25921,6 +25921,35 @@ conversion: Gamut A, B, and C.")
      applying JSON Patches according to RFC 6902.")
     (license license:bsd-3)))
 
+(define-public python-rfc3987-syntax
+  (package
+    (name "python-rfc3987-syntax")
+    (version "1.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/willynilly/rfc3987-syntax")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "13nmzq1ra5660c3k29c937q4kwq7qj7z6dv9bgr1ph57qb3kyc7a"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatchling
+           python-pytest))
+    (propagated-inputs
+     (list python-lark))
+    (home-page "https://github.com/willynilly/rfc3987-syntax")
+    (synopsis "RFC 3987 IRI validation built on a Lark grammar")
+    (description
+     "This package validates Internationalized Resource Identifiers (IRIs) and
+their components against the ABNF grammar from RFC 3987.  Built on the Lark
+parser, it is an MIT-licensed alternative to the GPL-licensed @code{rfc3987}
+package, and provides the @code{format-nongpl} extra required by recent
+@code{jsonschema} releases.")
+    (license license:expat)))
+
 (define-public python-rfc3986
   (package
     (name "python-rfc3986")
