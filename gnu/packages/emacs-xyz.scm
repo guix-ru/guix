@@ -44082,45 +44082,43 @@ REPL appropriate to the current major mode.")
     (license license:gpl3+)))
 
 (define-public emacs-liberime
-  (let ((commit "cc9eb9812fd6f68e78ed6a0c0a85da7a18765753")
-        (revision "0"))
-    (package
-      (name "emacs-liberime")
-      (version (git-version "0.0.6" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/merrickluo/liberime")
-               (commit commit)))
-         (sha256
-          (base32
-           "11c2wj00wwbdxqkzl60sd77cp43rja5v8hrvhrvhg75v62kawva2"))
-         (file-name (git-file-name name version))))
-      (build-system emacs-build-system)
-      (arguments
-       (list
-        #:test-command #~(list "make" "test" "EMACS=emacs --batch")
-        #:include #~(cons "^src/liberime-core.so$" %default-include)
-        #:phases
-        #~(modify-phases %standard-phases
-            (add-after 'unpack 'delete-files-and-patch-paths
-              (lambda* (#:key inputs #:allow-other-keys)
-                (delete-file-recursively "emacs-module")
-                (emacs-substitute-variables "liberime.el"
-                  ("liberime-module-file"
-                   (string-append #$output "/src/liberime-core.so"))
-                  ("liberime-shared-data-dir"
-                   (search-input-directory inputs "share/rime-data")))))
-            (add-before 'install 'build-emacs-module
-              (lambda _
-                (invoke "make"))))))
-      (inputs (list librime rime-data))
-      (home-page "https://github.com/merrickluo/liberime")
-      (synopsis "Librime Emacs Lisp binding")
-      (description
-       "Liberime is an Emacs dynamic module provide librime bindings.")
-      (license license:gpl3+))))
+  (package
+    (name "emacs-liberime")
+    (version "0.0.10.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/merrickluo/liberime")
+              (commit (string-append "v" version))))
+       (sha256
+        (base32
+         "0mq106yppl9kkqfyvbxma4d9k88bqpvwk6b6lcyr8kmkd2bd6n8f"))
+       (file-name (git-file-name name version))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      #:test-command #~(list "make" "test" "EMACS=emacs --batch")
+      #:include #~(cons "^src/liberime-core.so$" %default-include)
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'delete-files-and-patch-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (delete-file-recursively "emacs-module")
+              (emacs-substitute-variables "liberime.el"
+                ("liberime-module-file"
+                 (string-append #$output "/src/liberime-core.so"))
+                ("liberime-shared-data-dir"
+                 (search-input-directory inputs "share/rime-data")))))
+          (add-before 'install 'build-emacs-module
+            (lambda _
+              (invoke "make"))))))
+    (inputs (list librime rime-data))
+    (home-page "https://github.com/merrickluo/liberime")
+    (synopsis "Librime Emacs Lisp binding")
+    (description
+     "Liberime is an Emacs dynamic module provide librime bindings.")
+    (license license:gpl3+)))
 
 (define-public emacs-bison-mode
   (package
