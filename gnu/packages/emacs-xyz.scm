@@ -7573,7 +7573,7 @@ Lisp.")
  (define-public emacs-fontaine
    (package
      (name "emacs-fontaine")
-     (version "3.0.0")
+     (version "3.1.0")
      (source (origin
                (method git-fetch)
                (uri (git-reference
@@ -7582,7 +7582,7 @@ Lisp.")
                (file-name (git-file-name name version))
                (sha256
                 (base32
-                 "1rkk6bzb5fwl1xkr8ifcvla7xgms7iks09xkxmpzar4qvq7y8c28"))))
+                 "16y2j8bz8467k93zs11d3jg1186kxpbazwrkazzzcm4lisml7sm2"))))
      (build-system emacs-build-system)
      (home-page "https://github.com/protesilaos/fontaine")
      (synopsis "Set Emacs font configurations using presets")
