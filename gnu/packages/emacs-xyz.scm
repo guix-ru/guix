@@ -48860,7 +48860,7 @@ reconciliation and layouts, rendered using native Emacs widgets.")
 (define-public emacs-vulpea
   (package
     (name "emacs-vulpea")
-    (version "2.2.0")
+    (version "2.5.0")
     (source
      (origin
        (method git-fetch)
@@ -48869,7 +48869,7 @@ reconciliation and layouts, rendered using native Emacs widgets.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01vq47y9sr62b1nb8dr5aq499kvgca8dswrxn3bpnzxfx5sfdq3b"))))
+        (base32 "0hnlff6g1sw130s4v6hhgsdkmnb7b0pw98g1kj717a91h3hpd91m"))))
     (build-system emacs-build-system)
     (arguments
      (list
@@ -48949,6 +48949,10 @@ contextual information (stats, outline, backlins, links...) for
     (arguments
      (list
       #:emacs emacs-no-x                ; requires sqlite support.
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-home
+            (lambda _ (setenv "HOME" (getenv  "TMPDIR")))))
       #:test-command
       #~(list "emacs" "-Q" "--batch"
               "-l" "test/vulpea-journal-test.el"
