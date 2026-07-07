@@ -380,6 +380,25 @@ formal verification.  This is the Yosyshq fork of ABC.")
 generating bitstreams with Gowin FPGAs.")
     (license license:expat)))
 
+(define-public bender
+  (package
+    (name "bender")
+    (version "0.31.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (crate-uri "bender" version))
+       (file-name (string-append name "-" version ".tar.gz"))
+       (sha256
+        (base32 "1ddrzn6ggwqsrxrkblsissyrmjbbgb90w1irpd0hrbjxwmsgv8gq"))))
+    (build-system cargo-build-system)
+    (inputs (cargo-inputs 'bender))
+    (home-page "https://github.com/pulp-platform/bender")
+    (synopsis "dependency management tool for hardware projects.")
+    (description
+     "This package provides a dependency management tool for hardware projects.")
+    (license (list license:asl2.0 license:expat))))
+
 (define-public camv-rnd
   (package
     (name "camv-rnd")
