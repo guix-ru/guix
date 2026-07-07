@@ -48832,28 +48832,30 @@ projects.")
    (license license:gpl3+)))
 
 (define-public emacs-vui
-  (let ((commit "48f22e6a72d950f2576a7364d3bdb9a149ddcf1f")
-        (revision "1"))
-    (package
-      (name "emacs-vui")
-      (version "1.1.0")
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-                (url "https://github.com/d12frosted/vui.el")
-                (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "0zqyg20yk2kgp1cgbis20z880lr4napy52rxcklp9y6l8n0qg1jf"))))
-      (build-system emacs-build-system)
-      (native-inputs (list emacs-buttercup))
-      (home-page "https://github.com/d12frosted/vui.el")
-      (synopsis "Declarative, component-based UI library for Emacs")
-      (description
-       "This package provides React-like components with state, hooks,
+  (package
+    (name "emacs-vui")
+    (version "1.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/d12frosted/vui.el")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1xlnp9myjw4p90lir78p0kwl0shfglwm6wb3afd2wk1l3bf8882b"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      #:test-command
+      #~(list "buttercup" "-L" "." "-L" "docs/examples")))
+    (native-inputs (list emacs-buttercup))
+    (home-page "https://github.com/d12frosted/vui.el")
+    (synopsis "Declarative, component-based UI library for Emacs")
+    (description
+     "This package provides React-like components with state, hooks,
 reconciliation and layouts, rendered using native Emacs widgets.")
-      (license license:gpl3+))))
+    (license license:gpl3+)))
 
 (define-public emacs-vulpea
   (package
