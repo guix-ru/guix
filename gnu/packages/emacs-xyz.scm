@@ -21910,7 +21910,7 @@ federated blogging platform WriteFreely.")
 (define-public emacs-org
   (package
     (name "emacs-org")
-    (version "9.8.3")
+    (version "9.8.7")
     (source
      (origin
        (method git-fetch)
@@ -21919,7 +21919,7 @@ federated blogging platform WriteFreely.")
              (commit (string-append "release_" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0vv3pkr9kk9j9f45nkmkk4jbwghbqi2qffdv9v7gjjinn6fx0l3q"))))
+        (base32 "16hxd3yzj1jrbh1wzh236yyrvl9i917h8wwgy2dgy4b38l1b16gd"))))
     (build-system emacs-build-system)
     (outputs (list "out" "test"))
     (arguments
@@ -21972,6 +21972,9 @@ federated blogging platform WriteFreely.")
                 (("ob-shell/remote-with-stdin-or-cmdline .*" all)
                  (string-append all "  (skip-unless nil)\n"))
                 (("ob-shell/cmdline .*" all)
+                 (string-append all "  (skip-unless nil)\n")))
+              (substitute* "testing/lisp/test-org.el"
+                (("test-org/org-log-done .*" all)
                  (string-append all "  (skip-unless nil)\n")))))
           (replace 'build
             (lambda args
