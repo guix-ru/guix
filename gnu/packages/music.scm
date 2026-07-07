@@ -5812,6 +5812,16 @@ ALSA, Pulseaudio, JACK, OSSv4 and CoreAudio.")
                (base32
                 "0kl1hzhb7cykzkrqcqgq1dk4xcgrcxv0jja251aq4z4l783jpj7j"))))
     (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      '(modify-phases %standard-phases
+         (add-after 'unpack 'compatibility
+           (lambda _
+             ;; seq_event.h should not be used directly.
+             (substitute* "dssi/dssi.h"
+               (("alsa/seq_event.h")
+                "alsa/asoundlib.h")))))))
     (inputs
      (list alsa-lib
            jack-1
