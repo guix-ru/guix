@@ -1889,19 +1889,29 @@ neuronal models")
 (define-public python-marsilea
   (package
     (name "python-marsilea")
-    (version "0.5.4")
+    (version "0.6.2")
     (source
      (origin
-       (method git-fetch)       ;no tests in PyPI archive
+       (method git-fetch)
        (uri (git-reference
               (url "https://github.com/Marsilea-viz/marsilea")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09pyfx0gn46ypsp991d3n4a4xx6zlbpss078lw6yywnhl834v2i0"))))
+        (base32 "0i7n44fzy8qibdk8jc6f1g356xa10cc7fr64dhpqkrsp9sz6kx70"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-version
+            (lambda _
+              (substitute* "pyproject.toml"
+                ((".*uv-dynamic-versioning>.*") "")
+                (("source.*uv-dynamic-versioning.*") "source = 'vcs'")))))))
     (native-inputs
-     (list python-hatchling
+     (list python-hatch-vcs
+           python-hatchling
            python-pytest))
     (propagated-inputs
      (list python-legendkit
@@ -1910,7 +1920,10 @@ neuronal models")
            python-pandas
            python-platformdirs
            python-scipy
-           python-seaborn))
+           python-seaborn
+           ;; [optional]
+           python-fastcluster
+           python-pyarrow))     ;extra == "parquet"
     (home-page "https://github.com/Marsilea-viz/marsilea")
     (synopsis "Declarative creation of composable visualizations")
     (description
