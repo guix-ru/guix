@@ -26085,7 +26085,7 @@ highlighting.")
 (define-public emacs-jsonrpc
   (package
     (name "emacs-jsonrpc")
-    (version "1.0.28")
+    (version "1.0.29")
     (source
      (origin
        (method url-fetch)
@@ -26094,7 +26094,7 @@ highlighting.")
                   (string-append "https://elpa.gnu.org/packages/"
                                  "jsonrpc-" version ".tar.lz")))
        (sha256
-        (base32 "13zdm9ss1sfpw55lwr8nrv1ha30qcj7v10m1ql8r9cbdxxkzxp8f"))))
+        (base32 "1cjxdzckxffiw2cjp68rf382iaf7qpg9iqkxm0yrz0rmw3vk3gcq"))))
     (build-system emacs-build-system)
     (home-page "https://elpa.gnu.org/packages/jsonrpc.html")
     (synopsis "JSON-RPC library")
