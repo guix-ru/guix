@@ -5853,7 +5853,7 @@ loads outdated byte code files.")
 (define-public emacs-compile-angel
   (package
     (name "emacs-compile-angel")
-    (version "1.2.0")
+    (version "1.2.1")
     (source
      (origin
        (method git-fetch)
@@ -5862,7 +5862,7 @@ loads outdated byte code files.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "18bhhsw8qfj4rx6fmvr3cp419pw5yn5lfvdwdi8dcczi8bf1f7dh"))))
+        (base32 "1vzs2j9xwgxd54gm6j73dpxs5si77l3ywkf3g4af5hmrqpshb6c0"))))
     (build-system emacs-build-system)
     (arguments
      (list
