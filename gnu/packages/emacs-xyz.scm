@@ -25505,7 +25505,7 @@ gnugo-image-display-mode}.")
 (define-public emacs-gnuplot
   (package
     (name "emacs-gnuplot")
-    (version "0.11")
+    (version "0.12")
     (source
      (origin
        (method git-fetch)
@@ -25514,7 +25514,7 @@ gnugo-image-display-mode}.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17kh2mpbm5rir4bfrl2hmf8hic6v09z13y6svbf22fm0nkfvic1p"))))
+        (base32 "1hv7pyvwad67p2ii0lnww0vkk1jrj5pdkph5fxpavyln84wxxnmq"))))
     (build-system emacs-build-system)
     (arguments
      (list #:test-command #~(list "make" "test"
@@ -25544,6 +25544,7 @@ gnugo-image-display-mode}.")
                    (gnuplot-number-tests
                     "gnuplot-tests.el"
                     "gnuplot-comment-with-single-quotes"))))))
+    (propagated-inputs (list emacs-compat))
     (home-page "https://github.com/emacsorphanage/gnuplot-mode")
     (synopsis "Emacs major mode for interacting with Gnuplot")
     (description
