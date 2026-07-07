@@ -8054,7 +8054,7 @@ Lisp developers who want to write macros with convenience.")
 (define-public emacs-tablist
   (package
     (name "emacs-tablist")
-    (version "1.1")
+    (version "1.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -8063,7 +8063,7 @@ Lisp developers who want to write macros with convenience.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "11vmvrhmsxy97bfj7jndpc58bik7177i3wvc45mlyldxwyirs962"))))
+                "0nc6dw9p420kf3c6wbi0fl31sm9q9357dnx3wyphj0r6162f3fvb"))))
     (build-system emacs-build-system)
     (arguments (list #:tests? #f))      ; no test suite
     (home-page "https://github.com/politza/tablist")
