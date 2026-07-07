@@ -1839,7 +1839,7 @@ It started as a side project of LXC but can be used by any run-time.")
            dmidecode
            dnsmasq
            eudev
-           fuse-2
+           fuse
            gnutls
            iproute
            iptables
