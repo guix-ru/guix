@@ -27872,7 +27872,7 @@ literate programming tools for exporting, weaving and tangling.")
 (define-public emacs-ansible
   (package
     (name "emacs-ansible")
-    (version "0.4.2")
+    (version "0.4.3")
     (source
      (origin
        (method git-fetch)
@@ -27881,7 +27881,7 @@ literate programming tools for exporting, weaving and tangling.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0b5rrkxygxhnixbwhv5gsz3d216l2j6ljbvipdyysmvzv4fxmgwj"))))
+        (base32 "04zr6vswxnh3jqf180lv32s4f6bap8913fym2d2gnmjv7nb6wb3i"))))
     (build-system emacs-build-system)
     (propagated-inputs (list emacs-f emacs-s))
     (home-page "https://gitlab.com/emacs-ansible/emacs-ansible")
