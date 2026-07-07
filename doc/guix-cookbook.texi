@@ -2082,8 +2082,8 @@ package source is a compressed archive, you would at this point extract it to a
 directory to proceed.
 @end quotation
 
-Now, given that we have access to the @code{Cargo.toml} file, we can now run
-the following inside the checkout:
+Having access to the @code{Cargo.toml} file, we can audit the source code
+in the checkout directory with commands:
 
 @example shell
 $ guix shell rust rust:cargo -- cargo generate-lockfile
