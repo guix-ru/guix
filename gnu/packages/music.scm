@@ -5824,7 +5824,7 @@ ALSA, Pulseaudio, JACK, OSSv4 and CoreAudio.")
                 "alsa/asoundlib.h")))))))
     (inputs
      (list alsa-lib
-           jack-1
+           jack-2
            ladspa
            libsamplerate
            libsndfile
