@@ -6210,7 +6210,7 @@ listing type errors via Flycheck, as well as REPL support for Carp.")
 (define-public emacs-cond-let
   (package
     (name "emacs-cond-let")
-    (version "1.1.2")
+    (version "1.1.3")
     (source
      (origin
        (method git-fetch)
@@ -6219,7 +6219,7 @@ listing type errors via Flycheck, as well as REPL support for Carp.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "18507g86bz50as93cajx754nmg5y26djhmrj50ba88rm2rl8szlf"))))
+        (base32 "1d5daj00qkpyjqhdy24rng08ynpqxc44d30sv5f1y92nmlhswmdv"))))
     (build-system emacs-build-system)
     (arguments
      (list
