@@ -3216,14 +3216,14 @@ for filesystem and generic servers.")
 (define-public emacs-mct
   (package
     (name "emacs-mct")
-    (version "1.1.0")
+    (version "1.1.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
                     (url "https://gitlab.com/protesilaos/mct")
                     (commit version)))
               (sha256
-               (base32 "0k9g3305ba4m2bljq4k69jvrzd8h27mmkj17544182hfl6i64gs1"))
+               (base32 "191rgdq0zbmdkk21bicmlsacyihlf1pizx6288wd1kqv8pahvdvq"))
               (file-name (git-file-name name version))))
     (native-inputs (list texinfo))
     (build-system emacs-build-system)
