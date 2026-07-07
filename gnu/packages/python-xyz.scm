@@ -9496,7 +9496,7 @@ and convert DDL to BigQuery JSON schema.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 7744 passed, 71 skipped
+      ;; tests: 7762 passed, 53 skipped
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'pre-check
@@ -9520,6 +9520,7 @@ and convert DDL to BigQuery JSON schema.")
            python-jsonpointer
            python-rfc3339-validator
            python-rfc3986-validator
+           python-rfc3987-syntax        ;sanity-check fails without this
            python-uri-template
            python-webcolors))
     (home-page "https://github.com/Julian/jsonschema")
