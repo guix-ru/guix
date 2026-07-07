@@ -475,6 +475,37 @@ time dependencies in tests.")
 @url{https://github.com/syndtr/goleveldb, go-leveldb}.")
     (license license:expat)))
 
+(define-public go-code-forgejo-org-go-chi-cache
+  (package
+    (name "go-code-forgejo-org-go-chi-cache")
+    (version "1.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://code.forgejo.org/go-chi/cache.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1iz44wysis9r97bdfc1269x555l1qlxhwpw1jwq3x4qsrbrnyr3b"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.forgejo.org/go-chi/cache"
+      #:test-flags
+      ;; Running Memcache instance is expected.
+      #~(list "-skip" "Test_MemcacheCacher")))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-bradfitz-gomemcache))
+    (home-page "https://code.forgejo.org/go-chi/cache")
+    (synopsis "Middleware interface for cache implementations in Go")
+    (description
+     "Package cache is a middleware that aim to have a transparent interface
+for a lot of cache implementations.")
+    (license license:asl2.0)))
+
 (define-public go-code-forgejo-org-go-chi-captcha
   (package
     (name "go-code-forgejo-org-go-chi-captcha")
