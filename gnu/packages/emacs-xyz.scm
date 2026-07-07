@@ -6849,7 +6849,7 @@ searches.  Unlike @code{emacs-wiki.el}, it can be combined with any format.")
 (define-public emacs-mediawiki
   (package
     (name "emacs-mediawiki")
-    (version "3.1.1")
+    (version "4.0.1")
     (source
      (origin
        (method git-fetch)
@@ -6858,7 +6858,7 @@ searches.  Unlike @code{emacs-wiki.el}, it can be combined with any format.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0kmrbj82hdada6vvncavk0zmjiv5zkyvfhkkhjrl7ggflq8pggf2"))))
+        (base32 "021gxmx8492gz9zi9535s09z1rhwgh6fprxw6q231nx5cdrfbi1a"))))
     (build-system emacs-build-system)
     (arguments
      (list
