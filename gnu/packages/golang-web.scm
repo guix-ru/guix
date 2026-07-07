@@ -10027,6 +10027,32 @@ middleware for Go web applications and services.")
     (description "This package provides a CSS3 tokenizer.")
     (license license:bsd-3)))
 
+(define-public go-github-com-gorilla-feeds
+  (package
+    (name "go-github-com-gorilla-feeds")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gorilla/feeds")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0285iq589q7i6mr2wl3qzr282yc82sg1raxfna0xxvin7a5k7mx6"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/gorilla/feeds"))
+    (propagated-inputs
+     (list go-github-com-kr-pretty))
+    (home-page "https://gorilla.github.io/")
+    (synopsis "Glang RSS/Atom generator library")
+    (description
+     "This package is a web feed generator library for generating RSS,Atom and
+JSON feeds from Go applications.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-gorilla-handlers
   (package
     (name "go-github-com-gorilla-handlers")
