@@ -606,6 +606,8 @@ unpacking them into a directory which can eventually be chrooted into.")
                (base32
                 "0hw407fm5ylsf28b0vrwz7rm2r2rsgfwzajbkbn6n2b6kqhdjyy9"))))
     (build-system gnu-build-system)
+    (inputs (if (%current-target-system) (list bash-minimal)
+                '()))
     (native-inputs
      (list autoconf automake gettext-minimal po4a-minimal))
     (home-page "https://packages.debian.org/unstable/debianutils")
