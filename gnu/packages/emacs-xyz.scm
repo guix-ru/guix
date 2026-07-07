@@ -15849,7 +15849,7 @@ include installing, removing or visiting the homepage.")
 (define-public emacs-prescient
   (package
     (name "emacs-prescient")
-    (version "6.3.2")
+    (version "6.3.3")
     (source
      (origin
        (method git-fetch)
@@ -15858,7 +15858,7 @@ include installing, removing or visiting the homepage.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0f4wi8aq3yfykxfza4y4c5yhcs50cs3gpfj0qrmvfq9hvkhzj52w"))))
+        (base32 "199150yng81f6n3kb120s37yf2dqs0i9k91f2gzkk8kjn6hvrsj8"))))
     (build-system emacs-build-system)
     (arguments (list #:test-command #~(list "make" "test")))
     (propagated-inputs
