@@ -3275,7 +3275,7 @@ Meyvn} build tool.")
 (define-public emacs-affe
   (package
     (name "emacs-affe")
-    (version "0.9")
+    (version "0.10")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3284,7 +3284,7 @@ Meyvn} build tool.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "166v7d120hbk6vczj1iam85xivk6wwpvga8m0vxgcii19issh5b3"))))
+                "07f3z5cp98nlmxbii8fnsq9p87v4j29pydadzic2kzckzp5rcymw"))))
     (build-system emacs-build-system)
     (arguments (list #:tests? #f))      ; no tests
     (propagated-inputs (list emacs-consult))
