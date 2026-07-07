@@ -10134,7 +10134,7 @@ for the Zig programming language in Emacs.")
 (define-public emacs-zk
   (package
     (name "emacs-zk")
-    (version "0.7")
+    (version "1.0")
     (source
      (origin
        (method git-fetch)
@@ -10144,7 +10144,7 @@ for the Zig programming language in Emacs.")
          (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0449zsahyzvjlhv27lkj33ybnq86j47paww779zd0qhq550hdnjs"))))
+        (base32 "1d00i9p391h4341q76ci0x6pxsishsh2mkxshfqivllv80gczn2c"))))
     (arguments
      (list
       #:tests? #f ; There are no tests.
