@@ -20902,7 +20902,7 @@ sly-quickload command that prompts the user for a package to install.")
 (define-public emacs-sly-asdf
   (package
     (name "emacs-sly-asdf")
-    (version "0.2.0")
+    (version "0.3.0")
     (home-page "https://github.com/mmgeorge/sly-asdf")
     (source
      (origin
@@ -20913,7 +20913,7 @@ sly-quickload command that prompts the user for a package to install.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0gncp8xv33s4wx594bgd35vr1455bcggv1bg28qv75mhv41nzw97"))))
+         "090cam192hrk6xriwscbfnzkdbvrbmdncdrmxxqgv048bcnj93g0"))))
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-sly emacs-popup))
