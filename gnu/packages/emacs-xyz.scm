@@ -21321,7 +21321,7 @@ being deleted, changed, yanked, or pasted when using evil commands")
 (define-public emacs-goggles
   (package
     (name "emacs-goggles")
-    (version "0.4")
+    (version "0.5")
     (source
      (origin
        (method git-fetch)
@@ -21330,7 +21330,7 @@ being deleted, changed, yanked, or pasted when using evil commands")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1fczxygg1blfmlwswck49rllww77rc7qn91wqw1kvjwfz31sk8z4"))))
+        (base32 "0247jq97l30ykn02wmkpq401is453yqix7y28pf2milj3mic9blw"))))
     (build-system emacs-build-system)
     (arguments (list #:test-command #~(list "ert-runner" ".")))
     (native-inputs (list emacs-ert-runner))
