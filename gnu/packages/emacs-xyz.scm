@@ -38178,7 +38178,7 @@ recursively.  The results are cached for speed.")
 (define-public emacs-orgit
   (package
     (name "emacs-orgit")
-    (version "2.1.2")
+    (version "2.2.0")
     (home-page "https://github.com/magit/orgit")
     (source (origin
               (method git-fetch)
@@ -38188,7 +38188,7 @@ recursively.  The results are cached for speed.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1qa07q41383f79iv4r5ykxrb1fs2drk6h3qxkb3z7ymhjfbcifli"))))
+                "1730vha6pa10cnz5j5nyzf8wxnnkck6ncmi4i3sqmhfxalf901xk"))))
     (build-system emacs-build-system)
     (arguments
      (list #:tests? #f)) ; A makefile but no tests.
