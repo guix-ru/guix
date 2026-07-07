@@ -22775,14 +22775,14 @@ view your Denote directory.")
 (define-public emacs-denote-org
   (package
     (name "emacs-denote-org")
-    (version "0.2.1")
+    (version "0.3.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://elpa.gnu.org/packages/denote-org-" version
                            ".tar"))
        (sha256
-        (base32 "1cs1ml38xhj0c921qdsvqhqg42lm5r0qb7nf7sj1krvw1r9913bn"))))
+        (base32 "0r3idn17875hzmidi1xjb9hddifzby9i23j35ywzn88h9a33845k"))))
     (build-system emacs-build-system)
     (arguments (list #:tests? #f))      ; no tests
     (propagated-inputs (list emacs-denote))
