@@ -48906,7 +48906,7 @@ See @url{https://github.com/d12frosted/vulpea} for documentation.")
 (define-public emacs-vulpea-ui
   (package
     (name "emacs-vulpea-ui")
-    (version "1.1.0")
+    (version "1.2.0")
     (source
      (origin
        (method git-fetch)
@@ -48915,7 +48915,7 @@ See @url{https://github.com/d12frosted/vulpea} for documentation.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1jc8c1s8slsbs1yvyw0h14wcmzmyxrc15jpmmcvr0jibp7k45brr"))))
+        (base32 "1jvw7gryb4l6x0ljb03d4fvkh15j71pxjigb1g9sl5ygqlw6j8sj"))))
     (build-system emacs-build-system)
     (arguments
      (list
