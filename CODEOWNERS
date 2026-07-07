@@ -183,6 +183,7 @@ tests/import/elpa\.scm                             @guix/emacs
 
 gnu/packages/bootloaders\.scm                      @guix/embedded
 gnu/packages/coreboot\.scm                         @guix/embedded
+gnu/packages/embedded\.scm                         @guix/embedded
 gnu/packages/firmware\.scm                         @guix/embedded
 
 gnu/packages/emulators\.scm                        @guix/games

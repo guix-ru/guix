@@ -705,6 +705,7 @@ ecosystem."
         #:name "Embedded"
         #:scope (list "gnu/packages/bootloaders.scm"
                       "gnu/packages/coreboot.scm"
+                      "gnu/packages/embedded.scm"
                       "gnu/packages/firmware.scm")))
 
 (define-team games
