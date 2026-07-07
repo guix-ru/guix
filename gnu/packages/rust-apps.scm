@@ -3944,14 +3944,16 @@ blanks grouped by language.")
 (define-public typst
   (package
     (name "typst")
-    (version "0.14.2")
+    (version "0.15.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (crate-uri "typst-cli" version))
-       (file-name (string-append name "-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/typst/typst")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "176gnwxzs5ddwpsx6a1ayvwr4da0k14mqgd4z0vksy3fpfhrvy9h"))))
+        (base32 "0y727lyicn3ciq36mdpbcg8d09naff39y1i52467mlmr11p0l9xa"))))
     (build-system cargo-build-system)
     (arguments
      (list
@@ -3961,15 +3963,22 @@ blanks grouped by language.")
       #:modules '((guix build cargo-build-system)
                   ((guix build copy-build-system) #:prefix copy:)
                   (guix build utils))
+      #:cargo-install-paths ''("crates/typst-cli")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'set-version-string
             (lambda _
               (setenv "TYPST_VERSION" #$(package-version this-package))))
+          (add-after 'unpack 'fix-dev-assets
+            (lambda _
+              (substitute* "Cargo.toml"
+                (("typst-dev-assets = \\{[^}]*\\}")
+                 (string-append "typst-dev-assets = {version=\""
+                                #$version
+                                "\"}")))))
           (add-after 'configure 'configure-artifacts
             (lambda _
-              (mkdir "artifacts")
-              (setenv "GEN_ARTIFACTS" "artifacts")))
+              (setenv "GEN_ARTIFACTS" (string-append (getcwd) "/artifacts"))))
           (add-after 'install 'install-artifacts
             (lambda args
                (apply (assoc-ref copy:%standard-phases 'install)
