@@ -7306,7 +7306,7 @@ completion at point function.")
 (define-public emacs-direnv
   (package
     (name "emacs-direnv")
-    (version "2.2.0")
+    (version "2.3.0")
     (source
      (origin
        (method git-fetch)
@@ -7315,7 +7315,7 @@ completion at point function.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0cf5npgksl9a03mnfdhfdhlf46gr9qz9adjxz3dbckq9b1vl0dfc"))))
+        (base32 "078g5x3xzsqh9j87qdxmp131fbwrazcj0hxr5c7rr2f25pih8lq4"))))
     (build-system emacs-build-system)
     (arguments
      `(#:phases
