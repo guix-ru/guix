@@ -2168,16 +2168,16 @@ comparing large files in batches.")
 (define-public emacs-package-build
   (package
     (name "emacs-package-build")
-    (version "4.0.0")
+    (version "5.0.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
                     (url "https://github.com/melpa/package-build")
-                    (commit version)))
+                    (commit (string-append "v" version))))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "165gbrc1h1yj764kn3qq2y1551y04lqnklfa0k87gqgd38q5v985"))))
+                "00v3fi2ssq9z9z5qf40b49z2yw9dsjkhcdfzy7qk1wdgv0pjbq0h"))))
     (build-system emacs-build-system)
     (arguments
      (list #:tests? #f))  ; No tests.
