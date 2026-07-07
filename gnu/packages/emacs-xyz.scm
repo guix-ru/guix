@@ -38354,7 +38354,7 @@ constant expressions.")
 (define-public emacs-kubed
   (package
     (name "emacs-kubed")
-    (version "0.6.1")
+    (version "0.7.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -38363,7 +38363,7 @@ constant expressions.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "096v7pbvk26fw81rajpyl295lxh1frc94vp37rm0i2m26bipg1dj"))))
+                "0b6jhlf8aax4vgszfah68iy7bi8skxs28gwlx2hb2wj3k0fxa8l2"))))
     (build-system emacs-build-system)
     (synopsis "Kubernetes control")
     (description "This package provides a Kubernetes control interface
