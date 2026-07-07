@@ -145,14 +145,14 @@
 (define-public aardvark-dns
   (package
     (name "aardvark-dns")
-    (version "1.17.0")
+    (version "2.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (crate-uri "aardvark-dns" version))
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
-        (base32 "1i7agi5ivg1399xy2cgcrz2hgg1bgfs68jwvdrxfz5856hc0gcrk"))))
+        (base32 "0ypbiqkzdlw8zk36ggkzmglqgyq6ya7g7zz4fxf2qy0j9w1l48j2"))))
     (build-system cargo-build-system)
     (arguments
      `(#:install-source? #f))
