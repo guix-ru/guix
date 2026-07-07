@@ -48935,7 +48935,7 @@ contextual information (stats, outline, backlins, links...) for
 (define-public emacs-vulpea-journal
   (package
     (name "emacs-vulpea-journal")
-    (version "1.0.1")
+    (version "1.1.1")
     (source
      (origin
        (method git-fetch)
@@ -48944,7 +48944,7 @@ contextual information (stats, outline, backlins, links...) for
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x47rvpmrpg6m2lyh7550mynkpjqqihgj7v04wbn2s85vr9gnv94"))))
+        (base32 "0yad7qjam45myc4a2d9jfmcajjb40v9qbhr9gkgbdk82jp3jfbf5"))))
     (build-system emacs-build-system)
     (arguments
      (list
