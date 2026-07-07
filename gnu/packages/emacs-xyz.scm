@@ -39225,7 +39225,7 @@ as Emacs Lisp.")
 (define-public emacs-transient
   (package
     (name "emacs-transient")
-    (version "0.13.2")
+    (version "0.13.5")
     (source
      (origin
        (method git-fetch)
@@ -39234,7 +39234,7 @@ as Emacs Lisp.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0c5kdzs55xzn4ksrxlm94s4w4mbamh7l5ycjnq9pvgqvggzijqng"))))
+        (base32 "0893jfiqqyxc54hbzspkp5mhfzj7s1nkdfdmrp590g559blcjhmg"))))
     (build-system emacs-build-system)
     (arguments
      `(#:tests? #f ;no test suite
@@ -39247,7 +39247,7 @@ as Emacs Lisp.")
                       ;; installed by the emacs-build-system.
                       (rename-file "../docs/transient.info" "transient.info"))))))
     (native-inputs (list texinfo))
-    (propagated-inputs (list emacs-compat emacs-cond-let))
+    (propagated-inputs (list emacs-compat emacs-cond-let emacs-llama))
     (home-page "https://magit.vc/manual/transient")
     (synopsis "Transient commands in Emacs")
     (description
