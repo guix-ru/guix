@@ -14023,7 +14023,7 @@ Python documentation with @code{pydoc} in Emacs.")
 (define-public emacs-python-black
   (package
     (name "emacs-python-black")
-    (version "1.2.0")
+    (version "1.3.0")
     (source
      (origin
        (method git-fetch)
@@ -14032,7 +14032,7 @@ Python documentation with @code{pydoc} in Emacs.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1x6b67cs7kn8711fxr3fq8y9wcpf9g71asf9wiqfrk2mrfzli6a3"))))
+        (base32 "19wjs67yc6gdfdjdrfav8m3w0rmyhdzfwq3hi2gcy6shyykm7s0i"))))
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-dash emacs-reformatter python-black-macchiato))
