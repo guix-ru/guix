@@ -386,7 +386,7 @@ used to write R packages that link with Rust libraries.")
   (hidden-package
    (package
      (name "rust-hypher")
-     (version "0.1.6")
+     (version "0.1.7")
      (source
       (origin
         (method git-fetch)
@@ -395,7 +395,7 @@ used to write R packages that link with Rust libraries.")
               (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "0mbgfq51gf98dl8b4m7q0s66njjc4hb87qmd4lf361nmwh63m9hk"))
+         (base32 "0nqwrk9fi9d9rn4sj081k1v5zhls8xg6rsmrrickv362p8zw0mlj"))
         (modules '((guix build utils)))
         ;; Pre-generated.
         (snippet '(for-each delete-file (find-files "tries")))))
