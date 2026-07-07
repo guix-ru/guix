@@ -1231,6 +1231,31 @@ language models.")
        (description "This package provides a Rust allocator backed by jemalloc.")
        (license (list license:expat license:asl2.0))))))
 
+(define-public rust-typst-dev-assets
+  (hidden-package
+   (package
+     (name "rust-typst-dev-assets")
+     (version "0.15.0")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+              (url "https://github.com/typst/typst-dev-assets")
+              (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "0il0rb7qj8qd1k34vxbvj3lqql1jbgn2q2m451mqz7xkibmn5drf"))))
+     (build-system cargo-build-system)
+     (arguments
+      (list
+       #:skip-build? #t
+       #:cargo-package-crates ''("typst-dev-assets")))
+     (home-page "https://typst.app/")
+     (synopsis "Assets for testing the typst compiler")
+     (description
+      "This package provides assets needed for testing the typst package.")
+     (license license:asl2.0))))
+
 (define-public rust-codex-0.117.0
   (hidden-package
    (package
