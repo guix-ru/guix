@@ -1139,6 +1139,7 @@ like @command{tar} and @command{zip}.")
      (list ;; XDG
            desktop-file-utils
            hicolor-icon-theme
+           xdg-desktop-portal-lxqt
            xdg-user-dirs
            xdg-utils
            ;; Base
