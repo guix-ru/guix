@@ -964,7 +964,7 @@ SEGGER J-Link and compatible devices.")
            pkg-config
            texinfo))
     (inputs
-     (list hidapi jimtcl libftdi libjaylink openssl))
+     (list hidapi (@ (gnu packages tcl) jimtcl) libftdi libjaylink openssl))
     (arguments
      '(#:configure-flags
        (append (list "LIBS=-lutil -lcrypto -lssl"
