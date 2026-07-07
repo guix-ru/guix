@@ -9481,7 +9481,7 @@ This mode supports Apache HTTP Server 2.4 and major modules.")
 (define-public emacs-apheleia
   (package
     (name "emacs-apheleia")
-    (version "4.4.3")
+    (version "4.5.0")
     (source
      (origin
        (method git-fetch)
@@ -9490,7 +9490,7 @@ This mode supports Apache HTTP Server 2.4 and major modules.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1vs532hjkwj19laigqvvk11r0gwhv5vd8v6wh5598dzmfw3yh4bm"))))
+        (base32 "181whpb774gv3k2xxswxkjhd3075r2dpgvdfmpsjqyl2s1jpn5fj"))))
     (build-system emacs-build-system)
     (arguments (list #:include #~(cons "^scripts/formatters/" %default-include)
                      #:exclude #~(cons "\\.js$" %default-exclude)))
