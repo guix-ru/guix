@@ -18966,7 +18966,7 @@ like @code{org-edit-src-code} but for arbitrary regions.")
 (define-public emacs-projectile
   (package
     (name "emacs-projectile")
-    (version "2.9.1")
+    (version "3.1.0")
     (source
      (origin
        (method git-fetch)
@@ -18976,19 +18976,19 @@ like @code{org-edit-src-code} but for arbitrary regions.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "15wc2ivmac0kgbdgsaaxngmcffgd3227zsb4n7inhn14cqwr6qxd"))))
+         "1h6yc6lcs366v1fpkvbnnwpxsx8wcww5ylpnxwmxbp62yk37x13i"))))
     (build-system emacs-build-system)
     (arguments
      (list
-      #:test-command #~(list "buttercup" "-L" ".")
+      #:test-command #~(list "buttercup" "-L" "." "-L" "test")
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'fix-failing-test
             (lambda _
-              (substitute* "test/projectile-test.el"
+              (substitute* "test/projectile-indexing-test.el"
                 (("user-emacs-directory") "\".\"")))))))
     (native-inputs
-     (list emacs-buttercup))
+     (list emacs-buttercup emacs-consult git-minimal))
     (propagated-inputs
      (list emacs-dash emacs-pkg-info))
     (home-page "https://github.com/bbatsov/projectile")
