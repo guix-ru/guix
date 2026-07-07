@@ -43268,11 +43268,11 @@ automatically be applied to the buffer in the format of a git merge.")
       (license license:gpl3+))))
 
 (define-public emacs-dimmer
-  (let ((commit "2f915b100044e09dd647b22085e1696249c4b115")
+  (let ((commit "bbab62f01d45086b9098f6a0ab765282d9c7bc45")
         (revision "1"))
     (package
       (name "emacs-dimmer")
-      (version (git-version "0.4.2" revision commit))
+      (version (git-version "0.4.3" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -43282,7 +43282,7 @@ automatically be applied to the buffer in the format of a git merge.")
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "00y6645zjary1sz7517qy5pjwfm5ipsc46sypmdygin65hbbc8wg"))))
+           "1azpm377q2qvwfgfpc01fgma66s52xy829r2kjadqsw0px0gjkq4"))))
       (build-system emacs-build-system)
       (arguments (list #:tests? #f))    ; no tests
       (home-page "https://github.com/gonewest818/dimmer.el")
