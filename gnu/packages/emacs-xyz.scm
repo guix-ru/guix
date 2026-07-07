@@ -20478,7 +20478,7 @@ as well as features for editing search results.")
 (define-public emacs-helm-projectile
   (package
     (name "emacs-helm-projectile")
-    (version "1.4.0")
+    (version "1.6.0")
     (source
      (origin
        (method git-fetch)
@@ -20487,7 +20487,7 @@ as well as features for editing search results.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "19zafd0l2mcd53q83bd2mxinadzsp90q5znfcm9fq0m88lpcmg94"))))
+        (base32 "0ycrrdj6xppxsayqp16yf2npw5vaf0b0hmp54l9xsrnfr42zlv1f"))))
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-helm emacs-projectile))
