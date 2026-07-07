@@ -36644,29 +36644,27 @@ type.")
     (license license:expat)))
 
 (define-public emacs-browse-kill-ring
-  (let ((commit "1ef72cc6accd94cd7032c02b1b2c78ae7f1d1965")
-        (revision "0"))
-    (package
-      (name "emacs-browse-kill-ring")
-      (version (git-version "2.0.0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/browse-kill-ring/browse-kill-ring")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32
-           "0mil32g7hcw376jibs5hdyv00xbaql3m4a27rwqaafg0x59avxdj"))))
-      (build-system emacs-build-system)
-      (home-page "https://github.com/browse-kill-ring/browse-kill-ring")
-      (synopsis "Interactively insert items from kill-ring")
-      (description
-       "Did you ever feel that @code{C-y M-y M-y M-y ...} is not a great way
+  (package
+    (name "emacs-browse-kill-ring")
+    (version "2.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/browse-kill-ring/browse-kill-ring")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0xm857gs7xj5z9l8zfkdh87j3r6kszj1jwzzx4w0wafr69dnyjwc"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/browse-kill-ring/browse-kill-ring")
+    (synopsis "Interactively insert items from kill-ring")
+    (description
+     "Did you ever feel that @code{C-y M-y M-y M-y ...} is not a great way
 of trying to find that piece of text you know you killed a while back?  Then
 @code{browse-kill-ring.el} is for you.")
-      (license license:gpl2+))))
+    (license license:gpl2+)))
 
 (define-public emacs-powerline
   (let ((commit "c35c35bdf5ce2d992882c1f06f0f078058870d4a")
