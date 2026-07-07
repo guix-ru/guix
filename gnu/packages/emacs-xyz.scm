@@ -760,7 +760,7 @@ renderer, @code{shr}.")
 (define-public emacs-sops
   (package
     (name "emacs-sops")
-    (version "0.1.8")
+    (version "0.2.0")
     (source
      (origin
        (method git-fetch)
@@ -769,7 +769,7 @@ renderer, @code{shr}.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0vi7jw7zqj04ikajnssa68v6npd43bvaiw2afck25wxa9hnaja7f"))))
+        (base32 "01wd7qglz3z5ip9mviy92bhfvmnhfm3mwfirxrhjb9y4jxyq9da3"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/djgoku/sops")
     (synopsis "SOPS encrypt and decrypt without leaving the editor")
