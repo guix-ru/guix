@@ -15986,7 +15986,7 @@ completion using Consult.")
 (define-public emacs-consult-denote
   (package
     (name "emacs-consult-denote")
-    (version "0.4.2")
+    (version "0.5.1")
     (source
      (origin
        (method git-fetch)
@@ -15994,7 +15994,7 @@ completion using Consult.")
               (url "https://github.com/protesilaos/consult-denote/")
               (commit version)))
        (sha256
-        (base32 "0lc16scxbxc79zsxmsb0kf8lkhpz16v3vcyfzm00zl5pmn5yy7x8"))))
+        (base32 "0c8zy1aphdn4hhznm7gcg6v7pd025k95blp3ad0p0m6905x2h5wy"))))
     (build-system emacs-build-system)
     (arguments
      (list
