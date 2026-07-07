@@ -5467,7 +5467,7 @@ Protocol, MCP}, designed to connect LLM agents directly to Emacs.")
 (define emacs-emms-print-metadata
   (package
     (name "emacs-emms-print-metadata")
-    (version "25")
+    (version "26")
     (source
      (origin
        (method git-fetch)
