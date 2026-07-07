@@ -11372,7 +11372,7 @@ symbol and documentation lookup, and more.")
 (define-public emacs-mode-line-bell
   (package
     (name "emacs-mode-line-bell")
-    (version "0.2")
+    (version "0.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -11381,7 +11381,7 @@ symbol and documentation lookup, and more.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "13n3di05lgqfm4f8krn3p36yika5znhymp5vr2d747x54hqmgh7y"))))
+                "11j0dzc8290ykcs2wwyjda3lvmxm39zrvgmig5fq1p3l2984m88b"))))
     (build-system emacs-build-system)
     (arguments (list #:tests? #f)) ; no tests
     (home-page "https://github.com/purcell/mode-line-bell")
