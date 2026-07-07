@@ -1206,6 +1206,47 @@ validation for @code{net/http}.  It's a fork of
 @url{https://github.com/go-macaron/macaron, Macaron}.")
     (license license:asl2.0)))
 
+(define-public go-code-forgejo-org-go-chi-session
+  (package
+    (name "go-code-forgejo-org-go-chi-session")
+    (version "1.0.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://code.forgejo.org/go-chi/session.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11xg6glxqylscbja78nk32nznbkw3bc2zv429vrzh4aw8syiabsi"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.forgejo.org/go-chi/session"
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; Running databases are expected.
+                       (list "Test_MemcacheProvider"
+                             "Test_MysqlProvider"
+                             "Test_MysqlProvider"
+                             "Test_PostgresProvider"
+                             "Test_RedisProvider")
+                       "|"))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-bradfitz-gomemcache
+           go-github-com-go-chi-chi-v5
+           go-github-com-go-sql-driver-mysql
+           go-github-com-jackc-pgx-v5
+           go-github-com-redis-go-redis-v9))
+    (home-page "https://code.forgejo.org/go-chi/session")
+    (synopsis "Session middleware for go-chi")
+    (description
+     "Package session a middleware that provides the session management of
+@url{https://github.com/go-macaron/macaron, Macaron}.")
+    (license license:asl2.0)))
+
 (define-public go-code-gitea-io-sdk-gitea
   (package
     (name "go-code-gitea-io-sdk-gitea")
