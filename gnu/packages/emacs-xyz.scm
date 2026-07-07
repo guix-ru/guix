@@ -45403,7 +45403,7 @@ text into a QR Code and show it in a separate buffer.")
 (define-public emacs-quick-fasd
   (package
     (name "emacs-quick-fasd")
-    (version "1.0.1")
+    (version "1.0.2")
     (source
      (origin
        (method git-fetch)
@@ -45413,7 +45413,7 @@ text into a QR Code and show it in a separate buffer.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1fsl6l67jf8fm5h6i5qxqvibzssbiyyjzchq3r5sbqry3d8yx3mk"))))
+         "0662xmvikhfgcvivxb0m9d583ir1skj904i3sl5qq1cnn2a4hgcd"))))
     (build-system emacs-build-system)
     (arguments (list #:tests? #f))      ;no tests
     (home-page "https://github.com/jamescherti/quick-fasd.el/")
