@@ -296,7 +296,7 @@
      (list c-ares-for-node-bootstrap
            http-parser
            libuv-for-node
-           `(,nghttp2 "lib")
+           `(,nghttp2-for-node-bootstrap "lib")
            openssl-1.1
            zlib
            ;; Regular build-time dependencies.
@@ -316,7 +316,7 @@
            c-ares-for-node-bootstrap
            http-parser
            libuv-for-node
-           `(,nghttp2 "lib")
+           `(,nghttp2-for-node-bootstrap "lib")
            openssl
            python-wrapper               ;for node-gyp (supports python3)
            zlib))
