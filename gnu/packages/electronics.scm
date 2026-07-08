@@ -4995,7 +4995,7 @@ unique design feature of Trilinos is its focus on packages.")
 (define-public verilator
   (package
     (name "verilator")
-    (version "5.048")
+    (version "5.050")
     (source
      (origin
        (method git-fetch)
@@ -5004,7 +5004,7 @@ unique design feature of Trilinos is its focus on packages.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "16c1x66kqmc5ldqjij81kypj471fibfihcqn6kz4wbxvnn0smyn6"))))
+        (base32 "1zwc1qvnl8kh0iy85s4rjdykrvssvgdqvssbc7d46gsdnl2h3v34"))))
     (native-inputs
      (list autoconf
            automake
