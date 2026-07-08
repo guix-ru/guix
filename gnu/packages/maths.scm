@@ -3624,15 +3624,6 @@ script files.")
 (define-public octave
   (package (inherit octave-cli)
     (name "octave")
-    (inputs
-     `(("qscintilla-qt5" ,qscintilla-qt5)
-       ("qt" ,qtbase-5)
-       ("qtwayland" ,qtwayland-5)
-       ,@(package-inputs octave-cli)))
-    (native-inputs
-     `(("qttools-5" , qttools-5) ;for lrelease
-       ("texlive" ,(texlive-local-tree (list texlive-epsf))) ; for texi2dvi
-       ,@(package-native-inputs octave-cli)))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:modules modules %default-gnu-modules)
@@ -3640,27 +3631,30 @@ script files.")
        ((#:imported-modules imported-modules %default-gnu-imported-modules)
         `((guix build qt-utils) ,@imported-modules))
        ((#:phases phases)
-        `(modify-phases ,phases
-           (add-before 'configure 'patch-qscintilla-library-name
-             (lambda* (#:key inputs #:allow-other-keys)
-               ;; The QScintilla library that the Octave configure script tries
-               ;; to link with should be named libqscintilla-qt5.so, but the
-               ;; QScintilla input provides the shared library as
-               ;; libqscintilla2_qt5.so.
-               (substitute* "configure"
-                 (("qscintilla2-qt5")
-                  "qscintilla2_qt5"))
-               #t))
-           (add-after 'install 'wrap-qt
-             (lambda* (#:key inputs outputs #:allow-other-keys)
-               (let ((out (assoc-ref outputs "out")))
-                 (with-directory-excursion out
-                   (for-each
-                    (lambda (x)
-                      (wrap-qt-program (string-append "../" x)
-                                       #:output out
-                                       #:inputs inputs))
-                    (find-files "libexec" "^octave-gui$"))))))))))
+        #~(modify-phases #$phases
+            (add-before 'configure 'patch-qscintilla-library-name
+              (lambda* (#:key inputs #:allow-other-keys)
+                ;; The QScintilla library that the Octave configure script
+                ;; tries to link with should be named libqscintilla-qt5.so,
+                ;; but the QScintilla input provides the shared library
+                ;; as libqscintilla2_qt5.so.
+                (substitute* "configure"
+                  (("qscintilla2-qt5") "qscintilla2_qt5"))))
+            (add-after 'install 'wrap-qt
+              (lambda* (#:key inputs #:allow-other-keys)
+                (for-each (lambda (path)
+                            (wrap-qt-program
+                             (string-append "../" path)     ;relative to bin
+                             #:output #$output #:inputs inputs))
+                          (with-directory-excursion #$output
+                            (find-files "libexec" "^octave-gui$")))))))))
+    (native-inputs
+     (modify-inputs native-inputs
+       (prepend qttools-5                                   ;for lrelease
+                (texlive-local-tree (list texlive-epsf))))) ;for texi2dvi
+    (inputs
+     (modify-inputs inputs
+       (prepend qscintilla-qt5 qtbase-5 qtwayland-5)))
     (synopsis "High-level language for numerical computation (with GUI)")))
 
 (define-public opencascade-occt
