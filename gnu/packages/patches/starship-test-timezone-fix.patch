@@ -1,0 +1,32 @@
+The test expects datetimes to match EST timezone. Guix gnu-build-system
+defaults to UTC. This patch addresses it.
+
+diff --git a/src/modules/time.rs b/src/modules/time.rs
+index a98dce9..f5ddb48 100644
+--- a/src/modules/time.rs
++++ b/src/modules/time.rs
+@@ -584,7 +584,7 @@ mod tests {
+             })
+             .collect();
+ 
+-        let expected = Some(format!("at {} ", Color::Yellow.bold().paint("+05:30")));
++        let expected = Some(format!("at {} ", Color::Yellow.bold().paint("+00:00")));
+ 
+         assert_eq!(actual, expected, "Uses timezone");
+     }
+@@ -625,7 +625,7 @@ mod tests {
+         );
+         let output = actual.unwrap();
+         assert!(
+-            output.contains("EST") || output.contains("EDT"),
++            output.contains("UTC"),
+             "Should contain timezone abbreviation"
+         );
+     }
+@@ -645,7 +645,7 @@ mod tests {
+ 
+         let expected = Some(format!(
+             "at {} ",
+-            Color::Yellow.bold().paint("America/New_York")
++            Color::Yellow.bold().paint("+0000")
+         ));

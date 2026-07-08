@@ -51,6 +51,7 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system go)
   #:use-module (guix build-system pyproject)
+  #:use-module (gnu packages)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
@@ -510,14 +511,16 @@ POSIX Shell}, @url{https://www.gnu.org/software/bash/, Bash}, and
 (define-public starship
   (package
     (name "starship")
-    (version "1.25.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (crate-uri "starship" version))
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
-        (base32 "022bnq9lq0kq0zxs34li0j653rhlh4y2garc3mvcr90pddjhp4wg"))))
+        (base32 "15jm2frr3l946drv1lazc9pa8fxpf324zcdwgya2p6h8r0505zv6"))
+       (patches
+        (search-patches "starship-test-timezone-fix.patch"))))
     (build-system cargo-build-system)
     (arguments
      (list
