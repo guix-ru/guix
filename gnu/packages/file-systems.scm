@@ -1861,13 +1861,13 @@ compatible directories.")
 (define-public dbxfs
   (package
     (name "dbxfs")
-    (version "2.0.1")
+    (version "2.1.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "dbxfs" version))
        (sha256
-        (base32 "1ml03anr6zz26ab3d8z1r8klz9bfincrn5v53l725svar9an0b12"))))
+        (base32 "1q0xakkddsf359wcsqi2z8pmzk65qps14yl5wwq8kv5i1i0w1y8q"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -1894,6 +1894,7 @@ compatible directories.")
            python-dropbox
            python-platformdirs
            python-privy
+           python-psutil
            python-userspacefs))
     (native-inputs
      (list python-setuptools))
