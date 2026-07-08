@@ -543,7 +543,7 @@ gnu/packages/vlang.scm
 gnu/packages/vnc.scm
 gnu/packages/w3m.scm
 gnu/packages/weather.scm
-gnu/packages/wm.scm
+gnu/packages/window-management.scm
 gnu/packages/wordnet.scm
 gnu/packages/vulkan.scm
 gnu/packages/web-browsers.scm

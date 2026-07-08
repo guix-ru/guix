@@ -720,6 +720,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/webkit.scm			\
   %D%/packages/wget.scm				\
   %D%/packages/wine.scm				\
+  %D%/packages/window-management.scm     	\
   %D%/packages/wireservice.scm				\
   %D%/packages/wm.scm				\
   %D%/packages/wordnet.scm			\
