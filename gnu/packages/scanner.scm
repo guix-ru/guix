@@ -230,26 +230,23 @@ package contains the library, but no drivers.")
 (define-public sane-backends
   (package/inherit sane
     (name "sane-backends")
-    (inputs
-     `(("libjpeg" ,libjpeg-turbo)       ; for pixma/epsonds/other back ends
-       ("libpng" ,libpng)               ; support ‘scanimage --format=png’
-       ("libxml2" ,libxml2)             ; for pixma back end
-       ,@(package-inputs sane)))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:phases phases)
-        `(modify-phases ,phases
-           (delete 'disable-backends)
-           (delete 'remove-dll.conf)
-           (add-after 'disable-failing-tests 'disable-failing-backend-tests
-             (lambda _
-               ;; Disable test that fails on i686:
-               ;;   <https://bugs.gnu.org/39449>
-               (substitute* "testsuite/backend/genesys/Makefile.in"
-                 ((" genesys_unit_tests\\$\\(EXEEXT\\)") ""))
-               #t))))))
-    (synopsis
-     "Raster image scanner library and drivers, with scanner support")
+        #~(modify-phases #$phases
+            (delete 'disable-backends)
+            (delete 'remove-dll.conf)
+            (add-after 'disable-failing-tests 'disable-failing-backend-tests
+              (lambda _
+                ;; Disable test that fails on i686:
+                ;;   <https://bugs.gnu.org/39449>
+                (substitute* "testsuite/backend/genesys/Makefile.in"
+                  ((" genesys_unit_tests\\$\\(EXEEXT\\)") ""))))))))
+    (inputs (modify-inputs inputs
+              (prepend libjpeg-turbo    ;for pixma/epsonds/other back ends
+                       libpng           ;support 'scanimage --format=png'
+                       libxml2)))       ;for pixma back end
+    (synopsis "Raster image scanner library and drivers, with scanner support")
     (description "SANE stands for \"Scanner Access Now Easy\" and is an API
 proving access to any raster image scanner hardware (flatbed scanner,
 hand-held scanner, video- and still-cameras, frame-grabbers, etc.).  The
