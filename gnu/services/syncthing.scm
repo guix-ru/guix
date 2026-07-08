@@ -155,7 +155,7 @@
   (marker-name syncthing-folder-marker-name (default ".stfolder"))
   (copy-ownership-from-parent? syncthing-folder-copy-ownership-from-parent? (default #f))
   (mod-time-window-seconds syncthing-folder-mod-time-window-seconds (default 0))
-  (max-concurrent-writes syncthing-folder-max-concurrent-writes (default 2))
+  (max-concurrent-writes syncthing-folder-max-concurrent-writes (default 16))
   (disable-fsync? syncthing-folder-disable-fsync? (default #f))
   (block-pull-order syncthing-folder-block-pull-order (default "standard"))
   (copy-range-method syncthing-folder-copy-range-method (default "standard"))
@@ -280,7 +280,7 @@
   (local-announce-mac-address syncthing-config-local-announce-mac-address (default "[ff12::8384]:21027"))
   (max-send-kbps syncthing-config-max-send-kbps (default 0))
   (max-receive-kbps syncthing-config-max-receive-kbps (default 0))
-  (reconnection-interval-seconds syncthing-config-reconnection-interval-seconds (default 60))
+  (reconnection-interval-seconds syncthing-config-reconnection-interval-seconds (default 20))
   (relays-enabled? syncthing-config-relays-enabled? (default #t))
   (relay-reconnect-interval-minutes syncthing-config-relay-reconnect-interval-minutes (default 10))
   (start-browser? syncthing-config-start-browser? (default #t))
@@ -364,7 +364,7 @@
        connection-priority-quic-wan connection-priority-relay
        connection-priority-upgrade-threshold default-folder default-device
        default-ignores)
-    `(configuration (@ (version "37"))
+    `(configuration (@ (version "52"))
                     ,@(map syncthing-folder->sxml
                            folders)
                     ;; collect any devices in any folders, as well as any

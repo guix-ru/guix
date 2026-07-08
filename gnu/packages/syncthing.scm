@@ -50,6 +50,8 @@
 (define-public syncthing
   (package
     (name "syncthing")
+    ;; XXX: During update, refresh the servcies configuration version as well,
+    ;; see: <https://docs.syncthing.net/users/config.html>.
     (version "2.1.1")
     (source (origin
               (method url-fetch)
