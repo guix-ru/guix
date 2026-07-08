@@ -6688,8 +6688,9 @@ images, etc.)")
                 "1x6m4mli92chns5dky9aq9w4r4pnycvlpa2q0giydapm5q9fkslf"))))
     (build-system meson-build-system)
     (arguments
-     '(#:configure-flags (list "--buildtype=release")
-       #:glib-or-gtk? #t))
+     (list #:configure-flags #~'("--buildtype=release"
+                                 "-Dc_args=-g -O2 -Wno-int-conversion")
+           #:glib-or-gtk? #t))
     (inputs (list glew
                   gtk+
                   libgee
