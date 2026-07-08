@@ -1687,51 +1687,10 @@ weakness, and multiple concurrent co-operating incremental generational
 garbage collections.  It also includes a library of memory pool classes
 implementing specialized memory management policies.")
     (license license:bsd-2)))
-;;; The package is named orangeduck-mpc to differentiate it from GNU mpc.
-(define-public orangeduck-mpc
-  ;; The last release lacks an 'install' target.
-  (let ((commit "1049534fc56b1971345c7aaa792dea55d6f9b7bc")
-        (revision "1"))
-    (package
-      (name "orangeduck-mpc")
-      (version (git-version "0.9.0" revision commit))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/orangeduck/mpc")
-                      (commit commit)))
-                (file-name (git-file-name name version))
-                (sha256
-                 (base32
-                  "1wpxchbjxsyksr8il9pvg195nvqzsjdshzyzwikxda0fss0p7aap"))))
-      (build-system gnu-build-system)
-      (arguments
-       (list #:make-flags #~(list (string-append "CC=" #$(cc-for-target))
-                                  (string-append "PREFIX=" #$output))
-             #:phases #~(modify-phases %standard-phases
-                          (add-after 'unpack 'patch-Makefile
-                            (lambda _
-                              (substitute* "Makefile"
-                                ;; Do not attempt to alter the permissions,
-                                ;; otherwise 'install' would error with
-                                ;; "cannot stat [...] Permission denied"
-                                ;; errors.
-                                (("\\s\\-m[0-9]{3}\\s")
-                                 " "))))
-                          (delete 'configure))))
-      (home-page "https://github.com/orangeduck/mpc")
-      (synopsis "Parser Combinator library for C")
-      (description "@code{mpc} is a lightweight Parser Combinator library for C.
-@code{mpc} can help with tasks such as:
-@itemize
-@item Building a new programming language
-@item Building a new data format
-@item Parsing an existing programming language
-@item Parsing an existing data format
-@item Embedding a Domain Specific Language
-@item Implementing Greenspun's Tenth Rule.
-@end itemize")
-      (license license:bsd-2))))
+
+;; Deprecated on 2026-07-08.
+(define-deprecated/public-alias orangeduck-mpc
+  (@ (gnu packages compiler-tools) orangeduck-mpc))
 
 ;;; Factored out of the ck package so that it can be adjusted and called on
 ;;; the host side easily, without impacting the package definition.
