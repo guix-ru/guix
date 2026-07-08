@@ -872,7 +872,7 @@ NumPy @code{dtype} extensions used in machine learning libraries, including:
     (license license:asl2.0)))
 
 (define-public llama-cpp
-  (let ((tag "9561"))                  ;sync with ggml and python-gguf
+  (let ((tag "9912"))                  ;sync with ggml and python-gguf
     (package
       (name "llama-cpp")
       (version (string-append "0.0.0-" tag))
@@ -884,7 +884,7 @@ NumPy @code{dtype} extensions used in machine learning libraries, including:
                (commit (string-append "b" tag))))
          (file-name (git-file-name name tag))
          (sha256
-          (base32 "1l282m21xssjrgpr87w4an6ygjgds7gsaqghahw1gv9xvkldjv9c"))))
+          (base32 "05z59i5461k3xxn8b7jkq5vl31ncx3b4v8xskk35b8djdvrxziyd"))))
       (build-system cmake-build-system)
       (arguments
        (list
@@ -907,7 +907,7 @@ NumPy @code{dtype} extensions used in machine learning libraries, including:
                 (with-directory-excursion "tools/ui"
                   (copy-file #$(this-package-input "ui.tar.gz") "ui.tar.gz")
                   (invoke "tar" "xvf" "ui.tar.gz")
-                  (rename-file "llama-b9353" "dist"))))
+                  (rename-file "llama-b9912" "dist"))))
             (add-after 'unpack 'fix-tests
               (lambda _
                 ;; test-thread-safety downloads ML model from network,
@@ -966,7 +966,7 @@ NumPy @code{dtype} extensions used in machine learning libraries, including:
                         "https://github.com/ggml-org/llama.cpp" tag tag))
                (file-name "ui.tar.gz")
                (sha256
-                (base32 "1rqgq5nfw0wbym3gz2ivhrpl69b4fpl6my6nnnr1cbdd6x1mvz44")))))
+                (base32 "0wgx0v85k41fjn8v7idylc5dkm4cdj8j6xnrfq11y9ry0dfvl9k7")))))
       (native-inputs
        ;; These are only used in the check phase for test-jinja-py
        (list python-minimal-wrapper python-jinja2))
