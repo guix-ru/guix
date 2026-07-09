@@ -44,6 +44,35 @@
 (channel-news
  (version 0)
 
+ (entry (commit "7a9d01dce758b0916bf8b0ac8a972f849f4bf31d")
+        (title
+         (en "SDDM display manager defaults to the Qt5 variant")
+         (de "SDDM-Anzeigenverwaltung läuft mit Qt5-Variante als Vorgabe")
+         (fr "Le gestionnaire d'affichage SDDM utilise sa variante Qt5 par défaut"))
+        (body
+         (en "Theme packages for SDDM display manager that only support Qt5 have
+been renamed with a @code{-qt5} suffix.  Since default themes included in the
+SDDM display manager are made for Qt5, @code{sddm-service-type} has been changed
+to use the Qt5 variant by default as well.
+
+If you're using Qt6 themes, please declare the Qt6 SDDM variant, @code{sddm}, in
+your @code{sddm-configuration}.")
+         (de "Themapakete für die SDDM-Anzeigenverwaltung, die bloß Qt5
+unterstützen, wurden umbenannt: Sie tragen jetzt das Suffix @code{-qt5}.  Weil
+die mit der SDDM-Anzeigenverwaltung mitgelieferten Themen für Qt5 ausgelegt
+sind, benutzt @code{sddm-service-type} in der Vorgabeeinstellung jetzt auch die
+Qt5-Variante.
+
+Wenn Sie ein Qt6-Thema benutzen, wählen Sie in Ihrer @code{sddm-configuration}
+die Qt6-Variante von SDDM aus namens @code{sddm}.")
+         (fr "Les paquets de thèmes du gestionnaire d'affichage SDDM qui ne
+prennent que Qt5 en charge ont été renommés en ajoutant le suffixe
+@code{-qt5}. Comme les thèmes par défaut inclus dans le gestionnaire d'affichage
+SDDM sont conçus pour Qt5, @code{sddm-service-type} a été modifié pour également
+utiliser la variante Qt5 par défaut.
+
+Si vous utilisez les thèmes Qt6, déclarez la variante Qt6 de SDDM, @code{sddm},
+dans votre enregistrement @code{ssdm-configuration}."))))
 
  (entry (commit "02bea7700255bc16b2ee2212be878cf2c792884e")
         (title
