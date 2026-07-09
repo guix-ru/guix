@@ -5283,7 +5283,7 @@ cache of unix and unix-like systems.")
 (define-public solaar
   (package
     (name "solaar")
-    (version "1.1.19")
+    (version "1.1.20")
     (source
      (origin
        (method git-fetch)
@@ -5292,12 +5292,12 @@ cache of unix and unix-like systems.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0pq1wy2m84ma0pg5k200f0fhywvx4qa873v8n5pz56ahc4ddcyk7"))))
+        (base32 "1a5n5js26ibsv0qc1nm71fyy945gxrqpb70xf852fcpd8k5s5yw7"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:phases
            #~(modify-phases %standard-phases
-               (add-after 'install 'wrap
+               (replace 'wrap
                  (lambda _
                    (wrap-program (string-append #$output "/bin/solaar")
                      `("GI_TYPELIB_PATH" = (,(getenv "GI_TYPELIB_PATH")))))))))
@@ -5306,10 +5306,10 @@ cache of unix and unix-like systems.")
            python-pytest
            python-pytest-mock
            python-setuptools
-           python-typing-extensions
-           python-wheel))
+           python-typing-extensions))
     (propagated-inputs
-     (list python-pygobject
+     (list python-pycairo
+           python-pygobject
            python-pyudev
            python-dbus
            python-evdev
@@ -5320,7 +5320,7 @@ cache of unix and unix-like systems.")
            python-xlib
            gtk+
            python-pygobject))
-    (inputs (list libappindicator))
+    (inputs (list bash-minimal libappindicator))
     (home-page "https://pwr-solaar.github.io/Solaar/")
     (synopsis "Linux devices manager for the Logitech Unifying Receiver")
     (description "This package provides tools to manage clients of the
