@@ -309,7 +309,7 @@ formal verification.")
   (package
     (inherit abc)
     (name "abc-yosyshq")
-    (version "0.66")
+    (version "0.67")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -324,7 +324,7 @@ formal verification.")
                      (for-each delete-file-recursively '("x64" "x86")))))
               (sha256
                (base32
-                "11viizz5kxh93a56fqxq0ma4945whzlfagw5bb61aw2jlyqym9ka"))
+                "05hhn3xzshyjcbahnshafxkglqj99pxlb8ph45k2f6dkvbqxw8n6"))
               (patches
                (search-patches "abc-tests.patch"))))
     (arguments
