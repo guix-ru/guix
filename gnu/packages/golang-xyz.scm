@@ -12128,6 +12128,32 @@ styled and positioned absolutely or relatively.  They respond to keyboard,
 mouse, and terminal resizing events.")
     (license license:expat)))
 
+(define-public go-github-com-go-ap-jsonld
+  (package
+    (name "go-github-com-go-ap-jsonld")
+    (version "0.0.0-20260607140920-737b40e0ca38")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-ap/jsonld")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1lncj4ff5iynb3cwwd8v6xncgkb9p30plbimk6ixvia4lv43qmm2"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-ap/jsonld"))
+    (home-page "https://github.com/go-ap/jsonld")
+    (synopsis "JSON-ld for Go")
+    (description
+     "Package jsonld implements encoding and decoding of JSON as defined in
+@url{https://rfc-editor.org/rfc/rfc4627.html, RFC 4627}.  The mapping between
+JSON and Go values is described in the documentation for the Marshal and
+Unmarshal functions.")
+    (license license:expat)))
+
 (define-public go-github-com-go-cmd-cmd
   (package
     (name "go-github-com-go-cmd-cmd")
