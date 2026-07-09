@@ -894,20 +894,20 @@ extensions.")
 (define-public ghc-hsopenssl
   (package
     (name "ghc-hsopenssl")
-    (version "0.11.7.9")
+    (version "0.11.7.11")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "HsOpenSSL" version))
        (sha256
-        (base32 "0z3nyqlcgqw4ncn90gs6bznyj3lrqpjv83nzs4854knm15x6cbsa"))))
+        (base32 "1fnlz44s5cvg3q7mc4cfyydhlkmpb1zlwvpsbrahhnmgl9llrgkq"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "HsOpenSSL")))
     (arguments
      (list #:extra-directories (list "openssl")
            #:configure-flags
            #~(list "--ghc-options=-optc=-Wno-incompatible-pointer-types")))
-    (inputs (list ghc-network openssl-3.0))
+    (inputs (list ghc-network openssl))
     (home-page "https://github.com/haskell-cryptography/HsOpenSSL")
     (synopsis "Partial OpenSSL binding for Haskell")
     (description
