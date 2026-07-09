@@ -1088,7 +1088,7 @@ supported solvers.")
 (define ocaml-opam-core
   (package
     (name "ocaml-opam-core")
-    (version "2.5.1")
+    (version "2.5.2")
     (source
      (origin
        (method git-fetch)
@@ -1097,7 +1097,7 @@ supported solvers.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "10diw6wdl6v89kbvb8x22dbfacw1ikhl63hybyp2s7560450hygc"))))
+        (base32 "0yva8w5mcfrmrwsscm596m60k75n659bdkl8qa2mhr23zlq7jzbx"))))
     (build-system dune-build-system)
     (arguments
      `(#:package "opam-core"
@@ -1146,7 +1146,7 @@ Git-friendly development workflow.")
 (define-public opam-installer
   (package
     (name "opam-installer")
-    (version "2.5.1")
+    (version "2.5.2")
     ;; opam has some library dependencies that in turn depend on
     ;; opam-installer (https://codeberg.org/guix/guix/issues/3588).  To break
     ;; the cycle, we build opam-installer from a version of the release that
@@ -1158,7 +1158,7 @@ Git-friendly development workflow.")
        (uri (string-append "https://github.com/ocaml/opam/releases/download/"
                            version "/opam-full-" version ".tar.gz"))
        (sha256
-        (base32 "1v9k00az5lkdrlb64xb9h8xasnsz73kms0j0bz64hh2wbypvzia8"))))
+        (base32 "1hsmhmnl97bry1gqfjpzid0wkphbpixqr6v7bmmys6bzaq4khqmk"))))
     (build-system gnu-build-system)
     (arguments
      (list
