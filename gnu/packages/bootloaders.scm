@@ -885,6 +885,50 @@ tree binary files.  These are board description files used by Linux and BSD.")
 library for reading and manipulating the Linux Kernel Device Tree binary format.")
     (license (list license:gpl2+ license:bsd-2))))
 
+(define-public dtschema
+  (package
+    (name "dtschema")
+    (version "2026.06")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/devicetree-org/dt-schema")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ikklbdpwpz7g3y7x9602gp4y3crqxb62n38r9cpi3w3dm8r2i0p"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-backend
+      #~'custom
+      #:test-flags
+      #~(list "test/test-dt-validate.py")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'patch-requirements
+            (lambda _
+              (substitute* "pyproject.toml"
+                (("pylibfdt")
+                 "libfdt")))))))
+    (inputs
+     (list python-jsonschema
+           python-libfdt
+           python-rfc3987
+           python-ruamel.yaml))
+    (native-inputs
+     (list dtc
+           python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (home-page "https://www.devicetree.org/")
+    (synopsis "Tooling for devicetree validation using YAML and jsonschema")
+    (description
+     "This package contains tools and schema data for Devicetree schema validation
+using the json-schema vocabulary.")
+    (license license:bsd-2)))
+
 (define u-boot
   (package
     (name "u-boot")
