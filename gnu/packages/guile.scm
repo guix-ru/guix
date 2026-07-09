@@ -488,7 +488,8 @@ without requiring the source code to be rewritten.")
        (uri (string-append "mirror://gnu/guile/guile-" version ".tar.xz"))
        (sha256
         (base32 "0q4laxcraxh3r9s62p6nw3g3n6xlqxy16r5kdylpyyk56v97k341"))
-       (patches (search-patches "guile-3.0.11-cross-compilation.patch"))
+       (patches (search-patches "guile-3.0.11-cross-compilation.patch"
+                                "guile-3.0.11-fix-riscv64-jit.patch"))
        ;; Replace the snippet because the oom-test still fails on some 32-bit
        ;; architectures.
        (snippet '(for-each delete-file

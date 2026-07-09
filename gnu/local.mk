@@ -1557,6 +1557,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/guile-2.2-default-utf8.patch		\
   %D%/packages/patches/guile-relocatable.patch			\
   %D%/packages/patches/guile-3.0.11-cross-compilation.patch	\
+  %D%/packages/patches/guile-3.0.11-fix-riscv64-jit.patch	\
   %D%/packages/patches/guile-3.0-relocatable.patch		\
   %D%/packages/patches/guile-linux-syscalls.patch		\
   %D%/packages/patches/guile-3.0-linux-syscalls.patch		\
