@@ -164,7 +164,7 @@
   ;; <https://bitcoincore.org/en/lifecycle/#schedule>.
   (package
     (name "bitcoin-core")
-    (version "31.0")
+    (version "31.1")
     (source (origin
               (method url-fetch)
               (uri
@@ -172,7 +172,7 @@
                               version "/bitcoin-" version ".tar.gz"))
               (sha256
                (base32
-                "1qxkcyq8nwq6sw4qi660z8n8356mqdsf4jvpq5ndkvrsx9gfz80b"))))
+                "1jdgqrpqnqrxi508hwmy5my6xp9adkmmjirrk40ckr678ddishah"))))
     (build-system qt-build-system)
     (arguments
      (list #:qtbase qtbase
