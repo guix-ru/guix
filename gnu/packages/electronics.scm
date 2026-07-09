@@ -4407,7 +4407,7 @@ and components.  The following simulation kernels are supported:
      "Xschem is an X11 schematic editor written in C and focused on
 hierarchical and parametric design.  It can generate VHDL, Verilog or Spice
 netlists from the drawn schematic, allowing the simulation of the circuit.")
-    (home-page "http://repo.hu/projects/xschem/xschem_man/xschem_man.html/")
+    (home-page "http://repo.hu/projects/xschem/")
     (license license:gpl2+)))
 
 (define-public route-rnd
