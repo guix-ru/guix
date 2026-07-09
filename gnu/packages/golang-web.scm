@@ -7620,6 +7620,44 @@ Features:
 @end itemize")
     (license license:expat)))
 
+(define-public go-github-com-go-ap-activitypub
+  (package
+    (name "go-github-com-go-ap-activitypub")
+    (properties '((commit . "13f25467c431e950068c67ef58877a31dd784f1e")
+                  (revision . "0")
+                  (go-pseudo-version . "0.0.0-20260701132640-13f25467c431")))
+    (version (git-version "0.0.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-ap/activitypub")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1j0k62dilfjsx78kvpvhq8lqwbycxbskp13da9hrmcchmp39c524"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-ap/activitypub"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (propagated-inputs
+     (list go-git-sr-ht-mariusor-go-xsd-duration
+           go-github-com-go-ap-errors
+           go-github-com-go-ap-jsonld
+           go-github-com-valyala-fastjson
+           go-golang-org-x-text))
+    (home-page "https://go-activitypub.federated.id/")
+    (synopsis "About GoActivityPub: Vocabulary")
+    (description
+     "This project is part of the @url{https://github.com/go-ap,
+GoActivityPub} library which helps with creating @code{ActivityPub}
+applications using the Go programming language.")
+    (license license:expat)))
+
 (define-public go-github-com-go-chi-chi
   (package
     (name "go-github-com-go-chi-chi")
