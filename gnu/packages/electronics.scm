@@ -2252,7 +2252,7 @@ versus schematic} tests and can assist with automatic routing.")
 (define-public mcy
   (package
     (name "mcy")
-    (version "0.66")
+    (version "0.67")
     (source
      (origin
        (method git-fetch)
@@ -2261,7 +2261,7 @@ versus schematic} tests and can assist with automatic routing.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "12hfnbb2kamins2azy43j2ii8ih7agnj9zizg9zv6h5zyrwb3rw9"))))
+        (base32 "09mivc15ypdxk66w4cx478snfq0ln8fscy50vr9yv2fm6fb4hlb7"))))
     (build-system qt-build-system)
     (arguments
      (list
@@ -2289,7 +2289,6 @@ versus schematic} tests and can assist with automatic routing.")
                "scripts" (string-append #$output "/share/mcy/scripts"))
               (copy-recursively
                "dash" (string-append #$output "/share/mcy/dash"))
-              ;; (mkdir-p (string-append #$output "/bin"))
               (define (install-it filename)
                 (let* ((bin (format #f "~a/bin" #$output))
                        (bin_ (format #f "~a/~a" bin filename)))
