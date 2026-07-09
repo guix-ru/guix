@@ -862,6 +862,29 @@ The SUBDIR argument defaults to \"efi/Guix\", as it is also the case for
 tree binary files.  These are board description files used by Linux and BSD.")
     (license license:gpl2+)))
 
+(define-public python-libfdt
+  (package
+    (name "python-libfdt")
+    (version (package-version dtc))
+    (source (package-source dtc))
+    (build-system pyproject-build-system)
+    (arguments
+     ;; Requires entire dtc tools to be built.
+     (list
+      #:tests? #f))
+    (native-inputs
+     (list dtc
+           python-meson
+           python-setuptools
+           python-setuptools-scm
+           swig))
+    (home-page "https://www.devicetree.org/")
+    (synopsis "python bindings for libfdt")
+    (description
+     "This package provides python bindings for @{libfdt}, a utility
+library for reading and manipulating the Linux Kernel Device Tree binary format.")
+    (license (list license:gpl2+ license:bsd-2))))
+
 (define u-boot
   (package
     (name "u-boot")
