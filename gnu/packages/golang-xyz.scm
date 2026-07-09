@@ -4736,6 +4736,38 @@ same interface.")
 strings into words like a POSIX or Windows shell would.")
     (license license:expat)))
 
+(define-public go-github-com-buildkite-terminal-to-html-v3
+  (package
+    (name "go-github-com-buildkite-terminal-to-html-v3")
+    (version "3.17.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/buildkite/terminal-to-html")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ydg7dnsjpy7k6yqdi6wd7wcpyvfpxwl9xq958cqdb8ln6p7w519"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/buildkite/terminal-to-html/v3"))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-urfave-cli-v2))
+    (propagated-inputs
+     (list go-golang-org-x-sys))
+    (home-page "http://buildkite.github.io/terminal-to-html")
+    (synopsis "Converts arbitrary shell output into beautifully rendered HTML")
+    (description
+     "Terminal is a Go library for converting arbitrary shell output
+(@url{http://en.wikipedia.org/wiki/ANSI_escape_code, with ANSI}) into
+beautifully rendered HTML.  It provides a single command, terminal-to-html,
+that can be used to convert terminal output via STDIN, as well as via a simple
+web server.")
+    (license license:expat)))
+
 (define-public go-github-com-burntsushi-graphics-go
   (package
     (name "go-github-com-burntsushi-graphics-go")
@@ -36789,6 +36821,23 @@ various modes for analyzing and transforming YAML data.")))
                      go-github-com-envoyproxy-protoc-gen-validate)
                     "\nThis package provides command line interface (CLI)
 tools."))))
+
+(define-public terminal-to-html
+  (package/inherit go-github-com-buildkite-terminal-to-html-v3
+    (name "terminal-to-html")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/buildkite/terminal-to-html/v3/cmd/...")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/buildkite/terminal-to-html/v3")))
+    (native-inputs
+     (append
+      (package-native-inputs go-github-com-buildkite-terminal-to-html-v3)
+      (package-propagated-inputs go-github-com-buildkite-terminal-to-html-v3)))
+    (propagated-inputs '())
+    (inputs '())))
 
 (define-public vellum
   (package/inherit go-github-com-blevesearch-vellum
