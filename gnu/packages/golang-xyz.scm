@@ -12128,6 +12128,35 @@ styled and positioned absolutely or relatively.  They respond to keyboard,
 mouse, and terminal resizing events.")
     (license license:expat)))
 
+(define-public go-github-com-go-ap-errors
+  (package
+    (name "go-github-com-go-ap-errors")
+    (version "0.0.0-20260701132509-92e5e4fd6394")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-ap/errors")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1ajvs8fi6jiai44lvnpkm5s1l64jdwv305al6ak4p04f0aqbprhb"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-ap/errors"))
+    (native-inputs
+     (list go-github-com-google-go-cmp))
+    (propagated-inputs
+     (list go-github-com-go-ap-jsonld
+           go-github-com-valyala-fastjson))
+    (home-page "https://github.com/go-ap/errors")
+    (synopsis "Errors handlers go-ap packages")
+    (description
+     "This package provides a Go utility library for errors handling for
+@url{https://go-activitypub.federated.id/, ActivityPub} projects.")
+    (license license:expat)))
+
 (define-public go-github-com-go-ap-jsonld
   (package
     (name "go-github-com-go-ap-jsonld")
