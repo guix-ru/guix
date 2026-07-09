@@ -5476,7 +5476,7 @@ Protocol, MCP}, designed to connect LLM agents directly to Emacs.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0pvlkybdpf1bfpjs0np89kfnxj3qjvyawk1g0b2l5jg21k6c20ww"))))
+        (base32 "0wn0ky1xpnb2hrlp48i6zr0f48gdnpsy3mzi7cdggx7wmp3cc2xq"))))
     (build-system gnu-build-system)
     (arguments
      (list
