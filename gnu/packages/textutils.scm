@@ -67,6 +67,7 @@
   #:use-module (guix build-system go)
   #:use-module (guix build-system perl)
   #:use-module (guix build-system pyproject)
+  #:use-module (guix deprecation)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -848,30 +849,8 @@ as existing hashing techniques, with provably negligible risk of collisions.")
 focuses on supporting new expressions.")
     (license license:bsd-2)))
 
-(define-public oniguruma
-  (package
-    (name "oniguruma")
-    (version "6.9.10")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://github.com/kkos/"
-                                  "oniguruma/releases/download/v"
-                                  ;; If there is a "-" in the version, convert
-                                  ;; to underscore for this part of the URI.
-                                  (string-map (lambda (c) (if (char=? #\- c) #\_ c))
-                                              version)
-                                  "/onig-" version ".tar.gz"))
-              (sha256
-               (base32
-                "01gwd7bkhwl2rdqbfq109vlzznic2pygz3dnhrzykr2rw9dgqp1a"))))
-    (build-system gnu-build-system)
-    (arguments '(#:configure-flags '("--disable-static")))
-    (home-page "https://github.com/kkos/oniguruma")
-    (synopsis "Regular expression library")
-    (description "Oniguruma is a regular expressions library.  The special
-characteristic of this library is that different character encoding for every
-regular expression object can be specified.")
-    (license license:bsd-2)))
+;; XXX: Deprecated on <2026-07-09>.
+(define-deprecated/public-alias oniguruma (@ (gnu packages regex) oniguruma))
 
 (define-public antiword
   (package

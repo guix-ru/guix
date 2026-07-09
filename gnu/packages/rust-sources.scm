@@ -37,9 +37,9 @@
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages regex)
   #:use-module (gnu packages rust)
   #:use-module (gnu packages statistics)
-  #:use-module (gnu packages textutils)
   #:use-module (gnu packages virtualization))
 
 ;;;

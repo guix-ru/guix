@@ -1,10 +1,12 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2014 John Darrington
 ;;; Copyright © 2015 Mark H Weaver <mhw@netris.org>
-;;; Copyright © 2016, 2020, 2022 Marius Bakke <marius@gnu.org>
+;;; Copyright © 2016 Jelle Licht <jlicht@fsfe.org>
+;;; Copyright © 2016, 2018, 2019, 2020, 2022 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2018, 2019, 2020 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2020 Brett Gilio <brettg@gnu.org>
 ;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
+;;; Copyright © 2025 Ashish SHUKLA <ashish.is@lostca.se>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -34,6 +36,32 @@
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages check)
   #:use-module (gnu packages cpp))
+
+(define-public oniguruma
+  (package
+    (name "oniguruma")
+    (version "6.9.10")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://github.com/kkos/"
+                           "oniguruma/releases/download/v"
+                           ;; If there is a "-" in the version, convert
+                           ;; to underscore for this part of the URI.
+                           (string-map (lambda (c) (if (char=? #\- c) #\_ c))
+                                       version)
+                           "/onig-" version ".tar.gz"))
+       (sha256
+        (base32 "01gwd7bkhwl2rdqbfq109vlzznic2pygz3dnhrzykr2rw9dgqp1a"))))
+    (build-system gnu-build-system)
+    (arguments '(#:configure-flags '("--disable-static")))
+    (home-page "https://github.com/kkos/oniguruma")
+    (synopsis "Regular expression library")
+    (description
+     "Oniguruma is a regular expressions library.  The special characteristic
+of this library is that different character encoding for every regular
+expression object can be specified.")
+    (license license:bsd-2)))
 
 (define-public re2
    (package
