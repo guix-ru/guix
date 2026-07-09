@@ -10457,7 +10457,7 @@ fewer GC pauses.")
 
 (define-public go-github-com-editorconfig-editorconfig-core-go-v2
   (package
-    (name "go-github-com-editorconfig-core-go-v2")
+    (name "go-github-com-editorconfig-editorconfig-core-go-v2")
     (version "2.6.3")
     (source
      (origin
