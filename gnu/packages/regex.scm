@@ -75,18 +75,22 @@ focuses on supporting new expressions.")
     (version "6.9.10")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "https://github.com/kkos/"
-                           "oniguruma/releases/download/v"
-                           ;; If there is a "-" in the version, convert
-                           ;; to underscore for this part of the URI.
-                           (string-map (lambda (c) (if (char=? #\- c) #\_ c))
-                                       version)
-                           "/onig-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/kkos/oniguruma")
+              (commit (string-append "v" version))))
+       (file-name
+        (git-file-name name version))
        (sha256
-        (base32 "01gwd7bkhwl2rdqbfq109vlzznic2pygz3dnhrzykr2rw9dgqp1a"))))
+        (base32 "0lp5ix2ky40ijzp1nsrxrlglvqrmik402n48f7v8siqd3isdbxzs"))))
     (build-system gnu-build-system)
-    (arguments '(#:configure-flags '("--disable-static")))
+    (arguments
+     (list
+      #:configure-flags #~(list "--disable-static")))
+    (native-inputs
+     (list autoconf
+           automake
+           libtool))
     (home-page "https://github.com/kkos/oniguruma")
     (synopsis "Regular expression library")
     (description
