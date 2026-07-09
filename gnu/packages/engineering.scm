@@ -1945,7 +1945,7 @@ language, ADMS transforms Verilog-AMS code into other target languages.")
             go-github-com-cmaglie-pb
             go-github-com-codeclysm-extract
             go-github-com-djherbis-buffer
-            go-github-com-djherbis-nio
+            go-github-com-djherbis-nio-v3
             go-github-com-fatih-color
             go-github-com-go-git-go-git-v5
             go-github-com-gofrs-uuid-v5

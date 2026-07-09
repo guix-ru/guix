@@ -9668,9 +9668,9 @@ it reaches its capacity.
 @end itemize")
     (license license:expat)))
 
-(define-public go-github-com-djherbis-nio
+(define-public go-github-com-djherbis-nio-v3
   (package
-    (name "go-github-com-djherbis-nio")
+    (name "go-github-com-djherbis-nio-v3")
     (version "3.0.1")
     (source
      (origin
@@ -9691,6 +9691,10 @@ it reaches its capacity.
     (synopsis "Concurrent buffered I/O")
     (description "Package @code{nio} provides a few buffered I/O primitives.")
     (license license:expat)))
+
+;; XXX: Deprecated on <2026-07-09>.
+(define-deprecated-package go-github-com-djherbis-nio
+  go-github-com-djherbis-nio-v3)
 
 (define-public go-github-com-djherbis-times
   (package
