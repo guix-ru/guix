@@ -23,6 +23,7 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages lisp-check)
   #:use-module (gnu packages lisp-xyz)
+  #:use-module (gnu packages machine-learning)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-xyz)
@@ -40,6 +41,75 @@
 ;;;
 ;;; Code:
 
+
+(define %cirq-version "1.6.1")
+
+(define %cirq-home-page "https://quantumai.google/cirq")
+
+(define %cirq-license license:asl2.0)
+
+;; Cirq source provides multiple Python packages all them share the same
+;; version.
+(define %cirq-source
+  (origin
+    (method git-fetch)
+    (uri (git-reference
+           (url "https://github.com/quantumlib/Cirq")
+           (commit (string-append "v" %cirq-version))))
+    (file-name (git-file-name "python-cirq" %cirq-version))
+    (sha256
+     (base32 "13ycpfwzwinipgmk62i4pm5r7v7vfwbzd01llrib17jff8cj7sik"))))
+
+(define-public python-cirq-core
+  (package
+    (name "python-cirq-core")
+    (version %cirq-version)
+    (source %cirq-source)
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      ;; As seen in project's CI, the full test suite is huge.
+      #~(list "--ignore=cirq/contrib")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir
+            (lambda _
+              (chdir "cirq-core")))
+          (add-before 'sanity-check 'pre-check
+            (lambda _
+              (setenv "HOME" "/tmp")
+              (setenv "NUMBA_CACHE_DIR" "/tmp"))))))
+    (native-inputs
+     (list python-freezegun
+           python-ipython
+           python-ply
+           python-pylatex
+           python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-attrs
+           python-duet
+           python-matplotlib
+           python-networkx
+           python-numpy
+           python-pandas
+           python-quimb
+           python-scipy
+           python-scikit-learn
+           python-sortedcontainers
+           python-sympy
+           python-tqdm))
+    (home-page %cirq-home-page)
+    (synopsis "Framework for creating, editing, and running NISQ circuits.")
+    (description
+     "This package provides a Python framework for creating, editing, and
+running Noisy Intermediate-Scale Quantum (NISQ) circuits.  Built-in simulators
+are provided for running quantum algorithms.  Algorithms can also be run on a
+variety of commercial quantum computing platforms by installing additional
+integrations.")
+    (license %cirq-license)))
+
 (define-public python-quimb
   (package
     (name "python-quimb")
