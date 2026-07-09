@@ -1108,10 +1108,11 @@ for longer text sequences.  As it relies on dictionaries,
 if a word is missing or mispelled, the detection will fail.")
     (license license:agpl3)))
 
-;; This package provides the database files created by
-;; The Árni Magnússon Institute for Icelandic Studies which
-;; are needed for building certain packages.
-;; This package is not intended to be installed directly.
+;; This source provides the database files created by The Árni Magnússon
+;; Institute for Icelandic Studies which are needed for building certain
+;; packages.  The source is not intended to be installed directly.  It's a
+;; mirror of <https://bin.arnastofnun.is/DMII/LTData/data/mimisbrunnur/>
+;; distributed udner CC BY-SA 4.0 license.
 (define arnastofnun-dim
   (let ((version "June2026"))
     (origin
