@@ -4336,7 +4336,7 @@ in a fast and accurate way.")
       (native-inputs
        (list googletest))
       (inputs
-       (append (list openssl-1.1)
+       (append (list openssl)
                (if (supported-package? rdma-core)
                    (list rdma-core)
                    '())))
