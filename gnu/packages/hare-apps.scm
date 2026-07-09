@@ -65,7 +65,7 @@ more available transition, the state goes back to the initial position.")
 (define-public hare-lsp
   (package
     (name "hare-lsp")
-    (version "0.2.0")
+    (version "0.2.1")
     (source
      (origin
        (method git-fetch)
@@ -74,7 +74,7 @@ more available transition, the state goes back to the initial position.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "174rphdxrky5mfmx6i0dzb67qx94in419d88yh2jsrgbrpk62pms"))))
+        (base32 "12fqd8jh5sd7i12dbbjjyl1h1zlr6h30pqf22l0xf0sfl97zywdr"))))
     (build-system hare-build-system)
     (inputs (list hare-json))
     (supported-systems %hare-supported-systems)
