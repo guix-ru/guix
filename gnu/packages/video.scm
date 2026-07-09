@@ -58,6 +58,7 @@
 ;;; Copyright © 2021 Robin Templeton <robin@terpri.org>
 ;;; Copyright © 2021 Aleksandr Vityazev <avityazev@posteo.org>
 ;;; Copyright © 2021 Pradana Aumars <paumars@courrier.dev>
+;;; Copyright © 2021 Alexandros Theodotou <alex@zrythm.org>
 ;;; Copyright © 2022,2026 Denis 'GNUtoo' Carikli <GNUtoo@cyberdimension.org>
 ;;; Copyright © 2022 Bird <birdsite@airmail.cc>
 ;;; Copyright © 2022 Jai Vetrivelan <jaivetrivelan@gmail.com>
@@ -7057,6 +7058,54 @@ showing UI features of your own apps or for showing a bug in bug reports.
 With Peek, you simply place the Peek window over the area you want to record
 and press \"Record\".  Peek is optimized for generating animated GIFs, but you
 can also directly record to WebM or MP4 if you prefer.")
+    (license license:gpl3+)))
+
+(define-public python-screenkey
+  (package
+    (name "python-screenkey")
+    (version "1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.com/screenkey/screenkey")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0j719kld4dr85d9lxn0d0b6156mcy09jm7arssfp2n3j6hmjssci"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ; No tests.
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-dlopen-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "Screenkey/xlib.py"
+                (("(libXtst.so.6|libX11.so.6)" lib)
+                 (search-input-file inputs (string-append "/lib/" lib))))))
+          (add-after 'install 'wrap-screenkey
+            (lambda _
+              (wrap-program (string-append #$output "/bin/screenkey")
+                `("GUIX_PYTHONPATH" ":" prefix
+                  (,(getenv "GUIX_PYTHONPATH")))
+                `("GI_TYPELIB_PATH" ":" prefix
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (inputs (list bash-minimal
+                  gtk+
+                  libx11
+                  libxtst
+                  python-babel
+                  python-dbus
+                  python-pycairo
+                  python-pygobject
+                  slop))
+    (native-inputs (list python-setuptools))
+    (home-page "https://www.thregr.org/~wavexx/software/screenkey/")
+    (synopsis "Screencast tool to display pressed keys")
+    (description
+     "Screenkey is a screencast tool to display your keys inspired by
+Screenflick.")
     (license license:gpl3+)))
 
 (define-public python-yewtube

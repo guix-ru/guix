@@ -72,7 +72,7 @@
 ;;; Copyright © 2020 Jakub Kądziołka <kuba@kadziolka.net>
 ;;; Copyright © 2020 sirgazil <sirgazil@zoho.com>
 ;;; Copyright © 2020 Sebastian Schott <sschott@mailbox.org>
-;;; Copyright © 2020, 2021 Alexandros Theodotou <alex@zrythm.org>
+;;; Copyright © 2020 Alexandros Theodotou <alex@zrythm.org>
 ;;; Copyright © 2020 Josh Marshall <joshua.r.marshall.1991@gmail.com>
 ;;; Copyright © 2020 Lars-Dominik Braun <ldb@leibniz-psychology.org>
 ;;; Copyright © 2020 Alex ter Weele <alex.ter.weele@gmail.com>
@@ -33077,53 +33077,9 @@ CMake.")
 following enviroments: X11 (thought Xinerama) and DRM (experimental).")
     (license license:expat)))
 
-(define-public python-screenkey
-  (package
-    (name "python-screenkey")
-    (version "1.5")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://gitlab.com/screenkey/screenkey")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0j719kld4dr85d9lxn0d0b6156mcy09jm7arssfp2n3j6hmjssci"))))
-    (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:tests? #f ; No tests.
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'fix-dlopen-paths
-            (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* "Screenkey/xlib.py"
-                (("(libXtst.so.6|libX11.so.6)" lib)
-                 (search-input-file inputs (string-append "/lib/" lib))))))
-          (add-after 'install 'wrap-screenkey
-            (lambda _
-              (wrap-program (string-append #$output "/bin/screenkey")
-                `("GUIX_PYTHONPATH" ":" prefix
-                  (,(getenv "GUIX_PYTHONPATH")))
-                `("GI_TYPELIB_PATH" ":" prefix
-                  (,(getenv "GI_TYPELIB_PATH")))))))))
-    (inputs (list bash-minimal
-                  gtk+
-                  libx11
-                  libxtst
-                  python-babel
-                  python-dbus
-                  python-pycairo
-                  python-pygobject
-                  slop))
-    (native-inputs (list python-setuptools))
-    (home-page "https://www.thregr.org/~wavexx/software/screenkey/")
-    (synopsis "Screencast tool to display pressed keys")
-    (description
-     "Screenkey is a screencast tool to display your keys inspired by
-Screenflick.")
-    (license license:gpl3+)))
+;; Deprecated on <2026-07-23>.
+(define-deprecated/public-alias python-screenkey
+  (@ (gnu packages video) python-screenkey))
 
 (define-public python-jinja2-cli
   (package
