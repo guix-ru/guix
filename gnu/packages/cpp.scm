@@ -2667,30 +2667,13 @@ Google's C++ code base.")
 made up of a single source file and has no external dependencies.")
     (license license:expat)))
 
-(define-public pegtl
-  (package
-    (name "pegtl")
-    (version "3.2.7")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/taocpp/PEGTL")
-                    (commit version)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "01adjqqdr9yf4h379jl1x0526kvixfpqk4hdk9mna49qc4s5hpi1"))))
-    (build-system cmake-build-system)
-    (home-page "https://github.com/taocpp/PEGTL")
-    (synopsis "Parsing Expression Grammar template library")
-    (description "The Parsing Expression Grammar Template Library (PEGTL) is
-a zero-dependency C++ header-only parser combinator library for creating
-parsers according to a Parsing Expression Grammar (PEG).")
-    (license license:expat)))
-
 ;; Deprecated on 2026-07-08.
 (define-deprecated/public-alias lexy
   (@ (gnu packages compiler-tools) lexy))
+
+;; Deprecated on 2026-07-08.
+(define-deprecated/public-alias pegtl
+  (@ (gnu packages compiler-tools) pegtl))
 
 (define-public psascan
   (package
