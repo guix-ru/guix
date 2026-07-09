@@ -28,6 +28,7 @@
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages bison)
+  #:use-module (gnu packages check)
   #:use-module (gnu packages gawk)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages man)
@@ -213,6 +214,44 @@ executes the corresponding C code.")
 @item Implementing Greenspun's Tenth Rule.
 @end itemize")
       (license license:bsd-2))))
+
+(define-public lexy
+  (package
+    (name "lexy")
+    (version "2025.05.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/foonathan/lexy")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "14j2z7x2l65q95j5br5nw7awgd87p9m2xw7mma4qspiricd0rniq"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "-DLEXY_BUILD_DOCS=OFF")  ; needs Hugo
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-dependencies
+            (lambda _
+              (substitute* "tests/CMakeLists.txt"
+                (("^message\\(STATUS \"Fetching doctest\"\\).*") "")
+                (("^include\\(FetchContent\\).*") "")
+                (("^FetchContent_Declare\\(doctest .*") "")
+                (("^FetchContent_MakeAvailable\\(doctest\\)")
+                 "find_package(doctest REQUIRED)")
+                (("^(target_link_libraries\\(lexy_test_base .*) doctest\\)"
+                  _ prefix)
+                 (string-append prefix ")"))))))))
+    (native-inputs (list doctest))
+    (home-page "https://lexy.foonathan.net/")
+    (synopsis "C++ parser combinator library")
+    (description
+     "lexy is a parser combinator library for C++17 and later.")
+    (license license:boost1.0)))
 
 (define-public oyacc
   (package
