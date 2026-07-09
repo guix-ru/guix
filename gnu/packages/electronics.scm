@@ -276,9 +276,8 @@ are also taken from the original.")
       (build-system cmake-build-system)
       (arguments
        (list #:configure-flags
-             #~(list (string-append "-DCMAKE_C_COMPILER=" #$(cc-for-target))
-                     (string-append "-DCMAKE_CXX_COMPILER="
-                                    #$(cxx-for-target)))
+             #~(list "-DCMAKE_C_COMPILER=clang"
+                     "-DCMAKE_CXX_COMPILER=clang++")
              #:phases
              #~(modify-phases %standard-phases
                  (replace 'install
@@ -293,7 +292,7 @@ are also taken from the original.")
       (inputs
        (list readline))
       (native-inputs
-       (list googletest perl))
+       (list clang googletest perl))
       (home-page "https://people.eecs.berkeley.edu/~alanmi/abc/")
       (synopsis "Sequential logic synthesis and formal verification")
       (description "ABC is a program for sequential logic synthesis and
