@@ -5143,38 +5143,50 @@ parallel computing platforms.  It also supports serial execution.")
 (define-public yosys
   (package
     (name "yosys")
-    (version "0.66")
+    (version "0.67")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/YosysHQ/yosys")
-              (commit (string-append "v" version))))
+              (commit (string-append "v" version))
+              ;; Deeply related vendored dependencies.
+              (recursive? #t)))
        (sha256
-        (base32 "0nhaidrbl7awaq28mij64c6na64rmkd6zciizd5swg5nn5ssk7j1"))
-       (file-name (git-file-name name version))))
-    (build-system gnu-build-system)
+        (base32 "0843457yh65p14c0jdn789yghi1jhl1vk7cyizxljb37h299x5mh"))
+       (file-name (git-file-name name version))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils)
+                         (srfi srfi-26))
+            (delete-file-recursively "abc")
+            (delete-file-recursively "libs/dlfcn-win32")
+            (substitute* "libs/CMakeLists.txt"
+              (("add_subdirectory\\(dlfcn-win32\\)") ""))))))
+    (build-system cmake-build-system)
     (outputs '("out" "doc"))
     (arguments
      (list
-      #:test-target "vanilla-test"
-      #:make-flags
-      #~(list (string-append "PREFIX=" #$output)
-              "ENABLE_FUNCTIONAL_TESTS=1"
-              "ENABLE_EDITLINE=1"
-              "ENABLE_LIBYOSYS=1"
-              "ENABLE_PYOSYS=1"
-              (string-append
-               "CXX=" #$(this-package-native-input "clang") "/bin/clang++")
-              (format #f "PYTHON_DESTDIR=~a"
-                      (string-append
-                       #$output "/lib/python"
-                       #$(version-major+minor
-                          (package-version python))
-                       "/site-packages"))
-              "PYOSYS_USE_UV=0"
-              (format #f "ABCEXTERNAL=~a/bin/abc"
-                      #$(this-package-input "abc-yosyshq")))
+      #:configure-flags
+      #~(list "-DYOSYS_ENABLE_FUNCTIONAL_TESTS=ON"
+              (string-append "-DYOSYS_CHECKOUT_INFO=" #$version)
+              "-DYOSYS_WITHOUT_EDITLINE=ON"
+              "-DYOSYS_ENABLE_READLINE=ON"
+              "-DCMAKE_C_COMPILER=clang"
+              "-DCMAKE_CXX_COMPILER=clang++"
+              (string-append "-DYOSYS_ABC_EXECUTABLE="
+                             #$(this-package-input "abc-yosyshq") "/bin/abc")
+              "-DYOSYS_INSTALL_DRIVER=ON"
+              "-DYOSYS_INSTALL_LIBRARY=ON"
+              "-DYOSYS_INSTALL_PYTHON=ON"
+              ;; Python
+              "-DYOSYS_ENABLE_PYTHON=ON"
+              "-DYOSYS_WITH_PYTHON=ON"
+              "-DYOSYS_INSTALL_PYTHON=ON"
+              (string-append "-DYOSYS_INSTALL_PYTHON_SITEDIR="
+                             #$output "/lib/python"
+                             #$(version-major+minor (package-version python))
+                             "/site-packages"))
       #:phases
       #~(modify-phases %standard-phases
           ;; TODO: Remove when fixed.
@@ -5185,16 +5197,15 @@ parallel computing platforms.  It also supports serial execution.")
           (add-before 'configure 'fix-paths
             (lambda* (#:key inputs #:allow-other-keys)
               (substitute* "backends/smt2/smtio.py"
+                (("\\['yices-smt2")
+                 (string-append
+                  "['" (search-input-file inputs "bin/yices-smt2")))
                 (("\\['z3")
-                 (string-append "['"
-                                (search-input-file inputs "bin/z3"))))
-              (substitute* "kernel/driver.cc"
-                (("^#include \"libs/cxxopts/include/cxxopts.hpp\"")
-                 "#include <cxxopts.hpp>"))
+                 (string-append
+                  "['" (search-input-file inputs "bin/z3"))))
               (substitute* '("passes/cmds/show.cc" "passes/cmds/viz.cc")
                 (("fuser")
                  (search-input-file inputs "bin/fuser")))))
-          (delete 'configure)
           (add-after 'install 'add-symbolic-link
             (lambda* (#:key inputs #:allow-other-keys)
               ;; Previously this package provided a copy of the "abc"
@@ -5203,12 +5214,6 @@ parallel computing platforms.  It also supports serial execution.")
               ;; work.
               (symlink (search-input-file inputs "/bin/abc")
                        (string-append #$output "/bin/yosys-abc"))))
-          (add-after 'install 'keep-pmgen-py
-            (lambda* (#:key inputs #:allow-other-keys)
-              ;; pmgen.py is required by some yosys plugins.
-              (install-file (search-input-file inputs
-                                               "/passes/pmgen/pmgen.py")
-                            (string-append #$output "/bin"))))
           (add-after 'install 'wrap
             (lambda* (#:key inputs #:allow-other-keys)
               (wrap-program (string-append #$output "/bin/yosys-witness")
@@ -5216,21 +5221,27 @@ parallel computing platforms.  It also supports serial execution.")
                   (,(getenv "GUIX_PYTHONPATH"))))))
           (add-before 'build 'build-info
             (lambda _
-              (substitute* '("docs/Makefile")
-                (("SPHINXOPTS    = -W --keep-going")
-                 "SPHINXOPTS    = --keep-going"))
-              (invoke "make" "-C" "docs" "info")
-              (install-file "docs/build/texinfo/yosyshqyosys.info"
-                            (string-append #$output:doc "/share/info"))
-              (copy-recursively
-               "docs/build/texinfo/yosyshqyosys-figures"
-               (string-append
-                #$output:doc "/share/info/yosyshqyosys-figures")))))))
+              (with-directory-excursion "../source/docs"
+                (substitute* "Makefile"
+                  (("SPHINXOPTS    = -W --keep-going")
+                   "SPHINXOPTS    = --keep-going"))
+                (invoke "make" "info")
+                (install-file "build/texinfo/yosyshqyosys.info"
+                              (string-append #$output:doc "/share/info"))
+                (copy-recursively
+                 "build/texinfo/yosyshqyosys-figures"
+                 (string-append
+                  #$output:doc "/share/info/yosyshqyosys-figures")))))
+          (replace 'check
+            (lambda* (#:key tests? (parallel-tests? #t) #:allow-other-keys)
+              (when tests?
+                (apply invoke "cmake" "--build" "." "-t" "test"
+                       `(,@(if parallel-tests?
+                               `("-j" ,(number->string (parallel-job-count)))
+                               '("-j" "1"))))))))))
     (native-inputs
      (list bison
            clang
-           cmake-minimal
-           cxxopts ;header-only library
            flex
            gawk ;for the tests and "make" progress pretty-printing
            googletest
@@ -5248,15 +5259,15 @@ parallel computing platforms.  It also supports serial execution.")
     (inputs
      (list abc-yosyshq
            bash-minimal
-           editline
            libffi
            psmisc
            pybind11
-           python
+           python-wrapper
            python-click
            python-cxxheaderparser
            readline
            tcl
+           yices
            z3
            zlib))
     (home-page "https://yosyshq.net/yosys/")
