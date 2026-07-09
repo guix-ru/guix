@@ -845,6 +845,33 @@ result in a loss of precision, range or sign.")
 the notification area.")
     (license license:asl2.0)))
 
+(define-public go-git-sr-ht-mariusor-go-xsd-duration
+  (package
+    (name "go-git-sr-ht-mariusor-go-xsd-duration")
+    (version "0.0.0-20220703122237-02e73435a078")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.sr.ht/~mariusor/go-xsd-duration")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ibrjaf12bylma6phhdi46xcx7gxxrvmzggpspjrlq2xg7zzgv75"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "git.sr.ht/~mariusor/go-xsd-duration"))
+    (home-page "https://git.sr.ht/~mariusor/go-xsd-duration")
+    (synopsis
+     "Parsing @code{xsd:duration} strings to @code{time.Duration} in Go")
+    (description
+     "This package provides a Go library for parsing @code{xsd:duration}
+strings to @code{time.Duration}.  Note that @code{Month} and @code{Year}
+values are not precise taking into account the limitations of
+@code{time.Duration} in Go.")
+    (license license:expat)))
+
 (define-public go-git-sr-ht-rjarry-go-opt
   (package
     (name "go-git-sr-ht-rjarry-go-opt")
