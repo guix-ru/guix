@@ -11968,6 +11968,90 @@ photo-booth-like software, such as Cheese.")
 apply fancy special effects and lets you share the fun with others.")
       (license license:gpl2+))))
 
+(define-public snapshot
+  (package
+    (name "snapshot")
+    (version "50.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.gnome.org/GNOME/snapshot")
+             (commit version)))
+       (sha256
+        (base32 "0v1239p015qd35s25s62544srh4wn7f2819mkavnng7anxfbjxgk"))))
+    (arguments
+     (list
+      #:glib-or-gtk? #t
+      #:imported-modules `(,@%meson-build-system-modules
+                           ,@%cargo-build-system-modules)
+      #:modules `(((guix build cargo-build-system)
+                   #:prefix cargo:)
+                  (guix build meson-build-system)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'prepare-for-build
+            (lambda _
+              (substitute* "meson.build"
+                (("gtk_update_icon_cache: true")
+                 "gtk_update_icon_cache: false")
+                (("update_desktop_database: true")
+                 "update_desktop_database: false")
+                ;; Fix missing manifest path for tests
+                (("cargo_release_options,")
+                 "cargo_release_options,
+'--manifest-path',
+meson.project_source_root() / 'Cargo.toml',")
+                (("clippy_options,")
+                 "clippy_options,
+'--manifest-path',
+meson.project_source_root() / 'Cargo.toml',"))
+              (delete-file "Cargo.lock")))
+          (add-after 'configure 'prepare-cargo-build-system
+            (lambda args
+              (for-each (lambda (phase)
+                          (format #t "Running cargo phase: ~a~%" phase)
+                          (apply (assoc-ref cargo:%standard-phases phase)
+                                 #:vendor-dir "vendor"
+                                 #:cargo-target #$(cargo-triplet)
+                                 args))
+                        '(prepare-rust-crates unpack-rust-crates configure
+                                              check-for-pregenerated-files
+                                              patch-cargo-checksums))))
+          (add-after 'install 'wrap-program
+            (lambda _
+              (let ((prog (string-append #$output "/bin/snapshot"))
+                    (gst-plugin-path (getenv "GST_PLUGIN_SYSTEM_PATH")))
+                (wrap-program prog
+                  `("GST_PLUGIN_SYSTEM_PATH" ":" prefix
+                    (,gst-plugin-path)))))))))
+    (build-system meson-build-system)
+    (native-inputs (cons* gettext-minimal
+                          `(,glib "bin")
+                          pkg-config
+                          rust
+                          `(,rust "cargo")
+                          (or (and=> (%current-target-system)
+                                     (compose list make-rust-sysroot))
+                              '())))
+    (inputs (cons* bash-minimal
+                   glib
+                   glycin-loaders
+                   gst-plugins-bad
+                   gst-plugins-good
+                   `(,gst-plugins-rs "video")
+                   gstreamer
+                   gtk
+                   libadwaita
+                   pipewire
+                   (cargo-inputs 'snapshot)))
+    (home-page "https://apps.gnome.org/Snapshot")
+    (synopsis "Take pictures and videos")
+    (description
+     "Take pictures and videos on your computer, tablet, or phone.")
+    (license license:gpl3+)))
+
 (define-deprecated/public-alias secrets
   (@ (gnu packages gnome-circle) secrets))
 
