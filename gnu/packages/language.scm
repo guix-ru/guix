@@ -1127,7 +1127,7 @@ if a word is missing or mispelled, the detection will fail.")
   (hidden-package
    (package
      (name "python-islenska-bootstrap")
-     (version "1.1.1")
+     (version "1.3.2")
      ;; Use the git source since this should not include database files.
      (source
       (origin
@@ -1137,7 +1137,7 @@ if a word is missing or mispelled, the detection will fail.")
                (commit version)))
         (file-name (git-file-name "python-islenska" version))
         (sha256
-         (base32 "1wgv2k41m1jmsqr1sdlj92kw5v3d5r9cg2268vfh8308pncn1fya"))))
+         (base32 "1zc5pn0rd44dqsipc2i4w37a1ws7smhv81p8whl9ixamhp1rsbkl"))))
      (build-system pyproject-build-system)
      (arguments
       (list
