@@ -1212,7 +1212,7 @@ forms, and about 300,000 distinct lemmas.")
 (define-public python-icegrams
   (package
     (name "python-icegrams")
-    (version "1.1.6")
+    (version "1.1.7")
     (source
      (origin
        (method git-fetch)
@@ -1222,7 +1222,7 @@ forms, and about 300,000 distinct lemmas.")
              (commit (string-append version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0kzj3k1rl11l66l2xlqilx576hgknb5fd7im96mqjq34ykm70i6f"))))
+        (base32 "1wbjk0l8j0bm3wym6pkp25vnfj4mdxl7amybzgfpfg6d43rf0n4w"))))
     (build-system pyproject-build-system)
     (arguments
      (list
