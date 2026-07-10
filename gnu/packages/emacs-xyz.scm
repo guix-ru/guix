@@ -587,6 +587,32 @@ compatible.")
      "This package provides a Helix emulation layer for Emacs.")
     (license license:gpl3)))
 
+(define-public emacs-hel-leader
+  (package
+    (name "emacs-hel-leader")
+    (version "2.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/anuvyklack/hel-leader")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0lhs65sw4ivpbxwapapjimzcmspf67s41bpy8a8lg19m57ibr7mq"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f)) ; There are no tests.
+    (propagated-inputs
+     (list emacs-dash
+           emacs-hel
+           emacs-s))
+    (home-page "https://github.com/anuvyklack/hel-leader")
+    (synopsis "Leader key support for hel")
+    (description
+     "This package provides a leader key (like Space) for the Hel Helix
+emulation layer for Emacs.")
+    (license license:gpl3)))
+
 (define-public emacs-helix
   (package
     (name "emacs-helix")
