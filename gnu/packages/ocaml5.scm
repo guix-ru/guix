@@ -3427,10 +3427,13 @@ https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions/
 See https://spdx.org/licenses/ for more details.")
     (license license:expat)))
 
+;; Version shared by the ocaml-opam-core and opam-installer packages.
+(define %opam-version "2.5.2")
+
 (define ocaml-opam-core
   (package
     (name "ocaml5-opam-core")
-    (version "2.5.2")
+    (version %opam-version)
     (source
      (origin
        (method git-fetch)
@@ -3487,7 +3490,7 @@ Git-friendly development workflow.")
 (define-public opam-installer
   (package
     (name "ocaml5-opam-installer")
-    (version "2.5.2")
+    (version %opam-version)
     ;; opam has some library dependencies that in turn depend on
     ;; opam-installer (https://codeberg.org/guix/guix/issues/3588).  To break
     ;; the cycle, we build opam-installer from a version of the release that
