@@ -447,16 +447,16 @@ a pen-tablet display and a beamer.")
 (define-public fet
   (package
     (name "fet")
-    (version "7.5.4")
+    (version "7.9.1")
     (source
      (origin
        (method url-fetch)
-       (uri (let ((directory "https://www.lalescu.ro/liviu/fet/download/")
-                  (base (string-append "fet-" version ".tar.bz2")))
+       (uri (let ((directory "https://lalescu.ro/liviu/fet/download/")
+                  (base (string-append "fet-" version ".tar.xz")))
               (list (string-append directory base)
                     (string-append directory "old/" base))))
        (sha256
-        (base32 "0vjjvr9vs3vxncrikchmk60qa99d5wyxja6b3p46vgfaziv1nj31"))))
+        (base32 "0c0vcdv1llzx9pp6lddssqcv24d107fm2zriphb9i7hbn9xpmj30"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -473,7 +473,7 @@ a pen-tablet display and a beamer.")
             (lambda _ (invoke "qmake" "fet.pro"))))))
     (inputs
      (list qtbase))
-    (home-page "https://www.lalescu.ro/liviu/fet/")
+    (home-page "https://lalescu.ro/liviu/fet/")
     (synopsis "Timetabling software")
     (description
      "FET is a program for automatically scheduling the timetable of a school,
