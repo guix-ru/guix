@@ -36841,43 +36841,9 @@ markdown-compliant strings.")
 with one function call.  IceCream makes print debugging a little sweeter.")
     (license license:expat)))
 
-(define-public python-icegrams
-  (package
-    (name "python-icegrams")
-    (version "1.1.6")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             ;; no tests in the PyPI archive
-             (url "https://github.com/mideind/Icegrams")
-             (commit (string-append version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0kzj3k1rl11l66l2xlqilx576hgknb5fd7im96mqjq34ykm70i6f"))))
-    (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:test-flags
-      #~(list
-         ;; two tests fail because of a hardcoded file path in the package's source code
-         ;; this should be fixed upstream instead of with a substitution here
-         "-k"
-         (string-append "not test_trigrams" " and not test_word_ids")
-         "test/test_ngrams.py")))
-    (propagated-inputs (list python-cffi))
-    (native-inputs (list python-pytest python-setuptools
-                         python-setuptools-scm python-wheel))
-    (home-page "https://github.com/mideind/Icegrams")
-    (synopsis "Trigram statistics for Icelandic")
-    (description
-     "Icegrams is a Python package that encapsulates a large trigram
-library for Icelandic.  You can use Icegrams to obtain probabilities (relative
-frequencies) of over a million different unigrams (single words or tokens), or of
-bigrams (pairs of two words or tokens), or of trigrams.  Icegrams is useful for
-instance in spelling correction, predictive typing, to help disabled people
-write text fast, and for various text generation, statistics, and modeling tasks.")
-    (license license:expat)))
+;; XXX: Deprecated on <2026-07-12>.
+(define-deprecated/public-alias python-icegrams
+  (@ (gnu packages language) python-icegrams))
 
 (define-public python-sbsv
   (package
