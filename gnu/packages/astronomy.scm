@@ -6903,7 +6903,8 @@ milliarcsecond).")
           (add-after 'unpack 'relax-requirements
             (lambda _
               (substitute* "pyproject.toml"
-                (("photutils>=2.1.0,<3") "photutils>=2.1.0")))))))
+                (("photutils>=2.1.0,<3") "photutils>=2.1.0")
+                (("stdatamodels>=5.0.2,<6") "stdatamodels")))))))
     (native-inputs
      (list python-ci-watson
            python-pysiaf
