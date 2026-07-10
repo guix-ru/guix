@@ -2480,7 +2480,8 @@ layout of a circuit corresponds to the desired netlists.")
            prjtrellis
            python-minimal-wrapper
            sanitizers-cmake
-           yosys))
+           yosys
+           `(,yosys "config")))
     (inputs
      (list boost
            eigen
