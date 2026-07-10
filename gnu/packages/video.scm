@@ -937,7 +937,7 @@ television and DVD.  It is also known as AC-3.")
 (define-public libaom
   (package
     (name "libaom")
-    (version "3.13.3")
+    (version "3.14.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -946,25 +946,26 @@ television and DVD.  It is also known as AC-3.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1i5sd7zbjz5jy1w8cdrrm09cqi4ai8vdf08nvjf75dlszmmvl9j5"))))
+                "00y0c29va611nk0ndrdlgpijpkpf4p2b12pilhdkbrlm8l72plvm"))))
     (build-system cmake-build-system)
     (native-inputs
      (list perl pkg-config python))     ; to detect the version
     (arguments
-     `(#:tests? #f                      ; downloads many video clips
-       #:configure-flags
-       (list "-DBUILD_SHARED_LIBS=YES"
-             "-DAOM_TARGET_CPU=generic"
-             (string-append "-DCMAKE_INSTALL_PREFIX="
-                            (assoc-ref %outputs "out")))
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'delete-static-libraries
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (lib (string-append out "/lib")))
-               (for-each delete-file
-                         (find-files lib "\\.a$"))))))))
+     (list
+      #:tests? #f                       ; downloads many video clips
+      #:configure-flags
+      #~(list "-DBUILD_SHARED_LIBS=YES"
+              "-DENABLE_TESTS=NO"
+              "-DAOM_TARGET_CPU=generic"
+              (string-append "-DCMAKE_INSTALL_PREFIX=" #$output))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'delete-static-libraries
+            (lambda _
+              (let ((lib (string-append #$output "/lib")))
+                ;; CMake files are deeply coupled with static libraries.
+                (delete-file-recursively (string-append lib "/cmake"))
+                (for-each delete-file (find-files lib "\\.a$"))))))))
     (home-page "https://aomedia.googlesource.com/aom/")
     (synopsis "AV1 video codec")
     (description "Libaom is the reference implementation of AV1.  It includes a
