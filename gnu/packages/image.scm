@@ -2986,7 +2986,7 @@ by AOM, including with alpha.")
 (define-public libheif
   (package
     (name "libheif")
-    (version "1.22.2")
+    (version "1.23.1")
     (source
      (origin
        (method git-fetch)
@@ -2995,7 +2995,7 @@ by AOM, including with alpha.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0j5iklzyl4abvfp6yl1p0hwxmcsbc9xbfalwy7kh0zqkj1yx76yg"))))
+        (base32 "1asr4zvj7h1nywzwmq6dby1ark4709q8rada45z1r9g5zw511s53"))))
     (build-system cmake-build-system)
     (native-inputs
      (list autoconf automake libtool pkg-config))
@@ -3005,7 +3005,7 @@ by AOM, including with alpha.")
             libpng))
      ;; Propagated to satisfy 'libheif.pc'.
      (propagated-inputs
-      (list dav1d libaom libde265 x265))
+      (list dav1d libaom libde265 libx264 openh264 x265))
     (home-page "https://github.com/strukturag/libheif")
     (synopsis "HEIF and AVIF file format decoder and encoder")
     (description
