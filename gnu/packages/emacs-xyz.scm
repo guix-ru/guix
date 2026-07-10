@@ -19046,16 +19046,16 @@ and tooling.")
 (define-public emacs-elfeed
   (package
     (name "emacs-elfeed")
-    (version "4.0.1")
+    (version "4.1.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/skeeto/elfeed")
+             (url "https://github.com/emacs-elfeed/elfeed")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0sldxrvqcdf7is4x8g2dj4apix78bqq0q5pq1pzdawl6hfwdy1xw"))))
+        (base32 "0r207pxip8s7h4lcmrbd98p1psrs5211byvj5501n8qdcdwn199s"))))
     (build-system emacs-build-system)
     (arguments
      (list
@@ -19079,11 +19079,12 @@ and tooling.")
      (list curl gzip))
     (propagated-inputs
      (list emacs-compat))
-    (home-page "https://github.com/skeeto/elfeed")
+    (home-page "https://github.com/emacs-elfeed/elfeed")
     (synopsis "Atom/RSS feed reader for Emacs")
     (description
      "Elfeed is an extensible web feed reader for Emacs, supporting both Atom
-and RSS, with a user interface inspired by notmuch.")
+and @acronym{RSS, Really Simple Syndication}, with a user interface inspired
+by notmuch.")
     (license license:unlicense)))
 
 (define-public emacs-elfeed-goodies
