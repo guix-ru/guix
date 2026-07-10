@@ -5164,7 +5164,9 @@ parallel computing platforms.  It also supports serial execution.")
             (substitute* "libs/CMakeLists.txt"
               (("add_subdirectory\\(dlfcn-win32\\)") ""))))))
     (build-system cmake-build-system)
-    (outputs '("out" "doc"))
+    (outputs '("out" "doc" "config"))
+    (properties
+     `((output-synopsis "config" "Yosys configuration file")))
     (arguments
      (list
       #:configure-flags
@@ -5189,6 +5191,10 @@ parallel computing platforms.  It also supports serial execution.")
                              "/site-packages"))
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'reduce-closure
+            (lambda _
+              (substitute* "cmake/YosysVersion.cmake"
+                (("\\$\\{CMAKE_CXX_COMPILER\\}") "clang++"))))
           ;; TODO: Remove when fixed.
           (add-after 'unpack 'remove-aiger
             (lambda _
@@ -5219,6 +5225,12 @@ parallel computing platforms.  It also supports serial execution.")
               (wrap-program (string-append #$output "/bin/yosys-witness")
                 `("GUIX_PYTHONPATH" ":" prefix
                   (,(getenv "GUIX_PYTHONPATH"))))))
+          (add-after 'install 'build-config
+            (lambda _
+              (mkdir-p (string-append #$output:config "/bin"))
+              (rename-file
+               (string-append #$output "/bin/yosys-config")
+               (string-append #$output:config "/bin/yosys-config"))))
           (add-before 'build 'build-info
             (lambda _
               (with-directory-excursion "../source/docs"
