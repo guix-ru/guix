@@ -3430,7 +3430,7 @@ See https://spdx.org/licenses/ for more details.")
 (define ocaml-opam-core
   (package
     (name "ocaml5-opam-core")
-    (version "2.5.1")
+    (version "2.5.2")
     (source
      (origin
        (method git-fetch)
@@ -3439,7 +3439,7 @@ See https://spdx.org/licenses/ for more details.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "10diw6wdl6v89kbvb8x22dbfacw1ikhl63hybyp2s7560450hygc"))))
+        (base32 "0yva8w5mcfrmrwsscm596m60k75n659bdkl8qa2mhr23zlq7jzbx"))))
     (build-system dune-build-system)
     (arguments
      `(#:package "opam-core"
