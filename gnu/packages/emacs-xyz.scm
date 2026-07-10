@@ -564,7 +564,7 @@ compatible.")
 (define-public emacs-hel
   (package
     (name "emacs-hel")
-    (version "0.10.0")
+    (version "0.12.0")
     (source
      (origin
        (method git-fetch)
@@ -573,12 +573,14 @@ compatible.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0w3szydrwgjhy4as7snrkys7biixyvnfdgf0xdwmcspw3khljfcw"))))
+        (base32 "1fxm8cbwiml77yrxh5b9n732q8iksay8fiagdgabpin80psyi1fm"))))
     (build-system emacs-build-system)
+    (arguments (list #:tests? #f)) ; There are no tests.
     (propagated-inputs
      (list emacs-avy
            emacs-dash
-           emacs-pcre2el))
+           emacs-pcre2el
+           emacs-ultra-scroll))
     (home-page "https://github.com/anuvyklack/hel")
     (synopsis "Helix emulation layer for Emacs")
     (description
