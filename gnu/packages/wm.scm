@@ -5564,7 +5564,7 @@ and xmonad.")
                        "0ziiqdh9pgzmhqc566qc0lq2hsy9ihn8hvg503kr4bkn57msvhar"))))
     (build-system meson-build-system)
     (native-inputs (list pkg-config))
-    (inputs (list glm libxml2 wlroots-0.17 libevdev))
+    (inputs (list glm libxml2 libevdev))
     (home-page "https://github.com/WayfireWM/wf-config")
     (synopsis "Library for managing configuration files for Wayfire")
     (description "The package provides a library for managing the
