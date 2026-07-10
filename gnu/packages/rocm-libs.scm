@@ -317,7 +317,7 @@ configurations deterministically based on compute and memory latencies.")
            rocm-hip-runtime
            rocm-toolchain))
     (propagated-inputs
-     (list msgpack-3
+     (list msgpack-c
            python-msgpack
            python-pyyaml
            python-joblib
