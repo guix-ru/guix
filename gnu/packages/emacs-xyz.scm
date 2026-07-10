@@ -23308,6 +23308,31 @@ a (typically) noncontiguous set of text.")
 Additionally it can display the number of unread emails in the mode line.")
       (license license:gpl3+))))
 
+(define-public emacs-mu4e-walk
+  (let ((commit "3d0b613cfdd52f0ddf56f305d8f96e9a52b3e4f9") ; no release
+        (revision "1"))
+    (package
+      (name "emacs-mu4e-walk")
+      (version (git-version "2.0" revision commit)) ; version from mu4e-walk.el
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://codeberg.org/timmli/mu4e-walk.git")
+                       (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "18n6l3pgh57mll2rgg2byxyzimbknq2waaik42vd3svaf913npzk"))))
+      (build-system emacs-build-system)
+      (arguments (list #:tests? #f)) ; no tests included
+      (propagated-inputs (list mu)) ; mu4e-walk requires mu4e
+      (home-page "https://codeberg.org/timmli/mu4e-walk")
+      (synopsis "Move email addresses around when composing emails with mu4e")
+      (description "This package allows one to swap email addresses
+horizontally and vertically in the header while composing an email with
+@code{mu4e-compose-mode}.")
+      (license license:gpl3+))))
+
 (define-public emacs-org-notify
   (package
     (name "emacs-org-notify")
