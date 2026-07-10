@@ -3487,7 +3487,7 @@ Git-friendly development workflow.")
 (define-public opam-installer
   (package
     (name "ocaml5-opam-installer")
-    (version "2.5.1")
+    (version "2.5.2")
     ;; opam has some library dependencies that in turn depend on
     ;; opam-installer (https://codeberg.org/guix/guix/issues/3588).  To break
     ;; the cycle, we build opam-installer from a version of the release that
@@ -3499,7 +3499,7 @@ Git-friendly development workflow.")
        (uri (string-append "https://github.com/ocaml/opam/releases/download/"
                            version "/opam-full-" version ".tar.gz"))
        (sha256
-        (base32 "1v9k00az5lkdrlb64xb9h8xasnsz73kms0j0bz64hh2wbypvzia8"))))
+        (base32 "1hsmhmnl97bry1gqfjpzid0wkphbpixqr6v7bmmys6bzaq4khqmk"))))
     (build-system gnu-build-system)
     (arguments
      (list
