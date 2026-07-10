@@ -863,20 +863,19 @@ library for GNU Guile based on the actor model.")
 (define-public guile-daemon
   (package
     (name "guile-daemon")
-    (version "0.1.3")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/alezost/guile-daemon")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256 (base32
-                       "0mdxdiwb52zgpz144vii8f4jdia8a7w1i1mpffw8zh3ghglfrjzl"))))
+    (version "0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/alezost/guile-daemon")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1l6656f2v0aaqnsxyks96y3q24gya0kxd2c8ma8vdh169y9iwmjz"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list autoconf automake texinfo pkg-config))
-    (inputs
-     (list guile-3.0))
+    (native-inputs (list autoconf automake texinfo pkg-config))
+    (inputs (list guile-3.0))
     (home-page "https://github.com/alezost/guile-daemon")
     (synopsis "Evaluate code in a running Guile process")
     (description
