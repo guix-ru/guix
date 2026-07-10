@@ -2483,31 +2483,31 @@ written in pure Scheme by using Guile's foreign function interface.")
 (define-public guile-xosd
   (package
     (name "guile-xosd")
-    (version "0.2.2")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/alezost/guile-xosd")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0jc88zg6icdg70mxbg732hx5by5bahqjm68yhx2ypqdqi7kqq1fk"))))
+    (version "0.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/alezost/guile-xosd")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1a7zlx0fa61vf6m5fbmm8g7ni9a850wfl62wa8104f9y491wdn1z"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'set-cpath
-           (lambda* (#:key inputs #:allow-other-keys)
-             (setenv "CPATH"
-                     (string-append
-                      (assoc-ref inputs "guile") "/include/guile/3.0:"
-                      (or (getenv "CPATH") "")))
-             #t)))))
-    (native-inputs
-     (list autoconf automake libtool texinfo pkg-config))
-    (inputs
-     (list guile-3.0 libx11 libxext libxinerama xosd))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'substitute-libxosd
+            (lambda _
+              (substitute* "modules/xosd.scm"
+                (("\"libxosd\"")
+                 (string-append "\""
+                                #$(this-package-input "xosd")
+                                "/lib/libxosd.so"
+                                "\""))))))))
+    (native-inputs (list autoconf automake texinfo pkg-config))
+    (inputs (list guile-3.0 xosd))
     (home-page "https://github.com/alezost/guile-xosd")
     (synopsis "XOSD bindings for Guile")
     (description
