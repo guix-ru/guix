@@ -25334,6 +25334,33 @@ bundles
 that can use multiple signing keys
 @end itemize")))
 
+(define-public go-xorm-io-builder
+  (package
+    (name "go-xorm-io-builder")
+    (version "0.3.13")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitea.com/xorm/builder")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1khn5cmrn3my2sk8pldri2i6ymfy8q7bpc65h3pbi6l4grrmkily"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "xorm.io/builder"
+      #:test-flags #~(list "-vet=off")))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-gitea-com-xorm-sqlfiddle))
+    (home-page "https://xorm.io/builder")
+    (synopsis "SQL builder for Go")
+    (description "Package builder is a simple and powerful SQL builder for Golang.")
+    (license license:bsd-3)))
+
 (define-public lyrebird
   (package
     (name "lyrebird")
