@@ -16925,6 +16925,31 @@ dependent.")
 unmarshal code.")
     (license license:bsd-3)))
 
+(define-public go-github-com-powerman-fileuri
+  (package
+    (name "go-github-com-powerman-fileuri")
+    (version "0.3.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/powerman/fileuri")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02g2y13nwr2p9jl8xlv4ml8nl82j68a6mmlczd718mzhdn3agglm"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/powerman/fileuri"))
+    (home-page "https://github.com/powerman/fileuri")
+    (synopsis "Go package to work with @code{file://} URI")
+    (description
+     "Package fileuri provides functions to work with @code{file://} URLs.  It
+implements @url{https://rfc-editor.org/rfc/rfc8089.html, RFC 8089} The
+\"file\" URI Scheme.")
+    (license license:expat)))
+
 (define-public go-github-com-pquerna-cachecontrol
   (package
     (name "go-github-com-pquerna-cachecontrol")
