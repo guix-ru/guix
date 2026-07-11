@@ -9407,6 +9407,33 @@ GitHub API v3.")
     (propagated-inputs
      (list go-github-com-google-go-querystring))))
 
+(define-public go-github-com-google-go-github-v81
+  (package
+    (inherit go-github-com-google-go-github-v61)
+    (name "go-github-com-google-go-github-v81")
+    (version "81.0.0")
+    (source
+     (origin
+       (inherit (package-source go-github-com-google-go-github-v61))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/google/go-github")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "13wa34mh7bvqc25av2p3nvjavnn0mvzpg2ibq67201wd68mbwp01"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/google/go-github/v81")
+       ((#:test-flags test-flags #~(list))
+        #~(list "-skip" (string-join
+                         ;; Tests need network setup and access to Internet.
+                         (list "TestEnterpriseService_.*"
+                               "TestOrganizationsService_.*"
+                               "TestRepositoriesService_.*"
+                               "TestUsersService_specifiedUser_GetPackage")
+                         "|")))))))
+
 (define-public go-github-com-google-go-querystring
   (package
     (name "go-github-com-google-go-querystring")
