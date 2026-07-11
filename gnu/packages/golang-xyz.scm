@@ -27037,6 +27037,32 @@ timestamp without any special type-aware logic.")
 compact-output,binary and feature-rich serialization protocol.")
     (license license:bsd-2)))
 
+(define-public go-github-com-serenize-snaker
+  (package
+    (name "go-github-com-serenize-snaker")
+    (version "0.0.0-20201027110005-a7ad2135616e")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/serenize/snaker")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1c1d335q1i3mz55bhs2k84rcrz4xdaps2y63vwkyv9fsjpb2wnzb"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/serenize/snaker"))
+    (native-inputs
+     (list go-github-com-onsi-ginkgo))
+    (home-page "https://github.com/serenize/snaker")
+    (synopsis "Convert camel cased strings to snake case in Go")
+    (description
+     "Package snaker provides methods to convert @code{CamelCase} names to
+@code{snake_case} and back.")
+    (license license:expat)))
+
 (define-public go-github-com-sergi-go-diff
   (package
     (name "go-github-com-sergi-go-diff")
