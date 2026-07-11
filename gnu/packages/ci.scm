@@ -45,6 +45,7 @@
   #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-build)
   #:use-module (gnu packages golang-check)
+  #:use-module (gnu packages golang-compression)
   #:use-module (gnu packages golang-vcs)
   #:use-module (gnu packages golang-web)
   #:use-module (gnu packages golang-xyz)
@@ -290,6 +291,84 @@ Laminar encourages the use of existing tools such as bash and cron instead of
 reinventing them.")
     (home-page "https://laminar.ohwg.net/")
     (license l:gpl3+)))
+
+(define-public go-code-forgejo-org-forgejo-runner-v12
+  (package
+    (name "go-code-forgejo-org-forgejo-runner-v12")
+    (version "12.13.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://code.forgejo.org/forgejo/runner.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1v609i9ymqzqf04m6yx51bd1aap52kmnasf3dlnhsdqnz3idkcf2"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t  ;XXX: remove when go-team is merged
+      #:import-path "code.forgejo.org/forgejo/runner/v12"
+      #:embed-files #~(list ".*\\.json" ".*\\.js" ".*\\.sh")
+      #:test-subdirs    ;XXX: remove when go-team is merged
+      #~(list "act/model"
+              "act/common"
+              "act/schema"
+              "act/jobparser"
+              "act/exprparser"
+              "act/workflowpattern"
+              "internal/pkg/config"
+              "internal/pkg/labels"
+              "act/common/gitignore")))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-spf13-cobra
+           go-github-com-spf13-pflag
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-code-forgejo-org-forgejo-actions-proto
+           go-connectrpc-com-connect
+           go-dario-cat-mergo
+           go-github-com-avast-retry-go-v4
+           go-github-com-containerd-errdefs
+           go-github-com-creack-pty
+           go-github-com-distribution-reference
+           go-github-com-djherbis-buffer
+           go-github-com-djherbis-nio-v3
+           go-github-com-docker-cli
+           go-github-com-docker-docker
+           go-github-com-docker-go-connections
+           go-github-com-gdgvda-cron
+           go-github-com-gobwas-glob
+           go-github-com-google-uuid
+           go-github-com-joho-godotenv
+           go-github-com-julienschmidt-httprouter
+           go-github-com-kballard-go-shellquote
+           go-github-com-masterminds-semver
+           go-github-com-mattn-go-isatty
+           go-github-com-moby-go-archive
+           go-github-com-moby-patternmatcher
+           go-github-com-opencontainers-image-spec
+           go-github-com-opencontainers-selinux
+           go-github-com-powerman-fileuri
+           go-github-com-rhysd-actionlint
+           go-github-com-sirupsen-logrus
+           go-github-com-timshannon-bolthold
+           go-go-etcd-io-bbolt
+           go-go-yaml-in-yaml-v3
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-golang-org-x-time
+           go-google-golang-org-protobuf
+           go-gotest-tools-v3))
+    (home-page "https://code.forgejo.org/forgejo/runner")
+    (synopsis "Run continuous integration jobs for Forgejo")
+    (description
+     "This package provides a daemon that connects to a Forgejo instance and
+runs jobs for continuous integration.  Forgejo Runner can also run workflows
+locally and act as a cache.")
+    (license l:gpl3)))
 
 (define-public forgejo-runner
   (package
