@@ -168,6 +168,7 @@
 ;;; Copyright © 2026 Adrien 'neox' Bourmault <neox@gnu.org>
 ;;; Copyright © 2026 Jiyu Software <info@jiyu.dev>
 ;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
+;;; Copyright © 2026 Julian Flake <julian@flake.de>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -23863,6 +23864,33 @@ in various ways with @code{hydra}.")
       (description "Diss is a full-featured image slideshow for Emacs, based
 on Dired and image-mode.")
       (license (list license:gpl3+)))))
+
+(define-public emacs-dired-open-with
+    (package
+      (name "emacs-dired-open-with")
+      (version "1.2")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/FrostyX/dired-open-with")
+               (commit (string-append "v" version))))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0439grmaly9sbkk3ivnmahdlc67h8ygrb8plbblhkrjfz632pm15"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list
+        #:test-command
+        #~(list "emacs" "-Q" "--batch"
+                "-l" "tests/dired-open-with-tests.el"
+                "-f" "ert-run-tests-batch-and-exit")))
+      (home-page "https://github.com/FrostyX/dired-open-with")
+      (synopsis "'Open with' dialog for opening files in external applications")
+      (description "Right-clicking a file in most GUI file managers provides
+an “Open with” menu for choosing which application should be used.  This
+package implements such functionality for Emacs default file manager Dired.")
+      (license (list license:gpl3+))))
 
 (define-public emacs-dired-toggle-sudo
   (let ((commit "13bbe52c54893f5aa3e56228450ffdd0c9e1d169")
