@@ -2322,7 +2322,7 @@ coverage.")
 (define-public netgen
   (package
     (name "netgen")
-    (version "1.5.320")
+    (version "1.5.323")
     (source
      (origin
        (method git-fetch)
@@ -2331,7 +2331,7 @@ coverage.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "11mvf0nrsfc1lxbgqhmczi0maw4n10lib2xqnhpkyy73ci489147"))))
+        (base32 "1798bhr3ql60cqcswhn4jdwvbnhcbspn96wihzmbz4b59rvckh1g"))))
     (build-system gnu-build-system)
     (arguments
      (list
