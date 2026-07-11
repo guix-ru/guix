@@ -1,0 +1,170 @@
+Upstream-status: https://github.com/rust-lang/rust-clippy/pull/17406
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Subject: clippy: add missing proc_macros aux-build declarations.
+Date: 2026-07-11
+License: expat
+
+Fix two Clippy UI tests that import the `proc_macros` auxiliary crate without
+declaring it as an aux-build dependency.
+
+Both tests only declare:
+
+  //@aux-build:proc_macro_derive.rs
+
+but they also contain:
+
+  extern crate proc_macros;
+  use proc_macros::inline_macros;
+
+Because `proc_macros.rs` is not declared, ui_test does not pass an explicit
+`--extern proc_macros=.../libproc_macros.so` for these tests.  The tests can
+still appear to work when another test has already built `proc_macros.rs`,
+because rustc then finds it through the shared `-L .../tests/ui/auxiliary`
+directory.
+
+That fallback is racy.  During a parallel Clippy UI run, the auxiliary build can
+leave `libproc_macros.rmeta` visible before `libproc_macros.so` is written.  If
+one of these tests starts in that window, rustc loads metadata for a proc-macro
+crate but has no dylib in the crate source, then ICEs in
+`rustc_metadata::creader` with:
+
+  no dylib for a proc-macro crate
+
+Adding `//@aux-build:proc_macros.rs` makes the dependency explicit, forcing
+ui_test to build `proc_macros.rs` before running the test and to pass the
+proc-macro dylib through `--extern`.
+
+diff --git a/src/tools/clippy/tests/ui/non_canonical_clone_impl.fixed b/src/tools/clippy/tests/ui/non_canonical_clone_impl.fixed
+index d9be98d..b50455c 100644
+--- a/src/tools/clippy/tests/ui/non_canonical_clone_impl.fixed
++++ b/src/tools/clippy/tests/ui/non_canonical_clone_impl.fixed
+@@ -1,4 +1,5 @@
+ //@aux-build:proc_macro_derive.rs
++//@aux-build:proc_macros.rs
+ #![allow(clippy::clone_on_copy, unused)]
+ #![allow(clippy::assigning_clones)]
+ #![no_main]
+diff --git a/src/tools/clippy/tests/ui/non_canonical_clone_impl.rs b/src/tools/clippy/tests/ui/non_canonical_clone_impl.rs
+index 3db22bd..6e1974b 100644
+--- a/src/tools/clippy/tests/ui/non_canonical_clone_impl.rs
++++ b/src/tools/clippy/tests/ui/non_canonical_clone_impl.rs
+@@ -1,4 +1,5 @@
+ //@aux-build:proc_macro_derive.rs
++//@aux-build:proc_macros.rs
+ #![allow(clippy::clone_on_copy, unused)]
+ #![allow(clippy::assigning_clones)]
+ #![no_main]
+diff --git a/src/tools/clippy/tests/ui/non_canonical_clone_impl.stderr b/src/tools/clippy/tests/ui/non_canonical_clone_impl.stderr
+index cf36a8f..86e01d0 100644
+--- a/src/tools/clippy/tests/ui/non_canonical_clone_impl.stderr
++++ b/src/tools/clippy/tests/ui/non_canonical_clone_impl.stderr
+@@ -1,5 +1,5 @@
+ error: non-canonical implementation of `clone` on a `Copy` type
+-  --> tests/ui/non_canonical_clone_impl.rs:14:29
++  --> tests/ui/non_canonical_clone_impl.rs:15:29
+    |
+ LL |       fn clone(&self) -> Self {
+    |  _____________________________^
+@@ -12,7 +12,7 @@ LL | |     }
+    = help: to override `-D warnings` add `#[allow(clippy::non_canonical_clone_impl)]`
+ 
+ error: unnecessary implementation of `clone_from` on a `Copy` type
+-  --> tests/ui/non_canonical_clone_impl.rs:19:5
++  --> tests/ui/non_canonical_clone_impl.rs:20:5
+    |
+ LL | /     fn clone_from(&mut self, source: &Self) {
+ LL | |
+@@ -22,7 +22,7 @@ LL | |     }
+    | |_____^ help: remove it
+ 
+ error: non-canonical implementation of `clone` on a `Copy` type
+-  --> tests/ui/non_canonical_clone_impl.rs:87:29
++  --> tests/ui/non_canonical_clone_impl.rs:88:29
+    |
+ LL |       fn clone(&self) -> Self {
+    |  _____________________________^
+@@ -32,7 +32,7 @@ LL | |     }
+    | |_____^ help: change this to: `{ *self }`
+ 
+ error: unnecessary implementation of `clone_from` on a `Copy` type
+-  --> tests/ui/non_canonical_clone_impl.rs:92:5
++  --> tests/ui/non_canonical_clone_impl.rs:93:5
+    |
+ LL | /     fn clone_from(&mut self, source: &Self) {
+ LL | |
+@@ -42,7 +42,7 @@ LL | |     }
+    | |_____^ help: remove it
+ 
+ error: non-canonical implementation of `clone` on a `Copy` type
+-  --> tests/ui/non_canonical_clone_impl.rs:127:37
++  --> tests/ui/non_canonical_clone_impl.rs:128:37
+    |
+ LL |               fn clone(&self) -> Self {
+    |  _____________________________________^
+diff --git a/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.fixed b/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.fixed
+index aa23fd9..526497c 100644
+--- a/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.fixed
++++ b/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.fixed
+@@ -1,4 +1,5 @@
+ //@aux-build:proc_macro_derive.rs
++//@aux-build:proc_macros.rs
+ #![no_main]
+ 
+ extern crate proc_macros;
+diff --git a/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.rs b/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.rs
+index da7f73f..cff9881 100644
+--- a/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.rs
++++ b/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.rs
+@@ -1,4 +1,5 @@
+ //@aux-build:proc_macro_derive.rs
++//@aux-build:proc_macros.rs
+ #![no_main]
+ 
+ extern crate proc_macros;
+diff --git a/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.stderr b/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.stderr
+index a134df1..718d640 100644
+--- a/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.stderr
++++ b/src/tools/clippy/tests/ui/non_canonical_partial_ord_impl.stderr
+@@ -1,5 +1,5 @@
+ error: non-canonical implementation of `partial_cmp` on an `Ord` type
+-  --> tests/ui/non_canonical_partial_ord_impl.rs:20:1
++  --> tests/ui/non_canonical_partial_ord_impl.rs:21:1
+    |
+ LL | /  impl PartialOrd for A {
+ LL | |
+@@ -15,7 +15,7 @@ LL | |  }
+    = help: to override `-D warnings` add `#[allow(clippy::non_canonical_partial_ord_impl)]`
+ 
+ error: non-canonical implementation of `partial_cmp` on an `Ord` type
+-  --> tests/ui/non_canonical_partial_ord_impl.rs:55:1
++  --> tests/ui/non_canonical_partial_ord_impl.rs:56:1
+    |
+ LL | / impl PartialOrd for C {
+ LL | |
+@@ -34,7 +34,7 @@ LL +     fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp
+    |
+ 
+ error: non-canonical implementation of `partial_cmp` on an `Ord` type
+-  --> tests/ui/non_canonical_partial_ord_impl.rs:191:9
++  --> tests/ui/non_canonical_partial_ord_impl.rs:192:9
+    |
+ LL | /          impl PartialOrd for A {
+ LL | |
+@@ -49,7 +49,7 @@ LL | |          }
+    = note: this error originates in the macro `__inline_mac_mod_issue12788` (in Nightly builds, run with -Z macro-backtrace for more info)
+ 
+ error: non-canonical implementation of `partial_cmp` on an `Ord` type
+-  --> tests/ui/non_canonical_partial_ord_impl.rs:271:1
++  --> tests/ui/non_canonical_partial_ord_impl.rs:272:1
+    |
+ LL | /  impl PartialOrd for K {
+ LL | |
+@@ -62,7 +62,7 @@ LL | |  }
+    | |__^
+ 
+ error: non-canonical implementation of `partial_cmp` on an `Ord` type
+-  --> tests/ui/non_canonical_partial_ord_impl.rs:289:1
++  --> tests/ui/non_canonical_partial_ord_impl.rs:290:1
+    |
+ LL | /  impl PartialOrd for L {
+ LL | |

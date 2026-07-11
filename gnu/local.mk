@@ -2408,6 +2408,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/rust-1.70-fix-rustix-build.patch	\
   %D%/packages/patches/rust-1.78-unwinding-fix.patch		\
   %D%/packages/patches/rust-1.81-fix-riscv64-bootstrap.patch	\
+  %D%/packages/patches/rust-1.94-clippy-fix-proc-macros-aux-race.patch	\
   %D%/packages/patches/rust-candle-0.9.1-add-candle-onnx-to-workspace.patch	\
   %D%/packages/patches/rust-codex-0.98.0-test-shebangs.patch	\
   %D%/packages/patches/rust-codex-0.117.0-core-remove-self-dep.patch	\
