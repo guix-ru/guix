@@ -24451,6 +24451,38 @@ certificate verification behaviors.")
      (list go-golang-org-x-crypto
            go-gopkg-in-alecthomas-kingpin-v2))))
 
+(define-public go-gopkg-in-gomail-v2
+  (package
+    (name "go-gopkg-in-gomail-v2")
+    (properties '((commit . "81ebce5c23dfd25c6c67194b37d3dd3f338c98b1")
+                  (revision . "0")))
+    (version (git-version "2.0.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-gomail/gomail")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zdykrv5s19lnq0g49p6njldy4cpk4g161vyjafiw7f84h8r28mc"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "gopkg.in/gomail.v2"
+      ;; Test fails to compare email headers.
+      #:test-flags #~(list "-skip" "TestAttachments")))
+    (home-page "https://github.com/go-gomail/gomail")
+    (synopsis "The best way to send emails in Go")
+    (description
+     "Gomail is a simple and efficient package to send emails.  It is well
+tested and documented.  Gomail can only send emails using an SMTP server.  But
+the API is flexible and it is easy to implement other methods for sending
+emails using a local Postfix, an API, etc.")
+    (license license:expat)))
+
 ;; This to satisfy alternative import path.
 (define-public go-gopkg-in-jcmturner-rpc-v1
   (package
