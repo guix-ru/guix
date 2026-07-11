@@ -14875,6 +14875,37 @@ publish-subscribe messaging service.  It's alternative fork of
 @url{https://github.com/pythonandchips/wray}.")
     (license license:expat)))
 
+(define-public go-github-com-mrjones-oauth
+  (package
+    (name "go-github-com-mrjones-oauth")
+    (version "0.0.0-20190623134757-126b35219450")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mrjones/oauth")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "120ajfcqcbdiglxl31yq1xgp6ahpb7jfnyk0587b9mljkaggs8gh"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/mrjones/oauth"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'remove-examples
+            (lambda* (#:key import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (delete-file-recursively "examples")))))))
+    (home-page "https://github.com/mrjones/oauth")
+    (synopsis "OAuth 1.0 implementation in Go")
+    (description
+     "This package provides a OAuth 1.0 consumer implementation as specified
+in @url{http://www.oauth.net,http://www.oauth.net} and
+@url{https://rfc-editor.org/rfc/rfc5849.html, RFC 5849}.")
+    (license license:expat)))
+
 (define-public go-github-com-muhlemmer-httpforwarded
   (package
     (name "go-github-com-muhlemmer-httpforwarded")
