@@ -21387,6 +21387,34 @@ It is to used for inputs in other packages.")
      ;; which apply to the Application, with which you must still comply
      license:lgpl3)))
 
+(define-public go-github-com-yohcop-openid-go
+  (package
+    (name "go-github-com-yohcop-openid-go")
+    (version "1.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/yohcop/openid-go")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1dkxsivwlv7zmk44iwhphrqx2fv2sighlf6vz451m9lap47851s9"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/yohcop/openid-go"
+      ;; Discovery failed.
+      #:test-flags #~(list "-skip" "TestYahoo|TestYohcop|TestSteam")))
+    (propagated-inputs
+     (list go-golang-org-x-net))
+    (home-page "https://github.com/yohcop/openid-go")
+    (synopsis "OpenID consumer implementation in Go")
+    (description
+     "This package provides a consumer (Relying party) implementation of
+@code{OpenId} 2.0, written in Golang.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-ysmood-fetchup
   (package
     (name "go-github-com-ysmood-fetchup")
