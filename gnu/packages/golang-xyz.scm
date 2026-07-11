@@ -31600,6 +31600,49 @@ deltas can be applied to a JSON object to \"patch\" them.")
 common sequence} values from two arbitrary arrays.")
     (license license:expat)))
 
+(define-public go-github-com-yuin-goldmark-highlighting-v2
+  (package
+    (name "go-github-com-yuin-goldmark-highlighting-v2")
+    (properties '((commit . "37449abec8cc453aad3ea47d44583b172b20f4b1")
+                  (revision . "0")
+                  (go-pseudo-version . "2.0.0-20230729083705-37449abec8cc")))
+    (version (git-version "0.0.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/yuin/goldmark-highlighting")
+              (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "163jbi8si9qxcabzni39qypj495y48rabkkchc03ay68p19v160y"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/yuin/goldmark-highlighting/v2"
+      ;; For go-github-com-alecthomas-chroma-v2.
+      #:embed-files #~(list ".*\\.xml")
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; Failed to render HTML.
+                       (list "TestCoalesceNeeded"
+                             "TestHighlighting"
+                             "TestHighlighting3"
+                             "TestHighlightingCustom"
+                             "TestHighlightingGuessLanguage")
+                       "|"))))
+    (propagated-inputs
+     (list go-github-com-alecthomas-chroma-v2
+           go-github-com-yuin-goldmark))
+    (home-page "https://github.com/yuin/goldmark-highlighting")
+    (synopsis "Syntax highlighting extension for the goldmark")
+    (description
+     "This package provides a extension for the
+(@url{http://github.com/yuin/goldmark, goldmark}).")
+    (license license:expat)))
+
 (define-public go-github-com-yuin-goldmark-meta
   (package
     (name "go-github-com-yuin-goldmark-meta")
