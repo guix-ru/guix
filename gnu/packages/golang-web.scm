@@ -1496,6 +1496,33 @@ Gemini clients and servers.")
 2019.")
     (license license:expat)))
 
+(define-public go-gitea-com-xorm-sqlfiddle
+  (package
+    (name "go-gitea-com-xorm-sqlfiddle")
+    (version "0.0.0-20180821085327-62ce714f951a")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://gitea.com/xorm/sqlfiddle.git")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "03g79q02djhk7rjp4k6jh9aaq6z3sqwjcyz4zzml1klv5gwyb1ij"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      ;; The try to access to
+      ;; <http://sqlfiddle.com/backend/createSchema?_action=create>.
+      #:tests? #f 
+      #:import-path "gitea.com/xorm/sqlfiddle"))
+    (home-page "https://gitea.com/xorm/sqlfiddle")
+    (synopsis "SQL Fiddle API (UnOfficial)")
+    (description
+     "This Go library is aimed to provide an API to operate
+@url{http://sqlfiddle.com/}.")
+    (license license:expat)))
+
 (define-public go-github-com-1password-onepassword-sdk-go
   (package
     (name "go-github-com-1password-onepassword-sdk-go")
