@@ -1137,6 +1137,13 @@ dist_patch_DATA =						\
   %D%/packages/patches/clog-fix-shared-build.patch		\
   %D%/packages/patches/clucene-gcc-14.patch			\
   %D%/packages/patches/clucene-pkgconfig.patch			\
+  %D%/packages/patches/codex-0.144.1-disable-code-mode.patch	\
+  %D%/packages/patches/codex-0.144.1-remove-libwebrtc.patch	\
+  %D%/packages/patches/codex-0.144.1-remove-patch-sections.patch	\
+  %D%/packages/patches/codex-0.144.1-test-disable-network-model-refresh.patch	\
+  %D%/packages/patches/codex-0.144.1-test-selected-capability-readiness.patch	\
+  %D%/packages/patches/codex-0.144.1-test-shebangs.patch		\
+  %D%/packages/patches/codex-0.144.1-test-timeout.patch		\
   %D%/packages/patches/codex-acp-0.11.1-disable-code-mode.patch \
   %D%/packages/patches/codex-acp-0.11.1-remove-patch-sections.patch \
   %D%/packages/patches/cogl-fix-double-free.patch		\
@@ -2434,12 +2441,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/rust-1.78-unwinding-fix.patch		\
   %D%/packages/patches/rust-1.81-fix-riscv64-bootstrap.patch	\
   %D%/packages/patches/rust-candle-0.9.1-add-candle-onnx-to-workspace.patch	\
-  %D%/packages/patches/rust-codex-0.98.0-test-shebangs.patch	\
   %D%/packages/patches/rust-codex-0.117.0-core-remove-self-dep.patch	\
-  %D%/packages/patches/rust-codex-0.120.0-remove-libwebrtc.patch	\
-  %D%/packages/patches/rust-codex-0.120.0-test-timeout.patch	\
-  %D%/packages/patches/rust-codex-0.124.0-code-mode-stub-toolname.patch	\
-  %D%/packages/patches/rust-codex-0.124.0-remove-patch-sections.patch	\
   %D%/packages/patches/rust-librocksdb-sys-unbundled-sources.patch	\
   %D%/packages/patches/rust-ring-0.17-ring-core.patch		\
   %D%/packages/patches/rw-igraph-0.10.patch			\

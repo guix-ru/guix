@@ -18,11 +18,11 @@
 
 ;;; This module is separate from (gnu packages rust-apps) to avoid a
 ;;; circular module dependency: (gnu packages rust-sources), which
-;;; defines rust-codex-0.124.0, transitively loads (gnu packages
-;;; rust-apps) through its #:use-module chain.  If the codex package
-;;; lived in rust-apps.scm, loading rust-sources would trigger loading
-;;; rust-apps before rust-codex-0.124.0 is defined, causing an unbound
-;;; variable error.
+;;; defines rust-codex packages used by codex-acp, transitively loads
+;;; (gnu packages rust-apps) through its #:use-module chain.  If the
+;;; codex-acp package lived in rust-apps.scm, loading rust-sources would
+;;; trigger loading rust-apps before those rust-codex packages are
+;;; defined, causing an unbound variable error.
 
 (define-module (gnu packages codex)
   #:use-module ((guix licenses) #:prefix license:)
@@ -30,19 +30,26 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
+  #:use-module (guix search-paths)
+  #:use-module (guix utils)
   #:use-module (guix build-system cargo)
+  #:use-module (srfi srfi-1)
   #:use-module (gnu packages)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages base)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages curl)
+  #:use-module (gnu packages gdb)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages libunwind)
   #:use-module (gnu packages llvm)
+  #:use-module (gnu packages llvm-meta)
   #:use-module (gnu packages lsof)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages rust)
   #:use-module (gnu packages rust-sources)
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages textutils)
@@ -54,22 +61,36 @@
 (define-public codex
   (package
     (name "codex")
-    (version (package-version rust-codex-0.124.0))
+    (version "0.144.1")
     (source
      (origin
-       (inherit (package-source rust-codex-0.124.0))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/openai/codex")
+             (commit "44918ea10c0f99151c6710411b4322c2f5c96bea")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0icwnvss0zswsp0vz2cffzr4xq46zfv634cl9phn40kjhsl2ny18"))
+       (modules '((guix build utils)))
+       (snippet '(begin
+                   ;; Bundled bubblewrap source tree; includes a
+                   ;; compiled BPF blob (demos/flatpak.bpf).
+                   (delete-file-recursively "codex-rs/vendor/bubblewrap")))
        (patches (search-patches
-                 "codex-acp-0.11.1-disable-code-mode.patch"
-                 "rust-codex-0.124.0-code-mode-stub-toolname.patch"
-                 "rust-codex-0.124.0-remove-patch-sections.patch"
-                 "rust-codex-0.120.0-remove-libwebrtc.patch"
-                 "rust-codex-0.98.0-test-shebangs.patch"
-                 "rust-codex-0.120.0-test-timeout.patch"))))
+                 "codex-0.144.1-disable-code-mode.patch"
+                 "codex-0.144.1-remove-patch-sections.patch"
+                 "codex-0.144.1-remove-libwebrtc.patch"
+                 "codex-0.144.1-test-disable-network-model-refresh.patch"
+                 "codex-0.144.1-test-fd-cleanup.patch"
+                 "codex-0.144.1-test-selected-capability-readiness.patch"
+                 "codex-0.144.1-test-shebangs.patch"
+                 "codex-0.144.1-test-timeout.patch"))))
     (build-system cargo-build-system)
     (arguments
      (list
+      #:rust rust-1.94
       #:install-source? #f
-      ;; exec-server is library-only in 0.124 (no [[bin]] in
+      ;; exec-server is library-only in this release (no [[bin]] in
       ;; exec-server/Cargo.toml); cargo install --path exec-server fails
       ;; with "no packages found with binaries or examples".  Drop it
       ;; from the install paths -- the library is consumed via the
@@ -83,6 +104,14 @@
       ;; fixture was not regenerated).
       #:cargo-test-flags '(list "--workspace"
                                 "--exclude" "codex-app-server-protocol"
+                                "--exclude" "codex-code-mode"
+                                "--exclude" "codex-code-mode-host"
+                                ;;; BEGIN rustdoc absent from rust-1.94
+                                ;; rust-1.94 installs rustc and cargo but
+                                ;; not rustdoc.  Select the ordinary test
+                                ;; targets explicitly, excluding doctests.
+                                "--lib" "--bins" "--tests"
+                                ;;; END rustdoc absent from rust-1.94
                                 "--"
                                 ;;; BEGIN Landlock returns NotEnforced
                                 ;;; in the build container; the sandbox
@@ -182,13 +211,35 @@
                                 "--skip" "get_last_n_thread_memories_for_cwd_does_not_prefix_match"
                                 "--skip" "deleting_thread_cascades_thread_memory"
                                 ;;; END SQLite test isolation
-                                ;; The test spawns 'sh' after
+                                ;;; BEGIN unchanged filesystem mtime
+                                ;; This test overwrites an imported
+                                ;; session immediately and expects
+                                ;; detection to hash it again.  When
+                                ;; both writes receive the same mtime,
+                                ;; the mtime fast path treats the source
+                                ;; as unchanged and returns no session.
+                                "--skip" "redetects_sessions_when_source_contents_change_after_import"
+                                ;;; END unchanged filesystem mtime
+                                ;;; BEGIN bare 'sh' after env_clear().
+                                ;; These tests spawn 'sh' after
                                 ;; env_clear() with an empty env map;
                                 ;; glibc execvp uses confstr(_CS_PATH)
                                 ;; ("/bin:/usr/bin") when PATH is
                                 ;; unset, but /bin/sh does not exist
                                 ;; in the build container.
                                 "--skip" "cancellation_expiration_keeps_process_alive_until_terminated"
+                                "--skip" "timeout_or_cancellation_reports_cancellation_without_timeout_exit_code"
+                                ;;; END bare 'sh' after env_clear()
+                                ;;; BEGIN Guile 3.0.9 system* inherits ignored SIGINT
+                                ;; Guile 3.0.9's system* temporarily sets
+                                ;; SIGINT to SIG_IGN while it waits for the
+                                ;; command ("Make sure the child can't kill
+                                ;; us").  The test command inherits that
+                                ;; disposition through cargo, and Codex's
+                                ;; pipe backend does not reset it before
+                                ;; exec.  Its shell SIGINT trap cannot run.
+                                "--skip" "exec_process_signal_interrupts_process"
+                                ;;; END Guile 3.0.9 system* inherits ignored SIGINT
                                 ;; Proxy baseline_policy returns 403
                                 ;; "not_allowed_local" for example.com;
                                 ;; test expects 200.
@@ -209,17 +260,30 @@
                                 "--skip" "unified_exec_env_injects_defaults"
                                 ;;; BEGIN V8 disabled (codex-code-mode
                                 ;;; default-features = false).
+                                ;; codex-core: missing process-host fallback
+                                ;; executes JavaScript in the V8 session.
+                                "--skip" "missing_process_host_falls_back_to_in_process_session"
+                                ;; codex-core: wait tracing terminates a cell
+                                ;; through the code-mode runtime.
+                                "--skip" "missing_code_mode_wait_traces_only_the_wait_tool_call"
                                 "--skip" "suite::code_mode::"
-                                "--skip" "suite::js_repl::"
-                                "--skip" "suite::view_image::js_repl_"
+                                "--skip" "suite::code_mode_elicitation::"
+                                "--skip" "suite::v2::imagegen_extension::standalone_image_generation_is_callable_from_code_mode_only"
                                 ;;; END V8 disabled
                                 ;;; BEGIN same compgen root cause:
                                 ;;; assert_posix_snapshot_sections
                                 ;;; asserts snapshot.contains("PATH").
+                                ;;; END compgen / shell snapshot
+                                ;;; BEGIN inaccessible snapshot under sh
+                                ;;; bash-minimal lacks "compgen -e", so the
+                                ;;; generated snapshot has no PATH section
+                                ;;; and these tests fail their snapshot
+                                ;;; assertions.  They also expose a separate
+                                ;;; restricted-bwrap failure.
                                 "--skip" "linux_shell_command_uses_shell_snapshot"
                                 "--skip" "linux_unified_exec_uses_shell_snapshot"
                                 "--skip" "shell_command_snapshot_still_intercepts_apply_patch"
-                                ;;; END compgen / shell snapshot
+                                ;;; END inaccessible snapshot under sh
                                 ;;; BEGIN These sandbox tests set
                                 ;;; exclude_slash_tmp: true which makes
                                 ;;; bwrap exclude /tmp from its mount
@@ -250,6 +314,17 @@
                                 ;; < 5800 ms for a 5 s timeout; under
                                 ;; contention elapsed drifts past 5800.
                                 "--skip" "remote_models_request_times_out_after_5s"
+                                ;;; BEGIN delayed auto-environment filesystem probes
+                                ;; This test adds a one-second delay in each
+                                ;; direction to every exec-server WebSocket
+                                ;; RPC, but allows only 60 seconds for
+                                ;; thread/start.  Auto-environment startup
+                                ;; serially probes .git, AGENTS files, and
+                                ;; plugin metadata through many ancestors;
+                                ;; each missing-path request/response costs
+                                ;; about two seconds, so it cannot finish.
+                                "--skip" "builder_interposes_fixed_delay_for_auto_env"
+                                ;;; END delayed auto-environment filesystem probes
                                 ;; Queued inter-agent mail must be
                                 ;; injected between the reasoning/
                                 ;; commentary item and the gate release;
@@ -263,6 +338,15 @@
                                 ;; input_snapshot; expects mail at position
                                 ;; 04 but gets function_call/shell instead.
                                 "--skip" "queued_inter_agent_mail_triggers_follow_up_after_reasoning_item"
+                                ;;; BEGIN tracing callsite cache race
+                                ;; These tests install a thread-local tracing
+                                ;; subscriber, then rebuild tracing's
+                                ;; process-global callsite-interest cache.
+                                ;; Parallel tests can disable the request span,
+                                ;; causing the parent trace context to be sent.
+                                "--skip" "process_start_propagates_caller_trace_context_across_background_task"
+                                "--skip" "rpc_client_propagates_current_trace_context"
+                                ;;; END tracing callsite cache race
                                 ;;; BEGIN DNS for hostnames like
                                 ;;; example.com fails in the build
                                 ;;; sandbox.  host_resolves_to_non_
@@ -280,6 +364,29 @@
                                 "--skip" "http_connect_accept_blocks_in_limited_mode"
                                 "--skip" "http_connect_accept_allows_allowlisted_host_in_full_mode"
                                 "--skip" "mitm_policy_blocks_disallowed_method_and_records_telemetry"
+                                "--skip" "http_connect_accept_blocks_hooked_host_in_full_mode_without_mitm_state"
+                                "--skip" "http_connect_accept_defers_brokered_host_mitm_until_protocol_detection"
+                                "--skip" "http_connect_accept_passes_environment_id_to_decider"
+                                "--skip" "mitm_policy_allows_matching_hooked_write_in_full_mode"
+                                "--skip" "mitm_policy_blocks_hook_miss_for_hooked_host_and_records_telemetry_in_full_mode"
+                                "--skip" "mitm_policy_blocks_matching_hooked_write_in_limited_mode"
+                                "--skip" "evaluate_host_policy_emits_execution_id_for_baseline_allow"
+                                "--skip" "handle_socks5_tcp_blocks_hooked_non_https_host_in_full_mode"
+                                "--skip" "handle_socks5_tcp_blocks_limited_mode_without_mitm_state"
+                                "--skip" "handle_socks5_tcp_detects_tls_for_brokered_nonstandard_port_in_full_mode"
+                                "--skip" "handle_socks5_tcp_uses_mitm_for_hooked_host_in_full_mode"
+                                "--skip" "handle_socks5_tcp_uses_mitm_in_limited_mode"
+                                ;; These tests bind their servers to
+                                ;; 127.0.0.1 but construct WebSocket URLs
+                                ;; using the hostname "localhost".
+                                ;; connect_tcp() passes that hostname to
+                                ;; tokio::net::lookup_host, which requires
+                                ;; a name resolver unavailable in the
+                                ;; build container.
+                                "--skip" "public_connector_uses_factory_and_exposes_stream_and_sink"
+                                "--skip" "direct_route_connects_secure_websocket"
+                                "--skip" "http_proxy_tunnels_secure_websocket_before_handshake"
+                                "--skip" "https_proxy_tunnels_secure_websocket_before_handshake"
                                 ;;; END DNS failure / NotAllowedLocal
                                 ;;; BEGIN Flaky: wiremock mock expects
                                 ;;; 1 POST to /codex/safety/arc but
@@ -344,8 +451,8 @@
                                 ;;; calling
                                 ;;; resolve_mcp_oauth_credentials_store_mode
                                 ;;; with env!("CARGO_PKG_VERSION") -- which
-                                ;;; in the released 0.124.0 tarball is
-                                ;;; "0.124.0".  These fixture tests
+                                ;;; in the released 0.142.0 tarball is
+                                ;;; "0.142.0".  These fixture tests
                                 ;;; construct the expected Config by
                                 ;;; passing the LOCAL_DEV_BUILD_VERSION
                                 ;;; constant ("0.0.0") to the same
@@ -408,8 +515,8 @@
                                 ;;; block on connect() until the test's 2s
                                 ;;; timeout fires (Timeout, exit 124).
                                 ;;; Same root cause as the Landlock skips
-                                ;;; at the top of this list; new test names
-                                ;;; in 0.124.
+                                ;;; at the top of this list; newer test
+                                ;;; names.
                                 "--skip" "sandbox_blocks_nc"
                                 "--skip" "sandbox_blocks_ping"
                                 "--skip" "sandbox_blocks_dev_tcp_redirection"
@@ -434,7 +541,7 @@
                                 ;;; ExternalAgentConfigService::new_for_test,
                                 ;;; so there is no in-tree way to satisfy
                                 ;;; the test offline.
-                                "--skip" "import_plugins_infers_claude_official_marketplace_when_missing_from_settings"
+                                "--skip" "import_plugins_infers_external_official_marketplace_when_missing_from_settings"
                                 ;;; END github.com network access
                                 ;;; BEGIN Async race between the rollout
                                 ;;; writer task and a direct SQLite read.
@@ -480,111 +587,6 @@
                                 "--skip" "cancellation_receiver_fires_after_limit"
                                 ;;; END Stopwatch construction/start offset race
                                 )
-      #:cargo-package-crates
-      ''(;;; Tier 0: No internal deps.
-         "codex-ansi-escape"
-         "codex-async-utils"
-         "codex-backend-openapi-models"
-         "codex-client"
-         "codex-execpolicy"
-         "codex-file-search"
-         "codex-git-utils"
-         "codex-keyring-store"
-         "codex-process-hardening"
-         "codex-utils-absolute-path"
-         "codex-utils-cache"
-         "codex-utils-cargo-bin"
-         "codex-utils-elapsed"
-         "codex-utils-fuzzy-match"
-         "codex-utils-home-dir"
-         "codex-utils-json-to-toml"
-         "codex-utils-path"
-         "codex-utils-plugins"
-         "codex-utils-pty"
-         "codex-utils-readiness"
-         "codex-utils-rustls-provider"
-         "codex-utils-sleep-inhibitor"
-         "codex-utils-stream-parser"
-         "codex-utils-string"
-         "codex-utils-template"
-         ;;; Tier 1.
-         "codex-utils-image"
-         "codex-utils-output-truncation"
-         "codex-apply-patch"
-         "codex-protocol"
-         "codex-windows-sandbox"
-         "codex-api"
-         "codex-experimental-api-macros"
-         "codex-secrets"
-         "codex-execpolicy-legacy"
-         "codex-debug-client"
-         "codex-analytics"
-         "codex-rollout"
-         "codex-rollout-trace"
-         "codex-terminal-detection"
-         "codex-utils-approval-presets"
-         "codex-utils-cli"
-         "codex-uds"
-         "codex-install-context"
-         "codex-device-key"
-         ;;; Tier 2.
-         "codex-app-server-protocol"
-         "codex-rmcp-client"
-         "codex-otel"
-         "codex-thread-store"
-         "codex-state"
-         "codex-features"
-         "codex-model-provider"
-         "codex-config"
-         "codex-agent-identity"
-         "codex-aws-auth"
-         "codex-hooks"
-         "codex-code-mode"
-         "codex-feedback"
-         "codex-skills"
-         "codex-test-binary-support"
-         "codex-core"
-         "codex-core-plugins"
-         "codex-utils-sandbox-summary"
-         "codex-linux-sandbox"
-         "codex-sandboxing"
-         "codex-connectors"
-         "codex-core-skills"
-         ;;; Tier 3.
-         "codex-arg0"
-         "codex-lmstudio"
-         "codex-login"
-         "codex-ollama"
-         "codex-utils-oss"
-         "codex-mcp-server"
-         "codex-backend-client"
-         "codex-responses-api-proxy"
-         "codex-shell-command"
-         "codex-shell-escalation"
-         "codex-plugin"
-         "codex-model-provider-info"
-         "codex-models-manager"
-         ;;; Tier 4.
-         "codex-cloud-requirements"
-         "codex-exec"
-         "codex-exec-server"
-         "codex-network-proxy"
-         "codex-stdio-to-uds"
-         "codex-chatgpt"
-         "codex-cloud-tasks-client"
-         "codex-cloud-tasks-mock-client"
-         "codex-tools"
-         "codex-mcp"
-         "codex-collaboration-mode-templates"
-         ;;; Tier 5.
-         "codex-app-server"
-         "codex-app-server-test-client"
-         "codex-tui"
-         "codex-response-debug-context"
-         ;;; Tier 6.
-         "codex-cloud-tasks"
-         ;; The main executable.
-         "codex-cli")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'chdir-to-workspace
@@ -592,20 +594,32 @@
               (chdir "codex-rs")))
           (add-after 'chdir-to-workspace 'update-version-in-snapshots
             (lambda _
-              ;; Snapshot test files contain hardcoded v0.0.0 version strings.
+              ;; Snapshot test files contain hardcoded 0.0.0 version strings.
               ;; Update them to match the actual package version.
               (let ((snap-files (find-files "." "\\.snap$")))
                 (substitute* snap-files
-                  (("\\(v0\\.0\\.0\\)   ") "(v0.124.0) ")))))
+                  (("\\(v0\\.0\\.0\\)   ") "(v0.144.1) ")
+                  (("Update available! 0\\.0\\.0 -> 9\\.9\\.9  ")
+                   "Update available! 0.144.1 -> 9.9.9")
+                  (("Update available! 0\\.0\\.0 -> 9\\.9\\.9")
+                   "Update available! 0.144.1 -> 9.9.9")))))
           (add-after 'chdir-to-workspace 'patch-git-deps-to-vendor
             (lambda _
               ;; Replace git dependencies with version references so cargo
               ;; resolves them from the vendored sources.
               (substitute* "Cargo.toml"
+                (("crossterm = \\{ git = [^}]+\\}")
+                 "crossterm = { version = \"0.28.1\" }")
+                (("ratatui = \\{ git = [^}]+\\}")
+                 "ratatui = { version = \"0.29.0\" }")
+                (("tokio-tungstenite = \\{ git = [^}]+\\}")
+                 "tokio-tungstenite = { version = \"0.28.0\" }")
+                (("tungstenite = \\{ git = [^}]+\\}")
+                 "tungstenite = { version = \"0.27.0\" }")
                 (("nucleo = \\{ git = [^}]+\\}")
-                 "nucleo = \"0.5.0\"")
+                 "nucleo = { version = \"0.5.0\" }")
                 (("runfiles = \\{ git = [^}]+\\}")
-                 "runfiles = \"0.1.0\""))
+                 "runfiles = { version = \"0.1.0\" }"))
               ;; Remove workspace members that have unbuildable deps
               ;; (v8-poc requires V8).  code-mode stays a workspace member
               ;; so its codex-protocol resolves to the same local copy as
@@ -622,28 +636,22 @@
               ;; mismatches in codex-tools.
               (substitute* "Cargo.toml"
                 (("codex-code-mode = \\{ path = \"code-mode\" \\}")
-                 "codex-code-mode = { path = \"code-mode\", default-features = false }"))
-              ;; cargo build at workspace root ignores per-dep
-              ;; default-features=false and builds code-mode with its
-              ;; own default features, which include v8-runtime and
-              ;; would pull in V8.  Make the default feature empty.
-              (substitute* "code-mode/Cargo.toml"
-                (("^default = \\[\"v8-runtime\"\\]") "default = []"))))
+                 "codex-code-mode = { path = \"code-mode\", default-features = false }"))))
           (add-after 'patch-git-deps-to-vendor 'add-version-to-workspace-deps
             (lambda _
-              ;; cargo package requires all dependencies to have versions.
-              ;; Add version = "0.124.0" to internal path dependencies.
+              ;; Keep internal workspace path dependencies local, while giving
+              ;; Cargo explicit versions for resolver/vendor normalization.
               (let ((cargo-files (find-files "." "^Cargo\\.toml$")))
                 (substitute* cargo-files
                   ;; Handle inline deps: name = { path = "..." }
-                  (("(codex-[a-z0-9-]+) = \\{ path = " all name)
-                   (string-append name " = { version = \"0.124.0\", path = "))
+                  (("(codex[_-][a-z0-9_-]+|app_test_support|core_test_support|mcp_test_support) = \\{ path = " all name)
+                   (string-append name " = { version = \"0.144.1\", path = "))
                   ;; Handle inline deps with package: name = { package = "...", path = "..." }
-                  (("(codex-[a-z0-9-]+) = \\{ package = " all name)
-                   (string-append name " = { version = \"0.124.0\", package = "))
+                  (("(codex[_-][a-z0-9_-]+|app_test_support|core_test_support|mcp_test_support) = \\{ package = " all name)
+                   (string-append name " = { version = \"0.144.1\", package = "))
                   ;; Handle section deps: [dependencies.X] with path = "..."
                   (("^(path = \"\\.\\./[^\"]*\")" all path-line)
-                   (string-append path-line "\nversion = \"0.124.0\""))))))
+                   (string-append path-line "\nversion = \"0.144.1\""))))))
           (add-after 'chdir-to-workspace 'use-gnu-store-in-sandbox
             (lambda _
               ;; LINUX_PLATFORM_DEFAULT_READ_ROOTS in linux-sandbox/src/
@@ -721,7 +729,7 @@
                 (substitute* "cloud-tasks/src/env_detect.rs"
                   (("Command::new\\(\"git\"\\)")
                    (string-append "Command::new(\"" git-bin "/git\")")))
-                (substitute* "core/src/plugins/startup_sync.rs"
+                (substitute* "core-plugins/src/startup_sync.rs"
                   (("\"git\",")
                    (string-append "\"" git-bin "/git\",")))
                 (substitute* "file-search/src/lib.rs"
@@ -735,6 +743,20 @@
                    (string-append "\"GIT_PAGER\", \"" coreutils-bin "/cat\""))
                   (("\"GH_PAGER\", \"cat\"")
                    (string-append "\"GH_PAGER\", \"" coreutils-bin "/cat\"")))
+                ;; Bare /bin/sleep in the exec-server test (without
+                ;; surrounding double quotes, so the main pattern does
+                ;; not match).
+                (substitute*
+                  "exec-server/tests/exec_process.rs"
+                  (("/bin/sleep")
+                   (string-append coreutils-bin "/sleep")))
+                ;; The encrypted-relay test clears the child
+                ;; environment, so its bare "true" has no PATH
+                ;; through which it could be resolved.
+                (substitute*
+                  "exec-server/tests/relay.rs"
+                  (("\"true\"")
+                   (string-append "\"" coreutils-bin "/true\"")))
                 ;; Bare /bin/sleep inside a format! string
                 ;; (no surrounding double quotes, so the main
                 ;; pattern does not match).
@@ -754,16 +776,24 @@
                 ;; occurrences; these shebangs have no surrounding
                 ;; double quotes.
                 (substitute*
-                  (list "core/src/plugins/startup_sync_tests.rs"
+                  (list "cli/src/doctor.rs"
+                        "core-plugins/src/npm_source_tests.rs"
+                        "core-plugins/src/remote_bundle.rs"
+                        "core-plugins/src/startup_sync_tests.rs"
+                        "core/src/git_info_tests.rs"
                         "core/src/tools/runtimes/shell/unix_escalation_tests.rs"
                         "core/tests/suite/client.rs"
-                        "core/tests/suite/js_repl.rs"
+                        "core/tests/suite/guardian_review.rs"
                         "core/tests/suite/skill_approval.rs"
                         "core/tests/suite/user_notification.rs"
-                        "exec-server/tests/file_system.rs"
+                        "exec-server/tests/file_system_unix.rs"
+                        "git-utils/src/baseline.rs"
+                        "git-utils/src/info.rs"
                         "login/src/auth/auth_tests.rs"
                         "models-manager/src/manager_tests.rs"
-                        "sandboxing/src/bwrap_tests.rs")
+                        "sandboxing/src/bwrap_tests.rs"
+                        "shell-command/src/command_safety/is_safe_command.rs"
+                        "tui/src/get_git_diff.rs")
                   (("#!/bin/bash")
                    (string-append "#!" bash-bin "/bash"))
                   (("#!/bin/sh")
@@ -802,6 +832,20 @@
               (call-with-output-file "guix-vendor/node-version.txt"
                 (lambda (port)
                   (display "22.22.0" port)))))
+          (add-before 'check 'increase-open-file-limit
+            (lambda _
+              ;; The app-server integration suite runs hundreds of Tokio
+              ;; runtimes, mock HTTP servers, and app-server subprocesses under
+              ;; libtest.  On large builders, the default soft nofile limit of
+              ;; 1024 is not enough and failures cascade as EMFILE.
+              (call-with-values (lambda () (getrlimit 'nofile))
+                (lambda (soft hard)
+                  (let ((target (if hard (min hard 65536) 65536)))
+                    (when (and soft (< soft target))
+                      (setrlimit 'nofile target hard)
+                      (format #t
+                              "increased maximum number of open files from ~d to ~d~%"
+                              soft target)))))))
           (add-before 'check 'set-home
             (lambda _
               ;; HOME must not be a prefix of /tmp, otherwise
@@ -810,6 +854,10 @@
               (setenv "HOME" "/tmp/guix-home")
               (mkdir-p "/tmp/guix-home")
               (setenv "USER" "nixbld")
+              ;; fetch_ide_context_uses_unregistered_request_route:
+              ;; IDE-context IPC rejects sockets in group-writable
+              ;; temporary directories.
+              (umask #o077)
               ;; Default libtest thread stack is 2 MiB, which is not
               ;; enough for tokio current_thread tests that drive
               ;; codex-core's full turn pipeline.  Upstream gates such
@@ -818,11 +866,41 @@
               ;; raise the global default so future additions that
               ;; forget the wrapper still pass.
               (setenv "RUST_MIN_STACK" "8388608")
-              ;; Disable network access.
-              (setenv "CODEX_SANDBOX_NETWORK_DISABLED" "1"))))))
+              ;; Prevent fanout on huge servers.
+              (setenv "TOKIO_WORKER_THREADS" "3")
+              ;; Set Codex's no-network marker so upstream tests using
+              ;; skip_if_no_network! return early.
+              (setenv "CODEX_SANDBOX_NETWORK_DISABLED" "1")))
+          (replace 'check
+            (lambda* (#:key tests? parallel-build? cargo-test-flags
+                      #:allow-other-keys)
+              (when tests?
+                ;; Do not let libtest use all build cores here.  Most
+                ;; app-server integration tests start a real app-server
+                ;; process, and each initialized server creates two
+                ;; notify/inotify watchers (SkillsWatcher and FsWatchManager).
+                ;; Linux's default fs.inotify.max_user_instances is often 128
+                ;; per real UID, so --test-threads=128 can exhaust that
+                ;; per-user inotify instance limit even after raising
+                ;; RLIMIT_NOFILE.
+                (let ((test-threads (min 64 (parallel-job-count))))
+                  (apply invoke
+                         `("cargo" "test" "--offline"
+                           ,@(if parallel-build?
+                                 (list "-j"
+                                       (number->string
+                                        (parallel-job-count)))
+                                 (list "-j" "1"))
+                           ,@cargo-test-flags
+                           ,@(if (member "--" cargo-test-flags)
+                                 '()
+                                 '("--"))
+                           "--test-threads"
+                           ,(number->string test-threads))))))))))
     (native-inputs `(("bubblewrap" ,bubblewrap) ;tests need bwrap on PATH
-                     ("clang" ,clang-13)
+                     ("clang" ,clang)
                      ("cmake-minimal" ,cmake-minimal)
+                     ("curl" ,curl) ;local loopback test
                      ("libunwind" ,libunwind)
                      ("lsof" ,lsof)            ;app-server tests
                      ("nss-certs-for-test" ,nss-certs-for-test) ;OTLP gRPC TLS
@@ -844,7 +922,10 @@ It provides an interactive TUI for conversations with AI models, with
 support for shell command execution, file editing, and code generation.
 Configure providers via @file{~/.codex/config.toml}.
 
-codex-code-mode's V8 Javascript executor is disabled.")
+codex-code-mode's V8 Javascript executor is disabled.  That means if
+you want to use the GPT 5.6 models you need to add a custom
+@code{model_catalog_json} into @code{~/.codex/config.toml} that
+makes them NOT force code (i.e. V8) mode.")
     (license license:asl2.0)))
 
 (define-public codex-acp
@@ -900,7 +981,7 @@ default-features = false
                   (display "22.22.0" port))))))))
     (native-inputs
      `(("cmake-minimal" ,cmake-minimal)
-       ("clang" ,clang-13)
+       ("clang" ,clang)
        ("pkg-config" ,pkg-config)
        ("bubblewrap-source" ,(package-source bubblewrap))))
     (inputs (cons* libcap openssl sqlite zlib `(,zstd "lib")
