@@ -269,7 +269,7 @@ project when stable enough.")
 (define-public zsh-history-substring-search
   (package
     (name "zsh-history-substring-search")
-    (version "1.0.2")
+    (version "1.1.0")
     (home-page "https://github.com/zsh-users/zsh-history-substring-search")
     (source (origin
               (method git-fetch)
@@ -279,7 +279,7 @@ project when stable enough.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0y8va5kc2ram38hbk2cibkk64ffrabfv1sh4xm7pjspsba9n5p1y"))))
+                "0vjw4s0h4sams1a1jg9jx92d6hd2swq4z908nbmmm2qnz212y88r"))))
     (build-system copy-build-system)
     (arguments
      '(#:install-plan '(("zsh-history-substring-search.plugin.zsh"
