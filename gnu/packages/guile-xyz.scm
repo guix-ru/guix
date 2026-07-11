@@ -7817,6 +7817,42 @@ with a FSM is being built (for example, from a Makefile.)")
 provides API for reading and writing INI data.")
     (license license:gpl3)))
 
+(define-public guile-toml
+  (package
+    (name "guile-toml")
+    (properties '((commit . "ecb24deb407ef76ef7cf7e9f0115060c98366a6b")
+                  (revision . "0")))
+    (version (git-version "0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/hylophile/guile-toml")
+             (commit (assoc-ref properties 'commit))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1iqxivxcb0dcjbd5ba3c0g3mj71b32qjxfdmljyv9r297yykfd02"))))
+    (build-system guile-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'check
+            (lambda _
+              (invoke "guile" "-L" "." "--no-auto-compile"
+                      "test/test-datatypes.scm")
+              (delete-file-recursively "test"))))))
+    (native-inputs (list guile-3.0))
+    (propagated-inputs (list guile-json-4))
+    (home-page "https://github.com/hylophile/guile-toml")
+    (synopsis "TOML module for Guile Scheme")
+    (description
+     "This package provides a Guile Scheme module for parsing and building
+TOML documents.")
+    (license license:gpl3)))
+
 (define-public guile-schemetran
   (let ((commit "3f5e15273ee88ba60ad8caf2de6302ad2bab582b")
         (revision "1"))
