@@ -1839,6 +1839,8 @@ ge13ca993e8ccb9ba9847cc330696e02839f328f7/jemalloc"))
       (source
        (origin
          (inherit (package-source base-rust))
+         (patches (search-patches
+                   "rust-1.94-clippy-fix-proc-macros-aux-race.patch"))
          (snippet
           '(begin
              (for-each delete-file-recursively
