@@ -15323,9 +15323,9 @@ JSON tools. @code{OjG} is optimized to processing huge data sets where data
 does not necessarily conform to a fixed structure.")
     (license license:expat)))
 
-(define-public go-github-com-olivere-elastic
+(define-public go-github-com-olivere-elastic-v7
   (package
-    (name "go-github-com-olivere-elastic")
+    (name "go-github-com-olivere-elastic-v7")
     (version "7.0.32")
     (source
      (origin
@@ -15360,6 +15360,10 @@ does not necessarily conform to a fixed structure.")
      "Package elastic provides an interface to the Elasticsearch server
 @url{https://www.elastic.co/products/elasticsearch}.")
     (license license:expat)))
+
+;; Deprecated on <2026-07-11>.
+(define-deprecated-package go-github-com-olivere-elastic
+  go-github-com-olivere-elastic-v7)
 
 (define-public go-github-com-openfga-go-sdk
   (package
