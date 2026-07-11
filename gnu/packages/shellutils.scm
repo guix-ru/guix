@@ -243,7 +243,7 @@ as you type.")
 (define-public zsh-completions
   (package
     (name "zsh-completions")
-    (version "0.34.0")
+    (version "0.36.0")
     (home-page "https://github.com/zsh-users/zsh-completions")
     (source (origin
               (method git-fetch)
@@ -253,7 +253,7 @@ as you type.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0jjgvzj3v31yibjmq50s80s3sqi4d91yin45pvn3fpnihcrinam9"))))
+                "0ah3q756f1aahinzfb0mxbqv177ypg5pcnrv59rpqzm17kn8492w"))))
     (build-system copy-build-system)
     (arguments
      '(#:install-plan '(("src/" "share/zsh/site-functions/")
