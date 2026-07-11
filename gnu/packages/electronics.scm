@@ -1695,7 +1695,7 @@ an embedded event driven algorithm.")
 (define-public librelane
   (package
     (name "librelane")
-    (version "3.0.3")
+    (version "3.0.5")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1704,7 +1704,7 @@ an embedded event driven algorithm.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0g4b5kby7zp8v59xzxmfxh3a2yqvmmsb1wsmasl3cz1aibk343a8"))))
+                "18lwvmiv80p5dkc005arw8nr9w62wf9aqfkynxvwri1k2zir58d8"))))
     (build-system pyproject-build-system)
     (arguments
      (list
