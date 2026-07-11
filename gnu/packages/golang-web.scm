@@ -13645,6 +13645,43 @@ clients that speak the Gemini protocol.")
 @@url{https://github.com/makeworld-the-better-one/go-gemini,go-gemini}.")
     (license license:expat)))
 
+(define-public go-github-com-markbates-goth
+  (package
+    (name "go-github-com-markbates-goth")
+    (version "1.82.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/markbates/goth")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0f5bgdpm4vpb6jsjr2z0v7xlwg3kgy6h7jhw6mq619bdkl5hv5zd"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/markbates/goth"))
+    (native-inputs
+     (list go-github-com-jarcoal-httpmock
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-go-chi-chi-v5
+           go-github-com-golang-jwt-jwt-v5
+           go-github-com-gorilla-mux
+           go-github-com-gorilla-pat
+           go-github-com-gorilla-sessions
+           go-github-com-lestrrat-go-jwx
+           go-github-com-markbates-going
+           go-github-com-mrjones-oauth
+           go-golang-org-x-oauth2))
+    (home-page "https://github.com/markbates/goth")
+    (synopsis "Multi-Provider Authentication for Go")
+    (description
+     "Package goth provides a idiomatic way to write authentication packages
+for Go web applications.")
+    (license license:expat)))
+
 (define-public go-github-com-marten-seemann-tcp
   (package
     (name "go-github-com-marten-seemann-tcp")
