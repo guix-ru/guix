@@ -8998,6 +8998,30 @@ this package, and @code{gRPC} clients should expect a corresponding error to
 be returned from the RPC call.")
     (license license:asl2.0)))
 
+(define-public go-github-com-gogs-go-gogs-client
+  (package
+    (name "go-github-com-gogs-go-gogs-client")
+    (version "0.0.0-20210131175652-1d7215cd8d85")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/gogs/go-gogs-client")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11b8mwdly960z7jdx297jywxzljs0l0sl3i1qvii1fjzis7k608l"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/gogs/go-gogs-client"))
+    (home-page "https://github.com/gogs/go-gogs-client")
+    (synopsis "Gogs API client in Go")
+    (description
+     "This package provides API to @url{https://gogs.io/, Gogs} - a
+self-hosted Git service.")
+    (license license:expat)))
+
 (define-public go-github-com-golang-groupcache
   (package
     (name "go-github-com-golang-groupcache")
