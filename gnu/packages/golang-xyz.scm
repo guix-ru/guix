@@ -20190,6 +20190,43 @@ implementing features like:
 @end itemize")
     (license license:expat)))
 
+(define-public go-github-com-markbates-going
+  (package
+    (name "go-github-com-markbates-going")
+    (version "1.0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/markbates/going")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "14b8mj3x7bynpdw99a260j6gpjsqnki5fh3bbsf9cyggsgai11zz"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/markbates/going"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-serenize-snaker))
+    (home-page "https://github.com/markbates/going")
+    (synopsis "Utilities for Go")
+    (description
+     "This package provides various utilities to write application in Go:
+@itemize
+@item @code{nulls} - Proper JSON implementations of null database types.
+@item @code{validate} - A framework for writing validations.
+@item @code{wait} - Wait cleans up the pattern around using @code{sync.WaitGroup}.
+@item @code{defaults} - Allows for the setting of default values for common types.
+@item @code{willy} - A helper for cleaning up HTTP tests.
+@item @code{del} - A wrapper around the @code{render} package to make it work
+with @code{echo}.
+@end itemize")
+    (license license:expat)))
+
 (define-public go-github-com-maruel-natural
   (package
     (name "go-github-com-maruel-natural")
