@@ -1547,13 +1547,13 @@ scores.")
 (define-public python-music21
   (package
     (name "python-music21")
-    (version "9.9.1")
+    (version "10.5.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "music21" version))
        (sha256
-        (base32 "10i5y71zw2vjf8z8rm1v8vdwkas92lyrkk015r5c6kipnb2575sl"))))
+        (base32 "1cixrvrcwpwvxiaqmal8j3w4ci1319mj9fz3njzr5d9wjpxpc9pp"))))
     (build-system pyproject-build-system)
     (arguments
      `(#:phases
