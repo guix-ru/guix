@@ -47958,6 +47958,31 @@ general in Emacs.")
 for detecting and improve non-idiomatic Clojure source code.")
     (license license:gpl3+)))
 
+(define-public emacs-kirigami
+  (package
+    (name "emacs-kirigami")
+    (version "1.1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jamescherti/kirigami.el")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "03ql2x4npkw60mjvfn83gnp6dbshf6ikhj7558mwdk8qi695q2fc"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f))      ;no tests
+    (synopsis "Unified method to fold and unfold text in Emacs")
+    (description "This package provides a method to fold and unfold text in
+Emacs across a diverse set of Emacs modes.  Folding key bindings only need to
+be configured once.  After that, the same keys work consistently across all
+supported major and minor modes, providing a unified and predictable
+experience for opening and closing folds.")
+    (home-page "https://github.com/jamescherti/kirigami.el")
+    (license license:gpl3+)))
+
 (define-public emacs-mint-mode
   (package
     (name "emacs-mint-mode")
