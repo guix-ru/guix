@@ -152,10 +152,6 @@
 ;; be defined first, the split makes book-keeping easier.)
 
 
-;; compiles only on macos
-;; (define-public applewmproto
-
-
 (define xorg-cf-files
   ;; The xorg-cf-files package contains the data files for the imake utility,
   ;; defining the known settings for a wide variety of platforms (many of which
@@ -854,9 +850,6 @@ authentication records.")
 of new capabilities and controls for text keyboards.")
     (license license:x11)
     (properties `((superseded . ,xorgproto)))))
-
-;; requires applewmproto, which compiles only on macos
-;; (define-public libapplewm
 
 (define-public libdmx
   (package
@@ -2539,32 +2532,6 @@ for graphics acceleration.  The LX component supports EXA, including
 compositing.  Both support Xv overlay and dynamic rotation with XRandR.")
     (license license:x11)))
 
-;; Driver for obsolete graphics cards, depends on libglide:
-;; http://sourceforge.net/projects/glide/ ,
-;; last updated in 2003, and which does not compile out of the box any more.
-;; (define-public xf86-video-glide
-;;   (package
-;;     (name "xf86-video-glide")
-;;     (version "1.2.0")
-;;     (source
-;;       (origin
-;;         (method url-fetch)
-;;         (uri (string-append
-;;                "mirror://xorg/X11R7.7/src/everything/xf86-video-glide-"
-;;                version
-;;                ".tar.bz2"))
-;;         (sha256
-;;           (base32
-;;             "0byapm9mnpqk3wijfnnan3d22ii5cw6dmg4xn1625iiz89j5vs1l"))))
-;;     (build-system gnu-build-system)
-;;     (inputs `(("pkg-config" ,pkg-config)
-;;               ("xorg-server" ,xorg-server)))
-;;     (home-page "https://www.x.org/wiki/")
-;;     (synopsis "Glide video driver for X server")
-;;     (description
-;;      "xf86-video-glide is a Glide video driver for the Xorg X server.")
-;;     (license license:x11)))
-
 (define-public xf86-video-i128
   (package
     (name "xf86-video-i128")
@@ -2711,32 +2678,6 @@ the same level of support for generic VGA or 8514/A adapters.")
     (description
      "xf86-video-neomagic is a NeoMagic video driver for the Xorg X server.")
     (license license:x11)))
-
-;; This driver depends on XAA which has been removed from xorg-server.
-
-;; (define-public xf86-video-newport
-;;   (package
-;;     (name "xf86-video-newport")
-;;     (version "0.2.4")
-;;     (source
-;;       (origin
-;;         (method url-fetch)
-;;         (uri (string-append
-;;                "mirror://xorg/individual/driver/xf86-video-newport-"
-;;                version
-;;                ".tar.bz2"))
-;;         (sha256
-;;           (base32
-;;             "1yafmp23jrfdmc094i6a4dsizapsc9v0pl65cpc8w1kvn7343k4i"))))
-;;     (build-system gnu-build-system)
-;;     (inputs `(("xorg-server" ,xorg-server)))
-;;     (native-inputs `(("pkg-config" ,pkg-config)))
-;;     (home-page "https://www.x.org/wiki/")
-;;     (synopsis "Newport video driver for X server")
-;;     (description
-;;      "xf86-video-newport is an Xorg X server video driver for the SGI
-;; newport cards.")
-;;     (license license:x11)))
 
 (define-public xf86-video-nv
   (package
@@ -3139,9 +3080,6 @@ server driver works.")
     (description
      "xf86-video-voodoo is a Voodoo video driver for the Xorg X server.")
     (license license:x11)))
-
-;; Only relevant for the frame buffer on BSD systems.
-;; (define-public xf86-video-wsfb
 
 (define-public xgamma
   (package
