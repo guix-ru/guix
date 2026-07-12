@@ -1383,6 +1383,42 @@ which uncovers hidden structures in categorical data")
 learning frameworks.")
     (license license:expat)))
 
+(define-public python-fast-array-utils
+  (package
+    (name "python-fast-array-utils")
+    (version "1.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/scverse/fast-array-utils")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "07qbsbsmzycxa5nib39zp7rfwcj3cvqyg4mpfkdn7xg2bmqprl7n"))))
+    (build-system pyproject-build-system)
+    (arguments
+     ;; tests: 1455 passed, 1621 skipped, 232 deselected
+     (list #:test-flags #~(list "-m" "not benchmark")))
+    (native-inputs
+     (list python-dask-minimal
+           python-hatch-docstring-description
+           python-hatch-fancy-pypi-readme
+           python-hatch-vcs
+           python-hatchling
+           python-numba
+           python-packaging
+           python-pytest
+           python-pytest-doctestplus
+           python-scipy-minimal))
+    (propagated-inputs
+     (list python-numpy))
+    (home-page "https://fast-array-utils.scverse.org/")
+    (synopsis "Fast array utilities")
+    (description
+     "This package provides fast array utilities with minimal dependencies.")
+    (license license:mpl2.0)))
+
 (define-public python-fast-histogram
   (package
     (name "python-fast-histogram")
