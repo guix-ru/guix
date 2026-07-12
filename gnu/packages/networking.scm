@@ -1630,7 +1630,7 @@ files contain direct mappings of the abstractions provided by the ØMQ C API.")
 (define-public libcoap
   (package
     (name "libcoap")
-    (version "4.3.5a")
+    (version "4.3.5b")
     (source (origin
                 (method git-fetch)
                 (uri (git-reference
@@ -1639,7 +1639,7 @@ files contain direct mappings of the abstractions provided by the ØMQ C API.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "078bi6i6115wyhx9qssh30kf5ziv8sn7ch5fg31rf7qr7pypbfxa"))))
+                  "0z9ihlcqwqcpfmmp6s8lfhqpfni0czgck3sp62akvapq238v8n71"))))
     (outputs (list "out" "doc"))
     (build-system gnu-build-system)
     (arguments
