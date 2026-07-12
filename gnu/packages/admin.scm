@@ -7000,7 +7000,7 @@ network, which causes enabled computers to power on.")
 (define-public witr
   (package
     (name "witr")
-    (version "0.3.2")
+    (version "0.3.3")
     (source
      (origin
        (method git-fetch)
@@ -7009,7 +7009,7 @@ network, which causes enabled computers to power on.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "06vxrgd0j2v6s4snmyviwpp66hm5zai7xca9318inhyg4jw3ngg5"))))
+        (base32 "0c995b1c267sngg21546n60pqh09vc2pm6xbdy48kx5fwmi01w4h"))))
     (build-system go-build-system)
     (arguments
      (list
