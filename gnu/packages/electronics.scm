@@ -40,6 +40,7 @@
 ;;; Copyright © 2022 Petr Hodina <phodina@protonmail.com>
 ;;; Copyright © 2025 Thomas Guillermo Albers Raviola <thomas@thomaslabs.org>
 ;;; Copyright © 2019 Vagrant Cascadian <vagrant@debian.org>
+;;; Copyright © 2026 Thiago Negri <evohunz@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -91,6 +92,7 @@
   #:use-module (gnu packages cpp)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages dns)
   #:use-module (gnu packages documentation)
   #:use-module (gnu packages elf)
   #:use-module (gnu packages embedded)
@@ -927,6 +929,46 @@ built-in tools for traversal and analysis of the included gates and nets.")
 package supporting an integrated end-to-end workflow for PCB design, including
 from parts management and schematic entry to gerber export.")
     (license license:gpl3+)))
+
+(define-public input-leap
+  (package
+    (name "input-leap")
+    (version "3.0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/input-leap/input-leap")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ngvq1ah6w644qq7v5vg4x7r4sh0s41fyds0g0jkjgycv4las0k4"))))
+    (build-system qt-build-system)
+    (arguments
+     (list
+      #:qtbase qtbase
+      #:configure-flags
+      #~(list "-DINPUTLEAP_USE_EXTERNAL_GTEST=True")))
+    (native-inputs (list googletest pkg-config qttools))
+    (inputs (list avahi
+                  libice
+                  libsm
+                  libxi
+                  libxinerama
+                  libxrandr
+                  libxtst
+                  openssl))
+    (home-page "https://github.com/input-leap/input-leap")
+    (synopsis "Mimics a @acronym{KVM, Keyboard Video and Mouse} switch")
+    (description
+     "Input Leap is software that mimics the functionality of a KVM switch,
+which historically would allow you to use a single keyboard and mouse to control
+multiple computers by physically turning a dial on the box to switch the machine
+you're controlling at any given moment.  Input Leap does this in software,
+allowing you to tell it which machine to control by moving your mouse to the
+edge of the screen, or by using a keypress to switch focus to a different
+system.")
+    (license license:gpl2)))
 
 (define-public iverilog
   (package
