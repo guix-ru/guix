@@ -8568,10 +8568,12 @@ using the PyCPL Python API.")
 (define-public python-pyhalo
   (package
     (name "python-pyhalo")
+    ;; 1.4.7 only works with a specific lenstronomy-fork
     (version "1.4.6")
     (source
      (origin
        (method url-fetch)
+       ;; 1.4.6 is not tagged so cannot use git-fetch; 1.4.7 is though.
        (uri (pypi-uri "pyhalo" version))
        (sha256
         (base32 "0gwlcsgd4pd9smy8wx1bqk77bmd475plmqshj7r7czm8vh0w9lqr"))))
@@ -8586,6 +8588,18 @@ using the PyCPL Python API.")
             (lambda _
               (substitute* "setup.py"
                 ((".pyHalo=pyHalo.cli:main.*") ""))))
+          (add-after 'unpack 'fix-trapz
+            (lambda _
+              (substitute*
+                  (list "pyHalo/Halos/HaloModels/TNFW.py"
+                        "pyHalo/Halos/tidal_truncation.py")
+                ;; prevent TypeError: only 0-dimensional arrays can be converted
+                ;; to Python scalars
+                (("float\\(") "np.ndarray.item("))
+              (substitute*
+                  (find-files "." "\\.py$")
+                ;; trapz is removed in NumPy 2.4.6, and is now called trapezoid.
+                (("np.trapz\\(") "np.trapezoid("))))
           (add-before 'check 'pre-check
             (lambda _
               ;; RuntimeError: cannot cache function 'rotate': no locator
