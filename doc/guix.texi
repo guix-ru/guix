@@ -48354,7 +48354,7 @@ $ source /run/current-system/profile/etc/profile.d/nix.sh
 This data type represents the configuration of the Nix daemon.
 
 @table @asis
-@item @code{nix} (default: @code{nix})
+@item @code{package} (default: @code{nix})
 The Nix package to use.
 
 @item @code{sandbox} (default: @code{#t})
