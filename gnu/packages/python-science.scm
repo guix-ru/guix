@@ -1047,6 +1047,27 @@ Features:
 @end itemize")
     (license license:bsd-3)))
 
+;; A bare minimal package, mainly to use in tests and reduce closure size.
+;; Tests are left out in the main package to slim down native-inputs and
+;; propagated-inputs.
+(define-public python-dask-minimal
+  (package/inherit python-dask
+    (name "python-dask-minimal")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:tests? _ #t) #f)))
+    (native-inputs
+     (list python-setuptools
+           python-setuptools-scm-next))
+    (propagated-inputs
+     (list python-click
+           python-cloudpickle
+           python-fsspec
+           python-packaging
+           python-partd
+           python-pyyaml
+           python-toolz))))
+
 (define-public python-decaylanguage
   (package
     (name "python-decaylanguage")
