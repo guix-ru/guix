@@ -472,7 +472,7 @@ resembles Python.")
 (define-public muon
   (package
     (name "muon")
-    (version "0.5.0")
+    (version "0.6.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -481,7 +481,7 @@ resembles Python.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1w0vkishj7r3swzg4m1fl3hacs8mycwhsrr5vw8sy67y81cihqbd"))))
+                "1j5xw3i3z4v0hhlsxy1f8lqddlrr0i5h5yxz8mlxdfcn40d1sfn0"))))
     (build-system meson-build-system)
     (arguments
      (list #:meson (computed-file "null-package" #~(mkdir #$output))
@@ -490,12 +490,6 @@ resembles Python.")
            #:tests? #f                  ;to avoid extra dependencies
            #:phases
            #~(modify-phases %standard-phases
-               (add-after 'unpack 'patch-/bin/sh
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (substitute* "tools/generate_test_check_script.py"
-                     (("#!/bin/sh")
-                      (string-append "#!" (search-input-file inputs
-                                                             "bin/sh"))))))
                (add-after 'patch-source-shebangs 'build-muon-bootstrap
                  (lambda _
                    (setenv "CC" #$(cc-for-target))
