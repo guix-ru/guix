@@ -1744,7 +1744,7 @@ arbitrary wavevectors, using fully-vectorial and three-dimensional methods.")
 (define-public meep
   (package
     (name "meep")
-    (version "1.33.0")
+    (version "1.34.0")
     (source (origin
               (method url-fetch)
               (uri
@@ -1753,7 +1753,7 @@ arbitrary wavevectors, using fully-vectorial and three-dimensional methods.")
                 version "/meep-" version ".tar.gz"))
               (sha256
                (base32
-                "1azhgz6s95siqmnxb3if6waxbvia3bij5jmxgxjz4sgn2ahw1axx"))))
+                "1ihblq35z28shbb3s7xzkxpaagn5bwjx3visyc7kpqmkcr3894iw"))))
     (build-system gnu-build-system)
     (arguments
      (list #:configure-flags
