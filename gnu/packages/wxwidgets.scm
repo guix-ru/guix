@@ -73,7 +73,7 @@
   (package
     (name "wxwidgets")
     ;; There is a newer versions 3.3, but this is tagged "development".
-    (version "3.2.10")
+    (version "3.2.11")
     (source
      (origin
        (method url-fetch)
@@ -81,7 +81,7 @@
                            "releases/download/v" version
                            "/wxWidgets-" version ".tar.bz2"))
        (sha256
-        (base32 "15mq8k1z0q9s67xifjaz7slq7nlvk843k5b941cllylld6ar4vnn"))
+        (base32 "025gj1mdn2ilp0p2zsa73n065naahl8l9v31pzj19sg2phar04ka"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
