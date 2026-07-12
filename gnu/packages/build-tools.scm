@@ -1514,7 +1514,7 @@ builds as fast as possible.")
 (define-public samurai
   (package
     (name "samurai")
-    (version "1.2")
+    (version "1.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1523,7 +1523,7 @@ builds as fast as possible.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "04iw18hgkm72yrl83a2xh1jc47w9rilpb95kwick0j37b4q3gxj4"))))
+                "0bz75hclhwzyg3q6fwpdalg52rd8qmyyvfaqyv3zgm46hfx9n0nh"))))
     (build-system gnu-build-system)
     (arguments
      (list #:tests? #f                  ;no test suite
