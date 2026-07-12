@@ -25,17 +25,11 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix gexp)
+  #:use-module (guix utils)
   #:use-module (guix search-paths)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system trivial)
   #:use-module (gnu packages bash)
-
-  ;; Note: Because this module defines the 'pkg-config' macro, it cannot be
-  ;; caught in a cycle with other package modules or the macro wouldn't be
-  ;; visible at the time those other modules are compiled.  To fulfill that
-  ;; constraint, load (gnu packages check) lazily.
-  #:autoload   (gnu packages check) (atf kyua)
-
   #:use-module (guix memoization)
   #:export (pkg-config))
 
@@ -179,24 +173,28 @@ exec ~a \"$@\""
 (define-public pkgconf
   (package
     (name "pkgconf")
-    (version "2.5.1")
+    (version "3.0.3")
     (source (origin
               (method url-fetch)
-              (uri (string-append  "https://distfiles.dereferenced.org/"
-                                   name "/" name "-" version ".tar.xz"))
+              (uri (string-append "https://distfiles.ariadne.space/"
+                                  name "/" name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0hy2a058nrgxzwn5ilnf3q0fpj9bh9lj42n18kqfr1lzkdccj1fd"))))
+                "1kyqrdkdcxhgikv8mqz4wj39vi2k3s9mlj9mcvka8yvp5fxkl0xa"))))
     (build-system gnu-build-system)
     (arguments
-     (list #:phases #~(modify-phases %standard-phases
-                        (add-after 'unpack 'set-HOME
-                          (lambda _
-                            ;; Kyua requires a writable HOME.
-                            (setenv "HOME" "/tmp"))))))
-    (native-inputs (list atf kyua))
+     (list #:configure-flags
+           (if (target-hurd?)
+               #~'("CPPFLAGS=-DPATH_MAX=4096")
+               #~'())
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'fix-makefile
+                 (lambda _
+                   (substitute* "Makefile.in"
+                     (("PWD") "CURDIR")))))))
     (native-search-paths (list $PKG_CONFIG_PATH))
-    (home-page "http://pkgconf.org/")
+    (home-page "https://github.com/pkgconf/pkgconf")
     (synopsis "Package compiler and linker metadata toolkit")
     (description "@command{pkgconf} is a program which helps to configure
 compiler and linker flags for development libraries.  It is similar to
