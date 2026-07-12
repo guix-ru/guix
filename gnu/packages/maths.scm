@@ -9910,7 +9910,7 @@ Boolector.")
    (source (origin
             (method git-fetch)
             (uri (git-reference
-                  (url "https://github.com/ivmai/cudd")
+                  (url "https://github.com/cuddorg/cudd")
                   (commit (string-append "cudd-" version))))
             (file-name (git-file-name name version))
             (sha256
@@ -9923,7 +9923,7 @@ Boolector.")
    ;; The original home-page was lost to time, so we reference the "unofficial"
    ;; Github mirror.  For what it's worth, the author of the library appears to
    ;; have been involved with this mirror at some point in time.
-   (home-page "https://github.com/ivmai/cudd")
+   (home-page "https://github.com/cuddorg/cudd")
    (synopsis "Manipulate decision diagrams")
    (description "@acronym{CUDD, Colorado University Decision Diagrams} is a
 library for manipulating decision diagrams.  It supports binary decision
