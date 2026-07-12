@@ -203,6 +203,7 @@
   #:use-module (gnu packages ncurses)
   #:use-module (gnu packages netpbm)
   #:use-module (gnu packages networking)
+  #:use-module (gnu packages node)
   #:use-module (gnu packages ocaml)
   #:use-module (gnu packages oneapi)
   #:use-module (gnu packages opencl)
@@ -224,6 +225,8 @@
   #:use-module (gnu packages readline)
   #:use-module (gnu packages regex)
   #:use-module (gnu packages ruby-xyz)
+  #:use-module (gnu packages rust)
+  #:use-module (gnu packages rust-crates)
   #:use-module (gnu packages sdl)
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages shells)
@@ -248,6 +251,7 @@
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages)
+  #:use-module (guix build-system cargo)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system glib-or-gtk)
@@ -12301,6 +12305,115 @@ player adaptability for character progression.")
     (native-inputs
      (modify-inputs native-inputs
        (prepend pkg-config)))))
+
+(define-public hurrycurry
+  (package
+    (name "hurrycurry")
+    (version "3.1.1-1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://codeberg.org/hurrycurry/hurrycurry.git")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1qdj94cplw7xqjppdgcqk4nfs7dzkk0l4rgq61b27pa92flvgi2v"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ; no tests
+      #:imported-modules `(,@%default-gnu-imported-modules
+                           ,@%cargo-build-system-modules)
+      #:modules `(((guix build cargo-build-system) #:prefix cargo:)
+                  (guix build gnu-build-system)
+                  (guix build utils))
+      #:make-flags
+      #~(list "HURRYCURRY_DISTRIBUTION=\"GNU Guix\""
+              (string-append "HURRYCURRY_DATA_PATH="
+                             (assoc-ref %outputs "common")
+                             "/share/hurrycurry")
+              "all_client"
+              "all_server"
+              "all_data")
+      #:phases
+      #~(let ((cargo-phase (lambda (phase)
+                             (lambda args
+                               (apply (assoc-ref cargo:%standard-phases phase)
+                                      #:install-source #f
+                                      #:vendor-dir "guix-vendor"
+                                      #:cargo-target #$(cargo-triplet)
+                                      args)))))
+          (modify-phases %standard-phases
+            (add-after 'unpack 'set-env-vars
+              (lambda* (#:key parallel-build? #:allow-other-keys)
+                (setenv "HOME" (string-append (getcwd) "/tmp-home"))
+                ;; Needed because of
+                ;; <https://github.com/rust-lang/cargo/issues/17209>.
+                (setenv "CARGO_BUILD_JOBS"
+                        (number->string (if parallel-build?
+                                            (parallel-job-count)
+                                            1)))))
+            (add-after 'set-env-vars 'prepare-rust-crates
+              (cargo-phase 'prepare-rust-crates))
+            (add-after 'prepare-rust-crates 'unpack-rust-crates
+              (cargo-phase 'unpack-rust-crates))
+            (replace 'configure
+              (cargo-phase 'configure))
+            (add-after 'configure 'check-for-pregenerated-files
+              (cargo-phase 'check-for-pregenerated-files))
+            (add-after 'patch-generated-file-shebangs 'patch-cargo-checksums
+              (cargo-phase 'patch-cargo-checksums))
+            (add-before 'install 'create-client-bin-directory
+              (lambda* (#:key outputs #:allow-other-keys)
+                ;; XXX: This mkdir-p is needed because of
+                ;; <https://codeberg.org/hurrycurry/hurrycurry/pulls/665>.
+                ;; Remove this phase when this gets merged into a release.
+                (mkdir-p (string-append (assoc-ref outputs "client") "/bin"))))
+            (replace 'install
+              (lambda* (#:key make-flags outputs #:allow-other-keys)
+                (for-each
+                 (lambda (output)
+                   (apply invoke "make"
+                          `(,@make-flags
+                            ,(string-append "INSTALL_PREFIX=" (cdr output))
+                            ,(string-append "install_" (car output)))))
+                 (delete (assoc "debug" outputs) outputs))))
+            (add-after 'install 'patch-client-godot-path
+              (lambda* (#:key inputs outputs #:allow-other-keys)
+                (let ((client-script (string-append (assoc-ref outputs "client")
+                                                    "/bin/hurrycurry"))
+                      (godot (search-input-file inputs "bin/godot")))
+                  (substitute* client-script
+                    (("exec godot") (format #f "exec ~a" godot))))))))))
+    (inputs
+     (cons* godot
+            (cargo-inputs 'hurrycurry)))
+    (native-inputs
+     (list ffmpeg
+           node
+           rust
+           `(,rust "cargo")
+           sed))
+    (outputs
+     (list "client"
+           "server"
+           "common"
+           "debug"))
+    (home-page "https://hurrycurry.org/")
+    (synopsis "Cooperative 3D multiplayer game about cooking")
+    (description "Hurry Curry! is a cooperative multiplayer game about cooking.
+You work at a restaurant accepting orders, cooking various dishes and serving
+meals to customers.  But don’t take too long, as customers might get impatient.
+The game is free software, licensed under the AGPL 3.0 only.")
+    (license
+     (list license:agpl3
+           ;; Some models, sounds, music and other assets.
+           license:cc0
+           license:cc-by3.0
+           license:cc-by4.0
+           license:cc-by-sa4.0
+           license:silofl1.1))))
 
 (define-public li-ri
   (package
