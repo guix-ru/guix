@@ -2251,30 +2251,31 @@ when typing parentheses directly or commenting out code line by line.")
     (license license:gpl3+)))
 
 (define-public emacs-puni
-  ;; No tagged release upstream
-  (let ((commit "fe132f803868f325cf6f162139e327b76df9e4c1")
-        (revision "4"))
+  ;; No public release. Version string taken from source code.
+  (let ((commit "04819e0bad5ed62af9e412ef9715b33bb1edc3ba")
+        (revision "5"))
     (package
       (name "emacs-puni")
       (version (git-version "0" revision commit))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/AmaiKinono/puni")
-                      (commit commit)))
-                (file-name (git-file-name name version))
-                (sha256
-                 (base32
-                  "0ffjpb0ilhcng1wwmnl1lx7h8v1z0bgsq6wb7x4x2rwsrvqjv9hm"))))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/AmaiKinono/puni")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0pydanhwji3jglqc4pq7ljc5ik93ycgg8c8nvzsmgw6q5anqs09g"))))
       (build-system emacs-build-system)
-      (arguments (list #:tests? #f))    ; no actual tests
+      (arguments (list #:tests? #f))    ; No tests.
       (propagated-inputs (list emacs-with-editor))
       (home-page "https://github.com/AmaiKinono/puni")
       (synopsis "Emacs minor mode for structured editing")
       (description
        "Puni is an Emacs minor mode for structured editing: soft deletion,
-expression navigating and manipulating.  It supports many major modes
-out of the box.")
+expression navigating and manipulating.  It supports many major modes out of
+the box.")
       (license license:gpl3+))))
 
 (define-public emacs-pug-mode
