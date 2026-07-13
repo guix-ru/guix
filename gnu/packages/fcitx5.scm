@@ -337,7 +337,7 @@ IM module for GTK+3 applications.
 (define-public fcitx5-qt
   (package
     (name "fcitx5-qt")
-    (version "5.1.13")
+    (version "5.1.14")
     (source
      (origin
        (method url-fetch)
@@ -345,7 +345,7 @@ IM module for GTK+3 applications.
                            "/fcitx5-qt/fcitx5-qt-"
                            version ".tar.zst"))
        (sha256
-        (base32 "1yawhwnycrqp1flik3hc2vskvsyjfm6rkcdhsqnawix22r2n1wl0"))))
+        (base32 "0j1k0fm9hlkaicdp4kj2mfnw9h95q9x5lx8jwhbbwjkkhj3rh17h"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags
