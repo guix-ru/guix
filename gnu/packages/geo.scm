@@ -147,6 +147,7 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages sdl)
+  #:use-module (gnu packages specifications)
   #:use-module (gnu packages speech)
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages statistics)
@@ -2721,7 +2722,7 @@ from multiple records.")
 (define-public python-scitools-iris
   (package
     (name "python-scitools-iris")
-    (version "3.14.1")
+    (version "3.15.0")
     (source
      (origin
        (method git-fetch)
@@ -2730,53 +2731,42 @@ from multiple records.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0l94bmc7bc0q76nabr67ndxfrdbcl2smp1v94y03gzdrwf2lf2nd"))))
+        (base32 "13kgs0ahjr3swl352nss62qbpjb1xpmlwl9w6w1qfn291i3yh0dx"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 10420 passed, 81 skipped, 2712 warnings
       #:test-flags
       #~(list "--numprocesses" (number->string (parallel-job-count))
-              ;; XXX: Currently incompatible with pytest@9.
-              "--ignore=iris/tests/test_plot.py"
-              "--ignore=iris/tests/test_quickplot.py"
-              ;; XXX: Requires network.
-              "--ignore=iris/tests/integration/test_mask_cube_from_shape.py"
-              "--deselect=iris/tests/integration/plot/test_vector_plots.py::TestBarbs"
-              "--deselect=iris/tests/integration/plot/test_vector_plots.py::TestQuiver"
-              "--deselect=iris/tests/integration/plot/test_plot_2d_coords.py::Test"
-              ;; XXX: Requires the iris-sample-data.
-              "--deselect=iris/tests/test_constraints.py::TestCubeExtract__name_constraint"
-              "--deselect=iris/tests/test_constraints.py::TestCubeExtract__names"
-
+              "--pyargs" "iris"
               "-k" (string-join
-                    ;; Tests requiring additional data files distributed
-                    ;; separately from this project from
-                    ;; <https://github.com/SciTools/iris-test-data> or network
-                    ;; access.
-                    ;;
-                    ;; XXX: Review this list and try to ignore by files
-                    ;; instead in individual tests.
-                    (list "not test_load_pp_timevarying_orography"
-                          "test_oblique_cs"
+                    ;; Tests requiring network access.
+                    (list "not test_2d_coord_bounds_northpolarstereo"
+                          "test_2d_coord_bounds_platecarree"
+                          "test_2d_coords_contour"
+                          "test_2d_plain_latlon"
+                          "test_2d_plain_latlon_on_polar_map"
+                          "test_2d_rotated_latlon"
+                          "test_4d_global_proj_brazil"
+                          "test_circular_changes"
+                          "test_coord_coord_map"
+                          "test_coord_names"
+                          "test_coords"
+                          "test_default"
+                          "test_global_proj_china"
+                          "test_global_proj_russia"
+                          "test_mask_cube_from_shapefile_depreciation"
+                          "test_missing_cs"
+                          "test_plot_tmerc"
                           "test_python_versions"
-                          "test_simple"
+                          "test_rotated_pole_proj_germany_weighted_area"
+                          "test_rotated_pole_proj_uk"
                           "test_scatter"
-                          "test_transform_geometry")
-                    " and not ")
-              )
+                          "test_simple"
+                          "test_transverse_mercator_proj_uk")
+                    " and not "))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'delete-failing-test-files
-            (lambda _
-              (with-directory-excursion "lib/iris/tests"
-                ;; Tries to load the test data on import.
-                (delete-file
-                 "integration/netcdf/derived_bounds/test_bounds_files.py")
-                ;; GeoVista is not packaged yet, "--ignore" option did not work
-                ;; to skip test files.
-                (for-each delete-file-recursively
-                          (list "integration/experimental/geovista"
-                                "unit/experimental/geovista")))))
           (add-after 'unpack 'fix-paths
             (lambda* (#:key inputs #:allow-other-keys)
               (let ((netcdf-bin (dirname
@@ -2788,52 +2778,48 @@ from multiple records.")
                    (format #f "'~a/ncgen'" netcdf-bin))
                   (("env_bin_path\\(\"ncdump\"\\)")
                    (format #f "'~a/ncdump'" netcdf-bin))))))
-          ;; XXX: Tests are installed, but they need to be compiled
-          ;; before being run, and I fear breaking the ABI/compiled
-          ;; files when removing.
-          (replace 'check
-            (lambda* (#:key tests? test-flags inputs outputs
-                      #:allow-other-keys)
-              (setenv "HOME" "/tmp")
-              (delete-file-recursively "lib")
-              (let ((site (site-packages inputs outputs)))
-                (with-directory-excursion site
-                  ((assoc-ref %standard-phases 'unpack)
-                   #:source #$iris-test-data)
-                  (copy-recursively "test_data" "../iris/test_data")
-                  (chdir "..")
-                  (delete-file-recursively "source")
-                  ((assoc-ref %standard-phases 'check)
-                   #:tests? tests?
-                   #:test-flags test-flags)
-                  (delete-file-recursively "iris/test_data"))))))))
+          (add-before 'check 'pre-check
+            (lambda* (#:key inputs tests? #:allow-other-keys)
+              (when tests?
+                (setenv "HOME" "/tmp")
+                (setenv "OVERRIDE_TEST_DATA_REPOSITORY"
+                        (search-input-directory inputs "share/iris/test_data"))
+                (delete-file-recursively "lib")))))))
     (native-inputs
      (list netcdf ; for ncdump and ncgen
            nss-certs-for-test
-           python-affine
            python-distributed
            python-filelock
            python-imagehash
            python-pytest
            python-pytest-mock
-           python-pytest-xdist          ;for 'pytest -n'
-           python-rasterio
-           python-scitools-mo-pack
+           python-pytest-xdist
            python-setuptools
-           python-setuptools-scm))
+           python-setuptools-scm
+           specification-iris-test-data))
     (propagated-inputs
      (list python-cartopy
            python-cf-units
            python-cftime
            python-dask
-           ;; python-geovista ; optional, not packaged yet
            python-matplotlib
            python-netcdf4
            python-numpy
            python-pyproj
            python-scipy
            python-shapely
-           python-xxhash))
+           python-xxhash
+           ;; [optional]
+           python-affine
+           ;; python-esmpy        ;not packaged yet in Guix
+           ;; python-geovista     ;not packaged yet in Guix
+           python-graphviz
+           python-iris-sample-data
+           ;; python-nc-time-axis ;not packaged yet in Guix
+           python-pandas
+           ;; python-stratify     ;not packaged yet in Guix
+           python-rasterio
+           python-scitools-mo-pack))
     (home-page "https://github.com/SciTools/iris")
     (synopsis "Earth science data analysing and visualising library")
     (description
