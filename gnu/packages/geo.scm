@@ -2843,6 +2843,45 @@ tabular representations become unwieldy and inefficient.  Iris implements a
 data model based on the CF conventions.")
     (license license:lgpl3+)))
 
+(define-public python-iris-sample-data
+  (package
+    (name "python-iris-sample-data")
+    (version "2.5.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/SciTools/iris-sample-data")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0fc1d851rh9rrfi7sjcwpw7nh894caw3ra6nsfl8qk501scl74a6"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:tests? #f ;no tests
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-manifest.in
+            ;; See: <https://codeberg.org/guix/guix/issues/4393>.
+            (lambda* (#:key name source inputs #:allow-other-keys)
+              (let ((port (open-file "MANIFEST.in" "w")))
+                (for-each
+                 (lambda (file)
+                   (display "include " port)
+                   (display file port)
+                   (display "\n" port))
+                 (find-files "iris_sample_data"))
+                (close port))))))   )
+    (native-inputs
+     (list python-setuptools
+           python-setuptools-scm))
+    (home-page "https://github.com/SciTools/iris-sample-data")
+    (synopsis "Iris sample data")
+    (description
+     "This ppackage provides a store for the data used in the Iris examples.")
+    (license license:ogl-psi1.0)))
+
 (define-public python-scitools-mo-pack
   (package
     (name "python-scitools-mo-pack")
