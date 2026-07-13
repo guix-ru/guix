@@ -12142,7 +12142,7 @@ then IP sets may be the proper tool for you.")
 (define-public liburing
   (package
     (name "liburing")
-    (version "2.14")
+    (version "2.15")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -12151,7 +12151,7 @@ then IP sets may be the proper tool for you.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1xsrd1x3p5aidcmvhcqqjzgw283hjzrbz26ndpwd0i09dwrvhakd"))))
+                "1vq47c15fv60992qla7y9s3b52v958zkbfpr0hscji1n6bj6w4x0"))))
     (build-system gnu-build-system)
     (arguments
      `(;; Tests are dependent on kernel version and features
