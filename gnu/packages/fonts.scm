@@ -207,6 +207,37 @@ source code legibility.")
 typeface.  It is designed with an academic context in mind.")
       (license license:silofl1.1))))
 
+(define-public font-aldrich
+  (let ((commit "ec28a1d125f17139f1a0685025dc43a775bed76f")
+        (revision "1"))
+    (package
+      (name "font-aldrich")
+      (version (git-version "1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/librefonts/aldrich")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0291pm95n61a5cpjgy3fih1ym2r56s8pc2xrm3jpbha4j50x4dzw"))))
+      (build-system font-build-system)
+      (arguments
+       (list
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'install 'build
+              (lambda _
+                (invoke "ttx" "-o" "Aldrich-Regular.ttf"
+                        "Aldrich-Regular.ttf.ttx"))))))
+      (native-inputs (list python-fonttools))
+      (home-page "https://fonts.google.com/specimen/Aldrich")
+      (synopsis "Futuristic sans-serif display font")
+      (description
+       "Aldrich is a rounded yet rectangular sans-serif display typeface.")
+      (license license:silofl1.1))))
+
 (define-public font-arapey
   (let ((commit  "28fa45c7f31afe62f577b0b857570ab0326b9113")
         (revision "1"))
