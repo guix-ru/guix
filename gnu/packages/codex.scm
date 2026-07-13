@@ -81,7 +81,6 @@
                  "codex-0.144.1-remove-patch-sections.patch"
                  "codex-0.144.1-remove-libwebrtc.patch"
                  "codex-0.144.1-test-disable-network-model-refresh.patch"
-                 "codex-0.144.1-test-fd-cleanup.patch"
                  "codex-0.144.1-test-selected-capability-readiness.patch"
                  "codex-0.144.1-test-shebangs.patch"
                  "codex-0.144.1-test-timeout.patch"))))
