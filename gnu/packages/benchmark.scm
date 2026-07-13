@@ -899,7 +899,8 @@ user-provided Lua scripts.
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mpxyfwln1627zzi11fb6lgv7x1jz1p2w16w1mhhkdz1xsln6fj6"))))
+        (base32 "0mpxyfwln1627zzi11fb6lgv7x1jz1p2w16w1mhhkdz1xsln6fj6"))
+       (patches (search-patches "vkmark-2025.1-fix-vulkan-headers-1.4.333.patch"))))
     (build-system meson-build-system)
     (arguments
      (list
