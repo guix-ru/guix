@@ -21,7 +21,7 @@
 ;;; Copyright © 2024 Arun Isaac <arunisaac@systemreboot.net>
 ;;; Copyright © 2024 Wilko Meyer <w@wmeyer.eu>
 ;;; Copyright © 2024, 2025 David Elsing <david.elsing@posteo.net>
-;;; Copyright © 2025 Hennadii Stepanov <hebasto@gmail.com>
+;;; Copyright © 2025-2026 Hennadii Stepanov <hebasto@gmail.com>
 ;;; Copyright © 2025 Brendan Tildesley <mail@brendan.scot>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -671,7 +671,7 @@ This package also provides @samp{kdlpp}, a C++20 wrapper around @samp{ckdl}.")
 (define-public capnproto
   (package
     (name "capnproto")
-    (version "1.4.0")
+    (version "1.5.0")
     (source
      (origin
        (method git-fetch)
@@ -680,7 +680,7 @@ This package also provides @samp{kdlpp}, a C++20 wrapper around @samp{ckdl}.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17dmyq3v6xj2zphbr52rirbq7bwxw9gg0lalwsv03y8lkhw4ms0a"))))
+        (base32 "0p6zb9icy2cjj6y8bj2ai7csghak5aix8wld3jhvddf00diwb7fq"))))
     (build-system cmake-build-system)
     (arguments
      (list
