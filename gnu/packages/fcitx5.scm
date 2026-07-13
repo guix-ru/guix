@@ -96,7 +96,7 @@ client.")
 (define-public fcitx5
   (package
     (name "fcitx5")
-    (version "5.1.19")
+    (version "5.1.21")
     (source
      (origin
        (method url-fetch)
@@ -104,7 +104,7 @@ client.")
              "https://download.fcitx-im.org/fcitx5/fcitx5/fcitx5-"
              version "_dict.tar.zst"))
        (sha256
-        (base32 "1ngsadqdrwy99w63dmk493gg56j7r991v6pq1nwkx6apib9ykpc0"))
+        (base32 "0rgp5va3msxfx7yqp4fn3v0h6nc9knxs46g3v94ppi8i9zpd0j3q"))
        (snippet
         #~(begin
             (use-modules (guix build utils))
@@ -131,6 +131,7 @@ client.")
            libxkbfile
            nlohmann-json
            pango
+           plasma-wayland-protocols
            `(,util-linux "lib")         ;For libuuid.
            wayland
            wayland-protocols
