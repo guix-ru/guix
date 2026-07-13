@@ -200,6 +200,31 @@ The conversion of the JSON objects into tests within a specific language and
 test framework of choice is left to be done by the validator implementer.")
     (license license:expat)))
 
+(define-public specification-iris-test-data
+  (package
+    (name "specification-iris-test-data")
+    (version "2.28")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/SciTools/iris-test-data")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11pfd7jrmznvgcwwr4nfyd9w1rfx377svzlfzalbdcv7rhg2pcfx"))))
+    (build-system copy-build-system)
+    (arguments
+     '(#:install-plan '(("INDEX.md" "share/iris/")
+                        ("test_data" "share/iris/")
+                        ("version.txt" "share/iris/"))))
+    (home-page "https://scitools.org.uk/iris/docs/latest/")
+    (synopsis "Data and specs for Iris' tests")
+    (description
+     "This package provides a full Iris test data, it's artificially created
+data.")
+    (license license:ogl-psi1.0)))
+
 (define-public specification-multibase
   (let ((commit "4c8344e37852773de155f587dcf5897771b3fc19")
         (revision "1"))
