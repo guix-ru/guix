@@ -10155,8 +10155,8 @@ Emacs, inspired by @code{Dracula} theme.")
       (license license:gpl3+))))
 
 (define-public emacs-zig-mode
-  (let ((commit "f0b4a487530146f99230f4a5ff67e8d56c8f3f80")
-        (revision "2"))
+  (let ((commit "20e395f940afe1e19e965050b0284ec418d6a9d5")
+        (revision "3"))
     (package
       (name "emacs-zig-mode")
       (version (git-version "0.0.8" revision commit))
@@ -10164,11 +10164,11 @@ Emacs, inspired by @code{Dracula} theme.")
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://github.com/ziglang/zig-mode")
+               (url "https://codeberg.org/ziglang/zig-mode")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1cm4wvddvqyjhlp7wngls1lapsiq1n14qgi1ygiq3w2vryg96s1v"))))
+          (base32 "1nsm7z246sd48dvz6x10z9psshs87nk7n3mcpvgx4w32h2q3hiq7"))))
       (build-system emacs-build-system)
       (arguments
        (list
@@ -10178,7 +10178,7 @@ Emacs, inspired by @code{Dracula} theme.")
                                "-l" "test/zig-tests.el"
                                "-f" "ert-run-tests-batch-and-exit")))
       (propagated-inputs (list emacs-reformatter))
-      (home-page "https://github.com/ziglang/zig-mode/")
+      (home-page "https://codeberg.org/ziglang/zig-mode/")
       (synopsis "Zig mode for Emacs")
       (description
        "This package provides syntax highlighting and automatic indentation
