@@ -2614,20 +2614,25 @@ separate, named tab groups.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-commands
             (lambda* (#:key inputs #:allow-other-keys)
-              (make-file-writable "dicom.el")
               (let ((convert (search-input-file inputs "/bin/convert"))
                     (dcm2img (search-input-file inputs "/bin/dcm2img"))
                     (dcm2xml (search-input-file inputs "/bin/dcm2xml")))
                 (substitute* "dicom.el"
-                  (("(^|[^`])dcm2img" _ start)
-                   (string-append start dcm2img))
-                  (("\"dcm2xml")
-                   (string-append "\"" dcm2xml))
+                  (("\"dcm2img") (string-append "\"" dcm2img))
+                  (("\"dcm2xml") (string-append "\"" dcm2xml)))
+                (substitute* "dicom-convert.sh"
+                  (("dcm2img") dcm2img)
                   ;; Guix has ImageMagick 6.
-                  (("(^|[^`])magick" _ start)
-                   (string-append start convert))))))
+                  (("magick") convert)))))
           (add-before 'install 'makeinfo
-            (lambda _ (emacs-makeinfo))))))
+            (lambda _ (emacs-makeinfo)))
+          (add-after 'install 'install-script
+            (lambda _
+              (install-file "dicom-convert.sh"
+                            ;; The script is located using 'locate-library'.
+                            (string-append #$output
+                                           "/share/emacs/site-lisp/dicom-"
+                                           #$version)))))))
     (native-inputs (list texinfo))
     (inputs (list dcmtk imagemagick))
     (propagated-inputs (list emacs-compat))
