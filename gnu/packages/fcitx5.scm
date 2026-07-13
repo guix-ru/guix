@@ -463,14 +463,14 @@ backend.")
 (define-public fcitx5-chewing
   (package
     (name "fcitx5-chewing")
-    (version "5.1.11")
+    (version "5.1.12")
     (source (origin
               (method git-fetch)
               (uri (git-reference
                     (url "https://github.com/fcitx/fcitx5-chewing")
                     (commit version)))
               (sha256
-               (base32 "1x4a4vcb7vg9dx0f2bjrb2v6dcr8cwxnm8gdd47fkxqn890rgrnc"))
+               (base32 "027f6xfarbgy80vqhpfkk0risji5l72kyl3wkb8q7hpmfj99l42q"))
               (file-name (git-file-name name version))))
     (build-system cmake-build-system)
     (arguments
