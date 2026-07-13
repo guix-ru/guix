@@ -553,7 +553,7 @@ including input methods previous bundled inside Fcitx 4:
 (define-public fcitx5-configtool
   (package
     (name "fcitx5-configtool")
-    (version "5.1.13")
+    (version "5.1.14")
     (source
      (origin
        (method url-fetch)
@@ -561,7 +561,7 @@ including input methods previous bundled inside Fcitx 4:
              "https://download.fcitx-im.org/fcitx5"
              "/fcitx5-configtool/fcitx5-configtool-" version ".tar.zst"))
        (sha256
-        (base32 "1sr8ri68qbkgvnj9pr5yw680zq506h26ymfmyz7ihw5ri14a6klr"))))
+        (base32 "0k8jyv7axlksdswpy0n3pllvkg5qcaljh1zb37fykqx05sx4cbaw"))))
     (build-system qt-build-system)
     (arguments
      (list #:qtbase qtbase
