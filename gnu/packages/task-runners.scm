@@ -4,6 +4,8 @@
 ;;; Copyright © 2024-2025 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2025 Junker <dk@junkeria.club>
+;;; Copyright © 2026 Ryan Prior <rprior@protonmail.com>
+;;; Copyright © 2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -150,3 +152,38 @@ using a Runfile.")
      "Task spooler lets users run shell commands asynchronously one after the
 other in a separate process.")
     (license license:gpl2+)))
+
+(define-public xc
+  (package
+    (name "xc")
+    (version "0.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/joerdav/xc")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0m8r2mf98f6b6pzjaadg46y5j96byif4ybn5aczlzg7v64yi3v44"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:import-path "github.com/joerdav/xc/cmd/xc"
+      #:unpack-path "github.com/joerdav/xc"
+      #:test-subdirs #~(list "../../...")))
+    (native-inputs
+     (list go-github-com-charmbracelet-bubbles
+           go-github-com-charmbracelet-bubbletea
+           go-github-com-charmbracelet-lipgloss
+           go-github-com-google-shlex
+           go-github-com-posener-complete-v2
+           go-mvdan-cc-sh-v3))
+    (home-page "https://xcfile.dev/")
+    (synopsis "Documentation-oriented task runner")
+    (description
+     "@code{xc} is a task runner inspired by @code{Make} and @code{npm run}
+that aims to be discoverable and approachable by fully integrating with
+project documentation.")
+    (license license:expat)))
