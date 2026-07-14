@@ -370,8 +370,8 @@ operations in 3D space.")
   (sbcl-package->clasp-package sbcl-3d-matrices))
 
 (define-public sbcl-3d-quaternions
-  (let ((commit "f477801d1c85020f8173d2951a54e7be10460048")
-        (revision "1"))
+  (let ((commit "225cb40155dfb5a242e7162e7a7836ca487e92ce")
+        (revision "2"))
     (package
       (name "sbcl-3d-quaternions")
       (version (git-version "1.0.0" revision commit))
@@ -383,7 +383,7 @@ operations in 3D space.")
                (commit commit)))
          (file-name (git-file-name "cl-3d-quaternions" version))
          (sha256
-          (base32 "1vyagfn432d8gzhfcg1wy38zygks78by8q75qiybv4iarg41lm8i"))))
+          (base32 "0bfy9isd5dp2yv63nl7klg4amrkbkwk679fsdkjgfri7026zgh2f"))))
       (build-system asdf-build-system/sbcl)
       (native-inputs
        (list sbcl-parachute))
