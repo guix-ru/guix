@@ -979,7 +979,7 @@ Open Container Initiative specification.")
 (define-public libslirp
   (package
     (name "libslirp")
-    (version "4.9.1")
+    (version "4.9.3")
     (source
      (origin
        (method git-fetch)
@@ -987,7 +987,7 @@ Open Container Initiative specification.")
              (url "https://gitlab.freedesktop.org/slirp/libslirp")
              (commit (string-append "v" version))))
        (sha256
-        (base32 "1jlqda5k5wm0ql0fymkr3dbf1d71gxcj7896r8mz8s1i264gg8rh"))
+        (base32 "1rk2awamb4y59qf09bx2ccsw1a4xpjc9ri0xrwjyb1jyxrsgg6ja"))
        (file-name (git-file-name name version))))
     (build-system meson-build-system)
     (propagated-inputs
