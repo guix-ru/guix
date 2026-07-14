@@ -25178,6 +25178,30 @@ for testing purposes.")
      "@code{refmt} is a serialization and object-mapping library.")
     (license license:expat)))
 
+(define-public go-github-com-posener-autogen
+  (package
+    (name "go-github-com-posener-autogen")
+    (version "0.0.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/posener/autogen")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1rs89m2z271mgw44wqr9spyidhqjiapx02h1m0nyfy70q6kkv3pb"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/posener/autogen"))
+    (propagated-inputs
+     (list go-github-com-posener-script))
+    (home-page "https://github.com/posener/autogen")
+    (synopsis "Generate files from templates")
+    (description "Package autogen automatically generates files from templates.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-posener-complete
   (package
     (name "go-github-com-posener-complete")
