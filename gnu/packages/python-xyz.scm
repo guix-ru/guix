@@ -186,6 +186,7 @@
 ;;; Copyright © 2026 John Dawson <dawson.john.andrew@gmail.com>
 ;;; Copyright © 2026 Kevin Deldycke <kevin@deldycke.com>
 ;;; Copyright © 2026 Ryan Desfosses <rdesfo@sdf.org>
+;;; Copyright © 2026 nick <nicholascaitong@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -2328,6 +2329,34 @@ generator and the generated types for LSP.")
     (description
      "This package provides static memory-efficient and fast Trie-like structures
 for Python.")
+    (license license:expat)))
+
+(define-public python-materialyoucolor
+  (package
+    (name "python-materialyoucolor")
+    (version "3.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/T-Dynamos/materialyoucolor-python")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1yxz05g681zpvxzfcvp4dwayq8hjvw773n4lixkhgxkvvan5hah8"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:test-backend #~'custom
+           #:test-flags #~(list "tests/test_all.py")))
+    (propagated-inputs (list python-pillow))
+    (native-inputs (list pybind11 python-psutil python-rich python-setuptools))
+    (home-page "https://github.com/T-Dynamos/materialyoucolor-python")
+    (synopsis "Material You color generation algorithms")
+    (description
+     "@code{python-materialyoucolor} provides a tool that generates harmonious
+color palettes from the dominant colors of an image, based on the
+@uref{https://m3.material.io/styles/color/system/overview, Material color
+system}.")
     (license license:expat)))
 
 (define-public python-menuinst
