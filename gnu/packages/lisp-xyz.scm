@@ -149,8 +149,8 @@
   #:use-module (srfi srfi-19))
 
 (define-public sbcl-3b-bmfont
-  (let ((commit "332c2262705f161627fc18add0310451a42799af")
-        (revision "3"))
+  (let ((commit "056025a28e07265f69bb691397beb2f903099080")
+        (revision "4"))
     (package
       (name "sbcl-3b-bmfont")
       (version (git-version "0.0.1" revision commit))
@@ -162,7 +162,7 @@
                (commit commit)))
          (file-name (git-file-name "cl-3b-bmfont" version))
          (sha256
-          (base32 "11wnqa1wx9vji6cmxl5m5qnf12mqc6n7d5g8038r1wayq88bxia6"))))
+          (base32 "1zmkmhw8ma2j8p6crw0x6am6fx95rxkb1n3fqlgvs2rxdk273dan"))))
       (build-system asdf-build-system/sbcl)
       (arguments
        `(#:asd-systems '("3b-bmfont"
@@ -177,6 +177,8 @@
              sbcl-jsown
              sbcl-parse-number
              sbcl-split-sequence))
+      (native-inputs
+       (list sbcl-parachute))
       (home-page "https://github.com/3b/3b-bmfont/")
       (synopsis "Read/write bmfont metadata files")
       (description
