@@ -81,6 +81,7 @@
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 Luca Kredel <luca.kredel@web.de>
 ;;; Copyright © 2026 Orahcio Felício de Sousa <orahcio@gmail.com>
+;;; Copyright © 2026 Ryan Prior <rprior@protonmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -25204,6 +25205,33 @@ for testing purposes.")
      "Package complete provides a tool for bash writing bash completion in go,
 and bash completion for the go command line.")
     (license license:expat)))
+
+(define-public go-github-com-posener-script
+  (package
+    (name "go-github-com-posener-script")
+    (version "1.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/posener/script")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ypwapapz9q88ls3vd943qqqvxfxvscy1hfn06w695a7q4bmcgd1"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/posener/script"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/posener/script")
+    (synopsis "Helper functions to write scripts using Golang")
+    (description
+     "This package provides helper functions to write scripts, such as reading
+files, executing subprocesses, counting lines, and matching strings.  It was
+inspired by @url{https://github.com/bitfield/script}.")
+    (license license:asl2.0)))
 
 (define-public go-github-com-pquerna-otp
   (package
