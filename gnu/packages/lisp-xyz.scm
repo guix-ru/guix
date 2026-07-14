@@ -29582,8 +29582,8 @@ on top of Hunchentoot.")
   (sbcl-package->ecl-package sbcl-simple-routes))
 
 (define-public sbcl-simple-tasks
-  (let ((commit "745d4b54eac9bf5d6909792e63ecd2ef8d303cf2")
-        (revision "1"))
+  (let ((commit "fc6f36987656ddc8f588a1e6d8e8c3bab40c472f")
+        (revision "2"))
     (package
       (name "sbcl-simple-tasks")
       (version (git-version "1.3.0" revision commit))
@@ -29595,7 +29595,7 @@ on top of Hunchentoot.")
                (commit commit)))
          (file-name (git-file-name "simple-tasks" version))
          (sha256
-          (base32 "1ls1pij7dvb65g4nam7nvik1218jvfk5iplr48vy290fw3lq7v98"))))
+          (base32 "0x2i8qmvs6w20cqhjxibwxypk08dghiiqy5mgq124rijs04fn3lj"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-array-utils sbcl-bordeaux-threads sbcl-dissect))
