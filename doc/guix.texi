@@ -51235,7 +51235,7 @@ by using the @code{dhcpcd-service-type} service type.
 
 As an alternative to the default @command{qemu} graphical client you can
 use the @command{remote-viewer} from the @command{virt-viewer} package.  To
-connect pass the @command{-spice port=5930,disable-ticketing} flag to
+connect pass the @command{-spice port=5930,disable-ticketing=on} flag to
 @command{qemu}.  See previous section for further information on how to do this.
 
 Spice also allows you to do some nice stuff like share your clipboard with your
