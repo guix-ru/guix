@@ -38110,6 +38110,33 @@ final figures for submission to journals.  So far it supports arbitrary
 placement and scaling of SVG figures and adding markers, such as labels.")
     (license license:expat)))
 
+(define-public python-svgwrite
+  ;; XXX: Unmaintained since <2022-07-14>, used by python-qrbill.
+  (package
+    (name "python-svgwrite")
+    (version "1.4.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mozman/svgwrite")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "14nvgsdhndpsgqlcp1vbmczd7rfyiddhjav2xja0a0rx2472psxq"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; Disable test which wants internet.
+      #:test-flags
+      #~(list "-k" "not test_embed_google_web_font")))
+    (native-inputs (list python-pytest python-setuptools))
+    (home-page "https://github.com/mozman/svgwrite")
+    (synopsis "Python library to create SVG drawings")
+    (description
+     "This package provides a Python library to create SVG drawings.")
+    (license license:expat)))
+
 (define-public python-swagger-spec-validator
   (package
     (name "python-swagger-spec-validator")
