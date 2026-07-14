@@ -197,7 +197,7 @@ reptyr to grab it, and then kill the @code{ssh} session and head on home.")
 (define-public screen
   (package
     (name "screen")
-    (version "5.0.1")
+    (version "5.0.2")
     (source (origin
              (method git-fetch)
              (uri (git-reference
@@ -206,15 +206,7 @@ reptyr to grab it, and then kill the @code{ssh} session and head on home.")
              (file-name (git-file-name name version))
              (patches (search-patches "screen-hurd-path-max.patch"))
              (sha256
-              (base32 "1km6qbczlvzwcaagb8fy65k5z6ywn2whw57wdkfxg9dh9kg39hg7"))
-             (snippet
-              #~(begin (use-modules (guix build utils))
-                       ;; Fixes https://savannah.gnu.org/bugs/?67126.
-                       ;; Can be removed with 5.0.2?
-                       (with-fluids ((%default-port-encoding #f))
-                         (substitute* "src/doc/screen.texinfo"
-                           (("alexander_naumov@opensuse.org")
-                            "alexander_naumov@@opensuse.org")))))))
+              (base32 "019v1cwgn3l0sivajphjk1n7qnbfmzwq3qsgpb30lv7fprvawq67"))))
     (build-system gnu-build-system)
     (native-inputs
      (list autoconf-2.71 automake texinfo))
