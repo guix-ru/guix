@@ -15,6 +15,7 @@
 ;;; Copyright © 2022 Maxim Cournoyer <maxim.counoyer@gmail.com>
 ;;; Copyright © 2023, 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2024 Felix Gruber <felgru@posteo.net>
+;;; Copyright © 2026 Tomás Ortín Fernández (quanrong) <quanrong@mailbox.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -402,7 +403,7 @@ additional metadata about the object to which the docstring belongs.")
 (define-public zeal
   (package
     (name "zeal")
-    (version "0.7.2")
+    (version "0.8.1")
     (source
      (origin
        (method git-fetch)
@@ -411,7 +412,7 @@ additional metadata about the object to which the docstring belongs.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1slq3asssszim9y4lvqx08svilmyisk3cl35mmb676fsx7pningn"))))
+        (base32 "02bbg2m50awhbf5vyfnx2843fbvlpbvc08yr4q4n4dvfp7skqs0l"))))
     (build-system qt-build-system)
     (arguments
       (list
