@@ -2782,6 +2782,7 @@ from multiple records.")
             (lambda* (#:key inputs tests? #:allow-other-keys)
               (when tests?
                 (setenv "HOME" "/tmp")
+                (setenv "TMP_DIR" "/tmp")
                 (setenv "OVERRIDE_TEST_DATA_REPOSITORY"
                         (search-input-directory inputs "share/iris/test_data"))
                 (delete-file-recursively "lib")))))))
