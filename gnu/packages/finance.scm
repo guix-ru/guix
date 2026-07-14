@@ -2516,6 +2516,38 @@ and manipulation.")
 files.")
     (license license:bsd-3)))
 
+(define-public python-qrbill
+  (package
+    (name "python-qrbill")
+    ;; Version 1.2.0 is broken.
+    ;; See: <https://github.com/claudep/swiss-qr-bill/issues/108>.
+    (version "1.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/claudep/swiss-qr-bill")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1zsb90bvw62q4miv9wzarfkm4f6p2aivx4nnwxplpyjg73kylqqs"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools))
+    (propagated-inputs
+     (list python-iso3166
+           python-stdnum
+           python-qrcode
+           python-svgwrite))
+    (home-page "https://github.com/claudep/swiss-qr-bill")
+    (synopsis "Python library and application for generating Swiss QR-bills")
+    (description
+     "@code{qrbill} generates Swiss QR-bill payment slips.
+  It can be used as a stand-alone @acronym{CLI, Command Line Interface} as
+well as a Python library.")
+    (license license:expat)))
+
 (define-public xmrig
   (package
     (name "xmrig")
