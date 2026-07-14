@@ -25230,6 +25230,38 @@ for testing purposes.")
 and bash completion for the go command line.")
     (license license:expat)))
 
+(define-public go-github-com-posener-complete-v2
+  (package
+    (inherit go-github-com-posener-complete)
+    (name "go-github-com-posener-complete-v2")
+    (version "2.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/posener/complete")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0cij9m33ncpx3hphxkllpc1yc151dw3r6l8vgp9jvm6f941a8lhy"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/posener/complete/v2"
+      #:test-flags #~(list "-vet=off")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'remove-test
+            (lambda* (#:key tests? import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                ;; Tests depend on questionable module "bou.ke/monkey" which
+                ;; is archived and has no a clear license.
+                (delete-file "gocomplete/tests_test.go")))))))
+    (propagated-inputs
+     (list go-github-com-hashicorp-go-multierror
+           go-github-com-posener-script
+           go-github-com-posener-autogen))))
+
 (define-public go-github-com-posener-script
   (package
     (name "go-github-com-posener-script")
