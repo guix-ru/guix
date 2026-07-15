@@ -133,6 +133,12 @@ exec $pre_inst_env_maybe guix repl -- "$0" "$@"
 ;;; Forgejo support.
 ;;;
 
+(define-json-mapping <forgejo-validation-error>
+  forgejo-validation-error forgejo-validation-error?
+  json->forgejo-validation-error
+  (message    forgejo-validation-error-message)
+  (url        forgejo-validation-error-url))
+
 ;; Forgejo team.  This corresponds to both the 'Team' and 'CreateTeamOption'
 ;; structures in Forgejo.
 (define-json-mapping <forgejo-team>
@@ -204,7 +210,8 @@ exec $pre_inst_env_maybe guix repl -- "$0" "$@"
   forgejo-error?
   (url       forgejo-error-url)
   (method    forgejo-error-method)
-  (response  forgejo-error-response))
+  (response  forgejo-error-response)
+  (api-error forgejo-error-api-error))
 
 (define %codeberg-organization
   ;; Name of the organization at codeberg.org.
@@ -257,11 +264,15 @@ PARAMETERS."
              (let ((value (deserialize port)))
                (when port (close-port port))
                value)
-             (begin
+             (let ((error (and (= 422 (response-code response))
+                               port
+                               (false-if-exception
+                                (json->forgejo-validation-error port)))))
                (when port (close-port port))
                (raise (condition (&forgejo-error (url url)
                                                  (method 'verb)
-                                                 (response response)))))))))
+                                                 (response response)
+                                                 (api-error error)))))))))
     ((_ (proc parameters ...)
         docstring
         (method components ...)
