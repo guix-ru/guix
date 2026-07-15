@@ -37,11 +37,13 @@
   #:use-module (guix build-system perl)
   #:use-module (gnu packages)
   #:use-module (gnu packages admin)
+  #:use-module (gnu packages autotools)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages image)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages readline)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)
@@ -366,6 +368,49 @@ interfaces (GUIs) in the Tcl language.")
     (description "Tcllib, the standard Tcl library, is a collection of common
 utility functions and modules all written in high-level Tcl.")
     (license (package-license tcl))))
+
+(define-public tclreadline
+  (package
+    (name "tclreadline")
+    (version "2.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/flightaware/tclreadline")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0hpqiw6rppihax72n99xpi48jl1jdjygnipk477winr6q0k10lp8"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; See README.Linux.
+          (add-before 'configure 'pre-config
+            (lambda _
+              (invoke "libtoolize" "--force" "--install" "--copy")
+              (invoke "aclocal")
+              (invoke "autoheader")
+              (invoke "automake" "--force-missing" "--add-missing" "--copy")
+              (invoke "autoconf"))))
+      #:configure-flags
+      #~(list (string-append "--with-tcl=" #$(this-package-input "tcl") "/lib")
+              (string-append "--with-tk=" #$(this-package-input "tk") "/lib")
+              (string-append "--with-readline-includes="
+                             #$(this-package-input "readline")
+                             "/include/readline"))))
+    (native-inputs
+     (list autoconf-2.71 automake libtool))
+    (inputs (list tcl tk readline))
+    (home-page "https://github.com/flightaware/tclreadline")
+    (synopsis "Readline support for Tcl")
+    (description
+     "Tclreadline provides @code{readline} support for interactive Tcl shells,
+including command-line editing, history, and completion.")
+    (license license:bsd-3)))
 
 (define-public tklib
   (package
