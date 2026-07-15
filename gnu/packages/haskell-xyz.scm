@@ -2394,17 +2394,17 @@ human-readable error messages when things go wrong.")
 (define-public ghc-config-schema
   (package
     (name "ghc-config-schema")
-    (version "1.2.2.0")
+    (version "1.3.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "config-schema" version))
        (sha256
-        (base32 "10mp76j2gxcb51865lb6cf3nkc2nc7fwarkghb6yz71q6sbrg3yx"))))
+        (base32 "1j5br9y4s51ajxyg4aldibywqhf4qrxhrypac8jgca2irxdwb29w"))))
     (build-system haskell-build-system)
     (arguments
-     `(#:cabal-revision ("3"
-                         "16rwj3vcafq4fqqh5rq1na1g4syk63kki2gjinb6yj3h8s59vpp7")))
+     `(#:cabal-revision ("7"
+                         "19yg0k7cixxfhwxfdyy6js7rgfiy8ag8n8n3wlbkcsacl3r4jwca")))
     (inputs
      (list ghc-config-value
            ghc-free
