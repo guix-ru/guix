@@ -2887,7 +2887,7 @@ The following features are currently available:
            (string-append "-DBUILD_SHARED_LIBS=YES")
            "-B./build")))
       (native-inputs (list bison flex swig-4.4))
-      (inputs (list cudd eigen tcl tcllib zlib))
+      (inputs (list cudd eigen tcl tcllib tclreadline zlib))
       (synopsis "Parallax Static Timing Analyzer")
       (description
        "OpenSTA is a gate level static timing verifier.  As a stand-alone
