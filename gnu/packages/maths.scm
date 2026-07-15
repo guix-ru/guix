@@ -7768,23 +7768,21 @@ in finite element programs.")
         python
         zlib))
     (arguments
-     `(;; The 'share/flann/octave' contains a .mex file, which is an ELF file
+     (list
+       #:tests? #f ; The test data are downloaded from the Internet.
+       ;; The 'share/flann/octave' contains a .mex file, which is an ELF file
        ;; taken 46 MiB unstripped, and 6 MiB stripped.
-       #:strip-directories '("lib" "lib64" "libexec"
-                             "bin" "sbin" "share/flann/octave")
-
-       ;; Save 12 MiB by not installing .a files.  Passing
+       #:strip-directories #~(list "lib" "lib64" "libexec"
+                                   "bin" "sbin" "share/flann/octave")
+       ;; Save 10 MiB by not installing .a files.  Passing
        ;; '-DBUILD_STATIC_LIBS=OFF' has no effect.
-       #:phases (modify-phases %standard-phases
-                  (add-after 'install 'remove-static-libraries
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let* ((out (assoc-ref outputs "out"))
-                             (lib (string-append out "/lib")))
-                        (for-each delete-file
-                                  (find-files lib "\\.a$"))
-                        #t))))
-
-       #:tests? #f)) ; The test data are downloaded from the Internet.
+       #:phases
+       #~(modify-phases %standard-phases
+           (add-after 'install 'remove-static-libraries
+             (lambda _
+               (let ((lib (string-append #$output "/lib")))
+                 (for-each delete-file
+                           (find-files lib "\\.a$"))))))))
     (synopsis "Library for approximate nearest neighbors computation")
     (description "FLANN is a library for performing fast approximate
 nearest neighbor searches in high dimensional spaces.  It implements a
