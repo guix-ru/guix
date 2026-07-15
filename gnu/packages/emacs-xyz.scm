@@ -1140,8 +1140,8 @@ agentically, with any LLM.")
 
 (define-public emacs-gptel-prompts
   ;; No releases.
-  (let ((commit "f6d590c70dd2a1bab4426e2d4e51543e9953feb2")
-        (revision "3"))
+  (let ((commit "be29a9aa471e5f398cb5e1c2ce9f40a9f2b36281")
+        (revision "4"))
     (package
       (name "emacs-gptel-prompts")
       (version (git-version "1.0" revision commit))
@@ -1152,10 +1152,17 @@ agentically, with any LLM.")
                 (commit commit)))
          (method git-fetch)
          (sha256
-          (base32 "1gnv2kzs09xzdywckwscg7sz3ay8904gj19k6vbwrmh7isyygxan"))
+          (base32 "0k72qbnnhdp17lg1ljnp8181qw2v6j6iq3xmky4yvq6gk1y7gkkb"))
          (file-name (git-file-name name version))))
       (build-system emacs-build-system)
-      (arguments (list #:tests? #f))    ;no tests
+      (arguments
+       (list
+        #:test-command
+        #~(list "emacs" "-Q" "--batch"
+                "-l" "test/gptel-prompts-test.el"
+                "-l" "test/gptel-prompts-bench.el"
+                "-l" "test/gptel-prompts-fuzz.el"
+                "-f" "ert-run-tests-batch-and-exit")))
       (propagated-inputs (list emacs-gptel))
       (home-page "https://github.com/jwiegley/gptel-prompts/")
       (synopsis "Alternative Gptel directives management")
