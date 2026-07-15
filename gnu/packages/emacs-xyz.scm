@@ -18832,6 +18832,28 @@ convenient interface to your recently and most frequently used commands.  And
 to all the other commands, too.")
     (license license:gpl3+)))
 
+(define-public emacs-just-mode
+  (package
+    (name "emacs-just-mode")
+    (version "0.1.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/leon-barrett/just-mode.el")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1czf779akdcx72ma7x9v70kjbic73312fi1czbzvlvxr01pjpyj0"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f)) ; no tests
+    (home-page "https://github.com/leon-barrett/just-mode.el")
+    (synopsis "Justfile editing mode")
+    (description
+     "This package provides a major mode for editing justfiles, as defined by the tool
+\"just\" (@url{https://github.com/casey/just}).")
+    (license license:gpl3+)))
+
 (define-public emacs-js2-mode
   (package
     (name "emacs-js2-mode")
