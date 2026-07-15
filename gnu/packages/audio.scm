@@ -5056,6 +5056,65 @@ contents of one source file moved into a header file (and set as inline) to
 make the library header-only, and with the test folder removed.")
       (license license:wtfpl2))))
 
+(define-public tuning-library
+  (package
+    (name "tuning-library")
+    (version "1.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/surge-synthesizer/tuning-library")
+             (commit (string-append "release_" version))))
+       (file-name (git-file-name name version))
+       (patches
+        (search-patches
+         "tuning-library-1.1.0-add-missing-cstring-include.patch"))
+       (sha256
+        (base32 "0f7915xn61sqbdla1zamjd2nkbvdzlm162dmqap2j40yhra73q65"))
+       (modules '((guix build utils)))
+       ;; Unbundle catch2.
+       (snippet
+        '(begin
+           (delete-file-recursively "libs")
+           (substitute* "tests/alltests.cpp"
+             (("#include \"catch2.hpp\"") "#include <catch2/catch.hpp>"))))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:modules
+      '((guix build cmake-build-system)
+        (guix build utils)
+        (srfi srfi-26))                 ;for cute
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                (with-directory-excursion "../source"
+                  (invoke "../build/tuning-library-tests" "-a")
+                  (invoke "../build/tuning-library-symbolcheck")))))
+          (replace 'install
+            (lambda _
+              (for-each (cute install-file <>
+                              (string-append #$output "/bin"))
+                        '("showmapping" "parsecheck"))
+              (with-directory-excursion "../source"
+                (with-directory-excursion "include"
+                  (for-each (cute install-file <>
+                                  (string-append #$output "/include"))
+                            '("Tunings.h" "TuningsImpl.h")))
+                (install-file "README.md"
+                              (string-append #$output
+                                             "/share/doc/tuning-library"))))))))
+    (native-inputs (list catch2-2))
+    (home-page "https://github.com/surge-synthesizer/tuning-library")
+    (synopsis "C Library for micro-tuning and frequency finding")
+    (description
+     "Tuning Library is a header-only C library for micro-tuning format
+parsing and frequency finding.")
+    (license license:expat)))
+
 (define-public redumper
   (package
     (name "redumper")

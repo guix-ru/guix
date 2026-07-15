@@ -2575,6 +2575,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/trytond-add-guix_trytond_path.patch	\
   %D%/packages/patches/ttf2eot-cstddef.patch			\
   %D%/packages/patches/tuir-python-3.12-support.patch	\
+  %D%/packages/patches/tuning-library-1.1.0-add-missing-cstring-include.patch	\
   %D%/packages/patches/tuxpaint-stamps-path.patch		\
   %D%/packages/patches/tvm_fix_cpptest_build.patch              \
   %D%/packages/patches/twinkle-bcg729.patch			\
