@@ -1142,10 +1142,8 @@ packages (e.g. Astronomy, Chemistry, Math, Physics etc.)"
 (define-team security-response
   (team 'security-response
         #:name "Guix security response team"
-        #:description "Members of this team read the private
-guix-security@gnu.org email address, coordinate the development of security
-fixes with the relevant people, and coordinate the publication of security
-advisories.  Its members are listed at https://guix.gnu.org/security/ ."))
+        #:description "Security response team: \
+https://guix.gnu.org/security/ ."))
 
 (define-team sugar
   (team 'sugar
