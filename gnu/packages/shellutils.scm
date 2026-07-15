@@ -440,6 +440,52 @@ all of the regexes given on the command line in order.")
     (home-page "https://github.com/rupa/z")
     (license license:expat)))
 
+(define-public shadowenv
+  (package
+    (name "shadowenv")
+    (version "3.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Shopify/shadowenv")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1lyf1anvr7kkvchxh80dk974pamcc5v2vh1j2024s5x39yvhxfyl"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:imported-modules
+      (append %cargo-build-system-modules
+              %copy-build-system-modules)
+      #:modules
+      '((guix build cargo-build-system)
+        ((guix build copy-build-system) #:prefix copy:)
+        (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-home
+            ;; Tests require a writable HOME.
+            (lambda _
+              (setenv "HOME" "/tmp")))
+          (add-after 'install 'install-manpages
+             (lambda args
+               (apply (assoc-ref copy:%standard-phases 'install)
+                      #:install-plan
+                      '(("man" "share/"))
+                      args))))))
+    (inputs (cargo-inputs 'shadowenv))
+    (home-page "https://shopify.github.io/shadowenv/")
+    (synopsis "Reversible directory-local environment variable manipulations")
+    (description
+     "Shadowenv is a project-local environment variable manager.  It
+manipulates the environment by scanning @file{.shadowenv.d/} directories and
+loading any @file{*.lisp} files written in Shadowlisp, a domain-specific
+LISP-1 dialect.")
+    (license license:expat)))
+
 (define-public shfmt
   (package
     (name "shfmt")
