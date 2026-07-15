@@ -1573,7 +1573,7 @@ sequences that lead from a given start lanelet to some goal lanelet(s).")
 (define-public sumo
   (package
     (name "sumo")
-    (version "1.25.0")
+    (version "1.27.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1584,7 +1584,7 @@ sequences that lead from a given start lanelet to some goal lanelet(s).")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0nqz4izbwgbpz3xwx0mczagilhf06jxxpr3pmr7axjk80yk1r4ri"))))
+                "0l2bqxs5xjxx23aagxw5wvr1sz325ldnyx1l5gvhbvhvpxqg64xh"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -1619,7 +1619,7 @@ sequences that lead from a given start lanelet to some goal lanelet(s).")
                   python
                   xerces-c
                   zlib))
-    (native-inputs (list googletest-1.8 python))
+    (native-inputs (list googletest python))
     (home-page "https://eclipse.org/sumo")
     (synopsis "Traffic simulator")
     (description "@acronym{SUMO, Simulation of Urban MObility} is a traffic
