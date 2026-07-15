@@ -145,7 +145,7 @@ exec $pre_inst_env_maybe guix repl -- "$0" "$@"
   forgejo-team forgejo-team?
   json->forgejo-team <=> forgejo-team->json
   (name                forgejo-team-name)
-  (id                  forgejo-team-id)           ;integer
+  (id                  forgejo-team-id)           ;integer | *unspecified*
   (description         forgejo-team-description)
   (all-repositories?   forgejo-team-all-repositories?
                        "includes_all_repositories")
@@ -372,7 +372,7 @@ PARAMETERS."
 (define (team->forgejo-team team)
   "Return a Forgejo team derived from TEAM, a <team> record."
   (forgejo-team (team-id->forgejo-id (team-id team))
-                #f
+                *unspecified*                     ;no numeric ID initially
                 (or (team-description team) "")
                 #f                                ;all-repositories?
                 #f                                ;can-create-org-repository?
