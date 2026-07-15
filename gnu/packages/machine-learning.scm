@@ -682,7 +682,7 @@ distributions.")
                 (when tests?
                   (with-directory-excursion "tests"
                     (invoke "./fann_tests"))))))))
-      (native-inputs (list googletest-1.8))
+      (native-inputs (list googletest-1.13))
       (home-page "https://leenissen.dk/")
       (synopsis "Fast Artificial Neural Network")
       (description
