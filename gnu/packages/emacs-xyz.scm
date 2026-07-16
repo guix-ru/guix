@@ -11346,7 +11346,7 @@ package included with Emacs.")
 (define-public emacs-vhdl-ts-mode
   (package
     (name "emacs-vhdl-ts-mode")
-    (version "0.3.2")
+    (version "0.3.3")
     (source
      (origin
        (method git-fetch)
@@ -11355,7 +11355,7 @@ package included with Emacs.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x11sjiy3j43am0clwxsbx7b38pfsl74qgypkc3czs7dh1c5xyrx"))))
+        (base32 "0y41cva3qknisxnskmn1s15r3ja2hcf4bbzc5nx1z9xk2ndh8rzf"))))
     (build-system emacs-build-system)
     (arguments
      (list
