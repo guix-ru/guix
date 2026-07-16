@@ -3626,7 +3626,7 @@ be accessible and easy to use in many contexts.")
 (define-public python-scikit-surprise
   (package
     (name "python-scikit-surprise")
-    (version "1.1.4")
+    (version "1.1.5")
     (source
      (origin
        (method git-fetch)
@@ -3635,7 +3635,7 @@ be accessible and easy to use in many contexts.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15ckx2i41vs21sa3yqyj12zr0h4zrcdf3lrwcy2c1cq2bjq7mnvz"))))
+        (base32 "1jw05xb8w7d5vx0v8gjd51a5bp1zwqy5adcpaf8fy5mfrdjn6hpp"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -3649,12 +3649,12 @@ be accessible and easy to use in many contexts.")
               (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list python-cython
-           python-pandas
+           python-pandas-minimal
            python-pytest
            python-setuptools))
     (propagated-inputs
      (list python-joblib
-           python-numpy-1
+           python-numpy
            python-scikit-learn))
     (home-page "https://surpriselib.com/")
     (synopsis "Recommender system library for Scikit-learn")
