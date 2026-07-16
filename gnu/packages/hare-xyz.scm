@@ -112,7 +112,10 @@
       #:phases
       #~(modify-phases %standard-phases
           (delete 'build)
-          (delete 'check)
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                (invoke "haredo" "check"))))
           (add-before 'install 'substitute-vars
             (lambda _
               (substitute* "./install.do"
