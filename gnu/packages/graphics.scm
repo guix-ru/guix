@@ -1119,7 +1119,7 @@ volumetric texture formats beneficial for molecular visualization.")
 (define-public cgal-5
   (package
     (name "cgal")
-    (version "5.6.1")
+    (version "5.6.3")
     (source
      (origin
        (method git-fetch)
@@ -1128,7 +1128,7 @@ volumetric texture formats beneficial for molecular visualization.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0rym0xi4kh4nv2pdj178gygkalvrwgx38v13b0zm3jl0v1af9bhv"))))
+        (base32 "025dn5jphjw7arj5d6pvn7wcc4410wdi42h0ggcrqz9s4qvjwbf1"))))
     (build-system cmake-build-system)
     (arguments
      `(#:configure-flags
