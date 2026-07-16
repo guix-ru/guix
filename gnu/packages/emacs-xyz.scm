@@ -18854,6 +18854,29 @@ to all the other commands, too.")
 \"just\" (@url{https://github.com/casey/just}).")
     (license license:gpl3+)))
 
+(define-public emacs-just-ts-mode
+  (package
+    (name "emacs-just-ts-mode")
+    (version "0.1.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/leon-barrett/just-ts-mode.el")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0gmimdy2isfmyf622926y3w0a0fxm1q98ry0lbqjjvhfq9i2h3mc"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f)) ; no tests
+    (home-page "https://github.com/leon-barrett/just-ts-mode.el")
+    (synopsis "Justfile editing mode using TreeSitter")
+    (description
+     "This package provides a major mode for editing justfiles, as defined by
+the tool \"just\" (@url{https://github.com/casey/just}), using a Tree-Sitter grammar
+from tree-sitter-just (@url{https://github.com/IndianBoy42/tree-sitter-just}).")
+    (license license:gpl3+)))
+
 (define-public emacs-js2-mode
   (package
     (name "emacs-js2-mode")
