@@ -986,7 +986,7 @@ managers simultaneously.  Output formats include tables, JSON, and CSV.")
 (define-public nix
   (package
     (name "nix")
-    (version "2.25.5")
+    (version "2.26.4")
     (source
      (origin
        (method git-fetch)
@@ -995,72 +995,46 @@ managers simultaneously.  Output formats include tables, JSON, and CSV.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "150678l5bw8d8gaagsqy9fxlrxhvdx3cmphbn6b2l2c7pa3d06pp"))
-       (patches
-        (search-patches "nix-dont-build-html-doc.diff"))))
-    (build-system gnu-build-system)
+        (base32 "0bj2vk3d98na5nlhxq7w042fm5kvd3j0ssfvk3l15x821j5qqqas"))))
+    (build-system meson-build-system)
     (arguments
      (list
-      ;;; Only run functional tests.
-      #:test-target "installcheck"
-      #:configure-flags #~(list "--sysconfdir=/etc" "--enable-gc")
+      ;; Only run functional tests.
+      #:configure-flags #~(list "-Dunit-tests=false")
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'inject-config.sub
-            (lambda* (#:key inputs #:allow-other-keys)
-              (symlink (search-input-file inputs "bin/config.sub")
-                       "config/config.sub")))
-          (replace 'install
-            ;; Don't try & fail to create subdirectories in /etc, but keep them
-            ;; in the output as examples.
-            (lambda* (#:key (make-flags '()) outputs #:allow-other-keys)
-              (let ((etc (string-append #$output "/etc")))
-                (apply invoke "make" "install"
-                       (string-append "sysconfdir=" etc)
-                       (string-append "profiledir=" etc "/profile.d")
-                       make-flags))))
-          (delete 'check)
-          (add-after 'install 'check
-            (lambda args
-              ;; A few tests expect the environment variable NIX_STORE to be
-              ;; "/nix/store"
-              (let ((original-NIX_STORE (getenv "NIX_STORE")))
-                (dynamic-wind
-                  (lambda ()
-                    (setenv "NIX_STORE" "/nix/store"))
-                  (lambda ()
-                    (apply (assoc-ref %standard-phases 'check) args))
-                  (lambda ()
-                    (setenv "NIX_STORE" original-NIX_STORE))))))
           (add-after 'unpack 'skip-failing-tests
             (lambda _
-              (substitute* "Makefile"
-                (("tests/functional/git-hashing/local.mk")
-                 ""))
-              (substitute* "tests/functional/local.mk"
-                (((string-append " (" (string-join
+              (substitute* "tests/functional/meson.build"
+                (("subdir\\('git-hashing'\\)")
+                 "")
+                (((string-append "'(" (string-join
                                        '("chroot-store"
                                          "debugger"
                                          "fmt"
                                          "nix-profile"
-                                         "plugins"
                                          "shell")
-                                       "|") ")\\.sh"))
+                                        "|") ")\\.sh',"))
                  ""))
-              (substitute* "tests/functional/flakes/local.mk"
-                ((".*config\\.sh.*")
+              (substitute* "tests/functional/flakes/meson.build"
+                (((string-append "'(" (string-join
+                                       '("commit-lock-file-summary"
+                                         "config"
+                                         "dubious-query"
+                                         "edit"
+                                         "non-flake-inputs"
+                                         "shebang")
+                                        "|") ")\\.sh',"))
                  "")))))))
     (native-inputs
-     (list autoconf
-           autoconf-archive
-           automake
-           bison
-           config
+     (list bison
+           cmake-minimal
            flex
            googletest
            jq
-           libtool
            man-db
+           perl
+           perl-dbd-sqlite
            pkg-config
            rapidcheck
            util-linux)) ; for unshare
