@@ -11220,7 +11220,7 @@ snippets for yasnippet.")
 (define-public emacs-vhdl-ext
   (package
     (name "emacs-vhdl-ext")
-    (version "0.7.0")
+    (version "0.8.0")
     (source
      (origin
        (method git-fetch)
@@ -11229,19 +11229,18 @@ snippets for yasnippet.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0agiamq7g8zm3blznykbr1kgr09rb133rd4mh9nfc0vfk8i5mabv"))))
+        (base32 "1c9cfwadi18ib4psnf5xlgdjg75038fq1zhz2fxcjdp2kjwv5nwb"))))
     (build-system emacs-build-system)
     (arguments
      (list
       #:tests? #f         ;the testing framework, test-hdl, requires network
       #:test-command #~(list "make")))
     (propagated-inputs
-     (list emacs-ag
-           emacs-async
+     (list emacs-async
            emacs-flycheck
            emacs-hydra
            emacs-lsp-mode
-           emacs-ripgrep
+           emacs-rg
            emacs-vhdl-ts-mode))
     (home-page "https://github.com/gmlarumbe/vhdl-ext/")
     (synopsis "Extensions to Emacs @code{vhdl-mode}")
