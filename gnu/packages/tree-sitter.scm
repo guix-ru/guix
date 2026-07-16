@@ -1105,6 +1105,22 @@ which will be used as a snippet in origin."
    "0xi04a48ly438gar25bkkvvr8by4dd013cnafbjdysqjfs04q2wg"
    "0.23.1"))
 
+(define-public tree-sitter-just
+  (tree-sitter-grammar
+   "just" "Just"
+   "0zkdr09myjzp75cmyndzi70kzkbkr3l2hglyb79b1an8w49vkdcn"
+   "0.2.0"
+   #:repository-url
+   "https://github.com/casey/tree-sitter-just"
+   #:get-cleanup-snippet
+   (lambda (grammar-directories)
+     #~(begin
+         (use-modules (guix build utils))
+         ;; FIXME: test/highlight/statements.just fails
+         (with-directory-excursion "test/highlight"
+           (delete-file "statements.just"))
+         #$(tree-sitter-delete-generated-files grammar-directories)))))
+
 (define-public tree-sitter-kconfig
   (tree-sitter-grammar
    "kconfig" "Kconfig"
