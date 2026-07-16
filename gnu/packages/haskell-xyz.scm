@@ -33,6 +33,7 @@
 ;;; Copyright © 2022 jgart <jgart@dismail.de>
 ;;; Copyright © 2023 Josselin Poiret <dev@jpoiret.xyz>
 ;;; Copyright © 2023 zamfofex <zamfofex@twdb.moe>
+;;; Copyright © 2026 Konstantin Suntsov <protvin@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -13670,21 +13671,20 @@ work, but is substantially simpler and faster.")
 (define-public ghc-unique
   (package
     (name "ghc-unique")
-    (version "0.4.7.9")
+    (version "0.4.8.0")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "Unique" version))
        (sha256
-        (base32 "14f1qnmhdmbam8qis725dhwq1mk9h86fsnzhkwhsx73ny9z29s1l"))
-       (patches (search-patches "ghc-unique-support-newer-hashable.patch"))))
+        (base32 "1wv9dskvs2im5a97h3xm161sbqcbw81d7knk81y876ghqqf3hr56"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "Unique")))
     (inputs (list ghc-extra ghc-hashable ghc-unordered-containers))
     (native-inputs (list ghc-hspec ghc-quickcheck))
     (arguments
      `(#:cabal-revision ("1"
-                         "10s0npnfkh7naj49afmyrvnilikp6426fbhi49f97pxrgcmy4dvw")))
+                         "0cxifpgiq110618hzas1yz3g7ngcliw1skb9nahw3arsz3c3zifj")))
     (home-page "https://hackage.haskell.org/package/Unique")
     (synopsis "Haskell functionality like \"uniq\" tool")
     (description
