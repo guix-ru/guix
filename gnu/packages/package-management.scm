@@ -986,7 +986,7 @@ managers simultaneously.  Output formats include tables, JSON, and CSV.")
 (define-public nix
   (package
     (name "nix")
-    (version "2.26.4")
+    (version "2.32.8")
     (source
      (origin
        (method git-fetch)
@@ -995,7 +995,7 @@ managers simultaneously.  Output formats include tables, JSON, and CSV.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bj2vk3d98na5nlhxq7w042fm5kvd3j0ssfvk3l15x821j5qqqas"))))
+        (base32 "0jdxj8d0gax5mycc05lw0igzvn43c21y8nkfsfbahhgxsgfnhgmy"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -1011,7 +1011,8 @@ managers simultaneously.  Output formats include tables, JSON, and CSV.")
                 (((string-append "'(" (string-join
                                        '("chroot-store"
                                          "debugger"
-                                         "fmt"
+                                         "formatter"
+                                         "lang"
                                          "nix-profile"
                                          "shell")
                                         "|") ")\\.sh',"))
