@@ -13515,6 +13515,51 @@ such as GnuGo.
 @end itemize")
     (license license:gpl2+)))
 
+(define-public parallel-overhead
+  (package
+    (name "parallel-overhead")
+    (version "1.1.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/Huitsi/ParallelOverhead")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "17dbq6bwm0rk1jzb1q2y6h3dyvxpqfq3lc3jnpb6zy2y897was4d"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;no tests
+      #:make-flags
+      #~(list
+         (string-append "prefix=" #$output)
+         (string-append "bindir=" #$output "/bin") ;nooo don't put it in /games
+         (string-append "CC=" #$(cc-for-target)))
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (add-before 'build 'no-git-describe
+            (lambda _
+              (substitute* "Makefile"
+                (("\\$\\(shell git.+\\)") #$version)))))))
+    (inputs (list sdl2))
+    (native-inputs (list desktop-file-utils
+                         help2man
+                         lmms
+                         sfxr-qt))
+    (home-page "https://huitsi.net/ParallelOverhead")
+    (synopsis "Endless runner game")
+    (description "Parallel Overhead is a colorful endless runner game where you
+take control of the ships Truth and Beauty on a groundbreaking trip through
+hyperspace.  A stable hyperspace tunnel has finally been achieved with the two
+ships supporting it on opposite walls of the tunnel.  Well, almost stable...
+The goal is to keep the ships from falling through the cracks.")
+    (license (list license:expat        ;game
+                   license:cc0))))      ;sounds+music
+
 (define-public passage
   (package
     (name "passage")
