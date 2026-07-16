@@ -120,13 +120,13 @@
 (define-public glirc
   (package
     (name "glirc")
-    (version "2.39.0.1")               ; inherited by glirc-* extensions below
+    (version "2.41")               ; inherited by glirc-* extensions below
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "glirc" version))
        (sha256
-        (base32 "0jaywb43jfv6kzyz540k02mxdgw1shc6hn7kia21alssszkilh4r"))))
+        (base32 "1sigh9154jxsisszj4sm3zbjja0mgqk9hrv7a4rr2c976pqri9yb"))))
     (build-system haskell-build-system)
     (arguments
      (list
@@ -135,7 +135,7 @@
           (add-before 'configure 'update-constraints
            (lambda _
              (substitute* "glirc.cabal"
-               (("vty\\s+>=5.35\\s+&&\\s+<5.36") "vty"))))
+               (("vty\\s+\\^>=6.2") "vty"))))
           (add-after 'install 'install-extra-documentation
             (lambda _
               (install-file "glirc.1"
@@ -167,9 +167,11 @@
            ghc-random
            ghc-regex-tdfa
            ghc-split
+           ghc-typed-process
            ghc-unordered-containers
            ghc-vector
-           ghc-vty))
+           ghc-vty
+           ghc-vty-unix))
     (home-page "https://github.com/glguy/irc-core")
     (synopsis "Console IRC client")
     (description
