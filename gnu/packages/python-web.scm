@@ -6327,16 +6327,16 @@ your Web app.")
 (define-public python-webob
   (package
     (name "python-webob")
-    (version "1.8.9")
+    (version "1.8.10")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "webob" version))
        (sha256
         (base32
-          "12b5sl10yzzzz3g11kij3rdzk9y6583ywggc6h9nsxmnxpi7hq5d"))))
+          "0avwfsqqva46aix1p61jbwjsw7kh6zkxvfds9xi3zg07yc8km5hw"))))
     (build-system pyproject-build-system)
-    ;; tests: 2380 passed, 9 skipped, 1 xfailed, 12 warnings
+    ;; tests: 2394 passed, 9 skipped, 1 xfailed, 35 warnings
     (native-inputs
       (list python-pytest
             python-setuptools))
