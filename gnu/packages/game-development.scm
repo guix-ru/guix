@@ -39,6 +39,7 @@
 ;;; Copyright © 2025 Vinicius Monego <monego@posteo.net>
 ;;; Copyright © 2025 Simen Endsjø <contact@simendsjo.me>
 ;;; Copyright © 2025 gemmaro <gemmaro.dev@gmail.com>
+;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -70,6 +71,7 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system go)
   #:use-module (guix build-system pyproject)
+  #:use-module (guix build-system qt)
   #:use-module (guix build-system renpy)
   #:use-module (guix build-system scons)
   #:use-module (gnu packages)
@@ -111,6 +113,7 @@
   #:use-module (gnu packages icu4c)
   #:use-module (gnu packages image)
   #:use-module (gnu packages javascript)
+  #:use-module (gnu packages kde-frameworks)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages lisp)
   #:use-module (gnu packages llvm)
@@ -1321,6 +1324,47 @@ window, graphics, audio and network.")
 Originally created for use in video game prototypes, it can generate random
 sounds from presets such as \"explosion\" or \"powerup\".")
     (home-page "https://www.drpetter.se/project_sfxr.html")
+    (license license:expat)))
+
+(define-public sfxr-qt
+  (package
+    (name "sfxr-qt")
+    (version "1.5.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/agateau/sfxr-qt")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ghmw8kvc5rd10kqaslbdmj7nrp8g9sslzhp18v32x4njwapavdc"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Unbundles qpropgen.
+            (delete-file-recursively "3rdparty")
+            (substitute* "CMakeLists.txt"
+              (("include\\(3rdparty[^\n]+")
+               "include(qpropgen)"))))))
+    (build-system qt-build-system)
+    (arguments
+     (list
+      #:configure-flags
+      #~(list "-DUSE_SYSTEM_CATCH2=ON"
+              (string-append "-DCMAKE_MODULE_PATH="
+                             #+qpropgen "/share/qpropgen/cmake"))))
+    (inputs
+     (list qtdeclarative-5
+           qtquickcontrols-5            ;QtQuick.Dialogs
+           qtquickcontrols2-5           ;QtQuick.Controls, QtQuick.Layouts
+           sdl))
+    (native-inputs (list catch2 extra-cmake-modules qpropgen))
+    (home-page "https://github.com/agateau/sfxr-qt")
+    (synopsis "Retro sound effect generator")
+    (description "This package provides a QtQuick Controls 2 port of SFXR.
+It has the same features as the original SFXR with a more modern user
+interface.")
     (license license:expat)))
 
 (define-public surgescript
