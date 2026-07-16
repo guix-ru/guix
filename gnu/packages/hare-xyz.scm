@@ -193,6 +193,49 @@ format with one directive per line.")
 and agent protocols in pure Hare.")
     (license license:mpl2.0)))
 
+(define-public hare-streams
+  (package
+    (name "hare-streams")
+    (version "0.26.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.sr.ht/~stacyharper/hare-streams")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0z3k8n4y06x7121bciq0g1d7mqdna2cllvs8vjxyyf420kmk8ar7"))))
+    (native-inputs (list haredo))
+    (build-system hare-build-system)
+    (supported-systems %hare-supported-systems)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'build)
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys)
+              (when tests?
+                (invoke "haredo" "check"))))
+          (add-before 'install 'substitute-vars
+            (lambda _
+              (substitute* "./install.do"
+                (("PREFIX=.*") (format #f "PREFIX=\"~a\"~%" #$output))
+                (("SRCDIR=.*") (format #f "SRCDIR=\"~a/share/hare\"~%" #$output))
+                (("HARESRCDIR=.*") (format #f "HARESRC=\"~a/share/hare\"~%" #$output))
+                (("THIRDPARTYDIR=.*")
+                 (format #f "THIRDPARTYDIR=\"~a/share/hare\"~%" #$output)))))
+          (replace 'install
+            (lambda _
+              (setenv "PREFIX" #$output)
+              (invoke "haredo" "install"))))))
+    (home-page "https://git.sr.ht/~stacyharper/hare-streams")
+    (synopsis "General purpose stream toolsuite")
+    (description "This toolsuite provides different stream implementations,
+for general purpose.")
+    (license license:mpl2.0)))
+
 (define-public hare-template
   (package
     (name "hare-template")
