@@ -43,6 +43,7 @@
   #:use-module (gnu packages bash)
   #:use-module (gnu packages base)            ;for 'which'
   #:use-module (gnu packages bison)
+  #:use-module (gnu packages build-tools)
   #:use-module (gnu packages nss)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages documentation)
@@ -987,6 +988,96 @@ using a Python-based domain-specific language.")
 ONNX Runtime.  It supports models including Whisper and NeMo Parakeet.
 Includes bundled Parakeet TDT V3 model weights (int8, CC-BY-4.0, NVIDIA).")
     (license license:expat)))
+
+(define-public python-piper-tts
+  (package
+    (name "python-piper-tts")
+    (version "1.5.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/OHF-Voice/piper1-gpl")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0a043ra92dm2i20861xj1l55zz8i3rry8j576a2mqqab20ajd4as"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'no-embedded-git-fetch
+            ;; This project compiles a recent version of espeak-ng using
+            ;; an "ExternalProject_Add(...)" in the CMakeLists file that
+            ;; lets `CMake` use `git` to fetch and build espeak-ng, see:
+            ;; https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/BUILDING.md#design-decisions
+            ;; It will work just fine with the version of espeak-ng we have
+            ;; so we will edit the CMakeLists file in-place.
+            (lambda* (#:key inputs #:allow-other-keys)
+              (use-modules (ice-9 regex)
+                           (ice-9 rdelim))
+              (let ((pattern (make-regexp
+                              "ExternalProject_Add\\(espeak_ng_external[^)]+\\)"
+                              regexp/extended))
+                    (replacement "add_library(espeak_ng_external INTERFACE)"))
+                ;; Delete the multi-line "ExternalProject_Add(...)" block
+                ;; replacing it with a stub so cmake doesn't complain.
+                (with-atomic-file-replacement "CMakeLists.txt"
+                                              (lambda (in out)
+                                                (display (regexp-substitute/global
+                                                          #f
+                                                          pattern
+                                                          (read-string in)
+                                                          'pre
+                                                          replacement
+                                                          'post) out))))
+              (let ((espeak (assoc-ref inputs "espeak-ng"))
+                    (espeak-lib (search-input-file inputs
+                                                   "lib/libespeak-ng.so.1"))
+                    (espeak-data (search-input-directory inputs
+                                  "share/espeak-ng-data"))
+                    (cmake-setter (lambda (k v)
+                                    (string-append "set(" k " \"" v "\")\n"))))
+                ;; set paths to find dependencies in our guix env
+                (substitute* "CMakeLists.txt"
+                  (("set\\(ESPEAKNG_INSTALL_DIR .*")
+                   (cmake-setter "ESPEAKNG_INSTALL_DIR" espeak))
+                  (("set\\(ESPEAKNG_STATIC_LIB .*")
+                   (cmake-setter "ESPEAKNG_STATIC_LIB" espeak-lib))
+                  ;; espeak-ng in guix does not have UCD in its outputs
+                  ;; but piper finds all it needs from linked .so library
+                  (("set\\(UCD_STATIC_LIB .*")
+                   (cmake-setter "UCD_STATIC_LIB" ""))
+                  (("set\\(DATA_SRC .*")
+                   (cmake-setter "DATA_SRC" espeak-data)))))))))
+    (native-inputs (list ninja python-scikit-build python-setuptools
+                         python-pytest))
+    (propagated-inputs (list espeak-ng python-flask python-pathvalidate
+                             python-numpy
+                             (list onnxruntime "python")))
+    (home-page "https://github.com/OHF-Voice/piper1-gpl")
+    (synopsis "Fast and local neural text-to-speech engine")
+    (description
+     "Piper is a fast and local neural TTS (text-to-speech) engine that embeds
+espeak-ng for phonemization.  It is available as a library, a CLI (command-line
+interface) tool and a web-server.
+
+@example
+piper -m en_US-lessac-medium -f spoken.wav -- 'Hello, World.'
+@end example
+
+It comes with an HTTP server for repeated usage:
+
+@example
+python3 -m piper.http_server -m en_US-lessac-medium
+curl -X POST -H 'Content-Type: application/json' \\
+     -d '@{\"text\":\"This is a test.\"@}' -o spoken.wav localhost:5000/synthesize
+@end example
+
+It does not come with voices installed.  Visit the project home-page to sample
+or download them.  Alternatively use: @code{python -m piper.download_voices}.")
+    (license license:gpl3+)))
 
 (define-public python-pocket-tts
   (package
