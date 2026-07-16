@@ -3473,6 +3473,34 @@ isort.")
 you can upload files and test FTP functionality.")
     (license license:expat)))
 
+(define-public python-pytest-loguru
+  (package
+    (name "python-pytest-loguru")
+    (version "0.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mcarans/pytest-loguru")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jb8ps314dr5r755a3kv3ss3xybvcc1pf5zrircq9z2lr7jv3jp8"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatch-vcs
+           python-hatchling
+           python-pytest-bootstrap))
+    (propagated-inputs
+     (list python-loguru))
+    (home-page "https://github.com/mcarans/pytest-loguru")
+    (synopsis "Pytest Loguru plugin")
+    (description
+     "This package provides a pytest plugin to add support for
+@url{https://loguru.readthedocs.io/en/stable/, Loguru} to Pytest's caplog
+fixture.")
+    (license license:expat)))
+
 (define-public python-pytest-metadata
   (package
     (name "python-pytest-metadata")
