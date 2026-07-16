@@ -3583,6 +3583,31 @@ together.")
                (base32
                 "0skn3cvh7zs173v3i6ywdmddqzrhxvivwdisvmqc6hvq594f8z80"))))))
 
+(define-public clap-1.0
+  (package/inherit clap
+    (version "1.0.3")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/free-audio/clap")
+                    (commit version)))
+              (file-name (git-file-name "clap" version))
+              (sha256
+               (base32
+                "0ck07ihbmjlqfys5k942fn97f7z4sq1ikxdzcm5fs8nr9j0f1mfn"))))
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:phases phases
+         #~%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'include-headers-in-install
+              (lambda _
+                ;; The 1.0.x install rule is excluded from the default install
+                ;; target.
+                (substitute* "CMakeLists.txt"
+                  ((" OPTIONAL EXCLUDE_FROM_ALL")
+                   ""))))))))))
+
 (define-public ladspa
   (package
     (name "ladspa")
