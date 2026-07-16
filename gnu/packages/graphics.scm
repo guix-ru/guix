@@ -1159,7 +1159,7 @@ many more.")
   (package
     (inherit cgal-5)
     (name "cgal")
-    (version "6.1.1")
+    (version "6.2")
     (source
      (origin
        (method git-fetch)
@@ -1168,7 +1168,7 @@ many more.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0cbrqa9h8vx31fw0rp7fn00ndmcgip0xmcc303ycjjc8rirnsz9j"))))))
+        (base32 "0v2pdazm4c1mk8cqrypywqg2vrgapqdx6dms7lhrm4hwmp9f3399"))))))
 
 (define-public geomcpp
   ;; XXX: No releases.
