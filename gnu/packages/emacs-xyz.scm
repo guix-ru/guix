@@ -4184,7 +4184,6 @@ a constant work in progress as the language itself also progresses.")
                                emacs-org
                                emacs-s
                                emacs-hydra
-                               emacs-use-package
                                emacs-ts))
       (home-page "https://github.com/alphapapa/unpackaged.el")
       (synopsis "Useful snippets of Emacs Lisp code")
