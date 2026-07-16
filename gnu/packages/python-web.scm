@@ -3493,6 +3493,65 @@ client so it is easy to login users, with @acronym{Secure Remote Password,
 SRP} support.")
     (license license:asl2.0)))
 
+(define-public python-pydap
+  (package
+    (name "python-pydap")
+    (version "3.5.10")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pydap/pydap")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "000b7jqjpx71miwxhbi07amyjyijq925x9x3paa7kzrr268klc2z"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; tests: 435 passed, 6 skipped
+      #:test-flags
+      ;; Tests need extra packaging.
+      #~(list "--ignore=src/pydap/tests/test_wsgi_functions.py"
+              "--ignore=src/pydap/tests/test_wsgi_ssf.py"
+              ;; Network access is required.
+              "--ignore=src/pydap/tests/test_client.py"
+              "--ignore=src/pydap/tests/test_handlers_dap.py"
+              "--ignore=src/pydap/tests/test_open_dap4_url.py"
+              "--ignore=src/pydap/tests/test_virtualizarr.py")))
+    (native-inputs
+     (list nss-certs-for-test
+           python-requests-mock
+           python-pytest
+           python-setuptools
+           python-setuptools-scm
+           python-webtest))
+    (propagated-inputs
+     (list python-beautifulsoup4
+           python-jinja2
+           python-lxml
+           python-numpy
+           python-requests
+           python-requests-cache
+           python-scipy
+           python-webob
+           ;; [optional]
+           gunicorn
+           python-docopt-ng
+           ;; python-coards    ;not packaged yet in Guix
+           python-fastparquet
+           ;; python-gsw       ;not packaged yet in Guix
+           python-netcdf4
+           python-openpyxl
+           python-pastedeploy
+           python-werkzeug))
+    (home-page "https://pydap.github.io/pydap/en/intro.html")
+    (synopsis "Data Access Protocol implementation in Python")
+    (description
+     "This package provides a pure Python implementation of the Data Access
+Protocol (DAP, aka OPeNDAP).")
+    (license license:expat)))
+
 (define-public python-python3-saml
   (package
     (name "python-python3-saml")
