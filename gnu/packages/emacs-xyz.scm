@@ -19182,8 +19182,8 @@ like @code{org-edit-src-code} but for arbitrary regions.")
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/bbatsov/projectile")
-             (commit (string-append "v" version))))
+              (url "https://github.com/bbatsov/projectile")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
         (base32
@@ -19192,10 +19192,47 @@ like @code{org-edit-src-code} but for arbitrary regions.")
     (arguments
      (list
       #:test-command #~(list "buttercup" "-L" "." "-L" "test")
+      #:modules '((rnrs io ports)
+                  (ice-9 popen)
+                  (guix build emacs-build-system)
+                  (guix build utils)
+                  (guix build emacs-utils))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'fix-failing-test
             (lambda _
+              (let* ((port
+                      (open-pipe* OPEN_READ
+                                  "emacs" "-Q" "--batch" "--eval"
+                                  "(princ system-configuration-features)"))
+                     (features (get-string-all port))
+                     (status (close-pipe port)))
+                (unless (zero? (status:exit-val status))
+                  (error "emacs failed"))
+                (when (string-contains features "NATIVE_COMP")
+                  ;; These tests are problematic under native compilation due
+                  ;; to spying on file-exists-p.  Some of them fail already,
+                  ;; some could fail in the future.  So just disable them.
+                  ;;
+                  ;; Upstream bug report:
+                  ;;     https://github.com/bbatsov/projectile/issues/2100
+                  (let-syntax ((disable
+                                (syntax-rules ()
+                                  ((_ file it ...)
+                                   (substitute* file
+                                     ((it all)
+                                      (string-append "x" all)) ...)))))
+                    (disable
+                     "test/projectile-ignore-test.el"
+                     "it \"parses dirconfig and returns directories to "
+                     "it \"skips leading whitespace before dispatching ")
+                    (disable
+                     "test/projectile-relation-test.el"
+                     "it \"dir-fn and filename-fn applied correctly"
+                     "it \"returns nil when src-dir function result is not an"
+                     "it \"returns file relative to project root"
+                     "it \"returns result of projectile--complementary-file "
+                     "it \"error when test file does not exist and "))))
               (substitute* "test/projectile-indexing-test.el"
                 (("user-emacs-directory") "\".\"")))))))
     (native-inputs
