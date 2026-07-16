@@ -3589,7 +3589,7 @@ celestial-to-terrestrial coordinate transformations.")
   (package
     (inherit python-astropy-iers-data)
     (name "python-astropy-iers-data")
-    (version "0.2026.7.6.1.1.20")
+    (version "0.2026.7.13.0.54.2")
     (source
      (origin
        (method git-fetch)
@@ -3598,7 +3598,7 @@ celestial-to-terrestrial coordinate transformations.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0apwrw8r5bvhmih11ffa8ja6adi66fvjfi9k0w8ilhv2f88b970g"))))))
+        (base32 "1sz8378hlh9222k9gsc10ry3651phqxl353k176pd67iq5348bnb"))))))
 
 ;; A bare minimal package, mainly to use in tests and reduce closure
 ;; size. Tests are left out in the main package to slim down native-inputs.
