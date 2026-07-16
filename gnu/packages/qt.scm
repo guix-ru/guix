@@ -37,6 +37,7 @@
 ;;; Copyright © 2024, 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2025 Brice Waegeneire <brice@waegenei.re>
 ;;; Copyright © 2025 Laura Kirsch <laurakirsch240406@gmail.com>
+;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -280,6 +281,40 @@ your QtWidgets application.")
   applications.")
       (home-page "https://github.com/moonlight-stream/moonlight-common-c")
       (license license:expat))))
+
+(define-public qpropgen
+  (package
+    (name "qpropgen")
+    (version "0.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/agateau/qpropgen")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0rrd7dbmhycqcxs2pkzcadjh2khhzqc69xzha003161hjdf3vh9f"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; XXX: 0.1.2 does not have tests/, examples are manual and require C++.
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'install-cmake
+            (lambda _
+              (install-file "cmake/qpropgen.cmake"
+                            (string-append #$output "/share/"
+                                           #$name "/cmake")))))))
+    (propagated-inputs (list python-jinja2 python-pyyaml python-strictyaml))
+    (native-inputs (list python-pytest python-setuptools))
+    (home-page "https://github.com/agateau/qpropgen")
+    (synopsis "Generates QObject properties from a YAML file")
+    (description "This package provides a tool to generate QML-friendly
+QObject-based C++ classes from class definition files.")
+    (license license:asl2.0)))
 
 (define-public qite
   (let ((commit "e9d33c84a0b346185b27efb44189f18acaa53906")
