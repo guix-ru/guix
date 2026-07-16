@@ -1310,6 +1310,30 @@ Sorensen distance, plus some bonuses.  All distance computations are
 implemented in pure Python, and most of them are also implemented in C.")
       (license license:gpl2+))))
 
+(define-public python-docopt-ng
+  (package
+    (name "python-docopt-ng")
+    (version "0.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jazzband/docopt-ng")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vdh1amh8jkhll0ym1r72q1ddg8ds3pyx37kyw9abg1w3abh6ih8"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pdm-backend
+           python-pytest-8))
+    (home-page "https://github.com/jazzband/docopt-ng")
+    (synopsis "Humane command line arguments parser")
+    (description
+     "This package provides Jazzband-maintained fork of docopt, the humane
+command line arguments parser.")
+    (license license:expat)))
+
 (define-public python-doi
   (package
     (name "python-doi")
