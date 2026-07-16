@@ -8449,7 +8449,7 @@ invocations of itself.")
 (define-public ntfs-3g
   (package
     (name "ntfs-3g")
-    (version "2022.10.3")
+    (version "2026.7.7")
     (source (origin
               (method git-fetch)
               (uri
@@ -8459,7 +8459,7 @@ invocations of itself.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "02cmw0b2r6j5rk733ljlyrjibv997ck8f9lwrs93kpr6d6q57qcy"))
+                "0kkpmi28qihwmnyvdnkj0azrd7zr6wkv590pjfmbbhn1w4qfp7gd"))
               (patches
                (search-patches "ntfs-3g-autoconf-sbin-helpers.patch"
                                "ntfs-3g-consistent-sbindir-usage.patch"))))
