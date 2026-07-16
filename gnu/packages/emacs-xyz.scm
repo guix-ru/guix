@@ -25512,7 +25512,7 @@ other operations.")
          "0h248mma7kky30jr9bbhmp95wchl2cx5p6kh0gxmzpbc247dn2cc"))))
     (build-system emacs-build-system)
     (propagated-inputs
-     (list emacs-counsel emacs-exwm emacs-switch-window emacs-use-package))
+     (list emacs-counsel emacs-exwm emacs-switch-window))
     (inputs
      (list xhost dbus))
     ;; Need emacs instead of emacs-minimal,
