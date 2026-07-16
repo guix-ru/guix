@@ -47044,7 +47044,6 @@ This allows working with files in the current @code{binder-project-directory}.")
        (list emacs-dash
              emacs-general
              emacs-which-key
-             emacs-use-package
              emacs-bind-map))
       (home-page "https://github.com/mohkale/spaceleader")
       (synopsis "Emacs leader key implementation from Spacemacs")
