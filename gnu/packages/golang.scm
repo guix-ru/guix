@@ -1139,7 +1139,7 @@ in the style of communicating sequential processes (@dfn{CSP}).")
   (package
     (inherit go-1.24)
     (name "go")
-    (version "1.26.4")
+    (version "1.26.5")
     (source
      (origin
        (method git-fetch)
@@ -1148,11 +1148,18 @@ in the style of communicating sequential processes (@dfn{CSP}).")
              (commit (string-append "go" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "143qz6hikkh08gfm9md7r1na8mj404a27a4cidq3zkj6qc54jrm1"))))
+        (base32 "0kip7ak6ablgvpaf20mqy8an9g9y9nyslsf3hbk1z5gmy10789lg"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:phases phases)
         #~(modify-phases #$phases
+            (add-after 'unpack 'remove-testscript-mod_get_fips140_issue73649.txt
+              (lambda _
+                ;; vcs-test.golang.org rerouted to http://127.0.0.1:46381
+                ;; https://vcs-test.golang.org rerouted to https://127.0.0.1:44403
+                ;; go test proxy running at GOPROXY=http://127.0.0.1:40005/mod
+                ;; 2026/07/17 10:05:01 http: TLS handshake error from 127.0.0.1:33040: EOF
+                (delete-file "src/cmd/go/testdata/script/mod_get_fips140_issue73649.txt")))
             ;; There is no real discussion on the issue among humans, a lot
             ;; of gopherbot updates and it's closed without final resolution.
             ;; https://github.com/golang/go/issues/73977
