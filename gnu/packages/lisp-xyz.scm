@@ -2844,11 +2844,11 @@ can contain any kind of values.")
   (sbcl-package->ecl-package sbcl-bt-semaphore))
 
 (define-public sbcl-bubble-operator-upwards
-  (let ((commit "846275a318b960de81b62caecb1e31930f70aef6")
-        (revision "0"))
+  (let ((commit "a7bb02a30a1b9e9f489f9da082a3ca4952762977")
+        (revision "1"))
     (package
       (name "sbcl-bubble-operator-upwards")
-      (version (git-version "1.0" revision commit))
+      (version (git-version "1.1" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -2857,7 +2857,7 @@ can contain any kind of values.")
                (commit commit)))
          (file-name (git-file-name "cl-bubble-operator-upwards" version))
          (sha256
-          (base32 "0ybsy29ms3yrxgr7f2146lr6z4vm070dvdyzvwwxjh4dgm9na7bi"))))
+          (base32 "0amgc0z61yd3177dwn405ck5az67f0ksmh4cnsxqwgzi319k6nbx"))))
       (build-system asdf-build-system/sbcl)
       (native-inputs
        (list sbcl-parachute))
