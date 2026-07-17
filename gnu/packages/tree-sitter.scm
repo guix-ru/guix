@@ -540,6 +540,16 @@ which will be used as a snippet in origin."
    #:inputs (list tree-sitter-c
                   tree-sitter-cpp)))
 
+(define-public tree-sitter-cypher
+  (let ((commit "7553c0d18cd41237a64653bb91a09d70988f7300")
+        (revision "0"))
+    (tree-sitter-grammar
+     "cypher" "Cypher"
+     "14acb8rn9s1ps7gnw0vsacy6dn0qq1qvpblakcdgf598w316p4xa"
+     "M23"
+     #:repository-url "https://github.com/taekwombo/tree-sitter-cypher"
+     #:commit commit)))
+
 (define-public tree-sitter-d
   (let ((commit "45e5f1e9d6de2c68591bc8e5ec662cf18e950b4a")
         (revision "0"))
