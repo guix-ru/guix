@@ -745,10 +745,11 @@ dictionary-like data structures.")
   (sbcl-package->cl-source-package sbcl-access))
 
 (define-public sbcl-acclimation
-  (let ((commit "4d51150902568fcd59335f4cc4cfa022df6116a5"))
+  (let ((commit "9339b92e16e6a6784488f8bac82c189ae4bab4aa")
+        (revision "2"))
     (package
       (name "sbcl-acclimation")
-      (version (git-version "0.0.0" "1" commit))
+      (version (git-version "0.0.0" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -758,7 +759,7 @@ dictionary-like data structures.")
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1aw7rarjl8ai57h0jxnp9hr3dka7qrs55mmbl1p6rhd6xj8mp9wq"))))
+           "1rp4794czi01hlv67mgykxym1hqsyn04ldgwiqjwf4lj5d3p7aj4"))))
       (build-system asdf-build-system/sbcl)
       (home-page "https://github.com/robert-strandh/Acclimation")
       (synopsis "Internationalization library for Common Lisp")
