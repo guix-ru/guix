@@ -7422,6 +7422,27 @@ eshell.")
 are used in the context of graph databases.")
     (license license:gpl2+))))
 
+(define-public emacs-cypher-ts-mode
+   (package
+    (name "emacs-cypher-ts-mode")
+    (version "0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/nutcase/cypher-ts-mode")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jcgq6wyci0z2x11w1illnmsp4g2w1hqlk4r4g282maxi8fzgqaf"))))
+    (build-system emacs-build-system)
+    (arguments (list #:tests? #f)) ; no tests
+    (home-page "https://codeberg.org/nutcase/cypher-ts-mode")
+    (synopsis "Major mode for editing cypher scripts, powered by Tree-Sitter")
+    (description "This package provides a tree-sitter basedmajor mode for cypher
+files, which are used in the context of graph databases.")
+    (license license:gpl3+)))
+
 (define-public emacs-org-block-capf
   ;; There are no tagged releases upstream
   (let ((commit "080cfd2ed630a6739633b07a8ab6b896a1b5ef4a")
