@@ -34,6 +34,7 @@
 ;;; Copyright © 2025 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2025 Nguyễn Gia Phong <cnx@loang.net>
 ;;; Copyright © 2025 Adrien 'neox' Bourmault <neox@gnu.org>
+;;; Copyright © 2026 Tomás Ortín Fernández (quanrong) <quanrong@mailbox.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1371,6 +1372,60 @@ passwords.  It can be used to implement two-factor (2FA) or multi-factor
 (MFA) authentication methods in web applications and in other systems that
 require users to log in.")
     (license license:expat)))
+
+(define-public python-pysequoia
+  (package
+    (name "python-pysequoia")
+    (version "0.1.34")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/wiktor-k/pysequoia")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0nc22al57g9amvp9ylgn08hpf0rk9lx201b8w77acrbbvwbhi5lr"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:imported-modules `(,@%cargo-build-system-modules
+                           ,@%pyproject-build-system-modules)
+      #:modules '(((guix build cargo-build-system) #:prefix cargo:)
+                  (guix build pyproject-build-system)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'prepare-cargo-build-system
+            (lambda args
+              (for-each
+               (lambda (phase)
+                 (apply (assoc-ref cargo:%standard-phases phase)
+                        #:cargo-target #$(cargo-triplet)
+                        args))
+               '(unpack-rust-crates
+                 configure
+                 check-for-pregenerated-files
+                 patch-cargo-checksums))))
+          ;; The test suite is Rust-side only. There are no unit tests for
+          ;; Python; the Python API has integration tests that require a
+          ;; bespoke tool to be run (https://github.com/wiktor-k/tangler)
+          (replace 'check
+            (lambda* (#:key tests? #:allow-other-keys #:rest args)
+              (when tests?
+                (apply (assoc-ref cargo:%standard-phases 'check) args)))))))
+    (native-inputs (append (list rust
+                                 `(,rust "cargo"))
+                           (or (and=> (%current-target-system)
+                                      (compose list make-rust-sysroot))
+                               '())))
+    (inputs (cons* maturin
+                   (cargo-inputs 'python-pysequoia)))
+    (home-page "https://github.com/wiktor-k/pysequoia")
+    (synopsis "Provides OpenPGP facilities using Sequoia-PGP library")
+    (description
+     "This package provides @code{OpenPGP} facilities using Sequoia-PGP library.")
+    (license license:asl2.0)))
 
 ;; XXX: This project was archived by the owner on Apr 20, 2025. It is now
 ;; read-only.  Consider to remove when starts failing to build and nothing
