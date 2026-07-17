@@ -303,24 +303,6 @@ output in multiple windows in a terminal.")
 library.")
     (license license:expat)))
 
-(define-public spdlog-1.13
-  (package/inherit spdlog-1.15
-    (version "1.13.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/gabime/spdlog")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name (package-name spdlog-1.15) version))
-       (sha256
-        (base32 "0zgdmdgnp2y36jrlk85d4fiyjkjd6anly8pambyc3f3v6sg02zyy"))
-       (modules '((guix build utils)))
-       (snippet #~(delete-file-recursively "include/spdlog/fmt/bundled"))))
-    (propagated-inputs
-     (modify-inputs (package-propagated-inputs spdlog-1.15)
-       (replace "fmt" fmt-9)))))
-
 ;; Update when changing the pinned version of fmt.
 (define-public spdlog spdlog-1.15)
 
