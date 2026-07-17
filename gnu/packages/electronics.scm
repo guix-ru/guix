@@ -4606,7 +4606,6 @@ them usable as simple logic analyzer and/or oscilloscope hardware.")
           (add-after 'install 'python:wrap
             (assoc-ref python:%standard-phases 'wrap)))))
     (inputs (list abc-yosyshq
-                  boolector
                   python
                   python-click
                   python-xmlschema
