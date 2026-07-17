@@ -685,6 +685,37 @@ Haskell programmers.  The ultimate goal is to support all Amazon
 Web Services.")
     (license license:bsd-3)))
 
+(define-public ghc-base16
+  (package
+    (name "ghc-base16")
+    (version "1.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "base16" version))
+       (sha256
+        (base32 "1plwc4yrkvd5j6y09fjvyzhr05mzhzwz6z41fyb60y0bj5j66dl6"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "base16")))
+    (inputs (list ghc-primitive ghc-text-short))
+    (native-inputs (list ghc-base16-bytestring
+                         ghc-quickcheck
+                         ghc-random-bytestring
+                         ghc-tasty
+                         ghc-tasty-hunit
+                         ghc-tasty-quickcheck
+                         ghc-text-short))
+    (arguments
+     `(#:cabal-revision
+        ("4"
+         "0xvk439dhk1znz3zc0127rqs09p7bqbp5pal77hcvwk8h4i43lsd")))
+    (home-page "https://github.com/emilypi/base16")
+    (synopsis "Fast RFC 4648-compliant Base16 encoding")
+    (description
+     "This library provides RFC 4648-compliant Base16 encoding and decoding
+primitives, as well as support for textual values.")
+    (license license:bsd-3)))
+
 (define-public ghc-base16-bytestring
   (package
     (name "ghc-base16-bytestring")
