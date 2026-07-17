@@ -2039,7 +2039,7 @@ files, including Rmarkdown files.")
 (define-public python-pyreadstat
   (package
     (name "python-pyreadstat")
-    (version "1.3.2")
+    (version "1.3.5")
     (source
      (origin
        (method git-fetch)
@@ -2048,8 +2048,7 @@ files, including Rmarkdown files.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01b7zwvfl46sra0kvdvs19ggx150p4x7pkwl73ar2jda315kjfr4"))
-       (patches (search-patches "python-pyreadstat-link-libiconv.patch"))))
+        (base32 "16fd2xhpzg0v8zica4iqypybk5ygzmqn91r3l4iw227l0prrh97m"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -2062,6 +2061,12 @@ files, including Rmarkdown files.")
       #:test-flags #~(list "tests/test_basic.py")
       #:phases
       #~(modify-phases %standard-phases
+          (add-before 'build 'setenv
+            (lambda _
+              ;; This triggers
+              ;; libraries.append("iconv")
+              ;; in setup.py, so that iconv is linked and found by Guix.
+              (setenv "PYREADSTAT_LINK_ICONV" "1")))
           (add-before 'check 'pre-check
             (lambda _
               (setenv "HOME" "/tmp"))))))
