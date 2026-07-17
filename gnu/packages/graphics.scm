@@ -26,7 +26,7 @@
 ;;; Copyright © 2021 Antoine Côté <antoine.cote@posteo.net>
 ;;; Copyright © 2021 Andy Tai <atai@atai.org>
 ;;; Copyright © 2021 Ekaitz Zarraga <ekaitz@elenq.tech>
-;;; Copyright © 2021, 2022 Vinicius Monego <monego@posteo.net>
+;;; Copyright © 2021, 2022, 2026 Vinicius Monego <monego@posteo.net>
 ;;; Copyright © 2022 Michael Rohleder <mike@rohleder.de>
 ;;; Copyright © 2022, 2023, 2024 John Kehayias <john.kehayias@protonmail.com>
 ;;; Copyright © 2022, 2024, 2025 Zheng Junjie <z572@z572.online>
@@ -1008,50 +1008,75 @@ baking tools to produce normal maps.")
 (define-public openshadinglanguage
   (package
     (name "openshadinglanguage")
-    (version "1.13.10.0")
+    (version "1.15.7.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/AcademySoftwareFoundation/OpenShadingLanguage")
+             (url
+              "https://github.com/AcademySoftwareFoundation/OpenShadingLanguage")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1x97w4infifw33r4ii53q3v1ia0p21lbacd7z01vsz4vq7sy0dxn"))))
+        (base32 "067xp57wqh696x4dr43zyrp8h2fgq4gkv1kvbz0rpby9wvsps3z2"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags
-           #~(list "-DUSE_PARTIO=OFF"   ; TODO: not packaged
-                   (string-append "-DLLVM_BC_GENERATOR="
-                                  #$(this-package-native-input "clang")
-                                  "/bin/clang++"))
-           #:test-exclude (string-join
-                           (list
-                            "osl-imageio" ; file does not exist
-                            "osl-imageio.opt" ; file does not exist
-                            "osl-imageio.opt.rs_bitcode" ; file does not exist
-                            "texture-udim"    ; file does not exist
-                            "texture-udim.opt" ; file does not exist
-                            "texture-udim.opt.rs_bitcode" ; file does not exist
-                            "example-deformer" ; could not find OSLConfig
-                            "python-oslquery") ; no module oslquery
-                           "|")))
-    (native-inputs
-     (list bison
-           clang-13
-           flex
-           llvm-13
-           pybind11-2
-           python-wrapper))
-    (inputs
-     (list boost-1.83
-           imath
-           openexr
-           openimageio
-           pugixml
-           qtbase
-           zlib))
-    (home-page "https://github.com/AcademySoftwareFoundation/OpenShadingLanguage")
+     (list
+      #:configure-flags
+      #~(list "-DUSE_PARTIO=OFF" ;TODO: not packaged
+              ;; OSL looks for Clang libraries in the LLVM dir, but they are
+              ;; in the Clang dir.  See src/cmake/modules/FindLLVM.cmake.
+              (string-append
+               "-DCLANG_LIBRARIES="
+               (apply string-append
+                      (map (lambda (lib)
+                             (string-append
+                              #$(this-package-native-input "clang")
+                              "/lib/libclang" lib ".a;"))
+                           ;; They have to be in this order.
+                           (list "Frontend"
+                                 "Driver"
+                                 "Serialization"
+                                 "Parse"
+                                 "Sema"
+                                 "Analysis"
+                                 "AST"
+                                 "ASTMatchers"
+                                 "Edit"
+                                 "Lex"
+                                 "Support"
+                                 "APINotes"
+                                 "Basic"
+                                 "Options"
+                                 "AnalysisLifetimeSafety"))))
+              (string-append "-DLLVM_BC_GENERATOR="
+                             #$(this-package-native-input "clang")
+                             "/bin/clang++"))
+      #:test-exclude (string-join
+                      (list "osl-imageio" ;file does not exist
+                            "osl-imageio.opt" ;file does not exist
+                            "osl-imageio.opt.rs_bitcode" ;file does not exist
+                            "texture-udim" ;file does not exist
+                            "texture-udim.opt" ;file does not exist
+                            "texture-udim.opt.rs_bitcode" ;file does not exist
+                            "example-deformer" ;could not find OSLConfig
+                            "python-oslquery") ;no module oslquery
+                      "|")))
+    (native-inputs (list bison
+                         clang
+                         flex
+                         llvm
+                         pybind11
+                         python-wrapper))
+    (inputs (list imath
+                  openexr
+                  openimageio
+                  pugixml
+                  qtbase
+                  robin-map
+                  zlib))
+    (home-page
+     "https://github.com/AcademySoftwareFoundation/OpenShadingLanguage")
     (synopsis "Shading language for production GI renderers")
     (description "Open Shading Language (OSL) is a language for programmable
 shading in advanced renderers and other applications, ideal for describing
