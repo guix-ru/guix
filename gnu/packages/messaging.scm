@@ -1241,7 +1241,7 @@ of xmpppy.")
 (define-public gajim
   (package
     (name "gajim")
-    (version "2.4.6")
+    (version "2.5.0")
     (source
      (origin
        (method url-fetch)
@@ -1249,7 +1249,7 @@ of xmpppy.")
                            (version-major+minor version)
                            "/gajim-" version ".tar.gz"))
        (sha256
-         (base32 "0ilpgkzw45scjlnag94p8v6np629v7w0ihci5a2w5d742gpqvq6c"))
+         (base32 "1q7pg604d92v9ra6c6njkvc6mrhpfv65akmax5f6bmk3fhvrfa9l"))
        (patches
          (search-patches "gajim-honour-GAJIM_PLUGIN_PATH.patch"))))
     (build-system pyproject-build-system)
@@ -1307,7 +1307,6 @@ of xmpppy.")
      (list
       (search-path-specification
        (variable "GAJIM_PLUGIN_PATH")
-       (separator #f) ; single entry
        (files (list "share/gajim/plugins")))
       ;; Gajim needs to use the propagated inputs of its plugins.
       (search-path-specification
@@ -1319,7 +1318,7 @@ of xmpppy.")
           ;; FIXME: Cannot use this expression as it would
           ;; introduce a circular dependency at the top level.
           ;; (version-major+minor (package-version python))
-          "3.11"
+          "3.12"
           "/site-packages"))))))
     (native-inputs
      (list gettext-minimal
@@ -1365,6 +1364,7 @@ of xmpppy.")
            python-pycairo
            python-pygobject
            python-pyopenssl
+           python-pysequoia
            python-qrcode
            python-sqlalchemy-2
            python-truststore))

@@ -1,11 +1,18 @@
---- a/gajim/common/configpaths.py	2020-11-19 12:12:02.004414323 +0100
-+++ a/gajim/common/configpaths.py	2020-11-19 15:34:52.211476895 +0100
-@@ -47,7 +47,7 @@
-         return [Path(_paths['PLUGINS_BASE']),
-                 Path('/app/plugins')]
-     return [Path(_paths['PLUGINS_BASE']),
--            Path(_paths['PLUGINS_USER'])]
-+            Path(_paths['PLUGINS_USER'])] + ([Path(os.getenv('GAJIM_PLUGIN_PATH'))] if os.getenv('GAJIM_PLUGIN_PATH') and Path(os.getenv('GAJIM_PLUGIN_PATH')).is_dir() else [])
+diff --git a/gajim/common/configpaths.py b/gajim/common/configpaths.py
+index f9076d7..b5b5eed 100644
+--- a/gajim/common/configpaths.py
++++ b/gajim/common/configpaths.py
+@@ -42,7 +42,12 @@ def get_temp_dir() -> Path:
+ def get_plugin_dirs() -> list[Path]:
+     if gajim.IS_FLATPAK:
+         return [Path(_paths["PLUGINS_BASE"]), Path("/app/plugins")]
+-    return [Path(_paths["PLUGINS_BASE"]), Path(_paths["PLUGINS_USER"])]
++
++    dirs = [Path(_paths["PLUGINS_BASE"]), Path(_paths["PLUGINS_USER"])]
++    for path in os.getenv("GAJIM_PLUGIN_PATH", "").split(":"):
++        if path and Path(path).is_dir():
++            dirs.append(Path(path))
++    return dirs
  
  
- def get_paths(type_: PathType) -> Generator[str, None, None]:
+ def get_ui_path(filename: str) -> Path:
