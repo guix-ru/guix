@@ -35171,8 +35171,8 @@ file.")
   (sbcl-package->ecl-package sbcl-zpng))
 
 (define-public sbcl-zr-utils
-  (let ((commit "e7eaffcb71811f6e1ab85fb15a079bcac4038eeb")
-        (revision "0"))
+  (let ((commit "be63dff7020c5d8dd2016eb530a7e0285c0cf200")
+        (revision "1"))
     (package
       (name "sbcl-zr-utils")
       (version (git-version "0.0.0.0" revision commit))
@@ -35184,24 +35184,17 @@ file.")
                (commit commit)))
          (file-name (git-file-name "cl-zr-utils" version))
          (sha256
-          (base32 "1nx388974wdc49h3simr1jnv4rw1mcs2llv4xai88qwjf4y66hsy"))))
+          (base32 "0i30ynx33ag7krmy4s8jiws6sl2cnczk8p1dx8bf1m8zf4fjnkmc"))))
       (build-system asdf-build-system/sbcl)
-      (native-inputs (list sbcl-parachute))
       (inputs
         (list sbcl-alexandria
               sbcl-babel
               sbcl-closer-mop
               sbcl-cl-unicode
-              sbcl-trivial-gray-streams))
+              sbcl-trivial-gray-streams
+              sbcl-trivial-with-current-source-form))
       (arguments
-       (list #:tests? #f ; FIXME: Failing with new parachute.
-             #:phases
-             #~(modify-phases %standard-phases
-                 (add-after 'unpack 'fix-tests
-                   (lambda _
-                     (substitute* "zr-utils.asd"
-                       (("\\(:parachute")
-                        "(:parachute :zr-utils/tests/all")))))))
+       (list #:tests? #f)) ; FIXME: Test system not found.
       (synopsis "Common Lisp utilities library")
       (description
        "This is a Common Lisp utilities library originating from the
