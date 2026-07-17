@@ -1087,7 +1087,7 @@ in the style of communicating sequential processes (@dfn{CSP}).")
   (package
     (inherit go-1.24)
     (name "go")
-    (version "1.25.11")
+    (version "1.25.12")
     (source
      (origin
        (method git-fetch)
@@ -1096,7 +1096,7 @@ in the style of communicating sequential processes (@dfn{CSP}).")
               (commit (string-append "go" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0l9z57fzjca7z038yxkkxc42f18hcnznbfd3cq4ipng9cp5l2zfc"))))
+        (base32 "13191v8vixwf9a1yrn7hz828xfgdgm5dxx4vp0h4s0bzl4rzjn32"))))
     (arguments
      (substitute-keyword-arguments (package-arguments go-1.24)
        ((#:phases phases)
@@ -1109,6 +1109,13 @@ in the style of communicating sequential processes (@dfn{CSP}).")
                 (substitute* "src/runtime/synctest_test.go"
                   (("TestSynctest\\(.*" all)
                    (string-append all "\n        t.Skip(\"golang.org/issue/73977\")\n")))))
+            (add-after 'unpack 'remove-testscript-mod_get_fips140_issue73649.txt
+              (lambda _
+                ;; vcs-test.golang.org rerouted to http://127.0.0.1:46381
+                ;; https://vcs-test.golang.org rerouted to https://127.0.0.1:44403
+                ;; go test proxy running at GOPROXY=http://127.0.0.1:40005/mod
+                ;; 2026/07/17 10:05:01 http: TLS handshake error from 127.0.0.1:33040: EOF
+                (delete-file "src/cmd/go/testdata/script/mod_get_fips140_issue73649.txt")))
             #$@(if (target-aarch64?)
                    '((add-after 'unpack 'skip-shaky-tests-on-aarch64-system
                       (lambda _
