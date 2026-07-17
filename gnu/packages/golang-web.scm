@@ -77,6 +77,7 @@
   #:use-module (guix git-download)
   #:use-module (guix utils)
   #:use-module (gnu packages)
+  #:use-module (gnu packages aidc)
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages golang)
@@ -6406,6 +6407,93 @@ Features:
 @item supports v3 onion services
 @item support for embedded control socket in Tor >= 0.3.5
 @end itemize")
+    (license license:expat)))
+
+(define-public go-github-com-d99kris-nchat-lib-wmchat-go
+  (package
+    (name "go-github-com-d99kris-nchat-lib-wmchat-go")
+    (version "5.18.20")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/d99kris/nchat")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "014g7vc32dpdjljj1ahph52zjhll1sn1qx5dki3nkvvaijis696l"))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils)
+                         (ice-9 ftw)
+                         (srfi srfi-26))
+            (define (delete-all-but-rec preserve)
+              (let ((dir (dirname preserve))
+                    (pred (negate
+                           (cut member
+                                <> (list "." ".." (basename preserve))))))
+                (with-directory-excursion dir
+                  (for-each delete-file-recursively
+                            (scandir "." pred)))
+                (unless (string=? dir ".")
+                  (delete-all-but-rec dir))))
+            (let ((sub "lib/wmchat/go"))
+              (delete-all-but-rec sub)
+              (substitute* (string-append sub "/go.mod")
+                (("replace go.mau.fi/whatsmeow => ./ext/whatsmeow") ""))
+              (delete-file-recursively
+               (string-append sub "/CMakeLists.txt")))))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;This package is a sub-module of nchat
+      #:import-path "github.com/d99kris/nchat/lib/wmchat/go"
+      #:unpack-path "github.com/d99kris/nchat"
+      #:embed-files
+      #~(list ".*\\.sql"
+              ".*\\.json"
+              ".*\\.argo")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'apply-whatsmeow-nchat-patch
+            (lambda* (#:key inputs #:allow-other-keys)
+              (let* ((patch #$(local-file
+                               (search-patch "nchat-whatsmeow.patch")))
+                     (whatsmeow "src/go.mau.fi/whatsmeow")
+                     (download (string-append whatsmeow "/download.go"))
+                     (frame (string-append whatsmeow "/socket/framesocket.go"))
+                     (download-src (search-input-file inputs download))
+                     (frame-src (search-input-file inputs frame)))
+                (delete-file download)
+                (delete-file frame)
+                (copy-file download-src download)
+                (copy-file frame-src frame)
+                (with-directory-excursion whatsmeow
+                  (invoke "patch" "--force" "--no-backup-if-mismatch"
+                          "-p1" "--input" patch)))))
+          (add-after 'install 'build-install-libcgowm
+            (lambda _
+              (with-directory-excursion
+                  "src/github.com/d99kris/nchat/lib/wmchat/go"
+                (invoke "go" "build" "-buildmode=c-shared"
+                        "-o" "libcgowm.so" ".")
+                (for-each (lambda (file dir)
+                            (install-file file
+                                          (string-append #$output dir)))
+                          '("libcgowm.so" "libcgowm.h")
+                          '("/lib" "/include"))))))))
+    (propagated-inputs
+     (list go-go-mau-fi-whatsmeow
+           go-github-com-mattn-go-sqlite3
+           go-github-com-mdp-qrterminal
+           go-github-com-skip2-go-qrcode
+           go-go-mau-fi-libsignal
+           go-google-golang-org-protobuf))
+    (home-page "https://github.com/d99kris/nchat")
+    (synopsis "Go sub-module for @code{nchat}")
+    (description
+     "This package provides the Go sub-module to build the @code{libcgowm},
+a whatsapp protocal library for @code{nchat} messaging package.")
     (license license:expat)))
 
 (define-public go-github-com-danielgtaylor-huma-v2
