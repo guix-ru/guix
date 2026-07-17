@@ -4502,8 +4502,8 @@ tables.")
   (sbcl-package->clasp-package sbcl-cl-ascii-table))
 
 (define-public sbcl-cl-async
-  (let ((commit "f6423e44404a44434d803605e0d2e17199158e28")
-        (revision "1"))
+  (let ((commit "a2fa3d65a520d9b0cc6f5e5c294a68776d0c4e8b")
+        (revision "2"))
     (package
       (name "sbcl-cl-async")
       (version (git-version "0.6.1" revision commit))
@@ -4516,7 +4516,7 @@ tables.")
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "11xi9dxb8mjgwzrkj88i0xkgk26z9w9ddxzbv6xsvfc1d4x5cf4x"))))
+           "0z1zb8dvi0p5kx2fv1wi092l50jb88xwsbxzmkmny9647jfcq9kv"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-babel
