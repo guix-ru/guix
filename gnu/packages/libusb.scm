@@ -898,14 +898,14 @@ HID-Class devices.")
 (define-public python-hidapi
   (package
     (name "python-hidapi")
-    (version "0.14.0.post2")
+    (version "0.15.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "hidapi" version))
        (sha256
         (base32
-         "1b2q4kpzvfbbdy5xjh5nas3ymg7gspqai5dla6fk16h5dfx9f3kc"))
+         "0483ak6lzpcdkvzr0aqcapn92h08byi0n7j2bxsqhywbprf2dg7c"))
        (modules '((guix build utils)))
        (snippet
         ;; Remove bundled libraries.
@@ -916,16 +916,7 @@ HID-Class devices.")
      (list
       #:test-backend #~'unittest
       #:configure-flags
-      #~'(("--build-option" . "--with-system-hidapi"))
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'patch-configuration
-            (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* "setup.py"
-                (("/usr/include/libusb-1.0")
-                 (search-input-directory inputs "include/libusb-1.0"))
-                (("/usr/include/hidapi")
-                 (search-input-directory inputs "include/hidapi"))))))))
+      #~'(("--build-option" . "--with-system-hidapi"))))
     (inputs
      (list hidapi libusb eudev))
     (native-inputs
