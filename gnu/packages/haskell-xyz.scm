@@ -9993,6 +9993,31 @@ pure Haskell.  It is about 25 times slower than this package, but still quite
 usable.")
     (license license:bsd-3)))
 
+(define-public ghc-ram
+  (package
+    (name "ghc-ram")
+    (version "0.22.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "ram" version))
+       (sha256
+        (base32 "05ax0g99h0rngw8hl2vz1wrjz5p1jbka8ybh7fgrs0kfqc8l0zig"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "ram")))
+    (native-inputs (list ghc-quickcheck ghc-tasty))
+    (home-page "https://github.com/jappeace/ram")
+    (synopsis "memory and related abstraction stuff")
+    (description
+     "This is a fork of memory.  It's open to accept changes from anyone, and aims to
+use existing well maintained libraries as much as possible.  Chunk of memory,
+polymorphic byte array management and manipulation * A polymorphic byte array
+abstraction and function similar to strict @code{ByteString}. * Different type
+of byte array abstraction. * Raw memory IO operations (memory set, memory copy,
+..) * Aliasing with endianness support. * Encoding : Base16, Base32, Base64. *
+Hashing : FNV, @code{SipHash}.")
+    (license license:bsd-3)))
+
 (define-public ghc-random
   (package
     (name "ghc-random")
