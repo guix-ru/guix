@@ -3906,8 +3906,8 @@ coverage.")
   (sbcl-package->ecl-package sbcl-chirp))
 
 (define-public sbcl-chlorophyll
-  (let ((commit "f2a50ad36d2fb11823c0e5a8da08a0de89c5c35f")
-        (revision "1"))
+  (let ((commit "485539419fad9e7e739d965f845f9898927ac31b")
+        (revision "2"))
     (package
       (name "sbcl-chlorophyll")
       (version (git-version "0.0.1" revision commit))
@@ -3919,7 +3919,7 @@ coverage.")
                (commit commit)))
          (file-name (git-file-name "cl-chlorophyll" version))
          (sha256
-          (base32 "1hgl8sjsmyqx4gs77q4p94b63zgpxk1wi9w9niki8j0213dr1s3y"))))
+          (base32 "0q681pbcx4vcshrlligd5h07kakbjprb0kpf48z4glswy59vg8mg"))))
       (build-system asdf-build-system/sbcl)
       (native-inputs (list sbcl-fiveam))
       (inputs (list sbcl-alexandria))
