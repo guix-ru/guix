@@ -25,6 +25,7 @@
   #:use-module (gnu packages lisp-xyz)
   #:use-module (gnu packages machine-learning)
   #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-check)
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-xyz)
   #:use-module (guix build-system asdf)
@@ -42,7 +43,7 @@
 ;;; Code:
 
 
-(define %cirq-version "1.6.1")
+(define %cirq-version "1.7.0")
 
 (define %cirq-home-page "https://quantumai.google/cirq")
 
@@ -58,7 +59,7 @@
            (commit (string-append "v" %cirq-version))))
     (file-name (git-file-name "python-cirq" %cirq-version))
     (sha256
-     (base32 "13ycpfwzwinipgmk62i4pm5r7v7vfwbzd01llrib17jff8cj7sik"))))
+     (base32 "1bd8bsigfq9f00420bxj4snpcp4kr8x54y8kjx62a5q46diq231q"))))
 
 (define-public python-cirq-core
   (package
@@ -86,6 +87,7 @@
            python-ply
            python-pylatex
            python-pytest
+           python-pytest-benchmark
            python-setuptools))
     (propagated-inputs
      (list python-attrs
