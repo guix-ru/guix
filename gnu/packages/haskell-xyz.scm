@@ -13088,6 +13088,28 @@ function which generates instances.")
 features as possible.")
     (license license:bsd-3)))
 
+(define-public ghc-time-hourglass
+  (package
+    (name "ghc-time-hourglass")
+    (version "0.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (hackage-uri "time-hourglass" version))
+       (sha256
+        (base32 "08lx5dhs529wqxqh454svyx1l814hwzcn1l669h320x5vms7qz4w"))))
+    (build-system haskell-build-system)
+    (properties '((upstream-name . "time-hourglass")))
+    (native-inputs (list ghc-tasty ghc-tasty-hunit ghc-tasty-quickcheck))
+    (home-page "https://github.com/mpilgrem/time-hourglass")
+    (synopsis "A simple and efficient time library")
+    (description
+     "This package provides a simple and efficient time library.  A key part of the
+library is the `Timeable` and `Time` type classes.  Types representing time
+values that are instances of the classes allow easy conversion between values of
+one time type and another.")
+    (license license:bsd-3)))
+
 (define-public ghc-time-locale-compat
   (package
     (name "ghc-time-locale-compat")
