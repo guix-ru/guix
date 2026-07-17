@@ -49,6 +49,7 @@
 ;;; Copyright © 2025 Adrien 'neox' Bourmault <neox@gnu.org>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
+;;; Copyright © 2026 Tomás Ortín Fernández (quanrong) <quanrong@mailbox.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1207,7 +1208,7 @@ basic IRC protocol, CTCP, and DCC connections.")
 (define-public python-nbxmpp
   (package
     (name "python-nbxmpp")
-    (version "7.2.0")
+    (version "7.3.0")
     (source
      (origin
        (method git-fetch)
@@ -1216,7 +1217,7 @@ basic IRC protocol, CTCP, and DCC connections.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1dyf4jh76ffbl45x4cpk6rsn1r4wck54b3d8wfd2swxaqq4p7lis"))))
+        (base32 "0ywrkzxnr575k8zmzcnaf17sp89dy8br1xndm4k94b1vk1kq5iaj"))))
     (build-system pyproject-build-system)
     (arguments (list #:test-backend #~'unittest))
     (propagated-inputs
