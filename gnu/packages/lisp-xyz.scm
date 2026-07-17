@@ -1388,11 +1388,11 @@ Common Lisp.")
   (sbcl-package->ecl-package sbcl-anypool))
 
 (define-public sbcl-april
-  (let ((commit "bdd74f168ec82f28fe4ab692f2c0af39441a5701")
-        (revision "3"))
+  (let ((commit "0001af6d518d0e8fdf6a7d1688dd92a2fd9b29df")
+        (revision "4"))
     (package
       (name "sbcl-april")
-      (version (git-version "1.0" revision commit))
+      (version (git-version "1.0.0" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -1401,7 +1401,7 @@ Common Lisp.")
                (commit commit)))
          (file-name (git-file-name "cl-april" version))
          (sha256
-          (base32 "0hvlp2286z1ksa7jr7r661kdr0lpfv25n5chl72jrzq5zz70lidx"))
+          (base32 "0grl19c8i6r9rr8l80yjsz049701i26klmsgf6594jw14m9x1s0d"))
          (modules '((guix build utils)))
          (snippet '(begin
                      ;; Remove bundled Apache-relicensed MaxPC.
