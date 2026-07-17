@@ -308,21 +308,39 @@ reinventing them.")
     (build-system go-build-system)
     (arguments
      (list
-      #:skip-build? #t  ;XXX: remove when go-team is merged
+      ;; forgejo-runner binary is in forgejo-runner package, this is a Go
+      ;; source library to use in inputs for other packages.
+      #:skip-build? #f
       #:import-path "code.forgejo.org/forgejo/runner/v12"
       #:embed-files #~(list ".*\\.json" ".*\\.js" ".*\\.sh")
-      #:test-subdirs    ;XXX: remove when go-team is merged
-      #~(list "act/model"
-              "act/common"
-              "act/schema"
-              "act/jobparser"
-              "act/exprparser"
-              "act/workflowpattern"
-              "internal/pkg/config"
-              "internal/pkg/labels"
-              "act/common/gitignore")))
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; Newtork access and running Docker are required.
+                       (list "TestCancelLongRunningCommand"
+                             "TestClone/annotated-tag"
+                             "TestClone/branch"
+                             "TestClone/sha"
+                             "TestClone/short-sha"
+                             "TestClone/tag"
+                             "TestCloneIfRequired/clone"
+                             "TestCloneIfRequired/clone_different_remote"
+                             "TestHandler"
+                             "TestHandlerAPIFatalErrors/commit"
+                             "TestHandlerAPIFatalErrors/find"
+                             "TestHandlerAPIFatalErrors/get"
+                             "TestHandlerAPIFatalErrors/upload"
+                             "TestHandler_gcCache"
+                             "TestPollerPoll"
+                             "TestPollerPoll/fetchTasks_rate_limited"
+                             "TestRunJob_WithConnectionFromCommandOptions"
+                             "TestRunner_ReusableWorkflowGitHubInstance"
+                             "TestStepDockerMain")
+                       "|")
+              "-args" "-features" "-"
+              )))
     (native-inputs
-     (list go-github-com-google-go-cmp
+     (list git-minimal/pinned
+           go-github-com-google-go-cmp
            go-github-com-spf13-cobra
            go-github-com-spf13-pflag
            go-github-com-stretchr-testify))
