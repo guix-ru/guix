@@ -4165,7 +4165,7 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
 (define-public mlt
   (package
     (name "mlt")
-    (version "7.36.1")
+    (version "7.40.0")
     (source
      (origin
        (method git-fetch)
@@ -4174,7 +4174,7 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0kchbyh71bzw28s1hlifd49hqi4p2lliydy4h6xxlpkwi9pjp440"))))
+        (base32 "0pn0f6d6qjjnzp9ygx4gl5n74xr13ylfr2fygnijhd9z0mvzba5c"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -4219,6 +4219,7 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
            qt5compat
            qtbase
            qtsvg
+           rnnoise
            rtaudio
            rubberband
            sdl2
@@ -4226,7 +4227,7 @@ from sites like Twitch.tv and pipes them into a video player of choice.")
            sox
            vidstab))
     (native-inputs
-     (list frei0r-api pkg-config python-minimal swig-4.0))
+     (list frei0r-api pkg-config python-minimal swig-4.4))
     (native-search-paths
      (list (search-path-specification
             (variable "FREI0R_PATH")
