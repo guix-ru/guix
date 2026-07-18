@@ -392,11 +392,7 @@ without requiring the source code to be rewritten.")
        ((#:parallel-build? _ #f)
         (not (%current-target-system)))
        ((#:configure-flags flags #~'())
-        ;; XXX: JIT-enabled Guile crashes in obscure ways on GNU/Hurd.
-        #~(cons* #$@(if (target-hurd?)
-                        #~("--disable-jit")
-                        #~())
-                 ;; -fexcess-precision=standard is required when compiling for
+        #~(cons* ;; -fexcess-precision=standard is required when compiling for
                  ;; i686-linux, otherwise "numbers.test" will fail
                  ;; (see <https://issues.guix.gnu.org/49368> and
                  ;; <https://issues.guix.gnu.org/49659>).
