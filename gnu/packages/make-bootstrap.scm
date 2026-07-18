@@ -639,9 +639,6 @@ for `sh' in $PATH, and without nscd, and with static NSS modules."
                          #~("AR=gcc-ar" "RANLIB=gcc-ranlib")
                          #~())
 
-                  #$@(if (target-hurd?)
-                         #~("--disable-jit")
-                         #~())
                   #$@(if (target-hurd64?)
                          #~("lt_cv_prog_compiler_static_works=yes")
                          #~())))
