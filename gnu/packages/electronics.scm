@@ -2914,20 +2914,21 @@ the timing of a design using standard file formats.")
 (define-public openroad
   (package
     (name "openroad")
-    (version "26Q2")
+    (version "26Q3")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/The-OpenROAD-Project/OpenROAD")
               (commit version)
-              ;; 26Q1 Uses:
-              ;; - forked, custom opensta: v2.2.0-1952-g43177bba
-              ;; - forked, custom (berkeley) abc: 20260301.0445-g17cadca08
+              ;; 26Q3 Uses:
+              ;; - forked, custom opensta
+              ;; - forked, custom (berkeley) abc
+              ;; - magic commit number of yosys-slang
               (recursive? #t)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "152j78c47wyq4sw42bwlxdhvs5g47a8jqz1qz5yzdsk9z5y4y7vl"))))
+        (base32 "1nmklw2mr28p07g5d9zxq9x3n2s2bzilqc5gq535inlcr5pl0jcc"))))
     (build-system qt-build-system)
     (arguments
      (list
@@ -2942,20 +2943,7 @@ the timing of a design using standard file formats.")
       #~(modify-phases %standard-phases
           (add-before 'check 'symlink-test-dir
             (lambda _
-              (symlink "../build" "../source/build")))
-          (add-after 'unpack 'fix-boost-cmake
-            (lambda _
-              (substitute* (find-files "." "CMakeLists\\.txt")
-                (("set\\(Boost_USE_STATIC_LIBS ON\\)")
-                 "set(Boost_USE_STATIC_LIBS OFF)")
-                (("Boost_USE_STATIC_LIBS TRUE")
-                 "Boost_USE_STATIC_LIBS FALSE")
-                (("COMPONENTS serialization system thread")
-                 "COMPONENTS serialization thread")
-                (("COMPONENTS system thread")
-                 "COMPONENTS thread")
-                (("Boost::system")
-                 "")))))))
+              (symlink "../build" "../source/build"))))))
     (native-inputs
      (list bison
            flex
@@ -2967,10 +2955,11 @@ the timing of a design using standard file formats.")
            boost
            cudd
            eigen
+           fmt-12
            glpk
            gmp
            lemon-graph
-           libomp-13
+           libomp
            mpfr
            or-tools
            protobuf-6
