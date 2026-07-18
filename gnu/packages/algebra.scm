@@ -1651,7 +1651,7 @@ objects.")
 (define-public spectra
   (package
     (name "spectra")
-    (version "1.1.0")
+    (version "1.2.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1660,7 +1660,7 @@ objects.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0n080n8ap3b6y7nz0xrlq3x7i4nsf4pl65l5z1r828kkx88agpms"))))
+                "1npf7ki37g3lp0ip3as0ihf49fv62wivfzskzz6nmp6gfk1cxxlm"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags #~(list "-DBUILD_TESTS=ON")))
