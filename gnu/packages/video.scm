@@ -3207,27 +3207,32 @@ To load this plugin, specify the following option when starting mpv:
 (define-public mpvpaper
   (package
     (name "mpvpaper")
-    (version "1.8")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/GhostNaN/mpvpaper")
-                    (commit version)))
-              (sha256
-               (base32 "0pzc6f5r85qd0dgp6aa6pp8ba2m7ghzd3pc4xnqnarh2bx55jf95"))
-              (file-name (git-file-name name version))))
+    (version "1.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/GhostNaN/mpvpaper")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "082x1bj7byd3lrlagcp0pgcs3blis48fnpcjdqpkqvi66s3hr70n"))))
     (build-system meson-build-system)
-     (inputs
-      (list mesa mpv wayland wayland-protocols))
-     (native-inputs
-      (list pkg-config cmake-minimal))
-     (home-page "https://github.com/GhostNaN/mpvpaper")
-     (synopsis
-      "Video wallpaper program for wlroots-based wayland compositors")
-     (description "The mpvpaper package provides a wallpaper program for
-wlroots-based wayland compositors, allowing you to play videos as your
-wallpaper using mpv.")
-     (license license:gpl3)))
+    (inputs
+     (list mesa
+           mpv
+           wayland
+           wayland-protocols))
+    (native-inputs
+     (list cmake-minimal
+           pkg-config))
+    (home-page "https://github.com/GhostNaN/mpvpaper")
+    (synopsis
+     "Video wallpaper program for wlroots-based wayland compositors")
+    (description
+     "The mpvpaper package provides a wallpaper program for wlroots-based
+wayland compositors, allowing you to play videos as your wallpaper using mpv.")
+    (license license:gpl3)))
 
 (define-public libvpx
   (package
