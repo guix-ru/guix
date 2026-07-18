@@ -912,6 +912,7 @@ the store.")
         "glibc-2.41-hurd-local-clock_gettime_MONOTONIC.patch"
         "glibc-2.43-hurd-unimplemented-ioctls.patch"
         "glibc-hurd-unsupported-ioctls.patch"
+        "glibc-hurd-ldconfig.patch"
         "glibc-hurd-mach-print.patch"
         "glibc-hurd-gettyent.patch"
         "glibc-hurd-getauxval.patch"

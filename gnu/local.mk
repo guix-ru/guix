@@ -1518,6 +1518,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/glibc-hurd-clock_t_centiseconds.patch	\
   %D%/packages/patches/glibc-hurd-getauxval.patch		\
   %D%/packages/patches/glibc-hurd-gettyent.patch		\
+  %D%/packages/patches/glibc-hurd-ldconfig.patch 		\
   %D%/packages/patches/glibc-hurd-mach-print.patch		\
   %D%/packages/patches/glibc-hurd-unsupported-ioctls.patch 	\
   %D%/packages/patches/glibc-hurd-signal-sa-siginfo.patch	\
