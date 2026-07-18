@@ -1,0 +1,31 @@
+Taken from: https://salsa.debian.org/glibc-team/glibc/-/blob/sid/debian/patches/hurd-i386/local-enable-ldconfig.diff
+
+# DP: Description: Enable ldconfig and such on hurd-i386
+# DP: Author: Jeff Bailey <jbailey@nisa.net>
+# DP: Related Bugs: #309489
+# DP: Upstream status: Not submitted
+# DP: Status Details: Upstream disagrees with this patch, but I'm
+# DP: putting it in so that we have expected Debian behaviour on the
+# DP: Hurd.  We should review this when the ELF standard supports runpath.
+# DP: Date: 08 Apr 2003
+  
+---
+ sysdeps/mach/hurd/configure    |    1 +
+ sysdeps/mach/hurd/configure.ac |    2 ++
+ 2 files changed, 3 insertions(+)
+
+--- a/sysdeps/mach/hurd/configure
++++ b/sysdeps/mach/hurd/configure
+@@ -223,3 +223,4 @@
+ # Hurd already provides abort implementation for the loader
+ abort_in_ld=yes
+ 
++use_ldconfig=yes
+--- a/sysdeps/mach/hurd/configure.ac
++++ b/sysdeps/mach/hurd/configure.ac
+@@ -50,3 +50,5 @@
+ pthread_in_libc=no
+ # Hurd already provides abort implementation for the loader
+ abort_in_ld=yes
++
++use_ldconfig=yes
