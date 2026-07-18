@@ -683,14 +683,14 @@ choice.  Supported launchers are: dmenu, fuzzel, rofi, walker and custom.")
 (define-public catppuccin-whiskers
   (package
     (name "catppuccin-whiskers")
-    (version "2.5.1")
+    (version "2.9.0")
     (source
      (origin
        (method url-fetch)
        (uri (crate-uri "catppuccin-whiskers" version))
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
-        (base32 "0jjh8qkc7a0vn9wshfi6qmn8b03694kdz9r95fgxmw0fpw6vpnjn"))))
+        (base32 "0hyiac3436494grgajaznr7dbrfbjzcan5ih5dym1g599ajsavlj"))))
     (build-system cargo-build-system)
     (arguments '(#:install-source? #f))
     (inputs (cargo-inputs 'catppuccin-whiskers))
