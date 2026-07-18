@@ -560,21 +560,18 @@ and prevents bad data from getting to the icecast server.")
     (license license:gpl2+)))
 
 (define-public rnnoise
-  ;; No upstream release
-  (let ((commit "7f449bf8bd3b933891d12c30112268c4090e4d59")
-        (revision "0"))
    (package
      (name "rnnoise")
-     (version (git-version "0" revision commit))
+     (version "0.1.1")
      (source (origin
                (method git-fetch)
                (uri (git-reference
                      (url "https://gitlab.xiph.org/xiph/rnnoise")
-                     (commit commit)))
+                     (commit (string-append "v" version))))
                (file-name (git-file-name name version))
                (sha256
                 (base32
-                 "0y8jdvxd9namw4f9hcmcmm2q0f32mnhfyjap8906hl308cws3rkj"))))
+                 "1gmj3l76jjjsfgxwsqsgjs4n4wvrrsl3hiafgsrdc6v63in5zr6s"))))
      (build-system gnu-build-system)
      (native-inputs
       (list autoconf automake libtool))
@@ -584,4 +581,4 @@ and prevents bad data from getting to the icecast server.")
 neural network.  The algorithm is described in Jean-Marc Valin's paper
 @cite{A Hybrid DSP/Deep Learning Approach to Real-Time Full-Band Speech
 Enhancement}.")
-     (license license:bsd-3))))
+     (license license:bsd-3)))
