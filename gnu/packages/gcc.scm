@@ -992,14 +992,14 @@ It also includes runtime support libraries for these languages.")
 (define-public gcc-14
   (package
     (inherit gcc-13)
-    (version "14.3.0")
+    (version "14.4.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/gcc/gcc-"
                                   version "/gcc-" version ".tar.xz"))
               (sha256
                (base32
-                "0fna78ly417g69fdm4i5f3ms96g8xzzjza8gwp41lqr5fqlpgp70"))
+                "1ngnj3d0jb0if38akydz713pipbb66qq0xksqxck3j7agdb6yavm"))
               (patches (search-patches "gcc-12-strmov-store-file-names.patch"
                                        "gcc-5.0-libvtv-runpath.patch"
                                        "gcc-mangle-guix-store.patch"))
