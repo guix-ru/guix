@@ -804,7 +804,7 @@ aliasing facilities to work just as they would on normal mail.")
 (define-public mutt
   (package
     (name "mutt")
-    (version "2.2.14")
+    (version "2.3.3")
     (source
      (origin
        (method git-fetch)
@@ -816,7 +816,7 @@ aliasing facilities to work just as they would on normal mail.")
                        "-rel"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1qmq4l8xrmgs3g2an5r6888ih7wrig7m2ib0dv4kajqlnk9bh54s"))
+        (base32 "1npij92kd0yar4b9g1afi98r9h9za5ipjk3fkyrpcj7ac24n4z20"))
        (patches (search-patches "mutt-store-references.patch"))))
     (build-system gnu-build-system)
     (native-inputs
