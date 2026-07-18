@@ -437,7 +437,7 @@ secondary errors.")
            ffmpeg-6
            flac
            flatbuffers
-           fmt
+           fmt-12
            fontconfig
            freetype
            fribidi
