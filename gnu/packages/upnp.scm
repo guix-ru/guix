@@ -243,7 +243,7 @@ It aims to be fully compliant with DLNA and UPnP-AV standards.")
            exiv2
            ffmpeg
            file
-           fmt
+           fmt-12
            icu4c
            jsoncpp
            libebml
