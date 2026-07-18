@@ -585,6 +585,30 @@
                                 ;;; race; we don't always.
                                 "--skip" "cancellation_receiver_fires_after_limit"
                                 ;;; END Stopwatch construction/start offset race
+                                ;;; BEGIN Order-brittle app-list notification
+                                ;;; tests.  Codex fetches its apps list from
+                                ;;; two sources in parallel (installed apps
+                                ;;; via MCP, available apps via HTTP)
+                                ;;; and emits an "app/list/updated"
+                                ;;; notification as each source finishes.
+                                ;;; The tests use server-side delays
+                                ;;; (0 ms for MCP, 300 ms for HTTP) to force
+                                ;;; the MCP source to finish first, then
+                                ;;; assert a strict two-notification
+                                ;;; sequence.
+                                ;;; The implementation is order-agnostic
+                                ;;; (apps_processor.rs suppresses the
+                                ;;; HTTP-only interim; final merged
+                                ;;; state is identical either way).
+                                ;;; When the HTTP source wins the race, only
+                                ;;; the final merged notification fires, so
+                                ;;; the test sees one notification instead of
+                                ;;; two and fails the assertion against the
+                                ;;; expected first (accessible-only)
+                                ;;; notification.
+                                "--skip" "list_apps_emits_updates_and_returns_after_both_lists_load"
+                                "--skip" "list_apps_force_refetch_patches_updates_from_cached_snapshots"
+                                ;;; END Order-brittle app-list notification tests
                                 )
       #:phases
       #~(modify-phases %standard-phases
