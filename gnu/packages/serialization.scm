@@ -215,30 +215,6 @@ serialization.")))
 (define-deprecated-package msgpack
   msgpack-c)
 
-(define-public msgpack-3
-  (package
-    (inherit msgpack-c)
-    (name "msgpack")
-    (version "3.3.0")
-    (source
-     (origin
-       (method url-fetch)
-       (uri
-        (string-append
-         "https://github.com/msgpack/msgpack-c/releases/download/"
-         "cpp-" version "/msgpack-" version ".tar.gz"))
-       (snippet
-        '(let ((p (open-file "msgpack.pc.in" "a")))
-           (display
-            (string-append "Requires: " "zlib" "\n") p)
-           (close-output-port p)))
-       (sha256
-        (base32 "0yzhq50ijvwrfkr97knhvn54lj3f4hr3zy39yq8wpf6xll94s4bf"))))
-    (native-inputs (list googletest-1.8))
-    (description "Msgpack is a library for C/C++ that implements binary
-serialization.  This is the legacy version that predates the split into C and
-C++ specific packages.")))
-
 (define-public libmpack
   (package
     (name "libmpack")
