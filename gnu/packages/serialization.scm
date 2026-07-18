@@ -210,11 +210,6 @@ serialization.")
     (description "Msgpack is a library for C++ that implements binary
 serialization.")))
 
-;;; The msgpack package was split into msgpack-c and msgpack-cxx starting from
-;;; version 4.0.0.
-(define-deprecated-package msgpack
-  msgpack-c)
-
 (define-public libmpack
   (package
     (name "libmpack")
