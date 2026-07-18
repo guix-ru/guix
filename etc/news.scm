@@ -48,7 +48,8 @@
         (title
          (en "SDDM display manager defaults to the Qt5 variant")
          (de "SDDM-Anzeigenverwaltung läuft mit Qt5-Variante als Vorgabe")
-         (fr "Le gestionnaire d'affichage SDDM utilise sa variante Qt5 par défaut"))
+         (fr "Le gestionnaire d'affichage SDDM utilise sa variante Qt5 par défaut")
+         (pt "O SDDM display manager é a variante Qt5 por padrão"))
         (body
          (en "Theme packages for SDDM display manager that only support Qt5 have
 been renamed with a @code{-qt5} suffix.  Since default themes included in the
@@ -72,14 +73,23 @@ SDDM sont conçus pour Qt5, @code{sddm-service-type} a été modifié pour égal
 utiliser la variante Qt5 par défaut.
 
 Si vous utilisez les thèmes Qt6, déclarez la variante Qt6 de SDDM, @code{sddm},
-dans votre enregistrement @code{ssdm-configuration}."))))
+dans votre enregistrement @code{ssdm-configuration}.")
+         (pt "Os pacotes de tema para o SDDM display manager que suportam
+somente Qt5 foram renomeados com um sufixo @code{-qt5}.  Desde que os temas
+padrão inclusos no SDDM display manager são feitos para Qt5,
+@code{sddm-service-type} foi modificado para também usar a variante Qt5 por
+padrão.
+
+Se você está usando os temas Qt6, por favor declare a variante Qt6 do SDDM,
+@code{sddm}, em sua @code{sddm-configuration}."))))
 
  (entry (commit "02bea7700255bc16b2ee2212be878cf2c792884e")
         (title
          (en "Removal of encryption methods from plasma-vault")
          (de "Alte Chiffriermethoden wurden von plasma-vault entfernt")
          (fr "Enlèvement d'anciennes méthodes de chiffrement
-de plasma-vault"))
+de plasma-vault")
+         (pt "Remoção de métodos de encriptação do plasma-vault"))
         (body
          (en "The outdated encryption methods cryfs and encfs have been
 removed from plasma-vault.  For new vaults, it is recommended to use
@@ -94,7 +104,11 @@ wurden, benutzen Sie bitte @command{guix time-machine}.")
 de plasma-vault.  Dans l'avenir, il est recommandé d'utiliser gocryptfs
 pour créer des fichiers chiffrés.  Pour pouvoir accéder à des fichiers
 existants chiffrés avec les anciennes approches, veuillez utiliser
-@command{guix time-machine}.")))
+@command{guix time-machine}.")
+         (pt "Os métodos de encriptação cryfs e encfs foram removidos do
+plasma-vault.  Para novos cofres, é recomendado que use gocryptfs.  Para
+acessar cofres existentes criados com métodos depreciados de encriptação, por
+favor use @command{guix time-machine}.")))
 
  (entry (commit "897832f374dcdc9eeaf19d01e70b9a92fccfc68c")
         (title
