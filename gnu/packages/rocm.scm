@@ -457,7 +457,7 @@ particular CPU vendor or architecture.")
     (inputs (list rocm-hip-runtime
                   numactl
                   curl
-                  fmt-11
+                  fmt-12
                   spdlog-1.15
                   boost
                   catch2))
