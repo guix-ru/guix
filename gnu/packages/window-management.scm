@@ -3512,7 +3512,7 @@ compository, supporting the following features:
     (arguments
      (list #:configure-flags #~(list "--wrap-mode=nodownload")))
     (inputs (list date
-                  fmt
+                  fmt-12
                   gtk-layer-shell
                   gtkmm-3
                   jsoncpp
