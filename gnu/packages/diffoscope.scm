@@ -35,6 +35,7 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages cpio)
   #:use-module (gnu packages dbm)
+  #:use-module (gnu packages dotnet)
   #:use-module (gnu packages firmware)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages ghostscript)
@@ -78,7 +79,7 @@
 (define-public diffoscope
   (package
     (name "diffoscope")
-    (version "323")
+    (version "325")
     (source
      (origin
        (method git-fetch)
@@ -87,12 +88,21 @@
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0sslz0pivr1gn6wz7zp448l9k57izjam2ma1ccryjr9hpc0xsjd9"))))
+        (base32 "1ynafvig5j8agl4jvzpfymv1wc61vhlr5sh59hv322fkk8jk600j"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'add-mono-for-pedump
+            ;; Fixed upstream:
+            ;; https://salsa.debian.org/reproducible-builds/diffoscope/-/commit/b79afa9e56110010f9bf6f7578b379e71400ebc3
+            ;; remove this phase when updating to
+            ;; diffoscope 326
+            (lambda _
+              (substitute* "diffoscope/external_tools.py"
+                ((".debian.: .mono")
+                 "\"guix\": \"mono\", \"debian\": \"mono,"))))
           ;; These tests are broken because our `file` package has a
           ;; bug in berkeley-db and wasm file type detection.
           (add-after 'unpack 'remove-broken-file-type-detection-test
@@ -199,6 +209,12 @@
         ;; fpc is only available on x86 currently.
         ((or "x86_64-linux" "i686-linux")
          (list fpc))
+        (_ '()))
+
+      (match (%current-system)
+        ;; mono is only available on x86 currently.
+        ((or "x86_64-linux" "i686-linux")
+         (list mono))
         (_ '()))
 
       (list gettext-minimal
