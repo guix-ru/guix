@@ -8558,7 +8558,7 @@ type, for example: packages, buffers, files, etc.")
 (define-public emacs-guix
   (package
     (name "emacs-guix")
-    (version "0.6.1")
+    (version "0.7.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -8567,7 +8567,7 @@ type, for example: packages, buffers, files, etc.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "14639wg2717yawj4qhmmzvirrvjy0s1jw2j9wgyzc21h7hl016pz"))))
+                "00904i5kby3794lfyic80pqwbxk4v3a8p1v5v6wi59fzzpwz26kh"))))
     (build-system gnu-build-system)
     (arguments
      (list
