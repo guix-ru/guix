@@ -585,6 +585,88 @@
                                 ;;; race; we don't always.
                                 "--skip" "cancellation_receiver_fires_after_limit"
                                 ;;; END Stopwatch construction/start offset race
+                                ;;; BEGIN invalid remote-control auth-wakeup test
+                                ;;; remote_control_waits_for_account_id_before_enrolling
+                                ;;; tries to prove that auth_manager.reload()
+                                ;;; wakes the remote-control worker before
+                                ;;; REMOTE_CONTROL_ACCOUNT_ID_RETRY_INTERVAL.
+                                ;;; It does this by first waiting 100 ms for
+                                ;;; "no request", then rewriting auth.json,
+                                ;;; calling reload(), and waiting another
+                                ;;; 100 ms for the enroll request.
+                                ;;;
+                                ;;; That is not a valid assertion of the
+                                ;;; intended behavior.  The retry sleep starts
+                                ;;; when the worker first observes the missing
+                                ;;; account id, before the test's first
+                                ;;; 100 ms wait completes.  A larger second
+                                ;;; timeout can therefore overlap the existing
+                                ;;; one-second fallback retry and pass even if
+                                ;;; the auth-change watch never woke the task.
+                                ;;; The test also has no synchronization point
+                                ;;; proving the worker is actually parked on
+                                ;;; auth_change_rx.changed() before reload().
+                                "--skip" "remote_control_waits_for_account_id_before_enrolling"
+                                ;;; END invalid remote-control auth-wakeup test
+                                ;;; BEGIN invalid remote-control timeout tests
+                                ;;; These are tests, not production behavior.
+                                ;;; request_timeout_before_response_headers_is_transient
+                                ;;; tries to prove that a reqwest timeout before
+                                ;;; response headers is classified as a
+                                ;;; transient remote-control server error.
+                                ;;; response_body_timeout_is_transient tries to
+                                ;;; prove the same classification for a timeout
+                                ;;; while reading the response body after a
+                                ;;; partial HTTP 200 response.
+                                ;;;
+                                ;;; Both tests use timed_out_request.  That
+                                ;;; helper starts a fake TCP server and races
+                                ;;; the intended server setup against a 100 ms
+                                ;;; client timeout.  The client is supposed to
+                                ;;; time out; the invalid test assumption is
+                                ;;; that the spawned fake server task has always
+                                ;;; reached the later wait point before that
+                                ;;; timeout fires.  For the header-timeout test
+                                ;;; that means after listener.accept(); for the
+                                ;;; body-timeout test that means after
+                                ;;; listener.accept() and
+                                ;;; stream.write_all(partial_response).
+                                ;;;
+                                ;;; If the client times out before the fake
+                                ;;; server reaches that point, timed_out_request
+                                ;;; has already received the timeout error the
+                                ;;; test wants to assert.  It then tries to
+                                ;;; clean up by sending request_done_tx and
+                                ;;; awaiting server_task.  But request_done_tx
+                                ;;; is only observed after the fake server has
+                                ;;; completed the accept/partial-response setup;
+                                ;;; it cannot wake listener.accept() or an
+                                ;;; earlier write.  server_task.await can
+                                ;;; therefore hang before either test reaches
+                                ;;; assert_transient_timeout.
+                                "--skip" "request_timeout_before_response_headers_is_transient"
+                                "--skip" "response_body_timeout_is_transient"
+                                ;;; END invalid remote-control timeout tests
+                                ;;; BEGIN Order-brittle thread-name websocket
+                                ;;; notification test.
+                                ;;; thread_name_updated_broadcasts_for_loaded_threads
+                                ;;; resumes a stored thread, reads only the
+                                ;;; thread/resume response, renames the thread,
+                                ;;; reads the thread/name/updated notifications,
+                                ;;; and then asserts both websocket clients are
+                                ;;; silent.
+                                ;;;
+                                ;;; The resume path can emit an additional
+                                ;;; thread/goal/cleared snapshot notification
+                                ;;; after the resume response when the resumed
+                                ;;; thread has no stored goal.
+                                ;;; The test does not drain or expect that
+                                ;;; valid post-resume notification, so the
+                                ;;; final silence assertion can fail on
+                                ;;; thread/goal/cleared even though the thread
+                                ;;; rename broadcast itself succeeded.
+                                "--skip" "thread_name_updated_broadcasts_for_loaded_threads"
+                                ;;; END Order-brittle thread-name websocket notification test
                                 ;;; BEGIN Order-brittle app-list notification
                                 ;;; tests.  Codex fetches its apps list from
                                 ;;; two sources in parallel (installed apps
