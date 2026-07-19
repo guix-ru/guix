@@ -1882,8 +1882,8 @@ which will be used as a snippet in origin."
 (define-public tree-sitter-systemverilog
   (tree-sitter-grammar
    "systemverilog" "SystemVerilog"
-   "12sis5yaa23jnagzqcpaq57z0964mcdh37sv7agx2rgs74f26fy3"
-   "0.3.1"
+   "1qmdhd0ln6zhrwj1zpc96ws0x2gdb9fkfk7fwp1zjvkz6fkjc3la"
+   "0.4.0"
    #:repository-url "https://github.com/gmlarumbe/tree-sitter-systemverilog"))
 
 (define-public tree-sitter-tablegen
