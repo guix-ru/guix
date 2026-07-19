@@ -56,7 +56,7 @@
 ;;; Copyright © 2020 Trevor Hass <thass@okstate.edu>
 ;;; Copyright © 2020, 2021 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2020 Lu hux <luhux@outlook.com>
-;;; Copyright © 2020 Tomás Ortín Fernández <tomasortin@mailbox.org>
+;;; Copyright © 2020, 2026 Tomas Ortin Fernandez (quanrong) <quanrong@mailbox.org>
 ;;; Copyright © 2021 Olivier Rojon <o.rojon@posteo.net>
 ;;; Copyright © 2021 Stefan Reichör <stefan@xsteve.at>
 ;;; Copyright © 2021, 2022 Greg Hogan <code@greghogan.com>
@@ -8862,7 +8862,7 @@ fight against their plot and save his fellow rabbits from slavery.")
 (define-public 0ad-data
   (package
     (name "0ad-data")
-    (version "0.27.1")
+    (version "0.28.0")
     (source
      (origin
        (method url-fetch)
@@ -8870,7 +8870,7 @@ fight against their plot and save his fellow rabbits from slavery.")
                            version "-unix-data.tar.xz"))
        (file-name (string-append name "-" version ".tar.xz"))
        (sha256
-        (base32 "16592xq1ncjxc072rd4lzn2bp941fmfj85r0q1gh52qkvxnjszl3"))))
+        (base32 "0vsj75y4a4psfqiaf2l9n7mhrfh5xzhg1wpzlkh4fb0hw85b6i78"))))
     (build-system trivial-build-system)
     (native-inputs (list tar unzip xz))
     (arguments
@@ -8910,7 +8910,7 @@ fight against their plot and save his fellow rabbits from slavery.")
 (define-public 0ad
   (package
     (name "0ad")
-    (version "0.27.1")
+    (version "0.28.0")
     (source
      (origin
        (method url-fetch)
@@ -8918,7 +8918,7 @@ fight against their plot and save his fellow rabbits from slavery.")
                            version "-unix-build.tar.xz"))
        (file-name (string-append name "-" version ".tar.xz"))
        (sha256
-        (base32 "1yvb04bxq1r7cva58xx0rgzdlx6ra1hp6w1p517x4s2rxdg3b9d0"))))
+        (base32 "0am4smmsl6anqd4ga8sx6z96wjz5jqymkgwdwlpr4sppbrsigqi7"))))
     ;; A snippet here would cause a build failure because of timestamps
     ;; reset.  See https://bugs.gnu.org/26734.
     (inputs
@@ -8936,7 +8936,7 @@ fight against their plot and save his fellow rabbits from slavery.")
            libxcursor
            libxml2
            miniupnpc
-           mozjs-115
+           mozjs-128
            openal
            sdl2
            wxwidgets
@@ -8964,14 +8964,6 @@ fight against their plot and save his fellow rabbits from slavery.")
                 (string-append "\"" (assoc-ref inputs "cxxtest")
                                "/bin/cxxtestgen"
                                "\"")))))
-         (add-after 'unpack 'fix-mozjs-compatibility
-           ;; 0ad only builds fine with a specific version of mozjs
-           ;; (version 115.16.1 for 0ad-0.27.1).
-           ;; Here we change the error in case of version mismatch to a warning.
-           (lambda _
-             (substitute* "source/scriptinterface/ScriptTypes.h"
-               (("#error Your compiler is trying to use")
-                "#warning Your compiler is trying to use"))))
          (add-after 'unpack 'patch-python-shebangs
            ;; A couple Python scripts point to 'python' rather than 'python3'.
            ;; They work fine under python3, so let's fix that.
