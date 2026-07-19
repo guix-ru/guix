@@ -1094,7 +1094,7 @@ minimalistic.")
 (define-public fzf
   (package
     (name "fzf")
-    (version "0.74.0")
+    (version "0.74.1")
     (source
      (origin
        (method git-fetch)
@@ -1103,7 +1103,7 @@ minimalistic.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "13q9qd48lbrichnkh42wxkczgqy6z0dzqlbylvqphzhlqfxgzh3y"))))
+        (base32 "1dwjlv637m9iih1pgcyvc8f35x6cnsyw2r3qyirzlnrzkib7yrqf"))))
     (build-system go-build-system)
     (arguments
      (list
