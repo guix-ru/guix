@@ -68,7 +68,7 @@
   ;; directory.
   (package
     (name "gnucash")
-    (version "5.14")
+    (version "5.16")
     (source
      (origin
        ;; Install from git, as the some test files contained in the release
@@ -80,7 +80,7 @@
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "066l5p25ywbv89ygrpd04xwzjqrfjvap9fmkjr0gaf3z8c4qxhc0"))))
+         "13dnxhxaragnaycnzjrr3qrrfzi9yzb9sdf49ah9kj72j17r7i3c"))))
     (outputs '("out" "doc" "debug" "python"))
     (build-system cmake-build-system)
     (arguments
@@ -210,7 +210,7 @@ online_wiggle test-lots)" port)))))
     (inputs
      (list aqbanking
            bash-minimal
-           boost-1.83
+           boost
            glib
            gtk+
            guile-3.0
@@ -256,7 +256,7 @@ installed as well as Yelp, the Gnome help browser.")
                "https://github.com/Gnucash/gnucash/releases/download/"
                version "/gnucash-docs-" version ".tar.gz"))
          (sha256
-          (base32 "0nhvg11zkp7v6cd8j0g1gg00pmrn0jvf7n9qjl5b6m2hw6sfw34i"))))
+          (base32 "0mpyb6c5dcdn1vi9kmhi89pwal6jp2vkksaxv9169g74cwwz00xv"))))
       (build-system cmake-build-system)
       ;; These are native-inputs because they are only required for building the
       ;; documentation.
