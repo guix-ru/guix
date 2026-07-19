@@ -17203,13 +17203,13 @@ has not yet been packaged for Guix.")
 (define-public ruby-google-protobuf
   (package
     (name "ruby-google-protobuf")
-    (version "4.34.0.rc.2")
+    (version "4.35.1")
     (source (origin
               (method url-fetch)
               (uri (rubygems-uri "google-protobuf" version))
               (sha256
                (base32
-                "0fanmx5s1g3565npg7l1y3i4zxyd9v9nvvyns1j3lpdndpmqq9fm"))))
+                "09ipzsijxkrgwnyic0l4yhnazw46ca7ll0adza6za66r649lg9m3"))))
     (build-system ruby-build-system)
     (arguments
      (list #:tests? #f))  ; There are no tests.
