@@ -2333,7 +2333,7 @@ gnuplot program, if installed, to draw figures.")
 (define-public msolve
   (package
     (name "msolve")
-    (version "0.10.0")
+    (version "0.10.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -2342,7 +2342,7 @@ gnuplot program, if installed, to draw figures.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1a88xab76y19aj3xgqcnnvd5yaczzcl5d7ljkwv1qlb40hajcss8"))))
+                "1adxnl4y1dh13avsz2r51d52g9njgfav8s231mmg6bh4p3xjwm7c"))))
     (build-system gnu-build-system)
     (native-inputs (list autoconf automake libtool))
     (inputs (list flint gmp mpfr))
