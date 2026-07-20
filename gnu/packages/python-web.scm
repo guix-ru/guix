@@ -11390,10 +11390,13 @@ request/response web apps to larger, grown applications.")
     (version "4.12.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "pyramid_debugtoolbar" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Pylons/pyramid_debugtoolbar")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0gdlc7vcga4vzma53h5csnhh4gwfmv3w8v9y5fhwqpy8979qis3i"))))
+        (base32 "0kalb5rsrlcz62zv9a39kp28mvwg9j6gymvzxbybdnvk51v9if56"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -11414,14 +11417,14 @@ request/response web apps to larger, grown applications.")
            python-pyramid-chameleon
            python-pyramid-jinja2
            python-pyramid-mako
-           ;; python-selenium ; see: guix/guix#3478
+           python-selenium
            python-sqlalchemy
            python-waitress))
     (home-page "https://github.com/Pylons/pyramid_debugtoolbar")
     (synopsis "Pyramid debug toolbar")
     (description
-     "This package provides an interactive HTML debugger for Pyramid application
-development.")
+     "This package provides an interactive HTML debugger for Pyramid
+application development.")
     (license license:bsd-3)))
 
 (define-public python-pyramid-jinja2
