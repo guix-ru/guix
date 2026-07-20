@@ -324,7 +324,7 @@ asciinema-created terminal session recordings.")
 (define-public libtsm
   (package
     (name "libtsm")
-    (version "4.4.1")
+    (version "4.6.0")
     (source
      (origin
        (method git-fetch)
@@ -333,7 +333,7 @@ asciinema-created terminal session recordings.")
               (commit (string-append "v" version))))
        (sha256
         (base32
-         "02ab605bh6raq4kvb73s6fqqblra65jcl7cd3swmcmqwdimgzmpi"))
+         "0lrmdaqlaq97slwi4n99m4lr3b71vzq0xck8i3kbnzdw92v69ph8"))
        (file-name (git-file-name name version))
        (modules '((guix build utils)))
        (snippet
