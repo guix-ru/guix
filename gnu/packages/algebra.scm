@@ -1236,7 +1236,7 @@ extends it by a set of algebraic capabilities.")
 (define-public normaliz
   (package
     (name "normaliz")
-    (version "3.10.4")
+    (version "3.11.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1245,7 +1245,7 @@ extends it by a set of algebraic capabilities.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1smla96wjyv5ygg77ps9np6bfzp2qynq8vd1msybabi4621cnrma"))))
+                "1i4qkc9103m4v33jhaicz45wqvilvck4z6pymqyyx7zdca1am6zs"))))
     (build-system gnu-build-system)
     (native-inputs (list autoconf automake libtool pkg-config))
     ;; Flint is optional. TODO: Try to build with nauty and cocoalib support.
