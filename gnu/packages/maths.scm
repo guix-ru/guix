@@ -4781,7 +4781,7 @@ bindings to almost all functions of PETSc.")
 (define-public python-primecountpy
   (package
     (name "python-primecountpy")
-    (version "0.1.1")
+    (version "0.2.1")
     (source
      (origin
        (method git-fetch) ; Fetch from GitHub to avoid precompiled files
@@ -4790,15 +4790,15 @@ bindings to almost all functions of PETSc.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0pdmdch5fhzcclrdnb4z3n4a9f00iqr65yzpkhjpz5a6mbz3l5v8"))))
+        (base32 "0ddv2r6mwn2p2xgi6pa50mjirxb0zj10ngimfpak36yaj8bp0as1"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f)) ; there are no tests
     (native-inputs
-     (list python-cysignals
+     (list pkg-config
+           python-cysignals
            python-cython
-           python-setuptools
-           python-wheel))
+           python-meson))
     (inputs
      (list pari-gp
            primecount
