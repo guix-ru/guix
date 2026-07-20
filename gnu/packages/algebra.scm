@@ -1262,13 +1262,13 @@ algebraic extensions of QQ.")
 (define-public python-pynormaliz
   (package
     (name "python-pynormaliz")
-    (version "2.21")
+    (version "2.24")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "pynormaliz" version))
        (sha256
-        (base32 "0hsyxml71i2b9pa375ipbfpackj3y67jlg2rxgc433sfy3895wvf"))))
+        (base32 "1749z0wn57qpnqac53jrgpy6d0qy0klhy5zhp0n4gi2p9krcv48y"))))
     (build-system pyproject-build-system)
     (arguments
      (list
