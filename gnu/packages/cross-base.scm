@@ -220,7 +220,12 @@ base compiler and using LIBC (which may be either a libc package or #f.)"
                                    "--enable-languages=c,c++"
                                    (string-append "--with-native-system-header-dir="
                                                   #$libc "/" #$target "/include"))
-                                #~()))
+                                #~())
+                         ;; This avoids the situation where the cross-compiled
+                         ;; gcc-lib carries libcc1 and related plugins, thus
+                         ;; eliminating the need to rely on the native glibc
+                         ;; and corresponding bash-static.
+                         "--disable-libcc1")
 
                    (remove
                      (lambda (flag)
