@@ -1596,11 +1596,6 @@ the \"texlive\" importer."
                        "phfrohring")
   beam)
 
-(define-member (person "Igorj Gorjaĉev"
-                       "igor@goryachev.org"
-                       "delitrem")
-  beam)
-
 (define-member (person "Nguyễn Gia Phong"
                        "cnx@loang.net"
                        "cnx")
