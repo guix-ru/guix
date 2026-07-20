@@ -4386,7 +4386,7 @@ functions.")
 (define-public primecount
   (package
     (name "primecount")
-    (version "7.20")
+    (version "8.6")
     (source
      (origin
        (method git-fetch)
@@ -4396,7 +4396,7 @@ functions.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1kkhi6wq6nkaw62cyiqy9jmd4sfk4g0j637mmb8rdvy343a9rkxc"))))
+         "0xm0dzdjnm877gndh7r0mj0pgqx42f0v5vnhjx6ig7gv5g0c2s92"))))
     (build-system cmake-build-system)
     (arguments
      (list
