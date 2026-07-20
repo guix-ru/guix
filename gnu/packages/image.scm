@@ -1629,7 +1629,7 @@ graphics image formats like PNG, BMP, JPEG, TIFF and others.")
 (define-public ggg
   (package
     (name "ggg")
-    (version "0.4.16")
+    (version "0.6.1")
     (source
      (origin
        (method git-fetch)
@@ -1638,31 +1638,52 @@ graphics image formats like PNG, BMP, JPEG, TIFF and others.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0igdnjw2i9b7qy66x05v70r1vsd043ydpvgic3hdra3dpx6f8ppf"))))
-    (arguments
-     `(#:source-directory "src"
-       #:phases (modify-phases %standard-phases
-                  (add-before 'build 'install-program-files
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      (let ((bin (string-append (assoc-ref outputs "out")
-                                                "/bin"))
-                            (share (string-append (assoc-ref outputs "out")
-                                                  "/share")))
-                        (install-file "resources/help.txt"
-                                      (string-append share
-                                                     "/resources"))
-                        (copy-recursively "resources/svg-paths"
-                                          (string-append share
-                                           "/resources/svg-paths"))
-                        (install-file "scripts/ggg" bin)
-                        (install-file "scripts/log.bash"
-                                      (string-append share "/scripts/"))
-                        (chmod (string-append bin "/ggg") #o755)))))))
+        (base32 "0asrvc7fzyavv8xmrb0pbqqv35z8bhcl4si0xwj9xndbificx7li"))))
     (build-system guile-build-system)
-    (native-inputs (list guile-3.0))
-    (inputs (list guile-3.0 bash-minimal imagemagick))
-    (synopsis
-     "GGG is a SVG image generator for project and web badges")
+    (arguments
+     (list
+      #:source-directory "src"
+      #:modules '((guix build guile-build-system)
+                  (guix build utils)
+                  (ice-9 match))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'install-program-files
+            (lambda _
+              (let ((bin (string-append #$output "/bin"))
+                    (share (string-append #$output "/share")))
+                (install-file "resources/help.txt"
+                              (string-append share "/resources"))
+                (copy-recursively "resources/svg-paths"
+                                  (string-append share "/resources/svg-paths"))
+                (install-file "scripts/ggg" bin)
+                (chmod (string-append bin "/ggg") #o755))))
+          (add-after 'unpack 'fix-paths
+            (lambda* (#:key inputs #:allow-other-keys)
+              (for-each (match-lambda
+                          ((pattern program format-string)
+                           (substitute* "scripts/ggg"
+                             ((pattern)
+                              (format #f format-string
+                                      (search-input-file inputs
+                                                         (string-append "bin/"
+                                                          program)))))))
+                        '(("readlink -f " "readlink" "~s -f ")
+                          ("realpath " "realpath" "~s ")
+                          ("dirname " "dirname" "~s ")
+                          ("getopt " "getopt" "~s ")
+                          ("exec guile " "guile" "exec ~s ")))
+              (for-each (match-lambda
+                          ((pattern program format-string)
+                           (substitute* "src/ggg/main.scm"
+                             ((pattern)
+                              (format #f format-string
+                                      (search-input-file inputs
+                                                         (string-append "bin/"
+                                                          program)))))))
+                        '(("convert -quality 100" "convert" "~a -quality 100"))))))))
+    (inputs (list guile-3.0 bash-minimal imagemagick coreutils util-linux))
+    (synopsis "GGG is a SVG image generator for project and web badges")
     (description
      "GGG (Guile Glyph Generator) is a command-line utility
 that allows you to generate pretty images/badges which can be used for
