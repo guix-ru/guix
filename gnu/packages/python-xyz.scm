@@ -33315,7 +33315,7 @@ is the cythonized version of @code{fractions.Fraction}.")
 (define-public python-pathvalidate
   (package
     (name "python-pathvalidate")
-    (version "2.4.1")
+    (version "3.3.1")
     (source
      (origin
        (method git-fetch)
@@ -33324,10 +33324,15 @@ is the cythonized version of @code{fractions.Fraction}.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17s9vqmws4sfji4bw6qd4rn7ahzkpj6yp2ia5p6vd8kva8n05h37"))))
+        (base32 "14ymgd52v5r0g6yc2l7krg3n4x9bkv1ndvdaahiq503n1zhhs3iv"))))
     (build-system pyproject-build-system)
-    (native-inputs (list python-allpairspy python-click python-faker
-                         python-pytest python-setuptools))
+    (native-inputs (list python-allpairspy
+                         python-click
+                         python-faker
+                         python-pytest
+                         python-setuptools
+                         python-setuptools-scm
+                         python-tcolorpy))
     (home-page "https://github.com/thombashi/pathvalidate")
     (synopsis "Sanitize strings representing paths")
     (description
