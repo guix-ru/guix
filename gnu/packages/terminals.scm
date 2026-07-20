@@ -363,7 +363,7 @@ gnome-terminal, konsole, among others.")
 (define-public kmscon
   (package
     (name "kmscon")
-    (version "9.3.0")
+    (version "10.0.1")
     (source
      (origin
        (method git-fetch)
@@ -373,7 +373,7 @@ gnome-terminal, konsole, among others.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0jssf69n76lhvx4b2kmk4hn0sjfj6pjmdq5h7hz57n6qgpg3zlxx"))))
+         "162nxqrlsvsdf6pypqdd3s54ac3c6vfnchfk8dmmy4nzlj5acm5y"))))
     (build-system meson-build-system)
     (native-inputs
      (list check
