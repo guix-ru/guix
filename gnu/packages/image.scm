@@ -1682,7 +1682,12 @@ graphics image formats like PNG, BMP, JPEG, TIFF and others.")
                                                          (string-append "bin/"
                                                           program)))))))
                         '(("convert -quality 100" "convert" "~a -quality 100"))))))))
-    (inputs (list guile-3.0 bash-minimal imagemagick coreutils util-linux))
+    (inputs
+      (list guile-3.0
+            bash-minimal
+            imagemagick
+            coreutils-minimal
+            util-linux))
     (synopsis "GGG is a SVG image generator for project and web badges")
     (description
      "GGG (Guile Glyph Generator) is a command-line utility
