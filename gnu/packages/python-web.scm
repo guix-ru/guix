@@ -11320,26 +11320,31 @@ changed the process is restarted.")
 (define-public python-pyramid
   (package
     (name "python-pyramid")
-    (version "2.0.2")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "pyramid" version))
-              (sha256
-               (base32
-                "1phqdz068hl3zda263qkjp5am8fmvmpcxp3nrhsna8g472kkh89p"))))
+    (version "2.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/Pylons/pyramid")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0my03b81009w9zqx5cdn9qixh0jah49hr0379n98kx2j3b8cfk1p"))))
     (build-system pyproject-build-system)
+    (native-inputs
+     (list python-pytest
+           python-setuptools
+           python-webtest
+           python-zope-component))
     (propagated-inputs
      (list python-hupper
            python-plaster
            python-plaster-pastedeploy
-           python-setuptools
            python-translationstring
            python-venusian
            python-webob
-           python-zope-component
            python-zope-deprecation
            python-zope-interface))
-    (native-inputs (list python-pytest python-webtest python-wheel))
     (home-page "https://trypyramid.com/")
     (synopsis "Python web-framework suitable for small and large sites")
     (description
