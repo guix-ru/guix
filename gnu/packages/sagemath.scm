@@ -407,7 +407,7 @@ database.")
             eclib
             edge-addition-planarity-suite
             fflas-ffpack
-            flint-3.3
+            flint
             fontconfig
             freetype
             gap
