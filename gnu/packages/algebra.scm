@@ -498,14 +498,14 @@ or text interfaces) or as a C++ library.")
 (define-public flint
   (package
    (name "flint")
-   (version "3.4.0")
+   (version "3.6.0")
    (source
     (origin
       (method url-fetch)
       (uri (string-append "https://flintlib.org/download/flint-"
                           version ".tar.gz"))
       (sha256
-       (base32 "0csa8n7d4l3mh892q36nhiv1r7bkb168vszz79p95bfy0jc6g5wl"))))
+       (base32 "0sy3nk4zspgbjnr9982p5s1mcis3k102rm6jr2hs9vpmj9vjqpmr"))))
    (build-system gnu-build-system)
    (propagated-inputs
     (list gmp mpfr)) ; header files included by flint.h or mpfr_mat.h
