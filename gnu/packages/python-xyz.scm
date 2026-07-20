@@ -38541,6 +38541,35 @@ multiple processes (imagine multiprocessing, billiard, futures, celery etc).
 @end enumerate\n")
     (license license:bsd-3)))
 
+(define-public python-tcolorpy
+  (package
+    (name "python-tcolorpy")
+    (version "0.1.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/thombashi/tcolorpy")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "18cck1s0w9i5llaaw9s37g61dqg3vpjjgd3ywc72n1i02k0yj1fh"))))
+    (build-system pyproject-build-system)
+    (native-inputs (list python-pytest python-setuptools python-setuptools-scm))
+    (home-page "https://github.com/thombashi/tcolorpy")
+    (synopsis "Apply true color for terminal text")
+    (description
+     "@code{tcolorpy} is a Python library to apply true color for terminal
+text.
+You can set the following @code{tcolor} arguments:
+
+@itemize
+@item color
+@item bgcolor
+@item styles
+@end itemize")
+    (license license:expat)))
+
 (define-public python-telethon
   (package
     (name "python-telethon")
