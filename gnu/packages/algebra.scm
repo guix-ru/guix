@@ -544,7 +544,7 @@ fast arithmetic.")
 (define-public python-flint
   (package
     (name "python-flint")
-    (version "0.8.0")
+    (version "0.9.0")
     (source
      (origin
        (method git-fetch)
@@ -553,7 +553,7 @@ fast arithmetic.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1xdclpxpas29v3g14z2fxqf7hv4a6iq7bknl9d9r1510dcpxm67a"))))
+        (base32 "1i1lp7ir8r0jykbakirfkz1za0285806lbc7r6rsygydv22021vs"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -565,7 +565,7 @@ fast arithmetic.")
            python-pytest))
     (inputs
      (list gmp
-           flint-3.3))
+           flint))
     (propagated-inputs
      (list python-numpy))
     (home-page "https://fredrikj.net/python-flint/")
