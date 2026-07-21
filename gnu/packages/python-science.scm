@@ -3310,6 +3310,36 @@ fractional factorial methods.")
 genetic variation data.")
     (license license:expat)))
 
+(define-public python-scikit-base
+  (package
+    (name "python-scikit-base")
+    (version "1.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sktime/skbase")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1436l0jr6avyhz2dg3driykn6rwskwyf57aig7x3pwak6w3il6rv"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-numpy
+           python-pandas-minimal
+           python-pytest
+           python-scikit-learn
+           python-scipy-minimal
+           python-setuptools
+           python-toml))
+    (home-page "https://github.com/sktime/skbase")
+    (synopsis "Base classes for sklearn-like parametric objects")
+    (description
+     "@code{skbase} provides base classes for creating scikit-learn-like
+parametric objects, along with tools to make it easier to build your own
+packages that follow these design patterns.")
+    (license license:bsd-3)))
+
 (define-public python-scikit-build-core
   (package
     (name "python-scikit-build-core")
