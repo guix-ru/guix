@@ -1931,14 +1931,14 @@ management with library, schematic and board editors.")
 (define librnd
   (package
     (name "librnd")
-    (version "4.3.2")
+    (version "4.5.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "http://www.repo.hu/projects/librnd/"
                                   "releases/librnd-" version ".tar.bz2"))
               (sha256
                (base32
-                "1qjv6gg9fb3rpvr1y9l5nbzz2xk2sa4nqz0dgwvds5hc1bmd97mf"))))
+                "197gjd3a0q51ib4s7cfndls0hwc783wrjhqrm49p0kjicx2pxr6s"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
