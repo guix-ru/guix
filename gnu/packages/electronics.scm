@@ -402,7 +402,7 @@ generating bitstreams with Gowin FPGAs.")
 (define-public camv-rnd
   (package
     (name "camv-rnd")
-    (version "1.1.6")
+    (version "1.1.7")
     (source
      (origin
        (method url-fetch)
@@ -410,7 +410,7 @@ generating bitstreams with Gowin FPGAs.")
                            "releases/camv-rnd-" version ".tar.gz"))
        (sha256
         (base32
-         "1dp1vj5rpxlddx40paa9i727c92is3bz6z6pa0y6dy2nsjcm86fs"))))
+         "0l61z35q1k6aixbq2sxdqzi7km7nk2d4z3n71z1my3nhiszhyzdm"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
