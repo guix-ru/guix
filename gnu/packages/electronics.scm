@@ -2870,8 +2870,8 @@ The following features are currently available:
 
 (define-public opensta
   ;; There are no releases, we use last commit.
-  (let ((commit "08cf90d3fd4e0f825f570ed5ec273da202dd7013")
-        (revision "0"))
+  (let ((commit "dc5ccd2d6941289a6a7d3c918b10b493f44a7f56")
+        (revision "1"))
     (package
       (name "opensta")
       ;; The version string is taken from the CMakeLists.txt.
@@ -2884,34 +2884,30 @@ The following features are currently available:
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "07kky35xna75khpi220i84drlfsb0hpq2z3bj8ygwi91snyd77v2"))))
+          (base32 "1fjafwxwknr029z87nq48mzgzhy61aadhd6nkras62f6p2rw6sjr"))))
       (build-system cmake-build-system)
       (arguments
        (list
-        ;; Tests expect output sta binary inside source tree.
-        #:out-of-source? #f
         #:phases
         #~(modify-phases %standard-phases
+            (add-before 'check 'symlink-test-dir
+              (lambda _
+                (symlink "../build" "../source/build")))
             (replace 'check
               (lambda* (#:key tests? #:allow-other-keys)
                 (when tests?
-                  (invoke "../test/regression"))))
-            (add-before 'build 'create-build-dir
-              (lambda _
-                (mkdir-p "./build")
-                (chdir "./build"))))
+                  (invoke "../source/test/regression")))))
         #:configure-flags
         #~(list
            (string-append "-DCUDD_DIR=" #$(this-package-input "cudd"))
-           (string-append "-DBUILD_SHARED_LIBS=YES")
-           "-B./build")))
+           (string-append "-DBUILD_SHARED_LIBS=YES"))))
       (native-inputs (list bison flex swig-4.4))
-      (inputs (list cudd eigen tcl tcllib tclreadline zlib))
+      (inputs (list cudd eigen tcl tclreadline zlib))
       (synopsis "Parallax Static Timing Analyzer")
       (description
-       "OpenSTA is a gate level static timing verifier.  As a stand-alone
-executable it can be used to verify the timing of a design using standard file
-formats.")
+       "OpenSTA is an @acronym{EDA, electronic design automation} gate level
+static timing verifier.  As a stand-alone executable it can be used to verify
+the timing of a design using standard file formats.")
       (home-page "https://github.com/parallaxsw/OpenSTA/")
       (license license:gpl3+))))
 
