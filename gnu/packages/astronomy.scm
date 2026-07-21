@@ -6456,6 +6456,15 @@ Programmer’s Interface, HAPI} data server API.")
        (sha256
         (base32 "0vs3935c9cqwp44dycxfsv4p9q4zbw8i5z3946928yy0nqmj1aw7"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; trapz is removed in NumPy 2.4.6, and is now called trapezoid.
+          (add-after 'unpack 'numpy-compatibility
+            (lambda _
+              (substitute* (find-files "." ".\\py$")
+                (("np.trapz\\(") "np.trapezoid(")))))))
     (native-inputs
      (list python-pytest
            python-setuptools
