@@ -12,7 +12,7 @@
 ;;; Copyright © 2014 Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.org>
 ;;; Copyright © 2017–2021 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2016, 2019, 2021, 2022, 2023 Efraim Flashner <efraim@flashner.co.il>
-;;; Copyright © 2019 Andreas Enge <andreas@enge.fr>
+;;; Copyright © 2019, 2026 Andreas Enge <andreas@enge.fr>
 ;;; Copyright © 2019-2025 Nicolas Goaziou <mail@nicolasgoaziou.fr>
 ;;; Copyright © 2020-2022 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2020 Tom Zander <tomz@freedommail.ch>
@@ -1282,7 +1282,7 @@ in plain text file format.")
 (define-public editorconfig-core-c
   (package
     (name "editorconfig-core-c")
-    (version "0.12.6")
+    (version "0.12.11")
     (source
       (origin
         (method git-fetch)
@@ -1291,32 +1291,22 @@ in plain text file format.")
                (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "05qllpls3r95nfl14gqq3cv4lisf07fgn85n52w8blc5pfl1h93g"))))
+         (base32 "1nazzjkpjcb1npllm11zz6iijigkjb6r9b092gl7rbnbyga75k1z"))))
     (build-system cmake-build-system)
     (arguments
      (list
-      #:cmake cmake-3.25
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'insert-tests
             (lambda* (#:key inputs #:allow-other-keys)
               (let ((tests (assoc-ref inputs "tests")))
-                (copy-recursively tests "tests"))
-              #t))
-          (add-after 'insert-tests 'disable-failing-tests
-            (lambda _
-              (substitute* "tests/parser/CMakeLists.txt"
-                (("# Test max property name and values")
-                 "# Disabled: test max property name and values\nif(FALSE)\n")
-                (("# Test max section names")
-                 "endif()\n\n# Test max section names"))))
+                (copy-recursively tests "tests"))))
           (add-after 'install 'delete-static-library
             (lambda* (#:key outputs #:allow-other-keys)
               (let* ((out (assoc-ref outputs "out"))
                      (lib (string-append out "/lib")))
                 (with-directory-excursion lib
-                  (delete-file "libeditorconfig_static.a"))
-                #t))))))
+                  (delete-file "libeditorconfig_static.a"))))))))
     (native-inputs
      `(("tests"
         ,(origin
@@ -1324,10 +1314,10 @@ in plain text file format.")
            (uri (git-reference
                  (url "https://github.com/editorconfig/editorconfig-core-test")
                  ;; The tests submodule commit matching this package's version.
-                 (commit "48610d43b7455af12195473377f93c4ceea654f5")))
+                 (commit "d91029bdf1e3e0307714afe0d2cde7ba6fd208ab")))
            (file-name (git-file-name "editorconfig-core-test" version))
            (sha256
-            (base32 "1s29p4brmcsc3xsww3gk85dg45f1kk3iykh1air3ij0hymf5dyqy"))))))
+            (base32 "1nfh9xly0injyvcdmxqy7zhqp9cibvfqzj9d57yg0yaz997xbdhy"))))))
     (inputs
      (list pcre2))
     (home-page "https://editorconfig.org/")
