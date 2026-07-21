@@ -2455,7 +2455,7 @@ void DerivationGoal::execBuilderOrBuiltin(SpawnContext & ctx)
         if (settings.printBuildTrace)
             printMsg(lvlError, std::format("@ unsupported-platform {} {}", drvPath, drv.platform));
         throw Error(std::format("a `{}' is required to build `{}', but I am a `{}'",
-                    drv.platform, settings.thisSystem, drvPath));
+                                drv.platform, drvPath, settings.thisSystem));
     }
 
     errno = error;
