@@ -2708,14 +2708,14 @@ such as:
 (define-public pcb-rnd
   (package
     (name "pcb-rnd")
-    (version "3.1.7b")
+    (version "3.1.8")
     (source (origin
               (method url-fetch)
               (uri (string-append "http://repo.hu/projects/pcb-rnd/"
                                   "releases/pcb-rnd-" version ".tar.gz"))
               (sha256
                (base32
-                "1djsa0w53l6nvhwv28rlhpva55ir9n3xdvjgnjj8fgvcmrqlzrsl"))))
+                "1q8zq8w11rjlwddrqz2w5jcq3rmxqv2scgapgfjy6bw2660c9k8z"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
