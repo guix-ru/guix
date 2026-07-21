@@ -1073,22 +1073,25 @@ the store.")
                  (("@STORE_DIRECTORY@")
                   (string-append "\"" (%store-directory) "\"")))
 
-               ;; Have `system' use that Bash.
-               (substitute* "sysdeps/posix/system.c"
-                 (("#define[[:blank:]]+SHELL_PATH.*$")
-                  (format #f "#define SHELL_PATH \"~a/bin/bash\"\n" bash)))
+               ;; In the glibc-cross-target-intermediate, there is no need to
+               ;; modify bash, so we can skip this part.
+               (when bash
+                 ;; Have `system' use that Bash.
+                 (substitute* "sysdeps/posix/system.c"
+                   (("#define[[:blank:]]+SHELL_PATH.*$")
+                    (format #f "#define SHELL_PATH \"~a/bin/bash\"\n" bash)))
 
-               ;; Same for `popen'.
-               (substitute* "libio/iopopen.c"
-                 (("/bin/sh")
-                  (string-append bash "/bin/sh")))
+                 ;; Same for `popen'.
+                 (substitute* "libio/iopopen.c"
+                   (("/bin/sh")
+                    (string-append bash "/bin/sh")))
 
-               ;; Same for the shell used by the 'exec' functions for
-               ;; scripts that lack a shebang.
-               (substitute* (find-files "." "^paths\\.h$")
-                 (("#define[[:blank:]]+_PATH_BSHELL[[:blank:]].*$")
-                  (string-append "#define _PATH_BSHELL \""
-                                 bash "/bin/sh\"\n")))
+                 ;; Same for the shell used by the 'exec' functions for
+                 ;; scripts that lack a shebang.
+                 (substitute* (find-files "." "^paths\\.h$")
+                   (("#define[[:blank:]]+_PATH_BSHELL[[:blank:]].*$")
+                    (string-append "#define _PATH_BSHELL \""
+                                   bash "/bin/sh\"\n"))))
 
                ;; Make sure we don't retain a reference to the
                ;; bootstrap Perl.
