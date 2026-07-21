@@ -4477,7 +4477,7 @@ suite.")
 (define-public sch-rnd
   (package
     (name "sch-rnd")
-    (version "1.0.10")
+    (version "1.0.11")
     (source
      (origin
        (method url-fetch)
@@ -4485,7 +4485,7 @@ suite.")
                            "releases/sch-rnd-" version ".tar.gz"))
        (sha256
         (base32
-         "1wa43jhgzlchqpql9qdz7q4ps4wfk88akrl3pqgcb61mdwy51s20"))))
+         "1zckj0if1kfdqagama55zcp9nlvkppnfcqh7r99a1wlcc5s921y1"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
