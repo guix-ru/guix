@@ -6,6 +6,7 @@
 ;;; Copyright © 2017, 2019, 2023 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2020 Giacomo Leidi <therewasa@fishinthecalculator.me>
 ;;; Copyright © 2025 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2026 Konstantin Suntsov <protvin@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -953,7 +954,10 @@ the tls package, and borrows some ideas from x509-system.")
        (method url-fetch)
        (uri (hackage-uri "openssl-streams" version))
        (sha256
-        (base32 "10pnnpzgb5xr811kc9qdk7h2cgn6hk2yiyhnzz8f8p0fjzc0pwjm"))))
+        (base32 "10pnnpzgb5xr811kc9qdk7h2cgn6hk2yiyhnzz8f8p0fjzc0pwjm"))
+       (patches
+        (search-patches
+         "ghc-openssl-streams-regenerate-test-certificate.patch"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "openssl-streams")))
     (inputs (list ghc-hsopenssl ghc-io-streams ghc-network))
