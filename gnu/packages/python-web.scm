@@ -5131,7 +5131,7 @@ connector for @code{python-pycrdt}.")
 (define-public python-pycurl
   (package
     (name "python-pycurl")
-    (version "7.45.4")
+    (version "7.45.7")
     (source
      (origin
        (method git-fetch)
@@ -5141,7 +5141,7 @@ connector for @code{python-pycrdt}.")
                       "REL_" (string-replace-substring version "." "_")))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "00cd1l0lsml0708hpv5k4qyhqfv0qphb0p317j9aci2wdspn1mpl"))))
+        (base32 "1gkbv3cvrwd7z3vgqlvcf0wpvm3g6dia8xbx3g4bplnb2cascfiq"))))
     (build-system pyproject-build-system)
     (arguments
      '(#:test-flags
@@ -5149,26 +5149,21 @@ connector for @code{python-pycrdt}.")
        ;; - some tests want to use the same port: address already in use
        ;; - some tests use signal.Signal, i.e. main-thread only
        (list "-k" (string-append
-                   ;; Disable hanginging tests
-                   "not test_multi_socket_select"
-                   ;; E assert None is not None
-                   ;; E+ where None =
-                   ;; <tests.multi_callback_test.MultiCallbackTest
-                   ;; testMethod=test_multi_socket_action>.timer_result
-                   " and not test_multi_socket_action"
                    ;; OSError: tests/fake-curl/libcurl/with_gnutls.so: cannot
                    ;; open shared object file: No such file or directory
-                   " and not test_libcurl_ssl_gnutls"
+                   "not test_libcurl_ssl_gnutls"
                    ;; OSError: tests/fake-curl/libcurl/with_nss.so: cannot
                    ;; open shared object file: No such file or directory
                    " and not test_libcurl_ssl_nss"
                    ;; OSError: tests/fake-curl/libcurl/with_openssl.so: cannot
                    ;; open shared object file: No such file or directory
                    " and not test_libcurl_ssl_openssl"
-                   ;; Probably due to an expired CA
-                   " and not test_request_without_certinfo"
-                   ;; "A libcurl function was given a bad argument"
-                   " and not test_proxy_tlsauth"))
+                   ;; "A requested feature, protocol or option was not
+                   ;; found built-in in this libcurl due to a build-time
+                   ;; decision."
+                   " and not test_issuercert_blob"
+                   " and not test_krb4level"
+                   " and not test_krblevel"))
        #:phases (modify-phases %standard-phases
                   (add-before 'build 'configure-tls-backend
                     (lambda _
