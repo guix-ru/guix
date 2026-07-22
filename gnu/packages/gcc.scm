@@ -971,7 +971,8 @@ It also includes runtime support libraries for these languages.")
                                        "gcc-13-libsanitizer-no-crypt.patch"
                                        "gcc-libstdc++-newer-gcc.patch"
                                        "gcc-mangle-guix-store.patch"
-                                       "gcc-hurd-split-stack.patch"))
+                                       "gcc-hurd-split-stack.patch"
+                                       "gcc-13-fix-hurd-lib.patch"))
               (modules '((guix build utils)))
               (snippet gcc-canadian-cross-objdump-snippet)))
     (properties
