@@ -155,7 +155,7 @@ C or C++ programs, though that is not its primary goal.")
 (define-public libatomic-ops
   (package
     (name "libatomic-ops")
-    (version "7.8.2")
+    (version "7.10.0")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -163,25 +163,9 @@ C or C++ programs, though that is not its primary goal.")
                     version "/libatomic_ops-" version ".tar.gz"))
               (sha256
                (base32
-                "0lcv86ib2ryqh18gsgarpkyf6k5l2bd1kh5lbkxv7wh7w9zj01fk"))))
+                "1c6zj10jgkgazzp35hl567pfj4hqa724x9klbvv71caxfpzypcqd"))))
     (build-system gnu-build-system)
     (outputs '("out" "debug"))
-    (native-inputs (if (target-loongarch64?)
-                       (list config)
-                       '()))
-    (arguments (if (target-loongarch64?)
-                   (list #:phases
-                         #~(modify-phases %standard-phases
-                             (add-after 'unpack 'update-config-scripts
-                               (lambda* (#:key inputs native-inputs #:allow-other-keys)
-                                 ;; Replace outdated config.guess and config.sub.
-                                 (for-each (lambda (file)
-                                             (install-file
-                                              (search-input-file
-                                               (or native-inputs inputs)
-                                               (string-append "/bin/" file)) "."))
-                                           '("config.guess" "config.sub"))))))
-                   '()))
     (synopsis "Accessing hardware atomic memory update operations")
     (description
      "This C library provides semi-portable access to hardware-provided atomic
