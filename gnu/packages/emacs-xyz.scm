@@ -614,6 +614,31 @@ compatible.")
 emulation layer for Emacs.")
     (license license:gpl3)))
 
+(define-public emacs-hel-collection
+  ;; TODO: https://github.com/helheim-emacs/hel-collection/issues/1
+  (let ((commit "c474e7596269ac3883568073839b964a7bed587b")
+        (revision "0"))
+    (package
+      (name "emacs-hel-collection")
+      (version (git-version "0.1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/helheim-emacs/hel-collection")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0j210sg5hbc9n9c48ph8vcra4h5i2978xc7yr2d0cp3g7vib7fj1"))))
+      (build-system emacs-build-system)
+      (propagated-inputs (list emacs-hel))
+      (home-page "https://github.com/helheim-emacs/hel-collection")
+      (synopsis "Collection of keybinds for Hel")
+      (description
+       "The collection of keybindings for third-party and built-in Emacs
+packages to use them with Hel.")
+      (license license:gpl3+))))
+
 (define-public emacs-helix
   (package
     (name "emacs-helix")
