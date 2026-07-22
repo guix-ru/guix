@@ -691,6 +691,20 @@
                                 "--skip" "list_apps_emits_updates_and_returns_after_both_lists_load"
                                 "--skip" "list_apps_force_refetch_patches_updates_from_cached_snapshots"
                                 ;;; END Order-brittle app-list notification tests
+                                ;;; BEGIN Skip .git creators.  Otherwise other
+                                ;;; 8 tests would have their context poisoned.
+                                ;;; The other tests care about .git not being
+                                ;;; there.
+                                "--skip" "turn_interrupt_aborts_running_turn"
+                                "--skip" "sandbox_with_network_proxy_blocks_direct_loopback_access"
+                                "--skip" "zsh_fork_inner_allowed_script_inherits_active_permission_profile"
+                                "--skip" "permission_request_hook_allows_network_approval_without_prompt"
+                                "--skip" "guardian_receives_exact_triggers_for_concurrent_network_requests"
+                                "--skip" "guardian_receives_exact_trigger_for_single_network_request"
+                                "--skip" "approved_network_host_for_one_environment_still_prompts_in_another"
+                                "--skip" "unified_exec_network_denial_emits_failed_background_end_event"
+                                "--skip" "unified_exec_short_lived_network_denial_emits_failed_end_event"
+                                ;;; END Skip .git creators.
                                 )
       #:phases
       #~(modify-phases %standard-phases
