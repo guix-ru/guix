@@ -82,7 +82,16 @@
                 (install-file a (string-append #$output:static
                                                "/lib"))
                 (delete-file a))
-              (find-files (string-append #$output "/lib") "\\.a"))))))
+              (find-files (string-append #$output "/lib") "\\.a"))
+             (mkdir-p (string-append #$output:static "/lib/pkgconfig/"))
+             (let ((pc "/lib/pkgconfig/bdw-gc.pc"))
+               (copy-recursively (string-append #$output pc)
+                               (string-append #$output:static pc))
+             (substitute* (string-append #$output:static pc)
+               (((string-append "prefix=" #$output))
+                (string-append "prefix=" #$output:static))
+               (("includedir=\\$[{]prefix[}]/include")
+                (string-append "includedir=" #$output "/include"))))))))
      (cond
        ((target-ppc64le?)
         (list #:make-flags
