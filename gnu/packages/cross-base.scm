@@ -28,6 +28,7 @@
 
 (define-module (gnu packages cross-base)
   #:use-module (gnu packages)
+  #:use-module (gnu packages autotools) ;; for config
   #:use-module (gnu packages avr)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages base)
@@ -761,11 +762,12 @@ returned."
        (package
          (inherit static-bash)
          (name (string-append "bash-static-cross-" target))
-         (native-inputs '())
-         (inputs '())
          (native-inputs
           `(("cross-gcc" ,xgcc)
-            ("cross-binutils" ,xbinutils)))
+            ("cross-binutils" ,xbinutils)
+            ,@(if (target-loongarch64? target)
+                  `(("config"  ,config))
+                  '())))
          (inputs
           `(("cross-libc" ,xlibc)
             ("cross-libc:static" ,xlibc "static")))
