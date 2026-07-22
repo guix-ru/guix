@@ -563,30 +563,34 @@ compatible.")
     (license license:gpl3+)))
 
 (define-public emacs-hel
-  (package
-    (name "emacs-hel")
-    (version "0.12.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/anuvyklack/hel")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1fxm8cbwiml77yrxh5b9n732q8iksay8fiagdgabpin80psyi1fm"))))
-    (build-system emacs-build-system)
-    (arguments (list #:tests? #f)) ; There are no tests.
-    (propagated-inputs
-     (list emacs-avy
-           emacs-dash
-           emacs-pcre2el
-           emacs-ultra-scroll))
-    (home-page "https://github.com/anuvyklack/hel")
-    (synopsis "Helix emulation layer for Emacs")
-    (description
-     "This package provides a Helix emulation layer for Emacs.")
-    (license license:gpl3)))
+  ;; XXX: The latest tag is 0.12.0, but hel-collection needs the
+  ;; hel-unquote function which was added after that release.
+  (let ((commit "3ea52baa4236854bcb7c2d7e2dadc5030b901c01")
+        (revision "1"))
+    (package
+      (name "emacs-hel")
+      (version (git-version "0.12.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/anuvyklack/hel")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1s9p0k6mcmckpiflzirlxw3wrhpprzq3rc9lzd9930njziq5w8dg"))))
+      (build-system emacs-build-system)
+      (arguments (list #:tests? #f)) ; There are no tests.
+      (propagated-inputs
+       (list emacs-avy
+             emacs-dash
+             emacs-pcre2el
+             emacs-ultra-scroll))
+      (home-page "https://github.com/anuvyklack/hel")
+      (synopsis "Helix emulation layer for Emacs")
+      (description
+       "This package provides a Helix emulation layer for Emacs.")
+      (license license:gpl3))))
 
 (define-public emacs-hel-leader
   (package
