@@ -639,6 +639,30 @@ emulation layer for Emacs.")
 packages to use them with Hel.")
       (license license:gpl3+))))
 
+(define-public emacs-hel-paredit
+  (let ((commit "4ffb2bd22c2d5ad1766f39098a7c363ea5fff717")
+        (revision "0"))
+    (package
+      (name "emacs-hel-paredit")
+      (version (git-version "0.10.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/helheim-emacs/hel-paredit")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1a6ibdvnw8ws9nfbq2sg3amm32prb4ki8msqd9za78rd6rw7ddkc"))))
+      (build-system emacs-build-system)
+      (propagated-inputs (list emacs-hel emacs-paredit))
+      (home-page "https://github.com/helheim-emacs/hel-paredit")
+      (synopsis "Hel integration with Paredit")
+      (description
+       "This package provides a Hel extension for structural editing of Lisp
+S-expressions.")
+      (license license:gpl3+))))
+
 (define-public emacs-helix
   (package
     (name "emacs-helix")
