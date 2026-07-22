@@ -7840,7 +7840,7 @@ command-line arguments or read from stdin.")
 (define-public python-internetarchive
   (package
     (name "python-internetarchive")
-    (version "5.10.1")
+    (version "5.11.0")
     (source
      (origin
        (method git-fetch)
@@ -7850,17 +7850,13 @@ command-line arguments or read from stdin.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "19ljihjmwp82v0qp1xaivd7ahz7lzirx904pjzbx5n2yng3yyn1r"))))
+         "0y39mfi1j4r4gibl47k7h02s7amia96sgjcl7r5pxga63m0bcijm"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
-      '(list "-k"
-             (string-append
-              ;; These tests need Internet access.
-              "not test_get_item_with_kwargs"
-              " and not test_upload"
-              " and not test_ia"))))
+      ;; Run only the offline test suite.
+      '(list "-m" "not network")))
     (propagated-inputs
      (list python-jsonpatch
            python-requests
