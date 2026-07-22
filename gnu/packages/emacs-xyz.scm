@@ -635,6 +635,9 @@ emulation layer for Emacs.")
          (sha256
           (base32 "0j210sg5hbc9n9c48ph8vcra4h5i2978xc7yr2d0cp3g7vib7fj1"))))
       (build-system emacs-build-system)
+      (arguments
+       (list
+        #:include #~(cons "^modes/" %default-include)))
       (propagated-inputs (list emacs-hel))
       (home-page "https://github.com/helheim-emacs/hel-collection")
       (synopsis "Collection of keybinds for Hel")
