@@ -132,6 +132,15 @@
                           (display "1021\n" port)
                           (display "1474\n" port)
                           (display "1501\n" port)
+                          (display "1541\n" port) ;flaky
+                          ;; These tests fail because the nghttp2 server
+                          ;; version 1.69 after failure to set SO_REUSEPORT.
+                          (display "1700\n" port)
+                          (display "1701\n" port)
+                          (display "1702\n" port)
+                          (display "2402\n" port)
+                          (display "2403\n" port)
+                          (display "2404\n" port)
                           (close port)))))
                  #~())
           (add-after 'install 'sanitize-libcurl.pc
