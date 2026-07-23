@@ -7,6 +7,7 @@
 ;;; Copyright © 2020 Brett Gilio <brettg@gnu.org>
 ;;; Copyright © 2024 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2025 Ashish SHUKLA <ashish.is@lostca.se>
+;;; Copyright © 2026 gemmaro <gemmaro.dev@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -33,9 +34,40 @@
   #:use-module (guix build-system cmake)
   #:use-module (guix utils)
   #:use-module (gnu packages autotools)
-  #:use-module (gnu packages gettext)
   #:use-module (gnu packages check)
-  #:use-module (gnu packages cpp))
+  #:use-module (gnu packages cpp)
+  #:use-module (gnu packages gettext)
+  #:use-module (gnu packages python)
+  #:use-module (gnu packages ruby))
+
+(define-public onigmo
+  (package
+    (name "onigmo")
+    (version "6.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/k-takata/Onigmo")
+             (commit (string-append "Onigmo-" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0m6z61w8b4y8yk63sj9q8jm8a2v4ncrx258k96bn71nmji7rjnq3"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'check 'check-python
+            (lambda _
+              (invoke "make" "pytest"))))))
+    (native-inputs (list autoconf automake libtool ruby python))
+    (home-page "https://github.com/k-takata/Onigmo")
+    (synopsis "Regular expression library forked from Oniguruma")
+    (description
+     "Onigmo is a regular expression library forked from Oniguruma.  It
+focuses on supporting new expressions.")
+    (license license:bsd-2)))
 
 (define-public oniguruma
   (package

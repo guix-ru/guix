@@ -121,6 +121,7 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages rdf)
+  #:use-module (gnu packages regex)
   #:use-module (gnu packages rust)
   #:use-module (gnu packages ssh)
   #:use-module (gnu packages sqlite)
