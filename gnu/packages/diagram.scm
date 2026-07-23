@@ -27,8 +27,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public pikchr
-  (let ((commit "221988914eff6efe")
-        (revision "0"))                       ;increment for each new snapshot
+  (let ((commit "a7f1c35bc0448daf")
+        (revision "1"))                 ;increment for each new snapshot
     (package
       (name "pikchr")
       ;; To update, use the last check-in in https://pikchr.org/home/timeline?r=trunk
@@ -40,10 +40,11 @@
                 (file-name (string-append "pikchr-" version ".tar.gz"))
                 (sha256
                  (base32
-                  "0yclkincsgfni4scjzp5avdsij8vmyxjn0q2qkwjhn3p43y8nxzd"))))
+                  "06sx7mc6g79i8gvqczl1mlky9z6r23nbpmmlypjziiiv1mmmc9ad"))))
       (build-system gnu-build-system)
       (arguments
        (list #:tests? #f                ;no tests
+             #:make-flags #~(list (string-append "CC=" #$(cc-for-target)))
              #:phases
              #~(modify-phases %standard-phases
                  (delete 'bootstrap)
