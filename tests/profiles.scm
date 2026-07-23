@@ -367,11 +367,13 @@
        (profile -> (derivation->output-path drv))
        (bindir ->  (string-append profile "/bin"))
        (_          (built-derivations (list drv))))
-    (define-syntax-rule (with-environment-excursion exp ...)
+    (define-syntax-rule (with-environment-excursion body ...)
+      ;; Save the current environment variables, run BODY..., and restore
+      ;; them.
       (let ((env (environ)))
         (dynamic-wind
           (const #t)
-          (lambda () exp ...)
+          (lambda () body ...)
           (lambda () (environ env)))))
 
     (return (and (with-environment-excursion

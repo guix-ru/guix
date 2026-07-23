@@ -133,19 +133,8 @@ BODY..., and restore them."
         (set! %load-path path)
         (set! %load-compiled-path cpath)))))
 
-(define-syntax-rule (save-environment-excursion body ...)
-  "Save the current environment variables, run BODY..., and restore them."
-  (let ((env (environ)))
-    (dynamic-wind
-      (const #t)
-      (lambda ()
-        body ...)
-      (lambda ()
-        (environ env)))))
-
 (define topologically-sorted*
   (store-lift topologically-sorted))
-
 
 (define* (copy-item item info target db
                     #:key (log-port (current-error-port)))
