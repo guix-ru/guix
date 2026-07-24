@@ -676,7 +676,7 @@ unprivileged user, known as \"Rootless mode\".")
            go-github-com-containerd-platforms
            go-github-com-containers-ocicrypt
            go-github-com-coreos-go-systemd-v22
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-davecgh-go-spew
            go-github-com-d6o-gotree-v3    ;go-github-com-disiqueira-gotree-v3
            go-github-com-docker-distribution
@@ -919,7 +919,7 @@ also implements \"simple image signing\".  It's a successor of
     (propagated-inputs
      (list go-github-com-burntsushi-toml
            go-github-com-containerd-stargz-snapshotter-estargz
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-docker-go-units
            go-github-com-google-go-intervals
            go-github-com-json-iterator-go
@@ -1983,7 +1983,7 @@ layer to create a new image.
            go-github-com-apex-log
            go-github-com-blang-semver-v4
            go-github-com-containerd-platforms
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-cyphar-go-mtree
            go-github-com-docker-go-units
            go-github-com-klauspost-compress

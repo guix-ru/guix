@@ -7767,7 +7767,7 @@ between different image formats like Docker and OCI.")
     (propagated-inputs
      (list go-github-com-burntsushi-toml
            go-github-com-containerd-stargz-snapshotter-estargz
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-docker-go-units
            go-github-com-google-go-intervals
            go-github-com-json-iterator-go
@@ -8613,6 +8613,23 @@ provide a @code{PoC} implementation to make the @code{SecureJoin} proposal
 (@url{https://github.com/golang/go/issues/20126,https://github.com/golang/go/issues/20126})
 more tangible.")
     (license license:bsd-3)))
+
+;; Breaking changes, remove when nothing depends on it.
+(define-public go-github-com-cyphar-filepath-securejoin-0.4.1
+  (hidden-package
+   (package
+     (inherit go-github-com-cyphar-filepath-securejoin)
+     (name "go-github-com-cyphar-filepath-securejoin")
+     (version "0.4.1")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/cyphar/filepath-securejoin")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "0cyqbxmrn3qgq8q0v7xmm9knc8nr60s017yrhkghcwg4yqqpmr9l")))))))
 
 ;; For umoci@1.6.0, remove when a fresh version is released.
 (define-public go-github-com-cyphar-go-mtree
@@ -12695,7 +12712,7 @@ error return.")
            go-github-com-stretchr-testify
            go-gopkg-in-check-v1))
     (propagated-inputs
-     (list go-github-com-cyphar-filepath-securejoin
+     (list go-github-com-cyphar-filepath-securejoin-0.4.1
            go-golang-org-x-sys))
     (home-page "https://github.com/go-git/go-billy/")
     (synopsis "File system abstraction for Go")
@@ -24295,7 +24312,7 @@ levels per backend and logger.")
     (propagated-inputs
      (list go-github-com-cilium-ebpf
            go-github-com-coreos-go-systemd-v22
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-godbus-dbus-v5
            go-github-com-moby-sys-mountinfo
            go-github-com-moby-sys-userns
@@ -24637,7 +24654,7 @@ or above.")
      (list go-github-com-adalogics-go-fuzz-headers
            go-github-com-apex-log
            go-github-com-blang-semver-v4
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-docker-go-units
            go-github-com-klauspost-compress
            go-github-com-klauspost-pgzip
