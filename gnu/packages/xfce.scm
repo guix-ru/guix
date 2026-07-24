@@ -249,9 +249,17 @@ to share commonly used Xfce widgets among the Xfce applications.")
                          (list gtk+ "bin") ;for gtk-update-icon-cache
                          pkg-config
                          python))
-    (inputs (list bash-minimal gobject-introspection which xfconf xdg-utils))
-    (propagated-inputs (list gtk+ python-dbus-1.2 python-pexpect python-pycairo
-                             python-pygobject))
+    (inputs (list
+             bash-minimal
+             gobject-introspection
+             gtk+
+             python-dbus-1.2
+             python-pexpect
+             python-pycairo
+             python-pygobject
+             which
+             xdg-utils
+             xfconf))
     (home-page "https://docs.xfce.org/apps/catfish/")
     (synopsis "File searching tool for Xfce")
     (description
