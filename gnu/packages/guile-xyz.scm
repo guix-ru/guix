@@ -1275,7 +1275,7 @@ is not available for Guile 2.0.")
      (list texinfo pkg-config autoconf automake libtool
            guile-3.0            ;for 'guild compile
            ;; Gettext brings 'AC_LIB_LINKFLAGS_FROM_LIBS'
-           gettext-minimal))
+           gettext-minimal-0.23))
     (arguments
      (if (%current-target-system)
          (substitute-keyword-arguments (package-arguments guile-fibers-1.3)
