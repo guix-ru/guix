@@ -24476,6 +24476,23 @@ containers on Linux according to the OCI specification.")
 specification-runtime-spec.")
     (license license:asl2.0)))
 
+;; Breaking changes, remove when dependents are updated.
+(define-public go-github-com-opencontainers-runtime-spec-1.0.2
+  (hidden-package
+   (package
+     (inherit go-github-com-opencontainers-runtime-spec)
+     (name "go-github-com-opencontainers-runtime-spec")
+     (version "1.0.2")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/opencontainers/runtime-spec")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "19w981vcmd5lp2hy0630x6ayb8zz17n2vxqm2py5mg945xflcizg")))))))
+
 (define-public go-github-com-opencontainers-runtime-tools
   (package
     (name "go-github-com-opencontainers-runtime-tools")
