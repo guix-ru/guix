@@ -24493,6 +24493,23 @@ specification-runtime-spec.")
         (sha256
          (base32 "19w981vcmd5lp2hy0630x6ayb8zz17n2vxqm2py5mg945xflcizg")))))))
 
+;; Breaking changes, remove when dependents are updated.
+(define-public go-github-com-opencontainers-runtime-spec-1.2.1
+  (hidden-package
+   (package
+     (inherit go-github-com-opencontainers-runtime-spec)
+     (name "go-github-com-opencontainers-runtime-spec")
+     (version "1.2.1")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/opencontainers/runtime-spec")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "0bh2awpdmbjh65js45vidm3s2pf42jykgad5wb772pysd7qnphbv")))))))
+
 (define-public go-github-com-opencontainers-runtime-tools
   (package
     (name "go-github-com-opencontainers-runtime-tools")
