@@ -24897,22 +24897,24 @@ Mustache templating language renderer.")
 (define-public python-dulwich
   (package
     (name "python-dulwich")
-    (version "1.0.0")
+    (version "1.2.12")
     (source
      (origin
-       (method url-fetch)
-       (uri (list (string-append "https://www.dulwich.io/releases/"
-                                 "dulwich-" version ".tar.gz")
-                  (pypi-uri "dulwich" version)))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/jelmer/dulwich")
+              (commit (string-append "dulwich-" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1g09iwy5hvjgd8qmkc5cny4qqcng2734ll9mxjzj4psj6m3i01rx"))))
+        (base32 "0in5pgqhnnbfqi5alcg85kiaxr8zww9iih7qsyy9g1yzlaxs0dvd"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 3796 passed, 89 skipped, 1 xfailed, 8 warnings, 33 subtests
+      ;; passed
       #:test-flags
-      ;; DULWICH_SWIFT_CFG is not set.
-      #~(list "--ignore=tests/contrib/test_swift.py"
-              "--ignore=tests/contrib/test_swift_smoke.py")
+      ;; Exclude fuzzing from discovery, depends on python-atheris.
+      #~(list "tests")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'fix-tests
@@ -24924,21 +24926,30 @@ Mustache templating language renderer.")
                 (("/bin/sh")
                  (search-input-file inputs "/bin/sh")))))
           (add-before 'check 'pre-check
-            (lambda _ (setenv "PYTHONHASHSEED" "random"))))))
-    (propagated-inputs
-     (list python-fastimport python-urllib3))
+            (lambda _
+              (setenv "PYTHONHASHSEED" "random")
+              (setenv "TMPDIR" "/tmp"))))))
     (native-inputs
-     (list gnupg
-           git-minimal/pinned
+     (list git-minimal/pinned
            openssh-sans-x
+           ;; python-atheris  ;not packaged yet in Guix
+           python-gevent
            python-geventhttpclient
-           python-merge3
-           python-mypy
-           python-paramiko
            python-pytest
-           python-requests
            python-setuptools
            python-setuptools-rust))
+    (propagated-inputs
+     (list python-urllib3
+           ;; [optional]
+           gnupg
+           gpgme
+           python-aiohttp
+           python-fastimport
+           python-merge3
+           python-munkres
+           python-paramiko
+           python-patiencediff
+           python-rich))
     (home-page "https://www.dulwich.io/")
     (synopsis "Git implementation in Python")
     (description "Dulwich is an implementation of the Git file formats and
