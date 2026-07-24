@@ -719,7 +719,7 @@ those files in github.com/containers repos.")
 (define-public go-go-podman-io-image-v5
   (package
     (name "go-go-podman-io-image-v5")
-    (version "5.37.0")
+    (version "5.39.2")
     (source
      (origin
        (method git-fetch)
@@ -728,7 +728,7 @@ those files in github.com/containers repos.")
               (commit (go-version->git-ref version #:subdir "image"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1p115gm6xj71pd00npdz5x3507iq57xmcb7pwmsrbi6fs6khq3f5"))
+        (base32 "17qjzgc3h89sa0y8qkviz5gry1kvkkm3j79yhn78c7gbmqcx5v0j"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -780,10 +780,11 @@ those files in github.com/containers repos.")
                        (list "TestComputeBlobInfo"
                              "TestCreateBigFileTemp"
                              "TestGPGSigningMechanismSign"
+                             "TestMkDirBigFileTemp"
                              "TestReferenceNewImage"
                              "TestReferenceNewImageSource"
-                             "TestMkDirBigFileTemp"
                              "TestReferencePolicyConfigurationNamespaces"
+                             "TestSetCredentialsInteroperability"
                              "TestSetupCertificates"
                              "TestSign"
                              "TestSignDockerManifest"
