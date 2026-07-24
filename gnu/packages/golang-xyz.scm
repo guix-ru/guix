@@ -6940,7 +6940,7 @@ run time.")
            go-github-com-docker-go-units
            go-github-com-godbus-dbus-v5
            go-github-com-gogo-protobuf
-           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-runtime-spec-1.0.2
            go-github-com-sirupsen-logrus
            go-golang-org-x-sys))
     (home-page "https://containerd.io/")
