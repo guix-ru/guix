@@ -24575,7 +24575,9 @@ specification-runtime-spec.")
       #:test-flags
       #~(list "-vet=off"
               ;; Network is required.
-              "-skip" "TestGenerateValid|TestJSONSchema")))
+              "-skip" "TestGenerateValid|TestJSONSchema")
+    #:test-subdirs
+    #~(list "filepath" "generate" "validate")))
     (native-inputs
      (list go-github-com-mndrix-tap-go
            go-github-com-stretchr-testify
