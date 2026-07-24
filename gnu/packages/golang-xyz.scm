@@ -7694,18 +7694,27 @@ between different image formats like Docker and OCI.")
     (license license:asl2.0)))
 
 (define-public go-github-com-containers-storage
+  ;; XXX: Project has been migrated to podman-containers-storage, deprecate
+  ;; this package when nothing depends on it.
   (package
     (name "go-github-com-containers-storage")
-    (version "1.59.1")
+    ;; 1.59.1 (2025-08-04); the latest changes provide compatibility with
+    ;; fresh versions of go-github-com-opencontainers-runtime-spec and
+    ;; go-github-com-opencontainers-selinux.
+    (properties '((commit . "83cf57466529353aced8f1803f2302698e0b5cb7")
+                  (revision . "0")))
+    (version (git-version "1.59.1"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/containers/storage")
-              (commit (string-append "v" version))))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1d7masgf73grsa5rv6y8lf1nwa1hay5fcgm49ab71yc693xr3ixq"))
+        (base32 "0r4472cv0x316x1nvpid3hb5z5qbb7m6zn4y210rlmc4ww571xn6"))
        (snippet
         #~(begin
             (use-modules (guix build utils))
@@ -7736,6 +7745,7 @@ between different image formats like Docker and OCI.")
                              "TestChrootUntarPathAndChown"
                              "TestChrootUntarWithHugeExcludesList"
                              "TestCopyDir"
+                             "TestCopySocket"
                              "TestCopyWithTarInexistentDestWillCreateIt"
                              "TestEnsureRemoveAllWithMount"
                              "TestMkdirAllAndChownNew"
