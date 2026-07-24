@@ -26276,7 +26276,7 @@ your Go binary to be later served from an http.FileSystem.")
      (list go-github-com-benbjohnson-clock
            go-github-com-containerd-cgroups
            go-github-com-elastic-gosigar
-           go-github-com-opencontainers-runtime-spec))
+           go-github-com-opencontainers-runtime-spec-1.0.2))
     (home-page "https://github.com/raulk/go-watchdog")
     (synopsis "Go memory watchdog")
     (description
