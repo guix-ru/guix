@@ -3052,7 +3052,7 @@ GUI for sigrok.")
 (define-public osvvm
   (package
     (name "osvvm")
-    (version "2025.06a")
+    (version "2026.05")
     (source
      (origin
        (method git-fetch)
@@ -3064,7 +3064,7 @@ GUI for sigrok.")
               (recursive? #t)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1dq56h51ydfpffd00qz9qkcg6sddlqixiixls9vvxczfkp9l21ws"))))
+        (base32 "0ga5ly71cgmfibl7636y3c9zm36fw77x78cgb78mh5bv1r10f3kq"))))
     (outputs
      '("out" "osvvm"))
     (properties
