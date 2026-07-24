@@ -3086,6 +3086,10 @@ GUI for sigrok.")
            #:exclude-regexp ("GHDL_Debug"))
           ("AXI4" "share/osvvm/work/AXI4"
            #:include ("vhd" "pro" "md"))
+          ("Ethernet" "share/osvvm/work/Ethernet"
+           #:include ("vhd" "pro" "md"))
+          ("Wishbone" "share/osvvm/work/Wishbone"
+           #:include ("vhd" "pro" "md"))
           ;; Library osvvm.
           ("osvvm" "share/osvvm/osvvm/osvvm/"
            #:include ("vhd" "pro" "md") #:output "osvvm")
@@ -3098,6 +3102,12 @@ GUI for sigrok.")
            #:exclude-regexp ("GHDL_Debug")
            #:output "osvvm")
           ("AXI4" "share/osvvm/osvvm/AXI4"
+           #:include ("vhd" "pro" "md")
+           #:output "osvvm")
+          ("Ethernet" "share/osvvm/osvvm/Ethernet"
+           #:include ("vhd" "pro" "md")
+           #:output "osvvm")
+          ("Wishbone" "share/osvvm/osvvm/Wishbone"
            #:include ("vhd" "pro" "md")
            #:output "osvvm"))
       #:phases
@@ -3125,7 +3135,10 @@ GUI for sigrok.")
                     (format port "source Scripts/StartNVC.tcl;\n")
                     (format port "include osvvm/osvvm.pro;\n")
                     (format port "include Common/build.pro;\n")
-                    (format port "include UART/build.pro\n")))
+                    (format port "include UART/build.pro\n")
+                    (format port "include AXI4/build.pro\n")
+                    (format port "include Ethernet/build.pro\n")
+                    (format port "include Wishbone/build.pro\n")))
                 (invoke "tclsh" "build.tcl")
                 (rename-file
                  (string-append "VHDL_LIBS/" "NVC-" #$(package-version nvc))
