@@ -853,7 +853,7 @@ also implements \"simple image signing\".  It's a successor of
 (define-public go-go-podman-io-storage
   (package
     (name "go-go-podman-io-storage")
-    (version "1.60.0")
+    (version "1.62.0")
     (source
      (origin
        (method git-fetch)
@@ -862,7 +862,7 @@ also implements \"simple image signing\".  It's a successor of
               (commit (go-version->git-ref version #:subdir "storage"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "00i4j4975mc9bhcm72zcy2xi3xr2x5prps1qas3gmjsvzk89wny6"))
+        (base32 "0ywj80wkpyq2yhizsdlfh0n2fxip75042rsk7jm4vyp98bb18rb6"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
