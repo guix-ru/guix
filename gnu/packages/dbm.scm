@@ -229,33 +229,16 @@ SQL, Key/Value, XML/XQuery or Java Object storage for their data model.")
 (define-public gdbm
   (package
     (name "gdbm")
-    (version "1.25")
+    (version "1.26")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/gdbm/gdbm-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "1v4kycs1n9x0pczm9ny6m16gfgpmj8gwv0bvh7w7gn3fjb2v6bfh"))
-              (patches
-               (search-patches "gdbm-lockwait-test.patch"))))
+                "0pjadya4f72cwmjn1wngiklgpxkdjyz3dffw0d0p8jny2i55093a"))))
     (arguments `(#:configure-flags '("--enable-libgdbm-compat"
-                                     "--disable-static")
-                 ,@(if (target-loongarch64?)
-                       `(#:phases
-                         (modify-phases %standard-phases
-                           (add-after 'unpack 'update-config
-                             (lambda* (#:key native-inputs inputs #:allow-other-keys)
-                               (for-each (lambda (file)
-                                           (install-file
-                                            (search-input-file
-                                             (or native-inputs inputs)
-                                             (string-append "/bin/" file)) "build-aux"))
-                                         '("config.guess" "config.sub"))))))
-                       '())))
-    (native-inputs (if (target-loongarch64?)
-                       (list config)
-                       '()))
+                                     "--disable-static")))
     (build-system gnu-build-system)
     (home-page "https://www.gnu.org.ua/software/gdbm")
     (synopsis
