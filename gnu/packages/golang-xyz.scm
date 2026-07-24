@@ -24297,9 +24297,10 @@ levels per backend and logger.")
     (license license:bsd-3)))
 
 (define-public go-github-com-opencontainers-cgroups
+  ;; TODO: Move to (gnu packages containers).
   (package
     (name "go-github-com-opencontainers-cgroups")
-    (version "0.0.3")
+    (version "0.0.8")
     (source
      (origin
        (method git-fetch)
@@ -24308,7 +24309,7 @@ levels per backend and logger.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0wwfknbj5zj9y07sdbzqg919ddz39xryp3n5vn94cn2zv3c1kwvr"))))
+        (base32 "149siapv341i1hak7sk3lmzjns6xjav0b8fdmqyw1x6rfjbk8fhg"))))
     (build-system go-build-system)
     (arguments
      (list
