@@ -610,7 +610,7 @@ unprivileged user, known as \"Rootless mode\".")
 (define-public go-go-podman-io-common
   (package
     (name "go-go-podman-io-common")
-    (version "0.68.0")
+    (version "0.68.1")
     (source
      (origin
        (method git-fetch)
@@ -619,7 +619,7 @@ unprivileged user, known as \"Rootless mode\".")
               (commit (go-version->git-ref version #:subdir "common"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1sh1ljd0gmbncanfr3jz9vlsbp6szdgikspzp6a5lghpgjl5jiy8"))
+        (base32 "040snqsg3il98pz9w8442wdzwm2rm07yqbch87f4jic4p4s0707s"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -658,11 +658,9 @@ unprivileged user, known as \"Rootless mode\".")
               "pkg/report" "pkg/sysctl" "pkg/cgroups" "pkg/filters"
               "pkg/formats" "pkg/machine" "pkg/seccomp" "pkg/secrets"
               "pkg/sysinfo" "pkg/timetype" "pkg/manifests" "pkg/configmaps"
-              "libnetwork/util" "pkg/hooks/0.1.0" "pkg/strongunits"
-              "libnetwork/types" "pkg/capabilities" "libimage/platform"
-              "pkg/subscriptions" "libnetwork/resolvconf"
-              "pkg/secrets/filedriver" "pkg/configmaps/filedriver"
-              "pkg/apparmor/internal/supported")))
+              "pkg/hooks/0.1.0" "pkg/strongunits" "pkg/capabilities"
+              "pkg/subscriptions" "pkg/secrets/filedriver"
+              "pkg/configmaps/filedriver" "pkg/apparmor/internal/supported")))
     (native-inputs
      (list go-github-com-onsi-ginkgo-v2
            go-github-com-davecgh-go-spew
