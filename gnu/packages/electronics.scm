@@ -3184,6 +3184,9 @@ verification.")
      (substitute-keyword-arguments arguments
        ((#:tests? _ #t)
         #f)
+       ((#:install-plan _)
+        #~'(("osvvm" "share/osvvm/work/osvvm/"
+             #:include ("vhd" "pro" "md"))))
        ((#:phases phases #~%standard-phases)
         #~(modify-phases #$phases
             (delete 'build)
