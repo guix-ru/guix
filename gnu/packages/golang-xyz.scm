@@ -7015,7 +7015,7 @@ cgroup uses the OCI runtime-spec found
 (define-public go-github-com-containerd-console
   (package
     (name "go-github-com-containerd-console")
-    (version "1.0.4")
+    (version "1.0.5")
     (source
      (origin
        (method git-fetch)
@@ -7024,7 +7024,7 @@ cgroup uses the OCI runtime-spec found
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1p10k6lwfxgij5a9i47dark8apffc6wn254dwj43ks8jr134854v"))))
+        (base32 "12zm0fqw1jsibp868i81ss8qvdjf629n3bbjbi262aksa3pgx38m"))))
     (build-system go-build-system)
     (arguments
      (list
