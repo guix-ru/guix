@@ -24421,6 +24421,7 @@ container image format spec (OCI Image Format).")
     (license license:asl2.0)))
 
 (define-public go-github-com-opencontainers-runc
+  ;; TODO: Move to (gnu packages containers).
   (package
     (name "go-github-com-opencontainers-runc")
     (version "1.3.0")
@@ -24457,7 +24458,7 @@ container image format spec (OCI Image Format).")
      (list go-github-com-checkpoint-restore-go-criu-v6
            go-github-com-containerd-console
            go-github-com-coreos-go-systemd-v22
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-docker-go-units
            go-github-com-godbus-dbus-v5
            go-github-com-moby-sys-capability
@@ -24465,8 +24466,8 @@ container image format spec (OCI Image Format).")
            go-github-com-moby-sys-user
            go-github-com-moby-sys-userns
            go-github-com-mrunalp-fileutils
-           go-github-com-opencontainers-cgroups
-           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-cgroups-0.0.1
+           go-github-com-opencontainers-runtime-spec-1.2.1
            go-github-com-opencontainers-selinux
            go-github-com-seccomp-libseccomp-golang
            go-github-com-sirupsen-logrus
