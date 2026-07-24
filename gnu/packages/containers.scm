@@ -1270,6 +1270,8 @@ Guix machinery.")
     (license license:gpl3+)))
 
 (define-public runc
+  ;; TODO: Inheerit form go-github-com-opencontainers-runc when it's moved
+  ;; here.
   (package
     (name "runc")
     (version "1.3.0")
@@ -1313,7 +1315,7 @@ Guix machinery.")
      (list go-github-com-checkpoint-restore-go-criu-v6
            go-github-com-containerd-console
            go-github-com-coreos-go-systemd-v22
-           go-github-com-cyphar-filepath-securejoin
+           go-github-com-cyphar-filepath-securejoin-0.4.1
            go-github-com-docker-go-units
            go-github-com-godbus-dbus-v5
            go-github-com-moby-sys-capability
@@ -1322,7 +1324,7 @@ Guix machinery.")
            go-github-com-moby-sys-userns
            go-github-com-mrunalp-fileutils
            go-github-com-opencontainers-cgroups-0.0.1
-           go-github-com-opencontainers-runtime-spec
+           go-github-com-opencontainers-runtime-spec-1.2.1
            go-github-com-opencontainers-selinux
            go-github-com-seccomp-libseccomp-golang
            go-github-com-sirupsen-logrus
