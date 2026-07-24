@@ -12061,19 +12061,25 @@ geared towards parsing MIME encoded emails.")
   (package
     (inherit go-github-com-jhillyerd-enmime)
     (name "go-github-com-jhillyerd-enmime-v2")
-    (version "2.1.0")
+    (version "2.4.1")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/jhillyerd/enmime")
-             (commit (string-append "v" version))))
+              (url "https://github.com/jhillyerd/enmime")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0ahw8bxwp8zbi7qgq2d49hd31iznc8njjjzk84xmxa30qyb3ilgc"))))
+        (base32 "1diiz7y86ac8mv5dzd44x46gcqay4zy8yfhbfcrgi75mk4xxyp7l"))))
     (arguments
      (list
-      #:import-path "github.com/jhillyerd/enmime/v2"))))
+      #:import-path "github.com/jhillyerd/enmime/v2"))
+    (propagated-inputs
+     (list go-github-com-cention-sany-utf7
+           go-github-com-gogs-chardet
+           go-github-com-inbucket-html2text
+           go-github-com-pkg-errors
+           go-golang-org-x-text))))
 
 (define-public go-github-com-jlaffaye-ftp
   (package
