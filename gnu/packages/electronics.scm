@@ -2557,7 +2557,7 @@ Automation}, portable and vendor neutral FPGA place and route tool.")
 (define-public nvc
   (package
     (name "nvc")
-    (version "1.21.1")
+    (version "1.22.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -2566,7 +2566,7 @@ Automation}, portable and vendor neutral FPGA place and route tool.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0aj053dw0m8iaicj6kck1yqh9i2dnsy40kwq6yhp60bb6q88d1wp"))))
+                "18pf0rybjh38wvqj576bzyq1f6kashby9abjagnlwshfr577ihv7"))))
     (build-system gnu-build-system)
     (arguments
      (list #:out-of-source? #t
@@ -2603,14 +2603,17 @@ Automation}, portable and vendor neutral FPGA place and route tool.")
            python-minimal
            which))
     (inputs
-     (list jansson
+     (list capstone
+           jansson
            libffi
            llvm
            readline
            tcl
            `(,zstd "lib")))
-    (synopsis "VHDL compiler and simulator")
-    (description "This package provides a VHDL compiler and simulator.")
+    (synopsis "Mix language HDL compiler and simulator")
+    (description "@code{Nvc} is an @acronym{EDA, electronic design automation}
+HDL compiler, with support for almost all of VHDL-2008 with the exception of
+PSL.  It includes experimental support for Verilog and VHDL-2019.")
     (home-page "https://www.nickg.me.uk/nvc/")
     (license license:gpl3+)))
 
