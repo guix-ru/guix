@@ -50,7 +50,7 @@
 (define-public libffi
   (package
     (name "libffi")
-    (version "3.5.2")
+    (version "3.7.1")
     (source (origin
               (method url-fetch)
               (uri
@@ -59,7 +59,7 @@
                               name "-" version ".tar.gz"))
               (sha256
                (base32
-                "1p42mimnfdg3a8m1psm73zwjy7rpgca5646d9wx2jz5k4cm0i8zk"))))
+                "17c1il40lbr1yq81rh5w0yknzgjbgsv8wlalvcym3lnvimisdsfm"))))
     (build-system gnu-build-system)
     (arguments
      `(;; Prevent the build system from passing -march and -mtune to the
