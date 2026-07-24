@@ -8584,7 +8584,9 @@ signatures.")
 (define-public go-github-com-cyphar-filepath-securejoin
   (package
     (name "go-github-com-cyphar-filepath-securejoin")
-    (version "0.4.1")
+    ;; XXX: Higher version depends on binding to Rust library
+    ;; <https://github.com/cyphar/libpathrs>.
+    (version "0.5.2")
     (source
      (origin
        (method git-fetch)
@@ -8593,11 +8595,15 @@ signatures.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0cyqbxmrn3qgq8q0v7xmm9knc8nr60s017yrhkghcwg4yqqpmr9l"))))
+        (base32 "1i109zkv3wd1fnc8fyb4zbxi7g0r1pkaasxghnxkp47c3d595aym"))))
     (build-system go-build-system)
     (arguments
      (list
-      #:test-flags #~(list "-timeout=30m" "-shuffle=on" "-v")
+      #:test-flags
+      #~(list "-timeout=30m"
+              "-shuffle=on"
+              ;; Messages: GreaterEqualThan(7.18446744073709551615).
+              "-skip" "TestGreaterEqualThan/OlderMinor")
       #:import-path "github.com/cyphar/filepath-securejoin"))
     (native-inputs
      (list go-github-com-stretchr-testify))
@@ -8610,7 +8616,7 @@ signatures.")
 hopefully-soon-to-be-included @code{SecureJoin} helper that is meant to be
 part of the \"path/filepath\" package.  The purpose of this project is to
 provide a @code{PoC} implementation to make the @code{SecureJoin} proposal
-(@url{https://github.com/golang/go/issues/20126,https://github.com/golang/go/issues/20126})
+(@url{https://github.com/golang/go/issues/20126})
 more tangible.")
     (license license:bsd-3)))
 
