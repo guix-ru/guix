@@ -9,6 +9,7 @@
 ;;; Copyright © 2023 David Pflug <david@pflug.io>
 ;;; Copyright © 2025 David Thompson <davet@gnu.org>
 ;;; Copyright © 2025-2026 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2026 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -35,6 +36,7 @@
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module (guix packages)
+  #:use-module (guix utils)
   #:use-module (gnu packages)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
@@ -310,6 +312,10 @@ reinventing them.")
       ;; source library to use in inputs for other packages.
       #:skip-build? #f
       #:import-path "code.forgejo.org/forgejo/runner/v12"
+      #:build-flags
+      #~(list (string-append "-ldflags=-X code.forgejo.org/"
+                             "forgejo/runner/v12/internal/pkg/ver.version="
+                             #$version))
       #:embed-files #~(list ".*\\.json" ".*\\.js" ".*\\.sh")
       #:test-flags
       #~(list "-skip" (string-join
@@ -387,59 +393,22 @@ locally and act as a cache.")
     (license l:gpl3)))
 
 (define-public forgejo-runner
-  (package
+  (package/inherit go-code-forgejo-org-forgejo-runner-v12
     (name "forgejo-runner")
-    (version "6.2.2")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://code.forgejo.org/forgejo/runner.git")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0bdn1pk9ghbyd4i9hmk7rfhqdkz9l5w4wgrwiryg8qpwplb7j8mz"))))
-    (build-system go-build-system)
     (arguments
-     (list
-      #:install-source? #f
-      #:import-path "gitea.com/gitea/act_runner"
-      #:embed-files #~(list ".*\\.json" ".*\\.js" ".*\\.sh")
-      #:test-flags
-      #~(list "-skip" (string-join
-                       (list
-                       ;; Should be true.
-                       "Test_ping"
-	               ;; panic: runtime error: invalid memory address or nil
-	               ;; pointer dereference.
-                        "Test_runCreateRunnerFile")
-                       "|"))
-      #:phases #~(modify-phases %standard-phases
-                   (add-after 'install 'rename-binary
-                     (lambda _
-                       (rename-file (string-append #$output "/bin/act_runner")
-                                    (string-append #$output "/bin/forgejo-runner")))))))
+     (substitute-keyword-arguments arguments
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:phases phases '%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'install 'rename-binary
+              (lambda _
+                (with-directory-excursion (string-append #$output "/bin")
+                  (rename-file "v12" "forgejo-runner"))))))))
     (native-inputs
-     (list go-code-gitea-io-actions-proto-go-ping
-           go-code-gitea-io-actions-proto-go-runner
-           go-connectrpc-com-connect
-           go-github-com-avast-retry-go
-           go-github-com-avast-retry-go-v4
-           go-github-com-google-uuid
-           go-github-com-joho-godotenv
-           go-github-com-mattn-go-isatty
-           go-github-com-nektos-act
-           go-github-com-sirupsen-logrus
-           go-github-com-spf13-cobra
-           go-golang-org-x-term
-           go-golang-org-x-time
-           go-google-golang-org-protobuf
-           go-gopkg-in-yaml-v3
-           go-gotest-tools-v3))
-    (home-page "https://code.forgejo.org/forgejo/runner")
-    (synopsis "Run continuous integration jobs for Forgejo")
-    (description
-     "Forgejo Runner is a daemon that connects to a Forgejo instance and runs
-jobs for continuous integration.")
-    (license l:expat)))
-
+     (append
+      (package-native-inputs go-code-forgejo-org-forgejo-runner-v12)
+      (package-propagated-inputs go-code-forgejo-org-forgejo-runner-v12)))
+    (propagated-inputs '())
+    (inputs '())))
