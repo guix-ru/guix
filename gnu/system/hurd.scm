@@ -110,7 +110,8 @@
 (define %setuid-programs/hurd
   ;; Default set of setuid-root programs.
   (map file-like->setuid-program
-       (list (file-append shadow "/bin/passwd")
+       (list (file-append glibc/hurd "/libexec/pt_chown")
+             (file-append shadow "/bin/passwd")
              (file-append shadow "/bin/sg")
              (file-append shadow "/bin/su")
              (file-append shadow "/bin/newgrp")
