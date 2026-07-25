@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2014-2022 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2014-2022, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2017 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2020 Maxim Cournoyer <maxim@guixotic.coop>
 ;;; Copyright © 2020 Julien Lepiller <julien@lepiller.eu>
@@ -191,8 +191,7 @@ ignoring it~%")
                       file (strerror err)))))
         (('syntax-error proc message properties form . rest)
          (let ((loc (source-properties->location properties)))
-           (leave (G_ "~a: ~a~%")
-                  (location->string loc) message)))
+           (leave loc (G_ "~a~%") message)))
         (x
          (leave (G_ "failed to load machine file '~a': ~s~%")
                 file args))))))

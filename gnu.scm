@@ -64,12 +64,6 @@
 (define (%try-use-modules modules location make-hint)
   "Attempt to load all of MODULES.  Report errors as coming from LOCATION, a
 <location> record, and use MAKE-HINT to produce a fix hint."
-  (define (location->string loc)
-    (match loc
-      (#f "")
-      (($ <location> file line column)
-       (format #f "~a:~a:~a: " file line column))))
-
   (for-each (lambda (module)
               (catch 'misc-error
                 (lambda ()

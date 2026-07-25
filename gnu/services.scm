@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2015-2024 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2015-2024, 2026 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2016 Chris Marusich <cmmarusich@gmail.com>
 ;;; Copyright © 2020 Jan (janneke) Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2020, 2021 Ricardo Wurmus <rekado@elephly.net>
@@ -283,9 +283,10 @@ TYPE does not have a default value, an error is raised."
            (make-compound-condition
             (condition
              (&missing-value-service-error (type type) (location location)))
-            (formatted-message (G_ "~a: no value specified \
+            (condition
+             (&error-location (location location)))
+            (formatted-message (G_ "no value specified \
 for service of type '~a'")
-                               (location->string location)
                                (service-type-name type)))))
         (service type default))))
 
