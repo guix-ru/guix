@@ -268,7 +268,7 @@ backups (called chunks) to allow easy burning to CD/DVD.")
 (define-public libarchive
   (package
     (name "libarchive")
-    (version "3.7.7")
+    (version "3.8.8")
     (source
      (origin
        (method url-fetch)
@@ -279,7 +279,7 @@ backups (called chunks) to allow easy burning to CD/DVD.")
                                  version ".tar.xz")))
        (sha256
         (base32
-         "1vps57mrpqmrk4zayh5g5amqfq7031s5zzkkxsm7r71rqf1wv6l7"))))
+         "065rxw147fqcjzryd3zfa2fm443phw3az2d9502ps1ns064ahwrq"))))
     (build-system gnu-build-system)
     (inputs
      (list bzip2
@@ -299,28 +299,37 @@ backups (called chunks) to allow easy burning to CD/DVD.")
           "--without-openssl")
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'build 'patch-pwd
+          (add-before 'build 'patch-commands
             (lambda _
               (substitute* "Makefile"
-                (("/bin/pwd") (which "pwd")))))
+                (("/bin/pwd") (which "pwd")))
+              (substitute* "test_utils/test_main.c"
+                (("/bin/sh") (which "sh")))))
           (replace 'check
-            (lambda* (#:key tests? #:allow-other-keys)
+            (lambda* (#:key parallel-build? tests? #:allow-other-keys)
               (if tests?
-		  ;; XXX: The test_owner_parse, test_read_disk, and
-		  ;; test_write_disk_lookup tests expect user 'root' to
-		  ;; exist, but the chroot's /etc/passwd doesn't have
-		  ;; it.  Turn off those tests.
                   (begin
-		    ;; The tests allow one to disable tests matching a globbing pattern.
-		    (invoke "make"
-			    "libarchive_test"
-			    "bsdcpio_test"
-			    "bsdtar_test")
+                    ;; These environment variables are taken from
+                    ;; <https://raw.githubusercontent.com/libarchive/libarchive/refs/heads/master/.github/workflows/ci.yml>
+                    (setenv "SKIP_OPEN_FD_ERR_TEST" "1")
+                    (setenv "IGNORE_TRAVERSALS_TEST4" "1")
 
-		    ;; XXX: This glob disables too much.
-		    (invoke "./libarchive_test" "^test_*_disk*")
-		    (invoke "./bsdcpio_test" "^test_owner_parse")
-		    (invoke "./bsdtar_test"))
+                    ;; XXX: The test_owner_parse, test_read_disk, and
+                    ;; test_write_disk_lookup tests expect user 'root' to
+                    ;; exist, but the chroot's /etc/passwd doesn't have it
+                    ;; (see:
+                    ;; <https://github.com/libarchive/libarchive/issues/2794>).
+                    (invoke "make" "-j" (number->string
+                                         (if parallel-build?
+                                             (parallel-job-count)
+                                             1))
+                            "libarchive_test"
+                            "bsdcpio_test"
+                            "bsdtar_test")
+                    ;; XXX: This glob disables too much.
+                    (invoke "./libarchive_test" "^test_*_disk*")
+                    (invoke "./bsdcpio_test" "^test_owner_parse")
+                    (invoke "./bsdtar_test"))
                   ;; Tests may be disabled if cross-compiling.
                   (format #t "Test suite not run.~%"))))
           (add-after 'install 'add--L-in-libarchive-pc
@@ -361,61 +370,7 @@ random access nor for in-place modification.  This package provides the
 @command{bsdcat}, @command{bsdcpio} and @command{bsdtar} commands.")
     (license license:bsd-2)))
 
-;;; TODO: core update (20k rebuilds).
-(define-public libarchive-next
-  (package
-    (inherit libarchive)
-    (name "libarchive")
-    (version "3.8.7")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (list (string-append "https://libarchive.org/downloads/libarchive-"
-                                 version ".tar.xz")
-                  (string-append "https://github.com/libarchive/libarchive"
-                                 "/releases/download/v" version "/libarchive-"
-                                 version ".tar.xz")))
-       (sha256
-        (base32
-         "0x27bngfjiszsfq4wpaqpx01snyczlp0m0yj9z42fp72g92vma6k"))))
-    (arguments
-     (substitute-keyword-arguments arguments
-       ((#:phases phases)
-        #~(modify-phases #$phases
-            (delete 'patch-pwd)
-            (add-before 'build 'patch-commands
-              (lambda _
-                (substitute* "Makefile"
-                  (("/bin/pwd") (which "pwd")))
-                (substitute* "test_utils/test_main.c"
-                  (("/bin/sh") (which "sh")))))
-            (replace 'check
-              (lambda* (#:key parallel-build? tests? #:allow-other-keys)
-                (if tests?
-                    (begin
-                      ;; These environment variables are taken from
-                      ;; <https://raw.githubusercontent.com/libarchive/libarchive/refs/heads/master/.github/workflows/ci.yml>
-                      (setenv "SKIP_OPEN_FD_ERR_TEST" "1")
-                      (setenv "IGNORE_TRAVERSALS_TEST4" "1")
-
-		      ;; XXX: The test_owner_parse, test_read_disk, and
-		      ;; test_write_disk_lookup tests expect user 'root' to
-		      ;; exist, but the chroot's /etc/passwd doesn't have it
-		      ;; (see:
-		      ;; <https://github.com/libarchive/libarchive/issues/2794>).
-		      (invoke "make" "-j" (number->string
-                                           (if parallel-build?
-                                               (parallel-job-count)
-                                               1))
-			      "libarchive_test"
-			      "bsdcpio_test"
-			      "bsdtar_test")
-		      ;; XXX: This glob disables too much.
-		      (invoke "./libarchive_test" "^test_*_disk*")
-		      (invoke "./bsdcpio_test" "^test_owner_parse")
-		      (invoke "./bsdtar_test"))
-                    ;; Tests may be disabled if cross-compiling.
-                    (format #t "Test suite not run.~%"))))))))))
+(define-public libarchive-next libarchive)
 
 (define-public rdup
   (package
