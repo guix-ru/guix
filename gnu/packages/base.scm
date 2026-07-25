@@ -1223,7 +1223,12 @@ the store.")
            python-minimal
            texinfo)
      (if (target-hurd?)
-         (list mig)
+         (list (if (%current-target-system)
+                   (let* ((cross-base (resolve-interface
+                                       '(gnu packages cross-base)))
+                          (cross-mig (module-ref cross-base 'cross-mig)))
+                     (cross-mig (%current-target-system)))
+                   mig))
          (list))))
    (native-search-paths
     ;; Search path for packages that provide locale data.  This is useful
@@ -1579,13 +1584,6 @@ command.")
     (name "glibc-hurd-headers")
     (outputs '("out"))
     (propagated-inputs (list gnumach-headers hurd-headers))
-    (native-inputs
-     (modify-inputs (package-native-inputs glibc/hurd)
-       (prepend (if (%current-target-system)
-                    (let* ((cross-base (resolve-interface '(gnu packages cross-base)))
-                           (cross-mig (module-ref cross-base 'cross-mig)))
-                      (cross-mig (%current-target-system)))
-                    mig))))
     (arguments
      (substitute-keyword-arguments (package-arguments glibc/hurd)
        ;; We just pass the flags really needed to build the headers.
