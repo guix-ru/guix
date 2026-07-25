@@ -108,6 +108,7 @@
   #:use-module (guix build-system copy)
   #:use-module (gnu packages)
   #:use-module (gnu packages c)
+  #:use-module (gnu packages backup)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages compression)
@@ -1007,6 +1008,79 @@ The unified Libertinus family consists of:
        "The Libre Franklin font family is an open source interpretation and
 expansion of Franklin Gothic, a classic font.  It covers 105 Latin Languages.")
       (license license:silofl1.1))))
+
+(define font-maple-cn-base-variable
+  (origin
+    (method url-fetch)
+    (uri (string-append "https://github.com/subframe7536/maple-font/releases/"
+                        "download/cn-base/cn-base-variable.zip"))
+    (file-name "font-maple-cn-base-variable.zip")
+    (sha256
+     (base32
+      "10n00wn6zkgplnq8jmgjlri0068dbr6acpbmqxw0pxld3m0p1rn7"))))
+
+(define font-maple-cn-base-vfc
+  (origin
+    (method url-fetch)
+    (uri (string-append "https://github.com/subframe7536/maple-font/releases/"
+                        "download/cn-base/vfc.zip"))
+    (file-name "font-maple-cn-base-vfc.zip")
+    (sha256
+     (base32
+      "0k5727yszz5snhsbwj7i3yy6av8arlx7vamy37k9qvbvg497027f"))))
+
+(define-public font-maple
+  (package
+    (name "font-maple")
+    (version "7.9")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/subframe7536/maple-font")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "0qfbvq0l2qarmqgq56d8q54jinxznfq47gakyl4628yyhkkq9in2"))))
+    (build-system copy-build-system)
+    (arguments
+     (list #:install-plan
+           #~'(("fonts/Variable" "share/fonts/ttf" #:output "out")
+               ("fonts/TTF-AutoHint" "share/fonts/ttf" #:output "ttf")
+               ("fonts/CN" "share/fonts/ttf" #:output "ttf")
+               ("fonts/OTF" "share/fonts/otf" #:output "otf")
+               ("fonts/Woff2" "share/fonts/web" #:output "woff"))
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'unpack-cn-base
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (invoke "bsdunzip"
+                           #$(this-package-input "font-maple-cn-base-variable.zip")
+                           "-d" "source/cn")
+                   (invoke "bsdunzip"
+                           #$(this-package-input "font-maple-cn-base-vfc.zip")
+                           "-d" "source/cn")))
+               (add-after 'unpack-cn-base 'rebuild-cn
+                 (lambda _
+                   (invoke "python3" "task.py" "cn" "--rebuild")))
+               (add-before 'install 'build
+                 (lambda _
+                   (invoke "python3" "build.py" "--cn" "--no-nf"))))))
+    (inputs (list font-maple-cn-base-variable
+                  font-maple-cn-base-vfc))
+    (native-inputs (list libarchive     ; for bsdunzip
+                         python
+                         python-glyphslib
+                         python-foundrytools-cli))
+    (outputs '("out" "otf" "ttf" "woff"))
+    (home-page "https://font.subf.dev")
+    (synopsis "Smooth coding font")
+    (description "Maple Mono is a monospace font with focus on programming
+and a perfect 2:1 alignment of Chinese and Latin text.")
+    (license license:silofl1.1)
+    (properties `((output-synopsis "out" "Variable TTF fonts")
+                  (output-synopsis "otf" "OTF fonts")
+                  (output-synopsis "ttf" "Static TTF fonts")
+                  (output-synopsis "woff" "WOFF fonts")))))
 
 (define-public font-playfair
   (package
