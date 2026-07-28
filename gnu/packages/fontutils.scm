@@ -633,6 +633,37 @@ converts any cubic curves to quadratic.  The most useful function is probably
 @code{fonts_to_quadratic}.")
     (license license:asl2.0)))
 
+(define-public python-uharfbuzz
+  (package
+    (name "python-uharfbuzz")
+    (version "0.56.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/trufont/uharfbuzz")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "180c4ayj7h9vqpyz2kqivbzz9df0mmbwn4bwnsvm49n7ggpz6jlx"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:phases
+                     #~(modify-phases %standard-phases
+                         (add-after 'unpack 'use-system-libs
+                           (lambda _ (setenv "USE_SYSTEM_LIBS" "1"))))))
+    (inputs (list freetype glib graphite2 harfbuzz))
+    (native-inputs (list pkg-config
+                         python-cython
+                         python-pkgconfig
+                         python-setuptools
+                         python-setuptools-scm
+                         python-pytest))
+    (home-page "https://github.com/trufont/uharfbuzz")
+    (synopsis "Cython bindings for the Harfbuzz")
+    (description
+     "This package provides Cython bindings for the Harfbuzz shaping engine.")
+    (license license:asl2.0)))
+
 (define-public python-ufo2ft
   (package
     (name "python-ufo2ft")
