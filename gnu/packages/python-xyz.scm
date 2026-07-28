@@ -18580,13 +18580,13 @@ It has a flexible system of @samp{authorizers} able to manage both
 (define-public python-fonttools
   (package
     (name "python-fonttools")
-    (version "4.59.2")
+    (version "4.63.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "fonttools" version ".tar.gz"))
        (sha256
-        (base32 "08pgq9nrj3r81gzb6gbf5mcak0xyqrj26cw0rc5za4v1n14hfb77"))))
+        (base32 "1q64p5k26vs66j3li26gcvxfvav2xssaikb59dlqw5mmxqymisya"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -18639,6 +18639,14 @@ from an XML-based format.")
    (package
      (inherit python-fonttools)
      (name "python-fonttools-minimal")
+     ;; Pinned to avoid world rebuilds when updating python-fonttools.
+     (version "4.59.2")
+     (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "fonttools" version ".tar.gz"))
+        (sha256
+         (base32 "08pgq9nrj3r81gzb6gbf5mcak0xyqrj26cw0rc5za4v1n14hfb77"))))
      (arguments '(#:tests? #f))
      (native-inputs
       (list python-setuptools))
