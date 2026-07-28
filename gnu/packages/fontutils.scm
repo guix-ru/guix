@@ -74,6 +74,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-check)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages sqlite)
@@ -687,13 +688,13 @@ converts any cubic curves to quadratic.  The most useful function is probably
 (define-public python-ufo2ft
   (package
     (name "python-ufo2ft")
-    (version "2.33.4")
+    (version "3.9.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "ufo2ft" version))
        (sha256
-        (base32 "0xnnwlj3rl0p7q19l6wdrfkzzq1f2l5vyl2qs7kl4vvfalgpzakv"))))
+        (base32 "0b9yprzpq8mmyy0c8xncafzl7j5hbyp98bzgqw0gqy0sclykdsig"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:test-flags
@@ -707,18 +708,17 @@ converts any cubic curves to quadratic.  The most useful function is probably
                                   "and not test_kern_zyyy_zinh"))))
     (native-inputs
      (list python-pytest
-           python-setuptools-scm
            python-setuptools
-           python-wheel))
+           python-setuptools-scm
+           python-syrupy))
     (propagated-inputs
      (list python-booleanoperations
            python-cffsubr
            python-compreffor
            python-cu2qu
-           python-defcon
+           python-fontmath
            python-fonttools
-           python-skia-pathops
-           python-ufolib2))
+           python-skia-pathops))
     (home-page "https://github.com/googlefonts/ufo2ft")
     (synopsis "Generate OpenType fonts from Unified Font Objects (UFOs)")
     (description "@code{ufo2ft} (UFO to FontTools) is a fork of @code{ufo2fdk}
