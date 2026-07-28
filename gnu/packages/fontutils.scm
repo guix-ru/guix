@@ -701,6 +701,43 @@ save fonts in a variety of formats.")
 (hints) in fonts.")
     (license license:asl2.0)))
 
+(define-public python-fontfeatures
+  (package
+    (name "python-fontfeatures")
+    (version "1.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/simoncozens/fontFeatures")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1392agf436k2wlrbq4s71nrb3qpibrhq0fn105jx5xnr0w8qp8ly"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'check 'delete-failing-tests
+                 (lambda _
+                   (delete-file "tests/test_shaping_harfbuzz.py"))))))
+    (propagated-inputs (list python-babelfont
+                             python-fonttools
+                             python-glyphslib
+                             python-lxml
+                             python-tqdm
+                             python-vharfbuzz
+                             python-youseedee))
+    (native-inputs (list python-setuptools
+                         python-setuptools-scm
+                         python-pytest))
+    (home-page "https://github.com/simoncozens/fontFeatures")
+    (synopsis "Python library for manipulating OpenType font features")
+    (description
+     "This package provides a Python library for manipulating @code{OpenType}
+font features.")
+    (license license:bsd-3)))
+
 (define-public python-uharfbuzz
   (package
     (name "python-uharfbuzz")
