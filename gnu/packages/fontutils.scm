@@ -752,6 +752,30 @@ it can be more easily extended.  Like @code{ufo2fdk}, its primary purpose is
 to generate OpenType font binaries from Unified Font Objects (UFOs).")
     (license license:expat)))
 
+(define-public python-ufomerge
+  (package
+    (name "python-ufomerge")
+    (version "1.9.7")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "ufomerge" version))
+       (sha256
+        (base32 "14w3q13xwbhf3a6qwnx54hcn5bq6nba06fnhl392ylb0sylq51yb"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:tests? #f))       ; prevent bootstrap issues
+    (propagated-inputs (list python-ufolib2))
+    (native-inputs (list python-setuptools
+                         python-setuptools-scm))
+    (home-page "https://github.com/googlefonts/ufomerge")
+    (synopsis "Merge fonts in UFO format")
+    (description "This package provides a command line utility
+and Python library for merging two UFO source format fonts into
+a single file.  It can be used to include glyphs from one font
+into another font.  It takes care of handling glyph outlines, kerning,
+subsetting, layout rules, among other things.")
+    (license license:asl2.0)))
+
 (define-public python-fontmath
   (package
     (name "python-fontmath")
