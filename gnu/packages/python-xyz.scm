@@ -18684,6 +18684,36 @@ from an XML-based format.")
      "This package provides a library for working with fonts in Python.")
     (license license:expat)))
 
+(define-public python-foundrytools-cli
+  (package
+    (name "python-foundrytools-cli")
+    (version "2.0.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ftCLI/FoundryTools-CLI")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1aph63z1759w65h5pz8dr5q41sdy5bb9zll9kn2v57lz1dri8j86"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:tests? #f))      ; no tests
+    (propagated-inputs (list python-afdko
+                             python-click
+                             python-foundrytools
+                             python-loguru
+                             python-pathvalidate
+                             python-rich
+                             python-ufolib2))
+    (native-inputs (list python-hatchling))
+    (home-page "https://github.com/ftCLI/FoundryTools-CLI")
+    (synopsis "Command line tools to work with font files")
+    (description
+     "This package provides a set of command line tools to inspect, manipulate and
+convert font files.")
+    (license license:expat)))
+
 (define-public python-ly
   (package
     (name "python-ly")
