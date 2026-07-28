@@ -664,6 +664,26 @@ converts any cubic curves to quadratic.  The most useful function is probably
      "This package provides Cython bindings for the Harfbuzz shaping engine.")
     (license license:asl2.0)))
 
+(define-public python-vharfbuzz
+  (package
+    (name "python-vharfbuzz")
+    (version "0.3.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "vharfbuzz" version))
+       (sha256
+        (base32 "0iz2gl9y4mr7p5gg4rr22f2950c8xqyyrljg6r4w9vb1vkq70mfc"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:tests? #f))      ; no tests
+    (propagated-inputs (list python-fonttools python-uharfbuzz))
+    (native-inputs (list python-pytest python-setuptools python-setuptools-scm))
+    (home-page "https://github.com/simoncozens/vharfbuzz")
+    (synopsis "A user-friendlier way to use Harfbuzz in Python")
+    (description
+     "This package provides a user-friendlier way to use Harfbuzz in Python.")
+    (license license:expat)))
+
 (define-public python-ufo2ft
   (package
     (name "python-ufo2ft")
