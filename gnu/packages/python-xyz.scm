@@ -41405,16 +41405,16 @@ Breaking Algorithm written in Rust with Python bindings.")
 (define-public python-unicodedata2
   (package
     (name "python-unicodedata2")
-    (version "16.0.0")
+    (version "17.0.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "unicodedata2" version))
        (sha256
-        (base32 "1z3llixb4cd6cc6nmyps5vv2sss14n3x6dzcc65xg75mj9jqsj05"))))
+        (base32 "0fxdwqmdh8jkqznb7vgw6zd4n64535hyr9am7yzbzxpmag8l76fp"))))
     (build-system pyproject-build-system)
     (native-inputs
-     (list python-pytest
+     (list python-pytest python-pytest-randomly python-pytest-xdist
            python-setuptools))
     (home-page "https://github.com/fonttools/unicodedata2")
     (synopsis "Python unicodedata backport")
