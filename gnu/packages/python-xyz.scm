@@ -18652,6 +18652,38 @@ from an XML-based format.")
       (list python-setuptools))
      (propagated-inputs '()))))
 
+(define-public python-foundrytools
+  (package
+    (name "python-foundrytools")
+    (version "0.1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ftCLI/FoundryTools")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1dajpbp5nni6hf84042vqnca1w4zbhypylm7qwd9xvzbaks2wqvn"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:tests? #f))      ; no tests
+    (propagated-inputs (list python-afdko
+                             python-cffsubr
+                             python-defcon
+                             python-dehinter
+                             python-fonttools
+                             python-setuptools
+                             python-ttfautohint
+                             python-ufo-extractor
+                             python-ufo2ft
+                             python-ufolib2))
+    (native-inputs (list python-setuptools))
+    (home-page "https://github.com/ftCLI/FoundryTools")
+    (synopsis "Working with fonts in Python")
+    (description
+     "This package provides a library for working with fonts in Python.")
+    (license license:expat)))
+
 (define-public python-ly
   (package
     (name "python-ly")
