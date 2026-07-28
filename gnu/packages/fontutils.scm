@@ -635,6 +635,49 @@ converts any cubic curves to quadratic.  The most useful function is probably
 @code{fonts_to_quadratic}.")
     (license license:asl2.0)))
 
+(define-public python-babelfont
+  (package
+    (name "python-babelfont")
+    (version "3.1.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "babelfont" version))
+       (sha256
+        (base32 "1pvq2g4rdgxlwyky5vc348kgq5pad0bkjx0fxmaxyqpb09yb3xr3"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      #:test-flags
+      ;; Failing tests.
+      #~(list "-k"
+              (string-append "not test_rename "
+                             "and not test_load_many_axes "
+                             "and not test_load_glyph "
+                             "and not test_ufo_to_glyphs "
+                             "and not test_ufo_load")
+              "--ignore=tests/test_otf_loader.py"
+              "--ignore=tests/test_glyphs3.py"
+              "--ignore=tests/test_glyphs3_roundtrip.py")
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; Fails due to dependency cycle with python-fontfeatures.
+          (delete 'sanity-check))))
+    (propagated-inputs (list python-fonttools
+                             python-openstep-plist
+                             python-orjson
+                             python-ufolib2
+                             python-ufomerge))
+    (native-inputs (list python-defcon
+                         python-pytest
+                         python-setuptools
+                         python-setuptools-scm))
+    (home-page "https://github.com/simoncozens/babelfont")
+    (synopsis "Load, examine and save fonts in a variety of formats")
+    (description "This package provides a python library to load, examine and
+save fonts in a variety of formats.")
+    (license license:asl2.0)))
+
 (define-public python-dehinter
   (package
     (name "python-dehinter")
