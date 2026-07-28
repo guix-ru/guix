@@ -1,0 +1,61 @@
+From c319459137c45a52a9f9f7c766886ce8032aab7d Mon Sep 17 00:00:00 2001
+From: Liliana Marie Prikler <liliana.prikler@gmail.com>
+Date: Sat, 3 Oct 2026 09:04:01 +0200
+Subject: [PATCH] youseedee: Support fallback_path.
+
+Upstream-Status: Not submitted
+---
+ lib/youseedee/__init__.py | 17 ++++++++++++++---
+ lib/youseedee/__main__.py |  2 +-
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/lib/youseedee/__init__.py b/lib/youseedee/__init__.py
+index 5e73ef8..ee2e556 100644
+--- a/lib/youseedee/__init__.py
++++ b/lib/youseedee/__init__.py
+@@ -34,15 +34,27 @@ def bisect_key(haystack, needle, key):
+ 
+ 
+ UCD_URL = "https://unicode.org/Public/UCD/latest/ucd/UCD.zip"
++fallback_path = None            # Note: allow distro customization
+ 
+ 
+-def ucd_dir():
++def ucd_dir(force_cache=False):
+     """Return the directory where Unicode data is stored"""
+-    return Path(platformdirs.user_cache_dir("youseedee", ensure_exists=True))
++    if force_cache:
++        return Path(platformdirs.user_cache_dir("youseedee", ensure_exists=True))
++    else:
++        path = Path(platformdirs.user_cache_dir("youseedee"))
++        if path.exists():
++            return path
++        elif fallback_path is not None and fallback_path.exists():
++            return fallback_path
++        else:
++            return ucd_dir(force_cache=True)
+ 
+ 
+ def ensure_files():
+     """Ensure the Unicode data files are downloaded and up to date, and download them if not"""
++    if ucd_dir() is fallback_path:
++        return
+     file_lock = FileLock(ucd_dir() / ".youseedee_ensure_files.lock")
+     with file_lock:
+         if not (ucd_dir() / "UnicodeData.txt").is_file():
+diff --git a/lib/youseedee/__main__.py b/lib/youseedee/__main__.py
+index e1895ed..a756367 100644
+--- a/lib/youseedee/__main__.py
++++ b/lib/youseedee/__main__.py
+@@ -20,7 +20,7 @@ def main(args=None):
+ 
+     args = parser.parse_args(args)
+     if args.force_download:
+-        file_lock = FileLock(ucd_dir() / ".youseedee_ensure_files.lock")
++        file_lock = FileLock(ucd_dir(force_cache=True) / ".youseedee_ensure_files.lock")
+         with file_lock:
+             _download_files()
+     char = sys.argv[1]
+-- 
+2.54.0
+

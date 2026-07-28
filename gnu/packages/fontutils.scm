@@ -75,6 +75,7 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
   #:use-module (gnu packages python-check)
+  #:use-module (gnu packages python-web)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages sqlite)
@@ -2056,6 +2057,46 @@ for programmatic manipulation and fast batch processing of UFOs.  It resembles
 the defcon library, but does without notifications, the layout engine and
 other support classes.  Where useful and possible, ufoLib2 tries to be
 API-compatible with defcon.")
+    (license license:asl2.0)))
+
+(define-public python-youseedee
+  (package
+    (name "python-youseedee")
+    (version "0.8.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/simoncozens/youseedee")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0y246b5b2k6n9z0mh63jn6bfl8h94pszyajcc4j92v6f8wbxn2wx"))
+       (patches
+        (search-patches "python-youseedee-support-fallback-path.patch"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:tests? #f        ; no tests
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'set-fallback-path
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (substitute* "lib/youseedee/__init__.py"
+                     (("fallback_path = .*")
+                      (string-append "fallback_path = Path(\""
+                                     (search-input-directory inputs
+                                                             "share/ucd")
+                                     "\")"))))))))
+    (inputs (list ucd))
+    (propagated-inputs (list python-filelock
+                             python-platformdirs
+                             python-requests))
+    (native-inputs (list python-setuptools python-setuptools-scm))
+    (home-page "https://github.com/simoncozens/youseedee")
+    (synopsis "Interface to the Unicode Character Database")
+    (description
+     "This package provides a Python interface to the latest version of the
+Unicode Character Database.")
     (license license:asl2.0)))
 
 ;;; A variant used to break a cycle between python-fontpens and
