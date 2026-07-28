@@ -635,6 +635,29 @@ converts any cubic curves to quadratic.  The most useful function is probably
 @code{fonts_to_quadratic}.")
     (license license:asl2.0)))
 
+(define-public python-dehinter
+  (package
+    (name "python-dehinter")
+    (version "4.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/source-foundry/dehinter")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "061vbkqk431wwpz2lji7z0b07x27b411h5md4krsan4fdr4krpwp"))))
+    (build-system pyproject-build-system)
+    (propagated-inputs (list python-fonttools))
+    (native-inputs (list python-pytest python-setuptools))
+    (home-page "https://github.com/source-foundry/dehinter")
+    (synopsis "Remove TrueType instruction sets (hints) in fonts")
+    (description
+     "This package provides a tool for removing @code{TrueType} instruction sets
+(hints) in fonts.")
+    (license license:asl2.0)))
+
 (define-public python-uharfbuzz
   (package
     (name "python-uharfbuzz")
