@@ -1436,6 +1436,43 @@ scripts.")
     (license (list license:gpl2+ license:freetype)) ;choose one or the other
     (home-page "https://www.freetype.org/ttfautohint/")))
 
+(define-public python-ttfautohint
+  (package
+    (name "python-ttfautohint")
+    (version "0.6.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/fonttools/ttfautohint-py")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ksx63691ji3l1jl8zpb55swxxnvh50df6d8y4wy4xdccj1ldfvw"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'patch-exe-path
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (substitute* "src/python/ttfautohint/__init__.py"
+                     (("_exe_full_path = None")
+                      (string-append
+                       "_exe_full_path = \""
+                       (search-input-file inputs "bin/ttfautohint")
+                       "\""))))))))
+    (inputs (list ttfautohint))
+    (native-inputs (list pkg-config
+                         python-fonttools
+                         python-pytest
+                         python-setuptools
+                         python-setuptools-scm))
+    (home-page "https://github.com/fonttools/ttfautohint-py")
+    (synopsis "Python wrapper for ttfautohint")
+    (description
+     "This package provides a Python wrapper for ttfautohint.")
+    (license license:expat)))
+
 (define-public woff-tools
   (package
     (name "woff-tools")
