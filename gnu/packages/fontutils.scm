@@ -882,7 +882,7 @@ high-level API is bound.")
 (define-public python-glyphslib
   (package
     (name "python-glyphslib")
-    (version "6.6.1")  ;6.6.1 is the last version that works with ufo2ft 2.x
+    (version "6.13.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -891,7 +891,7 @@ high-level API is bound.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "193h5ixq9p9m2kwz8srfw61rzgqg6gishlndqm759cymwax0cibi"))))
+                "0ry8slmwqmlk3qyss2qgss2p10hjwyc5mhkwf5rq1div1489spii"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-setuptools-scm
