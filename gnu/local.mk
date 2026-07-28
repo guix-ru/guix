@@ -2367,6 +2367,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-vega-datasets-remove-la-riots-code.patch	\
   %D%/packages/patches/python-versioneer-guix-support.patch	\
   %D%/packages/patches/python-werkzeug-tests.patch		\
+  %D%/packages/patches/python-youseedee-support-fallback-path.patch		\
   %D%/packages/patches/qdigidoc-bundle-config-files.patch       \
   %D%/packages/patches/qdigidoc-bundle-tsl-files.patch          \
   %D%/packages/patches/qdigidoc-fix-icon.patch                  \
