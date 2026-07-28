@@ -832,6 +832,31 @@ it can be more easily extended.  Like @code{ufo2fdk}, its primary purpose is
 to generate OpenType font binaries from Unified Font Objects (UFOs).")
     (license license:expat)))
 
+(define-public python-ufo-extractor
+  (package
+    (name "python-ufo-extractor")
+    (version "0.8.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/robotools/extractor")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "08q9697nmkfcisv6bs63mq5sdxvi48id5308lsr3rill5m24scsb"))))
+    (build-system pyproject-build-system)
+    (propagated-inputs (list python-fontfeatures python-fonttools))
+    (native-inputs (list python-setuptools
+                         python-setuptools-scm
+                         python-pytest))
+    (home-page "https://github.com/robotools/extractor")
+    (synopsis "Tools for extracting data from font binaries into UFO objects.")
+    (description
+     "This package provides tools for extracting data from font binaries into UFO
+objects.")
+    (license license:expat)))
+
 (define-public python-ufomerge
   (package
     (name "python-ufomerge")
