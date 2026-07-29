@@ -131,6 +131,8 @@
                   (guix build utils)
                   (srfi srfi-1))
        #:tests? #f ; Tests are run by the all.bash script.
+       ;; The bin/go and cgo need the gcc
+       #:disallowed-references ()
        #:phases
        (modify-phases %standard-phases
          (delete 'configure)
@@ -221,7 +223,6 @@
            (lambda* (#:key outputs inputs #:allow-other-keys)
              (let* ((output (assoc-ref outputs "out"))
                     (doc_out (assoc-ref outputs "doc"))
-                    (bash (string-append (assoc-ref inputs "bash") "bin/bash"))
                     (docs (string-append doc_out "/share/doc/" ,name "-" ,version))
                     (tests (string-append
                             (assoc-ref outputs "tests") "/share/" ,name "-" ,version)))
