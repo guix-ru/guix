@@ -75,10 +75,8 @@ for `sh' in $PATH, and without nscd, and with static NSS modules."
       (inherit base)
       (source (origin (inherit (package-source base))
                       (patches (append (search-patches
-                                        (match (package-version base)
-                                          ("2.41" "glibc-2.41-bootstrap-system.patch")
-                                          (_ "glibc-bootstrap-system.patch")))
-                                   (origin-patches (package-source base))))))
+                                        "glibc-bootstrap-system.patch")
+                                       (origin-patches (package-source base))))))
       (arguments
        (substitute-keyword-arguments arguments
          ((#:configure-flags flags)

@@ -5,24 +5,27 @@ instead uses the hard-coded absolute file name of `bash'.
 
 In addition, status should be initialized to 0 and not -1.
 
+Adapted to glibc-2.41.
+
 diff --git a/libio/iopopen.c b/libio/iopopen.c
-index 4cc405f2de..8842c989c8 100644
+index ebc381ed7c..e0d3ed1bc3 100644
 --- a/libio/iopopen.c
 +++ b/libio/iopopen.c
-@@ -86,7 +86,7 @@ spawn_process (posix_spawn_file_actions_t *fa, FILE *fp, const char *command,
+@@ -106,8 +106,8 @@ spawn_process (posix_spawn_file_actions_t *fa, FILE *fp, const char *command,
  	}
      }
  
--  err = __posix_spawn (&((_IO_proc_file *) fp)->pid, _PATH_BSHELL, fa, 0,
-+  err = __posix_spawnp (&((_IO_proc_file *) fp)->pid, "sh", fa, 0,
+-  err = __posix_spawn (&((_IO_proc_file *) fp)->pid, _PATH_BSHELL, fa, NULL,
++  err = __posix_spawnp (&((_IO_proc_file *) fp)->pid, "sh", fa, NULL,
  		       (char *const[]){ (char*) "sh", (char*) "-c", (char*) "--",
  		       (char *) command, NULL }, __environ);
    if (err != 0)
+     return err;
 diff --git a/sysdeps/posix/system.c b/sysdeps/posix/system.c
-index 488b95163b..56b8a028ae 100644
+index a03f478fc7..94da6facf3 100644
 --- a/sysdeps/posix/system.c
 +++ b/sysdeps/posix/system.c
-@@ -100,7 +100,7 @@ cancel_handler (void *arg)
+@@ -101,7 +101,7 @@ cancel_handler (void *arg)
  static int
  do_system (const char *line)
  {
@@ -31,17 +34,16 @@ index 488b95163b..56b8a028ae 100644
    int ret;
    pid_t pid;
    struct sigaction sa;
-@@ -144,7 +144,7 @@ do_system (const char *line)
+@@ -145,7 +145,7 @@ do_system (const char *line)
    __posix_spawnattr_setflags (&spawn_attr,
  			      POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_SETSIGMASK);
  
--  ret = __posix_spawn (&pid, SHELL_PATH, 0, &spawn_attr,
-+  ret = __posix_spawnp (&pid, SHELL_NAME, 0, &spawn_attr,
+-  ret = __posix_spawn (&pid, SHELL_PATH, NULL, &spawn_attr,
++  ret = __posix_spawnp (&pid, SHELL_NAME, NULL, &spawn_attr,
  		       (char *const[]){ (char *) SHELL_NAME,
  					(char *) "-c",
- 					(char *) "--",
-diff --git a/include/spawn.h b/include/spawn.h
-index 4a0b1849da..9e47f74391 100644
+ 					(char *) line, NULL },
+
 --- a/include/spawn.h
 +++ b/include/spawn.h
 @@ -5,6 +5,9 @@
