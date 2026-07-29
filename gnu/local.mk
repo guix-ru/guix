@@ -1486,7 +1486,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/glibc-2.38-ldd-x86_64.patch		\
   %D%/packages/patches/glibc-2.39-git-updates.patch	\
   %D%/packages/patches/glibc-2.40-dl-cache.patch		\
-  %D%/packages/patches/glibc-2.41-bootstrap-system.patch	\
   %D%/packages/patches/glibc-2.41-hurd-local-clock_gettime_MONOTONIC.patch	\
   %D%/packages/patches/glibc-2.41-ldd-x86_64.patch		\
   %D%/packages/patches/glibc-2.43-hurd-unimplemented-ioctls.patch 	\
