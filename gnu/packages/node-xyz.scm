@@ -64,6 +64,7 @@
        ((guix build node-build-system)
         (srfi srfi-1)
         (ice-9 match)
+        (guix build json-utils)
         (guix build utils))
        #:phases
        (modify-phases %standard-phases
@@ -127,6 +128,7 @@ architecture supporting plugins.")
        ((guix build node-build-system)
         (srfi srfi-1)
         (ice-9 match)
+        (guix build json-utils)
         (guix build utils))
        #:phases
        (modify-phases %standard-phases
@@ -1306,10 +1308,10 @@ It can handle big files (tested up to 100mb). XML Entities, HTML entities, and D
     ; Use ESBuild because this package is used to build Typescript.
     (native-inputs (list esbuild))
     (arguments (list
-      #:modules '(
-        (guix build node-build-system)
-        (guix build utils)
-        (ice-9 match))
+      #:modules '((guix build node-build-system)
+                  (guix build json-utils)
+                  (guix build utils)
+                  (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'jest'.
       #:phases
       #~(modify-phases %standard-phases
@@ -1440,11 +1442,12 @@ suitable for use with the @code{fs} module functions.")
       node-path-scurry))
     ; Use ESBuild instead of tshy because this is used to build Typescript.
     (native-inputs (list esbuild))
-    (arguments (list
-      #:modules '(
-        (guix build node-build-system)
-        (guix build utils)
-        (ice-9 match))
+    (arguments
+     (list
+      #:modules '((guix build node-build-system)
+                  (guix build json-utils)
+                  (guix build utils)
+                  (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'c8' and 'tap'.
       #:phases
       #~(modify-phases %standard-phases
@@ -2114,10 +2117,10 @@ user-land JavaScript.")
     ; Use ESBuild instead of tshy because this is used to build Typescript.
     (native-inputs (list esbuild))
     (arguments (list
-      #:modules '(
-        (guix build node-build-system)
-        (guix build utils)
-        (ice-9 match))
+      #:modules '((guix build node-build-system)
+                  (guix build json-utils)
+                  (guix build utils)
+                  (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'tap'.
       #:phases #~(modify-phases %standard-phases
         (add-before 'patch-dependencies 'delete-dependencies
@@ -2262,10 +2265,10 @@ JavaScript.")
     ; Use ESBuild because this is used to build Typescript.
     (native-inputs (list esbuild))
     (arguments (list
-      #:modules '(
-        (guix build node-build-system)
-        (guix build utils)
-        (ice-9 match))
+      #:modules '((guix build node-build-system)
+                  (guix build json-utils)
+                  (guix build utils)
+                  (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'tap'.
       #:phases #~(modify-phases %standard-phases
         (add-before 'patch-dependencies 'modify-package
@@ -2401,6 +2404,7 @@ This is not a through or through2 stream. It doesn't transform the data, it just
      (list
       #:tests? #f ; FIXME: Tests require 'tap'.
       #:modules '((guix build node-build-system)
+                  (guix build json-utils)
                   (guix build utils)
                   (ice-9 match)
                   (srfi srfi-26))
@@ -2736,10 +2740,10 @@ particular cross-platform spellings of the PATH environment variable key.")
     ; Use ESBuild because this is used to build Typescript.
     (native-inputs (list esbuild))
     (arguments (list
-      #:modules '(
-        (guix build node-build-system)
-        (guix build utils)
-        (ice-9 match))
+      #:modules '((guix build node-build-system)
+                  (guix build json-utils)
+                  (guix build utils)
+                  (ice-9 match))
       #:tests? #f ; FIXME: Tests require 'tap'.
       #:phases #~(modify-phases %standard-phases
         (add-before 'patch-dependencies 'delete-dependencies
@@ -3670,6 +3674,7 @@ it to make a new binding for a different platform or underling technology.")))
        ((guix build node-build-system)
         (srfi srfi-1)
         (ice-9 match)
+        (guix build json-utils)
         (guix build utils))
        #:phases
        (modify-phases %standard-phases
@@ -3901,11 +3906,11 @@ connection.")))
     (build-system node-build-system)
     (native-inputs (list esbuild))
     (arguments (list
-      #:modules '(
-        (guix build node-build-system)
-        (guix build utils)
-        (ice-9 match)
-        (json))
+      #:modules '((guix build node-build-system)
+                  (guix build json-utils)
+                  (guix build utils)
+                  (ice-9 match)
+                  (json))
       #:phases #~(modify-phases %standard-phases
         (add-before 'patch-dependencies 'modify-package (lambda _
           (modify-json
@@ -4002,6 +4007,7 @@ connection.")))
        ((guix build node-build-system)
         (srfi srfi-1)
         (ice-9 match)
+        (guix build json-utils)
         (guix build utils))
        #:tests? #f ; FIXME: tests depend on node-mocha
        #:phases
