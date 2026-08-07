@@ -1801,7 +1801,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/libcroco-CVE-2020-12825.patch		\
   %D%/packages/patches/libcyaml-libyaml-compat.patch		\
   %D%/packages/patches/libexpected-use-provided-catch2.patch	\
-  %D%/packages/patches/libfaketime-32bit.patch			\
   %D%/packages/patches/libgda-CVE-2021-39359.patch		\
   %D%/packages/patches/libgda-disable-data-proxy-test.patch     \
   %D%/packages/patches/libgda-fix-build.patch			\
