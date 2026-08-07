@@ -58,7 +58,7 @@
 ;;; Copyright © 2022 cage <cage-dev@twistfold.it>
 ;;; Copyright © 2022 Pradana Aumars <paumars@courrier.dev>
 ;;; Copyright © 2022 Petr Hodina <phodina@protonmail.com>
-;;; Copyright © 2022 jgart <jgart@dismail.de>
+;;; Copyright © 2022, 2026 jgart <jgart@dismail.de>
 ;;; Copyright © 2023 Paul A. Patience <paul@apatience.com>
 ;;; Copyright © 2022 Bruno Victal <mirai@makinata.eu>
 ;;; Copyright © 2023 David Thompson <dthompson2@worcester.edu>
@@ -198,6 +198,7 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages compiler-tools)
   #:use-module (gnu packages readline)
+  #:use-module (gnu packages rust)
   #:use-module (gnu packages sdl)
   #:use-module (gnu packages search)
   #:use-module (gnu packages serialization)
@@ -9994,6 +9995,80 @@ reports the total number of hits recorded, bytes transferred, response time,
 concurrency, and return status.")
     ;; GPLv3+ with OpenSSL linking exception.
     (license license:gpl3+)))
+
+(define-public hurl
+  (package
+    (name "hurl")
+    (version "8.0.1")
+    (source
+     (origin
+       ;; The crates.io tarball does not include the hurlfmt crate.
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/Orange-OpenSource/hurl")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wsw9khfznc638qzp8zx2zwgnrg5d160ky5gnslwm9frz3p5hp0d"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:rust rust-1.94
+      #:cargo-install-paths ''("packages/hurl" "packages/hurlfmt")
+      #:cargo-test-flags
+      '(list
+        ;; Excluding doctests since rust-1.94 does not support them.
+        "--lib" "--bins" "--tests")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-rust-version
+            (lambda _
+              ;; Upstream requires the latest stable Rust.
+              (substitute* '("packages/hurl/Cargo.toml"
+                             "packages/hurlfmt/Cargo.toml")
+                (("rust-version = \"1.95.0\"")
+                 "rust-version = \"1.94.0\""))))
+          (add-before 'check 'start-test-server
+            (lambda _
+              ;; The integration tests expect a Flask test server
+              ;; listening on port 8000.
+              (with-directory-excursion "integration/hurl"
+                (mkdir-p "build")
+                (spawn "python3"
+                       '("python3" "server.py"
+                         "--host" "127.0.0.1" "--port" "8000")))
+              ;; Wait for the server to come up.
+              (let loop ((attempts 30))
+                (unless (false-if-exception
+                         (let ((s (socket PF_INET SOCK_STREAM 0)))
+                           (connect s AF_INET
+                                    (inet-pton AF_INET "127.0.0.1") 8000)
+                           (close-port s)))
+                  (when (zero? attempts)
+                    (error "test server did not start"))
+                  (sleep 1)
+                  (loop (1- attempts)))))))))
+    (native-inputs
+     (list clang
+           pkg-config
+           python
+           python-flask
+           python-waitress))
+    (inputs
+     (cons* curl
+            libxml2
+            openssl
+            zlib
+            (cargo-inputs 'hurl)))
+    (home-page "https://hurl.dev")
+    (synopsis "Run and test HTTP requests")
+    (description
+     "Hurl is a command line tool that runs HTTP requests defined in a plain
+text format.  It can chain requests, capture values and evaluate queries on
+headers and body response.  This package also provides @command{hurlfmt},
+a formatter and linter for Hurl files.")
+    (license license:asl2.0)))
 
 (define-public gmnisrv
   (package
