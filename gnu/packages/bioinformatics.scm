@@ -20280,7 +20280,10 @@ such as Hi-C contact matrices.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'fix-pytest-config
             (lambda _
-              (delete-file "pytest.ini"))))))
+              (delete-file "pytest.ini")))
+          (add-before 'sanity-check 'set-HOME
+            (lambda _
+              (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list python-cython
            python-pytest
@@ -20294,7 +20297,7 @@ such as Hi-C contact matrices.")
            python-multiprocess
            python-numba
            python-numpy
-           python-pandas
+           python-pandas-2
            python-scikit-image
            python-scikit-learn
            python-scipy))
