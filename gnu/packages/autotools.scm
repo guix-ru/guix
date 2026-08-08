@@ -483,14 +483,14 @@ Makefile, simplifying the entire process for the developer.")
 (define-public libtool
   (package
     (name "libtool")
-    (version "2.5.4")
+    (version "2.6.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/libtool/libtool-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "0xb64rhambx6mhxwr613xgyad7ybs5hgmpmd9gccf2vbcrh5h7zq"))))
+                "07hrkvj1k1ryri1arraah21sba9v7nycj33lzlqbjzf92ry0dw9f"))))
     (build-system gnu-build-system)
     (propagated-inputs (list m4))
     (native-inputs
