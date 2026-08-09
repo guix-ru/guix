@@ -2589,13 +2589,13 @@ application).")
 (define-public qtwebview
   (package
     (name "qtwebview")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "1w8z3d7w7z2xjfb5l15gb37v9w6pa7d71jalkrqda8l2wr5d3ksc"))))
+                "0g8k4xs7b0s474x00ds4i8q9b164icdgrdg8ngln10nmf3pwhqld"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags #~(list "-DQT_BUILD_TESTS=ON")
