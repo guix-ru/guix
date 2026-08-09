@@ -2096,13 +2096,13 @@ consume data received from the server, or both.")
   (package
     (inherit qtsvg)
     (name "qtsensors")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "0qj4674vim2p34mq3kp99spjyf82qvs75w625namzqp274pshk4n"))))
+                "13ygry3lybkgci6gkrd7k081l01icavzkiyy4g82drbvv9i70q93"))))
     (native-inputs (list qtdeclarative))
     (inputs (list qtbase))
     (synopsis "Qt Sensors module")
