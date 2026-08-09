@@ -2909,13 +2909,13 @@ provides a high-level interface for creating 3D content for user interfaces.  It
 (define-public qtquick3dphysics
   (package
     (name "qtquick3dphysics")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "12yc0lswcmyaw19yyxzy73j95ncgqw8mlx8svhrwsllgcf2n9z47"))))
+                "1bvrmjb6m0ynq00ybdghvkbmwm237vff23ng8n4njysf05pns26i"))))
     (build-system cmake-build-system)
     (arguments
      (list #:phases #~(modify-phases %standard-phases
