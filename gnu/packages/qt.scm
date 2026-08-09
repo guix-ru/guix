@@ -2056,16 +2056,13 @@ consume data received from the server, or both.")))
 (define-public qtwebsockets
   (package
     (name "qtwebsockets")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "1vh82w96436pqrp4daf324mqs2zjvn51z78b3ksc5mnqgrk3z0xy"))
-              (patches
-               (search-patches
-                "qtwebsockets-6.9-fix-tst_QWebSocket.patch"))))
+                "1gvgci383dfm4sljqlapdiva7jhks1i2z2ayck0wbj1436hklgi4"))))
     (build-system cmake-build-system)
     (arguments
      (list

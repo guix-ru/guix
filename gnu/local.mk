@@ -2398,7 +2398,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/qtwayland-5.15.18-0054-client-avoid-locking-resizing-in-qwaylandshmbackings.patch	\
   %D%/packages/patches/qtwayland-5.15.18-0055-bradient-use-qwaylandwindow-actual-window-title.patch	\
   %D%/packages/patches/qtwayland-5.15.18-0056-redraw-hidpi.patch	\
-  %D%/packages/patches/qtwebsockets-6.9-fix-tst_QWebSocket.patch\
   %D%/packages/patches/rabbitmq-defaults.patch		\
   %D%/packages/patches/radare2-fix-meson-build-to-use-sys-qjs.patch	\
   %D%/packages/patches/radare2-fix-meson-build-to-use-sys-sdb.patch	\
