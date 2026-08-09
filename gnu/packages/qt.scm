@@ -2186,7 +2186,7 @@ set of plugins for interacting with pulseaudio and GStreamer.")))
 (define-public qtshadertools
   (package
     (name "qtshadertools")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
@@ -2194,7 +2194,7 @@ set of plugins for interacting with pulseaudio and GStreamer.")))
               ;; sources.
               (sha256
                (base32
-                "158lpzb1nqspwm0n48d3nfr81q85zka1igrjp6xj8cjlv7wqlrqp"))))
+                "1z42r414jid12jmhm1yf5kw44j886w01igav0kggkg13kcphax90"))))
     (build-system cmake-build-system)
     (arguments
      (list
