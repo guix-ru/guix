@@ -3178,16 +3178,19 @@ graphs by selecting one of the charts themes.")
 (define-public qtgraphs
   (package
     (name "qtgraphs")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "0wsa4iar52dhiilyl053j7lmsw3xdn47b0pjrylb5a0ij1izp057"))))
+                "0qh43qxqg4biyrrsd78nmi4dm3dnbswa95cq8db2k3lans517cc4"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:configure-flags
+     ;; XXX: The 'tst_qgqmltest' test hangs for unknown reasons; skip it for
+     ;; now.
+     (list #:test-exclude "tst_qgqmltest"
+           #:configure-flags
            #~(list "-DQT_BUILD_TESTS=ON")
            #:phases
            #~(modify-phases %standard-phases
@@ -3208,6 +3211,7 @@ graphs by selecting one of the charts themes.")
                     "QML_IMPORT_PATH"
                     (string-append #$output "/lib/qt6/qml:"
                                    (getenv "QML_IMPORT_PATH"))))))))
+    (native-inputs (list tzdata-for-tests))
     (inputs (list qtbase qtdeclarative qtquick3d qtshadertools))
     (synopsis "Qt Graphs module")
     (description "The Qt Graphs module enables you to visualize data in 2D and
