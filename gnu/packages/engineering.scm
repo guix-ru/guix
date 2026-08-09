@@ -2657,7 +2657,7 @@ printers.")
            openssl
            python
            python-pyside-6
-           python-shiboken-6
+           python-shiboken
            qt5compat
            qtsvg
            qttools
