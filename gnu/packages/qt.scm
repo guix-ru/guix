@@ -3228,13 +3228,13 @@ graphs by selecting one of the charts themes.")
 (define-public qtnetworkauth
   (package
     (name "qtnetworkauth")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "114c65gyg56v70byyl3if1q7mzhp5kkv1g8sp4y9zaxqirbdjr91"))))
+                "0gan2qjv97d1387jqaiis2gigm6lz5jbk1k10x13w0yc5kr5n7cz"))))
     (build-system cmake-build-system)
     (arguments
      (list #:configure-flags #~(list "-DQT_BUILD_TESTS=ON")
