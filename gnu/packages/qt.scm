@@ -2855,13 +2855,13 @@ ECMAScript and Qt.")))
 (define-public qtquick3d
   (package
     (name "qtquick3d")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "002888xfnkxmvn8413fllidl3mm2fcwc4gbzdnbvpjlysaq9f3ig"))))
+                "0vs5bcz62r32gin0g4lb6wdmqrv0ypzar1s9wsza98la7zg8asy7"))))
     (build-system cmake-build-system)
     (arguments
      (list #:modules '((guix build cmake-build-system)
