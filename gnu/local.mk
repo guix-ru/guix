@@ -2336,6 +2336,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/qtbase-moc-ignore-gcc-macro.patch	\
   %D%/packages/patches/qtbase-patch-libvulkan.patch		\
   %D%/packages/patches/qtbase-qmake-use-libname.patch		\
+  %D%/packages/patches/qtbase-qtest-header.patch                \
   %D%/packages/patches/qtbase-5-use-TZDIR.patch			\
   %D%/packages/patches/qtscript-disable-tests.patch		\
   %D%/packages/patches/quagga-reproducible-build.patch          \

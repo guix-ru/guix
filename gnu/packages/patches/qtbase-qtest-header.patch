@@ -1,0 +1,35 @@
+From 6c1a003dbd8b211fefd18b84842d7ffab701ca24 Mon Sep 17 00:00:00 2001
+From: Tatiana Borisova <tatiana.borisova@qt.io>
+Date: Tue, 28 Jul 2026 19:41:36 +0200
+Subject: [PATCH] Fix a build issue
+
+- If configure Qt with the following command:
+cmake ../qt5/ -GNinja -DCMAKE_BUILD_TYPE=Release -DQT_BUILD_EXAMPLES=ON -DQT_BUILD_TESTS=ON
+
+I observe the following issue on building:
+qtbase/tests/auto/corelib/kernel/qvariant/relocatable_change.h:11:10: fatal error: QTest: No such file or directory
+   11 | #include <QTest>
+      |          ^~~~~~~
+
+Pick-to: 6.12 6.11
+Change-Id: If01c39456a820b14e7a698bd91ef9c5baabbe978
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+---
+ tests/auto/corelib/kernel/qvariant/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/auto/corelib/kernel/qvariant/CMakeLists.txt b/tests/auto/corelib/kernel/qvariant/CMakeLists.txt
+index d79c5d33129..508695473a5 100644
+--- a/tests/auto/corelib/kernel/qvariant/CMakeLists.txt
++++ b/tests/auto/corelib/kernel/qvariant/CMakeLists.txt
+@@ -45,6 +45,6 @@ qt_internal_extend_target(tst_qvariant CONDITION NOT QT_FEATURE_doubleconversion
+ 
+ if(BUILD_SHARED_LIBS AND QT_FEATURE_library)
+     qt_add_library(tst_qvariant_relocatabilitychange MODULE relocatable_change.cpp)
+-    target_link_libraries(tst_qvariant_relocatabilitychange PRIVATE Qt6::Core)
++    target_link_libraries(tst_qvariant_relocatabilitychange PRIVATE Qt6::Core Qt6::Test)
+     add_dependencies(tst_qvariant tst_qvariant_relocatabilitychange)
+ endif()
+-- 
+2.54.0
+
