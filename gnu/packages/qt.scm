@@ -3024,13 +3024,13 @@ and mobile applications targeting TV-like form factors.")))
 (define-public qtscxml
   (package
     (name "qtscxml")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "1dpb687zbw4akx42kfpbb5cpdlq3hcqn8l3l0x7sd5i9061z2sp0"))
+                "0gr0j09isxgii3aivfvr35x40d9n0kj0g2icc7g7bzniwm2m4jcf"))
               (modules '((guix build utils)))
               (snippet
                '(delete-file-recursively "tests/3rdparty"))))
