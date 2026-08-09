@@ -1446,13 +1446,13 @@ HostData=lib/qt5"
 (define-public qt3d
   (package
     (name "qt3d")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "0ndn5fbsfj2vbcq3siq1gnk2rgblicd6ri2jrh9g41anicxh4vma"))))
+                "01q11bs7vjz1s5wdrdjq904dgl2m6l7r8d3vd2kyf7lx0j78qvd6"))))
     (propagated-inputs (list))
     (native-inputs (list perl))
     (inputs (list libxkbcommon
