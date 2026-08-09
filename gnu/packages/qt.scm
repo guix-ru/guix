@@ -1804,14 +1804,14 @@ with JavaScript and C++.")))
 (define-public qtdeclarative
   (package
     (name "qtdeclarative")
-    (version "6.9.2")
+    (version "6.11.1")
     ;; TODO: Package 'masm' and unbundle from sources.
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "0r16qima008y2999r1djvwry01l295nmwwhqg081d2fr1cn2szs7"))
+                "193ar0fcfzjjr7mi8i2622vip95qrr3qry949d9lyc5hf3v71rjj"))
               (patches (search-patches "qtdeclarative-disable-qmlcache.patch"))))
     (outputs '("out" "debug"))
     (build-system cmake-build-system)
@@ -1845,16 +1845,7 @@ with JavaScript and C++.")))
                 (("QLibraryInfo::path\\(QLibraryInfo::QmlImportsPath)")
                  (string-append "QStringLiteral(\"" #$output
                                 "/lib/qt6/qml\")")))))
-          (replace 'build
-            (lambda* (#:key parallel-build? #:allow-other-keys)
-              (apply invoke "cmake" "--build" "."
-                     (if parallel-build?
-                         `("--parallel" ,(number->string (parallel-job-count)))
-                         '()))))
           (delete 'check)               ;move after the install phase
-          (replace 'install
-            (lambda _
-              (invoke "cmake" "--install" ".")))
           (add-after 'install 'check
             (lambda* (#:key tests? parallel-tests?
                       native-inputs inputs #:allow-other-keys)
@@ -1944,7 +1935,23 @@ with JavaScript and C++.")))
                     ;; This test fails starting with 6.6.3 (see:
                     ;; https://bugreports.qt.io/browse/QTBUG-123748), for
                     ;; unknown reasons.
-                    "tst_qquickiconimage") "|")
+                    "tst_qquickiconimage"
+
+                    ;; These tests fail for unknown reasons (see:
+                    ;; <https://qt-project.atlassian.net/browse/QTBUG-149020>).
+                    "tst_snippets"
+                    ;; <https://qt-project.atlassian.net/browse/QTBUG-149021>
+                    "test_duplicate_files_qml_files"
+                    ;; <https://qt-project.atlassian.net/browse/QTBUG-149022>
+                    "tst_qquickpopup"
+
+                    ;; These two tests fail due to not being able to decode
+                    ;; test SVG images, despite the qtsvg plugin being made
+                    ;; available on QT_PLUGIN_PATH (see:
+                    ;; <https://qt-project.atlassian.net/browse/QTBUG-149025>).
+                    "tst_fluentwinui3"
+                    "tst_qquickiconlabel"
+                    ) "|")
                   ")")))))
           (add-after 'install 'delete-installed-tests
             (lambda _
