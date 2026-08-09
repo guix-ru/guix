@@ -2219,13 +2219,13 @@ Vulkan, OpenGL and other main graphic APIs.")
 (define-public qtmultimedia
   (package
     (name "qtmultimedia")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "04mbwl1mg4rjgai027chldslpjnqrx52c3jxn20j2hx7ayda3y3v"))))
+                "02lvq1jk6m67m6z0w7vdzxhzmi441j8avvp79mfclfpfvm98w3rr"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -2263,7 +2263,7 @@ Vulkan, OpenGL and other main graphic APIs.")
            vulkan-headers))
     (inputs
      (list alsa-lib
-           ffmpeg-6
+           ffmpeg
            glib
            libxkbcommon
            libxrandr
