@@ -2711,13 +2711,13 @@ positioning and geolocation plugins.")))
 (define-public qtlottie
   (package
     (name "qtlottie")
-    (version "6.9.2")
+    (version "6.11.1")
     (source (origin
               (method url-fetch)
               (uri (qt-url name version))
               (sha256
                (base32
-                "1iiigsb4p1zwkxm1x9c4pbx5rgwz35krdqi3vkql4nawvp997px4"))))
+                "0y969gp64imwh49d5zbnw0wi2yva9fsp6qn58617rs9kvkdzml70"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -2732,7 +2732,7 @@ positioning and geolocation plugins.")))
                       (string-append #$output "/lib/qt6/qml:"
                                      (getenv "QML_IMPORT_PATH"))))))))
     (native-inputs (list perl))
-    (inputs (list libxkbcommon qtbase qtdeclarative))
+    (inputs (list libxkbcommon qtbase qtdeclarative qtsvg))
     (home-page (package-home-page qtbase))
     (synopsis "QML API for rendering Bodymovin graphics and animations")
     (description "Qt Lottie Animation provides a QML API for rendering
