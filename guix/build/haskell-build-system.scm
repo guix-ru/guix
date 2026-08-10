@@ -134,8 +134,8 @@ and parameters ~s~%"
 
 (define* (setup-compiler #:key system inputs outputs #:allow-other-keys)
   "Setup the compiler environment."
-  (let* ((haskell (assoc-ref inputs "haskell"))
-         (name-version (strip-store-file-name haskell)))
+  (let* ((ghc (search-input-file inputs "bin/ghc"))
+         (name-version (basename (readlink ghc))))
     (cond
      ((string-match "ghc" name-version)
       (make-ghc-package-database system inputs outputs))
@@ -151,8 +151,8 @@ and parameters ~s~%"
 
 (define (make-ghc-package-database system inputs outputs)
   "Generate the GHC package database."
-  (let* ((haskell  (assoc-ref inputs "haskell"))
-         (name-version (strip-store-file-name haskell))
+  (let* ((ghc (search-input-file inputs "bin/ghc"))
+         (name-version (basename (readlink ghc)))
          ;; Silence 'find-files' (see 'evaluate-search-paths')
          (conf-dirs (search-path-as-string->list (getenv "GHC_PACKAGE_PATH")))
          (conf-files (append-map (cut find-files <> "\\.conf$") conf-dirs)))
@@ -253,8 +253,8 @@ given Haskell package."
 
   (let* ((out (assoc-ref outputs "out"))
          (doc (assoc-ref outputs "doc"))
-         (haskell  (assoc-ref inputs "haskell"))
-         (name-version (strip-store-file-name haskell))
+         (ghc (search-input-file inputs "bin/ghc"))
+         (name-version (basename (readlink ghc)))
          (version (last (string-split name-version #\-)))
          (lib (string-append (or (assoc-ref outputs "lib") out) "/lib"))
          (config-dir (string-append lib
