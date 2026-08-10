@@ -192,8 +192,8 @@
                                  (string-append "--prefix=" #$output)
                                  (string-append "-Dcc=" #$(%current-target-system) "-gcc")
                                  "-Dbyteorder=1234"
-                                 (remove (lambda (x) (or (string-prefix? "-d" x)
-                                                         (string-prefix? "-Dcc=" x)))
+                                 (filter (negate (lambda (x) (or (string-prefix? "-d" x)
+                                                                 (string-prefix? "-Dcc=" x))))
                                          configure-flags)))
                                (bash (assoc-ref inputs "bash-minimal")))
                           (format (current-error-port)
