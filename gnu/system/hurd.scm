@@ -109,16 +109,25 @@
 
 (define %setuid-programs/hurd
   ;; Default set of setuid-root programs.
-  (map file-like->setuid-program
-       (list (file-append glibc/hurd "/libexec/pt_chown")
-             (file-append shadow "/bin/passwd")
-             (file-append shadow "/bin/sg")
-             (file-append shadow "/bin/su")
-             (file-append shadow "/bin/newgrp")
-             (file-append shadow "/bin/newuidmap")
-             (file-append shadow "/bin/newgidmap")
-             (file-append sudo "/bin/sudo")
-             (file-append sudo "/bin/sudoedit"))))
+  (let ((libc
+         (let-system (system target)
+           ;; Unless we're cross-compiling, arrange to use pt_chown
+           ;; from 'glibc-final' instead of pulling in a second
+           ;; glibc copy.
+           (if target
+               (cross-libc target)
+               (canonical-package glibc/hurd)))))
+    (map file-like->setuid-program
+         (list
+          (file-append libc "/libexec/pt_chown")
+          (file-append shadow "/bin/passwd")
+          (file-append shadow "/bin/sg")
+          (file-append shadow "/bin/su")
+          (file-append shadow "/bin/newgrp")
+          (file-append shadow "/bin/newuidmap")
+          (file-append shadow "/bin/newgidmap")
+          (file-append sudo "/bin/sudo")
+          (file-append sudo "/bin/sudoedit")))))
 
 (define %hurd-default-operating-system
   (operating-system
