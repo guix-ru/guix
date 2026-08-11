@@ -342,12 +342,12 @@ as the native format.")
 
 ;;; The Inkscape release year used in the about dialog.  Please keep it sync
 ;;; when updating the package!
-(define %inkscape-release-year 2025)
+(define %inkscape-release-year 2026)
 (define-public inkscape
   (package
     (inherit inkscape/pinned)
     (name "inkscape")
-    (version "1.4.3")
+    (version "1.4.4")
     (source
      (origin
        (inherit (package-source inkscape/pinned))
@@ -357,7 +357,7 @@ as the native format.")
                            "inkscape-" version ".tar.xz"))
        (patches '())
        (sha256
-        (base32 "1lfi1rqr32kwjdkka4sbsxmkyyw3k1qgxk0gzyhwbdkhnlyjqfp8"))))
+        (base32 "0vl5p2rxki7lcgf7k8x6p6m0lw30n1g6cv7ibhd8g2z0l59mgkmv"))))
     (build-system cmake-build-system)
     (arguments
      (substitute-keyword-arguments (package-arguments inkscape/pinned)
