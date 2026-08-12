@@ -48708,7 +48708,7 @@ directory (see below).
 @command{aureport} from the @code{audit} package can be used in order
 to view a report of all recorded events.
 The audit daemon by default logs into the file
-@file{/var/log/audit.log}.
+@file{/var/log/audit/audit.log}.
 
 @end defvar
 

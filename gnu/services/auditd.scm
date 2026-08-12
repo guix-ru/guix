@@ -31,7 +31,7 @@
             %default-auditd-configuration-directory))
 
 (define auditd.conf
-  (plain-file "auditd.conf" "log_file = /var/log/audit.log\nlog_format = \
+  (plain-file "auditd.conf" "log_file = /var/log/audit/audit.log\nlog_format = \
 ENRICHED\nfreq = 1\nspace_left = 5%\nspace_left_action = \
 syslog\nadmin_space_left_action = ignore\ndisk_full_action = \
 ignore\ndisk_error_action = syslog\n"))
@@ -49,6 +49,10 @@ ignore\ndisk_error_action = syslog\n"))
   (audit                   auditd-configuration-audit                          ; file-like
                            (default audit))
   (configuration-directory auditd-configuration-configuration-directory))      ; file-like
+
+(define %auditd-activation
+  #~(begin
+      (mkdir-p "/var/log/audit")))
 
 (define (auditd-shepherd-service config)
   (let* ((audit (auditd-configuration-audit config))
@@ -68,7 +72,9 @@ ignore\ndisk_error_action = syslog\n"))
                 (extensions
                  (list
                   (service-extension shepherd-root-service-type
-                                     auditd-shepherd-service)))
+                                     auditd-shepherd-service)
+                  (service-extension activation-service-type
+                                     (const %auditd-activation))))
                 (default-value
                   (auditd-configuration
                    (configuration-directory %default-auditd-configuration-directory)))))

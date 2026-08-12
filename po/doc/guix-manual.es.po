@@ -28240,7 +28240,7 @@ msgstr "Activaciones de filtros en el cortafuegos"
 msgid "Network access"
 msgstr "Accesos de red"
 
-msgid "@command{auditctl} from the @code{audit} package can be used in order to add or remove events to be tracked (until the next reboot).  In order to permanently track events, put the command line arguments of auditctl into a file called @code{audit.rules} in the configuration directory (see below).  @command{aureport} from the @code{audit} package can be used in order to view a report of all recorded events.  The audit daemon by default logs into the file @file{/var/log/audit.log}."
+msgid "@command{auditctl} from the @code{audit} package can be used in order to add or remove events to be tracked (until the next reboot).  In order to permanently track events, put the command line arguments of auditctl into a file called @code{audit.rules} in the configuration directory (see below).  @command{aureport} from the @code{audit} package can be used in order to view a report of all recorded events.  The audit daemon by default logs into the file @file{/var/log/audit/audit.log}."
 msgstr "Puede usarse @command{auditctl} del paquete @code{audit} para añadir o eliminar eventos a recolectar (hasta el siguiente reinicio). Para hacer permanente la recolección de dichos eventos, introduzca los parámetros de la línea de órdenes de auditctl en un archivo llamado @file{audit.rules} del directorio de configuración (véase a continuación). También se puede usar @command{aureport} del paquete @code{audit} para ver un informe de todos los eventos registrados. El daemon audit habitualmente registra los eventos en el archivo @file{/var/log/audit}."
 
 msgid "{Data Type} auditd-configuration"
