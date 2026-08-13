@@ -3925,77 +3925,9 @@ show number of files, total lines within those files and code, comments, and
 blanks grouped by language.")
     (license (list license:expat license:asl2.0))))
 
-(define-public typst
-  (package
-    (name "typst")
-    (version "0.15.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/typst/typst")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0y727lyicn3ciq36mdpbcg8d09naff39y1i52467mlmr11p0l9xa"))))
-    (build-system cargo-build-system)
-    (arguments
-     (list
-      #:install-source? #f
-      #:imported-modules (append %copy-build-system-modules
-                                 %cargo-build-system-modules)
-      #:modules '((guix build cargo-build-system)
-                  ((guix build copy-build-system) #:prefix copy:)
-                  (guix build utils))
-      #:cargo-install-paths ''("crates/typst-cli")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-version-string
-            (lambda _
-              (setenv "TYPST_VERSION" #$(package-version this-package))))
-          (add-after 'unpack 'fix-dev-assets
-            (lambda _
-              (substitute* "Cargo.toml"
-                (("typst-dev-assets = \\{[^}]*\\}")
-                 (string-append "typst-dev-assets = {version=\""
-                                #$version
-                                "\"}")))))
-          (add-after 'configure 'configure-artifacts
-            (lambda _
-              (setenv "GEN_ARTIFACTS" (string-append (getcwd) "/artifacts"))))
-          (add-after 'install 'install-artifacts
-            (lambda args
-               (apply (assoc-ref copy:%standard-phases 'install)
-                      #:install-plan
-                      '(("artifacts/typst.bash"
-                         "share/bash-completion/completions/typst")
-                        ("artifacts/typst.elv"
-                         "share//elvish/lib/typst")
-                        ("artifacts/typst.fish"
-                         "share/fish/vendor_completions.d/")
-                        ("artifacts/_typst"
-                         "share/zsh/site-functions/")
-                        ("artifacts/" "share/man/man1/"
-                         #:include-regexp ("\\.1$")))
-                      args))))))
-    (inputs (cons* openssl (cargo-inputs 'typst)))
-    (native-search-paths
-     (list (search-path-specification
-            (variable "TYPST_PACKAGE_PATH")
-            (files '("share/typst/packages"))
-            (separator #f))
-           (search-path-specification
-            (variable "TYPST_FONT_PATHS")
-            (files '("share/fonts" "share/texmf-dist/fonts")))))
-    (home-page "https://typst.app/")
-    (synopsis "LaTeX-like typesetting system")
-    (description
-     "Typst is a markup-based typesetting system that is designed to be as
-powerful as LaTeX while being much easier to learn and use.  Features include
-built-in markup for math typesetting, bibliography management and other common
-tasks, an extensible scripting system for uncommon tasks, incremental
-compilation, and intuitive error messages.")
-    (license license:asl2.0)))
+;; Deprecated on 2026-08-20.
+(define-deprecated/public-alias typst
+  (@ (gnu packages typst) typst))
 
 (define-public typstyle
   (package
