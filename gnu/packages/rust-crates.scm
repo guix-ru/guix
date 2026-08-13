@@ -19243,6 +19243,10 @@ fn main() {
   (crate-source "linefeed" "0.6.0"
                 "0dm0rbi9hnvxkmkcsvn6a387bb0b8aifdcp6k97hfv2wwc45sw98"))
 
+(define rust-linesweeper-0.3.0
+  (crate-source "linesweeper" "0.3.0"
+                "0ng7l7wcl6mv0vn99znjckkpz86ys1jx3lnqygjsrw3ax5vb48c4"))
+
 (define rust-link-cplusplus-1.0.12
   (crate-source "link-cplusplus" "1.0.12"
                 "10lcgfp9pnxpihp21s86xnq57vpr97m2k419d8rvkl57m8qcfy3z"))
@@ -36069,6 +36073,10 @@ fn main() {
   (crate-source "vello_cpu" "0.0.8"
                 "1l7c5nh7pjijgn5dnrjzgfabkwyi0rjjb0aqlnabn5l31riyv3bd"))
 
+(define rust-venial-0.5.0
+  (crate-source "venial" "0.5.0"
+                "1cjbvzrpc8rdk7jy79ap20jkm12hjpmm5j7w4mdppy8nbcr4ln31"))
+
 (define rust-vergen-8.3.2
   (crate-source "vergen" "8.3.2"
                 "0ri5n4k1g4z6gnllkjx9zny3vaa2bjma84zlrjh6w9k7b7mdk419"))
@@ -36908,6 +36916,10 @@ fn main() {
 (define rust-wasm-metadata-0.244.0
   (crate-source "wasm-metadata" "0.244.0"
                 "02f9dhlnryd2l7zf03whlxai5sv26x4spfibjdvc3g9gd8z3a3mv"))
+
+(define rust-wasm-minimal-protocol-0.1.0
+  (crate-source "wasm-minimal-protocol" "0.1.0"
+                "02lkazg0p5bywadv31c99hwlfxm0lnp7xs7y0g52lafxrc57wji6"))
 
 (define rust-wasm-streams-0.4.2
   (crate-source "wasm-streams" "0.4.2"
@@ -48707,6 +48719,43 @@ fn main() {
                                            rust-zerocopy-0.8.54
                                            rust-zerocopy-derive-0.8.54
                                            rust-zmij-1.0.23))
+                     (cetz-core =>
+                                (list rust-arrayvec-0.7.8
+                                      rust-autocfg-1.5.1
+                                      rust-cfg-if-1.0.4
+                                      rust-ciborium-0.2.2
+                                      rust-ciborium-io-0.2.2
+                                      rust-ciborium-ll-0.2.2
+                                      rust-crunchy-0.2.4
+                                      rust-euclid-0.22.14
+                                      rust-getrandom-0.3.4
+                                      rust-half-2.7.1
+                                      rust-kurbo-0.13.1
+                                      rust-libc-0.2.189
+                                      rust-linesweeper-0.3.0
+                                      rust-num-traits-0.2.19
+                                      rust-polycool-0.4.0
+                                      rust-ppv-lite86-0.2.21
+                                      rust-proc-macro2-1.0.107
+                                      rust-quote-1.0.47
+                                      rust-r-efi-5.3.0
+                                      rust-rand-0.9.5
+                                      rust-rand-chacha-0.9.0
+                                      rust-rand-core-0.9.5
+                                      rust-rustc-hash-2.1.3
+                                      rust-serde-1.0.229
+                                      rust-serde-core-1.0.229
+                                      rust-serde-derive-1.0.229
+                                      rust-smallvec-1.15.2
+                                      rust-syn-2.0.119
+                                      rust-syn-3.0.3
+                                      rust-unicode-ident-1.0.24
+                                      rust-venial-0.5.0
+                                      rust-wasip2-1.0.4+wasi-0.2.12
+                                      rust-wasm-minimal-protocol-0.1.0
+                                      rust-wit-bindgen-0.57.1
+                                      rust-zerocopy-0.8.56
+                                      rust-zerocopy-derive-0.8.56))
                      (clamav =>
                              (list rust-adler2-2.0.0
                                    rust-adler32-1.2.0

@@ -29,6 +29,8 @@
   #:use-module (guix build-system copy)
   #:use-module (guix build-system typst)
   #:use-module (gnu packages)
+  #:use-module (gnu packages llvm)
+  #:use-module (gnu packages rust)
   #:use-module (gnu packages rust-crates)
   #:use-module (gnu packages tls))
 
@@ -177,6 +179,58 @@ compilation, and intuitive error messages.")
 universal consistency and correctness as top priorities.  It is
 configuration-free.")
     (license license:asl2.0)))
+
+(define-public cetz-core-wasm
+  (package
+    (name "cetz-core-wasm")
+    (version "0.5.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/cetz-package/cetz")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name "cetz" version))
+       (sha256
+        (base32 "179nxacfxzkb23h3ikgk0x7m4003913zq64yn6l9zfz5qvfal0sh"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ; tests require rand
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir
+            (lambda _ (chdir "cetz-core")))
+          (add-after 'configure 'configure-target
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let ((sysroot
+                     (assoc-ref inputs
+                                "rust-sysroot-for-wasm32-unknown-unknown")))
+                (with-atomic-file-replacement ".cargo/config"
+                  (lambda (in out)
+                    (display (string-append "\
+[target.wasm32-unknown-unknown]
+linker = 'lld'
+
+[build]
+target = ['wasm32-unknown-unknown']
+") out)
+                    (dump-port in out)))
+                (setenv "RUSTFLAGS" (string-append "--sysroot " sysroot)))))
+          (replace 'install
+            (lambda _
+              (install-file
+               (car (find-files "target" "cetz_core.wasm"))
+               (string-append #$output "/share/typst/packages/preview/cetz/"
+                              #$version "/cetz-core")))))))
+    (inputs (cargo-inputs 'cetz-core))
+    (native-inputs (list lld rust-sysroot-for-wasm32-unknown-unknown))
+    (home-page "https://cetz-package.github.io")
+    (synopsis "Library for drawing in Typst")
+    (description "CeTZ is a library for drawing figures in Typst,
+similar to TikZ.  This package provides the core WebAssembly primitives
+used by the actual CeTZ package.")
+    (license license:lgpl3+)))
 
 (define-public typst-oxifmt
   (package
