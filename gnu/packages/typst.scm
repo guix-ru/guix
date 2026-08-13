@@ -29,8 +29,11 @@
   #:use-module (guix build-system copy)
   #:use-module (guix build-system typst)
   #:use-module (gnu packages)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages llvm)
+  #:use-module (gnu packages perl)
   #:use-module (gnu packages rust)
+  #:use-module (gnu packages rust-apps)
   #:use-module (gnu packages rust-crates)
   #:use-module (gnu packages tls))
 
@@ -231,6 +234,42 @@ target = ['wasm32-unknown-unknown']
 similar to TikZ.  This package provides the core WebAssembly primitives
 used by the actual CeTZ package.")
     (license license:lgpl3+)))
+
+(define cetz-common
+  (let ((commit "fa1d1181f45609edf85b9632c18ce950fe87d048"))
+    (origin
+      (method git-fetch)
+      (uri (git-reference
+             (url "https://github.com/cetz-package/common")
+             (commit commit)))
+      (file-name (git-file-name "cetz-common" (string-take commit 7)))
+      (sha256
+       (base32 "16934mjzy5glhw80vm80p1k1dr9l7yyj7s9425j8k3a0awykgyq0")))))
+
+(define-public typst-cetz
+  (package
+    (inherit cetz-core-wasm)
+    (name "typst-cetz")
+    (build-system typst-build-system)
+    (arguments
+     (list #:tests? #f                  ; tt not yet packaged
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'skip-build
+                 (lambda _
+                   (substitute* "justfile"
+                     ((": build") ":"))))
+               (add-after 'unpack 'unpack-scripts
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (mkdir-p "common")
+                   (copy-recursively (dirname
+                                      (search-input-file inputs "/scripts/package"))
+                                     "common/scripts"))))))
+    (propagated-inputs (list cetz-core-wasm typst-oxifmt))
+    (native-inputs (list bash-minimal
+                         cetz-common
+                         just
+                         perl))))
 
 (define-public typst-oxifmt
   (package
