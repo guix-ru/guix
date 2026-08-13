@@ -198,6 +198,7 @@ MODULES =					\
   guix/build-system/texlive.scm		\
   guix/build-system/tree-sitter.scm		\
   guix/build-system/trivial.scm		\
+  guix/build-system/typst.scm		\
   guix/build-system/vim.scm			\
   guix/build-system/waf.scm			\
   guix/build-system/zig.scm			\
@@ -263,6 +264,7 @@ MODULES =					\
   guix/build/scons-build-system.scm		\
   guix/build/texlive-build-system.scm		\
   guix/build/tree-sitter-build-system.scm	\
+  guix/build/typst-build-system.scm	\
   guix/build/vim-build-system.scm		\
   guix/build/waf-build-system.scm		\
   guix/build/haskell-build-system.scm		\
