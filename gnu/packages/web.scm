@@ -10,7 +10,7 @@
 ;;; Copyright © 2015 Eric Dvorsak <eric@dvorsak.fr>
 ;;; Copyright © 2016 Sou Bunnbu <iyzsong@gmail.com>
 ;;; Copyright © 2016 Jelle Licht <jlicht@fsfe.org>
-;;; Copyright © 2016-2025 Efraim Flashner <efraim@flashner.co.il>
+;;; Copyright © 2016-2026 Efraim Flashner <efraim@flashner.co.il>
 ;;; Copyright © 2016 Rene Saavedra <rennes@openmailbox.org>
 ;;; Copyright © 2016 Ben Woodcroft <donttrustben@gmail.com>
 ;;; Copyright © 2016, 2023 Clément Lassieur <clement@lassieur.org>
@@ -110,6 +110,7 @@
   #:use-module (gnu packages bittorrent)
   #:use-module (gnu packages boost)
   #:use-module (gnu packages build-tools)
+  #:use-module (gnu packages c)
   #:use-module (gnu packages check)
   #:use-module (gnu packages code)
   #:use-module (gnu packages compression)
@@ -1552,30 +1553,34 @@ libraries for working with JNLP applets.")
 (define-public iocaine
   (package
     (name "iocaine")
-    (version "2.1.0")
+    (version "3.5.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (crate-uri "iocaine" version))
-       (file-name (string-append name "-" version ".tar.gz"))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.madhouse-project.org/iocaine/iocaine.git")
+              (commit (string-append "iocaine-" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1pd42hn5lqm3xw6id652w7sswix3l6bslcld7svqyq47gscsm3vn"))))
+        (base32 "079b02bjl8afsgb4ci2c7a0yp087br8nxfhn3iq8d2akkfp20hhn"))
+       (snippet
+        #~(begin (use-modules (guix build utils))
+                 (substitute* "Cargo.toml"
+                   ;; Don't vendor lua source code
+                   ((".*\"vendored\",.*") ""))))))
     (build-system cargo-build-system)
     (arguments
      (list
       #:install-source? #f
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'build 'override-jemalloc
-            (lambda* (#:key inputs #:allow-other-keys) ;Copied from uv
-              (let ((jemalloc (assoc-ref inputs "jemalloc")))
-                ;; This flag is needed when not using the bundled jemalloc.
-                ;; https://github.com/tikv/jemallocator/issues/19
-                (setenv
-                 "CARGO_FEATURE_UNPREFIXED_MALLOC_ON_SUPPORTED_PLATFORMS" "1")
-                (setenv "JEMALLOC_OVERRIDE"
-                        (string-append jemalloc "/lib/libjemalloc.so"))))))))
-    (inputs (cons* jemalloc (cargo-inputs 'iocaine)))
+      #:cargo-install-paths ''("iocaine")))
+    (native-inputs
+     (list pkg-config))
+    (inputs (cons* clang    ; any version, needed for bindgen
+                   lua-5.4
+                   mimalloc
+                   nftables
+                   `(,zstd "lib")
+                   (cargo-inputs 'iocaine)))
     (home-page "https://iocaine.madhouse-project.org/")
     (synopsis "Serves poisonous data to large language model scrapers")
     (description
