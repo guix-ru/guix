@@ -2727,6 +2727,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/xygrib-fix-finding-data.patch		\
   %D%/packages/patches/xygrib-newer-proj.patch			\
   %D%/packages/patches/yajl-CVE-2023-33460.patch		\
+  %D%/packages/patches/yash-disable-standard-path-tests.patch	\
   %D%/packages/patches/yggdrasil-extra-config.patch	\
   %D%/packages/patches/ypsilon-Use-GNU-toolchain-as-default.patch	\
   %D%/packages/patches/zabbix-agent2-test-timezone-fix.patch	\

@@ -1,0 +1,39 @@
+Disable tests checking the default PATH set by yash, which is used when the
+PATH environment variable is unset.  These tests do not work on Guix because
+the standard PATH relies on /usr/bin:/bin:…, which do not exist no Guix.
+
+diff --git a/tests/command-p.tst b/tests/command-p.tst
+index 47a4f29b..0ac459de 100644
+--- a/tests/command-p.tst
++++ b/tests/command-p.tst
+@@ -57,13 +57,6 @@ __IN__
+ foo
+ __OUT__
+ 
+-test_o -e 0 'executing with standard path'
+-PATH=
+-command -p echo foo bar | command -p cat
+-__IN__
+-foo bar
+-__OUT__
+-
+ (
+ setup 'set -e'
+ 
+@@ -272,16 +265,6 @@ PATH=
+ command -V _no_such_command_
+ __IN__
+ 
+-test_x -e 0 'describing external command with standard path (-v)'
+-PATH=
+-command -pv cat
+-__IN__
+-
+-test_x -e 0 'describing external command with standard path (-V)'
+-PATH=
+-command -pV cat
+-__IN__
+-
+ )
+ 
+ test_O -d -e 127 'executing non-existent command'

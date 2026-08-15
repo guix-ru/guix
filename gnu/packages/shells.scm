@@ -82,6 +82,7 @@
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages texinfo)
+  #:use-module (gnu packages text-editors)
   #:use-module (guix build-system cargo)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system gnu)
@@ -1106,3 +1107,44 @@ designed to be capable of bootstrapping their standard GNU counterparts.
 Underpinning these utilities are many Scheme interfaces for manipulating
 files and text.")
     (license license:gpl3+)))
+
+(define-public yash
+  (package
+    (name "yash")
+    (version "2.61")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/magicant/yash/releases/download/"
+             (string-append version "/" "yash-" version ".tar.xz")))
+       (sha256
+        (base32 "0iyl42lxm3i1z2i6lqgfkrbhgmw7dvpx7911anm97cpq9xprc552"))
+       (patches (search-patches "yash-disable-standard-path-tests.patch"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda* (#:key target #:allow-other-keys)
+              (apply invoke "sh" "./configure"
+                     (string-append "--prefix=" #$output)
+                     (if target
+                         (list
+                          (string-append "--host=" target))
+                         '())))))))
+    (inputs (list ncurses))
+    (native-inputs (list asciidoc
+                         ed
+                         gettext-minimal
+                         procps))
+    (home-page "https://magicant.github.io/yash/")
+    (synopsis "POSIX-compliant command line shell written in C99")
+    (description
+     "@acronym{Yash, yet another shell}, is a POSIX-compliant command line
+shell written in C99.  Yash is intended to fully comply with POSIX when
+invoked as @command{sh}, treating undefined and unspecified behaviour as
+errors, while also supporting features for daily interactive and
+scripting use when invoked regularly.")
+    (license license:gpl2+)))
