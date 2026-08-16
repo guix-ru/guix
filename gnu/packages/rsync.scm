@@ -45,20 +45,37 @@
 (define-public rsync
   (package
    (name "rsync")
-   (version "3.4.4")
+   (version "3.5.0")
    (source (origin
             (method url-fetch)
             (uri (string-append "https://rsync.samba.org/ftp/rsync/src/rsync-"
                                 version ".tar.gz"))
             (sha256
              (base32
-              "15psv1vphxlin3sdhn0p1pw90p3w80v928pv2his6gb5za1cz25x"))))
+              "0cqddrjp5mlkdyqrj8wpdgpd3jprnw0cniqycq7m969ycppx3zy7"))))
    (build-system gnu-build-system)
    (arguments
     `(#:configure-flags
       ;; The bundled copies are preferred by default.
       (list "--without-included-zlib"
-            "--without-included-popt")))
+            "--without-included-popt")
+      #:make-flags
+      ,#~(list (string-append "CC=" #$(cc-for-target)))
+      #:phases
+      ,#~(modify-phases %standard-phases
+           (add-after 'unpack 'patch-testsuite
+             (lambda _
+               (let ((sh-file (which "sh"))
+                     (python-file (which "python3"))
+                     (bash-file (which "bash"))
+                     (cc (string-append "'"
+                                        #$(cc-for-target)
+                                        "'")))
+                 (substitute* (find-files "testsuite/" "\\.py$")
+                   (("'cc'") cc)
+                   (("/usr/bin/env python3") python-file)
+                   (("/usr/bin/env bash") bash-file)
+                   (("/bin/sh") sh-file))))))))
    (native-inputs
     (list perl python-minimal)) ;needed for tests
    (inputs
