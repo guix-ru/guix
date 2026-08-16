@@ -1446,6 +1446,31 @@ unparser.")
 @url{https://github.com/mCaptcha/mCaptcha, mCaptcha}.")
     (license license:expat)))
 
+(define-public go-codeberg-org-jwijenbergh-eduoauth-go-v2
+  (package
+    (name "go-codeberg-org-jwijenbergh-eduoauth-go-v2")
+    (version "2.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/jwijenbergh/eduoauth-go")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0jfvc1y4y80davhhi8cn3bsa3m5c12h4yaimqvdjdsplkxk85kjn"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "codeberg.org/jwijenbergh/eduoauth-go/v2"))
+    (home-page "https://codeberg.org/jwijenbergh/eduoauth-go")
+    (synopsis "OAuth library for geteduroam and eduVPN")
+    (description
+     "Eduoauth is a Go library in use by
+@url{https://github.com/geteduroam/linux-app, geteduroam} and
+@url{https://codeberg.org/eduVPN, eduVPN} to handle OAuth.")
+    (license license:expat)))
+
 (define-public go-codeberg-org-miekg-dns
   (package
     (name "go-codeberg-org-miekg-dns")
