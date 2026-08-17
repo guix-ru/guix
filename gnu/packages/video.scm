@@ -1756,15 +1756,14 @@ operate properly.")
 (define-public ffmpeg
   (package
     (name "ffmpeg")
-    (version "8.1.1")
-    (replacement ffmpeg-8.1.2)
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://ffmpeg.org/releases/ffmpeg-"
-                                  version ".tar.xz"))
-              (sha256
-               (base32
-                "1wzdaaf66233gbfkz07cbbk36qsz3f3n4x0108kg9648x7fkm1mn"))))
+    (version "8.1.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
+                           ".tar.xz"))
+       (sha256
+        (base32 "0k2jggcp8akl64i0id5ba64ghancx422zbj5igk13hzhgdgfnjs6"))))
     (outputs '("out" "debug"))
     (build-system gnu-build-system)
     (inputs
@@ -1995,17 +1994,8 @@ convert and stream audio and video.  It includes the libavcodec
 audio/video codec library.")
     (license license:gpl2+)))
 
-(define-public ffmpeg-8.1.2
-  (package
-    (inherit ffmpeg)
-    (version "8.1.2")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
-                           ".tar.xz"))
-       (sha256
-        (base32 "0k2jggcp8akl64i0id5ba64ghancx422zbj5igk13hzhgdgfnjs6"))))))
+;; Remove after February 2027.
+(define-deprecated-package ffmpeg-8.1.2 ffmpeg)
 
 (define-public ffmpeg-6
   (package
