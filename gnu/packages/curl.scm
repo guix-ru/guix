@@ -69,7 +69,6 @@
   (package
     (name "curl")
     (version "8.20.0")
-    (replacement curl/fixed)
     (source (origin
               (method url-fetch)
               (uri (string-append "https://curl.se/download/curl-"
@@ -77,7 +76,8 @@
               (sha256
                (base32
                 "15mqw8y9vdxlz9cpr2z7q9r6552wgs7q7vr2k7lfl35s930jvzk3"))
-              (patches (search-patches "curl-use-ssl-cert-env.patch"))))
+              (patches (search-patches "curl-use-ssl-cert-env.patch"
+                                       "curl-fix-wakeup-consumption.patch"))))
     (outputs '("out"
                "doc"))                  ;1.2 MiB of man3 pages
     (build-system gnu-build-system)
@@ -181,15 +181,8 @@ tunneling, and so on.")
     (license (license:non-copyleft "file://COPYING"
                                    "See COPYING in the distribution."))))
 
-(define-public curl/fixed
-  (package
-    (inherit curl)
-    (name "curl")
-    (version "8.20.0")
-    (source (origin
-              (inherit (package-source curl))
-              (patches (search-patches "curl-use-ssl-cert-env.patch"
-                                       "curl-fix-wakeup-consumption.patch"))))))
+;; Remove after February 2027.
+(define-deprecated-package curl/fixed curl)
 
 (define-public curl-ssh
   (package/inherit curl
