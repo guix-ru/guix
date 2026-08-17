@@ -292,6 +292,45 @@ on byte-critical systems.  It supports HTTP, HTTPS, FTP and FTPS
 protocols.")
     (license license:gpl2+)))
 
+(define-public geteduroam-cli
+  (package
+    (name "geteduroam-cli")
+    (version "0.14")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/geteduroam/linux-app")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0d55h22n855zn3cnl6a6k6qh03x91bsrvasyk5baxqcsr5mrpz36"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:unpack-path "github.com/geteduroam/linux-app"
+      #:import-path "github.com/geteduroam/linux-app/cmd/geteduroam-cli"
+      ;; XXX: Run only portion of tests.
+      #:test-subdirs #~(list "../../internal/...")))
+    (native-inputs
+     (list go-codeberg-org-jwijenbergh-eduoauth-go-v2
+           go-github-com-godbus-dbus-v5
+           go-github-com-youmark-pkcs8
+           go-golang-org-x-exp
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-golang-org-x-text
+           go-software-sslmate-com-src-go-pkcs12))
+    (home-page "https://www.eduroam.app")
+    (synopsis "Set up NetworkManager connection for eduroam access points")
+    (description
+     "Eduroam provides roaming network access across all participating
+research and education networks.  Geteduroam-cli is the command line interface
+version of geteduroam, which sets up a connection in NetworkManager, allowing
+you to connect to eduroam access points.")
+    (license license:bsd-3)))
+
 (define-public lcagent
   (package
     (name "lcagent")
