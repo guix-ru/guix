@@ -9,7 +9,7 @@
 ;;; Copyright © 2016, 2018, 2019, 2024, 2025 Ricardo Wurmus <rekado@elephly.net>
 ;;; Copyright © 2016, 2017, 2018 Julian Graham <joolean@gmail.com>
 ;;; Copyright © 2017–2021 Tobias Geerinckx-Rice <me@tobias.gr>
-;;; Copyright © 2017 Manolis Fragkiskos Ragkousis <manolis837@gmail.com>
+;;; Copyright © 2017, 2026 Manolis Fragkiskos Ragkousis <manolis837@gmail.com>
 ;;; Copyright © 2017 Peter Mikkelsen <petermikkelsen10@gmail.com>
 ;;; Copyright © 2017 Arun Isaac <arunisaac@systemreboot.net>
 ;;; Copyright © 2017, 2019 Rutger Helling <rhelling@mykolab.com>
@@ -3390,6 +3390,50 @@ the original, ioquake3 has been cleaned up, bugs have been fixed and features
 added.  The permanent goal is to create a Quake 3 distribution upon which
 people base their games, ports to new platforms, and other projects.")
       (license license:gpl2))))
+
+(define-public img2tim
+  ;; 0.75 does not compile on non-Windows targets, use newest commit.
+  (let ((commit "ca244c3de142e6a07cb973299f780c4586d9fef9")
+        (revision "0"))
+    (package
+      (name "img2tim")
+      (version (git-version "0.75" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/Lameguy64/img2tim")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1i0vhk5kipk0mdd24jd05k1a8z9x6iqx0gx81khdgh2blbzngclb"))))
+      (build-system gnu-build-system)
+      (arguments
+       (list
+        #:tests? #f                     ; no tests
+        #:phases
+        #~(modify-phases %standard-phases
+            (delete 'configure)
+            (replace 'build
+              (lambda _
+                (invoke "g++" "-O2"
+                        "main.cpp" "tim.cpp"
+                        "-o" "img2tim" "-lfreeimage")))
+            (replace 'install
+              (lambda _
+                (install-file "img2tim" (string-append #$output "/bin"))
+                (install-file "img2tim.txt"
+                              (string-append #$output "/share/doc/img2tim")))))))
+      (inputs (list freeimage))
+      (home-page "https://github.com/Lameguy64/img2tim")
+      (synopsis "Convert images to PlayStation TIM textures")
+      (description
+       "@command{img2tim} converts image files into PlayStation TIM textures.
+It uses FreeImage to read common formats such as PNG, BMP and JPEG, and can
+output 4-bit, 8-bit or 16-bit textures, with optional colour-key or alpha
+transparency.  The image and its @acronym{CLUT, Colour Lookup Table} can be
+placed at a chosen VRAM position.")
+      (license license:gpl3))))
 
 (define-public inform
     (package
