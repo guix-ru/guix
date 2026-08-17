@@ -720,17 +720,21 @@ and mmsh protocols.")
   (package
     (name "libde265")
     (version "1.0.14")
-    (replacement libde265/fixed)
     (source
      (origin
        (method git-fetch)
        (uri
         (git-reference
-         (url "https://github.com/strukturag/libde265")
-         (commit (string-append "v" version))))
+          (url "https://github.com/strukturag/libde265")
+          (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1a4n1hnr9ybji87irg2kya95slf4jnybnkg4x2zihnqqihbnv539"))))
+        (base32 "1a4n1hnr9ybji87irg2kya95slf4jnybnkg4x2zihnqqihbnv539"))
+       (patches (search-patches "libde265-CVE-2023-49465.patch"
+                                "libde265-CVE-2023-49467.patch"
+                                "libde265-CVE-2023-49468.patch"
+                                "libde265-CVE-2026-33164-CVE-2026-33165.patch"
+                                "libde265-CVE-2026-49295.patch"))))
     (build-system gnu-build-system)
     (arguments
      `(#:configure-flags
@@ -753,17 +757,8 @@ other software.")
       ;; Library.
       license:lgpl3+))))
 
-(define libde265/fixed
-  (package
-    (inherit libde265)
-    (source
-     (origin
-       (inherit (package-source libde265))
-       (patches (search-patches "libde265-CVE-2023-49465.patch"
-                                "libde265-CVE-2023-49467.patch"
-                                "libde265-CVE-2023-49468.patch"
-                                "libde265-CVE-2026-33164-CVE-2026-33165.patch"
-                                "libde265-CVE-2026-49295.patch"))))))
+;; Remove after February 2027.
+(define-deprecated-package libde265/fixed libde265)
 
 (define-public tslib
   (package
