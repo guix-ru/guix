@@ -557,7 +557,8 @@ $(prefix)/etc/openrc\n")))
       (native-search-paths
        (list (search-path-specification
                (variable "GUIX_EXTENSIONS_PATH")
-               (files '("share/guix/extensions")))
+               (files '("share/guix/extensions/1.5"
+                        "share/guix/extensions"))) ;deprecated
              ;; (guix git) and (guix build download) honor this variable whose
              ;; name comes from OpenSSL.
              $SSL_CERT_DIR))
