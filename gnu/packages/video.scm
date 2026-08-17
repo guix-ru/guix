@@ -2010,15 +2010,14 @@ audio/video codec library.")
 (define-public ffmpeg-6
   (package
     (inherit ffmpeg)
-    (version "6.1.5")
-    (replacement ffmpeg-6.1.6)
+    (version "6.1.6")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
                            ".tar.xz"))
        (sha256
-        (base32 "04ll214qrdbjy7j945l9ca0v0jwxva8vzndibdha6ljl3zdykyq5"))
+        (base32 "02ip0zsghyz09p0jv8ayqxrnkb3awirarh4jbppbxlwd09jb3z6l"))
        (patches (search-patches
                  "ffmpeg-add-av_stream_get_first_dts-for-chromium.patch"))))
     (arguments
@@ -2034,19 +2033,8 @@ audio/video codec library.")
                              " -Wno-error=int-conversion")))))))
          (package-arguments ffmpeg)))))
 
-(define-public ffmpeg-6.1.6
-  (package
-    (inherit ffmpeg-6)
-    (version "6.1.6")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://ffmpeg.org/releases/ffmpeg-" version
-                           ".tar.xz"))
-       (sha256
-        (base32 "02ip0zsghyz09p0jv8ayqxrnkb3awirarh4jbppbxlwd09jb3z6l"))
-       (patches (search-patches
-                 "ffmpeg-add-av_stream_get_first_dts-for-chromium.patch"))))))
+;; Remove after February 2027.
+(define-deprecated-package ffmpeg-6.1.6 ffmpeg-6)
 
 (define-public ffmpeg-5
   (package
