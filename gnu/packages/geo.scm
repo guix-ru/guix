@@ -2031,33 +2031,28 @@ Shapely capabilities
 (define-public postgis
   (package
     (name "postgis")
-    (version "3.3.8")
+    (version "3.7.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://download.osgeo.org/postgis/source/postgis-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "1w1jkb98rf22qz0x4wajp0cjwzcb928247169xk84az3adb0y9vf"))))
+                "012y7i5qsvwjqwlcpkb6z5diwr7y7dmngj9v0nmpzxdny98byaw3"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:tests? #f
-       #:make-flags
-       (list (string-append "datadir=" (assoc-ref %outputs "out") "/share")
-             (string-append "docdir="(assoc-ref %outputs "out") "/share/doc")
-             (string-append "pkglibdir="(assoc-ref %outputs "out") "/lib")
-             (string-append "bindir=" (assoc-ref %outputs "out") "/bin"))
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'build 'fix-install-path
-           (lambda* (#:key outputs #:allow-other-keys)
-             (substitute* '("raster/loader/Makefile" "raster/scripts/python/Makefile")
-               (("\\$\\(DESTDIR\\)\\$\\(PGSQL_BINDIR\\)")
-                (string-append (assoc-ref outputs "out") "/bin"))))))))
+     (list #:tests? #f
+           #:make-flags
+           #~(list (string-append "datadir=" #$output "/share")
+                   (string-append "docdir=" #$output "/share/doc")
+                   (string-append "pkglibdir=" #$output "/lib")
+                   (string-append "bindir=" #$output "/bin")
+                   (string-append "PG_SHAREDIR=" #$output "/share"))))
     (inputs
      (list gdal
            geos
            giflib
+           gmp
            json-c
            libjpeg-turbo
            libxml2
