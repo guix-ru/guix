@@ -35146,7 +35146,7 @@ Identifier (RFC3986) specification in Go.")
 (define-public go-go-mau-fi-util
   (package
     (name "go-go-mau-fi-util")
-    (version "0.9.9")
+    (version "0.10.0")
     (source
      (origin
        (method git-fetch)
@@ -35155,7 +35155,7 @@ Identifier (RFC3986) specification in Go.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1d6365n4j5hx172mi5f9rk49l7cgcbf8qvi721b0l34j2m036rsy"))))
+        (base32 "047ixyxm9r9kl58rg5s0bydkmjjx0qc96gsk79b5rmdds0if02ff"))))
     (build-system go-build-system)
     (arguments
      (list
