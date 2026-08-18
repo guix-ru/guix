@@ -23944,16 +23944,20 @@ state machine.  See @url{https://raft.github.io/raft.pdf} for more info.")
 (define-public go-go-mau-fi-whatsmeow
   (package
     (name "go-go-mau-fi-whatsmeow")
-    (version "0.0.0-20260529101937-a7ea56383ec4")
+    (properties '((commit . "662ad1dc6900ffe1b1a2a6bc0fca01cba488d747")
+                  (revision . "1")))
+    (version (git-version "0.0.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/tulir/whatsmeow")
-              (commit (go-version->git-ref version))))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0i6vcn6l5sf0wsyr3k856xiz5pq3ivl9a7xd1bzqzlq74jmivivc"))))
+        (base32 "1ykwgys1apqznz3px6sgcbmq1jnwqj9y8rx26xmxg48czfqqbd81"))))
     (build-system go-build-system)
     (arguments
      (list
