@@ -26749,7 +26749,7 @@ the code or routes.")
 (define-public go-maunium-net-go-mautrix
   (package
     (name "go-maunium-net-go-mautrix")
-    (version "0.28.0")
+    (version "0.30.0")
     (source
      (origin
        (method git-fetch)
@@ -26758,7 +26758,7 @@ the code or routes.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "09isb4q876mkcwm2yk7vgzwhd3yw1n0s78qvdb7wpmab6vvxjnlf"))))
+        (base32 "1fn2j2dqs0k96lnsiwv2x1vzwl83c06nsihgi3hl1ib8sr3q77aq"))))
     (build-system go-build-system)
     (arguments
      (list
