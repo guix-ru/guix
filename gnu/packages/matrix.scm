@@ -115,7 +115,7 @@ Interface, CLI}-based Matrix client app for sending and receiving.")
 (define-public mautrix-whatsapp
   (package
     (name "mautrix-whatsapp")
-    (version "0.2605.0")
+    (version "0.2608.0")
     (source
      (origin
        (method git-fetch)
@@ -124,7 +124,7 @@ Interface, CLI}-based Matrix client app for sending and receiving.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "02gmzby57vn5cc23m2laqcqqkvghlabm08fzjzqfzx8g18cmymas"))))
+        (base32 "027pnxxgb93n9dml7gl1b47xmn3jw194m9y275q6zm8v5whrf7w0"))))
     (build-system go-build-system)
     (arguments
      (list
