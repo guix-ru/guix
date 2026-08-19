@@ -61,6 +61,7 @@
 ;;; Copyright © 2025 Ekaitz Zarraga <ekaitz@elenq.tech>
 ;;; Copyright © 2026 Matt Wette <matt.wette@gmail.com>
 ;;; Copyright © 2026 Dzianis Jackievič <mail@miesta.by>
+;;; Copyright © 2026 Thomas Bennett <thomas.bennett@caminu.fr>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -6120,6 +6121,38 @@ Implements
 @item One-dimensional root solvers.
 @end itemize")
       (license license:gpl3+))))
+
+(define-public guile-gspec
+  (package
+    (name "guile-gspec")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/tbennett/gspec.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "00qdr8vc4ygfjxrg26h1vdvqjzars03hjkwcfp62xq84flc4lns0"))))
+    (build-system guile-build-system)
+    (arguments (list
+                #:source-directory "src"))
+    (native-inputs (list guile-3.0))
+    (inputs (list guile-3.0))
+    (home-page "https://codeberg.org/tbennett/gspec")
+    (synopsis "Test runner that encourages software design")
+    (description
+     "GSpec allows tests to come along with a short description and to be
+grouped by contexts.  Tests are not only non-regression mechanisms, but also a
+module usage and behavior documentation, a support for design thinking, and a
+support for communication about the model with domain experts.
+
+It is designed to be easy to use and the least obstructive possible.
+
+Its @acronym{API, Application Programming Interface} is inspired by RSpec.")
+    (license license:lgpl3+)))
 
 (define-public guile-ffi-fftw
   (let ((commit "294ad9e7491dcb40026d2fec9be2af05263be1c0")
