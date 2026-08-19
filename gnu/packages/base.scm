@@ -1672,19 +1672,15 @@ command.")
                      (string-append "TZDEFAULT=" out
                                     "/share/zoneinfo/localtime")
 
-                     ;; Likewise for the C library routines.
                      (string-append "LIBDIR=" tmp "/lib")
                      (string-append "MANDIR=" tmp "/man")
 
-                     ;; XXX: tzdata 2020b changed the on-disk format
+                     ;; tzdata 2020b changed the on-disk format
                      ;; of the time zone files from 'fat' to 'slim'.
                      ;; Many packages (particularly evolution-data-server)
                      ;; can not yet handle the latter, so we stick with
                      ;; 'fat' for now.
-                     #$@(if (version>=? (package-version this-package)
-                                        "2020b")
-                            '("CPPFLAGS=-DZIC_BLOAT_DEFAULT='\"fat\"'")
-                            '())
+                     "CPPFLAGS=-DZIC_BLOAT_DEFAULT='\"fat\"'"
 
                      "AWK=awk"
                      "CC=gcc"))
