@@ -499,7 +499,8 @@ is the subpackage in charge of the statistical and diagnostics computations.")
     (build-system gnu-build-system)
     (arguments
      (list
-      #:disallowed-references `(,(this-package-native-input "tzdata"))
+      #:disallowed-references `(,(this-package-native-input
+                                  "tzdata-for-tests"))
       #:make-flags
       #~(list (string-append "CFLAGS=-g -O2"
                              " -Wno-error=implicit-function-declaration")
