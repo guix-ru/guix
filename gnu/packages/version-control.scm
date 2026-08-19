@@ -4251,7 +4251,8 @@ be served with a HTTP file server of your choice.")
                             (assoc-ref %build-inputs "boost")
                             "/lib")
              "--with-tinyxml")
-       #:disallowed-references ,(list (this-package-native-input "tzdata"))
+       #:disallowed-references ,(list (this-package-native-input
+                                       "tzdata-for-tests"))
        #:phases (modify-phases %standard-phases
                   (add-after 'unpack 'unbundle
                     (lambda _

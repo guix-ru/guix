@@ -15296,7 +15296,7 @@ prop, vhea, vmtx and the reading and writing of all other table types.")
      `(;; XXX: We'd like to use #:disallowed-references 'perl-build-system'
        ;; doesn't support it yet.
        ;;
-       ;; #:disallowed-references (,(this-package-native-input "tzdata"))
+       ;; #:disallowed-references (,(this-package-native-input "tzdata-for-tests"))
 
        #:phases
        (modify-phases %standard-phases

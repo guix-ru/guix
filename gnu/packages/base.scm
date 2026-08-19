@@ -1722,15 +1722,35 @@ reflect changes made by political bodies to time zone boundaries, UTC offsets,
 and daylight-saving rules.")
     (license public-domain)))
 
-;;; A "fixed" version of tzdata, which is used in the test suites of glib and R
+;;; A "pinned" version of tzdata, which is used in the test suites of glib, R,
 ;;; and a few other places. We can update this whenever we are able to rebuild
 ;;; thousands of packages (for example, in a core-updates rebuild). This package
 ;;; will typically be obsolete and should never be referred to by a built
 ;;; package.
-;;;
-;;; Please make this a hidden-package if it is different from the primary tzdata
-;;; package.
-(define-public tzdata-for-tests tzdata)
+
+(define-public tzdata-for-tests
+  (hidden-package
+   (package
+     (inherit tzdata)
+     (name "tzdata-for-tests")
+     (version "2026c")
+     (source (origin
+               (method url-fetch)
+               (uri (string-append
+                     "https://data.iana.org/time-zones/releases/tzdata"
+                     version ".tar.gz"))
+               (sha256
+                (base32
+                 "1r1bj2fjw54yx7ki7ak1ipzzwf5afbzjh663gjkhwgbz8yj7i8g4"))))
+     (inputs
+      (list (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://data.iana.org/time-zones/releases/tzcode"
+                    version ".tar.gz"))
+              (sha256
+               (base32
+                "1s5czv4d67v7h8sz1g28v9whnggchvfplbxsxz87qk2crqxgrkxi"))))))))
 
 ;; XXX: Deprecated on <2026-05-23>.
 (define-deprecated/public-alias tzdata/leap-seconds tzdata)
