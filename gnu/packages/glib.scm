@@ -272,7 +272,7 @@ information, refer to the @samp{dbus-daemon(1)} man page.")))
     (arguments
      (list
       #:disallowed-references
-      (cons (this-package-native-input "tzdata")
+      (cons (this-package-native-input "tzdata-for-tests")
             ;; Verify glib-mkenums, gtester, ... use the cross-compiled
             ;; python.
             (if (%current-target-system)

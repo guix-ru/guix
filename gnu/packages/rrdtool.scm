@@ -75,7 +75,7 @@
            tzdata-for-tests))
     (arguments
      (list
-      #:disallowed-references (list (this-package-native-input "tzdata"))
+      #:disallowed-references (list (this-package-native-input "tzdata-for-tests"))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'prepare-test-environment
