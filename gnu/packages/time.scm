@@ -250,7 +250,6 @@ applications, and several support tools.")
                    (copy-recursively
                     (search-input-directory inputs "share/zoneinfo")
                     "src/tzdata/zoneinfo")
-                   (delete-file "src/tzdata/zoneinfo/posix")
                    (call-with-output-file "src/tzdata/zoneinfo/__init__.py"
                      (const #t)))))))
     (inputs (list tzdata))
