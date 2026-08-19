@@ -10,7 +10,7 @@
 ;;; Copyright © 2016, 2018 Alex Vong <alexvong1995@gmail.com>
 ;;; Copyright © 2017 Rene Saavedra <rennes@openmailbox.org>
 ;;; Copyright © 2017, 2020 Mathieu Othacehe <m.othacehe@gmail.com>
-;;; Copyright © 2017, 2018, 2020, 2022 Marius Bakke <marius@gnu.org>
+;;; Copyright © 2017, 2018, 2020, 2022, 2026 Marius Bakke <marius@gnu.org>
 ;;; Copyright © 2017 Eric Bavier <bavier@member.fsf.org>
 ;;; Copyright © 2018 Tobias Geerinckx-Rice <me@tobias.gr>
 ;;; Copyright © 2018, 2019, 2022 Ricardo Wurmus <rekado@elephly.net>
@@ -1646,7 +1646,7 @@ command.")
     (name "tzdata")
     ;; This package should be kept in sync with python-pytz and python-tzdata
     ;; in (gnu packages time).
-    (version "2026b")
+    (version "2026c")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -1654,7 +1654,7 @@ command.")
                     version ".tar.gz"))
               (sha256
                (base32
-                "0i7mqs9awir627n2w7yvldaqglvkl6p8cdm4pjszwswsy7cl6i8i"))))
+                "1r1bj2fjw54yx7ki7ak1ipzzwf5afbzjh663gjkhwgbz8yj7i8g4"))))
     (build-system gnu-build-system)
     (arguments
      (list #:tests? #f
@@ -1706,10 +1706,6 @@ command.")
                      ;; Discard zic, dump, and tzselect, already
                      ;; provided by glibc.
                      (delete-file-recursively (string-append out "/usr"))
-                     (symlink (string-append out "/share/zoneinfo")
-                              (string-append out "/share/zoneinfo/posix"))
-                     (copy-recursively (string-append out "/share/zoneinfo-leaps")
-                                       (string-append out "/share/zoneinfo/right"))
                      (install-file "leap-seconds.list"
                                    (string-append out "/share/zoneinfo")))))
                (delete 'configure))))
@@ -1720,7 +1716,7 @@ command.")
                           version ".tar.gz"))
                     (sha256
                      (base32
-                      "0i533kv67wrk1f3h646zxrq3s17vrf9y4n7w48f55lzm4y2fvs9p")))))
+                      "1s5czv4d67v7h8sz1g28v9whnggchvfplbxsxz87qk2crqxgrkxi")))))
     (home-page "https://www.iana.org/time-zones")
     (synopsis "Database of current and historical time zones")
     (description "The Time Zone Database (often called tz or zoneinfo)
