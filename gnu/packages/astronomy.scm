@@ -9216,7 +9216,7 @@ plot a single (or a few) model(s).")
 (define-public python-pynbody
   (package
     (name "python-pynbody")
-    (version "2.4.2")
+    (version "2.5.0")
     (source
      (origin
        (method git-fetch)
@@ -9225,7 +9225,7 @@ plot a single (or a few) model(s).")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "03gzqxkk8cj3riba7ssnq16ww70ll7rlxpdvppq0g4m65rd93mrn"))
+        (base32 "00shhb22m456j5sq25d3ka9ig1k0ybw869wa3933cm6askbmdag0"))
        (modules '((guix build utils)))
        (snippet
         ;; Symlink goes to not existing directory.
