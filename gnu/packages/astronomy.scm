@@ -10794,7 +10794,7 @@ and the options
 (define-public python-skyfield
   (package
     (name "python-skyfield")
-    (version "1.54")
+    (version "1.55")
     (source
      (origin
        (method git-fetch)
@@ -10803,11 +10803,11 @@ and the options
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1aayhbdnai6szld0vq7g69cva2y1gwj8zaxa97gcvajmq1rjd4d1"))))
+        (base32 "1506xv93c6n2pynflbssn74d6cpdp4jadr22jx6zsi91mrk7kr4b"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 594 passed
+      ;; tests: 584 passed
       #:test-flags
       #~(list "-m" "assay" "--batch" "skyfield.tests")
       #:phases
