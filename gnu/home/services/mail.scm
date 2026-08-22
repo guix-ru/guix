@@ -52,9 +52,37 @@
             msmtp-account-configuration
 
             goimapnotify-tls-options-configuration
+            goimapnotify-tls-options-configuration?
+            goimapnotify-tls-options-configuration-reject-unauthorized?
+            goimapnotify-tls-options-configuration-starttls?
             goimapnotify-box-configuration
+            goimapnotify-box-configuration?
+            goimapnotify-box-configuration-mailbox
+            goimapnotify-box-configuration-on-new-mail
+            goimapnotify-box-configuration-on-new-mail-post
+            goimapnotify-box-configuration-on-changed-mail
+            goimapnotify-box-configuration-on-changed-mail-post
+            goimapnotify-box-configuration-on-deleted-mail
+            goimapnotify-box-configuration-on-deleted-mail-post
             goimapnotify-configuration
+            goimapnotify-configuration?
+            goimapnotify-configuration-host
+            goimapnotify-configuration-host-command
+            goimapnotify-configuration-port
+            goimapnotify-configuration-tls?
+            goimapnotify-configuration-tls-options
+            goimapnotify-configuration-idle-logout-timeout
+            goimapnotify-configuration-user-name
+            goimapnotify-configuration-user-name-command
+            goimapnotify-configuration-alias
+            goimapnotify-configuration-password
+            goimapnotify-configuration-password-command
+            goimapnotify-configuration-xo-auth2?
+            goimapnotify-configuration-boxes
             home-goimapnotify-configuration
+            home-goimapnotify-configuration?
+            home-goimapnotify-configuration-goimapnotify
+            home-goimapnotify-configuration-configurations
             home-goimapnotify-service-type))
 
 (define (string-or-gexp? obj)
