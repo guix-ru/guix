@@ -122,48 +122,6 @@ IPv4 and IPv6, link-local IPv4 address handling and tethering (IP connection
 sharing) to clients via USB, ethernet, WiFi, cellular and Bluetooth.")
     (license license:gpl2)))
 
-(define-public econnman
-  (package
-    (name "econnman")
-    (version "1.1")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://download.enlightenment.org/rel/apps/"
-                           "econnman/econnman-" version ".tar.xz"))
-       (sha256
-        (base32
-         "11gd35v8kqr5gqqm8w3j6k1ppwgxcnpf1kv33q7sfz5f3xl8gkhc"))))
-    (build-system gnu-build-system)
-    (arguments
-     (list
-      #:configure-flags
-      #~(list "--localstatedir=/var")
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'set-home-directory
-            ;; FATAL: Cannot create run dir '/homeless-shelter/.run' - errno=2
-            (lambda _ (setenv "HOME" "/tmp")))
-          (add-after 'install 'wrap-binary
-            (lambda _
-              (let* ((bin (string-append #$output "/bin/econnman-bin")))
-                (wrap-program bin
-                  `("GUIX_PYTHONPATH" ":" prefix
-                    (,(getenv "GUIX_PYTHONPATH"))))))))))
-    (native-inputs
-     (list pkg-config))
-    (inputs
-     (list bash-minimal                 ; wrap-program
-           efl
-           python-wrapper
-           python-dbus-1.2
-           python-efl))
-    (home-page "https://www.enlightenment.org")
-    (synopsis "Connman User Interface written using the EFL")
-    (description
-     "An EFL user interface for the @code{connman} connection manager.")
-    (license license:lgpl3)))
-
 (define-public cmst
   (package
     (name "cmst")
