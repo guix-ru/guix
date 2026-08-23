@@ -117,33 +117,41 @@ MATE applications.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-power-manager-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-power-manager")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "08gf3vvmh335pyrhqaswag77pygqvrn19a59dcrnis07nrscpgcf"))))
+        (base32 "1k96w55ids1gyc2fk2j3l6yh30ah171y824f7cm2vdq6v1bb12n4"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config
-           yelp-tools
-           gettext-minimal
-           `(,glib "bin") ; glib-gettextize
-           polkit)) ; for ITS rules
-    (inputs
-     (list gtk+
-           glib
-           dbus-glib
-           libgnome-keyring
-           cairo
-           dbus
-           libnotify
-           mate-desktop
-           mate-panel
-           libxrandr
-           libcanberra
-           libsecret
-           startup-notification
-           upower))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         itstool
+                         libtool
+                         yelp-tools
+                         gettext-minimal
+                         (list glib "bin") ;glib-gettextize
+                         mate-common
+                         polkit ;for ITS rules
+                         which))
+    (inputs (list gtk+
+                  glib
+                  dbus-glib
+                  libgnome-keyring
+                  cairo
+                  dbus
+                  libnotify
+                  mate-desktop
+                  mate-panel
+                  libxrandr
+                  libcanberra
+                  libsecret
+                  startup-notification
+                  upower))
     (home-page "https://mate-desktop.org/")
     (synopsis "Power manager for MATE")
     (description
