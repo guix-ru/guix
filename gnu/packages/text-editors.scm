@@ -146,18 +146,19 @@
 (define-public ed
   (package
     (name "ed")
-    (version "1.22.5")
+    (version "1.22.6")
     (source (origin
              (method url-fetch)
              (uri (string-append "mirror://gnu/ed/ed-"
                                  version ".tar.lz"))
              (sha256
               (base32
-               "1k2ql71ybnsfwh81f95qwcg9wl2ijyziav1pj1kav7gjqbfhgqan"))))
+               "1wk8nb5j0wv0j058qybwl7id6rr53hbvgxwmqv1kk7116lhv4crz"))))
     (build-system gnu-build-system)
     (native-inputs (list lzip))
     (arguments
-     `(#:configure-flags (list ,(string-append "CC=" (cc-for-target)))))
+     (list
+      #:configure-flags #~(list (string-append "CC=" #$(cc-for-target)))))
     (home-page "https://www.gnu.org/software/ed/")
     (synopsis "Line-oriented text editor")
     (description
