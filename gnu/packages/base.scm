@@ -999,7 +999,7 @@ the store.")
                 (match-lambda
                   ((label . input)
                    (and (directory-exists?
-                         (string-append input "/include/" #$(if (system-hurd?)
+                         (string-append input "/include/" #$(if (target-hurd?)
                                                                 "mach"
                                                                 "linux")))
                         ;; Ensure we're not refering to another libc.
