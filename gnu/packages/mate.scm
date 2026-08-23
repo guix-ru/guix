@@ -88,19 +88,26 @@
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-common")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "02ms4s6kfxkbghc24rx9g1axdv50rndzdm0s3iz1vxv8wb7c5ds2"))
-       (patches
-        (search-patches "mate-common-honor-aclocal.patch"))))
+        (base32 "1l55jc35mfmla52kb75141i02qxysadz7ay3mf199zy8xi8vcnl6"))
+       (patches (search-patches "mate-common-honor-aclocal.patch"))))
     (build-system gnu-build-system)
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         itstool
+                         libtool
+                         which))
     (home-page "https://mate-desktop.org/")
     (synopsis "Common files for development of MATE packages")
-    (description
-     "Mate Common includes common files and macros used by
+    (description "Mate Common includes common files and macros used by
 MATE applications.")
     (license license:gpl3+)))
 
@@ -626,7 +633,7 @@ Interactive Weather Information Network (IWIN).
      "Applet for displaying application indicators on the MATE panel")
     (description "This applet displays information from various applications
 consistently in the MATE panel.")
-    (license 
+    (license
      ;; Dual-licensed under GPL-3+ and LGPL-2.1+
      (list
       license:gpl3+
