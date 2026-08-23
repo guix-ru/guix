@@ -196,16 +196,14 @@ actions.")
     (version "1.20.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           name
-                           "-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url
+              "https://github.com/mate-desktop-legacy-archive/mate-icon-theme-faenza")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "000vr9cnbl2qlysf2gyg1lsjirqdzmwrnh6d3hyrsfc0r2vh4wna"))))
+        (base32 "0jd2qjhn5sbs48kk4hk4zzzcxkf3hxqziqjzlw8mpqdlain3psdx"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -213,8 +211,10 @@ actions.")
       #~(modify-phases %standard-phases
           (add-after 'unpack 'autoconf
             (lambda _
-              (setenv "SHELL" (which "sh"))
-              (setenv "CONFIG_SHELL" (which "sh"))
+              (setenv "SHELL"
+                      (which "sh"))
+              (setenv "CONFIG_SHELL"
+                      (which "sh"))
               (invoke "sh" "autogen.sh"))))))
     (native-inputs
      ;; autoconf-wrapper is required due to the non-standard
