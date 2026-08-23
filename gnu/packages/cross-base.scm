@@ -579,7 +579,10 @@ the base compiler.  Use XBINUTILS as the associated cross-Binutils."
       (native-inputs `(("cross-gcc" ,xgcc)
                        ("cross-binutils" ,xbinutils)
                        ("cross-mig" ,xmig)
-                       ,@(alist-delete "mig"(package-native-inputs glibc/hurd-headers))))))
+                       ;; XXXX: This relies on the labels of the unlabeled libc
+                       ,@(alist-delete "mig-cross"
+                                       (alist-delete "mig"
+                                                     (package-native-inputs glibc/hurd-headers)))))))
 
   (define xhurd-minimal
     (package
@@ -740,7 +743,10 @@ returned."
                                             #:xbinutils xbinutils)))
                              '())
                        ,@(if static-bash '() (package-inputs libc))
-                       ,@(alist-delete "mig" (package-native-inputs libc))))))
+                       ;; XXXX: This relies on the labels of the unlabeled libc
+                       ,@(alist-delete "mig-cross"
+                                       (alist-delete "mig"
+                                                     (package-native-inputs libc)))))))
    ((? target-avr?)
     (make-avr-libc #:xbinutils xbinutils
                    #:xgcc xgcc))
