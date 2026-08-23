@@ -166,15 +166,24 @@ actions.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-icon-theme")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "0fkdk9pqgplmdlsikjb1fp804zcblgpf87cj892zfpfac280gmll"))))
+        (base32 "08xcmhsk4m1pvpajb7sa7fm58fh7ln9s9p7jby84hll6qjqkxkgn"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config intltool icon-naming-utils))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         itstool
+                         libtool
+                         icon-naming-utils
+                         mate-common
+                         which))
     (home-page "https://mate-desktop.org/")
     (synopsis "The MATE desktop environment icon theme")
     (description
