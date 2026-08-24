@@ -2412,7 +2412,17 @@ exec " gcc-bin "/" program
   (let ((lib (make-libstdc++ gcc)))
     (package
       (inherit lib)
-      (source (bootstrap-origin (package-source lib)))
+      (source (bootstrap-origin
+               (origin
+                 (inherit (package-source lib))
+                 (patches
+                  (append
+                   (origin-patches (package-source lib))
+                   (if (version>=? (package-version gcc) "14.0")
+                       ;; On x86_64-gnu the bootstrap compiler is
+                       ;; missing the extension
+                       (search-patches "gcc-libstdc++-revert-atomic-ctor.patch")
+                       '()))))))
       (name "libstdc++-boot0")
       (arguments
        `(#:guile ,%bootstrap-guile
