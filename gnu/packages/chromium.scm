@@ -406,9 +406,9 @@
   ;; run the Blink performance tests, just remove everything to save ~70MiB.
   '("third_party/blink/perf_tests"))
 
-(define %chromium-version "151.0.7922.137")
+(define %chromium-version "151.0.7922.173")
 (define %ungoogled-revision (string-append %chromium-version "-1"))
-(define %debian-revision (string-append "debian/" %ungoogled-revision))
+(define %debian-revision "debian/151.0.7922.169-1")
 
 (define %ungoogled-origin
   (origin
@@ -418,7 +418,7 @@
     (file-name (git-file-name "ungoogled-chromium" %ungoogled-revision))
     (sha256
      (base32
-      "03kia9fj40hlvvnz1v1gbzbhicfh5zj2f0am7yv3va4mmd3232a0"))))
+      "17m9sngn3ppb18mzj226l03839fg8czjs71kdvbs1lzci7mskdcv"))))
 
 (define %debian-origin
   (origin
@@ -431,7 +431,7 @@
                                 ((_ version) version))))
     (sha256
      (base32
-      "07ja5wk9p3vcak8czjn70cqg0x7pkwkm2yk9z9fz6925mipnl6yg"))))
+      "0lhp1l2x9p5v88l1cqqdki0zldszzkdcfl412makpcm0j92j0fwj"))))
 
 (define (origin-file origin file)
   (computed-file
@@ -629,7 +629,7 @@
                                   %chromium-version "-lite.tar.xz"))
               (sha256
                (base32
-                "0ignafc5yhhiknqi6wcw8s4wj1fs70jdcb4bcbv4b4f9q103989z"))
+                "1w2mlx2z59d31ndn8g7s8hc5lch9nlvcv6sf62kclsj76jrf5xc7"))
               (modules '((guix build utils)))
               (snippet (force ungoogled-chromium-snippet))))
     (build-system gnu-build-system)
