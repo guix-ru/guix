@@ -241,18 +241,27 @@ Faenza-Fresh icon packs.")
     (version "3.22.26")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/themes/" (version-major+minor version)
-                           "/mate-themes-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-themes")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1msyfpmhgijzr2i4jhzmrf9ilhlq994havbmrzqp6fzbck9qjki2"))))
+        (base32 "0df3lyyz219z65kcrzmd3mk63nvbd2lnak9hj80iyfxmzxnml6xc"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config intltool gdk-pixbuf ; gdk-pixbuf+svg isn't needed
-           gtk+-2))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         itstool
+                         libtool
+                         gdk-pixbuf ;gdk-pixbuf+svg isn't needed
+                         gtk+-2
+                         mate-common
+                         which))
     (home-page "https://mate-desktop.org/")
-    (synopsis
-     "Official themes for the MATE desktop")
+    (synopsis "Official themes for the MATE desktop")
     (description
      "This package includes the standard themes for the MATE desktop, for
 example Menta, TraditionalOk, GreenLaguna or BlackMate.  This package has
