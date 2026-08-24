@@ -1,0 +1,68 @@
+The bootstrap gcc in commencement.scm might not have the required extension.
+
+Subject: [PATCH] Revert "libstdc++: Clear padding bits in std::atomic ctor in
+ C++11 [PR114865]"
+
+This reverts commit 25a0e1986333654a1422f50aa115c8f10e3e9f24.
+---
+ libstdc++-v3/include/std/atomic                              | 5 +----
+ .../testsuite/29_atomics/atomic/compare_exchange_padding.cc  | 2 +-
+ .../testsuite/29_atomics/atomic/cons/zero_padding.cc         | 4 ++++
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/libstdc++-v3/include/std/atomic b/libstdc++-v3/include/std/atomic
+index 1ed5da87e15..d546c5e8a45 100644
+--- a/libstdc++-v3/include/std/atomic
++++ b/libstdc++-v3/include/std/atomic
+@@ -235,17 +235,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+       atomic& operator=(const atomic&) = delete;
+       atomic& operator=(const atomic&) volatile = delete;
+ 
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wc++14-extensions" // constexpr ctor body
+       constexpr atomic(_Tp __i) noexcept : _M_i(__i)
+       {
+-#if __has_builtin(__builtin_clear_padding)
++#if __cplusplus >= 201402L && __has_builtin(__builtin_clear_padding)
+ 	if _GLIBCXX17_CONSTEXPR (__atomic_impl::__maybe_has_padding<_Tp>())
+ 	  if (!std::__is_constant_evaluated())
+ 	    __builtin_clear_padding(std::__addressof(_M_i));
+ #endif
+       }
+-#pragma GCC diagnostic pop
+ 
+       operator _Tp() const noexcept
+       { return load(); }
+diff --git a/libstdc++-v3/testsuite/29_atomics/atomic/compare_exchange_padding.cc b/libstdc++-v3/testsuite/29_atomics/atomic/compare_exchange_padding.cc
+index d9c7b90c1a5..a6081968ca8 100644
+--- a/libstdc++-v3/testsuite/29_atomics/atomic/compare_exchange_padding.cc
++++ b/libstdc++-v3/testsuite/29_atomics/atomic/compare_exchange_padding.cc
+@@ -1,4 +1,4 @@
+-// { dg-do run { target c++11 } }
++// { dg-do run { target c++20 } }
+ // { dg-require-atomic-cmpxchg-word "" }
+ // { dg-add-options libatomic }
+ // { dg-additional-options "-fno-tree-sra" }
+diff --git a/libstdc++-v3/testsuite/29_atomics/atomic/cons/zero_padding.cc b/libstdc++-v3/testsuite/29_atomics/atomic/cons/zero_padding.cc
+index 4418b6c07e6..86acd73545d 100644
+--- a/libstdc++-v3/testsuite/29_atomics/atomic/cons/zero_padding.cc
++++ b/libstdc++-v3/testsuite/29_atomics/atomic/cons/zero_padding.cc
+@@ -56,11 +56,15 @@ void test_struct(std::atomic<T>& g, const T& zp)
+ 
+   std::atomic<T> l(T{1, 2});
+   std::memcpy(&t, &zp, sizeof(T));
++#if __cplusplus >= 201402L // Remove once PR114865 is fixed
+   VERIFY( l.compare_exchange_strong(t, d) );
++#endif
+ 
+   std::atomic<T>* h = new std::atomic<T>(T{1, 2});
+   std::memcpy(&t, &zp, sizeof(T));
++#if __cplusplus >= 201402L // Remove once PR114865 is fixed
+   VERIFY( h->compare_exchange_strong(t, d) );
++#endif
+   delete h;
+ 
+   constexpr std::atomic<T> cl(T{1, 2});
+-- 
+2.55.0
+
