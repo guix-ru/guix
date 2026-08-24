@@ -22,6 +22,7 @@
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
   #:use-module (gnu home services)
+  #:use-module (gnu home services utils)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages mail)
   #:use-module (ice-9 match)
@@ -78,6 +79,7 @@
             goimapnotify-configuration-password
             goimapnotify-configuration-password-command
             goimapnotify-configuration-xo-auth2?
+            goimapnotify-configuration-wait
             goimapnotify-configuration-boxes
             home-goimapnotify-configuration
             home-goimapnotify-configuration?
@@ -268,30 +270,22 @@ to SMTP servers.")))
 
 ;;; Goimapnotify.
 
-;; Mapping used by 'camelize-field-name' to handle certain symbols specially.
-(define field-name-mapping
-  (make-parameter '()))
-
 (define (camelize-field-name field-name)
-  (let* ((str (symbol->string (or (assq-ref (field-name-mapping) field-name)
-                                  field-name)))
-         (words (string-split (if (string-suffix? "?" str)
-                                  (string-drop-right str 1)
-                                  str)
-                              #\-)))
-    (match words
-      ((head . tail)
-       (string-concatenate (cons* head
-                                  (map string-capitalize tail)))))))
+  (let ((str (object->camel-case-string field-name)))
+    (if (string-suffix? "?" str)
+        (string-drop-right str 1)
+        str)))
 
 (define (goimapnotify-serialize-field field-name val)
-  (parameterize ((field-name-mapping
-                  '((host-command . hostCmd)
-                    (user-name . username)
-                    (user-name-command . usernameCmd)
-                    (password-command . passwordCmd))))
-    #~(format #f "~a: ~s\n"
-              #$(camelize-field-name field-name)
+  "The mapping is used to serialize certain FIELD-NAMES specially."
+  (let* ((field-name-mapping '((host-command . hostCmd)
+                               (user-name . username)
+                               (user-name-command . usernameCmd)
+                               (password-command . passwordCmd)))
+         (field-name* (or (assq-ref field-name-mapping field-name)
+                          field-name)))
+    #~(format #f "~a: ~s~%"
+              #$(camelize-field-name field-name*)
               #$val)))
 
 (define (goimapnotify-serialize-boolean field-name val)
@@ -335,27 +329,27 @@ to SMTP servers.")))
 
   (on-new-mail
    maybe-string-or-gexp
-   "Command to execute when new mail arrives.")
+   "The command to execute when new mail arrives.")
 
   (on-new-mail-post
    maybe-string-or-gexp
-   "Command to execute after the new-mail command.")
+   "The command to execute after the new-mail command.")
 
   (on-changed-mail
    maybe-string-or-gexp
-   "Command to execute when mail is changed.")
+   "The command to execute when mail is changed.")
 
   (on-changed-mail-post
    maybe-string-or-gexp
-   "Command to execute after the changed-mail command.")
+   "The command to execute after the changed-mail command.")
 
   (on-deleted-mail
    maybe-string-or-gexp
-   "Command to execute when mail is deleted.")
+   "The command to execute when mail is deleted.")
 
   (on-deleted-mail-post
    maybe-string-or-gexp
-   "Command to execute after the deleted-mail command.")
+   "The command to execute after the deleted-mail command.")
 
   (prefix goimapnotify-))
 
@@ -368,7 +362,13 @@ to SMTP servers.")))
       ""))
 
 (define (serialize-goimapnotify-tls-options-configuration field-name val)
-  (serialize-configuration val goimapnotify-tls-options-configuration-fields))
+  (let ((serialization (serialize-configuration val goimapnotify-tls-options-configuration-fields)))
+    #~(begin
+        (use-modules (ice-9 format) (ice-9 string-fun))
+        (format #f "~a:
+  ~a~%"
+                '#$(camelize-field-name field-name)
+                (string-replace-substring #$serialization "\n" "\n  ")))))
 
 (define-maybe goimapnotify-tls-options-configuration)
 
@@ -385,7 +385,7 @@ to SMTP servers.")))
         (use-modules (ice-9 format) (ice-9 string-fun))
         (format #f "~a:
 ~{  - ~a~%~}"
-                '#$field-name
+                '#$(camelize-field-name field-name)
                 (map (lambda (s)
                        (string-replace-substring s "\n" "\n    "))
                      #$serializations)))))
@@ -397,7 +397,7 @@ to SMTP servers.")))
 
   (host-command
    maybe-string-or-gexp
-   "Command to retrieve the IMAP server hostname.")
+   "The command to retrieve the IMAP server hostname.")
 
   (port
    (integer 993)
@@ -422,7 +422,7 @@ to SMTP servers.")))
 
   (user-name-command
    maybe-string-or-gexp
-   "Command to retrieve the user-name.")
+   "The command to retrieve the user-name.")
 
   (alias
    maybe-string
@@ -434,11 +434,15 @@ to SMTP servers.")))
 
   (password-command
    maybe-string-or-gexp
-   "Command to retrieve the password.")
+   "The command to retrieve the password.")
 
   (xo-auth2?
    (boolean #f)
    "Enable or disable XOAUTH2 authentication.")
+
+  (wait
+   maybe-integer
+   "The delay in seconds before the mail syncing is triggered.")
 
   (boxes
    list-of-goimapnotify-boxes-configurations
@@ -469,7 +473,7 @@ to SMTP servers.")))
         (use-modules (ice-9 format) (ice-9 string-fun))
         (format #f "~a:
 ~{  - ~a~%~}"
-                '#$field-name
+                '#$(camelize-field-name field-name)
                 (map (lambda (s)
                        (string-replace-substring s "\n" "\n    "))
                      #$serializations)))))
