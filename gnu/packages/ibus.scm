@@ -264,13 +264,16 @@ may also simplify input method development.")
                         (,(getenv "GI_TYPELIB_PATH")
                          ,(string-append #$output "/lib/girepository-1.0")))))
                   (list (search-input-file outputs "bin/ibus-setup")
-                        (search-input-file outputs "bin/ibus-daemon")))))))))
+                        (search-input-file outputs "bin/ibus-daemon")))))
+            (delete 'check)
+            (add-after 'install 'check
+              (assoc-ref %standard-phases 'check))))))
     (inputs (modify-inputs inputs
               (prepend gtk
                        pango
                        python
-                       python-dbus-1.2
-                       python-pygobject-3.50)))
+                       python-dbus
+                       python-pygobject)))
     (native-search-paths
      (cons (search-path-specification
             (variable "GUIX_GTK3_IM_MODULE_FILE")
