@@ -8663,8 +8663,8 @@ restore the saved place.")
     (license license:gpl3+)))
 
 (define-public emacs-org-pdftools
-  (let ((revision "0")
-        (commit "5613b7ae561e0af199f25aacc0a9c34c16638408"))
+  (let ((revision "1")
+        (commit "2b3357828a4c2dfba8f87c906d64035d8bf221f2"))
     (package
       (name "emacs-org-pdftools")
       (version (git-version "1.1" revision commit))
@@ -8676,19 +8676,14 @@ restore the saved place.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "0p86943abk55bc2402w5lb7115l3b61wv0w07m84wxi4hbfqk8k6"))))
+                  "1skyb7ph9i309bx13nwbc065k8r260qhqd67nh4anqd4nyb2xklp"))))
       (build-system emacs-build-system)
       (arguments
        (list #:tests? #f ; there are no tests
              #:phases
              #~(modify-phases %standard-phases
                  (add-after 'unpack 'setenv
-                   (lambda _
-                     (substitute* "org-pdftools.el"
-                       ;; Fix a small typo.
-                       (("let [(]pdf-isearch-narrow-to-page t[)]")
-                        "let ((pdf-isearch-narrow-to-page t))"))
-                     (setenv "HOME" "/tmp"))))))
+                   (lambda _ (setenv "HOME" "/tmp"))))))
       (propagated-inputs (list emacs-org-noter emacs-pdf-tools))
       (synopsis "Support for links to documents in pdfview mode")
       (description "This package adds support for org links from pdftools buffers
