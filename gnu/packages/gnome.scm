@@ -4630,7 +4630,7 @@ configuration storage systems.")
 (define-public json-glib-minimal
   (package
     (name "json-glib-minimal")
-    (version "1.10.0")
+    (version "1.10.8")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/json-glib/"
@@ -4638,7 +4638,7 @@ configuration storage systems.")
                                   "/json-glib-" version ".tar.xz"))
               (sha256
                (base32
-                "0yxg215gpa61sxnx05bgzbqq9dsvbawk6cfz8z0yq1k1v5k8vjhv"))))
+                "1p8jn9rsn4gq0rpwb8n26drmm9477ik9hxmyiy7mn934lm0w3iam"))))
     (build-system meson-build-system)
     (arguments
      (list #:glib-or-gtk? #t            ;to wrap binaries, compile schemas
