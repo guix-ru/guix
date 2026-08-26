@@ -8325,7 +8325,7 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
 (define-public evolution-data-server
   (package
     (name "evolution-data-server")
-    (version "3.60.0")
+    (version "3.62.0")
     (source
      (origin
        (method url-fetch)
@@ -8333,10 +8333,11 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
                            (version-major+minor version) "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "063cvwx83irc86f9kis572x4cpbsp3zzcwyknf8lvci81qz3hkp0"))))
+        (base32 "1ficjvr4ybfvdrbzqir65382sqjbx2nkwdifzzkszx8ilplqigkq"))))
     (build-system cmake-build-system)
     (arguments
      (list
+      #:disallowed-references (list gtk+ webkitgtk-for-gtk3)
       #:parallel-tests? #f
       #:configure-flags
       #~(let* ((lib (string-append #$output "/lib"))
@@ -8346,6 +8347,8 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
                                 "camel-providers" "credential-modules"
                                 "registry-modules"))))
           (list "-DENABLE_GOOGLE=OFF"   ;disable Google Contacts support
+                "-DENABLE_GTK=OFF"
+                "-DENABLE_GTK4=ON"
                 "-DENABLE_VALA_BINDINGS=ON"
                 (string-append "-DCMAKE_INSTALL_RPATH=" lib ";"
                                (string-append lib "/evolution-data-server;")
@@ -8385,7 +8388,10 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
               (substitute* "CMakeLists.txt"
                 ;; CMakeLists.txt hard-codes runpath to just the libdir.
                 ;; Remove it so the configure flag is respected.
-                (("SET\\(CMAKE_INSTALL_RPATH .*") "")))))))
+                (("SET\\(CMAKE_INSTALL_RPATH .*") ""))))
+          (add-before 'check 'prepare-for-tests
+            (lambda _
+              (setenv "HOME" (getcwd)))))))
     (native-inputs
      (list `(,glib "bin")               ; for glib-mkenums, etc.
            gobject-introspection
@@ -8400,7 +8406,6 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
      ;; These are all in the Requires field of .pc files.
      (list glib
            gtk
-           gtk+
            json-glib
            libical
            libsecret
@@ -8410,7 +8415,6 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
     (inputs
      (list bdb
            boost
-           gcr-3
            gnome-online-accounts
            json-glib
            libcanberra
@@ -8418,15 +8422,29 @@ Microsoft Exchange, Last.fm, IMAP/SMTP, Jabber, SIP and Kerberos.")
            libphonenumber
            mit-krb5
            openldap
-           webkitgtk
-           webkitgtk-for-gtk3))
+           webkitgtk))
     (synopsis "Store address books and calendars")
-    (home-page "https://wiki.gnome.org/Apps/Evolution")
+    (home-page "https://gitlab.gnome.org/GNOME/evolution-data-server/")
     (description
      "This package provides a unified backend for programs that work with
 contacts, tasks, and calendar information.  It was originally developed for
 Evolution (hence the name), but is now used by other packages as well.")
     (license license:lgpl2.0)))
+
+(define-public evolution-data-server-gtk3
+  (package/inherit evolution-data-server
+    (name "evolution-data-server-gtk3")
+    (arguments (substitute-keyword-arguments arguments
+                 ((#:disallowed-references _ #f)
+                  (list gtk webkitgtk))
+                 ((#:configure-flags flags ''())
+                  #~(cons* "-DENABLE_GTK=ON"
+                           "-DENABLE_GTK4=OFF"
+                           (delete "-DENABLE_GTK4=ON"
+                                   (delete "-DENABLE_GTK=OFF" #$flags))))))
+    (inputs (modify-inputs inputs
+              (replace "webkitgtk" webkitgtk-for-gtk3)
+              (replace "gtk" gtk+)))))
 
 (define-public network-manager
   (package
@@ -12135,8 +12153,8 @@ generic enough to work for everyone.")
     (inputs
      (list cmark
            enchant
-           evolution-data-server        ;must be the same version
            gcr-3
+           evolution-data-server-gtk3   ;must be the same version
            gsettings-desktop-schemas
            gnome-autoar
            gnome-desktop
