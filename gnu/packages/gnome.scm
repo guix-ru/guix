@@ -9678,7 +9678,7 @@ easy, safe, and automatic.")
 (define-public tinysparql
   (package
     (name "tinysparql")
-    (version "3.10.1")
+    (version "3.11.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/tinysparql/"
@@ -9686,7 +9686,7 @@ easy, safe, and automatic.")
                                   "tinysparql-" version ".tar.xz"))
               (sha256
                (base32
-                "0r824dz8szfwd2z95nk8ffkvwq0ayva0wa6n1railrxnkmw3wzss"))))
+                "07nadqyyx5w88g3z953aa5zpqy3sxjhplkvibr1ss50mxqhn1m6g"))))
     (build-system meson-build-system)
     (arguments
      (list
