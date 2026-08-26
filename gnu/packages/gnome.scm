@@ -1369,7 +1369,7 @@ given profile, etc.  DLNA is a subset of UPnP A/V.")
 (define-public gupnp-av
   (package
    (name "gupnp-av")
-   (version "0.14.4")
+   (version "0.14.5")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnome/sources/" name "/"
@@ -1377,18 +1377,18 @@ given profile, etc.  DLNA is a subset of UPnP A/V.")
                                 name "-" version ".tar.xz"))
             (sha256
              (base32
-              "1izq71qphyac02ynypwk0skxqzhfr0zrl7dap3sxrdaw4yrp9n91"))))
+              "00hwvvc7fmcz4hpvhfa90s4dz4ydfwxzrnfjnfjzsagmbb7qz4ck"))))
    (build-system meson-build-system)
    (native-inputs
     (list gettext-minimal
+          gi-docgen
           `(,glib "bin")
           gobject-introspection
           gtk-doc/stable
-          libxml2
           pkg-config
           vala))
-   (inputs
-    (list gtk+ gupnp))
+   (inputs (list gtk gupnp))
+   (propagated-inputs (list glib libxml2)) ;in Requires of gupnp-av-1.0.pc
    (synopsis "GUPnP A/V for GNOME")
    (description "This package provides a small library for handling
 and implementation of UPnP A/V profiles.")
