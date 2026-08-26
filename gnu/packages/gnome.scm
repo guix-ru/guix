@@ -6227,7 +6227,7 @@ such as OpenStreetMap, OpenCycleMap, OpenAerialMap, and Maps for free.")
 (define-public gom
   (package
     (name "gom")
-    (version "0.5.5")
+    (version "0.5.6")
     (source
      (origin
        (method url-fetch)
@@ -6236,7 +6236,7 @@ such as OpenStreetMap, OpenCycleMap, OpenAerialMap, and Maps for free.")
                            "gom-" version ".tar.xz"))
        (sha256
         (base32
-         "0d5m15gz97nyvssy1ljpi6qs7fwzk0baikqzfyqplyiiy9dg0qdd"))))
+         "1hscnn8i8c1n25y666yf64wi6xib7ag6xqq30vjfgj4qhqk5wyjd"))))
     (build-system meson-build-system)
     (arguments
      (list
