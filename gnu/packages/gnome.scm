@@ -13882,7 +13882,7 @@ receive calls.")
 (define-public calls
   (package
     (name "calls")
-    (version "49.1.1")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -13890,7 +13890,7 @@ receive calls.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1ph5m8rzksn1jmirxnp7xx9937hihsfg6vwavrsm30688kq9z2xf"))
+                "0by78lhg2s6qn78r1vg50pcp1fv935aimldmp3kpjl5wdy7cr37j"))
               (patches
                (search-patches "calls-disable-sip-test.patch"))))
     (build-system meson-build-system)
@@ -13914,12 +13914,24 @@ receive calls.")
               ;; Tests require a running X server.
               (system "Xvfb :1 &")
               (setenv "DISPLAY" ":1"))))))
+    (native-inputs
+     (list desktop-file-utils           ;update-desktop-database
+           gettext-minimal
+           `(,glib "bin")               ;glib-mkenums
+           gtk-doc                      ;gtkdoc-scan
+           `(,gtk "bin")               ;gtk-update-icon-cache
+           pkg-config
+           python-docutils              ;rst2man
+           vala
+           xorg-server-for-tests))
     (inputs
      (list evolution-data-server
            feedbackd
            folks
            glib
+           gmobile
            gom
+           gsound
            gstreamer
            gst-plugins-base
            gst-plugins-good
@@ -13929,18 +13941,9 @@ receive calls.")
            libgee
            libpeas-2
            libadwaita
+           mobile-broadband-provider-info
            modem-manager
            sofia-sip))
-    (native-inputs
-     (list desktop-file-utils           ;update-desktop-database
-           gettext-minimal
-           `(,glib "bin")               ;glib-mkenums
-           gtk-doc                      ;gtkdoc-scan
-           `(,gtk+ "bin")               ;gtk-update-icon-cache
-           pkg-config
-           python-docutils              ;rst2man
-           vala
-           xorg-server-for-tests))
     (home-page "https://gitlab.gnome.org/GNOME/calls")
     (synopsis "Phone dialer and call handler")
     (description "Calls can make and answer phone calls using different
