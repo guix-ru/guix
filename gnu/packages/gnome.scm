@@ -10246,7 +10246,7 @@ associations for GNOME.")
 (define-public gnome-tour
   (package
     (name "gnome-tour")
-    (version "49.0")
+    (version "50.0")
     (source
      (origin
        (method git-fetch)
@@ -10255,7 +10255,7 @@ associations for GNOME.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0fzvgffwargmycxby6j2q0fka74hcb4ff8yvbh8w8a0vpvpnc9b1"))
+        (base32 "11xm0jpmrxmmr3g0kqicj0zh6lv7kjiiw2rc249my92m37hr893i"))
        (modules '((guix build utils)))
        (snippet #~(begin
                     (substitute* "src/widgets/window.rs"
