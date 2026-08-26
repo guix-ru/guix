@@ -9260,7 +9260,7 @@ Libadwaita.")
 (define-public gnome-control-center
   (package
     (name "gnome-control-center")
-    (version "49.4")
+    (version "50.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -9268,7 +9268,7 @@ Libadwaita.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "00jb40sa4hd6hp96ia49nqakzjzqcz3a2rpp60x8y86xzpjpa68k"))))
+                "04gv0j1fxbkvfd1ikkwbkxlc2pib3vbc7fkk9zklbpxyk4wwfmjq"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -9337,7 +9337,6 @@ Libadwaita.")
            gnome-session-shepherd
            gnome-settings-daemon
            gnutls
-           grilo
            gsound
            ibus
            json-glib
