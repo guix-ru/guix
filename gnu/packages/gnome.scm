@@ -1257,7 +1257,7 @@ in the GNOME desktop.")
 (define-public gssdp
   (package
     (name "gssdp")
-    (version "1.6.4")
+    (version "1.6.6")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -1265,7 +1265,7 @@ in the GNOME desktop.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0ck04svd0cfh7wzydh1wykpw5rsra8aa5xml2dl3w7angzxzv5zz"))))
+                "1jvbg2xjlssmbhpngvrls5qd82jgkzziji66xbmfzq2c4msj4zbn"))))
     (build-system meson-build-system)
     (arguments
      (list #:configure-flags
