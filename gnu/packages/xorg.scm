@@ -6208,8 +6208,8 @@ output.")
     (build-system gnu-build-system)
     (arguments
      (list #:make-flags
-           #~(list (string-append "SHELL=" (assoc-ref %build-inputs "bash")
-                                  "/bin/bash")
+           #~(list (string-append "SHELL=" (search-input-file
+                                            %build-inputs "/bin/bash"))
                    (string-append "prefix=" #$output))
            #:tests? #f                  ; no tests
            #:phases
