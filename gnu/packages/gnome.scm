@@ -7235,7 +7235,7 @@ USB transfers with your high-level application or system daemon.")
 (define-public simple-scan
   (package
     (name "simple-scan")
-    (version "49.1")
+    (version "50.0")
     (source
      (origin
        (method url-fetch)
@@ -7243,7 +7243,7 @@ USB transfers with your high-level application or system daemon.")
                            (version-major version) "/"
                            "simple-scan-" version ".tar.xz"))
        (sha256
-        (base32 "0d733cjq0dy07fx3yxh2rzr3ij3rslvb96czxd2miyfa3qax9s4s"))))
+        (base32 "02aamad2qaky7j65745cwdb3fwhiwcr6cill3b9q4w92mrhvacnc"))))
     (build-system meson-build-system)
     (arguments
      (list #:glib-or-gtk? #t
