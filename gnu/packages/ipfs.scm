@@ -2367,7 +2367,6 @@ types.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.26
       #:modules '((guix build go-build-system)
                   (guix build utils)
                   (ice-9 match))
