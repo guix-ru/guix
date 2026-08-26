@@ -108,6 +108,7 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages aidc)
   #:use-module (gnu packages aspell)
+  #:use-module (gnu packages audio)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages backup)
   #:use-module (gnu packages base)
@@ -239,6 +240,7 @@
   #:use-module (gnu packages video)
   #:use-module (gnu packages virtualization)
   #:use-module (gnu packages vpn)
+  #:use-module (gnu packages vulkan)
   #:use-module (gnu packages web)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages window-management)
@@ -13719,7 +13721,7 @@ historical battery usage and related statistics.")
 (define-public gnome-remote-desktop
   (package
     (name "gnome-remote-desktop")
-    (version "49.2")
+    (version "50.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -13727,13 +13729,11 @@ historical battery usage and related statistics.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1b8nv7iacp0xjb74hidbrypli70xzv6i4mpzh0an5qblfhg4xm3k"))))
+                "07q9vwbql7y6igjj3vavv0y67v9sfq0w13gwdw9kymqk867n5pri"))))
     (build-system meson-build-system)
     (arguments
      (list #:configure-flags
            #~'("-Dsystemd=false"
-               ;; RDP support requires CUDA (ffnvcodec)
-               "-Drdp=false"
                ;; Enable VNC support
                "-Dvnc=true")
            #:glib-or-gtk? #t
@@ -13765,21 +13765,30 @@ historical battery usage and related statistics.")
                      (system "pipewire &")))))))
     (inputs
      (list cairo
+           freerdp
+           fuse
            glib
+           glslang
            libdrm
            libei
            libepoxy
+           libfdk
            libgudev
            libnotify
            libsecret
+           libva
            ;; Cyclic modular dependency
            (module-ref
             (resolve-interface
              '(gnu packages vnc))
             'libvnc)
+           mit-krb5
+           opus
            pipewire
-           wireplumber
-           tpm2-tss))
+           polkit
+           tpm2-tss
+           vulkan-loader
+           wireplumber))
     (native-inputs
      (list asciidoc
            dbus
@@ -13791,10 +13800,13 @@ historical battery usage and related statistics.")
            libxml2
            libxslt
            mutter
+           nv-codec-headers
            pkg-config
            python
            python-dbus-1.2
            python-pygobject
+           shaderc
+           spirv-tools
            xdg-desktop-portal-gnome))
     (home-page "https://gitlab.gnome.org/GNOME/gnome-remote-desktop")
     (synopsis "Share GNOME desktop with remote sessions")
