@@ -5904,7 +5904,7 @@ settings, themes, mouse settings, and startup of other daemons.")
 (define-public totem-pl-parser
  (package
    (name "totem-pl-parser")
-   (version "3.26.6")
+   (version "3.26.7")
    (source (origin
             (method url-fetch)
             (uri (string-append "mirror://gnome/sources/totem-pl-parser/"
@@ -5912,7 +5912,7 @@ settings, themes, mouse settings, and startup of other daemons.")
                                 "totem-pl-parser-" version ".tar.xz"))
             (sha256
              (base32
-              "075csd5x0frgf93jvhlqiwv5i0qm24zz3iw17jj7v7fgsml0zpy0"))))
+              "1wxmi5k1cdzvh1a6pqmadrlk0ry79wk52i7n6zilmrdbmk0igmb0"))))
    (build-system meson-build-system)
    (arguments
     ;; FIXME: Tests require gvfs.
