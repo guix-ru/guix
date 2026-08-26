@@ -6812,7 +6812,7 @@ supports image conversion, rotation, and slideshows.")
 (define-public libglycin
   (package
     (name "libglycin")
-    (version "2.1.1")
+    (version "2.1.5")
     (source
      (origin
        (method git-fetch)
@@ -6822,7 +6822,7 @@ supports image conversion, rotation, and slideshows.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1mrv733xhbxydww4szskv7jc0hif908aavh8h4kjcxp0zgy13blf"))
+         "18vj184bwyn58fcz6zs1n7i2ms1wr7jf2l47v8lr3kvzla5qqmbq"))
        (patches (search-patches "glycin-sandbox-Adapt-bwrap-invocation.patch"))))
     (outputs '("out" "debug"))
     (build-system meson-build-system)
