@@ -612,8 +612,8 @@ exec ${system}/rc \"$@\"
                       ;; aren't interdependent targets in the Makefile.
                       "-j1" "-C" "libdde_linux26"
                       (string-append "SHELL="
-                                     (assoc-ref (or native-inputs inputs) "bash")
-                                     "/bin/bash")
+                                     (search-input-file (or native-inputs inputs)
+                                                        "/bin/bash"))
                       (string-append "CC="
                                      ,(cc-for-target))
                       (string-append
@@ -652,7 +652,8 @@ exec ${system}/rc \"$@\"
                                      "/bin/make")
                       "-C" "libdde_linux26" "install"
                       (string-append "SHELL="
-                                     (assoc-ref (or native-inputs inputs) "bash")
+                                     (search-input-file (or native-inputs inputs)
+                                                        "/bin/bash")
                                      "/bin/bash")
                       (string-append "INSTALLDIR=" dir)
                       (string-append "ARCH=" arch))
