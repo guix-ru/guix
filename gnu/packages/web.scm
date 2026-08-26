@@ -528,7 +528,6 @@ one.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.26
       #:install-source? #f
       #:import-path "miniflux.app/v2"
       #:build-flags
