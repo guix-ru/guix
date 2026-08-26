@@ -1112,7 +1112,7 @@ application suites.")
 (define-public gtk
   (package
     (name "gtk")
-    (version "4.22.1")
+    (version "4.22.4")
     (source
      (origin
        (method url-fetch)
@@ -1120,7 +1120,7 @@ application suites.")
                            (version-major+minor version)  "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "1z2mkmazc2d51jbg3qwwdycycqiwswm88nhw6bxscz8j86f5lyyd"))
+        (base32 "14q86c8gks2m4h4pwgkbas1f5r5j3z168wvcamd6cfnjqxh9zgai"))
        (patches
         (search-patches "gtk4-demo-reproducible.patch"
                         "gtk4-needs-udmabuf.patch"
