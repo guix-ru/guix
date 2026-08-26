@@ -1255,7 +1255,6 @@ terminal with other users over the Internet.  tmate is a fork of tmux.")
     (outputs '("out" "terminfo" "shell-integration" "kitten"))
     (arguments
      (list
-      #:go go-1.26
       #:import-path "github.com/kovidgoyal/kitty/tools/cmd"
       #:unpack-path "github.com/kovidgoyal/kitty"
       #:embed-files #~(list ".*\\.xml" ".*\\.json" ".*\\.txt" ".*\\.css" ".*\\.html" ".*\\.icc")

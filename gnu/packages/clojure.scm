@@ -1275,7 +1275,6 @@ the same way for every operation on every service.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.26
       #:install-source? #f
       #:import-path "github.com/nooga/let-go"))
     (native-inputs
