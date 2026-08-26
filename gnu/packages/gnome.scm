@@ -5810,7 +5810,7 @@ services for numerous locations.")
 (define-public gnome-settings-daemon
   (package
     (name "gnome-settings-daemon")
-    (version "49.1")
+    (version "50.1")
     (source
      (origin
        (method url-fetch)
@@ -5819,7 +5819,7 @@ services for numerous locations.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "1hf1dip78sjfsi28w80wkh6i51glprwl2j29gc9bkhwi9zy5g69a"))
+         "0p70rxwls5jbimak8940n3g7v9a05668mp990b5cw3jgj4q9fb6x"))
        (patches (search-patches "gnome-settings-daemon-gc.patch"
                                 "gnome-settings-daemon-restore-desktop-files.patch"))))
     (build-system meson-build-system)
