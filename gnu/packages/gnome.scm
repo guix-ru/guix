@@ -9271,7 +9271,7 @@ properties, screen resolution, and other GNOME parameters.")
 (define-public gnome-shell
   (package
     (name "gnome-shell")
-    (version "49.4")
+    (version "50.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -9279,7 +9279,7 @@ properties, screen resolution, and other GNOME parameters.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "022vb4y0ri7ws6l1ghx63vxi9xhi6r0hfrsg257i230ly2i0qvwx"))
+                "1kv2wgbfbnplz6qbr12g4p9k04xx18vp0dpjmr0nlcfv76ar6cf5"))
               (patches
                (search-patches "gnome-shell-restore-desktop-file.patch"))))
     (outputs '("out" "debug"))
@@ -9287,7 +9287,6 @@ properties, screen resolution, and other GNOME parameters.")
     (arguments
      (let ((disallowed-references
             (list (gexp-input (this-package-native-input "glib") "bin")
-                  (this-package-native-input "libxslt")
                   meson)))
        (list
         #:glib-or-gtk? #t
@@ -9385,7 +9384,6 @@ properties, screen resolution, and other GNOME parameters.")
             (replace 'check
               (lambda* (#:key tests? inputs #:allow-other-keys #:rest args)
                 (when tests?
-                  ;; For the missing /var/lib/dbus/machine-id
                   ;; See explanation of the symlinks workaround in the gjs
                   ;; package definition.
                   (let* ((test-libraries (find-files (getcwd)
@@ -9403,19 +9401,6 @@ properties, screen resolution, and other GNOME parameters.")
                               test-library-links)
                     (apply (assoc-ref %standard-phases 'check) args)
                     (for-each delete-file (map cdr test-library-links))))))
-            (add-after 'install 'rewire
-              (lambda* (#:key inputs #:allow-other-keys)
-                (for-each
-                 (lambda (tool)
-                   (call-with-output-file (string-append #$output
-                                                         "/bin/" tool)
-                     (lambda (port)
-                       (format port "#!~a
-printf '~a is deprecated.  Use the \"gnome-extensions\" CLI or \
-\"gnome-extensions-app\" instead.\\n'"
-                               (search-input-file inputs "bin/bash")
-                               tool))))
-                 '("gnome-shell-extension-tool" "gnome-shell-extension-prefs"))))
             (add-after 'install 'install-xdg-autostart-service
               (lambda _
                 (install-file (string-append #$output "/share/applications/org.gnome.Shell.desktop")
@@ -9440,25 +9425,22 @@ printf '~a is deprecated.  Use the \"gnome-extensions\" CLI or \
                         #:outputs outputs))))))))
     (native-inputs
      (list adwaita-icon-theme           ;for cursor theme
-           asciidoc
            coreutils-minimal            ;for env
            gettext-minimal
            `(,glib "bin")               ;for glib-compile-schemas, etc.
            desktop-file-utils           ;for update-desktop-database
            gobject-introspection
-           libxslt
            perl
            pkg-config
            python
            python-dbus
            python-dbusmock
-           python-docutils
+           python-docutils              ;for rst2man
            sassc
            umockdev))
     (inputs
      (list accountsservice
            bash-minimal
-           docbook-xsl
            evolution-data-server
            gcr
            gdm
@@ -9474,25 +9456,21 @@ printf '~a is deprecated.  Use the \"gnome-extensions\" CLI or \
            gst-plugins-base
            gst-plugins-good
            ibus
-           libcanberra
-           libcroco
            libgweather
            libnma
            librsvg
            libsoup
            mesa-headers
            mutter
-           network-manager-applet
+           network-manager
            pipewire
            polkit
            pulseaudio
            python-pygobject
-           startup-notification
            tecla                        ;for keyboard previews
-           telepathy-logger
            upower))
     (synopsis "Desktop shell for GNOME")
-    (home-page "https://wiki.gnome.org/Projects/GnomeShell")
+    (home-page "https://gitlab.gnome.org/GNOME/gnome-shell")
     (description
      "GNOME Shell provides core user interface functions for the GNOME desktop,
 like switching to windows and launching applications.")
