@@ -14031,7 +14031,7 @@ you to mark favorite talks and highlights conflicts between favorited talks.")
 (define-public gnome-connections
   (package
     (name "gnome-connections")
-    (version "49.0")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -14039,7 +14039,7 @@ you to mark favorite talks and highlights conflicts between favorited talks.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "17kk9jra5c6gk75r004ddxzwj9m3dvn23bjz4d3lg4alp9k987rs"))
+                "1l4m9ms73ihl2hp4bzwxbrmcz3zvz56whdsgqy2aw0ykqqszcysn"))
               (snippet
                #~(begin
                    (use-modules (guix build utils))
