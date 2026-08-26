@@ -2251,7 +2251,7 @@ tests, as used by gjs for example.")
 (define-public gnome-font-viewer
   (package
     (name "gnome-font-viewer")
-    (version "49.0")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/gnome-font-viewer/"
@@ -2259,21 +2259,12 @@ tests, as used by gjs for example.")
                                   "/gnome-font-viewer-" version ".tar.xz"))
               (sha256
                (base32
-                "0114ar42akyl40g8gn8f8pbr7hf025bz39nisxainxw5q8jqj0bw"))))
+                "103bvjwg3cciz2489sb129ayxipf9l0wfyrs597cal5iqn4b0r4m"))))
     (build-system meson-build-system)
     (arguments
      (list
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'patch-post-install-script
-            (lambda _
-              (substitute* "meson-postinstall.sh"
-                (("update-desktop-database") (which "true")))))
-          (add-before 'configure 'relax-gcc-14-strictness
-            (lambda _
-              (setenv "CFLAGS"
-                      (string-append "-g -O2"
-                                     " -Wno-error=incompatible-pointer-types"))))
           (add-after 'install 'patch-thumbnailer
             (lambda* (#:key outputs #:allow-other-keys)
               (substitute*
@@ -2282,7 +2273,8 @@ tests, as used by gjs for example.")
                 (("gnome-thumbnail-font")
                  (search-input-file outputs "bin/gnome-thumbnail-font"))))))))
     (native-inputs
-     (list gettext-minimal
+     (list desktop-file-utils
+           gettext-minimal
            `(,glib "bin")
            pkg-config))
     (inputs
