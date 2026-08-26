@@ -1932,7 +1932,7 @@ to other formats.")
 (define-public gnome-characters
   (package
     (name "gnome-characters")
-    (version "49.1")
+    (version "50.0")
     (source
      (origin
        (method url-fetch)
@@ -1941,7 +1941,7 @@ to other formats.")
                            "/gnome-characters-" version ".tar.xz"))
        (sha256
         (base32
-         "0p0l1bsgdqj0n47j2xya0pmf3n67vcq5iywi6dwdq0p66kj0yp3r"))))
+         "1basxmvg8s2argfzxjfz3hqgrck1aid0bfv7wi5hkcrrsr6p6w20"))))
     (build-system meson-build-system)
     (arguments
      (list
