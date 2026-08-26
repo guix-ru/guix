@@ -2221,7 +2221,7 @@ information.")
 (define-public gtk-doc
   (package
     (name "gtk-doc")
-    (version "1.35.1")
+    (version "1.36.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -2229,10 +2229,7 @@ information.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1qi5bgqca1chdcfw7v4h3sw8jg661nmp77d7x658mn6nxlj9y731"))
-              (patches
-               (search-patches "gtk-doc-respect-xml-catalog.patch"
-                               "gtk-doc-mkhtml-test-fix.patch"))))
+                "1ifvrap24p96ksqbvwlq4f9b7a4avrmm2xz13cc33606jxgpll8f"))))
     (build-system meson-build-system)
     (arguments
      (list
