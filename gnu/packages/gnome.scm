@@ -7069,8 +7069,7 @@ MS Graph APIs.")
 (define-public gvfs
   (package
     (name "gvfs")
-    (version "1.58.1")
-    (replacement gvfs/fixed)
+    (version "1.60.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/gvfs/"
@@ -7078,7 +7077,7 @@ MS Graph APIs.")
                                   "gvfs-" version ".tar.xz"))
               (sha256
                (base32
-                "0fywnla2xwyi44jfipyixcczxh5h34c4lzfzf9lsgzxip9mpslzw"))))
+                "16myq43zdrm9wmij3fn2lfml8nwd867wrq1g61csb2542m379mx8"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -7106,15 +7105,15 @@ MS Graph APIs.")
                  (string-append "\"" (search-input-file inputs "bin/mount")
                                 " \\\"%s"))))))))
     (native-inputs
-     (list `(,glib "bin")               ;for glib-genmarshal, etc.
+     (list docbook-xml-4.2
+           docbook-xsl
+           `(,glib "bin")               ;for glib-genmarshal, etc.
            gettext-minimal
            gtk-doc/stable
            pkg-config
            libxslt))
     (inputs
      (list avahi
-           docbook-xml-4.2
-           docbook-xsl
            dbus
            elogind
            fuse
@@ -7122,12 +7121,11 @@ MS Graph APIs.")
            glib
            gnome-online-accounts
            gsettings-desktop-schemas
+           json-glib
            libarchive
            libbluray
            libcap
            libcdio-paranoia
-           libgcrypt
-           libgdata
            libgphoto2
            libgudev
            libimobiledevice
@@ -7143,7 +7141,7 @@ MS Graph APIs.")
            polkit
            udisks
            util-linux))
-    (home-page "https://wiki.gnome.org/Projects/gvfs")
+    (home-page "https://gitlab.gnome.org/GNOME/gvfs.git")
     (synopsis "Userspace virtual file system for GIO")
     (description
      "GVFS is a userspace virtual file system designed to work with the I/O
@@ -7154,19 +7152,6 @@ GVFS mounts to non-GIO applications using FUSE.
 GVFS comes with a set of backends, including trash support, SFTP, SMB, HTTP,
 DAV, and others.")
     (license license:lgpl2.0+)))
-
-(define gvfs/fixed
-  (package
-    (inherit gvfs)
-    (version "1.58.5")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://gnome/sources/gvfs/"
-                                  (version-major+minor version) "/"
-                                  "gvfs-" version ".tar.xz"))
-              (sha256
-               (base32
-                "1r1cj5mmdh9apgv1z6qiqznlslpp5bbpx378vkkqvm1ykkrms5xy"))))))
 
 (define-public gusb-minimal
   (package
