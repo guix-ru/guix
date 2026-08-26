@@ -11337,7 +11337,7 @@ kill/reinice processes.")
 (define-public python-pyatspi
   (package
     (name "python-pyatspi")
-    (version "2.58.1")
+    (version "2.58.2")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -11346,7 +11346,7 @@ kill/reinice processes.")
                     "/pyatspi-" version ".tar.xz"))
               (sha256
                (base32
-                "0dj5n3k02jsg3w96afwrbhj45swdhlqpap02651mh9pr6nchf7rz"))))
+                "1qll3x7rh3qffzvs731iprh400z71nlx49ydkysxzj7yc1dhwn94"))))
     (build-system meson-build-system)
     (native-inputs (list pkg-config))
     (inputs (list python))
