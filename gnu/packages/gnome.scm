@@ -8051,7 +8051,7 @@ to display dialog boxes from the commandline and shell scripts.")
 (define-public mutter
   (package
     (name "mutter")
-    (version "49.4")
+    (version "50.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -8059,12 +8059,7 @@ to display dialog boxes from the commandline and shell scripts.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0mbq7pijx29bp0b8nfy6057z6anc5ff973dqbki0nlv10p2nwrn1"))
-              (patches (search-patches "mutter-disable-flaky-tests.patch"))))
-    ;; NOTE: Since version 3.21.x, mutter now bundles and exports forked
-    ;; versions of cogl and clutter.  As a result, many of the inputs,
-    ;; propagated-inputs, and configure flags used in cogl and clutter are
-    ;; needed here as well.
+                "120965qn74j7gvy22d8ca6y5y58qbl2frx53prn4pjxbfp436g97"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -8084,7 +8079,6 @@ to display dialog boxes from the commandline and shell scripts.")
          (string-append "-Dgles2_libname="
                         (search-input-file %build-inputs "lib/libGLESv2.so"))
          "-Degl_device=true"            ;false by default
-         "-Dx11=true"                   ;false by default
          "-Dwayland_eglstream=true"     ;false by default
          (string-append "-Dudev_dir=" #$output "/lib/udev"))
       #:test-options #~(list "--verbose")
@@ -8106,10 +8100,6 @@ to display dialog boxes from the commandline and shell scripts.")
               (substitute* "src/wayland/meta-wayland-egl-stream.c"
                 (("libnvidia-egl-wayland.so.1")
                  (search-input-file inputs "lib/libnvidia-egl-wayland.so.1")))))
-          (add-before 'configure 'set-udev-dir
-            (lambda _
-              (setenv "PKG_CONFIG_UDEV_UDEVDIR"
-                      (string-append #$output "/lib/udev"))))
           (add-after 'unpack 'disable-problematic-tests
             (lambda _
               (with-directory-excursion "src/tests"
@@ -8189,8 +8179,7 @@ to display dialog boxes from the commandline and shell scripts.")
            umockdev
            wayland-protocols
            wireplumber-minimal
-           xvfb-run
-           zenity))
+           xvfb-run))
     (inputs
      (list colord
            egl-wayland                  ;for wayland-eglstream-protocols
