@@ -8271,7 +8271,7 @@ window manager.")
 (define-public gnome-online-accounts
   (package
     (name "gnome-online-accounts")
-    (version "3.56.4")
+    (version "3.58.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -8279,7 +8279,7 @@ window manager.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1cv1l757g4iac39l0ccwvqhibyjdjhy9q8p86fp8mqs5mfnix0ra"))))
+                "1g4vxljx6pkx5nvrp6fjd2zy6vz01g0jij07gh3c428lql691hcy"))))
     (build-system meson-build-system)
     (arguments
      (list
