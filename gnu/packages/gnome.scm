@@ -2936,7 +2936,7 @@ Freedesktop Icon Naming Specification.")
 (define-public adwaita-icon-theme
   (package
     (name "adwaita-icon-theme")
-    (version "49.0")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -2944,7 +2944,7 @@ Freedesktop Icon Naming Specification.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0p3mj6bl8wp1cri2qdszqrqqs47irh7qvajr5yaaly5js5hn85k5"))))
+                "0q6l4imz50ah2zda9gafncfvrhr7gs7in20sas04fwfa3x0f1ips"))))
     (build-system meson-build-system)
     (arguments
      (list #:phases
