@@ -4655,7 +4655,6 @@ is an extremely fast non-cryptographic hash algorithm.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.26
       #:import-path "github.com/zmap/zcrypto"
       #:test-flags
       ;; Network access is required.
