@@ -1538,7 +1538,7 @@ sharing to the masses.")
 (define-public sushi
   (package
     (name "sushi")
-    (version "46.0")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -1546,7 +1546,7 @@ sharing to the masses.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1ipjl1c9mib5gq9m58vhxg9jzfrggv2bbah6qr123arhljm5n24n"))))
+                "007f4yhn3gry34c3diz6hrkk0cjgkgmq36knd22wbk6m11wif9db"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -1569,22 +1569,18 @@ sharing to the masses.")
            pkg-config))
     (inputs
      (list bash-minimal
-           clutter
-           clutter-gst
-           clutter-gtk
            evince                       ; For file previewing.
            freetype
            gdk-pixbuf
            gjs
            gst-plugins-base
            gstreamer
+           gtk
            gtksourceview-4
            harfbuzz
            libepoxy
-           libmusicbrainz
-           libxml2
-           neon
-           webkitgtk-for-gtk3))
+           libsoup
+           webkitgtk))
     (synopsis "File previewer for the GNOME desktop")
     (description "Sushi is a DBus-activated service that allows applications
 to preview files on the GNOME desktop.")
