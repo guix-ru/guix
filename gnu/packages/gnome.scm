@@ -7860,7 +7860,7 @@ the GNU Shepherd.")
 (define-public gjs
   (package
     (name "gjs")
-    (version "1.88.0")
+    (version "1.88.1")
     (source
      (origin
        (method url-fetch)
@@ -7869,7 +7869,7 @@ the GNU Shepherd.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "0ly43lcpafl0an3k4g4mvwrwvc78f0y91ckdi6qn13ky67rvk81h"))
+         "1nd3y31b9666ai21vvcn566fracjngq2ag2n035p5mk5ws0anyvn"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
