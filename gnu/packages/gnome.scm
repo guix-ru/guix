@@ -9890,7 +9890,7 @@ through portals.")
 (define-public nautilus
   (package
     (name "nautilus")
-    (version "50.0")
+    (version "50.2.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -9898,7 +9898,7 @@ through portals.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1k1kcg8ran40b86554cds7pf2v3dhfrrp43ws2v8l4gy8jxnwnd9"))
+                "0njdngablrxkcd40ba892jyb9nj2sbwgfaavv86x6bplvppqbqp1"))
               (patches
                (search-patches "nautilus-extension-search-path.patch"))))
     (build-system meson-build-system)
@@ -9913,30 +9913,12 @@ through portals.")
                 (("g_file_new_for_path \\(\"/bin/sh\");")
                  (format #f "g_file_new_for_path (~s);"
                          (search-input-file inputs "bin/sh"))))))
-          (add-after 'unpack 'patch-tracker3-command
-            (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* "src/nautilus-tag-manager.c"
-                (("\"tracker3\"")
-                 (string-append "\""
-                                (search-input-file inputs "/bin/tracker3")
-                                "\"")))))
-          (add-after 'unpack 'fix-tests
+          (add-after 'unpack 'disable-problematic-tests
             (lambda _
-              ;; The tracker test hangs in the build container (see:
-              ;; https://gitlab.gnome.org/GNOME/nautilus/-/issues/2486).
+              ;; This test fails with a segmentation fault(see:
+              ;; <https://gitlab.gnome.org/GNOME/nautilus/-/work_items/4313>).
               (substitute* "test/automated/displayless/meson.build"
-                (("^foreach t: tracker_tests" all)
-                 (string-append "tracker_tests = []\n" all))
-                ;; This test fails for unknown reasons (see:
-                ;; <https://gitlab.gnome.org/GNOME/nautilus/-/issues/4174>).
-                ((".*'test-file-operations-archive'.*") "")
-                ;; This 'displayless' test requires a display (see:
-                ;; <https://gitlab.gnome.org/GNOME/nautilus/-/issues/4174>).
-                ((".*'test-thumbnails'.*") ""))
-              ;; /etc does not have that many files in our build container.
-              (substitute* "test/automated/displayless/test-directory.c"
-                (("g_assert_cmpint \\(g_list_length \\(files\\), >, 10\\);")
-                 "g_assert_cmpint (g_list_length (files), >, 1);"))))
+                ((".*'test-file-operations-archive'.*") ""))))
           (add-after 'unpack 'skip-gtk-update-icon-cache
             ;; Don't create 'icon-theme.cache'.
             (lambda _
@@ -9951,13 +9933,18 @@ through portals.")
               (setenv "HOME" "/tmp")    ;some tests require a writable HOME
               (setenv "XDG_DATA_DIRS"
                       (string-append (getenv "XDG_DATA_DIRS")
-                                     ":" #$output "/share")))))))
+                                     ":" #$output "/share"))
+              (setenv "XDG_RUNTIME_DIR"
+                      (string-append (getcwd) "/runtime-dir"))
+              (system "Xvfb :0 &")
+              (setenv "DISPLAY" ":0"))))))
     (native-inputs
      (list blueprint-compiler
            desktop-file-utils           ;for update-desktop-database
            `(,glib "bin")               ;for glib-mkenums, etc.
            gettext-minimal
            gobject-introspection
+           (libc-utf8-locales-for-target)
            pkg-config
            python
            python-pygobject
