@@ -8953,7 +8953,7 @@ library.")
 (define-public gdm
   (package
     (name "gdm")
-    (version "49.2")
+    (version "50.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -8961,11 +8961,10 @@ library.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "01ksb7gf2pfccnvw7dr363nppz0fwrk7hhsal478c3szkwgn64wq"))
+                "0hf5dxdxqc86zlnydrxhw6rqzdny89h87lyr3c58pznxgkj7jila"))
               (patches
                (search-patches
                 "gdm-default-session.patch"
-                "gdm-remove-hardcoded-xwayland-path.patch"
                 "gdm-wayland-session-wrapper-from-env.patch"
                 "gdm-pass-gdk-pixbuf-loader-env.patch"))))
     (build-system meson-build-system)
@@ -8992,8 +8991,6 @@ library.")
          ;; systemd-specific '/etc/locale.conf'.
          "-Dlang-file=/etc/environment"
 
-         (string-append "-Dudev-dir=" #$output "/lib/udev")
-
          "--localstatedir=/var"
          (string-append "-Ddefault-path="
                         (string-join '("/run/privileged/bin"
@@ -9005,95 +9002,18 @@ library.")
          "--sbindir" (string-append #$output "/bin"))
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'patch-paths
+          (add-after 'unpack 'patch-gnome-session
             (lambda* (#:key inputs #:allow-other-keys)
-              (substitute* "daemon/gdm-session.c"
-                (("dbus-run-session")
-                 (search-input-file inputs "bin/dbus-run-session")))))
+              (substitute* '("data/gnome-greeter.desktop.in"
+                             "data/gnome-initial-setup.desktop.in")
+                (("gnome-session")
+                 (search-input-file inputs "bin/gnome-session")))))
           (add-before 'configure 'pre-configure
             (lambda* (#:key inputs #:allow-other-keys)
               ;; We don't want to write to other packages.
               (substitute* "meson.build"
                 (("if dconf_dep\\.found\\(\\)" all)
-                 (string-append all " and false")))
-              ;; We don't have <systemd/sd-daemon.h>.
-              (substitute* '("common/gdm-log.c"
-                             "daemon/gdm-server.c"
-                             "daemon/gdm-session-worker.c"
-                             "daemon/gdm-session-worker-job.c")
-                (("#include <systemd/sd-daemon\\.h>") ""))
-              ;; Use elogind for sd-login.
-              (substitute* '("common/gdm-common.c"
-                             "daemon/gdm-local-display-factory.c"
-                             "daemon/gdm-manager.c"
-                             "libgdm/gdm-user-switching.c")
-                (("#include <systemd/sd-login\\.h>")
-                 "#include <elogind/sd-login.h>"))
-              ;; Look for system-installed sessions in
-              ;; /run/current-system/profile/share.
-              (substitute* '("libgdm/gdm-sessions.c"
-                             "daemon/gdm-session.c"
-                             "daemon/gdm-display.c"
-                             "daemon/gdm-launch-environment.c")
-                (("DATADIR \"/x")
-                 "\"/run/current-system/profile/share/x")
-                (("DATADIR \"/wayland")
-                 "\"/run/current-system/profile/share/wayland")
-                (("DATADIR \"/gnome")
-                 "\"/run/current-system/profile/share/gnome"))
-              (let ((propagate '("GDM_CUSTOM_CONF"
-                                 "GDM_DBUS_DAEMON"
-                                 "GDM_X_SERVER"
-                                 "GDM_X_SESSION"
-                                 ;; XXX: Remove this once GNOME Shell is
-                                 ;; a dependency of GDM.
-                                 "XDG_DATA_DIRS")))
-                (substitute* "daemon/gdm-session.c"
-                  (("set_up_session_environment \\(self\\);")
-                   (apply string-append
-                          "set_up_session_environment (self);\n"
-                          (map (lambda (name)
-                                 (string-append
-                                  "gdm_session_set_environment_variable "
-                                  "(self, \"" name "\","
-                                  "g_getenv (\"" name "\"));\n"))
-                               propagate)))
-                  ;; This is used by remote sessions, such as when using VNC.
-                  (("\\(GDMCONFDIR \"/Xsession \\\\\"%s\\\\\"\", command)")
-                   "(\"%s \\\"%s\\\"\", g_getenv (\"GDM_X_SESSION\"), command)")))
-              ;; Find the configuration file using an environment variable.
-              (substitute* '("common/gdm-settings.c")
-                (("GDM_CUSTOM_CONF")
-                 (string-append "(g_getenv(\"GDM_CUSTOM_CONF\") != NULL"
-                                " ? g_getenv(\"GDM_CUSTOM_CONF\")"
-                                " : GDM_CUSTOM_CONF)")))
-              ;; Use service-supplied path to X.
-              (substitute* '("daemon/gdm-server.c")
-                (("\\(X_SERVER X_SERVER_ARG_FORMAT")
-                 "(\"%s\" X_SERVER_ARG_FORMAT, g_getenv (\"GDM_X_SERVER\")"))
-              (substitute* '("daemon/gdm-wayland-session.c"
-                             "daemon/gdm-x-session.c")
-                (("\"dbus-daemon\"")
-                 "g_getenv (\"GDM_DBUS_DAEMON\")")
-                (("X_SERVER")
-                 "g_getenv (\"GDM_X_SERVER\")")
-                (("GDMCONFDIR \"/Xsession\"")
-                 "g_getenv (\"GDM_X_SESSION\")"))
-              ;; Use an absolute path for GNOME Session.
-              (substitute* "daemon/gdm-launch-environment.c"
-                (("\"gnome-session\"")
-                 (format #f "~s"
-                         (search-input-file inputs "bin/gnome-session"))))
-              ;; Do not automatically select the placeholder session.
-              (substitute* "daemon/gdm-session.c"
-                (("!g_str_has_suffix [(]base_name, \"\\.desktop\"[)]")
-                 (string-append "!g_str_has_suffix (base_name, \".desktop\") || "
-                                "(g_strcmp0(search_dirs[i], \""
-                                #$output "/share/gdm/BuiltInSessions/"
-                                "\") == 0 && "
-                                "g_strcmp0(base_name, \"fail.desktop\") == 0)"))
-                (("g_error [(]\"GdmSession: no session desktop files installed, aborting\\.\\.\\.\"[)];")
-                 "{ self->fallback_session_name = g_strdup(\"fail\"); goto out; }"))))
+                 (string-append all " and false")))))
           (add-before 'install 'install-logo
             (lambda* (#:key inputs #:allow-other-keys)
               (let ((icon (search-input-file inputs "share/icons/hicolor/\
@@ -9106,34 +9026,12 @@ org.gnome.login-screen.gschema.override")))
                     (format #t "\
 [org.gnome.login-screen]
 logo='~a'~%" icon))))))
-          ;; GDM requires that there be at least one desktop entry
-          ;; file.  This phase installs a hidden one that simply
-          ;; fails.  This enables users to use GDM with a
-          ;; '~/.xsession' script with no other desktop entry files.
-          ;; See <https://bugs.gnu.org/35068>.
-          (add-after 'install 'install-placeholder-desktop-entry
-            (lambda _
-              (let* ((sessions (string-append #$output
-                                              "/share/gdm/BuiltInSessions"))
-                     (fail (string-append sessions "/fail.desktop")))
-                (mkdir-p sessions)
-                (with-output-to-file fail
-                  (lambda ()
-                    (for-each
-                     display
-                     '("[Desktop Entry]\n"
-                       "Encoding=UTF-8\n"
-                       "Type=Application\n"
-                       "Name=Fail\n"
-                       "Comment=This session fails immediately.\n"
-                       "NoDisplay=true\n"
-                       "Exec=false\n")))))))
           ;; GDM needs some additional programs available via XDG_DATA_DIRS,
           ;; to make accessibility settings and related services available.
           (add-after 'install 'wrap-accessibility-dependencies
-            (lambda _
+            (lambda* (#:key inputs #:allow-other-keys)
               (wrap-program (string-append #$output "/bin/gdm")
-                `("XDG_DATA_DIRS" ":" prefix
+                `("XDG_DATA_DIRS" prefix
                   #$(map (lambda (input)
                            (file-append (this-package-input input) "/share"))
                          '("at-spi2-core"
@@ -9159,14 +9057,14 @@ logo='~a'~%" icon))))))
            gnome-session-shepherd
            gnome-control-center
            gnome-settings-daemon
-           gtk+
+           gtk
            iso-codes/pinned
            json-glib
            libcanberra
            libgudev
            linux-pam))
     (synopsis "Display manager for GNOME")
-    (home-page "https://wiki.gnome.org/Projects/GDM/")
+    (home-page "https://gitlab.gnome.org/GNOME/gdm")
     (description
      "GNOME Display Manager is a system service that is responsible for
 providing graphical log-ins and managing local and remote displays.")

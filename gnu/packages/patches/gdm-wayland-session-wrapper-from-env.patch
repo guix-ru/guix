@@ -1,28 +1,105 @@
-Get wayland-session wrapper from environment.
+Get session wrappers and configs from environment.
 
+This works in tandem with the environment variables set by the
+gdm-service-type.
+
+diff --git a/common/gdm-settings.c b/common/gdm-settings.c
+index 77b3316c7..ad370f0b5 100644
+--- a/common/gdm-settings.c
++++ b/common/gdm-settings.c
+@@ -199,7 +199,8 @@ gdm_settings_reload (GdmSettings *settings)
+         g_list_free (settings->backends);
+         settings->backends = NULL;
+ 
+-        backend = gdm_settings_desktop_backend_new (GDM_CUSTOM_CONF);
++        const char *custom_conf = g_getenv ("GDM_CUSTOM_CONF");
++        backend = gdm_settings_desktop_backend_new (custom_conf ? custom_conf : GDM_CUSTOM_CONF);
+         if (backend)
+                 settings->backends = g_list_prepend (NULL, backend);
+ 
 diff --git a/daemon/gdm-session.c b/daemon/gdm-session.c
-index b78068d42..644aad022 100644
+index 7a0a638bd..0f86a1d91 100644
 --- a/daemon/gdm-session.c
 +++ b/daemon/gdm-session.c
-@@ -3172,8 +3172,9 @@ gdm_session_start_session (GdmSession *self,
-                                                            allow_remote_connections? "--allow-remote-connections " : "",
-                                                            command);
-                         } else {
--                                program = g_strdup_printf (LIBEXECDIR "/gdm-wayland-session %s\"%s\"",
-+                                program = g_strdup_printf (LIBEXECDIR "/gdm-wayland-session %s\"%s %s\"",
-                                                            register_session ? "--register-session " : "",
-+                                                           g_getenv ("GDM_WAYLAND_SESSION"),
-                                                            command);
-                         }
-                 } else if (run_xsession_script) {
-@@ -3190,8 +3191,9 @@ gdm_session_start_session (GdmSession *self,
-                                                            register_session ? "--register-session " : "",
-                                                            self->selected_program);
-                         } else {
--                                program = g_strdup_printf (LIBEXECDIR "/gdm-wayland-session %s\"%s\"",
-+                                program = g_strdup_printf (LIBEXECDIR "/gdm-wayland-session %s\"%s %s\"",
-                                                            register_session ? "--register-session " : "",
-+                                                           g_getenv ("GDM_WAYLAND_SESSION"),
-                                                            self->selected_program);
-                         }
-                 } else {
+@@ -2870,6 +2870,22 @@ set_up_session_environment (GdmSession *self)
+                                               "XDG_SESSION_DESKTOP",
+                                               get_session_name (self));
+ 
++        /* Added by Guix */
++        const char *propagate[] = {
++                "GDM_CUSTOM_CONF",
++                "GDM_DBUS_DAEMON",
++                "GDM_X_SERVER_PATH",
++                "GDM_X_SESSION",
++                /* TODO: Remove once GNOME Shell is a dependency of GDM. */
++                "XDG_DATA_DIRS",
++                NULL };
++        for (const char **env = propagate; *env; ++env) {
++                const char *value = g_getenv(*env);
++                if (value) {
++                  gdm_session_set_environment_variable(self, *env, value);
++                }
++        }
++
+         desktop_names = get_session_desktop_names (self);
+         if (desktop_names != NULL) {
+                 gdm_session_set_environment_variable (self, "XDG_CURRENT_DESKTOP", desktop_names);
+@@ -3081,11 +3097,16 @@ gdm_session_start_session (GdmSession *self,
+ 
+         if (g_strcmp0 (self->session_type, "wayland") == 0) {
+                 gboolean needs_registration = !gdm_session_session_registers (self);
+-                program = g_strdup_printf (LIBEXECDIR "/gdm-wayland-session %s\"%s\"",
++                const char *gdm_wayland_session = g_getenv ("GDM_WAYLAND_SESSION");
++                program = g_strdup_printf (LIBEXECDIR "/gdm-wayland-session %s\"%s %s\"",
+                                            needs_registration ? "--handle-registration " : "",
++                                           gdm_wayland_session ? gdm_wayland_session : "",
+                                            command);
+         } else {
+-                program = g_strdup_printf (LIBEXECDIR "/gdm-x-session \"%s\"", command);
++                const char *gdm_x_session = g_getenv ("GDM_X_SESSION");
++                program = g_strdup_printf (LIBEXECDIR "/gdm-x-session \"%s %s\"",
++                                           gdm_x_session ? gdm_x_session : "",
++                                           command);
+         }
+ 
+         set_up_session_environment (self);
+diff --git a/daemon/gdm-wayland-session.c b/daemon/gdm-wayland-session.c
+index 3ca2d1496..82b72d941 100644
+--- a/daemon/gdm-wayland-session.c
++++ b/daemon/gdm-wayland-session.c
+@@ -136,7 +136,8 @@ spawn_bus (State        *state,
+ 
+         bus_address_fd_string = g_strdup_printf ("%d", BUS_ADDRESS_FILENO);
+ 
+-        g_ptr_array_add (arguments, "dbus-daemon");
++        const char *dbus_daemon = g_getenv ("GDM_DBUS_DAEMON");
++        g_ptr_array_add (arguments, dbus_daemon ? dbus_daemon : "dbus-daemon");
+ 
+         g_ptr_array_add (arguments, "--print-address");
+         g_ptr_array_add (arguments, bus_address_fd_string);
+diff --git a/daemon/gdm-x-session.c b/daemon/gdm-x-session.c
+index ed01fbe52..1787c96e2 100644
+--- a/daemon/gdm-x-session.c
++++ b/daemon/gdm-x-session.c
+@@ -451,7 +451,8 @@ spawn_bus (State        *state,
+ 
+         bus_address_fd_string = g_strdup_printf ("%d", BUS_ADDRESS_FILENO);
+ 
+-        g_ptr_array_add (arguments, "dbus-daemon");
++        const char *dbus_daemon = g_getenv ("GDM_DBUS_DAEMON");
++        g_ptr_array_add (arguments, dbus_daemon ? dbus_daemon : "dbus-daemon");
+ 
+         g_ptr_array_add (arguments, "--print-address");
+         g_ptr_array_add (arguments, bus_address_fd_string);
+@@ -670,9 +671,10 @@ spawn_session (State        *state,
+                 g_subprocess_launcher_setenv (launcher, "WINDOWPATH", vt, TRUE);
+         }
+ 
++        const char *xsession = g_getenv ("GDM_X_SESSION");
+         subprocess = g_subprocess_launcher_spawn (launcher,
+                                                   &error,
+-                                                  GDMCONFDIR "/Xsession",
++                                                  xsession ? xsession : GDMCONFDIR "/Xsession",
+                                                   state->session_command,
+                                                   NULL);
+ 

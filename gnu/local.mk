@@ -1439,7 +1439,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/gdbm-lockwait-test.patch			\
   %D%/packages/patches/gdk-pixbuf-honor-GUIX_GDK_PIXBUF_MODULE_FILES.patch	\
   %D%/packages/patches/gdm-default-session.patch		\
-  %D%/packages/patches/gdm-remove-hardcoded-xwayland-path.patch	\
   %D%/packages/patches/gdm-wayland-session-wrapper-from-env.patch	\
   %D%/packages/patches/gdm-pass-gdk-pixbuf-loader-env.patch	\
   %D%/packages/patches/gemmi-fix-pegtl-usage.patch		\

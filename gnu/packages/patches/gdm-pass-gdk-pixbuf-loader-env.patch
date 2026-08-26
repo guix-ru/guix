@@ -1,8 +1,8 @@
 diff --git a/daemon/gdm-launch-environment.c b/daemon/gdm-launch-environment.c
-index 67f6c291e..86d8e718f 100644
+index 110520c0b..5739e8c3d 100644
 --- a/daemon/gdm-launch-environment.c
 +++ b/daemon/gdm-launch-environment.c
-@@ -294,6 +294,7 @@ build_launch_environment (GdmLaunchEnvironment *launch_environment,
+@@ -277,6 +277,7 @@ build_launch_environment (GdmLaunchEnvironment *launch_environment,
                  "WINDOWPATH",
                  "XCURSOR_PATH",
                  "XDG_CONFIG_DIRS",
