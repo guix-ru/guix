@@ -1719,6 +1719,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/julia-Use-MPFR-4.2.patch	                \
   %D%/packages/patches/libcall-ui-make-it-installable.patch	\
   %D%/packages/patches/libcamera-ipa_manager-disable-signature-verification.patch	\
+  %D%/packages/patches/libcloudproviders-document-all-symbols.patch     \
   %D%/packages/patches/libconfuse-CVE-2022-40320.patch		\
   %D%/packages/patches/libcss-check-format.patch		\
   %D%/packages/patches/libde265-CVE-2023-49465.patch		\

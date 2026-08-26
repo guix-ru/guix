@@ -379,7 +379,7 @@ features to enable users to create their discs easily and quickly.")
 (define-public libcloudproviders-minimal
   (package
     (name "libcloudproviders-minimal")
-    (version "0.3.6")
+    (version "0.4.0")
     (source
      (origin
        (method url-fetch)
@@ -388,7 +388,9 @@ features to enable users to create their discs easily and quickly.")
                        (version-major+minor version)
                        "/libcloudproviders-" version ".tar.xz"))
        (sha256
-        (base32 "1dvlbsh5pfrnj745dlb1w0m4s1gy063y8h54qp2z9pjg785i2x9v"))))
+        (base32 "0r4076dfabfm370x1bcaj1z4afk9706himz7d0w6ici7226j4yr4"))
+       (patches
+        (search-patches "libcloudproviders-document-all-symbols.patch"))))
     (build-system meson-build-system)
     (arguments
      `(#:glib-or-gtk? #t             ; To wrap binaries and/or compile schemas
@@ -411,26 +413,25 @@ services.")
 (define-public libcloudproviders
   (package/inherit libcloudproviders-minimal
     (name "libcloudproviders")
+    ;; 2.3 MiB of HTML documentation.
     (outputs (cons "doc" (package-outputs libcloudproviders-minimal)))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags _)
         '(list "-Denable-gtk-doc=true")) ;false by default
        ((#:phases phases '%standard-phases)
-        `(modify-phases %standard-phases
-           (add-after 'install 'move-doc
-             (lambda* (#:key outputs #:allow-other-keys)
-               (let* ((out (assoc-ref outputs "out"))
-                      (doc (assoc-ref outputs "doc")))
-                 (mkdir-p (string-append doc "/share"))
-                 (rename-file
-                  (string-append out "/share/gtk-doc")
-                  (string-append doc "/share/gtk-doc")))))))))
+        #~(modify-phases #$phases
+            (add-after 'install 'move-doc
+              (lambda _
+                (mkdir-p (string-append #$output:doc "/share"))
+                (rename-file
+                 (string-append #$output "/share/doc")
+                 (string-append #$output:doc "/share/doc"))))))))
     (native-inputs
-     (append
-         `(("gobject-introspection" ,gobject-introspection)
-           ("gtk-doc" ,gtk-doc/stable))
-         (package-native-inputs libcloudproviders-minimal)))))
+     (modify-inputs native-inputs
+       (append gi-docgen
+               gobject-introspection
+               gtk-doc/stable)))))
 
 (define-public gnome-js-common
   (package
