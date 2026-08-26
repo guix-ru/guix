@@ -8686,7 +8686,8 @@ restore the saved place.")
                    (lambda _ (setenv "HOME" "/tmp"))))))
       (propagated-inputs (list emacs-org-noter emacs-pdf-tools))
       (synopsis "Support for links to documents in pdfview mode")
-      (description "This package adds support for org links from pdftools buffers
+      (description
+       "This package adds support for org links from pdftools buffers
 with more precise location control.")
       (home-page "https://github.com/fuxialexander/org-pdftools/")
       (license license:gpl3+))))
