@@ -1337,7 +1337,7 @@ argument.")))
                           "GDM_DBUS_DAEMON="
                           #$(gdm-configuration-dbus-daemon config))
                          (string-append
-                          "GDM_X_SERVER="
+                          "GDM_X_SERVER_PATH="
                           #$(xorg-wrapper
                              (gdm-configuration-xorg config)))
                          (string-append
