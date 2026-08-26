@@ -2023,7 +2023,7 @@ commonly used macros.")
 (define-public gnome-contacts
   (package
     (name "gnome-contacts")
-    (version "49.0")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/gnome-contacts/"
@@ -2031,17 +2031,11 @@ commonly used macros.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1bz4hns4vd9ifw0s4j7jgys143a650ny5lww5pppvmr9pikirwi5"))
-              (patches
-               ;; TODO: Remove when bumping to version 50.alpha or newer.
-               (search-patches "gnome-contacts-evolution-compat.patch"))))
+                "1cysq2di7b78ylx3k44qx8nsks9qr901mhmp297j9gki64sflfra"))))
     (build-system meson-build-system)
     (arguments
      (list
       #:glib-or-gtk? #t
-      ;; FIXME: Cannot build the Valadoc, because both gtk+ and gtk are in the
-      ;; same profile (evolution-data-server propagates both).
-      #:configure-flags #~'("-Ddocs=false")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'skip-gtk-update-icon-cache
@@ -2068,6 +2062,7 @@ commonly used macros.")
            gtk
            libadwaita
            libgee
+           libglycin
            libportal
            qrencode
            telepathy-glib
