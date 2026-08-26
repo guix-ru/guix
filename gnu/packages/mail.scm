@@ -488,6 +488,7 @@ POP3/POP3-S as well as CalDAV and CardDAV.")
                    "--disable-static"
                    "--disable-debug"
 
+                   "CURSES_LIBS=-lncurses -ltinfo"
                    ;; Specify path to sendmail setuid binary, which otherwise
                    ;; defaults to /usr/sbin/sendmail
                    "CPPFLAGS=-DPATH_SENDMAIL=\\\"/run/setuid-programs/sendmail\\\""
