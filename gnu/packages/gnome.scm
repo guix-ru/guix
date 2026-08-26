@@ -2488,7 +2488,7 @@ GNOME Desktop.")
 (define-public gnome-keyring
   (package
     (name "gnome-keyring")
-    (version "48.0")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -2496,7 +2496,7 @@ GNOME Desktop.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "17gbzfj2rgbp1yb28mnxs3ngxmyqa26bwi4bkff3zsp9434ih1gj"))))
+                "0z6ciqdcz6w2l82hkcw251lcllghsld9jcs75jy055rwqmi21myb"))))
     (build-system meson-build-system)
     (arguments
      (list
