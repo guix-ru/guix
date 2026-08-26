@@ -694,7 +694,7 @@ of known objects without needing a central registrar.")
 (define-public foundry
   (package
     (name "foundry")
-    (version "1.0.1")
+    (version "1.1.1")
     (source
      (origin
        (method git-fetch)
@@ -703,10 +703,11 @@ of known objects without needing a central registrar.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17f7r6x396g0s5d2w0f2mz5xxmmvjzh8v8w9ivarmgf5xrr3vb1f"))))
+        (base32 "1r7799nk2zgvbb1vzd7n48vfpy0md24x5j3q7symkmf86f6385kl"))))
     (build-system meson-build-system)
     (arguments
      (list
+      #:disallowed-references (list readline) ;gpl3+
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'set-HOME
@@ -715,7 +716,8 @@ of known objects without needing a central registrar.")
     (native-inputs
      (list gettext-minimal
            `(,glib "bin")
-           pkg-config))
+           pkg-config
+           readline))                   ;for tests
     (inputs
      (list cmark
            editorconfig-core-c
@@ -726,7 +728,9 @@ of known objects without needing a central registrar.")
            json-glib
            libdex
            libgit2
+           libpanel
            libpeas-2
+           libsecret
            libspelling
            libyaml
            sysprof
