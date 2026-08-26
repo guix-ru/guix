@@ -1596,6 +1596,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/gtk3-respect-GUIX_GTK3_IM_MODULE_FILE.patch \
   %D%/packages/patches/gtk3-treeview-test-fix.patch             \
   %D%/packages/patches/gtk4-demo-reproducible.patch             \
+  %D%/packages/patches/gtk4-fix-32-bit-vkimage-null.patch       \
   %D%/packages/patches/gtk4-needs-udmabuf.patch                 \
   %D%/packages/patches/gtk4-respect-GUIX_GTK4_PATH.patch    	\
   %D%/packages/patches/gtkglext-disable-disable-deprecated.patch \

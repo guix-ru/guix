@@ -1123,6 +1123,7 @@ application suites.")
         (base32 "14q86c8gks2m4h4pwgkbas1f5r5j3z168wvcamd6cfnjqxh9zgai"))
        (patches
         (search-patches "gtk4-demo-reproducible.patch"
+                        "gtk4-fix-32-bit-vkimage-null.patch"
                         "gtk4-needs-udmabuf.patch"
                         "gtk4-respect-GUIX_GTK4_PATH.patch"))
        (modules '((guix build utils)))))
