@@ -10676,7 +10676,7 @@ desktop.  It supports world clock, stop watch, alarms, and count down timer.")
 (define-public gnome-calendar
   (package
     (name "gnome-calendar")
-    (version "49.1")
+    (version "50.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -10684,7 +10684,7 @@ desktop.  It supports world clock, stop watch, alarms, and count down timer.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1hnjhdxa9vfrs6fj0c0l5fiqwgz5mvby0v7m3562qlsd56mia48c"))))
+                "1c7ag9hrhv3lawjd143p03cj978j62002zb4bsrqznaj383xyxab"))))
     (build-system meson-build-system)
     (arguments
      `(#:glib-or-gtk? #t
