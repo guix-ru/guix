@@ -2301,7 +2301,7 @@ the font would look under various sizes.")
 (define-public gcr
   (package
     (name "gcr")
-    (version "4.2.1")
+    (version "4.4.0.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -2309,24 +2309,27 @@ the font would look under various sizes.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1rbxjrwy88l1b6yml2hrracqamaflvif7a9fq1cd0g1ph1f3ny7d"))))
+                "164098bmv319pdh064p6cck0q2hr0jc51128599z5x7r94g38g0c"))))
     (build-system meson-build-system)
     (arguments
      (list
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'remove-fatal-warnings-option
-            ;; Otherwise, the gi-docgen tool would fail because of the
-            ;; "Fontconfig error: No writable cache directories" warnings.
-            (lambda _
-              (substitute* (find-files "." "^meson\\.build$")
-                ((".*'--fatal-warnings',.*") ""))))
           (add-after 'unpack 'skip-gtk-update-icon-cache
             (lambda _
               (substitute* "meson.build"
                 (("gtk_update_icon_cache: true")
                  "gtk_update_icon_cache: false"))))
-                    (add-before 'check 'pre-check
+          (add-after 'unpack 'patch-commands-for-tests
+            (lambda _
+              ;; The `_gcr_gnupg_process_run_async' procedure in
+              ;; gcr-gnupg-process.c clears the environment, causing the
+              ;; 'gnupg-process' test to fail because the 'mktemp' command is
+              ;; not found.
+              (substitute* "gcr/fixtures/gnupg-mock/mock-fail-signal"
+                (("mktemp")
+                 (which "mktemp")))))
+          (add-before 'check 'pre-check
             (lambda _
               ;; Some tests expect to write to $HOME.
               (setenv "HOME" "/tmp")))
