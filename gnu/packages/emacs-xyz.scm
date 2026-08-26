@@ -39414,6 +39414,42 @@ indexing of modern Fortran.")
     (home-page "https://github.com/raullaasner/fortran-tags")
     (license license:gpl3+)))
 
+(define-public emacs-futur
+  (package
+    (name "emacs-futur")
+    (version "2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://elpa.gnu.org/packages/futur-" version ".tar"))
+       (sha256
+        (base32
+         "06dpsis282z6zyq7g5lccq8r2dqcwbg7jbsc6zf0vv49wnsqd3sr"))
+       (patches
+        (search-patches
+         "emacs-futur-skip-broken-interruption-test.patch"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      ;; Futur's Makefile does not ask ERT to return a failing exit status;
+      ;; run ERT directly instead.
+      #:test-command
+      #~(list "emacs" "-Q" "--batch" "-L" "." "-l" "futur-tests"
+              "--eval"
+              (object->string
+               '(ert-run-tests-batch-and-exit
+                 ;; Omit the Bubblewrap test: Guix build containers cannot
+                 ;; reliably create its nested sandbox.
+                 '(not futur-elisp-sandbox-funcall))))))
+    (home-page "https://elpa.gnu.org/packages/futur.html")
+    (synopsis "Compose asynchronous Emacs Lisp computations")
+    (description
+     "Futur provides futures for composing asynchronous Emacs Lisp work.  It
+supports subprocesses, timers, concurrent groups, error propagation, and
+cancellation without generator-based control-flow rewriting.")
+    (license license:gpl3+)))
+
 (define-public emacs-bfuture
   (package
     (name "emacs-bfuture")
