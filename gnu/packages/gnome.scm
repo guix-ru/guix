@@ -5791,7 +5791,7 @@ service via the system message bus.")
 (define-public libgweather
   (package
     (name "libgweather")
-    (version "4.4.4")
+    (version "4.6.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -5799,7 +5799,7 @@ service via the system message bus.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "10s2pyf96yj287929px8jfbkda7bn76vzr2mqgyx3xydadvnf5vh"))))
+                "1237hxm8xwlyi0gr50rd1dag6ywdwk55ffigdks2zvw5js60wpbz"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -5828,12 +5828,13 @@ service via the system message bus.")
      ;; libsoup.
      (list gtk+
            gdk-pixbuf
+           geocode-glib
            json-glib
            libxml2
-           libsoup
-           geocode-glib))
+           libsoup))
     (inputs
-     (list tzdata))
+     (list gweather-locations
+           tzdata))
     (home-page "https://gnome.pages.gitlab.gnome.org/libgweather/")
     (synopsis "Location, time zone, and weather library for GNOME")
     (description
