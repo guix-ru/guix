@@ -4886,7 +4886,7 @@ as OpenStreetMap, OpenCycleMap, OpenAerialMap and Maps.")
 (define-public libsoup-minimal
   (package
     (name "libsoup-minimal")
-    (version "3.6.5")
+    (version "3.6.6")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/libsoup/"
@@ -4894,15 +4894,7 @@ as OpenStreetMap, OpenCycleMap, OpenAerialMap and Maps.")
                                   "libsoup-" version ".tar.xz"))
               (sha256
                (base32
-                "0d52mnvvsvwpc3scjva5fbvns8f8ijyswgjwjhbr151ymid7d4b8"))
-              (patches
-               (search-patches
-                "libsoup-auth-digest-fix-crash.patch"
-                "libsoup-deadlock-in-add_listener_in_thread.patch"
-                "libsoup-fix-merge-of-ranges.patch"
-                "libsoup-memory-leak-in-soup_form_decode.patch"
-                "libsoup-multipart-bounds-check.patch"
-                "libsoup-use-libdl-instead-of-gmodule.patch"))))
+                "0h17hza18vg6kqsy2c3p1d8rlbv5bwp9wigz07s40nlxdzh0mvai"))))
     (build-system meson-build-system)
     (arguments
      (list
