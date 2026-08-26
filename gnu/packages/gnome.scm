@@ -10048,7 +10048,7 @@ is complete it provides a graphical representation of each selected folder.")
 (define-public gnome-backgrounds
   (package
     (name "gnome-backgrounds")
-    (version "49.0")
+    (version "50.0")
     (source
      (origin
        (method url-fetch)
@@ -10057,7 +10057,7 @@ is complete it provides a graphical representation of each selected folder.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "1dgl8jxczx2cwszg07bhrjpcg2rywfcak2d5md20x84bwl6jdzh1"))))
+         "1f2j7cc60277dm21sqcksmgxakrl8hs2gipb3wrcfd2grdxbmk8s"))))
     (build-system meson-build-system)
     (native-inputs (list gettext-minimal))
     (home-page "https://gitlab.gnome.org/GNOME/gnome-backgrounds")
