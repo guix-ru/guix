@@ -2031,6 +2031,29 @@ Emacs, whose initial working directories are determined in relation to the
 current buffer.")
     (license license:gpl3+)))
 
+(define-public emacs-termint
+  (package
+   (name "emacs-termint")
+   (version "0.2.3")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/milanglacier/termint.el")
+           (commit (string-append "v" version))))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32 "0wdyv7spafhj5d2y6xwdnm0dd5xv4bnaa9pc2wr6pz1q4x1r8qws"))))
+   (build-system emacs-build-system)
+   (arguments (list #:tests? #f)) ; no tests
+   (home-page "https://github.com/milanglacier/termint.el")
+   (synopsis "Run REPLs in a terminal emulator in Emacs")
+   (description
+    "This package provides a way to run REPLs in Emacs by using
+terminal emulators such as the built-in @code{M-x term} or others,
+such as @code{eat}, @code{vterm} or @code{ghostel}.")
+   (license license:gpl3+)))
+
 (define-public emacs-treeview
   (package
     (name "emacs-treeview")
