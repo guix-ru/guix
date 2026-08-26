@@ -779,7 +779,7 @@ images.")
   (hidden-package
    (package
      (name "at-spi2-core")
-     (version "2.60.0")
+     (version "2.60.6")
      (source (origin
                (method url-fetch)
                (uri (string-append "mirror://gnome/sources/" name "/"
@@ -787,7 +787,7 @@ images.")
                                    name "-" version ".tar.xz"))
                (sha256
                 (base32
-                 "16fb2hv12k2vzh462gbd4qf8ipvnb2ijrc5d7w56dzfqjwd0rrc0"))))
+                 "0mwxg2mfkzcaazgpbfhdchsyxki9nvxcnd8fvwmh9a0pnal696x8"))))
      (build-system meson-build-system)
      (arguments
       (list
