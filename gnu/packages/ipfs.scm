@@ -2366,7 +2366,6 @@ types.")
     (build-system go-build-system)
     (arguments
      (list
-      #:go go-1.26
       #:install-source? #f
       #:embed-files #~(list "sorted-network-list.bin" ".*\\.css" ".*\\.html")
       #:unpack-path "github.com/ipfs/kubo"
