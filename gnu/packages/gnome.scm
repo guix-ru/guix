@@ -9798,7 +9798,7 @@ endpoints for federated queries.")
 (define-public localsearch
   (package
     (name "localsearch")
-    (version "3.10.2")
+    (version "3.11.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/localsearch/"
@@ -9806,7 +9806,7 @@ endpoints for federated queries.")
                                   "/localsearch-" version ".tar.xz"))
               (sha256
                (base32
-                "11d2g3l55kix8bmq161f0g2iwqwgcwrrmv6lp80p2qbnbp48kpdl"))))
+                "0hhrwvmvffd2r8a4lbvw8i67d8y7wxggpchm5wbjpkwaib1acfbv"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -9862,6 +9862,7 @@ endpoints for federated queries.")
      (list exempi
            ffmpeg
            flac
+           gexiv2
            giflib
            glib
            gstreamer
