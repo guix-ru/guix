@@ -1589,7 +1589,7 @@ to preview files on the GNOME desktop.")
 (define-public rygel
   (package
     (name "rygel")
-    (version "45.1")
+    (version "45.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -1597,7 +1597,7 @@ to preview files on the GNOME desktop.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1j0pasaaazyq3k2mhp2dal4jmiw4hjkqpx52fxk9pbwf1ll6wf6g"))))
+                "079ky4np33f2ca596pzy26qn8b65mf3ggy9qvivmv1jsn5q7pr90"))))
     (build-system meson-build-system)
     (native-inputs
      (list gettext-minimal
@@ -1613,23 +1613,20 @@ to preview files on the GNOME desktop.")
     (inputs
      (list gdk-pixbuf
            gssdp
-           gstreamer
            gst-plugins-base
            gst-editing-services
            gtk
            gupnp
-           gupnp-av
            gupnp-dlna
            json-glib
-           libgee
            libmediaart
            libsoup
            libxslt
            libunistring
            tinysparql))
     (propagated-inputs
-     ;; The .pc files require.private gmodule-2.0
-     (list glib))
+     ;; In Requires or Requires.private of the various .pc files.
+     (list glib gstreamer gupnp-av libgee))
     (synopsis "Share audio, video, and pictures with other devices")
     (description
      "Rygel is a home media solution (@dfn{UPnP AV MediaServer and
