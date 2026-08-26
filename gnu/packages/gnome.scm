@@ -2625,14 +2625,14 @@ on the GNOME Desktop with a single simple application.")
 (define-public papers
   (package
     (name "papers")
-    (version "50.0")
+    (version "50.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/papers/"
                                   (version-major version) "/"
                                   "papers-" version ".tar.xz"))
               (sha256
-               (base32 "01dws72fb19i9jwp3r0khr7ym2ns51fifdzafb5dcr5w8vmj06rh"))))
+               (base32 "1x5rs9rl38gy6gcnlvnx2zgp477q0x37hra7v34m1js7rpqxq6xf"))))
     (build-system meson-build-system)
     (arguments
      (list
