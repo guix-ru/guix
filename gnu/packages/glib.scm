@@ -1454,7 +1454,7 @@ new DBus session for testing.")
 (define-public libdex
   (package
     (name "libdex")
-    (version "1.0.0")
+    (version "1.1.0")
     (source
      (origin
        (method url-fetch)
@@ -1462,7 +1462,7 @@ new DBus session for testing.")
                            (version-major+minor version) "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "0pbz41dpp1mw1gkzw598p4qahsvnaqijwhhh5vhi8vkrndfmr3vv"))))
+        (base32 "1als45asmlag3n086vdgwvppg8vblrx5p30ly5y9l770ps54rq59"))))
     (build-system meson-build-system)
     (arguments
      (list #:configure-flags #~'("-D" "docs=true")))
@@ -1470,6 +1470,7 @@ new DBus session for testing.")
      (list gobject-introspection
            gi-docgen
            pkg-config
+           python-minimal
            vala))
     (inputs
      (list glib
