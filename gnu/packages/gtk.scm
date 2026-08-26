@@ -646,7 +646,7 @@ highlighting and other features typical of a source code editor.")
 (define-public gdk-pixbuf
   (package
     (name "gdk-pixbuf")
-    (version "2.44.5")
+    (version "2.44.7")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/" name "/"
@@ -654,7 +654,7 @@ highlighting and other features typical of a source code editor.")
                                   name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0s5b010jlinmki5iidbj2yip8n2sxc6xc0qmcvpc104v2c4kxfb9"))
+                "194md5dgnl2jyy2jikf2yqc4gq4l6qd0yh3hm4h1bhvfcbiq0bqp"))
               (patches
                (search-patches
                 "gdk-pixbuf-honor-GUIX_GDK_PIXBUF_MODULE_FILES.patch"))))
