@@ -11447,7 +11447,7 @@ for the GNOME desktop.")
 (define-public orca
   (package
     (name "orca")
-    (version "48.9")
+    (version "50.2")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -11456,8 +11456,7 @@ for the GNOME desktop.")
                     name "-" version ".tar.xz"))
               (sha256
                (base32
-                "0sfs06f66dsibvnp87jshhs7n3f8shkn9x7j3ygpk8409za2n2xy"))
-              (patches (search-patches "orca-fix-gst-init-check-call.patch"))))
+                "017x2dvh7zkhw1lia5ivzqy4lp2f5fhv9r0qgzsbmi4fvqf44507"))))
     (build-system meson-build-system)
     (arguments
      '(#:glib-or-gtk? #t
@@ -11490,6 +11489,8 @@ for the GNOME desktop.")
                  (,(getenv "GUIX_PYTHONPATH")))))))))
     (native-inputs
      (list gettext-minimal
+           `(,glib "bin")
+           gobject-introspection
            itstool
            pkg-config
            libxml2))
@@ -11506,8 +11507,8 @@ for the GNOME desktop.")
            `(,liblouis "python")
            procps                       ; for pgrep
            python
-           python-dbus
-           python-pygobject-3.50
+           python-dasbus
+           python-pygobject
            python-pyatspi
            speech-dispatcher
            xkbcomp))
