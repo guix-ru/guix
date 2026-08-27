@@ -1423,6 +1423,14 @@ new Date();"))))
                                "warning: failed to substitute: ~a~%"
                                file))))
                  (find-files "." "\\.c$|\\.h$")))))
+          (add-before 'build 'set-affinity
+            (lambda* (#:key parallel-build? #:allow-other-keys)
+              ;; The java process itself normally uses as many cores as
+              ;; available.
+              (let ((cores (if parallel-build?
+                               (parallel-job-count)
+                               1)))
+                (setaffinity (getpid) (make-bitvector cores #t)))))
           (add-before 'build 'write-source-revision-file
             (lambda _
               (with-output-to-file ".src-rev"
