@@ -14,7 +14,7 @@
 ;;; Copyright © 2021 Julien Lepiller <julien@lepiller.eu>
 ;;; Copyright © 2021 Pierre Langlois <pierre.langlois@gmx.com>
 ;;; Copyright © 2022, 2024 Ricardo Wurmus <rekado@elephly.net>
-;;; Copyright © 2022-2024 Ekaitz Zarraga <ekaitz@elenq.tech>
+;;; Copyright © 2022-2026 Ekaitz Zarraga <ekaitz@elenq.tech>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -2040,8 +2040,8 @@ ac_cv_c_float_format='IEEE (little-endian)'
                                "/bin/sh")
                 (string-append "--syslibdir=" #$output "/lib")
                 "CC=gcc"
-                "--enable-gcc-wrapper"))
-       ((#:phases phases #~'%standard-phases)
+                "--disable-shared"))
+       #;((#:phases phases #~'%standard-phases)
         #~(modify-phases #$phases
             (delete 'remove-complex)
             (add-after 'install 'symlink-dynamic-linker
@@ -2108,7 +2108,7 @@ ac_cv_c_float_format='IEEE (little-endian)'
                   (invoke "patch" "--force" "-p1" "-i" patch-file))))
             (replace 'setenv
               (lambda _
-                (setenv "CC" "musl-gcc")
+                (setenv "CC" "gcc")
                 (setenv "CPLUS_INCLUDE_PATH" (getenv "C_INCLUDE_PATH"))))))))
    (native-search-paths
     (list (search-path-specification
@@ -2890,7 +2890,7 @@ exec " gcc "/bin/" program
                                                   ; modular core/language downloads
                 (add-after 'unpack 'setenv
                   (lambda _
-                    (setenv "CC" "musl-gcc")))
+                    (setenv "CC" "gcc")))
                 #;
                 (add-before 'configure 'configure-libiberty
                   (lambda _
