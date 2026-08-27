@@ -1272,10 +1272,9 @@ is not available for Guile 2.0.")
                                "guile-fibers-epoll-instance-is-dead.patch"
                                "guile-fibers-fd-finalizer-leak.patch"))))
     (native-inputs
-     (list texinfo pkg-config autoconf automake libtool
+     (list texinfo pkg-config autoconf-2.73 automake libtool
            guile-3.0            ;for 'guild compile
-           ;; Gettext brings 'AC_LIB_LINKFLAGS_FROM_LIBS'
-           gettext-minimal-0.23))
+           gettext-minimal))
     (arguments
      (if (%current-target-system)
          (substitute-keyword-arguments (package-arguments guile-fibers-1.3)
