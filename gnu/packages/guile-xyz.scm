@@ -3964,6 +3964,9 @@ library.")
      '(#:make-flags '("GUILE_AUTO_COMPILE=0") ;placate guild warnings
        #:phases
        (modify-phases %standard-phases
+         (add-before 'bootstrap 'fix-bootstrap
+           (lambda _
+             (invoke "autopoint" "--force")))
          (delete 'strip)
          (add-before 'configure 'patch-module-dir
            (lambda _
@@ -3977,7 +3980,7 @@ $(libdir)/guile/@GUILE_EFFECTIVE_VERSION@/site-ccache\n")))))))
      (list autoconf
            automake
            texinfo
-           gettext-minimal-0.23              ;for 'AC_LIB_LINKFLAGS_FROM_LIBS'
+           gettext-minimal
            guile-3.0
            pkg-config))
     (inputs
