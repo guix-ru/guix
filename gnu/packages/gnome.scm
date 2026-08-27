@@ -5901,6 +5901,30 @@ handles settings such keyboard layout, shortcuts, and accessibility, clipboard
 settings, themes, mouse settings, and startup of other daemons.")
     (license license:gpl2+)))
 
+(define-public gweather-locations
+  (package
+    (name "gweather-locations")
+    (version "2026.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://gitlab.gnome.org/GNOME/gweather-locations")
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "02791jgl6xdb6w9v1k4xqb1irhjsfk84ws6xi67yx448afgwln1a"))))
+    (build-system meson-build-system)
+    (native-inputs (list python-minimal python-pygobject))
+    (home-page "https://gitlab.gnome.org/GNOME/gweather-locations")
+    (synopsis "Location and timezone database for the libgweather library")
+    (description "The GWeather locations database contains a list of locations
+used by GNOME components through the GWeather library.  The locations are
+structured in an XML file, which follows a provided schema file.  The XML
+source is compiled into a binary format for fast parsing and access.  Location
+names are translatable.")
+    (license license:gpl2+)))
+
 (define-public totem-pl-parser
  (package
    (name "totem-pl-parser")
