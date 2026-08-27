@@ -120,6 +120,7 @@ If NATIVE?, only disable native compilation."
   (let* ((file (string-append directory "/" name "-autoloads.el"))
          (expr `(let ((backup-inhibited t)
                       (generated-autoload-file ,file))
+                  (require 'jka-compr) ;; to read ".el.gz" files
                   (cond
                    ((require 'loaddefs-gen nil t)
                     ;; Emacs >= 29
