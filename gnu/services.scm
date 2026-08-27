@@ -254,6 +254,28 @@ is used as the initial value of RESULT."
       "Return the list of services with the given NAME (a symbol)."
       (vhash-foldq* cons '() name (force table)))))
 
+(define (%validate-service-type obj properties)
+  (unless (service-type? obj)
+    (raise
+     (apply make-compound-condition
+            (make-exception-from-throw 'wrong-type-arg
+                                       `("service"
+                                         "Wrong type of argument for \
+service type: ~S"
+                                         (,obj)))
+            (condition
+             (&error-location
+              (location (source-properties->location properties))))
+            (formatted-message
+             (G_ "first argument to 'service' (~s) is not a service type")
+             obj)
+            '())))
+  obj)
+
+(define-syntax-rule (validate-service-type obj)
+  "Return OBJ if and only if it is a service type.  Otherwise raise an error."
+  (%validate-service-type obj (current-source-location)))
+
 ;; Services of a given type.
 (define-record-type <service>
   (make-service type value)
@@ -266,10 +288,10 @@ is used as the initial value of RESULT."
     "Return a service instance of TYPE.  The service value is VALUE or, if
 omitted, TYPE's default value."
     ((_ type value)
-     (make-service type value))
+     (make-service (validate-service-type type) value))
     ((_ type)
      (%service-with-default-value (current-source-location)
-                                  type))))
+                                  (validate-service-type type)))))
 
 (define (%service-with-default-value location type)
   "Return a instance of service type TYPE with its default value, if any.  If
