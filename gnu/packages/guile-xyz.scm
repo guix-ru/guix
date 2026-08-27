@@ -1282,10 +1282,9 @@ is not available for Guile 2.0.")
                       ((".*assert-run-fibers-terminates .*pingpong.*")
                        "")))))))))
     (native-inputs
-     (list texinfo pkg-config autoconf automake libtool
+     (list texinfo pkg-config autoconf-2.73 automake libtool
            guile-3.0            ;for 'guild compile
-           ;; Gettext brings 'AC_LIB_LINKFLAGS_FROM_LIBS'
-           gettext-minimal-0.23))
+           gettext-minimal))
     (inputs
      (list guile-3.0))                            ;for libguile-3.0.so
     (supported-systems
