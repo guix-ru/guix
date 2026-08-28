@@ -6479,6 +6479,32 @@ multiplexer and demultiplexer, and can mux video and audio in several formats
 using standalone executable files.")
     (license license:isc)))
 
+(define-public nv-codec-headers
+  (package
+    (name "nv-codec-headers")
+    (version "13.1.15.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://code.ffmpeg.org/FFmpeg/nv-codec-headers.git")
+              (commit (string-append "n" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11spiawjvsh6yy9nbhd2gmqcd9lmh959kg9hmplpfwkqh7mrbgra"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:tests? #f                       ;no test suite
+      #:make-flags #~(list (string-append "PREFIX=" #$output))
+      #:phases #~(modify-phases %standard-phases
+                   (delete 'configure)))) ;no configure script
+    (home-page "https://github.com/FFmpeg/nv-codec-headers")
+    (synopsis "FFmpeg nvidia headers")
+    (description "FFmpeg version of headers required to interface with NVIDIA
+codec APIs.  This package provides the @code{ffnvcodec} pkg-config module.")
+    (license license:expat)))
+
 ;; XXX: This project is not being maintained. Consider removal or patch merges.
 (define-public qtfaststart
   (package
