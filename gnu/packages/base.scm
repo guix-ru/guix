@@ -1102,8 +1102,11 @@ the store.")
                  (("exec @PERL@")
                   "exec perl")))))
 
+         ;; This needs to refer the #:outputs keyword, not to #$output , so
+         ;; that the code works whether or not a "static" output exists
+         ;; ('glibc-locales' does not have a "static" output).
          (add-after 'install 'move-static-libs
-           (lambda _
+           (lambda* (#:key outputs #:allow-other-keys)
              ;; Move static libraries to the "static" output.
              ;; Note: As of GNU libc 2.34, the contents of some ".a"
              ;; files have been moved into "libc.so", and *both* empty
@@ -1118,7 +1121,8 @@ the store.")
              (define (empty-static-library? file)
                ;; Return true if FILE is an 'ar' archive with nothing
                ;; beyond the header.
-               (let ((file (string-append #$output "/lib/" file)))
+               (let ((file (string-append (assoc-ref outputs "out")
+                                          "/lib/" file)))
                  (and (ar-file? file)
                       (= (stat:size (stat file)) 8))))
 
@@ -1137,10 +1141,12 @@ the store.")
                (and (not (ar-file? file))
                     (not (elf-file? file))))
 
-             (let* ((lib (string-append #$output "/lib"))
-                    (files (scandir lib static-library?))
-                    (empty (scandir lib empty-static-library?))
-                    (slib (string-append #$output:static "/lib")))
+             (let* ((out    (assoc-ref outputs "out"))
+                    (lib    (string-append out "/lib"))
+                    (files  (scandir lib static-library?))
+                    (empty  (scandir lib empty-static-library?))
+                    (static (assoc-ref outputs "static"))
+                    (slib   (string-append static "/lib")))
                (mkdir-p slib)
                (for-each (lambda (base)
                            (rename-file (string-append lib "/" base)
@@ -1156,8 +1162,7 @@ the store.")
                ;; instead of OUT.
                (for-each (lambda (ld-script)
                            (substitute* ld-script
-                             ((#$output)
-                              #$output:static)))
+                             ((out) static)))
                          (filter linker-script?
                                  (map (cut string-append slib "/" <>)
                                       files))))))
