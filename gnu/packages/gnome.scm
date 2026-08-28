@@ -13244,7 +13244,7 @@ host to avoid parser overhead and memory-allocator fragmentation.")
 (define-public gmobile
   (package
     (name "gmobile")
-    (version "0.2.1")
+    (version "0.7.3")
     (source
      (origin
        (method git-fetch)
@@ -13254,12 +13254,13 @@ host to avoid parser overhead and memory-allocator fragmentation.")
        (file-name (git-file-name "gmobile" version))
        (sha256
         (base32
-         "1cnm4vkvgrkxf1nnghs5zc13d6f46h4c57vn54rlcy6q7qjkdr74"))))
+         "1jyrkg0rmnxmrmzn3zwdfr8ks8yhmlx2bdi8nwgmanx165rhr7wi"))))
     (build-system meson-build-system)
     (native-inputs
      (list `(,glib "bin") ; for glib-compile-resources
            gobject-introspection
-           pkg-config))
+           pkg-config
+           vala))
     (propagated-inputs
      (list glib json-glib))
     (synopsis "Functions useful in mobile related, glib based projects")
