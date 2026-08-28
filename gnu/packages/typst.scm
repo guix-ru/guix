@@ -27,6 +27,7 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix build-system cargo)
   #:use-module (guix build-system copy)
+  #:use-module (guix build-system typst)
   #:use-module (gnu packages)
   #:use-module (gnu packages rust-crates)
   #:use-module (gnu packages tls))
@@ -176,3 +177,32 @@ compilation, and intuitive error messages.")
 universal consistency and correctness as top priorities.  It is
 configuration-free.")
     (license license:asl2.0)))
+
+(define-public typst-oxifmt
+  (package
+    (name "typst-oxifmt")
+    (version "1.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/PgBiel/typst-oxifmt")
+                     (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "0mwh8jmck9cxkq9prsjlmxd5msyvfd2a2si4xqc43sqw2dgiqivk"))))
+    (build-system typst-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (replace 'check
+                 (lambda* (#:key tests? #:allow-other-keys)
+                   (when tests?
+                     (invoke "typst" "compile"
+                             "--root=."
+                             "tests/strfmt-tests.typ")))))))
+    (home-page "https://github.com/PgBiel/typst-oxifmt")
+    (synopsis "Convenient string formatting")
+    (description "This package provides string formatting and interpolation
+through the @code{strfmt} function, with syntax similar to Rust's format
+strings.")
+    (license (list license:expat license:asl2.0))))
