@@ -1,0 +1,89 @@
+Upstream-Status: Not applicable.
+See-also: https://github.com/typst/typst/pull/6190
+diff --git a/crates/typst-cli/src/args.rs b/crates/typst-cli/src/args.rs
+index ee3ae7e31..3ab497fca 100644
+--- a/crates/typst-cli/src/args.rs
++++ b/crates/typst-cli/src/args.rs
+@@ -454,6 +454,9 @@ pub struct PackageArgs {
+     #[clap(long = "package-path", env = "TYPST_PACKAGE_PATH", value_name = "DIR")]
+     pub package_path: Option<PathBuf>,
+ 
++    #[clap(env = "GUIX_TYPST_PACKAGE_PATH", value_delimiter = ENV_PATH_SEP)]
++    pub guix_typst_package_path: Option<Vec<PathBuf>>,
++
+     /// Custom path to package cache, defaults to system-dependent location.
+     #[clap(
+         long = "package-cache-path",
+diff --git a/crates/typst-cli/src/packages.rs b/crates/typst-cli/src/packages.rs
+index 86d739ec9..9be2ac716 100644
+--- a/crates/typst-cli/src/packages.rs
++++ b/crates/typst-cli/src/packages.rs
+@@ -13,6 +13,12 @@ pub fn system(args: &PackageArgs) -> SystemPackages {
+             .clone()
+             .map(FsPackages::new)
+             .or_else(FsPackages::system_cache),
++        args.guix_typst_package_path
++            .clone()
++            .unwrap_or_default()
++            .iter()
++            .map(FsPackages::new)
++            .collect(),
+         UniversePackages::new(crate::download::downloader()),
+     )
+ }
+diff --git a/crates/typst-kit/src/packages.rs b/crates/typst-kit/src/packages.rs
+index c0027b9c5..668e80551 100644
+--- a/crates/typst-kit/src/packages.rs
++++ b/crates/typst-kit/src/packages.rs
+@@ -35,6 +35,7 @@ use {
+ pub struct SystemPackages {
+     data: Option<FsPackages>,
+     cache: Option<FsPackages>,
++    guix: Vec<FsPackages>,
+     universe: UniversePackages,
+ }
+ 
+@@ -53,6 +54,7 @@ impl SystemPackages {
+         Self::from_parts(
+             FsPackages::system_data(),
+             FsPackages::system_cache(),
++            Vec::<FsPackages>::new(),
+             UniversePackages::new(downloader),
+         )
+     }
+@@ -61,9 +63,10 @@ impl SystemPackages {
+     pub fn from_parts(
+         data: Option<FsPackages>,
+         cache: Option<FsPackages>,
++        guix: Vec<FsPackages>,
+         universe: UniversePackages,
+     ) -> Self {
+-        Self { data, cache, universe }
++        Self { data, cache, guix, universe }
+     }
+ 
+     /// Returns a handle to the data package directory.
+@@ -76,6 +79,10 @@ impl SystemPackages {
+         self.cache.as_ref()
+     }
+ 
++    pub fn guix(&self) -> &Vec<FsPackages> {
++        self.guix.as_ref()
++    }
++
+     /// Returns a handle to the Typst universe registry.
+     pub fn universe(&self) -> &UniversePackages {
+         &self.universe
+@@ -99,6 +106,12 @@ impl SystemPackages {
+             return Ok(root);
+         }
+ 
++        for candidate in self.guix.iter() {
++            if let Some(root) = candidate.obtain(spec) {
++                return Ok(root);
++            }
++        }
++
+         if let Some(cache) = &self.cache {
+             if let Some(root) = cache.obtain(spec) {
+                 return Ok(root);

@@ -27,6 +27,7 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix build-system cargo)
   #:use-module (guix build-system copy)
+  #:use-module (gnu packages)
   #:use-module (gnu packages rust-crates)
   #:use-module (gnu packages tls))
 
@@ -64,6 +65,7 @@ typesetting system.")
              (url "https://github.com/typst/typst")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
+       (patches (search-patches "typst-support-GUIX_TYPST_PACKAGE_PATH.patch"))
        (sha256
         (base32 "0y727lyicn3ciq36mdpbcg8d09naff39y1i52467mlmr11p0l9xa"))))
     (build-system cargo-build-system)
@@ -109,9 +111,8 @@ typesetting system.")
     (inputs (cons* openssl (cargo-inputs 'typst)))
     (native-search-paths
      (list (search-path-specification
-            (variable "TYPST_PACKAGE_PATH")
-            (files '("share/typst/packages"))
-            (separator #f))
+            (variable "GUIX_TYPST_PACKAGE_PATH")
+            (files '("share/typst/packages")))
            (search-path-specification
             (variable "TYPST_FONT_PATHS")
             (files '("share/fonts" "share/texmf-dist/fonts")))))

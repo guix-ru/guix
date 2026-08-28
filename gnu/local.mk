@@ -2600,6 +2600,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/tuxpaint-stamps-path.patch		\
   %D%/packages/patches/tvm_fix_cpptest_build.patch              \
   %D%/packages/patches/twinkle-bcg729.patch			\
+  %D%/packages/patches/typst-support-GUIX_TYPST_PACKAGE_PATH.patch	\
   %D%/packages/patches/u-boot-allow-disabling-openssl.patch	\
   %D%/packages/patches/ucx-tcp-iface-ioctl.patch		\
   %D%/packages/patches/uftrace-fix-tests.patch			\
