@@ -13833,46 +13833,51 @@ historical battery usage and related statistics.")
     (license license:gpl2+)))
 
 (define-public libcall-ui
-  (package
-    (name "libcall-ui")
-    (version "0.2.1")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://gitlab.gnome.org/World/Phosh/libcall-ui")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name "libcall-ui" version))
-       (sha256
-        (base32
-         "1bzrsrqjbncnck762sfr9a55n0l540bx0850dhjm6lwi0yp7giyc"))
-       (patches (search-patches "libcall-ui-make-it-installable.patch"))))
-    (build-system meson-build-system)
-    (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'check 'pre-check
-            (lambda _
-              (setenv "HOME" (getcwd))
-              ;; Tests require a running X server.
-              (system "Xvfb :1 &")
-              (setenv "DISPLAY" ":1"))))))
-    (propagated-inputs ; All these in call-ui.pc.
-     (list glib
-           gtk
-           libadwaita
-           libcallaudio
-           libhandy))
-    (native-inputs
-     (list `(,glib "bin") ; glib-mkenums
-           pkg-config
-           xorg-server-for-tests))
-    (synopsis "Common User Interfaces for call handling")
-    (description "This package provides common user interfaces to make and
+  ;; 'calls' is very picky about libcall-ui; use the exact commit it wants,
+  ;; see at
+  ;; <https://gitlab.gnome.org/GNOME/calls/-/blob/main/subprojects/libcall-ui.wrap>.
+  (let ((commit "3a2044f8e7c45387954ed35d22c6b6309e6751d6")
+        (revision "0"))
+    (package
+      (name "libcall-ui")
+      (version (git-version "0.2.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://gitlab.gnome.org/World/Phosh/libcall-ui")
+                (commit commit)))
+         (file-name (git-file-name "libcall-ui" version))
+         (sha256
+          (base32
+           "1iv10fhwbvjh591gydailb40bm8lx0n78i39dfymqi6x5jl2qjxa"))
+         (patches (search-patches "libcall-ui-make-it-installable.patch"))))
+      (build-system meson-build-system)
+      (arguments
+       (list
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'check 'pre-check
+              (lambda _
+                (setenv "HOME" (getcwd))
+                ;; Tests require a running X server.
+                (system "Xvfb :1 &")
+                (setenv "DISPLAY" ":1"))))))
+      (propagated-inputs ; All these in call-ui.pc.
+       (list glib
+             gtk
+             libadwaita
+             libcallaudio
+             libhandy))
+      (native-inputs
+       (list `(,glib "bin") ; glib-mkenums
+             pkg-config
+             xorg-server-for-tests))
+      (synopsis "Common User Interfaces for call handling")
+      (description "This package provides common user interfaces to make and
 receive calls.")
-    (home-page "https://gitlab.gnome.org/World/Phosh/libcall-ui")
-    (license license:lgpl2.1+)))
+      (home-page "https://gitlab.gnome.org/World/Phosh/libcall-ui")
+      (license license:lgpl2.1+))))
 
 (define-public calls
   (package
