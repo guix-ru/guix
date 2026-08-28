@@ -294,7 +294,7 @@ for elementary OS and its desktop environment: Pantheon.")
            libgphoto2
            libgudev
            libhandy
-           libportal
+           libportal-gtk3
            libraw
            libwebp
            sqlite))
