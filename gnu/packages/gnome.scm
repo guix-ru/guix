@@ -6789,15 +6789,14 @@ supports playlists, song ratings, and any codecs installed through gstreamer.")
            bash-minimal
            exempi
            gnome-desktop
-           gtk
            lcms
            libexif
            libjpeg-turbo
            libpeas
-           libportal
+           libportal-gtk3
            librsvg
            shared-mime-info))
-    (home-page "https://wiki.gnome.org/Apps/EyeOfGnome")
+    (home-page "https://gitlab.gnome.org/GNOME/eog")
     (synopsis "GNOME image viewer")
     (description "Eye of GNOME is the GNOME image viewer.  It
 supports image conversion, rotation, and slideshows.")
@@ -12662,7 +12661,7 @@ desktop environment.")
            libgudev
            libhandy
            libosinfo
-           libportal
+           libportal-gtk3
            libsecret
            libsoup
            libusb

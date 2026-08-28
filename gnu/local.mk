@@ -1739,7 +1739,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/libinfinity-renew-test-certificate.patch \
   %D%/packages/patches/libmaus2-fix-gcc-13-require-include-cstdint.patch	\
   %D%/packages/patches/libpatch-respect-ldflags.patch		\
-  %D%/packages/patches/libportal-qt-6.9.patch                   \
   %D%/packages/patches/libretranslate-use-flasgger.patch	\
   %D%/packages/patches/libretro-dolphin-emu-unbundle-tinygltf.patch     \
   %D%/packages/patches/libretro-dolphin-emu-unbundle-watcher.patch      \
