@@ -13763,6 +13763,25 @@ historical battery usage and related statistics.")
                      (setenv "PIPEWIRE_LOG" "meson-logs/pipewire.log")
                      (invoke "pipewire" "--version")
                      (system "pipewire &")))))))
+    (native-inputs
+     (list asciidoc
+           dbus
+           docbook-xsl
+           docbook-xml-4.3
+           gettext-minimal
+           `(,glib "bin")
+           itstool
+           libxml2
+           libxslt
+           mutter
+           nv-codec-headers
+           pkg-config
+           python
+           python-dbus-1.2
+           python-pygobject
+           shaderc
+           spirv-tools
+           xdg-desktop-portal-gnome))
     (inputs
      (list cairo
            freerdp
@@ -13789,25 +13808,6 @@ historical battery usage and related statistics.")
            tpm2-tss
            vulkan-loader
            wireplumber))
-    (native-inputs
-     (list asciidoc
-           dbus
-           docbook-xsl
-           docbook-xml-4.3
-           gettext-minimal
-           `(,glib "bin")
-           itstool
-           libxml2
-           libxslt
-           mutter
-           nv-codec-headers
-           pkg-config
-           python
-           python-dbus-1.2
-           python-pygobject
-           shaderc
-           spirv-tools
-           xdg-desktop-portal-gnome))
     (home-page "https://gitlab.gnome.org/GNOME/gnome-remote-desktop")
     (synopsis "Share GNOME desktop with remote sessions")
     (description "This package provides a remote desktop server for GNOME.")
