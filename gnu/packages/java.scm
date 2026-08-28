@@ -1306,6 +1306,9 @@ new Date();"))))
            which
            zip))))
 
+;;; Note: The build of openjdk11 fails half of the time with a
+;;; ConcurrentModificationException error, whether building in parallel or not
+;;; (see: <https://codeberg.org/guix/guix/issues/10850>).
 (define-public openjdk11
   (package
     (name "openjdk")
@@ -1333,8 +1336,6 @@ new Date();"))))
     (outputs '("out" "jdk" "doc"))
     (arguments
      (list
-      ;; Prevent a java.util.ConcurrentModificationException.
-      #:parallel-build? #f
       #:modules `((guix build gnu-build-system)
                   (guix build utils)
                   (ice-9 match)
@@ -1655,8 +1656,6 @@ new Date();"))))
       (patches (search-patches "openjdk-10-setsignalhandler.patch"))))
    (arguments
     (substitute-keyword-arguments (package-arguments openjdk11)
-      ;; Re-enable parallel build.
-      ((#:parallel-build? _ #t) #t)
       ((#:phases phases)
        #~(modify-phases #$phases
            #$@(if (target-aarch64?)
