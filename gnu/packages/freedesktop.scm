@@ -3228,7 +3228,7 @@ compatible with the well-known scripts of the same name.")
 (define-public libportal
   (package
     (name "libportal")
-    (version "0.9.1")
+    (version "0.10.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3237,38 +3237,33 @@ compatible with the well-known scripts of the same name.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1rbqkmvvfig98ig8gsf93waiizrminj7gywxbza15hzx3an3hwh9"))
-              (patches (search-patches "libportal-qt-6.9.patch"))))
+                "10psp6k477mz6gcvk78d9nw2w7q8whffd8ck9161dgs2gjff6kdx"))))
     (build-system meson-build-system)
-    (arguments
-     (list
-      #:configure-flags
-      #~(list "-Ddocs=false")          ; requires unpackaged gi-docgen
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-before 'check 'set-qt-environment-variables
-            (lambda* (#:key inputs #:allow-other-keys)
-              ;; Required for tests
-              (setenv "QT_QPA_PLATFORM" "offscreen"))))))
+    ;; Avoid dragging Qt in the closure, which is an optional input anyway.
+    (arguments (list #:disallowed-references (list gtk+ qtbase)))
     (native-inputs
-     (list pkg-config
-           docbook-xsl
-           docbook-xml
-           `(,glib "bin")
-           gobject-introspection
-           libxml2
-           vala))
-    (inputs
-     (list gtk
-           gtk+
-           qtbase))
-    (propagated-inputs
-     (list glib))
+     (list gi-docgen pkg-config `(,glib "bin") gobject-introspection vala))
+    (inputs (list gtk))
+    (propagated-inputs (list glib))
     (home-page "https://github.com/flatpak/libportal")
     (synopsis "Flatpak portal library")
     (description
      "libportal provides GIO-style async APIs for most Flatpak portals.")
     (license license:lgpl2.1+)))
+
+(define-public libportal-gtk3
+  (package/inherit libportal
+    (name "libportal-gtk3")
+    (arguments (list #:disallowed-references (list gtk qtbase)))
+    (inputs (modify-inputs inputs
+              (replace "gtk" gtk+)))))
+
+(define-public libportal-qt
+  (package/inherit libportal
+    (name "libportal-qt")
+    (arguments (list #:disallowed-references (list gtk+ gtk)))
+    (inputs (modify-inputs inputs
+              (replace "gtk" qtbase)))))
 
 (define-public xdg-desktop-portal
   (package
