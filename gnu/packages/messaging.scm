@@ -2979,7 +2979,7 @@ asynchronicity.")
 (define-public libphonenumber
   (package
    (name "libphonenumber")
-   (version "9.0.21")
+   (version "9.0.38")
    (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -2990,7 +2990,7 @@ asynchronicity.")
                         "libphonenumber-reproducible-build.patch"))
               (sha256
                (base32
-                "07ap8qvzlm4wb7x8qvs4n1jhb50fgwsy41ck4ivsj427wy79726r"))))
+                "0jgv5jis0xhvm4vifsg4pacjhssj2fcz7rqhc2n01j2f1zrngjaj"))))
    (arguments
     (list
      #:modules '((guix build cmake-build-system)
