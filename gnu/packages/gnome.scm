@@ -6392,13 +6392,14 @@ as possible!")
         (base32 "01k7aclyp1z2mm6d0201zk5vav6bvla7qmkrgmk9q4xb34fwhs88"))))
     (build-system meson-build-system)
     (arguments
-     (list #:phases #~(modify-phases %standard-phases
+     (list #:configure-flags #~(list "-Denable-test-ui=false")
+           #:phases #~(modify-phases %standard-phases
                         (add-before 'unpack 'set-HOME
                           (lambda _
                             ;; Tests require write access to HOME.
                             (setenv "HOME" "/tmp"))))))
     (native-inputs
-     (list `(,glib "bin") ; for glib-mkenums and glib-genmarshal
+     (list `(,glib "bin")               ; for glib-mkenums and glib-genmarshal
            gettext-minimal
            gsettings-desktop-schemas
            pkg-config
@@ -6409,16 +6410,15 @@ as possible!")
     (inputs
      (list cyrus-sasl
            glib
-           gtk+
            liboauth
            libsoup
            libxml2
            totem-pl-parser))
     (native-search-paths
      (list (search-path-specification
-            (variable "GRL_PLUGIN_PATH")
-            (files (list (string-append "lib/grilo-"
-                                        (version-major+minor version)))))))
+             (variable "GRL_PLUGIN_PATH")
+             (files (list (string-append "lib/grilo-"
+                                         (version-major+minor version)))))))
     (home-page "https://wiki.gnome.org/Projects/Grilo")
     (synopsis "Framework for discovering and browsing media")
     (description
