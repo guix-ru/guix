@@ -646,6 +646,7 @@ for the GStreamer multimedia library.")
     (build-system meson-build-system)
     (arguments
      (list
+      #:disallowed-references (list gtk+ qtbase)
       #:glib-or-gtk? #t              ; To wrap binaries and/or compile schemas
       #:phases
       #~(modify-phases %standard-phases
@@ -705,7 +706,6 @@ for the GStreamer multimedia library.")
            glib
            glib-networking
            glu
-           gtk+
            jack-2
            lame
            libavc1394
