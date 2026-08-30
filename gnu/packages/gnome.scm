@@ -4590,7 +4590,7 @@ editors, IDEs, etc.")
     (build-system meson-build-system)
     (arguments
      (list
-      #:glib-or-gtk? #t
+      #:glib-or-gtk? #t                 ;to compile schemas
       ;; Configure sysconfdir to /etc so that gconf profiles can be written
       ;; there and loaded without having to set GCONF_PROFILE, which cannot be
       ;; safely set globally (as a gconf profile is a per-user thing).
@@ -4615,12 +4615,8 @@ editors, IDEs, etc.")
            pkg-config
            python
            vala))
-    (inputs
-     (list gtk+
-           dbus))
-    (propagated-inputs
-     ;; In Requires of dconf.pc.
-     (list glib))
+    (inputs (list dbus))
+    (propagated-inputs (list glib))    ;in Requires of dconf.pc.
     (home-page "https://wiki.gnome.org/action/show/Projects/dconf")
     (synopsis "Low-level GNOME configuration system")
     (description "Dconf is a low-level configuration system.  Its main purpose
