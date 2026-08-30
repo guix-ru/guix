@@ -1400,7 +1400,7 @@ libraries designed for computer vision research and implementation.")
                                         module-ad-commit)))
     (package
       (name "insight-toolkit")
-      (version "5.4.5")
+      (version "5.4.7")
       (source
        (origin
          (method git-fetch)
@@ -1409,7 +1409,7 @@ libraries designed for computer vision research and implementation.")
                (commit (string-append "v" version))))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0sd037pgsdfigc5gi4lr5iwm063s0wrjl8i4b8dfxmrbipxjvn33"))
+          (base32 "1didpkrfg3ah738x4fby8c47cwmr1svw8a6bzkn87krj753d38lm"))
          ;; This patch is required to build with both ITK_USE_GPU=ON and
          ;; ITK_WRAP_PYTHON=ON.
          ;; <https://github.com/InsightSoftwareConsortium/ITK/pull/4842>
