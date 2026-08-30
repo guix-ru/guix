@@ -388,6 +388,7 @@ panel used in GNOME 3.0's control center.")
      (list accountsservice
            cinnamon-desktop
            cinnamon-menus
+           cinnamon-session
            cinnamon-settings-daemon
            colord-gtk
            cups
@@ -395,7 +396,6 @@ panel used in GNOME 3.0's control center.")
            gcr
            gnome-bluetooth
            gnome-online-accounts
-           gnome-session
            gnutls
            grilo
            gsound
