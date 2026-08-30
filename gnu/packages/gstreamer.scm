@@ -775,6 +775,7 @@ model to base your own plug-in on, here it is.")
     (build-system meson-build-system)
     (arguments
      (list
+      #:disallowed-references (list gtk+ qtbase)
       #:configure-flags #~(list "-Dgpl=enabled"
                                 "-Dsctp-internal-usrsctp=disabled"
                                 ;; TODO: Figure out why audiovisualizer test
@@ -884,7 +885,6 @@ model to base your own plug-in on, here it is.")
             glib-networking
             glu
             gsm
-            gtk+
             iqa
             ladspa
             lcms
