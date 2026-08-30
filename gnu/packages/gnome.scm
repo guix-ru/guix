@@ -10006,38 +10006,36 @@ configuration system for GNOME.  It allows users to configure desktop
 software that do not provide their own configuration interface.")
     (license license:lgpl2.1+)))
 
-(define-public gnome-default-applications
+;;; The gnome-mimeapp.list base file for the GNOME desktop is shipped with the
+;;; 'gnome-session' package.
+(define-public gnome-mimeapps-list
   (package
-    (name "gnome-default-applications")
-    (version "0")
-    (build-system trivial-build-system)
-    (source #f)
-    (propagated-inputs
-     (list nautilus evince))
+    (name "gnome-mimeapps-list")
+    (version "50.1")
+    (build-system copy-build-system)
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://gitlab.gnome.org/GNOME/gnome-session")
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1lskby2x0qmsxx3z90i91gln9rz0gnf4yf081vngpc0h301py0cv"))))
     (arguments
-     `(#:modules ((guix build utils))
-       #:builder
-       (begin
-         (use-modules (guix build utils))
-         (let* ((out (assoc-ref %outputs "out"))
-                (apps (string-append out "/share/applications")))
-           (mkdir-p apps)
-           (call-with-output-file (string-append apps "/gnome-mimeapps.list")
-             (lambda (port)
-               (format port "[Default Applications]\n")
-               (format port "inode/directory=org.gnome.Nautilus.desktop\n")
-               (format port "application/pdf=evince.desktop\n")
-               (format port "application/postscript=evince.desktop\n")))
-           #t))))
+     (list
+      #:install-plan #~'(("data/gnome-mimeapps.list" "share/applications/"))))
     (synopsis "Default MIME type associations for the GNOME desktop")
     (description
-     "Given many installed packages which might handle a given MIME type, a
-user running the GNOME desktop probably has some preferences: for example,
-that folders be opened by default by the Nautilus file manager, not the Baobab
-disk usage analyzer.  This package establishes that set of default MIME type
-associations for GNOME.")
+     "This package provides the @file{gnome-mimeapps.list} file that
+establishes the set of default MIME type associations for GNOME.")
+    (home-page "https://gitlab.gnome.org/GNOME/gnome-session")
     (license license:gpl3+)
-    (home-page #f)))
+    (properties '((upstream-name . "gnome-session")))))
+
+;;; TODO: Remove when 2027/03 comes.
+(define-deprecated/public-alias gnome-default-applications
+  gnome-mimeapps-list)
 
 (define-public libgovirt
   (package
@@ -10316,7 +10314,7 @@ playing media, scanning, and much more.")
                             desktop-file-utils
                             font-adwaita
                             font-dejavu
-                            gnome-default-applications
+                            gnome-mimeapps-list
                             gnome-online-accounts
                             gst-plugins-base
                             gst-plugins-good
