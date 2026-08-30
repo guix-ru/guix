@@ -1269,22 +1269,15 @@ in the GNOME desktop.")
     (build-system meson-build-system)
     (arguments
      (list #:configure-flags
-           #~(list "-Dgtk_doc=true"
-                   ;; Manpages are built using pandoc.
-                   #$@(if (this-package-native-input "pandoc")
-                          #~("-Dmanpages=true")
-                          #~("-Dmanpages=false")))))
+           #~(list "-Dmanpages=false"   ;avoid heavy pandoc dependency
+                   "-Dgtk_doc=true")))
     (native-inputs
-     (append
-       (if (supported-package? pandoc)
-           (list pandoc)
-           '())
-       (list gettext-minimal
-             `(,glib "bin")
-             gi-docgen
-             gobject-introspection
-             pkg-config
-             vala)))
+     (list gettext-minimal
+           `(,glib "bin")
+           gi-docgen
+           gobject-introspection
+           pkg-config
+           vala))
     (inputs
      (list gtk))
     (propagated-inputs
