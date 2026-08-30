@@ -1169,7 +1169,8 @@ after their category.")
         (base32 "0y2sz79ms498mag3rsvkng8q5pmg9f2v0njfq3zw7k1z0v5z70j0"))))
     (build-system meson-build-system)
     (arguments
-     (list #:glib-or-gtk? #t         ; To wrap binaries and/or compile schemas
+     (list #:disallowed-references (list gtk+ qtbase)
+           #:glib-or-gtk? #t         ; To wrap binaries and/or compile schemas
            #:configure-flags #~(list "-Dgpl=enabled")
            #:phases
            #~(modify-phases %standard-phases
