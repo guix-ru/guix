@@ -12106,7 +12106,7 @@ generic enough to work for everyone.")
 (define-public evolution
   (package
     (name "evolution")
-    (version "3.60.0")
+    (version "3.62.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnome/sources/evolution/"
@@ -12114,7 +12114,7 @@ generic enough to work for everyone.")
                                   "evolution-" version ".tar.xz"))
               (sha256
                (base32
-                "1rdm75a8w6xn1vil2npb69n6qdmwdab2fq7y708plflk8j579v8g"))))
+                "1mm3hwjylv02mp2p5g7dk4xn5i0gcmah5kygnl3gg6v9w50crhkz"))))
     (build-system cmake-build-system)
     (arguments
      (list
@@ -12153,7 +12153,6 @@ generic enough to work for everyone.")
     (inputs
      (list cmark
            enchant
-           gcr-3
            evolution-data-server-gtk3   ;must be the same version
            gsettings-desktop-schemas
            gnome-autoar
