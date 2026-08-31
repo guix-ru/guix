@@ -165,7 +165,7 @@
 (define-public appstream
   (package
     (name "appstream")
-    (version "1.0.5")
+    (version "1.2.0")
     (source
      (origin
        (method url-fetch)
@@ -174,7 +174,7 @@
                        "appstream/releases/"
                        "AppStream-" version ".tar.xz"))
        (sha256
-        (base32 "08aijy6mfyd9cc7b7gk0610w6rqr5xwpva0fg77z1mdbi6gd43nf"))))
+        (base32 "0ifblpdmvlynsc2dw66j78pm5xls9h1jdn5jzrqh4m8hi4vij6ch"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -207,7 +207,14 @@
            python-wrapper
            gi-docgen))
     (inputs
-     (list curl libsoup-minimal-2 libstemmer libxmlb libxml2 libyaml lmdb))
+     (list bash-completion
+           curl
+           libstemmer
+           libxmlb
+           libxml2
+           libfyaml
+           wayland
+           `(,zstd "lib")))
     (propagated-inputs
      (list glib))
     (synopsis "Tools and libraries to work with AppStream metadata")
