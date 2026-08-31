@@ -798,14 +798,14 @@ GEXP)."
     (description "Debian patches")
     (license license:gpl2)))
 
-(define-public linux-debian-6.12-version "6.12.105")
+(define-public linux-debian-6.12-version "6.12.107")
 (define debian-patches-6.12
   (linux-debian-patches
    (string-append linux-debian-6.12-version "-1")
-   (base32 "1nz6p83y4ak6l1hw8l6hsp0j61nvlfw0xrvsq54kza9rd5a89gq5")))
+   (base32 "1cqpb35hv3danwdyw7r8cxx14xa9d6ypf86j8cji8nc8kyw6scby")))
 (define-public linux-debian-6.12-pristine-source
   (let ((version linux-debian-6.12-version)
-        (hash (base32 "0ggni16ill7acfxsmwr96q2zfcia1v19sif32csv2acm24g80dpb")))
+        (hash (base32 "0yih5s4xbp1hlyfha49z2j3l9x7i5ij335jfl6f6sbfy7yzcby55")))
     (make-linux-source
      version (%upstream-linux-source version hash)
      (delay
