@@ -720,8 +720,7 @@ and mmsh protocols.")
 (define-public libde265
   (package
     (name "libde265")
-    (version "1.0.14")
-    (replacement libde265/fixed)
+    (version "1.1.1")
     (source
      (origin
        (method git-fetch)
@@ -731,11 +730,9 @@ and mmsh protocols.")
          (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1a4n1hnr9ybji87irg2kya95slf4jnybnkg4x2zihnqqihbnv539"))))
+        (base32 "1qln88z6jxhwkiay5hby4na0l46s054ylwxa9s69iz6sfihf7fxp"))))
     (build-system gnu-build-system)
-    (arguments
-     `(#:configure-flags
-       (list "--disable-static")))
+    (arguments (list #:configure-flags #~'("--disable-static")))
     (native-inputs
      (list autoconf automake libtool pkg-config python-wrapper))
     (inputs
@@ -753,18 +750,6 @@ other software.")
       license:expat
       ;; Library.
       license:lgpl3+))))
-
-(define libde265/fixed
-  (package
-    (inherit libde265)
-    (source
-     (origin
-       (inherit (package-source libde265))
-       (patches (search-patches "libde265-CVE-2023-49465.patch"
-                                "libde265-CVE-2023-49467.patch"
-                                "libde265-CVE-2023-49468.patch"
-                                "libde265-CVE-2026-33164-CVE-2026-33165.patch"
-                                "libde265-CVE-2026-49295.patch"))))))
 
 (define-public tslib
   (package
