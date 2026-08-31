@@ -1300,7 +1300,8 @@ re-executing them as necessary.")
 
               ;; Make sure 'PATH_PROCNET_DEV' gets defined when
               ;; cross-compiling (by default it does not.)
-              #$@(if (%current-target-system)
+              #$@(if (and (%current-target-system)
+                          (not (target-hurd?)))
                      '("--with-path-procnet-dev=/proc/net/dev")
                      '())
               #$@(if (target-hurd?)
