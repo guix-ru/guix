@@ -74,6 +74,7 @@ NL < '\n'")
 (define %names
   '(("adwaita-fonts" . "font-adwaita")
     ("glycin" . "libglycin")
+    ("gnome-session" . "gnome-mimeapps-list")
     ("json-glib" . "json-glib-minimal")
     ("libcloudproviders" . "libcloudproviders-minimal")
     ("libsoup" . "libsoup-minimal")
