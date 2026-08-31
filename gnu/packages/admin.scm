@@ -1304,16 +1304,7 @@ re-executing them as necessary.")
                      '("--with-path-procnet-dev=/proc/net/dev")
                      '())
               #$@(if (target-hurd?)
-                     '("--with-path-klog=/dev/klog"
-                       "--disable-rcp"
-                       "--disable-rexec"
-                       "--disable-rexecd"
-                       "--disable-rlogin"
-                       "--disable-rlogind"
-                       "--disable-rsh"
-                       "--disable-rshd"
-                       "--disable-uucpd"
-                       "--disable-whois")
+                     '("--with-path-klog=/dev/klog")
                      '()))
       ;; Make sure that canonical "coreutils" package is not referred.
       #:make-flags
