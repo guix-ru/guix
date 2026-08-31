@@ -4142,7 +4142,7 @@ background agent taking care of maintaining the necessary state.")
      (list pkg-config))
     (inputs
      (cons* curl
-            libgit2-1.9/pinned
+            libgit2-1.9
             libssh2
             openssl
             sqlite
