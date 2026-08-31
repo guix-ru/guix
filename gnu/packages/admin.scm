@@ -1296,7 +1296,7 @@ re-executing them as necessary.")
      (list
       #:configure-flags
       #~(list "--localstatedir=/var"
-
+              "--sysconfdir=/etc"
               ;; Make sure 'PATH_PROCNET_DEV' gets defined when
               ;; cross-compiling (by default it does not.)
               #$@(if (and (%current-target-system)
