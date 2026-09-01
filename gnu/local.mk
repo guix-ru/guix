@@ -1255,6 +1255,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/emacs-deferred-fix-number-of-arguments.patch	\
   %D%/packages/patches/emacs-disable-jit-compilation.patch			\
   %D%/packages/patches/emacs-doc-toc-shell-commands.patch	\
+  %D%/packages/patches/emacs-eat-fix-dec-line-drawing.patch	\
   %D%/packages/patches/emacs-elisp-autofmt-fix-region-send.patch	\
   %D%/packages/patches/emacs-fix-scheme-indent-function.patch	\
   %D%/packages/patches/emacs-gnus-alias-reference-signature.patch	\
