@@ -43,7 +43,7 @@
 ;;; Copyright © 2022 Zhu Zihao <all_but_last@163.com>
 ;;; Copyright © 2022 Antero Mejr <antero@mailbox.org>
 ;;; Copyright © 2022 Taiju HIGASHI <higashi@taiju.info>
-;;; Copyright © 2022, 2023 Zheng Junjie <873216071@qq.com>
+;;; Copyright © 2022, 2023, 2026 Zheng Junjie <z572@z572.online>
 ;;; Copyright © 2022, 2025-2026 Evgeny Pisemsky <mail@pisemsky.site>
 ;;; Copyright © 2022, 2026 jgart <jgart@dismail.de>
 ;;; Copyright © 2023 Andrew Tropin <andrew@trop.in>
@@ -6410,6 +6410,54 @@ SHA-512).")
 memoizing, backtracking, recursive-descent parsing technique that runs in time
 and space linear in the size of the input text.")
     (license license:expat)))
+
+(define-public guile-r6rs-pffi
+  ;; The unreleased commits contain fixes for Guile 3.0.9.
+  (let ((commit "5f2e46d99fc330c39e5f898f9fee0331a9949338")
+        (revision "0"))
+    (package
+      (name "guile-r6rs-pffi")
+      (version (git-version "25.05.16" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://github.com/ktakashi/r6rs-pffi")
+                       (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "0fsbqci6s4d10x1mq61hjhmqi13jgl5rf688w1v7b0chc95xbh3z"))))
+      (build-system guile-build-system)
+      (arguments
+       (list
+        #:source-directory "src"
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-before 'build 'move-sls-files
+              (lambda _
+                (define (guile-sls->scm file)
+                  (string-append (string-drop-right
+                                  file (string-length ".guile.sls"))
+                                 ".scm"))
+                (define (sls->scm sls)
+                  (string-append (string-drop-right sls 4)
+                                 ".scm"))
+                (for-each (lambda (file)
+                            (rename-file file (guile-sls->scm file)))
+                          (find-files "." "\\.guile\\.sls$"))
+                (for-each delete-file (find-files "." "\\..*\\.sls$"))
+                (delete-file "src/pffi/struct/chez.sls")
+                (for-each (lambda (file)
+                            (rename-file file (sls->scm file)))
+                          (find-files "." "\\.sls$")))))))
+      (native-inputs
+       (list guile-3.0))
+      (home-page "https://github.com/ktakashi/r6rs-pffi")
+      (synopsis "Portable @acronym{FFI, Foreign Function Interface} for R6RS")
+      (description
+       "PFFI is a portable foreign function interface for R6RS Scheme
+implementations.")
+      (license license:bsd-2))))
 
 (define-public guile-ac-d-bus
   (package
