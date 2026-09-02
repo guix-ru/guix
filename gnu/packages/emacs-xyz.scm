@@ -26446,6 +26446,10 @@ hidden.")
         #~(modify-phases %standard-phases
             (add-after 'build 'build-and-install-manual
               (lambda _
+                ;; makeinfo errors.  @anchor defined multiple times
+                (substitute* "docs/org-transclusion-manual.org"
+                  (("^\\*\\* Keybindings" all)
+                   (string-append all "   :noexport:")))
                 (invoke "make" "-C" "./docs" "org-transclusion.texi")
                 (invoke "makeinfo" "--no-split"
                         "-o" "org-transclusion.info" "./docs/org-transclusion.texi")
@@ -26456,6 +26460,8 @@ hidden.")
                                "-f" "ert-run-tests-batch-and-exit")))
       (native-inputs
        (list texinfo))
+      (propagated-inputs
+       (list emacs-org))
       (home-page "https://nobiot.github.io/org-transclusion/")
       (synopsis "Enable transclusion with Org Mode")
       (description "Org-transclusion lets you insert a copy of text content via
