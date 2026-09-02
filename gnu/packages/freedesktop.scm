@@ -176,6 +176,7 @@
        (sha256
         (base32 "0ifblpdmvlynsc2dw66j78pm5xls9h1jdn5jzrqh4m8hi4vij6ch"))
        (patches (search-patches
+                 "appstream-32-bit-overflow.patch"
                  "appstream-elogind.patch"
                  "appstream-libstemmer-include-dir.patch"))))
     (build-system meson-build-system)
