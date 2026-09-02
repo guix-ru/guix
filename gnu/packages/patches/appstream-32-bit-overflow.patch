@@ -1,0 +1,15 @@
+Upstream-status: <https://github.com/ximion/appstream/pull/788>
+
+diff --git a/src/as-system-info.c b/src/as-system-info.c
+index 2967bae3..306c1093 100644
+--- a/src/as-system-info.c
++++ b/src/as-system-info.c
+@@ -479,7 +479,7 @@ as_get_physical_memory_total (void)
+ 	struct sysinfo si = { 0 };
+ 	sysinfo (&si);
+ 	if (si.mem_unit > 0)
+-		return (si.totalram * si.mem_unit) / MB_IN_BYTES;
++		return ((guint64) si.totalram * si.mem_unit) / MB_IN_BYTES;
+ 	return 0;
+ #elif defined(__FreeBSD__) || defined(__NetBSD__)
+ 	unsigned long physmem;
