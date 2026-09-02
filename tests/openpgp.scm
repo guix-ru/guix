@@ -147,6 +147,19 @@ Pz7oopeN72xgggYUNT37ezqN3MeCqw0=
 =AE4G
 -----END PGP SIGNATURE-----")
 
+(define %short-hello-signature/ed25519/sha512     ;digest-algo: sha512
+  ;; A signature of the ASCII string "Hello!\n" with a short (stripped) 30
+  ;; byte MPI, which should get padded up to 32 bytes.
+  "\
+-----BEGIN PGP SIGNATURE-----
+
+iLUEABYKAF8WIQRE0x4hr3E4+bYyKAp3H0nL+q4HLQUCapd8RxsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIlFIAAAAAAFwAFcmVwcm9kdWNlckBndWl4LmludmFs
+aWQxMjA4MgAKCRB3H0nL+q4HLQe5AQCCMx+0Vdp+A85KVcMnfsy4SQG66XN6MPom
+CMNP2EAK9ADwt+637LJ7W2tILiBnaYLncs9n6D7qoXWHMgyWzZsE
+=9a6K
+-----END PGP SIGNATURE-----")
+
 
 (test-begin "openpgp")
 
@@ -216,6 +229,7 @@ Pz7oopeN72xgggYUNT37ezqN3MeCqw0=
     (good-signature ,%dsa-key-id)
     (good-signature ,%ed25519-key-id)
     (good-signature ,%ed25519-key-id)
+    (good-signature ,%ed25519-key-id)
     (good-signature ,%ed25519-key-id))
   (map (lambda (key signature)
          (let* ((key        (search-path %load-path key))
@@ -230,12 +244,14 @@ Pz7oopeN72xgggYUNT37ezqN3MeCqw0=
              "tests/keys/openpgp/dsa.pub"
              "tests/keys/openpgp/ed25519.pub"
              "tests/keys/openpgp/ed25519.pub"
+             "tests/keys/openpgp/ed25519.pub"
              "tests/keys/openpgp/ed25519.pub")
        (list %hello-signature/rsa
              %hello-signature/dsa
              %hello-signature/ed25519/sha256
              %hello-signature/ed25519/sha512
-             %hello-signature/ed25519/sha1)))
+             %hello-signature/ed25519/sha1
+             %short-hello-signature/ed25519/sha512)))
 
 (test-equal "verify-openpgp-signature, bad signature"
   `((bad-signature ,%rsa-key-id)

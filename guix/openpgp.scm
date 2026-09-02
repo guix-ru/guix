@@ -628,13 +628,14 @@ FINGERPRINT, a bytevector."
            (let ((r (get-mpi/bytevector p))
                  (s (get-mpi/bytevector p)))
              ;; XXX: 'verify' fails down the road with GPG_ERR_INV_LENGTH if
-             ;; we provide a 31-byte R or S below, hence the second argument
-             ;; to '->hex' ensuring the MPIs are represented as two-byte
-             ;; multiples, with leading zeros.
+             ;; we provide a less than 32-byte R or S below, which can happen
+             ;; if either of them get stripped of their leading zeroes (See
+             ;; RFC 9580 11.3.1), hence we ensure the MPIs are at least
+             ;; 32-bytes by adding back leading zeros.
              (define (bytevector->hex bv)
                (let ((str (bytevector->base16-string bv)))
-                 (if (odd? (bytevector-length bv))
-                     (string-append "00" str)
+                 (if (> 32 (bytevector-length bv))
+                     (string-pad str 64 #\0)
                      str)))
 
              (string->canonical-sexp
