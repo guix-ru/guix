@@ -174,7 +174,8 @@
                        "appstream/releases/"
                        "AppStream-" version ".tar.xz"))
        (sha256
-        (base32 "0ifblpdmvlynsc2dw66j78pm5xls9h1jdn5jzrqh4m8hi4vij6ch"))))
+        (base32 "0ifblpdmvlynsc2dw66j78pm5xls9h1jdn5jzrqh4m8hi4vij6ch"))
+       (patches (search-patches "appstream-libstemmer-include-dir.patch"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -182,13 +183,6 @@
       #:configure-flags #~(list "-Dsystemd=false")
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'patch-libstemmer
-            (lambda* (#:key inputs #:allow-other-keys)
-              (let ((libstemmer.h (search-input-file inputs
-                                                     "include/libstemmer.h")))
-                (substitute* "meson.build"
-                  (("/usr/include")
-                   (dirname libstemmer.h))))))
           (add-before 'check 'check-setup
             (lambda _
               (setenv "HOME" (getcwd)))))))

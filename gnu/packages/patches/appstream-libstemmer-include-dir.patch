@@ -1,0 +1,90 @@
+From 832c929031a124be07f6044d027ad2d8c35806d9 Mon Sep 17 00:00:00 2001
+From: Matthias Klumpp <matthias@tenstral.net>
+Date: Sat, 5 Sep 2026 00:12:05 +0200
+Subject: [PATCH] meson: Don't use any absolute include path to find
+ libstemmer.h
+
+Resolves: #569
+---
+ meson.build      | 25 ++++++++++++++++---------
+ src/as-stemmer.c |  4 ++++
+ src/meson.build  |  5 ++---
+ 3 files changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index b1bc44ee8..e907bace6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -226,16 +226,23 @@ if get_option ('gir')
+     dependency('gobject-introspection-1.0', version: '>=1.56')
+ endif
+ 
+-stemmer_inc_dirs = include_directories()
++stemmer_dep = dependency('', required: false)
+ if get_option('stemming')
+-    stemmer_lib = cc.find_library('stemmer', required: true)
+-    stemmer_inc_dirs = include_directories(['/usr/include'])
+-    if not cc.has_header('libstemmer.h')
+-        if cc.has_header('libstemmer/libstemmer.h')
+-            stemmer_inc_dirs = include_directories('/usr/include/libstemmer')
+-        else
+-            error('Unable to find Snowball header "libstemmer.h". Please ensure libstemmer/Snowball is installed properly in order to continue.')
+-        endif
++    # Snowball doesn't have an upstream pkg-conf file, but some distros conveniently add one
++    # See https://github.com/snowballstem/snowball/issues/190
++    stemmer_dep = dependency('libstemmer', required: false)
++    if not stemmer_dep.found()
++        stemmer_dep = cc.find_library('stemmer', required: true)
++    endif
++
++    # The Snowball header is either installed directly into an include directory,
++    # or into a "libstemmer" subdirectory of it.
++    if cc.has_header('libstemmer.h', dependencies: [stemmer_dep])
++        conf.set('HAVE_LIBSTEMMER_SUBDIR', false)
++    elif cc.has_header('libstemmer/libstemmer.h', dependencies: [stemmer_dep])
++        conf.set('HAVE_LIBSTEMMER_SUBDIR', true)
++    else
++        error('Unable to find Snowball header "libstemmer.h". Please ensure libstemmer/Snowball is installed properly in order to continue.')
+     endif
+ endif
+ 
+diff --git a/src/as-stemmer.c b/src/as-stemmer.c
+index bd93065a1..22abafb81 100644
+--- a/src/as-stemmer.c
++++ b/src/as-stemmer.c
+@@ -24,8 +24,12 @@
+ #include <glib.h>
+ #include <string.h>
+ #ifdef HAVE_STEMMING
++#ifdef HAVE_LIBSTEMMER_SUBDIR
++#include <libstemmer/libstemmer.h>
++#else
+ #include <libstemmer.h>
+ #endif
++#endif
+ 
+ #include "as-utils.h"
+ #include "as-utils-private.h"
+diff --git a/src/meson.build b/src/meson.build
+index 479605848..6553fcf82 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -207,7 +207,7 @@ aslib_deps = [
+     coregraphics_dep,
+ ]
+ if get_option ('stemming')
+-    aslib_deps += [stemmer_lib]
++    aslib_deps += [stemmer_dep]
+ endif
+ 
+ appstream_lib = library ('appstream',
+@@ -220,8 +220,7 @@ appstream_lib = library ('appstream',
+     soversion: as_api_level,
+     version: as_version,
+     dependencies: [aslib_deps],
+-    include_directories: [stemmer_inc_dirs,
+-                          root_inc_dir],
++    include_directories: [root_inc_dir],
+     install: true
+ )
+ 
