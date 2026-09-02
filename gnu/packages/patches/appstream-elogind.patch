@@ -1,0 +1,28 @@
+Upstream-status: <https://github.com/ximion/appstream/pull/786>
+
+diff --git a/meson.build b/meson.build
+index c84392ee..b1bc44ee 100644
+--- a/meson.build
++++ b/meson.build
+@@ -202,7 +202,7 @@ else
+     zstd_dep = dependency('', required: false)
+ endif
+ if get_option('systemd')
+-    libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
++    libsystemd_dep = dependency('libsystemd', 'libelogind', required: get_option('systemd'))
+ else
+     libsystemd_dep = dependency('', required: false)
+ endif
+diff --git a/meson_options.txt b/meson_options.txt
+index ac364979..62d4102b 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,7 +6,7 @@ option('stemming',
+ option('systemd',
+        type : 'boolean',
+        value : true,
+-       description : 'Build with systemd support'
++       description : 'Build with systemd/elogind support'
+ )
+ option('vapi',
+        type : 'boolean',

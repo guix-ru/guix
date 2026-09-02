@@ -175,12 +175,13 @@
                        "AppStream-" version ".tar.xz"))
        (sha256
         (base32 "0ifblpdmvlynsc2dw66j78pm5xls9h1jdn5jzrqh4m8hi4vij6ch"))
-       (patches (search-patches "appstream-libstemmer-include-dir.patch"))))
+       (patches (search-patches
+                 "appstream-elogind.patch"
+                 "appstream-libstemmer-include-dir.patch"))))
     (build-system meson-build-system)
     (arguments
      (list
       #:glib-or-gtk? #t
-      #:configure-flags #~(list "-Dsystemd=false")
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'check-setup
@@ -203,6 +204,7 @@
     (inputs
      (list bash-completion
            curl
+           elogind
            libstemmer
            libxmlb
            libxml2
