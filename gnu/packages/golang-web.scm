@@ -1062,7 +1062,8 @@ its service definition.")
     (arguments
      (list
       #:import-path "cloud.google.com/go/profiler"
-      #:unpack-path "cloud.google.com/go"))
+      #:unpack-path "cloud.google.com/go"
+      #:test-flags #~(list "-vet=off")))
     (native-inputs
      (list go-github-com-golang-mock))
     (propagated-inputs
@@ -10030,7 +10031,8 @@ GitHub API v3.")
      (substitute-keyword-arguments arguments
        ((#:import-path _) "github.com/google/go-github/v78")
        ((#:test-flags test-flags #~(list))
-        #~(list "-skip" (string-join
+        #~(list "-vet=off"
+                "-skip" (string-join
                          ;; Tests need network setup and access to Internet.
                          (list
                           "TestEnterpriseService_ListEnterpriseNetworkC"
@@ -10064,7 +10066,8 @@ GitHub API v3.")
      (substitute-keyword-arguments arguments
        ((#:import-path _) "github.com/google/go-github/v81")
        ((#:test-flags test-flags #~(list))
-        #~(list "-skip" (string-join
+        #~(list "-vet=off"
+                "-skip" (string-join
                          ;; Tests need network setup and access to Internet.
                          (list "TestEnterpriseService_.*"
                                "TestOrganizationsService_.*"
@@ -11387,7 +11390,8 @@ with other clients.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/hashicorp/go-retryablehttp"))
+      #:import-path "github.com/hashicorp/go-retryablehttp"
+      #:test-flags #~(list "-vet=off")))
     (propagated-inputs
      (list go-github-com-hashicorp-go-hclog
            go-github-com-hashicorp-go-cleanhttp))
@@ -15897,7 +15901,8 @@ function for formatting a Forwarded header.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/multiformats/go-multiaddr"))
+      #:import-path "github.com/multiformats/go-multiaddr"
+      #:test-flags #~(list "-vet=off")))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
@@ -17507,7 +17512,8 @@ in Golang.")
         (base32 "0fihyk4p7mqilj4ymdrgns6fg3c2pfsi12v145im5vy1gxy6lc42"))))
     (arguments
      (list
-      #:import-path "github.com/pion/dtls/v2"))
+      #:import-path "github.com/pion/dtls/v2"
+      #:test-flags #~(list "-vet=off")))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
@@ -22194,7 +22200,8 @@ TCP/UDP and IPv4/IPv6 support.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/uber/jaeger-client-go"))
+      #:import-path "github.com/uber/jaeger-client-go"
+      #:test-flags #~(list "-vet=off")))
     (native-inputs
      (list go-github-com-crossdock-crossdock-go
            go-github-com-golang-mock
@@ -22843,7 +22850,8 @@ netmasks.")
     (arguments
      (list
       #:skip-build? #t
-      #:import-path "github.com/willscott/go-nfs-client"))
+      #:import-path "github.com/willscott/go-nfs-client"
+      #:test-flags #~(list "-vet=off")))
     (propagated-inputs (list go-github-com-rasky-go-xdr))
     (home-page "https://github.com/willscott/go-nfs-client")
     (synopsis "NFS client for Go")
@@ -23565,7 +23573,8 @@ alert us to censorship events.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/goptlib"))
+      #:import-path "gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/goptlib"
+      #:test-flags #~(list "-vet=off")))
     (home-page "https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/goptlib")
     (synopsis "Go pluggable transports library")
     (description "GoPtLib is a library for writing Tor pluggable transports in
@@ -23988,7 +23997,8 @@ lists)
               "trace/propagation"
               "trace/tracestate")
       #:test-flags
-      #~(list "-skip"
+      #~(list "-vet=off"
+              "-skip"
               (string-join
                ;; Tests requiring networking.
                (list "TestAgainstSpecs/Successful_GET_call_to_https.*"
