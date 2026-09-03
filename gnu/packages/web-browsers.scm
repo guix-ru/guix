@@ -923,7 +923,7 @@ saved to a file for further viewing in another window.")
 (define-public edbrowse
   (package
     (name "edbrowse")
-    (version "3.8.15")
+    (version "3.8.18")
     (source
      (origin
        (method git-fetch)
@@ -932,28 +932,21 @@ saved to a file for further viewing in another window.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0fgd2kdpkzrv9db059zm8sbnscxf489p65wq36s88n2y5xqnclr9"))))
+        (base32 "04fly77d20h1g6i36rv3pca44vpi0adin8k3hfan57bxy9nx8iww"))))
     (build-system gnu-build-system)
-    (inputs (list curl-ssh pcre2 quickjs-ng openssl readline-7 unixodbc))
+    (inputs (list curl-ssh pcre2 quickjs-ng openssl readline unixodbc))
     (native-inputs (list perl pkg-config))
     (arguments
      (list
       #:make-flags
       #~(list (string-append "CC=" #$(cc-for-target))
+              (string-append "PREFIX=" #$output)
               "CPPFLAGS=-DQ_NG=1"
               "QUICKJS_LIB_NAME=qjs")
       #:tests? #f ; Edbrowse doesn't have tests
       #:phases
       #~(modify-phases %standard-phases
-          (delete 'configure)
-          (replace 'install
-            (lambda* (#:key outputs #:allow-other-keys)
-              (let* ((out (assoc-ref outputs "out"))
-                     (bin (string-append out "/bin"))
-                     (doc (string-append out "/share/doc/" #$name "-" #$version)))
-                (mkdir-p doc)
-                (install-file "doc/usersguide.html" doc)
-                (install-file "src/edbrowse" bin)))))))
+          (delete 'configure))))
     (home-page "https://edbrowse.org/")
     (synopsis "Command-line editor and web browser")
     (description "Edbrowse is a combination editor, browser, and mail client that is
