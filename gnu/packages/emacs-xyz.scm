@@ -3056,7 +3056,7 @@ Forgejo-based (e.g. Codeberg) repositories.")
 (define-public emacs-magit
   (package
     (name "emacs-magit")
-    (version "4.7.0")
+    (version "4.7.1")
     (source
      (origin
        (method git-fetch)
@@ -3065,7 +3065,7 @@ Forgejo-based (e.g. Codeberg) repositories.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0a2b0jfgsvkbg9i5k2q8i1xhrwwmqrb1yqag7mcpvzi95zcqmv4a"))))
+        (base32 "09h6q0y1q4gw1g7zckr0liizpp1hrabdslwwf2dildaikcsrdp5a"))))
     (build-system emacs-build-system)
     (arguments
      (list
