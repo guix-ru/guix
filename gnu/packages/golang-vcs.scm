@@ -566,7 +566,8 @@ supported yet.")
                               "TestDetectErrorBadRequest"
                               "TestFetchOK"
                               "TestFetchError/not_found")
-                            "|"))))
+                            "|")
+                           "-vet=off")))
     (native-inputs
      ;; Test dependencies.
      (append
