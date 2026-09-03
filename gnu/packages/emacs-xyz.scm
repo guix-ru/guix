@@ -170,6 +170,7 @@
 ;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;; Copyright © 2026 Julian Flake <julian@flake.de>
 ;;; Copyright © 2026 John Haman <mail@johnhaman.org>
+;;; Copyright © 2026 Konstantin Suntsov <protvin@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -4270,7 +4271,7 @@ organizing remote Go repository clones.")
 (define-public emacs-ghub
   (package
     (name "emacs-ghub")
-    (version "5.3.0")
+    (version "5.3.2")
     (source
      (origin
        (method git-fetch)
@@ -4279,7 +4280,7 @@ organizing remote Go repository clones.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "082p22shcbs5xa4x1j145ns77avhm3pn2609mlshjnv0llnxrncq"))))
+        (base32 "17sm0ikxc054aia6f6d9zrq2cjgrl92rfcmn56ib1ifj9wznf35v"))))
     (build-system emacs-build-system)
     (arguments
      (list
