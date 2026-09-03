@@ -10483,7 +10483,6 @@ for clients and servers based on @code{gRPC} and Google API conventions.")
           (add-before 'check 'pre-check
             (lambda _
               ;; See: <https://go.dev/blog/synctest>.
-              (setenv "GOEXPERIMENT" "synctest")
               (setenv "GODEBUG" "asynctimerchan=0"))))))
     (native-inputs
      (list go-github-com-golang-mock
@@ -19214,8 +19213,6 @@ implementation in the Go standard library}.")
                 (invoke "go" "generate" "-v" "-n" "./..."))))
           (add-before 'check 'pre-check
             (lambda* (#:key tests? import-path #:allow-other-keys)
-              ;; See: <https://go.dev/blog/synctest>.
-              (setenv "GOEXPERIMENT" "synctest")
               ;; See: <https://github.com/quic-go/quic-go/issues/5419>.
               (setenv "GODEBUG" "asynctimerchan=0")
               (setenv "TIMESCALE_FACTOR" "10"))))))
@@ -19278,7 +19275,6 @@ protocol.")
             (add-before 'check 'pre-check
               (lambda* (#:key tests? import-path #:allow-other-keys)
                 ;; See: <https://go.dev/blog/synctest>.
-                (setenv "GOEXPERIMENT" "synctest")
                 (setenv "GODEBUG" "asynctimerchan=0"))))))
       (native-inputs
        (list go-github-com-stretchr-testify))
