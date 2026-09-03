@@ -1156,7 +1156,7 @@ game Warzone2100."))))
 (define-public quickjs-ng
   (package
     (name "quickjs-ng")
-    (version "0.14.0")
+    (version "0.16.2")
     (source
      (origin
        (method git-fetch)
@@ -1165,7 +1165,7 @@ game Warzone2100."))))
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "05k8niswh0ly5sx0129jdhiinqs84s86b7sv29ff68v3546dl04i"))))
+        (base32 "0043l493wipcad5rxw4dkavj56xlc83pqkw4g52hm8jjigw8x1mg"))))
     (arguments
      (list
       #:configure-flags
