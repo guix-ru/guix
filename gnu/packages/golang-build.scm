@@ -715,6 +715,28 @@ library.")
      "This package provides a markdown parser.")
     (license license:expat)))
 
+(define-public go-github-com-yuin-goldmark-v2
+  (package
+    (inherit go-github-com-yuin-goldmark)
+    (name "go-github-com-yuin-goldmark-v2")
+    (version "2.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/yuin/goldmark")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0pz5k0890hjfwr2zl5rlj05hxyqbbz1zff6ldgdq4m2803xx7hqi"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/yuin/goldmark"
+      ;; panic: exit status 1: go: modules disabled by GO111MODULE=off; see
+      ;; 'go help modules'.
+      #:test-flags #~(list "-skip" "TestDoc")))))
+
 (define-public go-github-com-yuin-goldmark-emoji
   (package
     (name "go-github-com-yuin-goldmark-emoji")
