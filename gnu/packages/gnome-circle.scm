@@ -363,14 +363,14 @@ Legendary, RetroArch, Flatpak and desktop files.")
 (define-public deja-dup
   (package
     (name "deja-dup")
-    (version "45.2")
+    (version "50.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://gitlab.gnome.org/World/deja-dup/-/archive/"
                                   version "/deja-dup-" version ".tar.bz2"))
               (sha256
                (base32
-                "000cwy1haiglkvn5plmhrs2a1fhpcpw6z4mdzck7ybmky795amza"))))
+                "1jm20ccpcg3zagv0806cw888y8ygfdxzn411cijd13jfpbdr5cff"))))
     (build-system meson-build-system)
     (arguments
      (list
@@ -379,7 +379,11 @@ Legendary, RetroArch, Flatpak and desktop files.")
       #~(list
          ;; Otherwise, the RUNPATH will lack the final path component.
          (string-append "-Dc_link_args=-Wl,-rpath="
-                        (assoc-ref %outputs "out") "/lib/deja-dup"))
+                        (assoc-ref %outputs "out") "/lib/deja-dup")
+         (string-append "-Dduplicity_command="
+                        (search-input-file %build-inputs "/bin/duplicity"))
+         (string-append "-Drestic_command="
+                        (search-input-file %build-inputs "/bin/restic")))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-paths
@@ -400,14 +404,7 @@ Legendary, RetroArch, Flatpak and desktop files.")
               (let ((libgpg-error (assoc-ref inputs "libgpg-error")))
                 (substitute* "meson.build"
                   (("(gpgerror_libs = ).*" _ var)
-                   (format #f "~a '-L~a/lib -lgpg-error'\n" var libgpg-error))))))
-          (add-after 'install 'wrap-program
-            (lambda* (#:key inputs outputs #:allow-other-keys)
-              ;; Add duplicity to the search path
-              (wrap-program (string-append (assoc-ref outputs "out")
-                                           "/bin/deja-dup")
-                `("PATH" ":" prefix
-                  (,(dirname (search-input-file inputs "/bin/duplicity"))))))))))
+                   (format #f "~a '-L~a/lib -lgpg-error'\n" var libgpg-error)))))))))
     (inputs
      (list bash-minimal
            duplicity
@@ -422,9 +419,11 @@ Legendary, RetroArch, Flatpak and desktop files.")
            libhandy
            packagekit
            python
-           python-pygobject))
+           python-pygobject
+           restic))
     (native-inputs
      (list appstream-glib
+           blueprint-compiler
            desktop-file-utils
            gettext-minimal
            `(,glib "bin")               ;for glib-compile-schemas
@@ -433,7 +432,7 @@ Legendary, RetroArch, Flatpak and desktop files.")
            itstool
            pkg-config
            vala))
-    (home-page "https://wiki.gnome.org/Apps/DejaDup")
+    (home-page "https://apps.gnome.org/DejaDup")
     (synopsis "Simple backup tool, for regular encrypted backups")
     (description
      "Déjà Dup is a simple backup tool, for regular encrypted backups.  It
