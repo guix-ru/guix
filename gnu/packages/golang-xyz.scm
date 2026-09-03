@@ -26819,7 +26819,7 @@ policy.")
 (define-public go-github-com-redis-go-redis-v9
   (package
     (name "go-github-com-redis-go-redis-v9")
-    (version "9.17.3")
+    (version "9.22.0")
     (source
      (origin
        (method git-fetch)
@@ -26828,17 +26828,11 @@ policy.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1d66g7sdgimiyd7aal8zay7h1p42pd4v8frl7lik79cqmyb17q6q"))
+        (base32 "05c4dg0c8230763rk7nr6wd32f1qp1y56jw783pkpwyqbcx4fpas"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
-            ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - github.com/redis/go-redis/extra/rediscensus/v9
-            ;; - github.com/redis/go-redis/extra/rediscmd/v9
-            ;; - github.com/redis/go-redis/extra/redisotel/v9
-            ;; - github.com/redis/go-redis/extra/redisprometheus/v9
-            ;; - github.com/redis/go-redis/internal/customvet
+            ;; Submodules with their own go.mod files and packaged separately.
             (delete-file-recursively "extra")
             (delete-file-recursively "internal/customvet")))))
     (build-system go-build-system)
@@ -26846,8 +26840,9 @@ policy.")
      (list
       #:import-path "github.com/redis/go-redis/v9"
       #:test-flags
-      ;; Tests require running Redis server.
-      #~(list "-skip" "Example|TestGinkgoSuite")
+      #~(list "-vet=off"
+              ;; Tests require running Redis server.
+              "-skip" "Example|TestGinkgoSuite")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'remove-examples
@@ -26859,7 +26854,9 @@ policy.")
            go-github-com-bsm-gomega))
     (propagated-inputs
      (list go-github-com-cespare-xxhash-v2
-           go-github-com-dgryski-go-rendezvous))
+           go-github-com-zeebo-xxh3
+           go-go-uber-org-atomic
+           go-golang-org-x-sys))
     (home-page "https://github.com/redis/go-redis")
     (synopsis "Redis client for Golang")
     (description
