@@ -9709,7 +9709,8 @@ GitHub API v3.")
      (substitute-keyword-arguments arguments
        ((#:import-path _) "github.com/google/go-github/v78")
        ((#:test-flags test-flags #~(list))
-        #~(list "-skip" (string-join
+        #~(list "-vet=off"
+                "-skip" (string-join
                          ;; Tests need network setup and access to Internet.
                          (list
                           "TestEnterpriseService_ListEnterpriseNetworkC"
@@ -9743,7 +9744,8 @@ GitHub API v3.")
      (substitute-keyword-arguments arguments
        ((#:import-path _) "github.com/google/go-github/v81")
        ((#:test-flags test-flags #~(list))
-        #~(list "-skip" (string-join
+        #~(list "-vet=off"
+                "-skip" (string-join
                          ;; Tests need network setup and access to Internet.
                          (list "TestEnterpriseService_.*"
                                "TestOrganizationsService_.*"
@@ -11032,7 +11034,8 @@ with other clients.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/hashicorp/go-retryablehttp"))
+      #:import-path "github.com/hashicorp/go-retryablehttp"
+      #:test-flags #~(list "-vet=off")))
     (propagated-inputs
      (list go-github-com-hashicorp-go-hclog
            go-github-com-hashicorp-go-cleanhttp))
@@ -15504,7 +15507,8 @@ function for formatting a Forwarded header.")
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/multiformats/go-multiaddr"))
+      #:import-path "github.com/multiformats/go-multiaddr"
+      #:test-flags #~(list "-vet=off")))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
@@ -16865,7 +16869,8 @@ in Golang.")
         (base32 "0fihyk4p7mqilj4ymdrgns6fg3c2pfsi12v145im5vy1gxy6lc42"))))
     (arguments
      (list
-      #:import-path "github.com/pion/dtls/v2"))
+      #:import-path "github.com/pion/dtls/v2"
+      #:test-flags #~(list "-vet=off")))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
