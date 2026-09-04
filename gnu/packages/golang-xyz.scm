@@ -10112,6 +10112,39 @@ mtime,ctime and btime for files.")
      "Regexp2 is a feature-rich RegExp engine for Go.")
     (license license:expat)))
 
+(define-public go-github-com-dmarkham-enumer
+  (package
+    (name "go-github-com-dmarkham-enumer")
+    (version "1.6.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/dmarkham/enumer")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0n55ix0hq4pyjpanflm3ic835iqch9n7awr7fcksxcb46dq1k32n"))
+       (snippet
+        #~(begin
+            (use-modules (guix build utils))
+            ;; Submodules with their own go.mod files and packaged separately.
+            (delete-file-recursively "examples/gomods")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/dmarkham/enumer"))
+    (propagated-inputs
+     (list go-github-com-pascaldekloe-name
+           go-golang-org-x-tools))
+    (home-page "https://github.com/dmarkham/enumer")
+    (synopsis "Go tool to auto generate methods for enums")
+    (description
+     "Enumer is a tool to generate Go code that adds useful methods to Go
+enums (constants with a specific type).  It started as a fork of Rob Pike’s
+Stringer tool.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-dnephin-pflag
   (package
     (name "go-github-com-dnephin-pflag")
