@@ -99,6 +99,28 @@ testing package automatically and requires to check the returning boolean
 value and call @code{t.Fatal()} if the assertion fails.")
     (license license:expat)))
 
+(define-public go-code-pfad-fr-check
+  (package
+    (name "go-code-pfad-fr-check")
+    (version "1.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://codeberg.org/pfad.fr/check.git")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "025hhqb1z6ry8j4jgj4clab34nryyn1k89343bxz33pfy30gwhp6"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "code.pfad.fr/check"))
+    (home-page "https://code.pfad.fr/check")
+    (synopsis "Minimal Go assertion package")
+    (description "Package check is a minimalist Go assertion package.")
+    (license license:cc0)))
+
 (define-public go-git-sr-ht-nelsam-correct
   (package
     (name "go-git-sr-ht-nelsam-correct")
