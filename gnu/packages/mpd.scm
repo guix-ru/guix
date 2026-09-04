@@ -341,16 +341,16 @@ sort playlists, and a local file system browser.")
 (define-public mpdscribble
   (package
     (name "mpdscribble")
-    (version "0.25")
+    (version "0.26")
     (source (origin
               (method url-fetch)
               (uri (string-append "http://www.musicpd.org/download/mpdscribble/"
                                   version "/mpdscribble-" version ".tar.xz"))
               (sha256
                (base32
-                "1kimbcmvwyfs3v9fi58jmd13icgxb6ipfyppigbc85zmbfa9vy10"))))
+                "02b3pxafxx9whimb83g5mz9xkc8438700h61arr70rf4i6dq5mdr"))))
     (build-system meson-build-system)
-    (inputs (list boost curl libgcrypt libmpdclient))
+    (inputs (list boost curl fmt libgcrypt libmpdclient))
     (native-inputs (list pkg-config))
     (synopsis "MPD client for track scrobbling")
     (description "mpdscribble is a Music Player Daemon client which submits
