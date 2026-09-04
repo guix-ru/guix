@@ -361,7 +361,7 @@ information about tracks being played to a scrobbler, such as Libre.FM.")
 (define-public python-mpd2
   (package
     (name "python-mpd2")
-    (version "3.0.4")
+    (version "3.1.2")
     (source
      (origin
        (method git-fetch)
@@ -370,7 +370,7 @@ information about tracks being played to a scrobbler, such as Libre.FM.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "06j1n43sg3blp89xwgm64yssz6478y5r09xwdg9mnsgihpjpm89a"))))
+        (base32 "1vpxd1vj03zzhm87rq840w6ha6j7pixhnv74qqmmmfq5xvfifayy"))))
     (build-system pyproject-build-system)
     (arguments
      (list
