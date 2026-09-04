@@ -22380,17 +22380,17 @@ connection management for @url{https://github.com/xtaci/kcp-go,kcp-go}.")
 (define-public go-github-com-yggdrasil-network-yggdrasil-go
   (package
     (name "go-github-com-yggdrasil-network-yggdrasil-go")
-    (version "0.5.12")
+    (version "0.5.14")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/yggdrasil-network/yggdrasil-go")
-             (commit (string-append "v" version))))
+              (url "https://github.com/yggdrasil-network/yggdrasil-go")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "072r52b6bkpc7bhn0v1z6dm6q5g9qf4k1xlqwrvzmzwai6fm0lrn"))
-      (patches (search-patches "yggdrasil-extra-config.patch"))))
+        (base32 "005a66p95p8mn30zgfxrdrldz5nn7xwfzh9p38c59fz1kvrafg3f"))
+       (patches (search-patches "yggdrasil-extra-config.patch"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -22405,17 +22405,17 @@ connection management for @url{https://github.com/xtaci/kcp-go,kcp-go}.")
            go-github-com-hashicorp-go-syslog
            go-github-com-hjson-hjson-go-v4
            go-github-com-kardianos-minwinsvc
-           go-github-com-olekukonko-tablewriter-0.0.5
-           go-github-com-quic-go-quic-go-0.52
+           go-github-com-olekukonko-tablewriter
+           go-github-com-quic-go-quic-go
            go-github-com-vishvananda-netlink
            go-github-com-wlynxg-anet
            go-golang-org-x-crypto
            go-golang-org-x-net
            go-golang-org-x-sys
            go-golang-org-x-text
-           ;; go-golang-zx2c4-com-wintun
+           ;; go-golang-zx2c4-com-wintun             ;Windows only
            go-golang-zx2c4-com-wireguard
-           ;; go-golang-zx2c4-com-wireguard-windows
+           ;; go-golang-zx2c4-com-wireguard-windows  ;Windows only
            go-suah-dev-protect))
     (home-page "https://github.com/yggdrasil-network/yggdrasil-go")
     (synopsis "IPv6 overlay network Golang library")
