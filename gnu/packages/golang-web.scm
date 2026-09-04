@@ -13121,7 +13121,7 @@ Features:
   (package
     (inherit go-github-com-labstack-echo-v4)
     (name "go-github-com-labstack-echo-v5")
-    (version "5.1.1")
+    (version "5.3.1")
     (source
      (origin
        (method git-fetch)
@@ -13130,7 +13130,7 @@ Features:
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1a7d9cmn6kchzl79cdldxxhanqqjpml1vvaw5ak6cwan6cn9gb5i"))))
+        (base32 "1x79bphs2mdjq3qzdrrcy7bagf2vkyp9ynbgfih7afk1ajjk00ll"))))
     (arguments
      (list
       #:import-path "github.com/labstack/echo/v5"))
