@@ -30220,16 +30220,16 @@ Linux, and macOS.")
 (define-public go-github-com-tidwall-gjson
   (package
     (name "go-github-com-tidwall-gjson")
-    (version "1.17.1")
+    (version "1.19.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/tidwall/gjson")
-             (commit (string-append "v" version))))
+              (url "https://github.com/tidwall/gjson")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0gcjzbs5in4kics39d2v3j2v9gvfxkdgp0bdgbfmcsa5arqgq7g5"))))
+        (base32 "0ca9mnd67wak78j6b6ar89dvjmmg8pys4kzrp9isbf3hzdlnljqz"))))
     (build-system go-build-system)
     (arguments
      (list
