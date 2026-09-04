@@ -1176,7 +1176,7 @@ in the style of communicating sequential processes (@dfn{CSP}).")
   (package
     (inherit go-1.26)
     (name "go")
-    (version "1.27.0")
+    (version "1.27.1")
     (source
      (origin
        (method git-fetch)
@@ -1185,7 +1185,7 @@ in the style of communicating sequential processes (@dfn{CSP}).")
               (commit (string-append "go" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mkcpsyydcrx8rwym53fv05a4m4ddnxbw5vh8vb3xmcya3g9qqar"))))))
+        (base32 "0cfkl0lzas6fd2y6mg72n0ms8f6aswv5y5qca6nbxnv5d025nrpd"))))))
 
 ;; This is a placeholder for the next RC version when it's tagged.
 (define-public go-next
