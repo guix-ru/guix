@@ -9078,6 +9078,30 @@ terminal.")
 implementation.")
     (license license:expat)))
 
+(define-public go-github-com-danielgatis-go-utf8
+  (package
+    (name "go-github-com-danielgatis-go-utf8")
+    (version "1.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/danielgatis/go-utf8")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0d95yk6g5fjlvpk5fdnk3jda310705q9d7rqzchf3gxn1yiv75xm"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/danielgatis/go-utf8"))
+    (home-page "https://github.com/danielgatis/go-utf8")
+    (synopsis "State machine based UTF8 parser in Go")
+    (description
+     "This package provides a Go library implementing state machine based UTF8
+parser.")
+    (license license:expat)))
+
 (define-public go-github-com-danielgtaylor-mexpr
   (package
     (name "go-github-com-danielgtaylor-mexpr")
