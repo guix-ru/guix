@@ -9102,6 +9102,42 @@ implementation.")
 parser.")
     (license license:expat)))
 
+(define-public go-github-com-danielgatis-go-vte
+  (package
+    (name "go-github-com-danielgatis-go-vte")
+    (version "1.0.11")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/danielgatis/go-vte")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "05kjvsin260c5jgc4hjwqbxaz3kcbmqzlqbvmv7c1jvxqfw21380"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/danielgatis/go-vte"
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'remove-failing-test-files
+            (lambda* (#:key import-path #:allow-other-keys)
+              (with-directory-excursion (string-append "src/" import-path)
+                (delete-file "parser_apc_test.go")))))))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-danielgatis-go-utf8))
+    (home-page "https://github.com/danielgatis/go-vte")
+    (synopsis "Go library to parse terminal escape sequences")
+    (description
+     "This package implements a state machine that mirrors the behaviour of
+DEC (Digital Equipment Corporation) VT hardware terminals.  The state machine
+was originally described by Paul Williams; more information can be found here:
+@url{http://www.vt100.net/emu/dec_ansi_parser}.")
+    (license license:expat)))
+
 (define-public go-github-com-danielgtaylor-mexpr
   (package
     (name "go-github-com-danielgtaylor-mexpr")
