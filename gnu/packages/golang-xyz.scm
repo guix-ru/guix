@@ -12965,6 +12965,30 @@ you can use this library interchangeably with code that is expecting a normal
 error return.")
     (license license:expat)))
 
+(define-public go-github-com-go-faster-errors
+  (package
+    (name "go-github-com-go-faster-errors")
+    (version "0.8.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-faster/errors")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "174i5cz90h5b54kw3b731ykc49g93zmbi4cn4i57n8hq89b2xncs"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-faster/errors"))
+    (home-page "https://github.com/go-faster/errors")
+    (synopsis "Clear Go error wrapping with caller")
+    (description
+     "Package errors implements functions to manipulate errors.  It's a fork
+of @url{https://pkg.go.dev/golang.org/x/xerrors}")
+    (license license:bsd-3)))
+
 (define-public go-github-com-go-git-go-billy-v5
   (package
     (name "go-github-com-go-git-go-billy-v5")
