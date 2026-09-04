@@ -3523,6 +3523,37 @@ Go application.")
 original value once the test has been run.")
     (license license:expat)))
 
+(define-public go-github-com-quic-go-go-ossfuzz-seeds
+  (package
+    (name "go-github-com-quic-go-go-ossfuzz-seeds")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/quic-go/go-ossfuzz-seeds")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1xl5x2hg466xhrqz1yp25bnn4p7qf63dkx2xxs8m3zdfzblavbcw"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately.
+            (delete-file-recursively "testing")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/quic-go/go-ossfuzz-seeds"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/quic-go/go-ossfuzz-seeds")
+    (synopsis "Go fuzzing extension library")
+    (description
+     "Package ossfuzzseeds writes Go native fuzz seeds as OSS-Fuzz seed corpus
+files.")
+    (license license:expat)))
+
 (define-public go-github-com-rubyist-tracerx
   (package
     (name "go-github-com-rubyist-tracerx")
