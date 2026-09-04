@@ -25435,6 +25435,31 @@ recycling a massive number of goroutines, allowing developers to limit the
 number of goroutines in your concurrent programs.")
     (license license:expat)))
 
+(define-public go-github-com-pascaldekloe-name
+  (package
+    (name "go-github-com-pascaldekloe-name")
+    (version "1.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pascaldekloe/name")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1x379sm8x16xls6dcn6l1kwb9aqnw1gqvnj7s4qcfg67hxgryw6d"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/pascaldekloe/name"))
+    (home-page "https://github.com/pascaldekloe/name")
+    (synopsis "Naming convention library Go")
+    (description
+     "Package name implements various naming conventions.  The two categories
+are delimiter-separated and letter case-separated words.  Each of the
+formatting functions support both techniques for input, without any context.")
+    (license license:cc0)))
+
 (define-public go-github-com-patrickmn-go-cache
   (package
     (name "go-github-com-patrickmn-go-cache")
