@@ -1217,7 +1217,7 @@ the date of the most recent commit that modified them
 (define-public git-spice
   (package
     (name "git-spice")
-    (version "0.23.0")
+    (version "0.31.2")
     (source
      (origin
        (method git-fetch)
@@ -1226,7 +1226,7 @@ the date of the most recent commit that modified them
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1za4rr1jxjhlbbx0gw8wlsfa9dhw4zrpm43fz8scxlbh126wlid7"))))
+        (base32 "0ss1khysj8dcw60ikkq3z132zypyhw1d1hsfkhn392jl2dyx8ksb"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -1238,22 +1238,68 @@ the date of the most recent commit that modified them
       #~(list "-skip"
               (string-join
                ;; XXX: Tests failing with various reasons: requiring
-               ;; networking config or write access, or outbound access, check
-               ;; if some of them may be fixed.
-               (list "TestAuthenticationFlow_PAT"
+               ;; networking config, git setup, write access, or outbound
+               ;; access, check if some of them may be fixed.
+               (list "TestAdminAuth"
+                     "TestAdminChangeControls"
+                     "TestAdminCommentsAndDumps"
+                     "TestAdminMergeChange"
+                     "TestAdminRepositoriesAndConfig"
+                     "TestAuthenticationFlow_PAT"
+                     "TestAutoRestackMode_Kong"
+                     "TestBranchDeleteRestackFlag"
+                     "TestBranchOntoRestackConfig"
+                     "TestBranchTreeSelect_Script"
                      "TestBuildRESTHandler_GETRequest"
                      "TestBuildRESTHandler_GenericError"
                      "TestBuildRESTHandler_HTTPError"
                      "TestBuildRESTHandler_IntegerPath"
                      "TestBuildRESTHandler_InvalidIntegerPath"
                      "TestBuildRESTHandler_PathParameters"
+                     "TestBuildSeries_omitsOrigTarAfterFirstSeries"
+                     "TestCLI_setMergeability"
                      "TestDeviceFlowAuthenticator"
                      "TestDeviceFlowAuthenticator"
+                     "TestForgeRepository_ChangeMergeability_configured"
+                     "TestForgeRepository_setChangeMergeability"
                      "TestForkWorkflow"
-                     "TestSelectAuthenticator")
+                     "TestGatewayConformance_ChangeTemplate"
+                     "TestGatewayConformance_FindChangesByBranch"
+                     "TestGatewayConformance_GetChange"
+                     "TestGatewayConformance_GetChange_states"
+                     "TestGatewayConformance_ListCommitChecks"
+                     "TestGatewayConformance_ResolvableComments"
+                     "TestGatewayConformance_SetChangeDraft"
+                     "TestGatewayConformance_commentRoundTrip"
+                     "TestGitSectionsRequested"
+                     "TestGraphLogPresenter_Present"
+                     "TestHelp"
+                     "TestIntegrationEditor_commitMsgHook"
+                     "TestIntegrationEditor_prepareCommitMsgHook"
+                     "TestIssue1079_bashPTYLosesFirstTypedByte"
+                     "TestMainCmd_secretBackendBinding"
+                     "TestMainForgeKindConfig"
+                     "TestMainGitIndexLockTimeoutConfig"
+                     "TestMainSecretBackendConfig"
+                     "TestMainSecretBackendConfig_errors"
+                     "TestRepoSyncRestackConfig"
+                     "TestRunner_Run_scriptFilePath"
+                     "TestRunner_Run_shebangReceivesArgs"
+                     "TestRunner_Run_shebangScript"
+                     "TestSelect"
+                     "TestSelectAuthenticator"
+                     "TestShamHub_ChangeMergeability_conflicts"
+                     "TestShamHub_ChangeMergeability_deletedHeadErrors"
+                     "TestShamHub_ChangeMergeability_forkedHeadForcePush"
+                     "TestShamHub_ChangeMergeability_ready"
+                     "TestUploadSourcePackage_retriesTwice"
+                     "TestUploadSourcePackage_stopsAfterThirdAttempt")
                "|"))
       #:phases
       #~(modify-phases %standard-phases
+          (add-before 'check 'pre-check
+            (lambda _
+              (setenv "GODEBUG" "asynctimerchan=0")))
           (add-after 'install 'install-shell-completion
             (lambda _
               (let* ((out #$output)
@@ -1280,31 +1326,33 @@ the date of the most recent commit that modified them
                   (lambda _ (invoke gs "shell" "completion" "zsh")))))))))
     (native-inputs
      (list git-minimal/pinned ; for tests in testdata/scripts
+           go-charm-land-bubbles-v2
+           go-charm-land-bubbletea-v2
+           go-charm-land-lipgloss-v2
            go-github-com-alecthomas-kong
            go-github-com-buildkite-shellwords
-           go-github-com-charmbracelet-bubbles
-           go-github-com-charmbracelet-bubbletea
-           go-github-com-charmbracelet-lipgloss
+           go-github-com-charmbracelet-colorprofile
+           go-github-com-charmbracelet-x-ansi
+           go-github-com-charmbracelet-x-term
            go-github-com-cli-browser
            go-github-com-creack-pty
            go-github-com-dustin-go-humanize
            go-github-com-hexops-autogold-v2
            go-github-com-mattn-go-isatty
-           go-github-com-rogpeppe-go-internal-1.14
+           go-github-com-rogpeppe-go-internal
            go-github-com-sahilm-fuzzy
-           go-github-com-shurcool-githubv4
            go-github-com-stretchr-testify
-           go-github-com-tidwall-gjson
            go-github-com-vito-midterm
            go-github-com-zalando-go-keyring
-           go-gitlab-com-gitlab-org-api-client-go
            go-go-abhg-dev-container-ring
            go-go-abhg-dev-io-ioutil
            go-go-abhg-dev-komplete
            go-go-abhg-dev-log-silog
            go-go-abhg-dev-testing-stub
            go-go-uber-org-mock
+           go-golang-org-x-mod
            go-golang-org-x-oauth2
+           go-golang-org-x-sync
            go-gopkg-in-dnaeon-go-vcr-v4
            go-gopkg-in-yaml-v3
            go-pgregory-net-rapid))
