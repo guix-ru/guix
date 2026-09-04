@@ -9054,6 +9054,30 @@ Features:
 terminal.")
     (license license:expat)))
 
+(define-public go-github-com-danielgatis-go-iterator
+  (package
+    (name "go-github-com-danielgatis-go-iterator")
+    (version "0.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/danielgatis/go-iterator")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0lklg719g67f5c29cciif13a2x945p2qhzcdl9sn9kq0bl78l6lw"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/danielgatis/go-iterator"))
+    (home-page "https://github.com/danielgatis/go-iterator")
+    (synopsis "iterator interface and a slice iterator implementation for Go")
+    (description
+     "This package provides an iterator interface and a slice iterator
+implementation.")
+    (license license:expat)))
+
 (define-public go-github-com-danielgtaylor-mexpr
   (package
     (name "go-github-com-danielgtaylor-mexpr")
