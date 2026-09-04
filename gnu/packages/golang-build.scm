@@ -1867,6 +1867,39 @@ improved and cleaner API.")
 ;;; Executables:
 ;;;
 
+(define-public go-exp
+  (package/inherit go-golang-org-x-exp
+    (name "go-exp")
+    (arguments
+     (list
+      #:tests? #f
+      #:install-source? #f
+      #:import-path "golang.org/x/exp/cmd/..."
+      #:unpack-path "golang.org/x/exp"))
+    (native-inputs
+     (package-propagated-inputs go-golang-org-x-exp))
+    (propagated-inputs '())
+    (inputs '())
+    (description
+     "This package provides a collection of Go CLI tools from golang.org/x/exp
+module.
+
+@itemize
+
+@item @command{apidiff} - determines whether two versions of a package are
+compatiblep.
+
+@item @command{gorelease} - helps module authors avoid common problems before
+releasing a new version of a module.
+
+@item @command{modgraphviz} - converts @code{go mod graph} output into
+Graphviz's DOT language, for use with Graphviz visualization and analysis
+tools like dot, dotty, and sccmap.
+
+@command{txtar} - writes or extracts a text-based file archive in the format
+provided by the golang.org/x/tools/txtar package.
+@end itemize")))
+
 (define-public go-tools
   (package/inherit go-golang-org-x-tools
     (name "go-tools")
