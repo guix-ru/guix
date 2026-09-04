@@ -9054,6 +9054,35 @@ Features:
 terminal.")
     (license license:expat)))
 
+(define-public go-github-com-danielgatis-go-ansicode
+  (package
+    (name "go-github-com-danielgatis-go-ansicode")
+    (version "1.0.14")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/danielgatis/go-ansicode")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wgbhz6pbh6ix1yiiyid8qrgxfx4nsm4aaq93vp4p25qf6q7gg3i"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/danielgatis/go-ansicode"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-danielgatis-go-iterator
+           go-github-com-danielgatis-go-vte))
+    (home-page "https://github.com/danielgatis/go-ansicode")
+    (synopsis "ANSI codes implementation in Go")
+    (description
+     "go-ansicode is a package that interprets ANSI codes to register a
+handler to deal with the operations.")
+    (license license:expat)))
+
 (define-public go-github-com-danielgatis-go-iterator
   (package
     (name "go-github-com-danielgatis-go-iterator")
