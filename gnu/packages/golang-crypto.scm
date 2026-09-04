@@ -1678,6 +1678,31 @@ net/http, so the API is very similar.")
 encoding and decoding in the Go language.")
     (license license:expat)))
 
+(define-public go-github-com-go-faster-city
+  (package
+    (name "go-github-com-go-faster-city")
+    (version "1.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/go-faster/city")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0nssg8ynnsk4isrh88h4v8srzq46z8lqb867gr0dbpkasmq3d8dx"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/go-faster/city"))
+    (home-page "https://github.com/go-faster/city")
+    (synopsis "CityHash implementation in Go")
+    (description
+     "Package city implements @code{CityHash}, a family of hash functions for
+strings, in Go and it's a fork of
+@url{https://github.com/tenfyzhong/cityhash}.")
+    (license license:expat)))
+
 (define-public go-github-com-golang-jwt-jwt
   (package
     (name "go-github-com-golang-jwt-jwt")
