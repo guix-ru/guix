@@ -173,26 +173,23 @@ exec ~a \"$@\""
 (define-public pkgconf
   (package
     (name "pkgconf")
-    (version "3.0.3")
+    (version "3.0.7")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://distfiles.ariadne.space/"
                                   name "/" name "-" version ".tar.xz"))
               (sha256
                (base32
-                "1kyqrdkdcxhgikv8mqz4wj39vi2k3s9mlj9mcvka8yvp5fxkl0xa"))))
+                "02llwsmxyb4g6ccsb62i9ndp9cbsv4dq2q4ib0d376mx3i4zy9n9"))))
     (build-system gnu-build-system)
     (arguments
-     (list #:configure-flags
-           (if (target-hurd?)
-               #~'("CPPFLAGS=-DPATH_MAX=4096")
-               #~'())
-           #:phases
-           #~(modify-phases %standard-phases
-               (add-after 'unpack 'fix-makefile
-                 (lambda _
-                   (substitute* "Makefile.in"
-                     (("PWD") "CURDIR")))))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-makefile
+            (lambda _
+              (substitute* "Makefile.in"
+                (("PWD") "CURDIR")))))))
     (native-search-paths (list $PKG_CONFIG_PATH))
     (home-page "https://github.com/pkgconf/pkgconf")
     (synopsis "Package compiler and linker metadata toolkit")
