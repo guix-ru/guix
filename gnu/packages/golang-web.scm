@@ -22527,7 +22527,7 @@ tiny,non-intrusive, and encourages use of @code{net/http} Handlers.")
 (define-public go-github-com-valyala-fasthttp
   (package
     (name "go-github-com-valyala-fasthttp")
-    (version "1.71.0")
+    (version "1.73.0")
     (source
      (origin
        (method git-fetch)
@@ -22536,7 +22536,7 @@ tiny,non-intrusive, and encourages use of @code{net/http} Handlers.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0l744biq95xf9xwz2d2idhh179qg8z4pa84s8dnaqzgw1gf4n70g"))))
+        (base32 "04b1zz7lhfm2mv1scmhja3y6d5d5r8j0am440xz4g1kclyjkfib1"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -22545,7 +22545,8 @@ tiny,non-intrusive, and encourages use of @code{net/http} Handlers.")
       #~(list "-shuffle=on"
               ;; dialer_test.go:231: lookup github.com on [::1]:53: read udp
               ;; [::1]:52547->[::1]:53: read: connection refused
-              "-skip" "TestDialer_GetDialFunc")
+              "-skip" "TestDialerGetDialFunc"
+              "-vet=off")
       #:phases
       #~(modify-phases %standard-phases
           (replace 'check
