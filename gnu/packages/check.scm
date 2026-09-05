@@ -59,6 +59,7 @@
 ;;; Copyright © 2025 nomike Postmann <nomike@nomike.com>
 ;;; Copyright © 2025 Josep Bigorra <jjbigorra@gmail.com>
 ;;; Copyright © 2025 Murilo <murilo@disroot.org>
+;;; Copyright © 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -138,7 +139,7 @@
 (define-public atf
   (package
     (name "atf")
-    (version "0.23")
+    (version "0.25")
     (source
      (origin
        (method git-fetch)
@@ -148,7 +149,7 @@
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "12hcvclzphgkhmp226abhn9nl2j5vcm7nfnqbs8232ws41x1gmw3"))))
+         "01nq62s4vm6bf4ldl8jqx636i7ramw367r7kg7k59pql11vxjmn6"))))
     (build-system gnu-build-system)
     (arguments
      (list
