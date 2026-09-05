@@ -891,7 +891,7 @@ normally do not detect.  The goal is to detect only real errors in the code
 (define-public cukinia
   (package
     (name "cukinia")
-    (version "0.6.0")
+    (version "0.9.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -900,7 +900,7 @@ normally do not detect.  The goal is to detect only real errors in the code
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1i92b37w8kb0rzkazlnnhjjbh1l1nmk2yrjvar7rpl97i9gn212m"))))
+                "0glf7pvw95sirnm6n791pdn8z6i6fbgl2cmrvb9rkpkrvi4cx77v"))))
     (build-system gnu-build-system)
     (arguments
      (list
