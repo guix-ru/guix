@@ -2933,7 +2933,7 @@ functions.")
 (define-public go-github-com-aws-aws-sdk-go-v2
   (package
     (name "go-github-com-aws-aws-sdk-go-v2")
-    (version "1.41.7")
+    (version "1.46.0")
     (source
      (origin
        (method git-fetch)
@@ -2942,7 +2942,7 @@ functions.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1j68835z0dgzxwf3m4gfir50wi6r30yx3g78y63x55sdg2imbhsk"))
+        (base32 "03manwhrbmhzvlma616jyr18cjj1hdphhw7nb9b9z56cfy2q9919"))
        ;; XXX: It contains a lot of sub packages defined with go.mod, consider
        ;; to pack them separately.
        (modules '((guix build utils)))
