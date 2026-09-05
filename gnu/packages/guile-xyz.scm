@@ -6459,6 +6459,88 @@ and space linear in the size of the input text.")
 implementations.")
       (license license:bsd-2))))
 
+(define-public guile-text-mode
+  ;; The unreleased commits contain fixes for Guile 3.0.10.
+  (let ((commit "dd69a4219b503994e148ae4710fdb92a3649ddba")
+        (revision "0"))
+    (package
+      (name "guile-text-mode")
+      (version (git-version "1.1.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                       (url "https://gitlab.com/weinholt/text-mode")
+                       (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "0786b0lpy9cx1iavi0454pcqnvb6dpfsprxvrpwfik1lqdybzayi"))))
+      (build-system guile-build-system)
+      (arguments (list
+                  #:phases
+                  #~(modify-phases %standard-phases
+                      (replace 'unpack
+                        (lambda* (#:key source #:allow-other-keys)
+                          (mkdir-p "source/text-mode")
+                          (chdir "source/text-mode")
+                          (copy-recursively source "."
+                                            #:keep-mtime? #t)
+                          (for-each (lambda (f)
+                                      (false-if-exception (make-file-writable f)))
+                                    (find-files "."))
+                          (chdir "..")))
+                      ;; In guix, the terminfos cannot be found in the default
+                      ;; location, so here we instruct it to search in
+                      ;; TERMINFO_DIRS instead.
+                      (add-after 'unpack 'use-TERMINFO_DIRS
+                        (lambda _
+                          (substitute* "text-mode/terminfo.sls"
+                            (("[(]struct pack[)]" all)
+                             (string-append all "
+    (only (guile)
+        and=>
+        string-split)"))
+                            (("\"/usr/share/terminfo\"" all)
+                             (string-append all "
+                         ,@(or (and=> (get-environment-variable \"TERMINFO_DIRS\")
+                                      (lambda (env) (string-split env #\\:))) '())")))))
+                      (add-before 'build 'adjust-for-guile
+                        (lambda _
+                          (delete-file "text-mode/private/misc.chezscheme.sls")
+                          (delete-file "text-mode/termios.loko.sls")
+                          (define (sls->scm sls)
+                            (string-append (string-drop-right sls 4)
+                                           ".scm"))
+                          (for-each (lambda (file)
+                                      (rename-file file (sls->scm file)))
+                                    (find-files "." "\\.sls$"))))
+                      (add-before 'build 'build-libtextmode
+                        (lambda _
+
+                          (let ((lib (string-append #$output "/lib")))
+                            (mkdir-p lib)
+                            ;; see Akku.manifest
+                            (with-directory-excursion "text-mode"
+                              (invoke #$(cc-for-target)
+                                      "-Os"
+                                      "-g"
+                                      "-fPIC"
+                                      "-shared"
+                                      "-o"
+                                      (string-append lib "/libtextmode.so")
+                                      "textmode.c")
+                              (substitute* "termios.scm"
+                                (("libtextmode.so" all)
+                                 (string-append lib "/" all))))))))))
+      (native-inputs (list linux-libre-headers binutils gcc guile-3.0))
+      (propagated-inputs (list guile-struct-pack guile-r6rs-pffi))
+      (home-page "https://gitlab.com/weinholt/text-mode")
+      (synopsis "Text-mode console library (like curses)")
+      (description "This package provides an R6RS Scheme library for
+text-oriented consoles with keyboard and mouse input.")
+      (license license:expat))))
+
+
 (define-public guile-ac-d-bus
   (package
     (name "guile-ac-d-bus")
