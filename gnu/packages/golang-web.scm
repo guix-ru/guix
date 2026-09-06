@@ -2242,7 +2242,7 @@ APIs of Alibaba Cloud @acronym{OSS, Object Storage Service}.")
 (define-public go-github-com-amnezia-vpn-amneziawg-go
   (package
     (name "go-github-com-amnezia-vpn-amneziawg-go")
-    (version "0.2.17")
+    (version "0.2.19")
     (source
      (origin
        (method git-fetch)
@@ -2251,7 +2251,7 @@ APIs of Alibaba Cloud @acronym{OSS, Object Storage Service}.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1fs4f68b0r4nfxx5w04j57vf9vnkdzd8vi12fmivbqhn72sjp3fw"))
+        (base32 "18n4sxp2cjfn9plfqmvjpb64xl28vc1pnw48lq79fdk6qz7byk6x"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
@@ -2284,8 +2284,8 @@ APIs of Alibaba Cloud @acronym{OSS, Object Storage Service}.")
            go-golang-org-x-exp
            go-golang-org-x-net
            go-golang-org-x-sys
-           ;; go-golang-zx2c4-com-wintun ;Windows only
-           go-gvisor-dev-gvisor))
+           ;; go-golang-zx2c4-com-wintun     ;Windows only
+           go-gvisor-dev-gvisor-source))
     (home-page "https://github.com/amnezia-vpn/amneziawg-go")
     (synopsis "Go implementation of AmneziaWG")
     (description
