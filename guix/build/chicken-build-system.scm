@@ -1,5 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2020 raingloom <raingloom@riseup.net>
+;;; Copyright © 2026 Malte Frank gerdes <malte.f.gerdes@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -44,7 +45,7 @@
   (setenv "CHICKEN_INSTALL_REPOSITORY"
           (string-concatenate
            ;; see TODO item about binary version above
-           (append (list (assoc-ref outputs "out") "/var/lib/chicken/11/")
+           (append (list (assoc-ref outputs "out") "/var/lib/chicken/11")
                    (let ((oldenv (getenv "CHICKEN_INSTALL_REPOSITORY")))
                      (if oldenv
                          (list  ":" oldenv)
