@@ -757,7 +757,7 @@ from a mounted file system.")
   ;; completions by running a native bcachefs binary at build time.
   (package
     (name "bcachefs-tools-minimal")
-    (version "1.37.4")
+    (version "1.39.4")
     (source
      (origin
        (method git-fetch)
@@ -766,7 +766,7 @@ from a mounted file system.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17041jphzbg0ppxlc1acr3d73zyn02spjvi5my30wak8xh9n6nan"))))
+        (base32 "0xh76g3jhmaw4bv8jlrx6q9gnisrxfswl9sr7d98gmpy86csax3j"))))
     (build-system cargo-build-system)
     (arguments
      (list
