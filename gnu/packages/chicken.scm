@@ -129,6 +129,36 @@ la nguage standard, and includes many enhancements and extensions.")
     (properties
      (alist-delete 'hidden? (package-properties chicken-bootstrap)))))
 
+(define-public chicken-agrep
+  (package
+    (name "chicken-agrep")
+    (version "1.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/iraikov/chicken-agrep")
+             (commit version)))
+       (file-name (string-append "chicken-agrep-" version "-checkout"))
+       (sha256
+        (base32
+         "0z05x7f154n9bgmainrsmncf5i6dil43r9ymr3rdgwbg4wnxmz4s"))))
+    ;; TODO do we really have to make these propagated?
+    ;; I don't know Chicken's module system well enough to tell
+    (propagated-inputs
+     (list chicken-datatype chicken-srfi-1 chicken-srfi-14))
+    (inputs
+     (list chicken-test))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "agrep"))
+    (synopsis "Approximate string matching library")
+    (home-page "https://wiki.call-cc.org/eggref/5/agrep")
+    (description
+     "This library implements the Wu-Manber algorithm for approximate string
+searching with errors, popularized by the agrep Unix command and the glimpse
+file indexing tool.")
+    (license license:gpl3+)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
@@ -145,6 +175,96 @@ la nguage standard, and includes many enhancements and extensions.")
     (synopsis "Programmatic compiler invocation")
     (description "This egg provides a way to do on-the-fly compilation of
 source code and load it into the running process.")
+    (license license:bsd-3)))
+
+(define-public chicken-crypto-tools
+  (package
+    (name "chicken-crypto-tools")
+    (version "1.4")
+    (source (origin
+              (method url-fetch)
+              (uri (egg-uri "crypto-tools" version))
+              (sha256
+               (base32
+                "0ajf0qfnhp99f4x1dll2fhlxrsxamgrrwyksc7rrym77xmv8f1pd"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "crypto-tools"))
+    (home-page "https://wiki.call-cc.org/egg/crypto-tools")
+    (synopsis "Useful cryptographic primitives")
+    (description "The crypto-tools egg implements useful cryptographic
+primitives.  More specifically, provided are:
+
+@itemize
+@item binary blobs
+@itemize
+@item marshallers to and from hex strings
+@item blob xor
+@item blob padding using either PKCS#5 or ISO7816-4
+@end itemize
+@item Block cipher modes of operation
+@itemize
+@item CBC with or without incorporated encrypted IV in the ciphertext
+@item CTR with or without incorporated IV in the ciphertext
+@end itemize
+@end itemize")
+    (license license:bsd-3)))
+
+(define-public chicken-datatype
+  (package
+    (name "chicken-datatype")
+    (version "1.6")
+    (source
+     (origin
+       (method svn-fetch)
+       (uri (svn-reference
+             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
+                                 "release/5/datatype/tags/" version))
+             (revision 39266)
+             (user-name "anonymous")
+             (password "")))
+       (file-name (string-append "chicken-datatype-" version "-checkout"))
+       (sha256
+        (base32
+         "1a58q8ypjkjz6wdv25247wixds4179239d36nnvsfn6gp70s9jfq"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "datatype"))
+    (inputs
+     (list chicken-srfi-1 chicken-test))
+    (home-page "https://wiki.call-cc.org/eggref/5/datatype")
+    (synopsis "Facility for creating and using variant records")
+    (description
+     "This CHICKEN Scheme library provides a facility for creating and using
+variant records, as described in the book @i{Essentials of Programming
+Languages} by Friedman, Wand, and Haynes.")
+    (license license:bsd-3)))
+
+(define-public chicken-iset
+  (package
+    (name "chicken-iset")
+    (version "2.2")
+    (source
+     (origin
+       (method svn-fetch)
+       (uri (svn-reference
+             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
+                                 "release/5/iset/tags/" version))
+             (revision 39057)
+             (user-name "anonymous")
+             (password "")))
+       (file-name (string-append "chicken-iset-" version "-checkout"))
+       (sha256
+        (base32
+         "0gz50n5i561n5sk9prry0lrxz6bfrq9if5bclaq6a0f7lzinhnzb"))))
+    (inputs
+     (list chicken-test))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "iset"))
+    (synopsis "Integer set library")
+    (home-page "https://wiki.call-cc.org/eggref/5/iset")
+    (description
+     "This ``integer set'' CHICKEN Scheme library implements bit vectors.
+Bit-vectors provide an abstract interface to bitwise operations typically done
+with integers.")
     (license license:bsd-3)))
 
 (define-public chicken-srfi-1
@@ -279,94 +399,6 @@ CHICKEN Scheme, along with
 @uref{https://srfi.schemers.org/srfi-90/srfi-90.html, SRFI-90} extensions.")
     (license license:bsd-3)))
 
-(define-public chicken-agrep
-  (package
-    (name "chicken-agrep")
-    (version "1.7")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/iraikov/chicken-agrep")
-             (commit version)))
-       (file-name (string-append "chicken-agrep-" version "-checkout"))
-       (sha256
-        (base32
-         "0z05x7f154n9bgmainrsmncf5i6dil43r9ymr3rdgwbg4wnxmz4s"))))
-    ;; TODO do we really have to make these propagated?
-    ;; I don't know Chicken's module system well enough to tell
-    (propagated-inputs
-     (list chicken-datatype chicken-srfi-1 chicken-srfi-14))
-    (inputs
-     (list chicken-test))
-    (build-system chicken-build-system)
-    (arguments '(#:egg-name "agrep"))
-    (synopsis "Approximate string matching library")
-    (home-page "https://wiki.call-cc.org/eggref/5/agrep")
-    (description
-     "This library implements the Wu-Manber algorithm for approximate string
-searching with errors, popularized by the agrep Unix command and the glimpse
-file indexing tool.")
-    (license license:gpl3+)))
-
-(define-public chicken-datatype
-  (package
-    (name "chicken-datatype")
-    (version "1.6")
-    (source
-     (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/datatype/tags/" version))
-             (revision 39266)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-datatype-" version "-checkout"))
-       (sha256
-        (base32
-         "1a58q8ypjkjz6wdv25247wixds4179239d36nnvsfn6gp70s9jfq"))))
-    (build-system chicken-build-system)
-    (arguments '(#:egg-name "datatype"))
-    (inputs
-     (list chicken-srfi-1 chicken-test))
-    (home-page "https://wiki.call-cc.org/eggref/5/datatype")
-    (synopsis "Facility for creating and using variant records")
-    (description
-     "This CHICKEN Scheme library provides a facility for creating and using
-variant records, as described in the book @i{Essentials of Programming
-Languages} by Friedman, Wand, and Haynes.")
-    (license license:bsd-3)))
-
-(define-public chicken-iset
-  (package
-    (name "chicken-iset")
-    (version "2.2")
-    (source
-     (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/iset/tags/" version))
-             (revision 39057)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-iset-" version "-checkout"))
-       (sha256
-        (base32
-         "0gz50n5i561n5sk9prry0lrxz6bfrq9if5bclaq6a0f7lzinhnzb"))))
-    (inputs
-     (list chicken-test))
-    (build-system chicken-build-system)
-    (arguments '(#:egg-name "iset"))
-    (synopsis "Integer set library")
-    (home-page "https://wiki.call-cc.org/eggref/5/iset")
-    (description
-     "This ``integer set'' CHICKEN Scheme library implements bit vectors.
-Bit-vectors provide an abstract interface to bitwise operations typically done
-with integers.")
-    (license license:bsd-3)))
-
 (define-public chicken-test
   (package
     (name "chicken-test")
@@ -390,36 +422,4 @@ with integers.")
     (synopsis "Yet another testing utility")
     (description
      "This package provides a simple testing utility for CHICKEN Scheme.")
-    (license license:bsd-3)))
-
-(define-public chicken-crypto-tools
-  (package
-    (name "chicken-crypto-tools")
-    (version "1.4")
-    (source (origin
-              (method url-fetch)
-              (uri (egg-uri "crypto-tools" version))
-              (sha256
-               (base32
-                "0ajf0qfnhp99f4x1dll2fhlxrsxamgrrwyksc7rrym77xmv8f1pd"))))
-    (build-system chicken-build-system)
-    (arguments '(#:egg-name "crypto-tools"))
-    (home-page "https://wiki.call-cc.org/egg/crypto-tools")
-    (synopsis "Useful cryptographic primitives")
-    (description "The crypto-tools egg implements useful cryptographic
-primitives.  More specifically, provided are:
-
-@itemize
-@item binary blobs
-@itemize
-@item marshallers to and from hex strings
-@item blob xor
-@item blob padding using either PKCS#5 or ISO7816-4
-@end itemize
-@item Block cipher modes of operation
-@itemize
-@item CBC with or without incorporated encrypted IV in the ciphertext
-@item CTR with or without incorporated IV in the ciphertext
-@end itemize
-@end itemize")
     (license license:bsd-3)))
