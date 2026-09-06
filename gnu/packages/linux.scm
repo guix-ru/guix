@@ -2816,7 +2816,7 @@ module is also needed for the @code{tuxedo-control-center} (short tcc) package."
 (define-public evdi
   (package
     (name "evdi")
-    (version "1.14.15")                  ;inherited by libevdi
+    (version "1.15.0")                  ;inherited by libevdi
     (source
      (origin
        (method git-fetch)
@@ -2825,7 +2825,7 @@ module is also needed for the @code{tuxedo-control-center} (short tcc) package."
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "065mfwmb4nw71s0f0ax9si8xpbr1sah1bhxvq1k81yicvi83wsxn"))))
+        (base32 "07c4n7rigw2kls1qmsffhv1x4kql4h8mpnv5l76khgmbz4z7nw89"))))
     (build-system linux-module-build-system)
     (arguments
      (list #:tests? #f                  ;no test suite
