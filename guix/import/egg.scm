@@ -5,6 +5,7 @@
 ;;; Copyright © 2022 Hartmut Goebel <h.goebel@crazy-compilers.com>
 ;;; Copyright © 2024 Ekaitz Zarraga <ekaitz@elenq.tech>
 ;;; Copyright © 2024 Maxim Cournoyer <maxim@guixotic.coop>
+;;; Copyright © 2026 Malte Frank Gerdes <malte.f.gerdes@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -103,7 +104,11 @@ to the repository."
 
 (define (get-versions name)
   "Get the release versions of the egg NAME."
-  (or (scandir (egg-directory name)) '()))
+  (or (reverse
+       (scandir (egg-directory name)
+                (lambda (x)
+                  (not (member x '("." ".."))))))
+      '()))
 
 (define* (egg-metadata name #:key (version #f) (file #f))
   "Return the package metadata file for the egg NAME at version VERSION, or if
