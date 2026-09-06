@@ -2320,8 +2320,8 @@ APIs of Alibaba Cloud @acronym{OSS, Object Storage Service}.")
            go-golang-org-x-exp
            go-golang-org-x-net
            go-golang-org-x-sys
-           ;; go-golang-zx2c4-com-wintun ;Windows only
-           go-gvisor-dev-gvisor))
+           ;; go-golang-zx2c4-com-wintun     ;Windows only
+           go-gvisor-dev-gvisor-source))
     (home-page "https://github.com/amnezia-vpn/amneziawg-go")
     (synopsis "Go implementation of AmneziaWG")
     (description
