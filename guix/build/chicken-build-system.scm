@@ -50,6 +50,7 @@
                      (if oldenv
                          (list  ":" oldenv)
                          '())))))
+  (setenv "CHICKEN_INSTALL_PREFIX" (assoc-ref outputs "out"))
   (setenv "CHICKEN_EGG_CACHE" (getcwd))
   #t)
 
