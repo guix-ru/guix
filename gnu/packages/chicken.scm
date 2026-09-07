@@ -518,29 +518,25 @@ scheme.")
 (define-public chicken-srfi-14
   (package
     (name "chicken-srfi-14")
-    (version "0.2.1")
+    (version "0.2.3")
     (source
      (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/srfi-14/tags/" version))
-             (revision 39057)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-srfi-14-" version "-checkout"))
+       (method url-fetch)
+       (uri (egg-uri "srfi-14" version))
        (sha256
         (base32
-         "0wjsqfwawh9bx6vvii1gwag166bxkflc0ib374fbws14914g2ac1"))))
+         "03yajfyh1d58kk9hq5vhw69pf6x17wms7zpx8w7s59vzkn99l8a8"))))
     (build-system chicken-build-system)
     (arguments '(#:egg-name "srfi-14"))
-    (home-page "https://wiki.call-cc.org/eggref/5/srfi-14")
-    (synopsis "Character set library")
+    (propagated-inputs
+     (list chicken-srfi-1))
+    (home-page "https://wiki.call-cc.org/egg/srfi-14")
+    (synopsis "SRFI-14 character-sets library")
     (description
      "Character sets can be created, extended, tested for the membership of
-a characters and be compared to other character sets")
+a characters and be compared to other character sets.")
     (license (license:non-copyleft
-              "http://wiki.call-cc.org/eggref/5/srfi-14#license"))))
+              "http://wiki.call-cc.org/egg/srfi-14#license"))))
 
 (define-public chicken-srfi-18
   (package
