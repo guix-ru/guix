@@ -390,26 +390,19 @@ Languages} by Friedman, Wand, and Haynes.")
 (define-public chicken-iset
   (package
     (name "chicken-iset")
-    (version "2.2")
+    (version "2.3.1")
     (source
      (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/iset/tags/" version))
-             (revision 39057)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-iset-" version "-checkout"))
+       (method url-fetch)
+       (uri (egg-uri "iset" version))
        (sha256
-        (base32
-         "0gz50n5i561n5sk9prry0lrxz6bfrq9if5bclaq6a0f7lzinhnzb"))))
-    (inputs
+        (base32 "1v797b31369b625pd27dbqc6r988z9cgiipp187y8kgfa5dm69xn"))))
+    (native-inputs
      (list chicken-test))
     (build-system chicken-build-system)
     (arguments '(#:egg-name "iset"))
     (synopsis "Integer set library")
-    (home-page "https://wiki.call-cc.org/eggref/5/iset")
+    (home-page "https://wiki.call-cc.org/egg/iset")
     (description
      "This ``integer set'' CHICKEN Scheme library implements bit vectors.
 Bit-vectors provide an abstract interface to bitwise operations typically done
