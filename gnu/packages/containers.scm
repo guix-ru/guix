@@ -1710,6 +1710,24 @@ as created by Podman, CRI-O and containerd.")))
 configure network interfaces in Linux containers.")
     (license license:asl2.0)))
 
+(define-public containerd-fuse-overlayfs-grpc
+  (package/inherit go-github-com-containerd-fuse-overlayfs-snapshotter-v2
+    (name "containerd-fuse-overlayfs-grpc")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _)
+        "github.com/containerd/fuse-overlayfs-snapshotter/v2/cmd/...")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "")
+        "github.com/containerd/fuse-overlayfs-snapshotter/v2")))
+    (native-inputs
+     (package-propagated-inputs
+      go-github-com-containerd-fuse-overlayfs-snapshotter-v2))
+    (propagated-inputs '())
+    (inputs '())))
+
 (define-public crun
   (package
     (name "crun")
