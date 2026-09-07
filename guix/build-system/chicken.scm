@@ -2,6 +2,7 @@
 ;;; Copyright © 2020 raingloom <raingloom@riseup.net>
 ;;; Copyright © 2021 Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;; Copyright © 2026 Malte Frank Gerdes <malte.f.gerdes@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -35,7 +36,7 @@
 (define* (egg-uri name version #:optional (extension ".tar.gz"))
   "Return a URI string for the CHICKEN egg corresponding to NAME and VERSION.
 EXTENSION is the file name extension, such as '.tar.gz'."
-  (string-append "https://code.call-cc.org/egg-tarballs/5/"
+  (string-append "https://code.call-cc.org/egg-tarballs/6/"
                  name "/" name "-" version extension))
 
 (define %chicken-build-system-modules
