@@ -188,6 +188,27 @@ file indexing tool.")
 information about symbols in the toplevel environment.")
     (license license:expat)))
 
+(define-public chicken-autocompile
+  (package
+    (name "chicken-autocompile")
+    (version "1.1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "autocompile" version))
+       (sha256
+        (base32 "1yh8gzpyyflfmnv243ky0vzrpbnlxykq6s69v6f92lnk2qgb9nx6"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "autocompile"))
+    (propagated-inputs (list chicken-matchable))
+    (home-page "https://wiki.call-cc.org/egg/autocompile")
+    (synopsis "Automatically compile Scheme scripts on demand")
+    (description "A program named chicken-scheme takes a Scheme file and a
+number of arguments and if the script has not been compiled before or has
+changed as compared to the last compiled version, compiles it, storing the
+result in a cache in the user's $HOME directory.")
+    (license license:public-domain)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
