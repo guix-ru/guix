@@ -584,6 +584,32 @@ CHICKEN Scheme, along with
 @uref{https://srfi.schemers.org/srfi-90/srfi-90.html, SRFI-90} extensions.")
     (license license:bsd-3)))
 
+(define-public chicken-string-utils
+  (package
+    (name "chicken-string-utils")
+    (version "3.6.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "string-utils" version))
+       (sha256
+        (base32 "0hfab6sa11jsdjnsq9nlvs8yxy8hjbgizjwxkrpwlwbk91i2x6qx"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "string-utils"))
+    (native-inputs (list chicken-test chicken-test-utils))
+    (propagated-inputs
+     (list
+      chicken-srfi-1
+      chicken-srfi-13
+      chicken-srfi-14
+      chicken-srfi-69
+      chicken-miscmacros
+      chicken-check-errors))
+    (home-page "https://wiki.call-cc.org/egg/string-utils")
+    (synopsis "String Utilities")
+    (description #f)
+    (license license:bsd-3)))
+
 (define-public chicken-test
   (package
     (name "chicken-test")
