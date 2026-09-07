@@ -49,24 +49,24 @@
 ;;;
 ;;; (guix import egg) provides package importer for CHICKEN eggs.  See the
 ;;; official specification format for eggs
-;;; <https://wiki.call-cc.org/man/5/Egg%20specification%20format>.
+;;; <https://wiki.call-cc.org/man/6/Egg%20specification%20format>.
 ;;;
 ;;; The following happens under the hood:
 ;;;
-;;; * <git://code.call-cc.org/eggs-5-all> is a Git repository that contains
-;;;   all versions of all CHICKEN eggs.  We look clone this repository and, by
+;;; * <git://code.call-cc.org/eggs-6-all> is a Git repository that contains
+;;;   all versions of all CHICKEN eggs.  We clone this repository and, by
 ;;;   default, retrieve the latest version number, and the PACKAGE.egg file,
 ;;;   which contains a list of lists containing metadata about the egg.
 ;;;
 ;;; * All the eggs are stored as tarballs at
-;;;   <https://code.call-cc.org/egg-tarballs/5>, so we grab the tarball for
+;;;   <https://code.call-cc.org/egg-tarballs/6>, so we grab the tarball for
 ;;;   the egg from there.
 ;;;
 ;;; * The rest of the package fields will be parsed from the PACKAGE.egg file.
 ;;;
 ;;; Todos:
 ;;;
-;;; * Support for CHICKEN 4?
+;;; * Support for multiple CHICKEN versions?
 ;;;
 ;;; * Some packages will specify a specific version of a dependency in the
 ;;;   PACKAGE.egg file, how should we handle this?
@@ -81,7 +81,7 @@
 (define package-name-prefix "chicken-")
 
 (define %eggs-url
-  (make-parameter "https://code.call-cc.org/egg-tarballs/5"))
+  (make-parameter "https://code.call-cc.org/egg-tarballs/6"))
 
 (define %eggs-home-page
   (make-parameter "https://wiki.call-cc.org/egg"))
@@ -93,7 +93,7 @@
 (define (eggs-repository)
   "Update or fetch the latest version of the eggs repository and return the path
 to the repository."
-  (let* ((url "git://code.call-cc.org/eggs-5-all")
+  (let* ((url "git://code.call-cc.org/eggs-6-all")
          (directory commit _ (update-cached-checkout url)))
     directory))
 
