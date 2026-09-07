@@ -473,31 +473,25 @@ of Lex.")
     (version "0.5.1")
     (source
      (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append
-                   "https://code.call-cc.org/svn/chicken-eggs/"
-                   "release/5/srfi-1/tags/"
-                   version))
-             (revision 39055)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-srfi-1" version "-checkout"))
+       (method url-fetch)
+       (uri (egg-uri "srfi-1" version))
        (sha256
         (base32
-         "02940zsjrmn7c34rnp1rllm2nahh9jvszlzrw8ak4pf31q09cmq1"))))
+         "1s0m7ajjyif3r6nvsjphhykgd2wlsa6j7jsmfhy7s6sc47cddznj"))))
     (build-system chicken-build-system)
     (arguments '(#:egg-name "srfi-1"))
-    (inputs
+    (native-inputs
      (list chicken-test))
-    (home-page "https://wiki.call-cc.org/eggref/5/srfi-1")
+    (home-page "https://wiki.call-cc.org/egg/srfi-1")
     (synopsis "SRFI-1 list library")
     (description
      "The list library defined in
 @uref{https://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1} contains a lot of
 useful list processing procedures for construction, examining, destructuring
 and manipulating lists and pairs.")
-    (license license:bsd-3)))
+    (license (license:non-copyleft
+              "https://srfi.schemers.org/srfi-1/srfi-1.html"
+              "Olin Shivers' license; see the header of srfi-1.scm"))))
 
 (define-public chicken-srfi-13
   (package
