@@ -366,25 +366,20 @@ primitives.  More specifically, provided are:
 (define-public chicken-datatype
   (package
     (name "chicken-datatype")
-    (version "1.6")
+    (version "1.7")
     (source
-     (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/datatype/tags/" version))
-             (revision 39266)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-datatype-" version "-checkout"))
+    (origin
+       (method url-fetch)
+       (uri (egg-uri "datatype" version))
        (sha256
-        (base32
-         "1a58q8ypjkjz6wdv25247wixds4179239d36nnvsfn6gp70s9jfq"))))
+        (base32 "03pcif0f0srrbnay8r7p0jrgjnqs637wcd8iw3vzcsc76fn36p3r"))))
     (build-system chicken-build-system)
     (arguments '(#:egg-name "datatype"))
-    (inputs
-     (list chicken-srfi-1 chicken-test))
-    (home-page "https://wiki.call-cc.org/eggref/5/datatype")
+    (native-inputs
+     (list chicken-test))
+    (propagated-inputs
+     (list chicken-srfi-1))
+    (home-page "https://wiki.call-cc.org/egg/datatype")
     (synopsis "Facility for creating and using variant records")
     (description
      "This CHICKEN Scheme library provides a facility for creating and using
