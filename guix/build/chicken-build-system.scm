@@ -45,7 +45,7 @@
   (setenv "CHICKEN_INSTALL_REPOSITORY"
           (string-concatenate
            ;; see TODO item about binary version above
-           (append (list (assoc-ref outputs "out") "/var/lib/chicken/11")
+           (append (list (assoc-ref outputs "out") "/var/lib/chicken/12")
                    (let ((oldenv (getenv "CHICKEN_INSTALL_REPOSITORY")))
                      (if oldenv
                          (list  ":" oldenv)
