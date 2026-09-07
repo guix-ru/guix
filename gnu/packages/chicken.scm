@@ -267,6 +267,26 @@ RFC4648.")
 arguments.  If the unsafe feature is specified these checks are no-ops.")
     (license license:expat)))
 
+(define-public chicken-chibi-term
+  (package
+    (name "chicken-chibi-term")
+    (version "0.1.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "chibi-term" version))
+       (sha256
+        (base32 "1i6zs998jamdr4kfpchigx7jq7jpybnb5i893n2qlv23lyc2g869"))))
+    (build-system chicken-build-system)
+    (arguments
+     '(#:egg-name "chibi-term"))
+    (native-inputs (list chicken-test))
+    (home-page "https://wiki.call-cc.org/egg/chibi-term")
+    (synopsis "Chibi Scheme's term library")
+    (description "A library to use ANSI escape codes to format text and
+background color, font weight, and underlining.")
+    (license license:bsd-3)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
