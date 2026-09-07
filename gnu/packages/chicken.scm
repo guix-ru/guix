@@ -541,16 +541,16 @@ a characters and be compared to other character sets.")
 (define-public chicken-srfi-18
   (package
     (name "chicken-srfi-18")
-    (version "0.1.6")
+    (version "0.2.2")
     (source (origin
               (method url-fetch)
               (uri (egg-uri "srfi-18" version))
               (sha256
                (base32
-                "0v2pkdck0ji1wiqgg8sg4z6rbkj2qw4vy4b9lx0w0pmhlxqpg1xd"))))
+                "1qrrcss2izy182akx1vpzv66r0mmrnk879kqlgd0hf5wsj1567j9"))))
     (build-system chicken-build-system)
     (arguments
-     `(#:egg-name "srfi-18"))
+     '(#:egg-name "srfi-18"))
     (native-inputs (list chicken-compile-file))
     (home-page "https://wiki.call-cc.org/egg/srfi-18")
     (synopsis "Multithreading package, largely following SRFI-18")
