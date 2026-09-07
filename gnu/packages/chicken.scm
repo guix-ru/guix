@@ -305,6 +305,32 @@ background color, font weight, and underlining.")
 source code and load it into the running process.")
     (license license:bsd-3)))
 
+(define-public chicken-crunch
+  (package
+    (name "chicken-crunch")
+    (version "0.998")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "crunch" version))
+       (sha256
+        (base32 "1lfvnzxnvkry74jj4lx2bcib9dr82hm7332mjsyk34ncf6162sj2"))))
+    (build-system chicken-build-system)
+    (arguments
+     '(#:egg-name "crunch"))
+    (native-inputs (list chicken-compile-file chicken-miscmacros))
+    (propagated-inputs (list chicken-srfi-1 chicken-srfi-13 chicken-matchable))
+    (home-page "https://wiki.call-cc.org/egg/crunch")
+    (synopsis
+     "Embedded compiler for a statically typed subset of R7RS Scheme")
+    (description "CRUNCH is an embedded compiler for a statically typed subset
+of R7RS Scheme, generating C code.  The compiler uses type inference to decorate
+the code with type information without requiring declarations.  CRUNCH can be
+used to translate embedded Scheme code sections, whole programs or multiple
+source modules into standalone executables or compiled code that can be invoked
+from Scheme.")
+    (license license:bsd-3)))
+
 (define-public chicken-crypto-tools
   (package
     (name "chicken-crypto-tools")
