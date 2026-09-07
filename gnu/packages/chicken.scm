@@ -409,6 +409,25 @@ Bit-vectors provide an abstract interface to bitwise operations typically done
 with integers.")
     (license license:bsd-3)))
 
+(define-public chicken-matchable
+  (package
+    (name "chicken-matchable")
+    (version "1.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "matchable" version))
+       (sha256
+        (base32 "0h2awlx5y00i5mvqna1wj5ydxg86hc5lvd2fxdl3ypd7gcgz0y92"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "matchable"))
+    (native-inputs (list chicken-test))
+    (home-page "https://wiki.call-cc.org/egg/matchable")
+    (synopsis "Hygienic MATCH replacement")
+    (description "This extension implements Andrew Wright's pattern matching
+macros.")
+    (license license:public-domain)))
+
 (define-public chicken-srfi-1
   (package
     (name "chicken-srfi-1")
