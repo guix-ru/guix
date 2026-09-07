@@ -229,6 +229,25 @@ result in a cache in the user's $HOME directory.")
 RFC4648.")
     (license license:expat)))
 
+(define-public chicken-bytevector-utils
+  (package
+    (name "chicken-bytevector-utils")
+    (version "1.0.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "bytevector-utils" version))
+       (sha256
+        (base32 "1z9ybzbr6vp7w79ric5f8jfdy28s9pvm87h9pfgy2mq3jcsqpm0k"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "bytevector-utils"))
+    (native-inputs (list chicken-test chicken-test-utils))
+    (propagated-inputs (list chicken-string-utils chicken-check-errors))
+    (home-page "https://wiki.call-cc.org/egg/bytevector-utils")
+    (synopsis "Bytevector Utilities")
+    (description #f)
+    (license license:expat)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
