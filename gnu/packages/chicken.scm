@@ -445,6 +445,28 @@ macros.")
     (description #f)
     (license license:bsd-3)))
 
+(define-public chicken-silex
+  (package
+    (name "chicken-silex")
+    (version "1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "silex" version))
+       (sha256
+        (base32 "0hchm3mg18klkhi24dbrqq4v65awislf5d7hchg33i32acjnxir0"))))
+    (build-system chicken-build-system)
+    (arguments
+     '(#:egg-name "silex"))
+    (native-inputs (list chicken-test))
+    (propagated-inputs (list chicken-srfi-13))
+    (home-page "https://wiki.call-cc.org/egg/silex")
+    (synopsis "Efficient and powerful lexer generator")
+    (description "SILex is a lexical analyser generator similar to the Lex
+and Flex programs, but for Scheme. SILex stands for Scheme Implementation
+of Lex.")
+    (license license:bsd-3)))
+
 (define-public chicken-srfi-1
   (package
     (name "chicken-srfi-1")
