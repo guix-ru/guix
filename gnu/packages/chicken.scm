@@ -667,3 +667,22 @@ SSAX/SXML Sourceforge project.")
     (description
      "This package provides a simple testing utility for CHICKEN Scheme.")
     (license license:bsd-3)))
+
+(define-public chicken-test-utils
+  (package
+    (name "chicken-test-utils")
+    (version "1.8.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "test-utils" version))
+       (sha256
+        (base32 "0ripy8x4sjc8ga2iwcjwsfsf6vp5rq459pywj4c0bq22gffgrma3"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "test-utils"))
+    (native-inputs (list chicken-test))
+    (propagated-inputs (list chicken-test))
+    (home-page "https://wiki.call-cc.org/egg/test-utils")
+    (synopsis "Gloss & Runner for test egg")
+    (description "This egg provides a glossary and a runner for the test egg.")
+    (license license:expat)))
