@@ -652,23 +652,17 @@ SSAX/SXML Sourceforge project.")
 (define-public chicken-test
   (package
     (name "chicken-test")
-    (version "1.1")
+    (version "1.3")
     (source
      (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/test/tags/" version))
-             (revision 39263)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-test-" version "-checkout"))
+       (method url-fetch)
+       (uri (egg-uri "test" version))
        (sha256
         (base32
-         "14i91cxsn6hjkx6kqf7i9syck73cw71jik61jmhg87vpxx5kfnzx"))))
+         "0wifl5lwijfx555agwrxa4l3pc8hyh79n4knlq9mrbrrq2ydyxf6"))))
     (build-system chicken-build-system)
     (arguments '(#:egg-name "test"))
-    (home-page "https://wiki.call-cc.org/eggref/5/test")
+    (home-page "https://wiki.call-cc.org/egg/test")
     (synopsis "Yet another testing utility")
     (description
      "This package provides a simple testing utility for CHICKEN Scheme.")
