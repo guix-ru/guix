@@ -428,6 +428,23 @@ with integers.")
 macros.")
     (license license:public-domain)))
 
+(define-public chicken-miscmacros
+  (package
+    (name "chicken-miscmacros")
+    (version "1.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "miscmacros" version))
+       (sha256
+        (base32 "0cqmmahr4fj5ws0grzvqrzk097rbnzdk1f56qymrzgigiblfkglh"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "miscmacros"))
+    (home-page "https://wiki.call-cc.org/egg/miscmacros")
+    (synopsis "Various helper macros")
+    (description #f)
+    (license license:bsd-3)))
+
 (define-public chicken-srfi-1
   (package
     (name "chicken-srfi-1")
