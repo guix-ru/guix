@@ -290,15 +290,15 @@ background color, font weight, and underlining.")
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
-    (version "1.3")
+    (version "1.4")
     (source (origin
               (method url-fetch)
               (uri (egg-uri "compile-file" version))
               (sha256
                (base32
-                "1029i5ifr48vb3clvl8n50iq23rzc42szdcsl9320qmj1ksg9y93"))))
+                "0zjbk2s9nb35qhpf8wd2m3by7ykvicihb1zxk71v2j2zjr3za82k"))))
     (build-system chicken-build-system)
-    (arguments `(#:egg-name "compile-file"))
+    (arguments '(#:egg-name "compile-file"))
     (home-page "https://wiki.call-cc.org/egg/compile-file")
     (synopsis "Programmatic compiler invocation")
     (description "This egg provides a way to do on-the-fly compilation of
