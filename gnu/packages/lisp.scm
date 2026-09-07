@@ -38,7 +38,7 @@
 ;;; Copyright © 2024 Omar Bassam <omar.bassam88@gmail.com>
 ;;; Copyright © 2024 Suhail Singh <suhail@bayesians.ca>
 ;;; Copyright © 2024 bigbug <bigbookofbug@proton.me>
-;;; Copyright © 2024, 2025 Ashish SHUKLA <ashish.is@lostca.se>
+;;; Copyright © 2024-2026 Ashish SHUKLA <ashish.is@lostca.se>
 ;;; Copyright © 2026 Igorj Gorjaĉev <igor@goryachev.org>
 ;;; Copyright © 2026 Simen Endsjø <contact@simendsjo.me>
 ;;;
@@ -477,7 +477,7 @@ interface.")
 (define-public clasp-cl
   (package
     (name "clasp-cl")
-    (version "2.7.0")
+    (version "3.0.1")
     (source
      (origin
        (method url-fetch)
@@ -485,10 +485,10 @@ interface.")
              "https://github.com/clasp-developers/clasp/releases/download/"
              version "/clasp-" version ".tar.gz"))
        (sha256
-        (base32 "1sf8m0w3d4kagf4chb7viqndnr152crpsy979ll61krcfxaybc4j"))))
+        (base32 "1vmk4gk6y2pwylgm1vxkq8n2bj3pj4d75kn0ilw9kn499brw8ypc"))))
     (build-system gnu-build-system)
     (inputs
-     (list boost clang-toolchain-19 fmt `(,gcc "lib") gmp elfutils libunwind))
+     (list boost clang-toolchain-22 fmt `(,gcc "lib") gmp elfutils libunwind))
     (native-inputs
      (list binutils-gold ninja pkg-config sbcl))
     (arguments
@@ -532,7 +532,7 @@ interface.")
                        "--script"
                        "./koga"
                        "--skip-sync"
-                       "--build-mode=bytecode-faso"
+                       "--build-mode=bytecode"
                        (string-append "--cc=" clang "/bin/clang")
                        (string-append "--cxx=" clang "/bin/clang++")
                        (string-append "--ldflags=-Wl," ld-flags)
