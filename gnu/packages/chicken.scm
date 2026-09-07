@@ -565,24 +565,17 @@ multiple processor cores is not available.")
 (define-public chicken-srfi-69
   (package
     (name "chicken-srfi-69")
-    (version "0.4.1")
+    (version "0.5.3")
     (source
      (origin
-       (method svn-fetch)
-       (uri (svn-reference
-             (url (string-append "https://code.call-cc.org/svn/chicken-eggs/"
-                                 "release/5/srfi-69/tags/"
-                                 version))
-             (revision 39057)
-             (user-name "anonymous")
-             (password "")))
-       (file-name (string-append "chicken-srfi-69-" version "-checkout"))
+       (method url-fetch)
+       (uri (egg-uri "srfi-69" version))
        (sha256
         (base32
-         "1z0m9vmg9bj9z0a941pls6igvg8nmhq4mj5psjjidbp0fac572mp"))))
+         "0bypnghy5izifbxnrf61pm7bzih9fr5glzs3fmn00fmb58bhj4lf"))))
     (arguments '(#:egg-name "srfi-69"))
     (build-system chicken-build-system)
-    (home-page "https://wiki.call-cc.org/eggref/5/srfi-69")
+    (home-page "https://wiki.call-cc.org/egg/srfi-69")
     (synopsis "Implementation of SRFI 69 with SRFI 90 extensions")
     (description
      "This package provides an implementation of
