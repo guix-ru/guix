@@ -248,6 +248,25 @@ RFC4648.")
     (description #f)
     (license license:expat)))
 
+(define-public chicken-check-errors
+  (package
+    (name "chicken-check-errors")
+    (version "4.0.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "check-errors" version))
+       (sha256
+        (base32 "08hn6vw631q5k4adarq8fr146arbbxvxy36j77df3xvr0dqx7pjp"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "check-errors"))
+    (native-inputs (list chicken-test chicken-test-utils))
+    (home-page "https://wiki.call-cc.org/egg/check-errors")
+    (synopsis "Argument checks & errors")
+    (description "This egg provides functions and error types to check
+arguments.  If the unsafe feature is specified these checks are no-ops.")
+    (license license:expat)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
