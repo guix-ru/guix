@@ -209,6 +209,26 @@ changed as compared to the last compiled version, compiles it, storing the
 result in a cache in the user's $HOME directory.")
     (license license:public-domain)))
 
+(define-public chicken-base64
+  (package
+    (name "chicken-base64")
+    (version "1.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "base64" version))
+       (sha256
+        (base32 "1fdnxmwb336sx8kx1l5yjpryhivr8wsrvljsxywnx9439038gq02"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "base64"))
+    (native-inputs (list chicken-test))
+    (propagated-inputs (list chicken-srfi-13))
+    (home-page "https://wiki.call-cc.org/egg/base64")
+    (synopsis "Encoding and decoding of base64 strings")
+    (description "This egg provides base64 encoding and decoding compliant with
+RFC4648.")
+    (license license:expat)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
