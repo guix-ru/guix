@@ -160,6 +160,34 @@ searching with errors, popularized by the agrep Unix command and the glimpse
 file indexing tool.")
     (license license:gpl3+)))
 
+(define-public chicken-apropos
+  (package
+    (name "chicken-apropos")
+    (version "4.0.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "apropos" version))
+       (sha256
+        (base32 "05x659abn65mrplvk7lyvy44s4p2w8kwrz1bv2isi1qsnmfnnfgy"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "apropos"))
+    (native-inputs
+     (list
+      chicken-test
+      chicken-test-utils))
+    (propagated-inputs
+     (list
+      chicken-srfi-1
+      chicken-srfi-13
+      chicken-symbol-utils
+      chicken-check-errors))
+    (home-page "https://wiki.call-cc.org/egg/apropos")
+    (synopsis "CHICKEN apropos")
+    (description "An apropos facility for chicken scheme allowing to display
+information about symbols in the toplevel environment.")
+    (license license:expat)))
+
 (define-public chicken-compile-file
   (package
     (name "chicken-compile-file")
