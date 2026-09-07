@@ -630,6 +630,25 @@ CHICKEN Scheme, along with
 SSAX/SXML Sourceforge project.")
     (license license:public-domain)))
 
+(define-public chicken-symbol-utils
+  (package
+    (name "chicken-symbol-utils")
+    (version "3.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "symbol-utils" version))
+       (sha256
+        (base32 "01jpn15fbdzwjslq594iywv0zny4x72828qdyr6znrszpkg8rcjn"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "symbol-utils"))
+    (native-inputs (list chicken-test chicken-test-utils))
+    (propagated-inputs (list chicken-srfi-1 chicken-srfi-13))
+    (home-page "https://wiki.call-cc.org/egg/symbol-utils")
+    (synopsis "Symbol Utilities")
+    (description #f)
+    (license license:expat)))
+
 (define-public chicken-test
   (package
     (name "chicken-test")
