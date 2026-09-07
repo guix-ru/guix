@@ -2,6 +2,7 @@
 ;;; Copyright © 2020 Ekaitz Zarraga <ekaitz@elenq.tech>
 ;;; Copyright © 2020 Evan Hanson <evhan@foldling.org>
 ;;; Copyright © 2020 raingloom <raingloom@riseup.net>
+;;; Copyright © 2026 Malte Frank Ferdes <malte.f.gerdes@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -42,14 +43,14 @@
   (hidden-package
    (package
      (name "chicken-bootstrap")
-     (version "5.4.0")
+     (version "6.0.0")
      (source (origin
                (method url-fetch)
                (uri (string-append "https://code.call-cc.org/releases/"
                                    version "/chicken-" version ".tar.gz"))
                (sha256
                 (base32
-                 "0pzcrnzkjw2sa44vy59wbygvlc3nva8zisprkdnvyrqi3jk4lp9w"))))
+                 "0hzl875whdnkyv06x0gq57s0nl9np9d9nhkyfckav1xnn595b0wj"))))
      (build-system gnu-build-system)
      (arguments
       `(#:modules ((guix build gnu-build-system)
@@ -76,18 +77,18 @@
       (list (search-path-specification
              (variable "CHICKEN_REPOSITORY_PATH")
              ;; TODO extract binary version into a module level definition.
-             (files (list "var/lib/chicken/11")))))
+             (files (list "var/lib/chicken/12")))))
      ;; Reference gcc-toolchain lazily to avoid circular module dependency
      ;; problems.
      (propagated-inputs (list (module-ref (resolve-interface
                                            '(gnu packages commencement))
                                           'gcc-toolchain)))
      (home-page "https://www.call-cc.org/")
-     (synopsis "R5RS Scheme implementation that compiles native code via C")
+     (synopsis "Practical and portable scheme system")
      (description
-      "CHICKEN is a compiler for the Scheme programming language.  CHICKEN
-pr oduces portable and efficient C, supports almost all of the R5RS Scheme
-la nguage standard, and includes many enhancements and extensions.")
+      "CHICKEN is a compiler for the Scheme programming language.  It produces
+portable and efficient C and supports the R5RS and R7RS standards, and many
+extensions.")
      (license license:bsd-3))))
 
 ;; The CHICKEN compiler is itself written in CHICKEN, the CHICKEN release
@@ -109,7 +110,7 @@ la nguage standard, and includes many enhancements and extensions.")
             ;; compile from the Scheme source using chicken-bootstrap.
             (add-after 'unpack 'remove-auto-generated-code
               (lambda _
-                (invoke "make" "spotless")))
+                (invoke "make" "PLATFORM=linux" "spotless")))
             ;; Invoke commands by name, not by path.
             ;;
             ;; See <https://codeberg.org/guix/guix/issues/8471>.
