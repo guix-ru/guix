@@ -610,6 +610,26 @@ CHICKEN Scheme, along with
     (description #f)
     (license license:bsd-3)))
 
+(define-public chicken-sxml-transforms
+  (package
+    (name "chicken-sxml-transforms")
+    (version "1.5.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "sxml-transforms" version))
+       (sha256
+        (base32 "00wcgr6yyqvp2l1f7a4axg9vscpc6qb1iskcvwc2p8mkfp3159ja"))))
+    (build-system chicken-build-system)
+    (arguments '(#:egg-name "sxml-transforms"))
+    (propagated-inputs (list chicken-srfi-13))
+    (home-page "https://wiki.call-cc.org/egg/sxml-transforms")
+    (synopsis
+     "SXML transformations (to XML, SXML, and HTML) from the SSAX project")
+    (description "This egg provides the SXML transforms available in the
+SSAX/SXML Sourceforge project.")
+    (license license:public-domain)))
+
 (define-public chicken-test
   (package
     (name "chicken-test")
