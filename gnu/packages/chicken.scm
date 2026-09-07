@@ -496,17 +496,19 @@ and manipulating lists and pairs.")
 (define-public chicken-srfi-13
   (package
     (name "chicken-srfi-13")
-    (version "0.3.2")
+    (version "0.3.8")
     (source (origin
               (method url-fetch)
               (uri (egg-uri "srfi-13" version))
               (sha256
                (base32
-                "18clbmaampaxivwx9bya9fxnkzqbczhlz0kbs9bfapm77mxkwclc"))))
+                "02qwwja2s5800ylgkj5fz72qz079z3kjffvn2qj1vh2b5jchzcvg"))))
     (build-system chicken-build-system)
     (arguments '(#:egg-name "srfi-13"))
-    (native-inputs (list chicken-test))
-    (propagated-inputs (list chicken-srfi-14))
+    (native-inputs
+     (list chicken-test))
+    (propagated-inputs
+     (list chicken-srfi-1 chicken-srfi-14))
     (home-page "https://wiki.call-cc.org/egg/srfi-13")
     (synopsis "SRFI-13 string library for Chicken scheme")
     (description "This package provides the SRFI-13 string library for Chicken
