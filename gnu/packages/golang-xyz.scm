@@ -5233,6 +5233,30 @@ using JIT and SIMD approaches.")
 library.")
     (license license:asl2.0)))
 
+(define-public go-github-com-byteness-percent
+  (package
+    (name "go-github-com-byteness-percent")
+    (version "0.2.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ByteNess/percent")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0a54575pqjad6r4rlp6qbidcp8dm5s3cvn0wg0ryjllrb34rj74h"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/byteness/percent"))
+    (home-page "https://github.com/byteness/percent")
+    (synopsis "Package percent escapes strings using percent-encoding")
+    (description
+     "Package percent escapes strings using percent-encoding.  It's a
+maintained fork of @url{https://github.com/mtibben/percent}.")
+    (license license:expat)))
+
 (define-public go-github-com-c-bata-go-prompt
   (package
     (name "go-github-com-c-bata-go-prompt")
