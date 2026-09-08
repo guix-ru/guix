@@ -53,31 +53,33 @@
                  "0hzl875whdnkyv06x0gq57s0nl9np9d9nhkyfckav1xnn595b0wj"))))
      (build-system gnu-build-system)
      (arguments
-      `(#:modules ((guix build gnu-build-system)
+      (list
+       #:modules '((guix build gnu-build-system)
                    (guix build utils)
                    (srfi srfi-1))
 
-        ;; No `configure' script; run "make check" after "make install" as
-        ;; prescribed by README.
-        #:phases
-        (modify-phases %standard-phases
-          (delete 'configure)
-          (delete 'check)
-          (add-after 'install 'check
-            (assoc-ref %standard-phases 'check)))
+       ;; No `configure' script; run "make check" after "make install" as
+       ;; prescribed by README.
+       #:phases
+       #~(modify-phases %standard-phases
+           (delete 'configure)
+           (delete 'check)
+           (add-after 'install 'check
+             (assoc-ref %standard-phases 'check)))
 
-        #:make-flags (let ((out (assoc-ref %outputs "out")))
-                       (list "PLATFORM=linux"
-                             (string-append "PREFIX=" out)
-                             (string-append "VARDIR=" out "/var/lib")))
+       #:make-flags
+       #~(list
+          "PLATFORM=linux"
+          (string-append "PREFIX=" #$output)
+          (string-append "VARDIR=" #$output "/var/lib"))
 
-        ;; Parallel builds are not supported, as noted in README.
-        #:parallel-build? #f))
+       ;; Parallel builds are not supported, as noted in README.
+       #:parallel-build? #f))
      (native-search-paths
       (list (search-path-specification
-             (variable "CHICKEN_REPOSITORY_PATH")
-             ;; TODO extract binary version into a module level definition.
-             (files (list "var/lib/chicken/12")))))
+              (variable "CHICKEN_REPOSITORY_PATH")
+              ;; TODO extract binary version into a module level definition.
+              (files (list "var/lib/chicken/12")))))
      ;; Reference gcc-toolchain lazily to avoid circular module dependency
      ;; problems.
      (propagated-inputs (list (module-ref (resolve-interface
@@ -119,16 +121,21 @@ extensions.")
                 (let ((sh (search-input-file inputs "/bin/sh"))
                       (cp (search-input-file inputs "/bin/cp")))
                   (substitute* "egg-compile.scm"
-                    (("/bin/sh") sh)
-                    (("\"cp ") (string-append "\"" cp " "))
-                    (("\"cp\"") (string-append "\"" cp "\"")))
+                    (("/bin/sh")
+                     sh)
+                    (("\"cp ")
+                     (string-append "\"" cp " "))
+                    (("\"cp\"")
+                     (string-append "\"" cp "\"")))
                   (substitute* "posixunix.scm"
-                    (("/bin/sh") sh))
+                    (("/bin/sh")
+                     sh))
                   (substitute* "chicken-install.scm"
-                    (("\"sh \"") (string-append "\"" sh " \""))))))))))
+                    (("\"sh \"")
+                     (string-append "\"" sh " \""))))))))))
     (inputs (list chicken-bootstrap))
-    (properties
-     (alist-delete 'hidden? (package-properties chicken-bootstrap)))))
+    (properties (alist-delete 'hidden?
+                              (package-properties chicken-bootstrap)))))
 
 (define-public chicken-agrep
   (package
@@ -147,11 +154,15 @@ extensions.")
     ;; TODO do we really have to make these propagated?
     ;; I don't know Chicken's module system well enough to tell
     (propagated-inputs
-     (list chicken-datatype chicken-srfi-1 chicken-srfi-14))
+     (list
+      chicken-datatype
+      chicken-srfi-1
+      chicken-srfi-14))
     (inputs
      (list chicken-test))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "agrep"))
+    (arguments
+     (list #:egg-name "agrep"))
     (synopsis "Approximate string matching library")
     (home-page "https://wiki.call-cc.org/eggref/5/agrep")
     (description
@@ -171,17 +182,18 @@ file indexing tool.")
        (sha256
         (base32 "05x659abn65mrplvk7lyvy44s4p2w8kwrz1bv2isi1qsnmfnnfgy"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "apropos"))
+    (arguments
+     (list #:egg-name "apropos"))
     (native-inputs
      (list
       chicken-test
       chicken-test-utils))
     (propagated-inputs
      (list
+      chicken-check-errors
       chicken-srfi-1
       chicken-srfi-13
-      chicken-symbol-utils
-      chicken-check-errors))
+      chicken-symbol-utils))
     (home-page "https://wiki.call-cc.org/egg/apropos")
     (synopsis "CHICKEN apropos")
     (description "An apropos facility for chicken scheme allowing to display
@@ -199,11 +211,13 @@ information about symbols in the toplevel environment.")
        (sha256
         (base32 "1yh8gzpyyflfmnv243ky0vzrpbnlxykq6s69v6f92lnk2qgb9nx6"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "autocompile"))
+    (arguments
+     (list #:egg-name "autocompile"))
     (propagated-inputs (list chicken-matchable))
     (home-page "https://wiki.call-cc.org/egg/autocompile")
     (synopsis "Automatically compile Scheme scripts on demand")
-    (description "A program named chicken-scheme takes a Scheme file and a
+    (description
+     "A program named chicken-scheme takes a Scheme file and a
 number of arguments and if the script has not been compiled before or has
 changed as compared to the last compiled version, compiles it, storing the
 result in a cache in the user's $HOME directory.")
@@ -220,12 +234,14 @@ result in a cache in the user's $HOME directory.")
        (sha256
         (base32 "1fdnxmwb336sx8kx1l5yjpryhivr8wsrvljsxywnx9439038gq02"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "base64"))
+    (arguments
+     (list #:egg-name "base64"))
     (native-inputs (list chicken-test))
     (propagated-inputs (list chicken-srfi-13))
     (home-page "https://wiki.call-cc.org/egg/base64")
     (synopsis "Encoding and decoding of base64 strings")
-    (description "This egg provides base64 encoding and decoding compliant with
+    (description
+     "This egg provides base64 encoding and decoding compliant with
 RFC4648.")
     (license license:expat)))
 
@@ -240,7 +256,8 @@ RFC4648.")
        (sha256
         (base32 "1z9ybzbr6vp7w79ric5f8jfdy28s9pvm87h9pfgy2mq3jcsqpm0k"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "bytevector-utils"))
+    (arguments
+     (list #:egg-name "bytevector-utils"))
     (native-inputs (list chicken-test chicken-test-utils))
     (propagated-inputs (list chicken-string-utils chicken-check-errors))
     (home-page "https://wiki.call-cc.org/egg/bytevector-utils")
@@ -259,11 +276,13 @@ RFC4648.")
        (sha256
         (base32 "08hn6vw631q5k4adarq8fr146arbbxvxy36j77df3xvr0dqx7pjp"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "check-errors"))
+    (arguments
+     (list #:egg-name "check-errors"))
     (native-inputs (list chicken-test chicken-test-utils))
     (home-page "https://wiki.call-cc.org/egg/check-errors")
     (synopsis "Argument checks & errors")
-    (description "This egg provides functions and error types to check
+    (description
+     "This egg provides functions and error types to check
 arguments.  If the unsafe feature is specified these checks are no-ops.")
     (license license:expat)))
 
@@ -279,7 +298,7 @@ arguments.  If the unsafe feature is specified these checks are no-ops.")
         (base32 "1i6zs998jamdr4kfpchigx7jq7jpybnb5i893n2qlv23lyc2g869"))))
     (build-system chicken-build-system)
     (arguments
-     '(#:egg-name "chibi-term"))
+     (list #:egg-name "chibi-term"))
     (native-inputs (list chicken-test))
     (home-page "https://wiki.call-cc.org/egg/chibi-term")
     (synopsis "Chibi Scheme's term library")
@@ -291,14 +310,15 @@ background color, font weight, and underlining.")
   (package
     (name "chicken-compile-file")
     (version "1.4")
-    (source (origin
-              (method url-fetch)
-              (uri (egg-uri "compile-file" version))
-              (sha256
-               (base32
-                "0zjbk2s9nb35qhpf8wd2m3by7ykvicihb1zxk71v2j2zjr3za82k"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "compile-file" version))
+       (sha256
+        (base32 "0zjbk2s9nb35qhpf8wd2m3by7ykvicihb1zxk71v2j2zjr3za82k"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "compile-file"))
+    (arguments
+     (list #:egg-name "compile-file"))
     (home-page "https://wiki.call-cc.org/egg/compile-file")
     (synopsis "Programmatic compiler invocation")
     (description "This egg provides a way to do on-the-fly compilation of
@@ -317,13 +337,20 @@ source code and load it into the running process.")
         (base32 "1lfvnzxnvkry74jj4lx2bcib9dr82hm7332mjsyk34ncf6162sj2"))))
     (build-system chicken-build-system)
     (arguments
-     '(#:egg-name "crunch"))
-    (native-inputs (list chicken-compile-file chicken-miscmacros))
-    (propagated-inputs (list chicken-srfi-1 chicken-srfi-13 chicken-matchable))
+     (list #:egg-name "crunch"))
+    (native-inputs
+     (list
+      chicken-compile-file
+      chicken-miscmacros))
+    (propagated-inputs
+     (list
+      chicken-srfi-1
+      chicken-srfi-13
+      chicken-matchable))
     (home-page "https://wiki.call-cc.org/egg/crunch")
-    (synopsis
-     "Embedded compiler for a statically typed subset of R7RS Scheme")
-    (description "CRUNCH is an embedded compiler for a statically typed subset
+    (synopsis "Embedded compiler for a statically typed subset of R7RS Scheme")
+    (description
+     "CRUNCH is an embedded compiler for a statically typed subset
 of R7RS Scheme, generating C code.  The compiler uses type inference to decorate
 the code with type information without requiring declarations.  CRUNCH can be
 used to translate embedded Scheme code sections, whole programs or multiple
@@ -368,17 +395,16 @@ primitives.  More specifically, provided are:
     (name "chicken-datatype")
     (version "1.7")
     (source
-    (origin
+     (origin
        (method url-fetch)
        (uri (egg-uri "datatype" version))
        (sha256
         (base32 "03pcif0f0srrbnay8r7p0jrgjnqs637wcd8iw3vzcsc76fn36p3r"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "datatype"))
-    (native-inputs
-     (list chicken-test))
-    (propagated-inputs
-     (list chicken-srfi-1))
+    (arguments
+     (list #:egg-name "datatype"))
+    (native-inputs (list chicken-test))
+    (propagated-inputs (list chicken-srfi-1))
     (home-page "https://wiki.call-cc.org/egg/datatype")
     (synopsis "Facility for creating and using variant records")
     (description
@@ -397,10 +423,10 @@ Languages} by Friedman, Wand, and Haynes.")
        (uri (egg-uri "iset" version))
        (sha256
         (base32 "1v797b31369b625pd27dbqc6r988z9cgiipp187y8kgfa5dm69xn"))))
-    (native-inputs
-     (list chicken-test))
+    (native-inputs (list chicken-test))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "iset"))
+    (arguments
+     (list #:egg-name "iset"))
     (synopsis "Integer set library")
     (home-page "https://wiki.call-cc.org/egg/iset")
     (description
@@ -420,7 +446,8 @@ with integers.")
        (sha256
         (base32 "0h2awlx5y00i5mvqna1wj5ydxg86hc5lvd2fxdl3ypd7gcgz0y92"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "matchable"))
+    (arguments
+     (list #:egg-name "matchable"))
     (native-inputs (list chicken-test))
     (home-page "https://wiki.call-cc.org/egg/matchable")
     (synopsis "Hygienic MATCH replacement")
@@ -439,7 +466,8 @@ macros.")
        (sha256
         (base32 "0cqmmahr4fj5ws0grzvqrzk097rbnzdk1f56qymrzgigiblfkglh"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "miscmacros"))
+    (arguments
+     (list #:egg-name "miscmacros"))
     (home-page "https://wiki.call-cc.org/egg/miscmacros")
     (synopsis "Various helper macros")
     (description #f)
@@ -457,12 +485,13 @@ macros.")
         (base32 "0hchm3mg18klkhi24dbrqq4v65awislf5d7hchg33i32acjnxir0"))))
     (build-system chicken-build-system)
     (arguments
-     '(#:egg-name "silex"))
+     (list #:egg-name "silex"))
     (native-inputs (list chicken-test))
     (propagated-inputs (list chicken-srfi-13))
     (home-page "https://wiki.call-cc.org/egg/silex")
     (synopsis "Efficient and powerful lexer generator")
-    (description "SILex is a lexical analyser generator similar to the Lex
+    (description
+     "SILex is a lexical analyser generator similar to the Lex
 and Flex programs, but for Scheme. SILex stands for Scheme Implementation
 of Lex.")
     (license license:bsd-3)))
@@ -476,12 +505,11 @@ of Lex.")
        (method url-fetch)
        (uri (egg-uri "srfi-1" version))
        (sha256
-        (base32
-         "1s0m7ajjyif3r6nvsjphhykgd2wlsa6j7jsmfhy7s6sc47cddznj"))))
+        (base32 "1s0m7ajjyif3r6nvsjphhykgd2wlsa6j7jsmfhy7s6sc47cddznj"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "srfi-1"))
-    (native-inputs
-     (list chicken-test))
+    (arguments
+     (list #:egg-name "srfi-1"))
+    (native-inputs (list chicken-test))
     (home-page "https://wiki.call-cc.org/egg/srfi-1")
     (synopsis "SRFI-1 list library")
     (description
@@ -497,18 +525,17 @@ and manipulating lists and pairs.")
   (package
     (name "chicken-srfi-13")
     (version "0.3.8")
-    (source (origin
-              (method url-fetch)
-              (uri (egg-uri "srfi-13" version))
-              (sha256
-               (base32
-                "02qwwja2s5800ylgkj5fz72qz079z3kjffvn2qj1vh2b5jchzcvg"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "srfi-13" version))
+       (sha256
+        (base32 "02qwwja2s5800ylgkj5fz72qz079z3kjffvn2qj1vh2b5jchzcvg"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "srfi-13"))
-    (native-inputs
-     (list chicken-test))
-    (propagated-inputs
-     (list chicken-srfi-1 chicken-srfi-14))
+    (arguments
+     (list #:egg-name "srfi-13"))
+    (native-inputs (list chicken-test))
+    (propagated-inputs (list chicken-srfi-1 chicken-srfi-14))
     (home-page "https://wiki.call-cc.org/egg/srfi-13")
     (synopsis "SRFI-13 string library for Chicken scheme")
     (description "This package provides the SRFI-13 string library for Chicken
@@ -524,12 +551,11 @@ scheme.")
        (method url-fetch)
        (uri (egg-uri "srfi-14" version))
        (sha256
-        (base32
-         "03yajfyh1d58kk9hq5vhw69pf6x17wms7zpx8w7s59vzkn99l8a8"))))
+        (base32 "03yajfyh1d58kk9hq5vhw69pf6x17wms7zpx8w7s59vzkn99l8a8"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "srfi-14"))
-    (propagated-inputs
-     (list chicken-srfi-1))
+    (arguments
+     (list #:egg-name "srfi-14"))
+    (propagated-inputs (list chicken-srfi-1))
     (home-page "https://wiki.call-cc.org/egg/srfi-14")
     (synopsis "SRFI-14 character-sets library")
     (description
@@ -542,19 +568,20 @@ a characters and be compared to other character sets.")
   (package
     (name "chicken-srfi-18")
     (version "0.2.2")
-    (source (origin
-              (method url-fetch)
-              (uri (egg-uri "srfi-18" version))
-              (sha256
-               (base32
-                "1qrrcss2izy182akx1vpzv66r0mmrnk879kqlgd0hf5wsj1567j9"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (egg-uri "srfi-18" version))
+       (sha256
+        (base32 "1qrrcss2izy182akx1vpzv66r0mmrnk879kqlgd0hf5wsj1567j9"))))
     (build-system chicken-build-system)
     (arguments
-     '(#:egg-name "srfi-18"))
+     (list #:egg-name "srfi-18"))
     (native-inputs (list chicken-compile-file))
     (home-page "https://wiki.call-cc.org/egg/srfi-18")
     (synopsis "Multithreading package, largely following SRFI-18")
-    (description "The threads implemented in CHICKEN are so called \"green\"
+    (description
+     "The threads implemented in CHICKEN are so called \"green\"
 threads, based on first-class continuations.  Native threads that map directly
 to the threads provided by the operating system are not supported.  The
 advantage of this is that threads are very lightweight and somewhat larger
@@ -571,9 +598,9 @@ multiple processor cores is not available.")
        (method url-fetch)
        (uri (egg-uri "srfi-69" version))
        (sha256
-        (base32
-         "0bypnghy5izifbxnrf61pm7bzih9fr5glzs3fmn00fmb58bhj4lf"))))
-    (arguments '(#:egg-name "srfi-69"))
+        (base32 "0bypnghy5izifbxnrf61pm7bzih9fr5glzs3fmn00fmb58bhj4lf"))))
+    (arguments
+     (list #:egg-name "srfi-69"))
     (build-system chicken-build-system)
     (home-page "https://wiki.call-cc.org/egg/srfi-69")
     (synopsis "Implementation of SRFI 69 with SRFI 90 extensions")
@@ -595,16 +622,19 @@ CHICKEN Scheme, along with
        (sha256
         (base32 "0hfab6sa11jsdjnsq9nlvs8yxy8hjbgizjwxkrpwlwbk91i2x6qx"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "string-utils"))
-    (native-inputs (list chicken-test chicken-test-utils))
-    (propagated-inputs
+    (arguments
+     (list #:egg-name "string-utils"))
+    (native-inputs
      (list
-      chicken-srfi-1
-      chicken-srfi-13
-      chicken-srfi-14
-      chicken-srfi-69
-      chicken-miscmacros
-      chicken-check-errors))
+      chicken-test
+      chicken-test-utils))
+    (propagated-inputs
+     (list chicken-srfi-1
+           chicken-srfi-13
+           chicken-srfi-14
+           chicken-srfi-69
+           chicken-miscmacros
+           chicken-check-errors))
     (home-page "https://wiki.call-cc.org/egg/string-utils")
     (synopsis "String Utilities")
     (description #f)
@@ -621,8 +651,10 @@ CHICKEN Scheme, along with
        (sha256
         (base32 "00wcgr6yyqvp2l1f7a4axg9vscpc6qb1iskcvwc2p8mkfp3159ja"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "sxml-transforms"))
-    (propagated-inputs (list chicken-srfi-13))
+    (arguments
+     (list #:egg-name "sxml-transforms"))
+    (propagated-inputs
+     (list chicken-srfi-13))
     (home-page "https://wiki.call-cc.org/egg/sxml-transforms")
     (synopsis
      "SXML transformations (to XML, SXML, and HTML) from the SSAX project")
@@ -641,9 +673,16 @@ SSAX/SXML Sourceforge project.")
        (sha256
         (base32 "01jpn15fbdzwjslq594iywv0zny4x72828qdyr6znrszpkg8rcjn"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "symbol-utils"))
-    (native-inputs (list chicken-test chicken-test-utils))
-    (propagated-inputs (list chicken-srfi-1 chicken-srfi-13))
+    (arguments
+     (list #:egg-name "symbol-utils"))
+    (native-inputs
+     (list
+      chicken-test
+      chicken-test-utils))
+    (propagated-inputs
+     (list
+      chicken-srfi-1
+      chicken-srfi-13))
     (home-page "https://wiki.call-cc.org/egg/symbol-utils")
     (synopsis "Symbol Utilities")
     (description #f)
@@ -658,10 +697,10 @@ SSAX/SXML Sourceforge project.")
        (method url-fetch)
        (uri (egg-uri "test" version))
        (sha256
-        (base32
-         "0wifl5lwijfx555agwrxa4l3pc8hyh79n4knlq9mrbrrq2ydyxf6"))))
+        (base32 "0wifl5lwijfx555agwrxa4l3pc8hyh79n4knlq9mrbrrq2ydyxf6"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "test"))
+    (arguments
+     (list #:egg-name "test"))
     (home-page "https://wiki.call-cc.org/egg/test")
     (synopsis "Yet another testing utility")
     (description
@@ -679,9 +718,12 @@ SSAX/SXML Sourceforge project.")
        (sha256
         (base32 "0ripy8x4sjc8ga2iwcjwsfsf6vp5rq459pywj4c0bq22gffgrma3"))))
     (build-system chicken-build-system)
-    (arguments '(#:egg-name "test-utils"))
-    (native-inputs (list chicken-test))
-    (propagated-inputs (list chicken-test))
+    (arguments
+     (list #:egg-name "test-utils"))
+    (native-inputs
+     (list chicken-test))
+    (propagated-inputs
+     (list chicken-test))
     (home-page "https://wiki.call-cc.org/egg/test-utils")
     (synopsis "Gloss & Runner for test egg")
     (description "This egg provides a glossary and a runner for the test egg.")
