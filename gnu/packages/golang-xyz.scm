@@ -10805,17 +10805,18 @@ interact with distribution components.")
      (list
       #:import-path "github.com/docker/docker"
       #:skip-build? #t
-      #:test-subdirs
+      #:test-flags #~(list "-vet=off")
       ;; XXX: Remove when all inputs are packaged.
+      #:test-subdirs
       #~(list "oci" "opts" "image" "layer" "quota" "client" "plugin" "errdefs"
-              "registry" "testutil" "pkg/pools" "pkg/stack" "plugin/v2"
-              "reference" "runconfig" "pkg/system" "pkg/tarsum" "image/cache"
-              "pkg/homedir" "pkg/idtools" "pkg/ioutils" "pkg/meminfo"
-              "pkg/parsers" "pkg/pidfile" "pkg/process" "pkg/stdcopy"
-              "pkg/sysinfo" "daemon/links" "internal/mod" "pkg/longpath"
-              "pkg/progress" "pkg/stringid" "pkg/tailfile" "volume/local"
-              "daemon/events" "daemon/logger" "dockerversion" "internal/opts"
-              "pkg/fileutils" "pkg/useragent" "volume/mounts"
+              "registry" "testutil" "container" "pkg/pools" "pkg/stack"
+              "plugin/v2" "reference" "runconfig" "pkg/system" "pkg/tarsum"
+              "image/cache" "pkg/homedir" "pkg/idtools" "pkg/ioutils"
+              "pkg/meminfo" "pkg/parsers" "pkg/pidfile" "pkg/process"
+              "pkg/stdcopy" "pkg/sysinfo" "daemon/links" "internal/mod"
+              "pkg/longpath" "pkg/progress" "pkg/stringid" "pkg/tailfile"
+              "volume/local" "daemon/events" "daemon/logger" "dockerversion"
+              "internal/opts" "pkg/fileutils" "pkg/useragent" "volume/mounts"
               "api/types/time" "daemon/network" "restartmanager"
               "volume/drivers" "volume/service" "pkg/jsonmessage"
               "cmd/docker-proxy" "cmd/dockerd/trap" "container/stream"
@@ -10824,38 +10825,39 @@ interact with distribution components.")
               "internal/cleanups" "internal/platform" "libnetwork/bitmap"
               "libnetwork/config" "libnetwork/ipbits" "pkg/authorization"
               "api/types/registry" "api/types/strslice" "api/types/versions"
-              "daemon/graphdriver" "integration/plugin"
-              "internal/directory" "internal/sliceutil"
-              "internal/usergroup" "libnetwork/options"
-              "pkg/namesgenerator" "pkg/parsers/kernel"
-              "registry/resumable" "api/types/container"
-              "daemon/logger/local" "internal/lazyregexp"
-              "internal/multierror" "libcontainerd/queue"
-              "libnetwork/etchosts" "libnetwork/netlabel"
-              "pkg/streamformatter" "api/server/httputils"
-              "daemon/logger/splunk" "daemon/logger/syslog"
-              "internal/containerfs" "libnetwork/datastore"
-              "libnetwork/driverapi" "libnetwork/networkdb"
-              "api/server/middleware" "daemon/logger/awslogs"
-              "distribution/metadata" "libnetwork/ipams/null"
-              "libnetwork/osl/kernel" "pkg/plugins/transport"
+              "daemon/graphdriver" "integration/plugin" "internal/directory"
+              "internal/sliceutil" "internal/usergroup" "libnetwork/options"
+              "pkg/namesgenerator" "pkg/parsers/kernel" "registry/resumable"
+              "api/types/container" "daemon/logger/local"
+              "internal/lazyregexp" "internal/multierror"
+              "libcontainerd/queue" "libnetwork/etchosts"
+              "libnetwork/netlabel" "pkg/streamformatter"
+              "api/server/httputils" "daemon/logger/splunk"
+              "daemon/logger/syslog" "internal/containerfs"
+              "libnetwork/datastore" "libnetwork/driverapi"
+              "libnetwork/networkdb" "api/server/middleware"
+              "daemon/logger/awslogs" "distribution/metadata"
+              "libnetwork/ipams/null" "libnetwork/osl/kernel"
+              "pkg/plugins/transport" "daemon/cluster/convert"
               "daemon/logger/journald" "libnetwork/drvregistry"
               "api/server/router/swarm" "daemon/graphdriver/copy"
-              "daemon/logger/templates" "libnetwork/drivers/host"
-              "libnetwork/drivers/null" "api/server/router/system"
-              "api/server/router/volume" "daemon/graphdriver/btrfs"
-              "libnetwork/portallocator" "daemon/logger/jsonfilelog"
-              "daemon/logger/loggerutils" "libnetwork/drivers/ipvlan"
-              "pkg/plugins/pluginrpc-gen" "container/stream/bytespipe"
-              "libnetwork/drivers/macvlan" "libnetwork/drivers/overlay"
-              "libnetwork/internal/caller" "daemon/graphdriver/overlay2"
-              "libnetwork/internal/addrset" "pkg/parsers/operatingsystem"
-              "daemon/internal/capabilities" "libnetwork/ipams/defaultipam"
-              "builder/remotecontext/urlutil" "libnetwork/internal/netiputil"
+              "daemon/logger/templates" "libnetwork/cnmallocator"
+              "libnetwork/drivers/host" "libnetwork/drivers/null"
+              "api/server/router/system" "api/server/router/volume"
+              "daemon/graphdriver/btrfs" "libnetwork/portallocator"
+              "daemon/logger/jsonfilelog" "daemon/logger/loggerutils"
+              "libnetwork/drivers/ipvlan" "pkg/plugins/pluginrpc-gen"
+              "container/stream/bytespipe" "libnetwork/drivers/macvlan"
+              "libnetwork/drivers/overlay" "libnetwork/internal/caller"
+              "daemon/graphdriver/overlay2" "libnetwork/internal/addrset"
+              "pkg/parsers/operatingsystem" "daemon/internal/capabilities"
+              "libnetwork/ipams/defaultipam" "builder/remotecontext/urlutil"
+              "libnetwork/internal/netiputil"
               "libnetwork/internal/setmatrix"
               "libnetwork/internal/resolvconf"
               "daemon/internal/filedescriptors"
               "daemon/logger/loggerutils/cache"
+              "daemon/cluster/controllers/plugin"
               "daemon/graphdriver/fuse-overlayfs"
               "daemon/logger/jsonfilelog/jsonlog"
               "libnetwork/drivers/overlay/ovmanager"
@@ -10876,7 +10878,6 @@ interact with distribution components.")
            go-github-com-graylog2-go-gelf
            ;; go-github-com-microsoft-go-winio  ;Windows only
            ;; go-github-com-microsoft-hcsshim   ;Windows only
-           go-github-com-racksec-srslog
            go-github-com-aws-aws-sdk-go-v2
            go-github-com-aws-aws-sdk-go-v2-config
            go-github-com-aws-aws-sdk-go-v2-credentials
@@ -10927,6 +10928,7 @@ interact with distribution components.")
            go-github-com-moby-profiles-apparmor
            go-github-com-moby-profiles-seccomp
            go-github-com-moby-pubsub
+           go-github-com-moby-swarmkit-v2
            go-github-com-moby-sys-atomicwriter
            go-github-com-moby-sys-mount
            go-github-com-moby-sys-mountinfo
@@ -10946,6 +10948,7 @@ interact with distribution components.")
            go-github-com-pelletier-go-toml
            go-github-com-pkg-errors
            go-github-com-prometheus-client-golang
+           go-github-com-racksec-srslog
            go-github-com-sirupsen-logrus
            go-github-com-tonistiigi-go-archvariant
            go-github-com-vbatts-tar-split
@@ -10974,7 +10977,6 @@ interact with distribution components.")
            ;; TODO: Complete packaging.
            ;; go-github-com-golang-gddo
            ;; go-github-com-moby-buildkit
-           ;; go-github-com-moby-swarmkit-v2
            ;; go-github-com-rootless-containers-rootlesskit-v2
            #;go-go-opentelemetry-io-contrib-processors-baggagecopy))
     (home-page "https://github.com/docker/docker")
