@@ -298,6 +298,7 @@ ncursesw library provides wide character support.")
     (inputs (list gpm))))
 
 (define-deprecated-package ncurses/tinfo
+  "ncurses-with-tinfo"
   ncurses)
 
 (define-public cdk
