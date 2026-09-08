@@ -3980,6 +3980,11 @@ ASCII text files using Gmsh's own scripting language.")
       ;; start because no Qt platform plugin could be
       ;; initialized. Reinstalling the application may fix this problem.
       #:tests? #f
+      #:imported-modules (append %qt-build-system-modules
+                                 %pyproject-build-system-modules)
+      #:modules '((guix build pyproject-build-system)
+                  ((guix build qt-build-system) #:prefix qt:)
+                  (guix build utils))
       #:phases
       #~(modify-phases %standard-phases
           ;; Veusz uses python's site-packages to look for pyqt6_include_dir.
@@ -3994,18 +3999,10 @@ ASCII text files using Gmsh's own scripting language.")
                           #$(version-major+minor
                              (package-version python-wrapper))
                           "/site-packages"))))))
-          ;; Ensure that icons are found at runtime.
-          (add-after 'wrap 'wrap-executable
-            (lambda* (#:key inputs #:allow-other-keys)
-              (wrap-program (string-append #$output "/bin/veusz")
-                `("QT_PLUGIN_PATH" prefix
-                  ,(list (string-append
-                          (string-join
-                           (list #$(this-package-input "qtbase")
-                                 #$(this-package-input "qtsvg")
-                                 #$(this-package-input "qtwayland"))
-                           "/lib/qt6/plugins:")
-                          "/lib/qt6/plugins")))))))))
+          (add-after 'wrap 'qt-wrap
+            (lambda args
+              (apply (assoc-ref qt:%standard-phases 'qt-wrap)
+                     `(,@args #:qtbase #$(this-package-input "qtbase"))))))))
     (native-inputs
      (list pkg-config
            python-setuptools
