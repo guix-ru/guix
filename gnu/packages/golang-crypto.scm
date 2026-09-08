@@ -719,6 +719,38 @@ credential storage engines.  It's a maintained fork of
     ;; XXX: Don't expose since it's a partial package.
     (properties '((hidden? . #t)))))
 
+(define-public go-github-com-c2sp-wycheproof
+  (package
+    (name "go-github-com-c2sp-wycheproof")
+    (version "0.0.0-20260902155932-3fa63dd0344a")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/C2SP/wycheproof")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0bv92fsr0k9cllvy0hasillqj8x33wi8xsii6p9nwwvhgx8z48qf"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      ;; XXX: Build constraints exclude all Go files.
+      #:tests? #f
+      #:import-path "github.com/c2sp/wycheproof"))
+    (propagated-inputs
+     (list go-filippo-io-edwards25519
+           go-github-com-atombender-go-jsonschema
+           go-github-com-santhosh-tekuri-jsonschema-v6))
+    (home-page "https://github.com/c2sp/wycheproof")
+    (synopsis "Tests crypto libraries against known attacks")
+    (description
+     "This package provide a @url{https://github.com/C2SP, community managed}
+collection of test vectors that can be used by cryptography library developers
+to test against known attacks, specification inconsistencies, and other
+various implementation bugs.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-cespare-xxhash
   (package
     (name "go-github-com-cespare-xxhash")
