@@ -672,6 +672,51 @@ the Ristretto prime-order group built from Edwards25519.")
 @url{https://github.com/gsterjov/go-libsecret}.")
     (license license:expat)))
 
+(define-public go-github-com-byteness-keyring
+  (package
+    (name "go-github-com-byteness-keyring")
+    (version "1.13.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ByteNess/keyring")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1rzlgpjjqsr55b54c6l31g9qdpshwscxrj69zfzwng6g5iifmcg7"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      ;; XXX: Remove when all inputs are packaged.
+      #:skip-build? #t
+      #:tests? #f
+      #:import-path "github.com/byteness/keyring"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-1password-connect-sdk-go
+           go-github-com-1password-onepassword-sdk-go
+           go-github-com-byteness-go-libsecret
+           go-github-com-byteness-percent
+           go-github-com-danieljoos-wincred
+           go-github-com-dvsekhvalnov-jose2go
+           go-github-com-godbus-dbus-v5
+           go-golang-org-x-sys
+           go-golang-org-x-term
+           go-google-golang-org-protobuf
+
+           ;; TODO: Complete packaging.
+           ;; go-github-com-byteness-go-keychain
+           #;go-github-com-noamcohen97-touchid-go))
+    (home-page "https://github.com/byteness/keyring")
+    (synopsis "Uniform interface across a range of secure credential stores")
+    (description
+     "Package keyring provides a uniform API over a range of desktop
+credential storage engines.  It's a maintained fork of
+@url{https://github.com/99designs/keyring}.")
+    (license license:expat)))
+
 (define-public go-github-com-cespare-xxhash
   (package
     (name "go-github-com-cespare-xxhash")
