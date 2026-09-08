@@ -10679,7 +10679,7 @@ send collected metrics to Google Cloud.")
 (define-public go-github-com-googlecloudplatform-opentelemetry-operations-go-exporter-trace
   (package
     (name "go-github-com-googlecloudplatform-opentelemetry-operations-go-exporter-trace")
-    (version "1.32.0")
+    (version "1.37.0")
     (source
      (origin
        (method git-fetch)
@@ -10688,7 +10688,7 @@ send collected metrics to Google Cloud.")
               (commit (go-version->git-ref version #:subdir "exporter/trace"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0nizaaydcvvi718g5v4pgx8in6d546mmkrf7h3sxhz2yyyygvms3"))
+        (base32 "0wqhka6j69l6adq02i0h66gyv3v53xgpkmn68rmfciybv0xp45xz"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
