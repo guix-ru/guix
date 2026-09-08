@@ -13847,7 +13847,7 @@ with the order of keys maintained
 (define-public go-github-com-go-openapi-swag-yamlutils
   (package
     (name "go-github-com-go-openapi-swag-yamlutils")
-    (version "0.27.0")
+    (version "0.29.2")
     (source
      (origin
        (method git-fetch)
@@ -13856,7 +13856,7 @@ with the order of keys maintained
               (commit (go-version->git-ref version #:subdir "yamlutils"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0rg5q7xif4gmhc99kkgvnz03d0d0z2vanyv8xa4myn6ykvacw458"))
+        (base32 "1kk84irx6ifln01b5w1rzyrx4gmpzf6nkm190n6hhw7s4y28pq80"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -13877,7 +13877,6 @@ with the order of keys maintained
       #:embed-files #~(list "^.*\\.yaml$")))
     (native-inputs
      (list go-github-com-go-openapi-testify-enable-yaml-v2
-           go-github-com-go-openapi-swag-jsonutils-fixtures-test
            go-github-com-go-openapi-testify-v2))
     (propagated-inputs
      (list go-github-com-go-openapi-swag-conv
