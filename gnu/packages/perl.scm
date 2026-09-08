@@ -258,7 +258,7 @@
     (native-inputs
      (if (%current-target-system)
          `(("perl-cross"
-            ,(let ((version "1.6"))
+            ,(let ((version "1.6.5"))
                (origin
                  (method git-fetch)
                  (uri (git-reference
@@ -267,7 +267,7 @@
                  (file-name (git-file-name "perl-cross" version))
                  (sha256
                   (base32
-                   "0s06lkx5b79r9cn6pm5p6d4jbdjq7wg7rjr75nw5xdhw1z3wnl2d"))))))
+                   "1id4ww6701q51yhxl8r314dsxd84s83rhlbi4xz7wp82kja0yr32"))))))
          '()))
     (native-search-paths (list (search-path-specification
                                 (variable "PERL5LIB")
