@@ -3257,6 +3257,47 @@ collections.  It was based on
 providing various methods to work with it.")
     (license license:expat)))
 
+(define-public go-github-com-atombender-go-jsonschema
+  (package
+    (name "go-github-com-atombender-go-jsonschema")
+    (version "0.24.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/omissis/go-jsonschema")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1734jn6z299fnn0ifmj4mv1vxlii86qpk92w29ncy73519jaq4yb"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately.
+            (delete-file-recursively "tests")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/atombender/go-jsonschema"))
+    (native-inputs
+     (list go-github-com-spf13-cobra
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-dario-cat-mergo
+           go-github-com-google-go-cmp
+           go-github-com-goccy-go-yaml
+           go-github-com-mitchellh-go-wordwrap
+           go-github-com-sanity-io-litter
+           go-github-com-sosodev-duration))
+    (home-page "https://github.com/atombender/go-jsonschema")
+    (synopsis "Go data types from JSON Schema")
+    (description
+     "This package provides a tool which generates Go data types and structs
+that corresponds to definitions in the schema, along with unmarshalling code
+that validates the input JSON according to the schema's validation rules.")
+    (license license:expat)))
+
 (define-public go-github-com-atotto-clipboard
   (package
     (name "go-github-com-atotto-clipboard")
