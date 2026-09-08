@@ -28570,6 +28570,31 @@ logging workflows by combining multiple handlers with different strategies for
 distribution, routing, transformation, and error handling.")
     (license license:expat)))
 
+(define-public go-github-com-sanity-io-litter
+  (package
+    (name "go-github-com-sanity-io-litter")
+    (version "1.5.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/sanity-io/litter")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1dd1n60yfcsyy0x5z3p70dd0vnqhc202q624kljxr2h3v2vj43h5"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/sanity-io/litter"))
+    (native-inputs (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/sanity-io/litter")
+    (synopsis "Pretty printer library for Go")
+    (description
+     "Litter is a pretty printer library for Go data structures to aid in
+debugging and testing.")
+    (license license:expat)))
+
 (define-public go-github-com-sap-go-hdb
   (package
     (name "go-github-com-sap-go-hdb")
