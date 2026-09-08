@@ -1827,6 +1827,41 @@ Gemini clients and servers.")
 @url{http://sqlfiddle.com/}.")
     (license license:expat)))
 
+(define-public go-github-com-1password-connect-sdk-go
+  (package
+    (name "go-github-com-1password-connect-sdk-go")
+    (version "1.5.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/1Password/connect-sdk-go")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0qll6n4awgl3dwi8gdk4jhk6rv94rshaknih4v4jism43b4qxh4s"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/1Password/connect-sdk-go"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-google-uuid
+           go-github-com-opentracing-opentracing-go
+           go-github-com-uber-jaeger-client-go))
+    (home-page "https://github.com/1Password/connect-sdk-go")
+    (synopsis "Go SDK for 1Password Connect")
+    (description
+     "The 1Password Connect Go SDK provides access to the
+@url{https://developer.1password.com/docs/connect, 1Password Connect} API, to
+facilitate communication with the Connect server hosted on your infrastructure
+and 1Password.  The library is intended to be used by your applications,
+pipelines, and other automations to simplify accessing items stored in your
+1Password vaults.")
+    (license license:expat)))
+
 (define-public go-github-com-1password-onepassword-sdk-go
   (package
     (name "go-github-com-1password-onepassword-sdk-go")
