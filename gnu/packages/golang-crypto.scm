@@ -645,6 +645,33 @@ needing to use secp256k1 elliptic curve cryptography.")
 the Ristretto prime-order group built from Edwards25519.")
     (license license:expat)))
 
+(define-public go-github-com-byteness-go-libsecret
+  (package
+    (name "go-github-com-byteness-go-libsecret")
+    (version "0.0.0-20260108215642-107379d3dee0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/ByteNess/go-libsecret")
+              (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02k29fm5j28aa97hbmzxw778vbfca7z1l1xipm4da5is79mfivgy"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/byteness/go-libsecret"))
+    (propagated-inputs
+     (list go-github-com-godbus-dbus-v5))
+    (home-page "https://github.com/byteness/go-libsecret")
+    (synopsis "Manage secrets via the @code{Secret Service} DBus API")
+    (description
+     "This native Go library manages secrets via the freedesktop.org
+@code{Secret Service} DBus interface.  It's a maintained fork of
+@url{https://github.com/gsterjov/go-libsecret}.")
+    (license license:expat)))
+
 (define-public go-github-com-cespare-xxhash
   (package
     (name "go-github-com-cespare-xxhash")
