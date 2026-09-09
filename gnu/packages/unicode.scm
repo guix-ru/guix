@@ -235,3 +235,33 @@ of locale data, including among others
   conventions.
 @end itemize\n")
     (license unicode)))
+
+(define-public unihan
+  (package
+    (name "unihan")
+    (version "18.0.0")
+    (source
+     (origin
+       (sha256
+        (base32 "0gnlccf742g1rkym9a3vydm8hlvscvqph2c4k9r52r333yffm4sc"))
+       (method url-fetch/zipbomb)
+       (uri (string-append "https://www.unicode.org/Public/" version
+                           "/ucd/Unihan.zip"))))
+    (build-system copy-build-system)
+    (arguments
+     '(#:install-plan
+       '(("." "share/unihan/"))))
+    (home-page "https://home.unicode.org")
+    (synopsis "Database for unified Han characters")
+    (description
+     "The Unihan database provides information about all of the unified
+Han characters encoded in the Unicode Standard, including
+
+@itemize
+@item mappings to various national and industry standards,
+@item indices into standard dictionaries,
+@item encoded variants,
+@item pronunciations in various languages; and
+@item an English definition.
+@end itemize\n")
+    (license unicode)))
