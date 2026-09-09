@@ -55887,6 +55887,15 @@ The @code{goimapnotify} package to use.
 A list of @code{goimapnotify-configuration} records which contain
 information about all your accounts configurations.
 
+@item @code{shepherd-requirement} (default: @code{()}) (type: list-of-symbols)
+A list of services that should be started before this service.  For
+example, to make the service start after the gpg-agent service,
+(@pxref{GNU Privacy Guard}), one could write the following:
+
+@lisp
+(shepherd-requirement '(gpg-agent))
+@end lisp
+
 @end table
 
 @end deftp

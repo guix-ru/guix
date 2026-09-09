@@ -485,25 +485,38 @@ to SMTP servers.")))
    empty-serializer)
   (configurations
    (list-of-goimapnotify-configurations)
-   "List of @code{goimapnotify-configuration} records which contain
-information about all your accounts configurations."))
+   "A list of @code{goimapnotify-configuration} records which contain
+information about all your accounts configurations.")
+  (shepherd-requirement
+   (list-of-symbols '())
+   "A list of services that should be started before this service.  For
+example, to make the service start after the gpg-agent service
+(@pxref{GNU Privacy Guard}), one could write the following:
+
+@lisp
+(shepherd-requirement '(gpg-agent))
+@end lisp
+"
+   empty-serializer))
 
 (define (home-goimapnotify-shepherd-service config)
-  (let ((log-file #~(string-append %user-log-dir "/goimapnotify.log")))
+  (define contents
+    (serialize-configuration config home-goimapnotify-configuration-fields))
+
+  (match-record config <home-goimapnotify-configuration>
+                (goimapnotify configurations shepherd-requirement)
     (list
      (shepherd-service
        (provision '(goimapnotify))
+       (requirement shepherd-requirement)
        (modules '((shepherd support)))   ;for '%user-log-dir'
        (documentation "Run a goimapnotify process")
        (start #~(make-forkexec-constructor
                  (list
-                  #$(file-append
-                     (home-goimapnotify-configuration-goimapnotify config)
-                     "/bin/goimapnotify")
-                  "-conf" #$(mixed-text-file "goimapnotify.yaml"
-                                             (serialize-configuration config
-                                                                      home-goimapnotify-configuration-fields)))
-                 #:log-file #$log-file))
+                  #$(file-append goimapnotify "/bin/goimapnotify")
+                  "-conf" #$(mixed-text-file "goimapnotify.yaml" contents))
+                 #:log-file
+                 (string-append %user-log-dir "/goimapnotify.log")))
        (stop #~(make-kill-destructor))))))
 
 (define home-goimapnotify-service-type
