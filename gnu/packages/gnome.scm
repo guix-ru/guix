@@ -88,6 +88,7 @@
 ;;; Copyright © 2026 Roman Riabenko <roman@riabenko.com>
 ;;; Copyright © 2026 Igorj Gorjaĉev <igor@goryachev.org>
 ;;; Copyright © 2026 Alexey Ilin <avi@d314.org>
+;;; Copyright © 2026 Herman Rimm <herman@rimm.ee>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -235,6 +236,7 @@
   #:use-module (gnu packages text-editors)
   #:use-module (gnu packages time)
   #:use-module (gnu packages tls)
+  #:use-module (gnu packages unicode)
   #:use-module (gnu packages valgrind)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages video)
@@ -11280,82 +11282,66 @@ basically a text box in which notes can be written.")
     (license license:gpl3+)))
 
 (define-public gucharmap
-  (let ((unicode-files
-         '(("Blocks.txt"
-            "05fbpc7miqpv7yic5xkm74ybzxkaf5r58ww21a1iwxqr3apyzvf0")
-           ("DerivedAge.txt"
-            "160r7wwidj3c2jl4cw3am0c5d0l7qndis9xx38h0y8fwidvdzv7q")
-           ("NamesList.txt"
-            "1x1smmn2kmy8clf6ny2njln75i888lidckc6ssyp2gdhgasdrkhd")
-           ("Scripts.txt"
-            "1grmn3bd4m0rcmz544h94kimlj3gf1f343s8177ddrxfmg9m0plz")
-           ("UnicodeData.txt"
-            "0327jqfw2hyq8x986cfhwrp717r2jl7ydjjwvzp7biarrcfzq7if")
-           ("Unihan.zip"
-            "0pjbyf77lbaxdhwidvpgp81cw13lfhlaw1ynn9vsmkssahmqp97p"))))
-    (package
-      (name "gucharmap")
-      (version "17.0.2")
-      (source
-       (origin
-         (method url-fetch)
-         (uri (string-append "mirror://gnome/sources/" name "/"
-                             (version-major+minor version) "/"
-                             name "-" version ".tar.xz"))
-         (sha256
-          (base32
-           "1ah0vyxkx3w63ry1pn3592jsxpbrwmcg8z4jvps8ls5bmwn9f8s7"))))
-      (build-system meson-build-system)
-      (arguments
-       `(#:modules ((ice-9 match)
-                    (guix build meson-build-system)
-                    (guix build utils))
-         #:glib-or-gtk? #t
-         #:configure-flags
-         (list
-          "-Ducd_path=../unicode-data"
-          "-Dvapi=false"
-          ;; gtk-doc fails because it didn't generate a devhelp2 file
-          "-Ddocs=false")
-         #:phases
-         (modify-phases %standard-phases
+  (package
+    (name "gucharmap")
+    (version "17.0.2")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://gnome/sources/" name "/"
+                           (version-major+minor version) "/"
+                           name "-" version ".tar.xz"))
+       (sha256
+        (base32
+         "1ah0vyxkx3w63ry1pn3592jsxpbrwmcg8z4jvps8ls5bmwn9f8s7"))))
+    (build-system meson-build-system)
+    (arguments
+     (list
+       #:modules '((ice-9 match)
+                   (guix build meson-build-system)
+                   (guix build utils))
+       #:glib-or-gtk? #t
+       #:configure-flags
+       #~(list (string-append
+                "-Ducd_path="
+                #+(file-append (this-package-native-input "ucd")
+                               "/share/ucd"))
+               "-Dvapi=false"
+               ;; gtk-doc fails because it didn't generate a devhelp2 file
+               "-Ddocs=false")
+       #:phases
+       #~(modify-phases %standard-phases
            (add-after 'unpack 'prepare-unicode-data
-             (lambda* (#:key inputs #:allow-other-keys)
-               (mkdir-p "../unicode-data")
-               (with-directory-excursion "../unicode-data"
-                 (for-each (match-lambda
-                             ((file _)
-                              (install-file (assoc-ref inputs file) ".")))
-                           ',unicode-files)))))))
-      (native-inputs
-        (cons* desktop-file-utils
-               (list glib "bin")
-               gobject-introspection
-               intltool
-               itstool
-               pkg-config
-               python
-               unzip
-               (map (match-lambda
-                      ((file hash)
-                       (origin
-                         (method url-fetch)
-                         (uri (string-append
-                                "https://www.unicode.org/Public/17.0.0/ucd/"
-                                file))
-                         (sha256 (base32 hash)))))
-                    unicode-files)))
-      (inputs
-       (list gtk+
-             libxml2))
-      (home-page "https://gitlab.gnome.org/GNOME/gucharmap")
-      (synopsis "Unicode character picker and font browser")
-      (description
-       "This program allows you to browse through all the available Unicode
+             (lambda* (#:key native-inputs inputs #:allow-other-keys)
+               (substitute* "gucharmap/gen-guch-unicode-tables.pl"
+                 (("(\\$unihan_readings_txt = \").*)" _ definition)
+                  (string-append definition
+                                 (search-input-file
+                                  (or native-inputs inputs)
+                                  "share/unihan/Unihan_Readings.txt")
+                                 "\""))))))))
+    (native-inputs
+     (list desktop-file-utils
+           (list glib "bin")
+           gobject-introspection
+           intltool
+           itstool
+           pkg-config
+           python
+           ucd-17
+           unihan
+           unzip))
+    (inputs
+     (list gtk+
+           libxml2))
+    (home-page "https://gitlab.gnome.org/GNOME/gucharmap")
+    (synopsis "Unicode character picker and font browser")
+    (description
+     "This program allows you to browse through all the available Unicode
 characters and categories for the installed fonts, and to examine their
 detailed properties.  It is an easy way to find the character you might
 only know by its Unicode name or code point.")
-      (license license:gpl3+))))
+    (license license:gpl3+)))
 
 (define-public gcolor3
   (package
