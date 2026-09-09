@@ -3133,7 +3133,7 @@ track changes in important system configuration files.")
 (define-public libcap-ng
   (package
     (name "libcap-ng")
-    (version "0.9.5")
+    (version "0.9.6")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3142,7 +3142,7 @@ track changes in important system configuration files.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1wvl84nhbh94dvz04xi2zkhh9s812m2b0i5yp26lk5jjh4z5p18x"))))
+                "1xlsq97k8l3mcq7zpx9cz6cqmnv31000klvngjcfzqrla5rbfszv"))))
     (build-system gnu-build-system)
     (arguments
      (list
