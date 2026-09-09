@@ -20314,7 +20314,7 @@ and consumers to transparently record signed metadata to a ledger.")
 (define-public go-github-com-sigstore-rekor-tiles-v2
   (package
     (name "go-github-com-sigstore-rekor-tiles-v2")
-    (version "2.0.1")
+    (version "2.3.0")
     (source
      (origin
        (method git-fetch)
@@ -20323,26 +20323,19 @@ and consumers to transparently record signed metadata to a ledger.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0z9is3mf31abzwappwp05z1pzci6f25z1ax27qgghmdisxmd3c6k"))))
+        (base32 "1cyqgr04hpj132bxq7rpr7qslvnxnf7nrxmf06qfjksmmi4bmdb1"))))
     (build-system go-build-system)
     (arguments
      (list
       #:skip-build? #t
       #:import-path "github.com/sigstore/rekor-tiles/v2"
-      ;; XXX: Remove when all inputs are packaged.
-      #:test-subdirs
-      #~(list "internal/algorithmregistry"
-              "internal/safeint"
-              "pkg/client/read"
-              "pkg/client/write"
-              "pkg/types/dsse"
-              "pkg/types/hashedrekord"
-              "pkg/types/verifier"
-              "pkg/verifier/certificate"
-              "pkg/verifier/publickey"
-              "pkg/verify")))
+      #:embed-files #~(list ".*\\.json")
+      ;; TestFile3105535745/001/ecdsa-key.pem is not valid: x509: failed to
+      ;; parse EC private key: asn1: structure error: length too large.
+      #:test-flags #~(list "-skip" "TestFile/valid_ecdsa")))
     (native-inputs
      (list go-github-com-go-test-deep
+           go-github-com-sigstore-sigstore-go-bootstrap
            go-github-com-spf13-cobra
            go-github-com-spf13-viper
            go-github-com-stretchr-testify
@@ -20355,20 +20348,18 @@ and consumers to transparently record signed metadata to a ledger.")
            go-github-com-aws-aws-sdk-go-v2-credentials
            go-github-com-aws-aws-sdk-go-v2-service-s3
            go-github-com-aws-smithy-go
+           go-github-com-chainguard-dev-clog
            go-github-com-cyberphone-json-canonicalization
            go-github-com-grpc-ecosystem-go-grpc-middleware
            go-github-com-grpc-ecosystem-go-grpc-middleware-providers-prometheus
            go-github-com-grpc-ecosystem-go-grpc-middleware-v2
            go-github-com-grpc-ecosystem-grpc-gateway-v2
            go-github-com-prometheus-client-golang
-           go-github-com-secure-systems-lab-go-securesystemslib
            go-github-com-sigstore-protobuf-specs
            go-github-com-sigstore-sigstore
-           ;; go-github-com-sigstore-sigstore-go                 ;cycles
            go-github-com-sigstore-sigstore-pkg-signature-kms-aws
-           go-github-com-chainguard-dev-clog
            go-github-com-sigstore-sigstore-pkg-signature-kms-gcp
-           go-github-com-tink-crypto-tink-go-awskms-v2
+           go-github-com-tink-crypto-tink-go-awskms-v3
            go-github-com-tink-crypto-tink-go-gcpkms-v2
            go-github-com-tink-crypto-tink-go-v2
            go-github-com-transparency-dev-formats
@@ -20377,7 +20368,6 @@ and consumers to transparently record signed metadata to a ledger.")
            go-go-opentelemetry-io-otel
            go-go-opentelemetry-io-otel-exporters-prometheus
            go-go-opentelemetry-io-otel-sdk-metric
-           go-golang-org-x-exp
            go-golang-org-x-mod
            go-golang-org-x-sync
            go-google-golang-org-api
@@ -20386,8 +20376,10 @@ and consumers to transparently record signed metadata to a ledger.")
            go-google-golang-org-protobuf
            go-k8s-io-klog-v2
 
-           ;; TODO: Complete packaging.
-           #;go-go-step-sm-crypto))
+           ;; XXX: These packages have to be bootstrapped to break cycle with
+           ;; go-google-golang-org-grpc.
+           go-github-com-envoyproxy-go-control-plane
+           go-github-com-envoyproxy-go-control-plane-envoy))
     (home-page "https://github.com/sigstore/rekor-tiles")
     (synopsis "Tile-based transparency log for Sigstore")
     (description
