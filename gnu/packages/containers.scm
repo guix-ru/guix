@@ -1475,6 +1475,23 @@ filesystem layers, container images, and containers.")
 ;;; Executables:
 ;;;
 
+(define-public buildkit
+  (package/inherit go-github-com-moby-buildkit
+    (name "buildkit")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/moby/buildkit/cmd/...")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/moby/buildkit")))
+    (native-inputs
+     (append
+      (package-native-inputs go-github-com-moby-buildkit)
+      (package-propagated-inputs go-github-com-moby-buildkit)))
+    (propagated-inputs '())
+    (inputs '())))
+
 (define-public accelerated-container-image
   (package/inherit go-github-com-containerd-accelerated-container-image
     (name "accelerated-container-image")
