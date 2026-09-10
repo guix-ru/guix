@@ -128,7 +128,8 @@
   #:use-module (guix build-system cargo)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system meson)
-  #:use-module (guix build-system pyproject))
+  #:use-module (guix build-system pyproject)
+  #:use-module (guix build-system qt))
 
 (define-public pyre
   (package
@@ -7226,6 +7227,11 @@ Python style, together with a fast and comfortable execution environment.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      #:imported-modules (append %qt-build-system-modules
+                                 %pyproject-build-system-modules)
+      #:modules '((guix build pyproject-build-system)
+                  ((guix build qt-build-system) #:prefix qt:)
+                  (guix build utils))
       #:test-flags
       ;; The 'plugins' tests takes a long time to run and contains timeouts
       ;; and segfaults along the way.  Many more files and individual tests
@@ -7269,17 +7275,10 @@ Python style, together with a fast and comfortable execution environment.")
             (lambda _
               (setenv "HOME" "/tmp") ; tests need a writable home
               (setenv "QT_QPA_PLATFORM" "offscreen")))
-          (add-after 'wrap 'wrap-executable
-            (lambda _
-              (wrap-program (string-append #$output "/bin/spyder")
-                `("QT_PLUGIN_PATH" prefix
-                  ,(list (string-append
-                          (string-join
-                           (list #$(this-package-input "qtbase")
-                                 #$(this-package-input "qtsvg")
-                                 #$(this-package-input "qtwayland"))
-                           "/lib/qt6/plugins:")
-                          "/lib/qt6/plugins")))))))))
+          (add-after 'wrap 'qt-wrap
+            (lambda args
+              (apply (assoc-ref qt:%standard-phases 'qt-wrap)
+                     `(,@args #:qtbase #$(this-package-input "qtbase"))))))))
     (propagated-inputs (list python-aiohttp
                              python-asyncssh
                              python-atomicwrites
