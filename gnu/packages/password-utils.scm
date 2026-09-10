@@ -1554,16 +1554,16 @@ from password-store and gopass files.")
 (define-public browserpass-native
   (package
     (name "browserpass-native")
-    (version "3.1.0")
+    (version "3.1.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/browserpass/browserpass-native")
-             (commit version)))
+              (url "https://github.com/browserpass/browserpass-native")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1if72k526sqqxnw250qwxvzwvh1w0k8ag4p4xq3442b22hywx72i"))))
+        (base32 "1xskmb7jr42y000hab624dawri8lp4dyaq07j3cbfd6kphx7kjnf"))))
     (build-system go-build-system)
     (arguments
      (list #:import-path "github.com/browserpass/browserpass-native"
@@ -1598,11 +1598,14 @@ from password-store and gopass files.")
                      `("PATH" ":" prefix
                        (,(string-append #$(this-package-input "gnupg") "/bin")))))))))
     (native-inputs
-     (list which))
+     (list go-github-com-mattn-go-zglob
+           go-github-com-rifflock-lfshook
+           go-github-com-sirupsen-logrus
+           go-golang-org-x-sys
+           which))
     (inputs
-     (list bash-minimal gnupg go-github-com-mattn-go-zglob
-           go-github-com-rifflock-lfshook go-github-com-sirupsen-logrus
-           go-golang-org-x-sys))
+     (list bash-minimal
+           gnupg))
     (home-page "https://github.com/browserpass/browserpass-native")
     (synopsis "Browserpass native messaging host")
     (description "Browserpass is a browser extension for pass, a
