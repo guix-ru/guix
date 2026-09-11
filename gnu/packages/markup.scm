@@ -704,16 +704,16 @@ and smu is that smu doesn't support reference style links.")
 (define-public md4c
   (package
     (name "md4c")
-    (version "0.4.8")
+    (version "0.6.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/mity/md4c/")
-             (commit (string-append "release-" version))))
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "12pdh4rfjc3b0cblj5nz3jksr2376lx8ay0vw5dwa1s97q09pczq"))))
+        (base32 "0g18rw8gc93bak0nx86i4jrmf5xzqb3savyxsndnc8fwj8srifwz"))))
     (build-system cmake-build-system)
     (arguments '(#:tests? #f))
     (home-page "https://github.com/mity/md4c/")
