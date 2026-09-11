@@ -42,6 +42,7 @@
 ;;; Copyright © 2025 John Khoo <johnkhootf@gmail.com>
 ;;; Copyright © 2026 orahcio <orahcio@gmail.com>
 ;;; Copyright © 2026 Wilko Meyer <w@wmeyer.eu>
+;;; Copyright © 2026 Gábor Udvari <mail@gaborudvari.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -807,25 +808,18 @@ spreadsheets and outputs it in comma-separated-value format, and
 (define-public utfcpp
   (package
     (name "utfcpp")
-    (version "3.2.5")
+    (version "4.2.0")
     (source (origin
               (method git-fetch)
               (uri (git-reference
                      (url "https://github.com/nemtrif/utfcpp")
                      (commit (string-append "v" version))))
               (file-name (git-file-name name version))
-              (modules '((guix build utils)))
-              ;; Unbundle ftest
-              (snippet
-               '(begin
-                  (delete-file-recursively "extern")
-                  (substitute* (find-files "tests" "\\.cpp")
-                    (("\"../extern/ftest/ftest.h\"")
-                     "<ftest/ftest.h>"))))
               (sha256
                (base32
-                "195n47dblx765xas54vkgyin3xsvfnvcdc614njzqmcxybfpvix2"))))
+                "0d82ayrnrcj8b6x422pnn9gjliwyjwmkc56lz6m1xzjrallygkmx"))))
     (build-system cmake-build-system)
+    (arguments (list #:configure-flags #~'("-DUTF8CPP_ENABLE_TESTS=ON")))
     (native-inputs (list ftest))
     (home-page "https://github.com/nemtrif/utfcpp")
     (synopsis "Portable C++ library for handling UTF-8")
