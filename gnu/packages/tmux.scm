@@ -431,3 +431,31 @@ The system load average is also displayed.")
 repositories in a list of specified folders and open them as a new tmux session.
 For @code{git worktrees}, this tool opens all checked out worktrees as new windows.")
     (license license:expat)))
+
+(define-public opentmux
+  (package
+    (name "opentmux")
+    (version "3.6a")
+    (home-page "https://codeberg.org/opentmux/opentmux")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url home-page)
+                     (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1fzp15rc5rzrq0nmj54qj5c0kadc9p56wjalr7p0z10qsr3v40sp"))))
+    (build-system gnu-build-system)
+    (inputs
+     (list libevent ncurses))
+    (native-inputs
+     (list autoconf automake bison pkg-config))
+    (synopsis "Terminal multiplexer")
+    (description
+     "opentmux is fork of tmux, before AI was introduced. tmux is a terminal
+multiplexer: it enables a number of terminals (or windows), each running a
+separate program, to be created, accessed, and controlled from a single screen.
+tmux may be detached from a screen and continue running in the background, then
+later reattached.")
+    (license license:isc)))
