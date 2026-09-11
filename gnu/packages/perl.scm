@@ -118,14 +118,14 @@
   ;; Yeah, Perl...  It is required early in the bootstrap process by Linux.
   (package
     (name "perl")
-    (version "5.42.0")
+    (version "5.44.0")
     (source (origin
              (method url-fetch)
              (uri (string-append "mirror://cpan/src/5.0/perl-"
                                  version ".tar.gz"))
              (sha256
               (base32
-               "1p4n61k2jcym7q62p15qvavas42mynb54ip2jybip6kz9lcfz4z0"))
+               "1hwnbzvc4ckah33r26z58fm8i8yiaz5b3zvax10cp494p5k5119v"))
              (patches (search-patches
                        "perl-no-sys-dirs.patch"
                        "perl-autosplit-default-time.patch"
