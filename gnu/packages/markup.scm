@@ -18,6 +18,7 @@
 ;;; Copyright © 2025 Vinicius Monego <monego@posteo.net>
 ;;; Copyright © 2026 Carlos Durán Domínguez <wurt@wurt.eu>
 ;;; Copyright © 2026 Andy Tai <atai@atai.org>
+;;; Copyright © 2026 gemmaro <gemmaro.dev@gmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -53,6 +54,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages check)
+  #:use-module (gnu packages compiler-tools)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages glib)
@@ -535,7 +537,7 @@ convert HTML to Markdown.")
 (define-public cmark
   (package
     (name "cmark")
-    (version "0.31.1")
+    (version "0.31.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -544,9 +546,28 @@ convert HTML to Markdown.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "029x6rjlyxs50dxppaqk6lqzyy58hl0laqalmgiqr3m363pz14pq"))))
+                "1nidwvh9hm0fvdq7590qrayiazdx9hidcyha9hry2wlllpp0pfkp"))
+              (modules '((guix build utils)))
+              (snippet
+               '(begin
+                  ;; Delete generated files.
+                  (delete-file "src/case_fold.inc")
+                  (delete-file "src/entities.inc")
+                  (delete-file "src/scanners.c")))))
     (build-system cmake-build-system)
-    (native-inputs (list python))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'generate
+            (lambda _
+              ;; Remove clang-format invocation.
+              (substitute* "Makefile"
+                (("\\$\\(CLANG_FORMAT\\) \\$@")
+                 ""))
+              (invoke "make" "src/case_fold.inc" "src/entities.inc"
+                      "src/scanners.c"))))))
+    (native-inputs (list python re2c))
     (synopsis "CommonMark Markdown reference implementation")
     (description
      "CommonMark is a strongly defined, highly compatible specification of
