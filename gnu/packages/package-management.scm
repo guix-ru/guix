@@ -1399,27 +1399,69 @@ Features
 (define-public pipx
   (package
     (name "pipx")
-    (version "1.7.1")
+    (version "1.15.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "pipx" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pypa/pipx")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0q23b1iqs03hbxzr2d7mmspldx6fbqi6s5j54vljnikaw4sf2bbn"))))
+        (base32 "14gldyr5cvqh3hw137sqjsbgkb8i53r9wm1bnvxhdijh6z7gdzg3"))))
     (build-system pyproject-build-system)
     (arguments
-     (list #:tests? #f))        ;no tests in PyPI archive
+     (list
+      ;; tests: 186 passed, 122 deselected
+      #:test-flags
+      #~(list "--net-pypiserver"
+              #$@(map (lambda (file) (string-append "--ignore=tests/"
+                                                    file))
+                      ;; Tests try finding current Python version, install
+                      ;; additional packages, or compare strict version
+                      ;; constrains.
+                      (list "test_backends_install.py"
+                            "test_environment.py"
+                            "test_inject.py"
+                            "test_install.py"
+                            "test_install_all.py"
+                            "test_interpreter.py"
+                            "test_list.py"
+                            "test_pin.py"
+                            "test_pipx_metadata_file.py"
+                            "test_reinstall.py"
+                            "test_reinstall_all.py"
+                            "test_run.py"
+                            "test_runpip.py"
+                            "test_shared_libs.py"
+                            "test_standalone_interpreter.py"
+                            "test_uninject.py"
+                            "test_uninstall.py"
+                            "test_uninstall_all.py"
+                            "test_unpin.py"
+                            "test_upgrade.py"
+                            "test_upgrade_all.py"
+                            "test_upgrade_shared.py")))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-home
+            (lambda _
+              (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list python-hatch-vcs
-           python-hatchling))
+           python-hatchling
+           python-pytest
+           python-pytest-mock))
     (inputs
      (list python-argcomplete
            python-colorama
+           python-filelock
            python-packaging
            python-platformdirs
-           python-tomli
-           python-userpath))
-    (home-page "https://pypa.github.io/pipx/")
+           python-userpath
+           ;; [optional]
+           uv))
+    (home-page "https://pipx.pypa.io")
     (synopsis "Install and run Python applications in isolated environments")
     (description
      "@code{pipx} is a tool to help you install and run end-user applications
