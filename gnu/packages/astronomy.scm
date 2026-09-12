@@ -123,7 +123,6 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages rust)
-  #:use-module (gnu packages rust-apps)      ;XXX: maturin
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages specifications)
   #:use-module (gnu packages sphinx)
