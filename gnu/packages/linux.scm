@@ -4506,7 +4506,7 @@ Both commands are targeted at system administrators.")
 (define-public irqbalance
   (package
     (name "irqbalance")
-    (version "1.9.4")
+    (version "1.9.5")
     (source
      (origin
        (method git-fetch)
@@ -4515,7 +4515,7 @@ Both commands are targeted at system administrators.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1jswxr0jcxz83j1nanl6xaxpw001l0hfb2xvvy2k970g1g1kpszd"))))
+        (base32 "13drfji15qi7rnnsjvflp5yc98ga5x7frgw21ddhxjspjdib5cd9"))))
     (build-system gnu-build-system)
     (inputs (list glib ncurses libnl libcap-ng))
     (native-inputs (list autoconf automake libtool pkg-config))
