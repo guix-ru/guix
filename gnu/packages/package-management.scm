@@ -974,7 +974,7 @@ by using a Xapian cache.")
 (define-public meta-package-manager
   (package
     (name "meta-package-manager")
-    (version "7.5.0")
+    (version "7.6.1")
     (source
      (origin
        (method git-fetch)
@@ -983,7 +983,7 @@ by using a Xapian cache.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0rx593nv392y3smyrdlv9v9m81nl6n1xdxrlnziwl6zzigqb7dr7"))))
+        (base32 "1kpqxygf4jkmyqyiqa457dnd46dv2b04w2d67hrp34cyh3slzy9z"))))
     (build-system pyproject-build-system)
     ;; Upstream uses uv-build which is not yet available in Guix.
     (arguments
