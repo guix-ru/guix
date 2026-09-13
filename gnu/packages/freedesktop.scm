@@ -796,7 +796,7 @@ the freedesktop.org XDG Base Directory specification.")
 (define-public elogind
   (package
     (name "elogind")
-    (version "257.14")
+    (version "257.16")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -805,8 +805,7 @@ the freedesktop.org XDG Base Directory specification.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "16cbkkia2wmcjwqxgzl714igi9sgpcl4sdvag388vlh941136bs9"))
-              (patches (search-patches "elogind-fix-logind-dbus-install.patch"))))
+                "0sbggvmc3ni5pp5ybmxi0mxxgkyl84d539jsb6nf9qwqvxming8j"))))
     (build-system meson-build-system)
     (arguments
      `(#:configure-flags
