@@ -14782,6 +14782,62 @@ clients that speak the Gemini protocol.")
 @@url{https://github.com/makeworld-the-better-one/go-gemini,go-gemini}.")
     (license license:expat)))
 
+(define-public go-github-com-mark3labs-mcp-go
+  (package
+    (name "go-github-com-mark3labs-mcp-go")
+    (version "1.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/mark3labs/mcp-go")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "01wdlfk227czqchk00x8cry35yzbj99v76dfy4jc288dns889grm"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Submodules with their own go.mod files and packaged separately.
+            (delete-file-recursively "otel")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:import-path "github.com/mark3labs/mcp-go"
+      #:embed-files
+      ;; For go-github-com-santhosh-tekuri-jsonschema-v6:
+      #~(list "applicator"
+              "content"
+              "core"
+              "format"
+              "format-annotation"
+              "format-assertion"
+              "meta-data"
+              "schema"
+              "unevaluated"
+              "validation")
+    #:test-flags
+    #~(list "-skip"
+            ;; Network access is required.
+            (string-append "TestOAuthHandler_SetExpectedState_CrossRequestScenario"
+                           "|TestSSEServer/TestSSEHandlerWithDynamicMounting"))))
+    (native-inputs
+     (list go-github-com-rogpeppe-go-internal
+           go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-google-jsonschema-go
+           go-github-com-google-uuid
+           go-github-com-santhosh-tekuri-jsonschema-v6
+           go-github-com-spf13-cast
+           go-github-com-yosida95-uritemplate-v3))
+    (home-page "https://mcp-go.dev/")
+    (synopsis "Go implementation of the Model Context Protocol")
+    (description
+     "This package provides Go implementation of the @acronym{Model Context
+Protocol, MCP}.")
+    (license license:expat)))
+
 (define-public go-github-com-markbates-goth
   (package
     (name "go-github-com-markbates-goth")
