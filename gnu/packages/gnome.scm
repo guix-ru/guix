@@ -27,7 +27,7 @@
 ;;; Copyright © 2017, 2018 nee <nee-git@hidamari.blue>
 ;;; Copyright © 2017 Chris Marusich <cmmarusich@gmail.com>
 ;;; Copyright © 2017 Mohammed Sadiq <sadiq@sadiqpk.org>
-;;; Copyright © 2017, 2020, 2021 Brendan Tildesley <mail@brendan.scot>
+;;; Copyright © 2017, 2020, 2021, 2026 Brendan Tildesley <mail@brendan.scot>
 ;;; Copyright © 2017, 2018 Rutger Helling <rhelling@mykolab.com>
 ;;; Copyright © 2018 Jovany Leandro G.C <bit4bit@riseup.net>
 ;;; Copyright © 2018, 2023 Vasile Dumitrascu <va511e@yahoo.com>
@@ -2754,19 +2754,18 @@ and single page document formats like PDF and DejaVu.")
          "0ns8z9d5caagg5f50xklp1gh6gz3n33n3ayddz8qa9b7h98a4aha"))))
     (build-system meson-build-system)
     (arguments
-     `(#:phases (modify-phases %standard-phases
-                  (add-after 'unpack 'patch-schemas
-                    (lambda* (#:key inputs #:allow-other-keys)
-                      (substitute* (find-files "schemas"
-                                               "\\.gschema\\.xml\\.in$")
-                        ;; Provide the correct file name of the default
-                        ;; GNOME background, 'adwaita-timed.xml'.
-                        (("@datadir@/backgrounds/gnome")
-                         (search-input-directory inputs
-                                                 "/share/backgrounds/gnome"))
-                        ;; Do not reference fonts, that may not exist.
-                        (("'Source Code Pro 10'") "'Monospace 11'")))))))
-    (inputs (list glib gnome-backgrounds gobject-introspection))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-schemas
+            (lambda _
+              (substitute* (find-files "schemas" "\\.gschema\\.xml\\.in$")
+                ;; Avoid large gnome-wallpapers in the closure.
+                ;; The GNOME desktop service supplies wallpaper defaults.
+                (("file://@datadir@/backgrounds/gnome/[^']+") "")
+                ;; Do not reference fonts that may not exist.
+                (("'Source Code Pro 10'") "'Monospace 11'")))))))
+    (inputs (list glib gobject-introspection))
     (native-inputs (list gettext-minimal
                          `(,glib "bin") ;glib-compile-schemas, etc.
                          gobject-introspection

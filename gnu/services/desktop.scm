@@ -24,6 +24,7 @@
 ;;; Copyright © 2025 dan <i@dan.games>
 ;;; Copyright © 2026 Noé Lopez <noelopez@free.fr>
 ;;; Copyright © 2026 Herman Rimm <herman@rimm.ee>
+;;; Copyright © 2026 Brendan Tildesley <mail@brendan.scot>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -2275,11 +2276,33 @@ CONFIG, a <gnome-desktop-configuration> object."
                         '()))))
     (map file-like->setuid-program files)))
 
+(define (gnome-dconf-profiles config)
+  ;; Set default wallpapers for gnome shell.
+  (list (dconf-profile
+         (name "user")
+         (keyfile
+          (dconf-keyfile
+           (name "00-gnome-backgrounds")
+           (content
+            (list "[org/gnome/desktop/background]"
+                  #~(string-append
+                     "picture-uri='file://" #$gnome-backgrounds
+                     "/share/backgrounds/gnome/adwaita-l.jxl'")
+                  #~(string-append
+                     "picture-uri-dark='file://" #$gnome-backgrounds
+                     "/share/backgrounds/gnome/adwaita-d.jxl'")
+                  "[org/gnome/desktop/screensaver]"
+                  #~(string-append
+                     "picture-uri='file://" #$gnome-backgrounds
+                     "/share/backgrounds/gnome/adwaita-l.jxl'"))))))))
+
 (define gnome-desktop-service-type
   (service-type
    (name 'gnome-desktop)
    (extensions
-    (list (service-extension udev-service-type
+    (list (service-extension dconf-service-type
+                             gnome-dconf-profiles)
+          (service-extension udev-service-type
                              gnome-udev-configuration-files)
           (service-extension pam-root-service-type
                              pam-gnome-keyring)
