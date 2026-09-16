@@ -22,7 +22,6 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages containers)
-  #:use-module (gnu packages docker)
   #:use-module (gnu packages file-systems)
   #:use-module (gnu services)
   #:use-module (gnu services base)

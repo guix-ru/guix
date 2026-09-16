@@ -44,7 +44,6 @@
   #:use-module (gnu packages)
   #:use-module (gnu packages cpp)
   #:use-module (gnu packages gettext)
-  #:use-module (gnu packages docker)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)

@@ -131,7 +131,6 @@
   #:use-module (gnu packages djvu)
   #:use-module (gnu packages dns)
   #:use-module (gnu packages docbook)
-  #:use-module (gnu packages docker)
   #:use-module (gnu packages documentation)
   #:use-module (gnu packages elf)
   #:use-module (gnu packages enchant)

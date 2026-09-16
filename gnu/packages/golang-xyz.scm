@@ -137,7 +137,6 @@
   ;; TODO: Remove when go-github-com-containerd-containerd is moved to (gnu
   ;; packages containers)
   #:use-module (gnu packages containers)
-  #:use-module (gnu packages docker)
   #:use-module (gnu packages kubernetes)
   #:use-module (gnu packages prometheus))
 

@@ -29,7 +29,7 @@
   #:use-module (gnu services shepherd)
   #:use-module (gnu system privilege)
   #:use-module (gnu system shadow)
-  #:use-module (gnu packages docker)
+  #:use-module (gnu packages containers)
   #:use-module (gnu packages linux)               ;singularity
   #:use-module (guix deprecation)
   #:use-module (guix diagnostics)
