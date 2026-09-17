@@ -1680,7 +1680,11 @@ command.")
                      ;; Many packages (particularly evolution-data-server)
                      ;; can not yet handle the latter, so we stick with
                      ;; 'fat' for now.
-                     "CPPFLAGS=-DZIC_BLOAT_DEFAULT='\"fat\"'"
+
+                     ;; The existence of mempcpy is guessed from platform maros
+                     ;; like __linux__. It does not consider __GNU__ and because
+                     ;; guix only has glibc it is save to always define it.
+                     "CPPFLAGS=-DZIC_BLOAT_DEFAULT='\"fat\"' -DHAVE_MEMPCPY=1"
 
                      "AWK=awk"
                      "CC=gcc"))
