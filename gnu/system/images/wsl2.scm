@@ -2,6 +2,7 @@
 ;;; Copyright © 2022 Alex Griffin <a@ajgrf.com>
 ;;; Copyright © 2022 Mathieu Othacehe <othacehe@gnu.org>
 ;;; Copyright © 2022 dan <i@dan.games>
+;;; Copyright © 2026 c4droid <c4droid@foxmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -36,7 +37,8 @@
   #:use-module (guix packages)
   #:use-module ((guix licenses) #:select (fsdg-compatible))
   #:export (wsl-boot-program
-            wsl-os
+            make-wsl-os
+            make-wsl-image
             wsl2-image))
 
 (define (wsl-boot-program user)
@@ -129,56 +131,144 @@ USER."
 
 (define dummy-bootloader
   (bootloader
-   (name 'dummy-bootloader)
-   (package dummy-package)
-   (configuration-file "/var/lib/wsl-bootloader.cfg")
-   (configuration-file-generator
-    (lambda (. _rest)
-      (computed-file "dummy-bootloader"
-                     #~(call-with-output-file #$output
-                         (lambda (port) (display "" port))))))
-   (installer #~(const #t))))
+    (name 'dummy-bootloader)
+    (package dummy-package)
+    (configuration-file "/var/lib/wsl-bootloader.cfg")
+    (configuration-file-generator
+     (lambda (. _rest)
+       (computed-file "dummy-bootloader"
+                      #~(call-with-output-file #$output
+                          (lambda (port) (display "" port))))))
+    (installer #~(const #t))))
 
 (define dummy-kernel dummy-package)
 
 (define (dummy-initrd . _rest)
   (plain-file "dummy-initrd" ""))
 
-(define-public wsl-os
+(define* (wsl-conf-file #:key
+                        (default-user "guest")
+                        (hostname "gnu")
+                        (automount? #t)
+                        (mount-root "/mnt")
+                        (mount-options "metadata,umask=22,fmask=11")
+                        (generate-hosts? #t)
+                        (generate-resolv? #t)
+                        (interop? #t)
+                        (append-windows-path? #t)
+                        (systemd? #f))
+  "Return a plain-file containing the content for /etc/wsl.conf.
+This configuration file is read by the WSL kernel when starting the
+distribution.  It controls the default user, systemd mode, automount
+settings, network behavior, and interop features."
+  (plain-file
+   "wsl.conf"
+   (string-append
+    "[user]\n"
+    "default=" default-user "\n\n"
+    "[boot]\n"
+    "systemd=" (if systemd? "true" "false") "\n\n"
+    "[automount]\n"
+    "enabled=" (if automount? "true" "false") "\n"
+    "root=" mount-root "\n"
+    "options=" mount-options "\n\n"
+    "[network]\n"
+    "hostname=" hostname "\n"
+    "generateHosts=" (if generate-hosts? "true" "false") "\n"
+    "generateResolvConf=" (if generate-resolv? "true" "false") "\n\n"
+    "[interop]\n"
+    "enabled=" (if interop? "true" "false") "\n"
+    "appendWindowsPath=" (if append-windows-path? "true" "false") "\n")))
+
+(define* (wsl-distribution-conf #:key
+                                (name "guix")
+                                (default-uid 1000)
+                                (oobe-command #f)
+                                (icon #f)
+                                (terminal? #t))
+  "Return a plain-file containing the content for /etc/wsl-distribution.conf.
+This file consumed by the WSL installer (e.g., when double-clicking a .wsl
+file or using 'wsl --install --from-file') to determine the distribution name,
+default UID, OOBE command, shortcut settings, and Windows Terminal integration."
+  (plain-file
+   "wsl-distribution.conf"
+   (string-append
+    "[oobe]\n"
+    (if oobe-command
+        (string-append "command=" oobe-command "\n")
+        "")
+    "defaultUid=" (number->string default-uid) "\n"
+    "defaultName=" name "\n\n"
+    "[shortcut]\n"
+    "enabled=true\n"
+    (if icon (string-append "icon=" icon "\n") "")
+    "\n[windowsterminal]\n"
+    "enabled=" (if terminal? "true" "false") "\n")))
+
+(define* (make-wsl-os #:key
+                      (user "guest")
+                      (uid 1000)
+                      (hostname "gnu")
+                      (extra-conf '()))
+  "Return an operating system suitable for use as WSL2 distribution.
+USER, UID, and HOSTNAME are the default user account name, its UID, and the
+system host name.  EXTRA-CONF is an optional list of additional files to be
+placed under /etc; each element is a pair (FILE-NAME . FILE-LIKE), where
+FILE-NAME is a string and FILE-LIKE is a file-like object (e.g., a plain-file
+or local-file).  These files will be installed alongside wsl.conf and
+wsl-distribution.conf in the generated image."
   (operating-system
-    (host-name "gnu")
+    (host-name hostname)
     (timezone "Etc/UTC")
-    (bootloader
-     (bootloader-configuration
-      (bootloader dummy-bootloader)))
+    (bootloader (bootloader-configuration
+                  (bootloader dummy-bootloader)))
     (kernel dummy-kernel)
     (initrd dummy-initrd)
     (initrd-modules '())
     (firmware '())
     (file-systems '())
     (users (cons* (user-account
-                   (name "guest")
-                   (group "users")
-                   (supplementary-groups '("wheel")) ; allow use of sudo
-                   (password "")
-                   (comment "Guest of GNU"))
+                    (name user)
+                    (uid uid)
+                    (group "users")
+                    (supplementary-groups '("wheel"))
+                    (password "")
+                    (comment "WSL user"))
                   (user-account
-                   (inherit %root-account)
-                   (shell (wsl-boot-program "guest")))
+                    (inherit %root-account)
+                    (shell (wsl-boot-program user)))
                   %base-user-accounts))
     (services
      (list
       (service guix-service-type)
+      (simple-service 'wsl-meta etc-service-type
+                      `(("wsl.conf" ,(wsl-conf-file #:default-user user
+                                                    #:hostname (operating-system-host-name this-operating-system)))
+                        ("wsl-distribution.conf" ,(wsl-distribution-conf #:name "guix"
+                                                                         #:default-uid uid))
+                        ,@extra-conf))
       (service special-files-service-type
                `(("/bin/sh" ,(file-append bash "/bin/bash"))
                  ("/bin/mount" ,(file-append util-linux "/bin/mount"))
                  ("/usr/bin/env" ,(file-append coreutils "/bin/env"))))))))
 
-(define wsl2-image
+(define* (make-wsl-image #:key
+                         (user "guest")
+                         (uid 1000)
+                         (hostname "gnu")
+                         (extra-conf '()))
+  "Return an image record for a WSL2 distribution.
+All keyword arguments are passed to 'make-wsl-os'."
   (image
-   (inherit
-    (os->image wsl-os
-               #:type wsl2-image-type))
-   (name 'wsl2-image)))
+    (inherit
+     (os->image (make-wsl-os #:user user
+                             #:uid uid
+                             #:hostname hostname
+                             #:extra-conf extra-conf)
+                #:type wsl2-image-type))
+    (name 'wsl-image)))
+
+(define wsl2-image
+  (make-wsl-image))
 
 wsl2-image
