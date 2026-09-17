@@ -293,6 +293,7 @@ backups (called chunks) to allow easy burning to CD/DVD.")
      (list
       #:configure-flags
       #~'("--disable-static"
+          "--with-nettle"
           ;; Because of the circular dependency, we cannot use openssl here.
           ;; Explicitly disable openssl to avoid unnecessary dependencies in the
           ;; pc file.
