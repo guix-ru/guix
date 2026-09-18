@@ -609,7 +609,7 @@ output), and Binutils.")
     ("20.1.8" . "0v0lwf58i96vcwsql3hlgy72z3ncfvqwgyghyn26m2ri8vy83k6a")
     ("21.1.8" . "0v99a90546lrd3cxgam32c0jcnwzi0ljk0ihdvd9xghzss1pq1x6")
     ("22.1.8" . "1rww5cs3rw2yyjnz84ywlpkcvh46p1m9ac1nkhwprjbjw2vwv20q")
-    ("23.1.0" . "0papvpzwgkl3yh8w0l4planl1pg6m57cqwi09p9rd8vras1lfihl")))
+    ("23.1.1" . "0nyr1k7324qv7xa4r1sn4mvw47y7sswhax6fgmq3lnh4x7qbavnw")))
 
 (define %llvm-patches
   '(("14.0.6" . ("clang-14.0-libc-search-path.patch"
@@ -632,7 +632,7 @@ output), and Binutils.")
     ("22.1.8" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"
                  "llvm-22-cfloat128-detection.patch"))
-    ("23.1.0" . ("clang-18.0-libc-search-path.patch"
+    ("23.1.1" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))))
 
 (define (llvm-monorepo version)
@@ -1280,7 +1280,7 @@ Library.")
 
 
 (define-public llvm-23
-  (make-llvm "23.1.0"))
+  (make-llvm "23.1.1"))
 
 (define-public clang-runtime-23
   (clang-runtime-from-llvm llvm-23))
