@@ -653,8 +653,7 @@ exec ${system}/rc \"$@\"
                       "-C" "libdde_linux26" "install"
                       (string-append "SHELL="
                                      (search-input-file (or native-inputs inputs)
-                                                        "/bin/bash")
-                                     "/bin/bash")
+                                                        "/bin/bash"))
                       (string-append "INSTALLDIR=" dir)
                       (string-append "ARCH=" arch))
               (when ,(target-hurd64?)
