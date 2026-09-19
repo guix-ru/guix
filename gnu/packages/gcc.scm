@@ -225,7 +225,7 @@ where the OS part is overloaded to denote a specific ABI---into GCC
          #~(modify-phases %standard-phases
              (add-before 'configure 'relax-gcc-14s-strictness
                (lambda* (#:key inputs #:allow-other-keys)
-                 (let ((bash (search-input-file inputs "/bin/bash"))
+                 (let ((bash (which "bash"))
                        (wrapper (string-append (getcwd) "/gcc.sh"))
                        (stage-wrapper (string-append (getcwd) "/stage-gcc.sh")))
                    (with-output-to-file wrapper
