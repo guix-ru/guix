@@ -916,7 +916,9 @@ It also includes runtime support libraries for these languages.")
                                      "gcc-5.0-libvtv-runpath.patch"
                                      "gcc-10-libsanitizer-no-crypt.patch"
                                      "gcc-11-libstdc++-hurd-libpthread.patch"
-                                     "gcc-libstdc++-newer-gcc.patch"))
+                                     "gcc-libstdc++-newer-gcc.patch"
+                                     "gcc-11-libsanitizer-Fix-build-with-glibc-2.42.patch"
+                                     "gcc-sanitizer_common-Remove-reference-to-obsolete-termio-ioctls.patch"))
             (modules '((guix build utils)))
             (snippet gcc-canadian-cross-objdump-snippet)))
    (properties

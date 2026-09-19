@@ -1424,6 +1424,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/gcc-12-strmov-store-file-names.patch	\
   %D%/packages/patches/gcc-10-cross-environment-variables.patch \
   %D%/packages/patches/gcc-10-libsanitizer-no-crypt.patch	\
+  %D%/packages/patches/gcc-11-libsanitizer-Fix-build-with-glibc-2.42.patch \
   %D%/packages/patches/gcc-11-libstdc++-hurd-libpthread.patch   \
   %D%/packages/patches/gcc-12-cross-environment-variables.patch \
   %D%/packages/patches/gcc-11-libstdc++-powerpc.patch           \
