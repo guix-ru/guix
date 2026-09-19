@@ -1019,17 +1019,16 @@ It also includes runtime support libraries for these languages.")
 (define-public gcc-15
   (package
     (inherit gcc-14)
-    (version "15.2.0")
+    (version "15.3.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://gnu/gcc/gcc-"
                                   version "/gcc-" version ".tar.xz"))
               (sha256
                (base32
-                "0knj4ph6y7r7yhnp1v4339af7mki5nkh7ni9b948433bhabdk3s3"))
+                "1srhqnq62vihnhdzzyp6scar6647flidzhbi9myg55c9xyzc2ngs"))
               (patches (search-patches "gcc-12-strmov-store-file-names.patch"
                                        "gcc-5.0-libvtv-runpath.patch"
-                                       "gcc-hurd-split-stack.patch"
                                        "gcc-mangle-guix-store.patch"))
               (modules '((guix build utils)))
               (snippet gcc-canadian-cross-objdump-snippet)))
