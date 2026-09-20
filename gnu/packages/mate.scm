@@ -463,37 +463,44 @@ configuration program to choose applications starting on login.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-settings-daemon-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-settings-daemon")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0fhsc505p34zk1bln764fbh7dfq32x0vi0h2zkzrxjd4manwvmsf"))))
+        (base32 "1wc26b7c0vwq0k2mk8fyw2c7n7n0mky4n6dsjf8m4qmk5avl59vr"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list pkg-config intltool gobject-introspection))
-    (inputs
-     (list cairo
-           dbus
-           dbus-glib
-           dconf
-           fontconfig
-           gtk+
-           libcanberra
-           libmatekbd
-           libmatemixer
-           libnotify
-           libx11
-           libxext
-           libxi
-           libxklavier
-           mate-desktop
-           nss
-           polkit
-           startup-notification))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         gobject-introspection
+                         mate-common
+                         which))
+    (inputs (list cairo
+                  dbus
+                  dbus-glib
+                  dconf
+                  fontconfig
+                  gtk+
+                  libcanberra
+                  libmatekbd
+                  libmatemixer
+                  libnotify
+                  libx11
+                  libxext
+                  libxi
+                  libxklavier
+                  mate-desktop
+                  nss
+                  polkit
+                  startup-notification))
     (home-page "https://mate-desktop.org/")
     (synopsis "Settings Daemon for MATE")
-    (description
-     "Mate-settings-daemon is a fork of gnome-settings-daemon.")
+    (description "Mate-settings-daemon is a fork of gnome-settings-daemon.")
     (license (list license:lgpl2.1 license:gpl2))))
 
 (define-public libmatemixer
