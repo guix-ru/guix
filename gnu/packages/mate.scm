@@ -1982,12 +1982,13 @@ MATE Desktop to monitor your system resources and usage.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-polkit")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "1s2ac2p5smiwr7lf4snciyb9waclychjmzrw32f2qspdm381s2im"))))
+        (base32 "0z4awzfmz133sl2h041gnm10vkpq72cl3ngximspvpwhwkpchbpd"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
@@ -1996,24 +1997,29 @@ MATE Desktop to monitor your system resources and usage.")
           (add-after 'install 'enable-autostart-for-xfce
             (lambda _
               ;; We also use mate-polkit in Xfce.
-              (substitute* (string-append
-                            #$output
-                            "/etc/xdg/autostart/"
+              (substitute* (string-append #$output "/etc/xdg/autostart/"
                             "polkit-mate-authentication-agent-1.desktop")
-                (("OnlyShowIn=MATE;") "OnlyShowIn=MATE;XFCE;")))))))
-    (native-inputs
-     (list gettext-minimal gtk-doc/stable intltool libtool pkg-config))
-    (inputs
-     (list accountsservice
-           glib
-           gobject-introspection
-           gtk+
-           gdk-pixbuf
-           polkit))
+                (("OnlyShowIn=MATE;")
+                 "OnlyShowIn=MATE;XFCE;")))))))
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         gtk-doc/stable
+                         intltool
+                         libtool
+                         mate-common
+                         pkg-config
+                         which))
+    (inputs (list accountsservice
+                  glib
+                  gobject-introspection
+                  gtk+
+                  gdk-pixbuf
+                  polkit))
     (home-page "https://mate-desktop.org/")
     (synopsis "Polkit authentication agent for MATE")
-    (description
-     "MATE Polkit is a MATE specific D-Bus service that is
+    (description "MATE Polkit is a MATE specific D-Bus service that is
 used to bring up authentication dialogs.")
     (license license:lgpl2.1)))
 
