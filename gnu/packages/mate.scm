@@ -1937,34 +1937,42 @@ can be used as backgrounds in the MATE Desktop environment.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-system-monitor-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-system-monitor")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "09asjqln7sn6rbqy8anwfnnf5wfnhdwm9xhkphg3dd8gp7b67mj2"))))
+        (base32 "1kdc6x826mbwkcwbdgbcbgk710vl4fl4sxcg5g31pzlqr3h4544h"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      `(#:configure-flags '("--enable-systemd=no")))
-    (native-inputs
-     (list autoconf gettext-minimal intltool pkg-config yelp-tools))
-    (inputs
-     (list cairo
-           glib
-           glibmm
-           gtkmm-3
-           gtk+
-           gdk-pixbuf
-           libsigc++
-           libcanberra
-           libxml2
-           libwnck
-           libgtop
-           (librsvg-for-system)
-           polkit))
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         intltool
+                         libtool
+                         mate-common
+                         pkg-config
+                         which
+                         yelp-tools))
+    (inputs (list cairo
+                  glib
+                  glibmm
+                  gtkmm-3
+                  gtk+
+                  gdk-pixbuf
+                  libsigc++
+                  libcanberra
+                  libxml2
+                  libwnck
+                  libgtop
+                  (librsvg-for-system)
+                  polkit))
     (home-page "https://mate-desktop.org/")
     (synopsis "System Monitor for MATE")
-    (description
-     "Mate System Monitor provides a tool for for the
+    (description "Mate System Monitor provides a tool for for the
 MATE Desktop to monitor your system resources and usage.")
     (license license:gpl2)))
 
