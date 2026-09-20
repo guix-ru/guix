@@ -829,17 +829,24 @@ mate-volume-control, a MATE volume control application and applet.")
     (version "1.28.3")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           "mate-notification-daemon-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-notification-daemon")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "04zlmli3kv80h7fpf0xlxm0hkf238gj5hib4qb6bjxczzyqyq370"))))
+        (base32 "0p1wssgyqyd9b75lgkz3gn3jycwf6wra8cyficgs2v1i18z4vs7f"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs (list pkg-config gettext-minimal libxml2))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         intltool
+                         libtool
+                         libxml2
+                         mate-common
+                         which))
     (inputs (list gtk+
                   dbus-glib
                   libwnck
