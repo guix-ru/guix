@@ -1271,31 +1271,31 @@ icons on the MATE desktop.  It works on local and remote file systems.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           name
-                           "-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/python-caja")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1ml0yrkbly1mz5gmz1wynn3zff5900szncc4rk83xqyzvcww4mmh"))))
+        (base32 "0av6fxvhardsx93hqf2kap0my57g2hip2g0ls4pp3ymmscib8gw2"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
       #:configure-flags
       #~(list (string-append "--with-cajadir="
-                             #$output
-                             "/lib/caja/extensions-2.0/"))))
-    (native-inputs
-     (list pkg-config
-           gettext-minimal
-           python-wrapper))
-    (inputs
-     (list caja
-           gtk+
-           python-pygobject))
+                             #$output "/lib/caja/extensions-2.0/"))))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         mate-common
+                         gtk-doc/stable
+                         which
+                         gettext-minimal
+                         python-wrapper))
+    (inputs (list caja gtk+ python-pygobject))
     (home-page "https://mate-desktop.org/")
     (synopsis "Python bindings for Caja components")
     (description
