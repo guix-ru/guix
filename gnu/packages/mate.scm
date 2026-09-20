@@ -365,28 +365,35 @@ for the MATE desktop environment.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-terminal-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-terminal")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "14ly8v4wcz735caw0rdvwrsdgkxlzla1kp5jxjc2gqiakqdfndgi"))))
+        (base32 "07336r3pdk6bnkj20071v5v5l0psq36lhmxbklfaw999vasl6w8f"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list pkg-config
-           intltool
-           itstool
-           gobject-introspection
-           libxml2
-           yelp-tools))
-    (inputs
-     (list dconf
-           gtk+
-           libice
-           libsm
-           libx11
-           mate-desktop
-           pango
-           vte/gtk+-3))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         itstool
+                         gobject-introspection
+                         libxml2
+                         yelp-tools
+                         mate-common
+                         which))
+    (inputs (list dconf
+                  gtk+
+                  libice
+                  libsm
+                  libx11
+                  mate-desktop
+                  pango
+                  vte/gtk+-3))
     (home-page "https://mate-desktop.org/")
     (synopsis "MATE Terminal Emulator")
     (description
