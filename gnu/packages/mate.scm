@@ -1559,25 +1559,32 @@ can be used as backgrounds in the MATE Desktop environment.")
     (version "1.26.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-netbook")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "12gdy69nfysl8vmd8lv8b0lknkaagplrrz88nh6n0rmjkxnipgz3"))))
+        (base32 "0n0afsmn2k2jj30wzyaq487pbr5dpds01djk13vvvwfkd053y1h1"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list gettext-minimal intltool pkg-config))
-    (inputs
-     (list cairo
-           glib
-           gtk+
-           libfakekey
-           libwnck
-           libxtst
-           libx11
-           mate-panel
-           xorgproto))
+    (native-inputs (list gettext-minimal
+                         intltool
+                         pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         libtool
+                         mate-common
+                         which))
+    (inputs (list cairo
+                  glib
+                  gtk+
+                  libfakekey
+                  libwnck
+                  libxtst
+                  libx11
+                  mate-panel
+                  xorgproto))
     (home-page "https://mate-desktop.org/")
     (synopsis "Tool for MATE on Netbooks")
     (description
@@ -1589,7 +1596,8 @@ can be used as backgrounds in the MATE Desktop environment.")
 and window class.
 @item Allows @code{reversing} of rules when the user manually changes something:
 Re-decorates windows on un-maximise.
-@end enumerate\n")
+@end enumerate
+")
     (license license:gpl3+)))
 
 (define-public mate-screensaver
