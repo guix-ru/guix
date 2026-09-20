@@ -1801,15 +1801,14 @@ can be used as backgrounds in the MATE Desktop environment.")
     (version "1.28.2")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           "engrampa-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/engrampa")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1vq9mi87c0agfwysrbki155835xgv5qm2cbzld1qigs56z17g68y"))))
+        (base32 "1kwwhgirm0fah4a044c9mf52ch7yiw4hljgpcnr9mbbzr4l1vl7z"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
@@ -1826,12 +1825,18 @@ can be used as backgrounds in the MATE Desktop environment.")
               (substitute* "data/Makefile"
                 (("gtk-update-icon-cache")
                  "true")) #t)))))
-    (native-inputs
-     (list gettext-minimal
-           gtk-doc/stable
-           intltool
-           pkg-config
-           yelp-tools))
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         gtk-doc/stable
+                         intltool
+                         itstool
+                         libtool
+                         mate-common
+                         pkg-config
+                         which
+                         yelp-tools))
     (inputs (list caja
                   file
                   glib
