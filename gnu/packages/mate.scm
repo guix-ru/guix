@@ -697,17 +697,23 @@ Interactive Weather Information Network (IWIN).
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           "mate-indicator-applet-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-indicator-applet")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1ka9mplw28p2sb75lj9559sszqvi44f0ppypgj6maghajw1xgcyf"))))
+        (base32 "1sm9f1xxggal755qcjls5pw5sv89kmvdqmdn2a81jdq275aff970"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs (list pkg-config gettext-minimal))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         intltool
+                         libtool
+                         mate-common
+                         which))
     (inputs (list gtk+ libindicator mate-common mate-panel hicolor-icon-theme))
     (home-page "https://mate-desktop.org/")
     (synopsis
