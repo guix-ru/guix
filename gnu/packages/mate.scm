@@ -1859,16 +1859,14 @@ can be used as backgrounds in the MATE Desktop environment.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           name
-                           "-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/pluma")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1m51cmcl6z68bx37zhi72wfl58kq9bg7xcih1sjr6l1li6axz2ma"))))
+        (base32 "17l64v3d3i3i0a37f56d3wpi2c7zp7qljr4169hvaciha894491q"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
@@ -1891,13 +1889,19 @@ can be used as backgrounds in the MATE Desktop environment.")
       ;; Tests can not succeed.
       ;; https://github.com/mate-desktop/mate-text-editor/issues/33
       #:tests? #f))
-    (native-inputs (list gettext-minimal
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
                          gtk-doc/stable
                          gobject-introspection
                          intltool
+                         itstool
                          libtool
+                         mate-common
                          perl
                          pkg-config
+                         which
                          yelp-tools))
     (inputs (list at-spi2-core
                   cairo
