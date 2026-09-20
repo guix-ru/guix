@@ -542,25 +542,32 @@ sound systems.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "libmatekbd-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/libmatekbd")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "03p8dx7n0fi77qdh1r6pi40wqa0ap7w8hk6j0csx68rb7i45hbjx"))))
+        (base32 "0qhs7k6n263bzkqxfhx5284wwp425gpvhlmkqn3n61fvwn50kkza"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list pkg-config intltool gobject-introspection))
-    (inputs
-     (list cairo
-           (librsvg-for-system)
-           glib
-           gtk+
-           libx11
-           libxklavier))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         gobject-introspection
+                         mate-common
+                         which))
+    (inputs (list cairo
+                  (librsvg-for-system)
+                  glib
+                  gtk+
+                  libx11
+                  libxklavier))
     (home-page "https://mate-desktop.org/")
     (synopsis "MATE keyboard configuration library")
-    (description
-     "Libmatekbd is a keyboard configuration library for the
+    (description "Libmatekbd is a keyboard configuration library for the
 MATE desktop environment.")
     (license license:lgpl2.1)))
 
