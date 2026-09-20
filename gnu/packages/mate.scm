@@ -509,16 +509,25 @@ configuration program to choose applications starting on login.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "libmatemixer-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/libmatemixer")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1ix0f3c40b535wsvbc9d4q7c6inf5d9ync4m7j76hq3z74ibjwsx"))))
+        (base32 "0d3q9d8nyj5483h6mg7iv6hs2zpp5wwzvdib7klfbmqf6hz21hc2"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list pkg-config intltool gobject-introspection))
-    (inputs
-     (list glib pulseaudio alsa-lib))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         gobject-introspection
+                         gtk-doc/stable
+                         mate-common
+                         which))
+    (inputs (list glib pulseaudio alsa-lib))
     (home-page "https://mate-desktop.org/")
     (synopsis "Mixer library for the MATE desktop")
     (description
