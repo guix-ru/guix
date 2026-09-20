@@ -732,26 +732,30 @@ consistently in the MATE panel.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           "mate-sensors-applet-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-sensors-applet")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "10as64102wbgmi8ak3ya2zyvc3dpx24rfg18323fp3xgh9k3crfl"))))
+        (base32 "0lbcnw4ykm2x96700l7gm748hyhj50wpgr1gvyx02f9vnrq27a23"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
       #:configure-flags
       #~(list "--enable-in-process")))
     (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
                          intltool
                          itstool
                          yelp-tools
                          gettext-minimal
-                         gobject-introspection))
+                         gobject-introspection
+                         libtool
+                         mate-common
+                         which))
     (inputs (list at-spi2-core
                   dbus
                   dbus-glib
