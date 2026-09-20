@@ -619,43 +619,48 @@ assorted menu related utility programs.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-applets-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-applets")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "11k66nfgs403r70isc8ccss994hv9c793zr8r2fzn9nksmmyysqv"))))
+        (base32 "0w690z66i63fsl6ysi6jbwk30xal33ykx1x975wiq7gk391qv03v"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list pkg-config
-           intltool
-           libxslt
-           yelp-tools
-           gettext-minimal
-           docbook-xml
-           gobject-introspection))
-    (inputs
-     (list at-spi2-core
-           dbus
-           dbus-glib
-           glib
-           gucharmap
-           gtk+
-           gtksourceview-4
-           libgtop
-           libmateweather
-           libnl
-           libnotify
-           libx11
-           libxml2
-           libwnck
-           mate-desktop
-           mate-panel
-           pango
-           polkit ; either polkit or setuid
-           upower
-           wireless-tools))
-    (propagated-inputs
-     (list python-pygobject))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         libxslt
+                         yelp-tools
+                         gettext-minimal
+                         docbook-xml
+                         gobject-introspection
+                         mate-common
+                         which))
+    (inputs (list at-spi2-core
+                  dbus
+                  dbus-glib
+                  glib
+                  gucharmap
+                  gtk+
+                  gtksourceview-4
+                  libgtop
+                  libmateweather
+                  libnl
+                  libnotify
+                  libx11
+                  libxml2
+                  libwnck
+                  mate-desktop
+                  mate-panel
+                  pango
+                  polkit ;either polkit or setuid
+                  upower
+                  wireless-tools))
+    (propagated-inputs (list python-pygobject))
     (home-page "https://mate-desktop.org/")
     (synopsis "Various applets for the MATE Panel")
     (description
@@ -682,7 +687,8 @@ applet downloads the stock information from Yahoo! Finance.
 @item Weather report: downloads weather information from the
 U.S National Weather Service (NWS) servers, including the
 Interactive Weather Information Network (IWIN).
-@end enumerate\n")
+@end enumerate
+")
     (license (list license:gpl2+ license:lgpl2.0+ license:gpl3+))))
 
 (define-public mate-indicator-applet
