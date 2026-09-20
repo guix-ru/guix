@@ -308,8 +308,7 @@ desktop and the mate-about program.")
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/mate-desktop/libmateweather")
-             (commit (string-append "v" version))
-             (recursive? #t)))
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
         (base32 "15ajz83na76lcnw9cy1m36f9xfzl1nywk9xwwjax1cklfz63vl0g"))))
