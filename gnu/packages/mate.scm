@@ -275,23 +275,28 @@ themes for both gtk+-2 and gtk+-3.")
     (version "1.28.2")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-desktop-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-desktop")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "18jajrj5bs98gnx4qjwqa1v48k9bm0c9rbmqw70r3cql41wlpfrj"))))
+        (base32 "0wjl756wzm200qr6f6nx1dpxh2rv8xzvx89wdb14ajcf3zgmal6k"))))
     (build-system gnu-build-system)
-    (native-inputs
-     (list pkg-config
-           intltool
-           `(,glib "bin")
-           gobject-introspection
-           yelp-tools
-           gtk-doc/stable))
-    (inputs
-     (list gtk+ libxrandr iso-codes/pinned startup-notification))
-    (propagated-inputs
-     (list dconf)) ; mate-desktop-2.0.pc
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         `(,glib "bin")
+                         gobject-introspection
+                         yelp-tools
+                         gtk-doc/stable
+                         mate-common
+                         which))
+    (inputs (list gtk+ libxrandr iso-codes/pinned startup-notification))
+    (propagated-inputs (list dconf)) ;mate-desktop-2.0.pc
     (home-page "https://mate-desktop.org/")
     (synopsis "Library with common API for various MATE modules")
     (description
