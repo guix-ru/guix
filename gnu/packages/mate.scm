@@ -577,29 +577,34 @@ MATE desktop environment.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-menus-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-menus")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "13ahf1cy9mzasswhnkx8qqmj5ii54338z0k994fss2kggmfcfh6g"))))
+        (base32 "1nfmgjwggs31c79r9223cr5w1gfqrln36qqvhfjdfsbfb421m3fz"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after
-          'unpack 'fix-introspection-install-dir
-          (lambda* (#:key outputs #:allow-other-keys)
-            (let ((out (assoc-ref outputs "out")))
-              (substitute* '("configure")
-                (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
-                 (string-append "\"" out "/share/gir-1.0/\""))
-                (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
-                 (string-append out "/lib/girepository-1.0/")))
-              #t))))))
-    (native-inputs
-     (list pkg-config intltool gobject-introspection))
-    (inputs
-     (list glib))
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'bootstrap 'fix-introspection-install-dir
+                    (lambda* (#:key outputs #:allow-other-keys)
+                      (let ((out (assoc-ref outputs "out")))
+                        (substitute* '("configure")
+                          (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
+                           (string-append "\"" out "/share/gir-1.0/\""))
+                          (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
+                           (string-append out "/lib/girepository-1.0/"))) #t))))))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         gobject-introspection
+                         mate-common
+                         which))
+    (inputs (list glib))
     (home-page "https://mate-desktop.org/")
     (synopsis "Freedesktop menu specification implementation for MATE")
     (description
