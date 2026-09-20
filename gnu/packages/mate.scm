@@ -789,14 +789,22 @@ GNU plus Linux distributions.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-media-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-media")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "04lr7bl0k1m88m1qf2m3wrq3a48wx44cgmb667k5agzn48p11p5w"))))
+        (base32 "16wklpb8ggxgygvckaznk0j8waa4xv6mgqaplr6csyr3r002q99z"))))
     (build-system glib-or-gtk-build-system)
     (native-inputs
-     (list pkg-config intltool gettext-minimal gobject-introspection))
+     (list pkg-config intltool gettext-minimal gobject-introspection
+           autoconf
+           autoconf-archive
+           automake
+           libtool
+           mate-common
+           which))
     (inputs
      (list cairo
            gtk+
