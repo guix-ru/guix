@@ -1606,63 +1606,68 @@ Re-decorates windows on un-maximise.
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-screensaver-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-screensaver")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0w7awc8a9q2hsqz51p2zln4adb6l7zk57aql07hrabsaz2l283va"))))
+        (base32 "1k6g60c611v2bkam2f06acmj1wp9i507hqf2dpiycl4gbsy49bwa"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      `(#:configure-flags
        ;; FIXME: There is a permissions problem with screen locking
        ;; which effectively locks you out completely. Enable locking
        ;; once this has been fixed.
-       (list "--enable-locking" "--with-kbd-layout-indicator"
-             "--with-xf86gamma-ext" "--enable-pam"
-             "--disable-schemas-compile" "--without-console-kit")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'autoconf
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (dbus-dir (string-append out "/share/dbus-1/services")))
-             (setenv "SHELL" (which "sh"))
-             (setenv "CONFIG_SHELL" (which "sh"))
-             (substitute* "configure"
-               (("dbus-1") ""))))))))
-    (native-inputs
-     `(("automake" ,automake)
-       ("autoconf" ,autoconf)
-       ("gettext" ,gettext-minimal)
-       ("intltool" ,intltool)
-       ("mate-common" ,mate-common)
-       ("pkg-config" ,pkg-config)
-       ("which" ,which)
-       ("xorgproto" ,xorgproto)))
-    (inputs
-     (list cairo
-           dconf
-           dbus
-           dbus-glib
-           glib
-           gtk+
-           (librsvg-for-system)
-           libcanberra
-           libglade
-           libmatekbd
-           libnotify
-           libx11
-           libxext
-           libxklavier
-           libxrandr
-           libxrender
-           libxscrnsaver
-           libxxf86vm
-           linux-pam
-           mate-desktop
-           mate-menus
-           pango
-           startup-notification))
+       (list "--enable-locking"
+             "--with-kbd-layout-indicator"
+             "--with-xf86gamma-ext"
+             "--enable-pam"
+             "--disable-schemas-compile"
+             "--without-console-kit")
+       #:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'autoconf
+                    (lambda _
+                      (setenv "SHELL"
+                              (which "sh"))
+                      (setenv "CONFIG_SHELL"
+                              (which "sh"))
+                      (substitute* "configure.ac"
+                        (("DBUS_SESSION_SERVICE_DIR=`pkg-config.*")
+                         "DBUS_SESSION_SERVICE_DIR='${datarootdir}/dbus-1/services'")))))))
+    (native-inputs (list automake
+                         autoconf
+                         autoconf-archive
+                         libtool
+                         gettext-minimal
+                         intltool
+                         mate-common
+                         pkg-config
+                         which
+                         xorgproto))
+    (inputs (list cairo
+                  dconf
+                  dbus
+                  dbus-glib
+                  glib
+                  gtk+
+                  (librsvg-for-system)
+                  libcanberra
+                  libglade
+                  libmatekbd
+                  libnotify
+                  libx11
+                  libxext
+                  libxklavier
+                  libxrandr
+                  libxrender
+                  libxscrnsaver
+                  libxxf86vm
+                  linux-pam
+                  mate-desktop
+                  mate-menus
+                  pango
+                  startup-notification))
     (home-page "https://mate-desktop.org/")
     (synopsis "Screensaver for MATE")
     (description
