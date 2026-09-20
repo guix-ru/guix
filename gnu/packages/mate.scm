@@ -1681,46 +1681,55 @@ can be used as backgrounds in the MATE Desktop environment.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-utils")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "1lw85zr38666y5zywsy2gzs9f7n2k1z9zjkq7gq0z40x1mx9si2q"))))
+        (base32 "0l900d46g2snw1c97m897g263h3yk14wyc5z2jxz2svi4qrb047c"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      ;; Newer itstool does the following--and that causes parallel builds to fail:
      ;; <https://github.com/itstool/itstool/commit/d3adf0264ee2b6fd28b7eff7dec33501d6e75a7c>
-     (list #:parallel-build? #f))
-    (native-inputs
-     (list gettext-minimal
-           gtk-doc/stable
-           intltool
-           libice
-           libsm
-           pkg-config
-           xorgproto
-           yelp-tools))
-    (inputs
-     (list at-spi2-core
-           cairo
-           glib
-           gtk+
-           (librsvg-for-system)
-           libcanberra
-           libgtop
-           libx11
-           libxext
-           mate-desktop
-           mate-panel
-           pango
-           startup-notification
-           udisks
-           zlib))
+     (list
+      #:parallel-build? #f))
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         (list glib "bin") ;glib-gettextize
+                         gtk-doc/stable
+                         intltool
+                         itstool
+                         libice
+                         libsm
+                         libtool
+                         mate-common
+                         pkg-config
+                         polkit ;for ITS rules
+                         which
+                         xorgproto
+                         yelp-tools))
+    (inputs (list at-spi2-core
+                  cairo
+                  glib
+                  gtk+
+                  (librsvg-for-system)
+                  libcanberra
+                  libgtop
+                  libx11
+                  libxext
+                  mate-desktop
+                  mate-panel
+                  pango
+                  startup-notification
+                  udisks
+                  zlib))
     (home-page "https://mate-desktop.org/")
     (synopsis "Utilities for the MATE Desktop")
-    (description
-     "Mate Utilities for the MATE Desktop containing:
+    (description "Mate Utilities for the MATE Desktop containing:
 
 @enumerate
 @item mate-system-log
@@ -1728,10 +1737,9 @@ can be used as backgrounds in the MATE Desktop environment.")
 @item mate-dictionary
 @item mate-screenshot
 @item mate-disk-usage-analyzer
-@end enumerate\n")
-    (license (list license:gpl2
-                   license:fdl1.1+
-                   license:lgpl2.1))))
+@end enumerate
+")
+    (license (list license:gpl2 license:fdl1.1+ license:lgpl2.1))))
 
 (define-public eom
   (package
