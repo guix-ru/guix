@@ -1531,19 +1531,25 @@ sessions, panels, menus, file management, and preferences.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-backgrounds")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "0hv97805gb89v64f90laskq4h483lgpvd9m54an0ggc64k8azlah"))))
+        (base32 "1h1yb0wxhbmmrzih00w5srh1xzkg1sq7jx02carazvq38kn12c55"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list intltool))
+    (native-inputs (list intltool
+                         pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         libtool
+                         mate-common
+                         which))
     (home-page "https://mate-desktop.org/")
     (synopsis "Calculator for MATE")
-    (description
-     "This package contains a collection of graphics files which
+    (description "This package contains a collection of graphics files which
 can be used as backgrounds in the MATE Desktop environment.")
     (license license:gpl2+)))
 
