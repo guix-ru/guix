@@ -868,70 +868,79 @@ deliver notifications to the user.")
     (version "1.28.4")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-panel")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0x48jqm2axzxp2hc7mh3znds7nqwaw59b2ghnsbw2ajc66q9xw02"))))
+        (base32 "1ldrvaskpj93qsiismbz2hhbzs1md9nyck9cvhlzpswbzd6qpl8r"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags
-       (list (string-append "--with-zoneinfo-dir="
-                            (assoc-ref %build-inputs "tzdata")
-                            "/share/zoneinfo")
-             "--with-in-process-applets=all")
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'fix-timezone-path
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let* ((tzdata (assoc-ref inputs "tzdata")))
-               (substitute* "applets/clock/system-timezone.h"
-                 (("/usr/share/lib/zoneinfo/tab")
-                  (string-append tzdata "/share/zoneinfo/zone.tab"))
-                 (("/usr/share/zoneinfo")
-                  (string-append tzdata "/share/zoneinfo"))))
-             #t))
-         (add-after 'unpack 'fix-introspection-install-dir
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (substitute* '("configure")
-                 (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
-                  (string-append "\"" out "/share/gir-1.0/\""))
-                 (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
-                  (string-append out "/lib/girepository-1.0/")))
-               #t))))))
-    (native-inputs
-     (list pkg-config intltool itstool xtrans gobject-introspection))
-    (inputs
-     (list dconf
-           dconf-editor
-           cairo
-           dbus-glib
-           gtk-layer-shell
-           gtk+
-           libcanberra
-           libice
-           libmateweather
-           (librsvg-for-system)
-           libsm
-           libx11
-           libxau
-           libxml2
-           libxrandr
-           libwnck
-           mate-desktop
-           mate-menus
-           pango
-           tzdata
-           wayland))
+     `(#:configure-flags (list (string-append "--with-zoneinfo-dir="
+                                              (assoc-ref %build-inputs
+                                                         "tzdata")
+                                              "/share/zoneinfo")
+                               "--with-in-process-applets=all")
+       #:phases (modify-phases %standard-phases
+                  (add-before 'configure 'fix-timezone-path
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let* ((tzdata (assoc-ref inputs "tzdata")))
+                        (substitute* "applets/clock/system-timezone.h"
+                          (("/usr/share/lib/zoneinfo/tab")
+                           (string-append tzdata "/share/zoneinfo/zone.tab"))
+                          (("/usr/share/zoneinfo")
+                           (string-append tzdata "/share/zoneinfo")))) #t))
+                  (add-after 'bootstrap 'fix-introspection-install-dir
+                    (lambda* (#:key outputs #:allow-other-keys)
+                      (let ((out (assoc-ref outputs "out")))
+                        (substitute* '("configure")
+                          (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
+                           (string-append "\"" out "/share/gir-1.0/\""))
+                          (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
+                           (string-append out "/lib/girepository-1.0/"))) #t))))))
+    (native-inputs (list pkg-config
+                         intltool
+                         itstool
+                         xtrans
+                         yelp-tools
+                         gobject-introspection
+                         gtk-doc/stable
+                         autoconf
+                         autoconf-archive
+                         automake
+                         libtool
+                         mate-common
+                         which))
+    (inputs (list dconf
+                  dconf-editor
+                  cairo
+                  dbus-glib
+                  gtk-layer-shell
+                  gtk+
+                  libcanberra
+                  libice
+                  libmateweather
+                  (librsvg-for-system)
+                  libsm
+                  libx11
+                  libxau
+                  libxml2
+                  libxrandr
+                  libwnck
+                  mate-desktop
+                  mate-menus
+                  pango
+                  tzdata
+                  wayland))
     (native-search-paths
-     (list
-      (search-path-specification
-        (variable "MATE_PANEL_APPLETS_DIR")
-        (files '("share/mate-panel/applets")))
-      (search-path-specification
-        (variable "MATE_PANEL_EXTRA_MODULES")
-        (files '("lib/mate-panel/modules")))))
+     (list (search-path-specification
+            (variable "MATE_PANEL_APPLETS_DIR")
+            (files '("share/mate-panel/applets")))
+           (search-path-specification
+            (variable "MATE_PANEL_EXTRA_MODULES")
+            (files '("lib/mate-panel/modules")))))
     (home-page "https://mate-desktop.org/")
     (synopsis "Panel for MATE")
     (description
