@@ -956,12 +956,14 @@ infamous 'Wanda the Fish'.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/atril")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "0ghrx1nhjjs016swj0qy88azgmvas1478xi3xwnxbspkg4lz9i3l"))))
+        (base32 "0d90llj94rmanv40fgkqhdrvp41sfm5ajxz9scrnn8z5azd0r572"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
@@ -982,7 +984,7 @@ infamous 'Wanda the Fish'.")
                 (substitute* "backend/epub/epub-document.c"
                   (("/usr/share/javascript/mathjax")
                    mathjax-path))) #t))
-          (add-after 'unpack 'fix-introspection-install-dir
+          (add-after 'bootstrap 'fix-introspection-install-dir
             (lambda _
               (substitute* '("configure")
                 (("\\$\\(\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0\\)")
@@ -998,64 +1000,70 @@ infamous 'Wanda the Fish'.")
                  "true")) #t))
           (add-after 'patch-dot-desktop-files 'patch-dot-thumbnailer-files
             (lambda _
-              (define abs-path (string-append #$output "/bin/atril-thumbnailer"))
-              (substitute* (string-append #$output "/share/thumbnailers/atril.thumbnailer")
+              (define abs-path
+                (string-append #$output "/bin/atril-thumbnailer"))
+              (substitute* (string-append #$output
+                            "/share/thumbnailers/atril.thumbnailer")
                 (("TryExec=atril-thumbnailer")
                  (format #f "TryExec=~a" abs-path))
                 (("Exec=atril-thumbnailer")
                  (format #f "Exec=~a" abs-path))))))))
-    (native-inputs
-     (list pkg-config
-           intltool
-           itstool
-           yelp-tools
-           (list glib "bin")
-           gobject-introspection
-           gtk-doc/stable
-           texlive-bin  ;synctex
-           libxml2
-           zlib))
-    (inputs
-     (list at-spi2-core
-           cairo
-           caja
-           dconf
-           dbus
-           dbus-glib
-           djvulibre
-           fontconfig
-           freetype
-           ghostscript
-           glib
-           gtk+
-           js-mathjax
-           libcanberra
-           libsecret
-           libspectre
-           libtiff
-           libx11
-           libice
-           libsm
-           libgxps
-           libjpeg-turbo
-           libxml2
-           mate-desktop
-           python-dogtail
-           shared-mime-info
-           gdk-pixbuf
-           gsettings-desktop-schemas
-           libgnome-keyring
-           libarchive
-           marco
-           openjpeg
-           pango
-           ;;texlive
-           ;; TODO:
-           ;;   Build libkpathsea as a shared library for DVI support.
-           ;; ("libkpathsea" ,texlive-bin)
-           poppler
-           startup-notification
-           webkitgtk-for-gtk3))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         itstool
+                         yelp-tools
+                         (list glib "bin")
+                         gobject-introspection
+                         gtk-doc/stable
+                         texlive-bin ;synctex
+                         libxml2
+                         libtool
+                         mate-common
+                         which
+                         zlib))
+    (inputs (list at-spi2-core
+                  cairo
+                  caja
+                  dconf
+                  dbus
+                  dbus-glib
+                  djvulibre
+                  fontconfig
+                  freetype
+                  ghostscript
+                  glib
+                  gtk+
+                  js-mathjax
+                  libcanberra
+                  libsecret
+                  libspectre
+                  libtiff
+                  libx11
+                  libice
+                  libsm
+                  libgxps
+                  libjpeg-turbo
+                  libxml2
+                  mate-desktop
+                  python-dogtail
+                  shared-mime-info
+                  gdk-pixbuf
+                  gsettings-desktop-schemas
+                  libgnome-keyring
+                  libarchive
+                  marco
+                  openjpeg
+                  pango
+                  ;; texlive
+                  ;; TODO:
+                  ;; Build libkpathsea as a shared library for DVI support.
+                  ;; ("libkpathsea" ,texlive-bin)
+                  poppler
+                  startup-notification
+                  webkitgtk-for-gtk3))
     (home-page "https://mate-desktop.org")
     (synopsis "Document viewer for Mate")
     (description
