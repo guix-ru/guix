@@ -1206,15 +1206,13 @@ menu of selected files.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/"
-                           (version-major+minor version)
-                           "/"
-                           "caja-extensions-"
-                           version
-                           ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/caja-extensions")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0x9ikq8biaq08wzj0qqpmy8k5w7axqimigfgf7i5z0s00xg6r66j"))))
+        (base32 "1gjhbf0gds4ljc2d7z4x518jvvwwifvnbbxamvla2jil8xm830hq"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      `(#:configure-flags (list "--enable-sendto"
@@ -1233,27 +1231,31 @@ menu of selected files.")
                                (string-append "--with-cajadir="
                                               (assoc-ref %outputs "out")
                                               "/lib/caja/extensions-2.0/"))))
-    (native-inputs
-     `(("intltool" ,intltool)
-       ("gettext" ,gettext-minimal)
-       ("glib:bin" ,glib "bin")
-       ("gobject-introspection" ,gobject-introspection)
-       ("gtk-doc" ,gtk-doc/stable)
-       ("libxml2" ,libxml2)
-       ("pkg-config" ,pkg-config)))
-    (inputs
-     (list attr
-           brasero
-           caja
-           dbus
-           dbus-glib
-           gajim ;runtime only?
-           gst-plugins-base
-           gtk+
-           graphicsmagick
-           mate-desktop
-           pidgin ;runtime only?
-           startup-notification))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         (list glib "bin")
+                         gobject-introspection
+                         gtk-doc/stable
+                         intltool
+                         libtool
+                         libxml2
+                         mate-common
+                         which))
+    (inputs (list attr
+                  brasero
+                  caja
+                  dbus
+                  dbus-glib
+                  gajim ;runtime only?
+                  gst-plugins-base
+                  gtk+
+                  graphicsmagick
+                  mate-desktop
+                  pidgin ;runtime only?
+                  startup-notification))
     (home-page "https://mate-desktop.org/")
     (synopsis "Extensions for the File manager Caja")
     (description
