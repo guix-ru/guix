@@ -1450,31 +1450,35 @@ for use with MATE or as a standalone window manager.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-user-guide")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "17jb0537xzlhiilzjzjgy6lx7j0w4bjppav1xla4cm06yla0ivsk"))))
+        (base32 "0qw2af4fxcfrdxvdfy5pap5ldjcir7hhkxghqg0gav6sg1r5slni"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'adjust-desktop-file
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let* ((yelp (assoc-ref inputs "yelp")))
-               (substitute* "mate-user-guide.desktop.in.in"
-                 (("yelp")
-                  (string-append yelp "/bin/yelp"))))
-             #t)))))
-    (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("intltool" ,intltool)
-       ("gettext" ,gettext-minimal)
-       ("yelp-tools" ,yelp-tools)
-       ("yelp-xsl" ,yelp-xsl)))
-    (inputs
-     (list yelp))
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'adjust-desktop-file
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let* ((yelp (assoc-ref inputs "yelp")))
+                        (substitute* "mate-user-guide.desktop.in.in"
+                          (("yelp")
+                           (string-append yelp "/bin/yelp")))) #t)))))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         libtool
+                         mate-common
+                         which
+                         intltool
+                         itstool
+                         gettext-minimal
+                         yelp-tools
+                         yelp-xsl))
+    (inputs (list yelp))
     (home-page "https://mate-desktop.org/")
     (synopsis "User Documentation for Mate software")
     (description
