@@ -2029,11 +2029,13 @@ used to bring up authentication dialogs.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mozo-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mozo")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0929yk7g7103d18p400ysi19pqrxl3dyzg4l0mnw7a3azm7ri67y"))))
+        (base32 "05fk1d4gd3z1k8jj2vrlgq84x0k4zij2yqdp4ndzkv95j7d6ffnm"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
@@ -2041,24 +2043,32 @@ used to bring up authentication dialogs.")
                                  %pyproject-build-system-modules)
       #:modules '((guix build utils)
                   (guix build glib-or-gtk-build-system)
-                  ((guix build pyproject-build-system) #:prefix python:))
+                  ((guix build pyproject-build-system)
+                   #:prefix python:))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'glib-or-gtk-wrap 'python-and-gi-wrap
             (lambda* (#:key inputs outputs #:allow-other-keys)
               (wrap-program (search-input-file outputs "bin/mozo")
-                `("GUIX_PYTHONPATH" = (,(getenv "GUIX_PYTHONPATH")
-                                       ,(python:site-packages inputs outputs)))
-                `("GI_TYPELIB_PATH" = (,(getenv "GI_TYPELIB_PATH")))))))))
-    (native-inputs
-     (list pkg-config))
-    (inputs
-     (list gettext-minimal
-           gtk+
-           mate-menus
-           mate-panel
-           python
-           python-pygobject))
+                `("GUIX_PYTHONPATH" =
+                  (,(getenv "GUIX_PYTHONPATH") ,(python:site-packages inputs
+                                                                      outputs)))
+                `("GI_TYPELIB_PATH" =
+                  (,(getenv "GI_TYPELIB_PATH")))))))))
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         mate-common
+                         pkg-config
+                         which))
+    (inputs (list gettext-minimal
+                  gtk+
+                  mate-menus
+                  mate-panel
+                  python
+                  python-pygobject))
     (home-page "https://mate-desktop.org/")
     (synopsis "Menu editor for MATE")
     (description "Mozo is a menu editor for MATE using the freedesktop.org
