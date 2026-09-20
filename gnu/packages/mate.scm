@@ -411,35 +411,45 @@ configurations (profiles).")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-session-manager-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-session-manager")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "0yrd1acnhp7gl60418532jr77n9br0mky83p0wlnbnm1bdcy8b6k"))))
+        (base32 "1sx7p1z37ynz136rdxjs5yf95p2jy7mkv0v40azfk71kvl34mbnk"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags (list "--with-elogind"
-                               "--disable-schemas-compile")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'update-xsession-dot-desktop
-           (lambda* (#:key outputs #:allow-other-keys)
-             ;; Record the absolute file name of 'mate-session' in the
-             ;; '.desktop' file.
-             (let* ((out (assoc-ref outputs "out"))
-                    (xsession (string-append
-                               out "/share/xsessions/mate.desktop")))
-               (substitute* xsession
-                 (("^Exec=.*$")
-                  (string-append "Exec=" out "/bin/mate-session\n"))
-                 (("^TryExec=.*$")
-                  (string-append "Exec=" out "/bin/mate-session\n")))
-               #t))))))
-    (native-inputs
-     (list pkg-config intltool libxcomposite xtrans
-           gobject-introspection))
-    (inputs
-     (list gtk+ dbus-glib elogind libsm mate-desktop))
+     `(#:configure-flags (list "--with-elogind" "--disable-schemas-compile")
+       #:phases (modify-phases %standard-phases
+                  (add-after 'install 'update-xsession-dot-desktop
+                    (lambda* (#:key outputs #:allow-other-keys)
+                      ;; Record the absolute file name of 'mate-session' in the
+                      ;; '.desktop' file.
+                      (let* ((out (assoc-ref outputs "out"))
+                             (xsession (string-append out
+                                        "/share/xsessions/mate.desktop")))
+                        (substitute* xsession
+                          (("^Exec=.*$")
+                           (string-append "Exec=" out "/bin/mate-session\n"))
+                          (("^TryExec=.*$")
+                           (string-append "Exec=" out "/bin/mate-session\n")))
+                        #t))))))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         libxcomposite
+                         xtrans
+                         gobject-introspection
+                         mate-common
+                         libxslt
+                         docbook-xsl
+                         which))
+    (inputs (list gtk+ dbus-glib elogind libsm mate-desktop))
     (home-page "https://mate-desktop.org/")
     (synopsis "Session manager for MATE")
     (description
