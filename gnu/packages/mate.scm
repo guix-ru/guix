@@ -1309,11 +1309,13 @@ MATE desktop.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-control-center-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-control-center")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1g0lg4x3idilaxhwq1s90pajkvv9i012kzrnk0pxqj2jzl2cgwpb"))))
+        (base32 "1dcg2slg1kbdcpy6q7gd2brr02vz548wbpd72kgnp8n1h5mdwm1r"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
@@ -1322,60 +1324,62 @@ MATE desktop.")
           (add-before 'configure 'use-elogind-as-systemd
             (lambda _
               (substitute* "configure"
-                (("systemd") "libelogind"))))
+                (("systemd")
+                 "libelogind"))))
           (add-before 'build 'fix-polkit-action
             (lambda _
               ;; Make sure the polkit file refers to the right
               ;; executable.
-              (substitute*
-                  '("capplets/display/org.mate.randr.policy.in"
-                    "capplets/display/org.mate.randr.policy")
+              (substitute* "capplets/display/org.mate.randr.policy.in"
                 (("/usr/sbin")
                  (string-append #$output "/sbin"))))))))
-    (native-inputs
-     (list pkg-config
-           intltool
-           yelp-tools
-           desktop-file-utils
-           xorgproto
-           xmodmap
-           gobject-introspection))
-    (inputs
-     (list at-spi2-core
-           cairo
-           caja
-           dconf
-           dbus
-           dbus-glib
-           elogind
-           fontconfig
-           freetype
-           glib
-           gsettings-desktop-schemas
-           gtk+
-           libappindicator
-           libcanberra
-           libgtop
-           libmatekbd
-           libx11
-           libxcursor
-           libxext
-           libxi
-           libxklavier
-           libxml2
-           libxrandr
-           libxrender
-           libxscrnsaver
-           marco
-           mate-desktop
-           mate-menus
-           mate-settings-daemon
-           pango
-           polkit
-           startup-notification
-           udisks))
-    (propagated-inputs
-     (list (librsvg-for-system)))        ;mate-slab.pc
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         mate-common
+                         which
+                         yelp-tools
+                         desktop-file-utils
+                         xorgproto
+                         xmodmap
+                         gobject-introspection))
+    (inputs (list at-spi2-core
+                  cairo
+                  caja
+                  dconf
+                  dbus
+                  dbus-glib
+                  elogind
+                  fontconfig
+                  freetype
+                  glib
+                  gsettings-desktop-schemas
+                  gtk+
+                  libappindicator
+                  libcanberra
+                  libgtop
+                  libmatekbd
+                  libx11
+                  libxcursor
+                  libxext
+                  libxi
+                  libxklavier
+                  libxml2
+                  libxrandr
+                  libxrender
+                  libxscrnsaver
+                  marco
+                  mate-desktop
+                  mate-menus
+                  mate-settings-daemon
+                  pango
+                  polkit
+                  startup-notification
+                  udisks))
+    (propagated-inputs (list (librsvg-for-system))) ;mate-slab.pc
     (home-page "https://mate-desktop.org/")
     (synopsis "MATE Desktop configuration tool")
     (description
