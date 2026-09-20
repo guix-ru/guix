@@ -1080,17 +1080,20 @@ hypertext navigation, and table-of-contents bookmarks.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/caja")
+             (commit (string-append "v" version))
+             (recursive? #t)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32
-         "0ylm46wgg7linppid6pdfaixhdb8zgyrxl3lxz17x0am2k718c0y"))))
+        (base32 "0z1ihbbg88kl4fwxix2grq6v37qiq8bvvywlkfmj3sgxh7w0hvda"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list
-      #:tests? #f ; tests fail even with display set
-      #:configure-flags #~(list "--disable-update-mimedb")
+      #:tests? #f ;tests fail even with display set
+      #:configure-flags
+      #~(list "--disable-update-mimedb")
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'pre-check
@@ -1100,26 +1103,31 @@ hypertext navigation, and table-of-contents bookmarks.")
               (setenv "DISPLAY" ":1")
               ;; For the missing /etc/machine-id.
               (setenv "DBUS_FATAL_WARNINGS" "0"))))))
-    (native-inputs
-     (list pkg-config
-           intltool
-           (list glib "bin")
-           xorg-server
-           gobject-introspection))
-    (inputs
-     (list exempi
-           gtk+
-           gvfs
-           libexif
-           libnotify
-           libsm
-           libxml2
-           mate-desktop
-           startup-notification))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         (list glib "bin")
+                         xorg-server
+                         gobject-introspection
+                         gtk-doc/stable
+                         libtool
+                         mate-common
+                         which))
+    (inputs (list exempi
+                  gtk+
+                  gvfs
+                  libexif
+                  libnotify
+                  libsm
+                  libxml2
+                  mate-desktop
+                  startup-notification))
     (native-search-paths
      (list (search-path-specification
-             (variable "CAJA_EXTENSION_DIRS")
-             (files (list "lib/caja/extensions-2.0")))))
+            (variable "CAJA_EXTENSION_DIRS")
+            (files (list "lib/caja/extensions-2.0")))))
     (home-page "https://mate-desktop.org/")
     (synopsis "File manager for the MATE desktop")
     (description
