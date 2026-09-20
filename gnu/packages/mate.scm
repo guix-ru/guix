@@ -1493,23 +1493,32 @@ sessions, panels, menus, file management, and preferences.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "mate-calc-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/mate-calc")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1x98wsjssmbkxqvl95xgp5r99cdq5adxl5pq9bkv2r183rfi4jw0"))))
+        (base32 "1rj6hrl98d6syf09yv6x3qr3knz5i8y8hvirjn835abwhx3hhakl"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list gettext-minimal intltool pkg-config yelp-tools))
-    (inputs
-     (list at-spi2-core
-           glib
-           gtk+
-           libxml2
-           libcanberra
-           mpc
-           mpfr
-           pango))
+    (native-inputs (list gettext-minimal
+                         intltool
+                         pkg-config
+                         yelp-tools
+                         autoconf
+                         autoconf-archive
+                         automake
+                         libtool
+                         mate-common
+                         which))
+    (inputs (list at-spi2-core
+                  glib
+                  gtk+
+                  libxml2
+                  libcanberra
+                  mpc
+                  mpfr
+                  pango))
     (home-page "https://mate-desktop.org/")
     (synopsis "Calculator for MATE")
     (description
