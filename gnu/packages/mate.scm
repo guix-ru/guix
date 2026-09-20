@@ -1747,46 +1747,52 @@ can be used as backgrounds in the MATE Desktop environment.")
     (version "1.28.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           "eom-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/eom")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1g1sspnj7r077bfaywj6qhq4gvc2y7jylrf8b1r8q6jsk6rcl0cs"))))
+        (base32 "13976l5dpg2ji2qn55q34bp2mj578877y2y8cnk8vgkz9fpgqx9s"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list gettext-minimal
-           gtk-doc/stable
-           gobject-introspection
-           intltool
-           pkg-config
-           yelp-tools))
-    (inputs
-     (list at-spi2-core
-           cairo
-           dconf
-           dbus
-           dbus-glib
-           exempi
-           glib
-           gtk+
-           libcanberra
-           libx11
-           libxext
-           libpeas
-           libxml2
-           libexif
-           libjpeg-turbo
-           (librsvg-for-system)
-           lcms
-           mate-desktop
-           pango
-           shared-mime-info
-           startup-notification
-           zlib))
+    (native-inputs (list autoconf
+                         autoconf-archive
+                         automake
+                         gettext-minimal
+                         gtk-doc/stable
+                         gobject-introspection
+                         intltool
+                         itstool
+                         libtool
+                         mate-common
+                         pkg-config
+                         which
+                         yelp-tools))
+    (inputs (list at-spi2-core
+                  cairo
+                  dconf
+                  dbus
+                  dbus-glib
+                  exempi
+                  glib
+                  gtk+
+                  libcanberra
+                  libx11
+                  libxext
+                  libpeas
+                  libxml2
+                  libexif
+                  libjpeg-turbo
+                  (librsvg-for-system)
+                  lcms
+                  mate-desktop
+                  pango
+                  shared-mime-info
+                  startup-notification
+                  zlib))
     (home-page "https://mate-desktop.org/")
     (synopsis "Eye of MATE")
-    (description
-     "Eye of MATE is the Image viewer for the MATE Desktop.")
+    (description "Eye of MATE is the Image viewer for the MATE Desktop.")
     (license license:gpl2)))
 
 (define-public engrampa
