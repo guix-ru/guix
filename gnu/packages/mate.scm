@@ -1393,40 +1393,47 @@ of various aspects of your desktop.")
     (version "1.28.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
-                           name "-" version ".tar.xz"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/mate-desktop/marco")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1qf219zmg6m1kf6xlx66h65yq3gxz3hc6fj995lcv0791vjfb5i4"))))
+        (base32 "0la9y1nhhfslf1rn5a84ncv8p6xykslqf809ckgyv6yhm48nslnf"))))
     (build-system glib-or-gtk-build-system)
-    (native-inputs
-     (list pkg-config
-           intltool
-           itstool
-           glib
-           gobject-introspection
-           libxft
-           libxml2
-           zenity))
-    (inputs
-     (list gtk+
-           libcanberra
-           libgtop
-           libice
-           libsm
-           libx11
-           libxcomposite
-           libxcursor
-           libxdamage
-           libxext
-           libxfixes
-           libxinerama
-           libxrandr
-           libxrender
-           libxres
-           mate-desktop
-           pango
-           startup-notification))
+    (native-inputs (list pkg-config
+                         autoconf
+                         autoconf-archive
+                         automake
+                         intltool
+                         libtool
+                         mate-common
+                         which
+                         itstool
+                         yelp-tools
+                         glib
+                         gobject-introspection
+                         libxft
+                         libxml2
+                         zenity))
+    (inputs (list gtk+
+                  libcanberra
+                  libgtop
+                  libice
+                  libsm
+                  libx11
+                  libxcomposite
+                  libxcursor
+                  libxdamage
+                  libxext
+                  libxfixes
+                  libxinerama
+                  libxrandr
+                  libxrender
+                  libxres
+                  mate-desktop
+                  pango
+                  startup-notification))
     (home-page "https://mate-desktop.org/")
     (synopsis "Window manager for the MATE desktop")
     (description
