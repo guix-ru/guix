@@ -1044,8 +1044,7 @@ icons on the MATE desktop.  It works on local and remote file systems.")
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/mate-desktop/caja-actions")
-             (commit (string-append "v" version))
-             (recursive? #t)))
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
         (base32 "1a21kz5796prdq88a3yjc8jnd6qv8jg5zji43m057ra46qjbjazf"))))
