@@ -1021,7 +1021,7 @@ pure Scheme by using Guile's foreign function interface.")
 (define-public guile-zstd
   (package
     (name "guile-zstd")
-    (version "0.1.1")
+    (version "0.1.2")
     (home-page "https://codeberg.org/guile-compression/guile-zstd")
     (source (origin
               (method git-fetch)
@@ -1030,7 +1030,7 @@ pure Scheme by using Guile's foreign function interface.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1c8l7829b5yx8wdc0mrhzjfwb6h9hb7cd8dfxcr71a7vlsi86310"))))
+                "1rlbjqq0jb3xkrsa0pnk6irgcpyksvf5n3gk89w7arf5yjycm05h"))))
     (build-system gnu-build-system)
     (native-inputs (list autoconf automake pkg-config guile-3.0))
     (inputs (list `(,zstd "lib") guile-3.0))
