@@ -57150,7 +57150,8 @@ a file-like object,
 a pair.  The first argument of this pair must be a string, a
 G-expression or a file-like object.  The second element describes how
 the wallpaper will be displayed.  It must be a symbol among
-@code{stretch}, @code{fill}, @code{fit}, @code{center} and @code{tile}.
+@code{stretch}, @code{fill}, @code{fit}, @code{center}, @code{tile} and
+@code{solid_color}.
 
 If the second element is not specified (@i{i.e.}@: when the value is not
 a pair), the @code{fill} mode will be used.

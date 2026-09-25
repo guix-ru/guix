@@ -305,7 +305,7 @@
   (or (string-ish? bg)
       (and (pair? bg)
            (string-ish? (car bg))
-           (member (cdr bg) '(stretch fill fit center tile)))))
+           (member (cdr bg) '(stretch fill fit center tile solid_color)))))
 
 (define-maybe background (no-serialization))
 
