@@ -441,6 +441,7 @@ console.")
                   (url "https://github.com/melonDS-emu/melonDS")
                   (commit version)))
             (file-name (git-file-name name version))
+            (patches (search-patches "melonds-qt-private-headers.patch"))
             (sha256
              (base32
               "0qrpqgiw678kcdvjl6hm9wi223m6igngppkvws3q86lmkwrhg039"))))
