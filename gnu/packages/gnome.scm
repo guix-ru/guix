@@ -13619,7 +13619,8 @@ Document Analysis and Recognition program.")
                                   "libadwaita-" version ".tar.xz"))
               (sha256
                (base32
-                "08z7260nna76wlapfyd1h1q2502fdqpmv03viqq2c0gy51qb6ngw"))))
+                "08z7260nna76wlapfyd1h1q2502fdqpmv03viqq2c0gy51qb6ngw"))
+              (patches (search-patches "libadwaita-appstream-1.2.0.patch"))))
     (build-system meson-build-system)
     (outputs (list "doc" "out"))
     (arguments

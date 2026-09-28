@@ -1794,6 +1794,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/less-hurd-path-max.patch			\
   %D%/packages/patches/libaio-32bit-test.patch                  \
   %D%/packages/patches/libaio-riscv-test5.patch			\
+  %D%/packages/patches/libadwaita-appstream-1.2.0.patch         \
   %D%/packages/patches/libbase-fix-includes.patch		\
   %D%/packages/patches/libbase-use-own-logging.patch		\
   %D%/packages/patches/libbonobo-activation-test-race.patch	\
