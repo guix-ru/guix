@@ -5797,7 +5797,7 @@ to the in-kernel OOM killer.")
 (define-public eudev
   (package
     (name "eudev")
-    (version "3.2.14")
+    (version "3.2.15")
     (source (origin
               (method git-fetch)
               (uri (git-reference (url "https://github.com/eudev-project/eudev")
@@ -5805,7 +5805,7 @@ to the in-kernel OOM killer.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1f6lz57igi7iw2ls3fpzgw42bfznam4nf9368h7x8yf1mb737yxz"))))
+                "0qyp8n7qv4vbzra3nifhi2vyfq2dy54q89g4fwmlnff05xs1y4vn"))))
     (build-system gnu-build-system)
     (arguments
      (list
