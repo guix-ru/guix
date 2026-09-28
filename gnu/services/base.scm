@@ -2816,11 +2816,7 @@ item of PACKAGES."
                ;; actually handled.
                (wait-for-udevd)
 
-               ;; Trigger device and subsystem nodes creation.  Note that as
-               ;; of eudev v3.2.14, it is missing the '--type=all' found in
-               ;; systemd.
-               (system* udevadm "trigger" "--action=add" "--type=devices")
-               (system* udevadm "trigger" "--action=add" "--type=subsystems")
+               (system* udevadm "trigger" "--action=add" "--type=all")
 
                ;; Wait for things to settle down.
                (system* udevadm "settle")
