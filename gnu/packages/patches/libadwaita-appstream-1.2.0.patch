@@ -1,0 +1,46 @@
+Upstream-status: <https://gitlab.gnome.org/GNOME/libadwaita/-/merge_requests/1812>
+
+diff --git a/tests/test-about-dialog.c b/tests/test-about-dialog.c
+index 752505dd..913599d6 100644
+--- a/tests/test-about-dialog.c
++++ b/tests/test-about-dialog.c
+@@ -19,7 +19,7 @@ test_adw_about_dialog_from_appdata (void)
+   g_assert_nonnull (dialog);
+ 
+   g_assert_cmpstr (adw_about_dialog_get_appdata_resource_path (dialog), ==, "/org/gnome/Adwaita1/Test/org.gnome.Adwaita1.Test.metainfo.xml");
+-  g_assert_cmpstr (adw_about_dialog_get_release_notes (dialog), ==, "<p>Testing Build</p>\n");
++  g_assert_cmpstr (g_strchomp (adw_about_dialog_get_release_notes (dialog)), ==, "<p>Testing Build</p>");
+   g_assert_cmpstr (adw_about_dialog_get_release_notes_version (dialog), ==, "1.0");
+   g_assert_cmpstr (adw_about_dialog_get_version (dialog), ==, "1.0");
+   g_assert_cmpstr (adw_about_dialog_get_application_icon (dialog), ==, "org.gnome.Adwaita1.Test");
+@@ -37,7 +37,7 @@ test_adw_about_dialog_from_appdata (void)
+   g_assert_nonnull (dialog);
+ 
+   g_assert_cmpstr (adw_about_dialog_get_appdata_resource_path (dialog), ==, "/org/gnome/Adwaita1/Test/org.gnome.Adwaita1.Test.metainfo.xml");
+-  g_assert_cmpstr (adw_about_dialog_get_release_notes (dialog), ==, "<p>Testing Build Older</p>\n");
++  g_assert_cmpstr (g_strchomp (adw_about_dialog_get_release_notes (dialog)), ==, "<p>Testing Build Older</p>");
+   g_assert_cmpstr (adw_about_dialog_get_release_notes_version (dialog), ==, "0.1");
+   g_assert_cmpstr (adw_about_dialog_get_version (dialog), ==, "1.0");
+ 
+diff --git a/tests/test-about-window.c b/tests/test-about-window.c
+index ed0aa9d4..c4599710 100644
+--- a/tests/test-about-window.c
++++ b/tests/test-about-window.c
+@@ -17,7 +17,7 @@ test_adw_about_window_from_appdata (void)
+ 
+   g_assert_nonnull (window);
+ 
+-  g_assert_cmpstr (adw_about_window_get_release_notes (window), ==, "<p>Testing Build</p>\n");
++  g_assert_cmpstr (g_strchomp (adw_about_window_get_release_notes (window)), ==, "<p>Testing Build</p>");
+   g_assert_cmpstr (adw_about_window_get_release_notes_version (window), ==, "1.0");
+   g_assert_cmpstr (adw_about_window_get_version (window), ==, "1.0");
+   g_assert_cmpstr (adw_about_window_get_application_icon (window), ==, "org.gnome.Adwaita1.Test");
+@@ -34,7 +34,7 @@ test_adw_about_window_from_appdata (void)
+ 
+   g_assert_nonnull (window);
+ 
+-  g_assert_cmpstr (adw_about_window_get_release_notes (window), ==, "<p>Testing Build Older</p>\n");
++  g_assert_cmpstr (g_strchomp (adw_about_window_get_release_notes (window)), ==, "<p>Testing Build Older</p>");
+   g_assert_cmpstr (adw_about_window_get_release_notes_version (window), ==, "0.1");
+   g_assert_cmpstr (adw_about_window_get_version (window), ==, "1.0");
+ 
