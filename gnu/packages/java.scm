@@ -2160,11 +2160,14 @@ and is best suited to building Java projects.  Ant uses XML to describe the
 build process and its dependencies, whereas Make uses Makefile format.")
     (license license:asl2.0)))
 
+;; Deprecated on <2026-04-02>.
+(define-public ant/java8 ant)
+
 (define-public ant/java8-empty-etc
   (package
-    (inherit ant/java8)
+    (inherit ant)
     (arguments
-     (substitute-keyword-arguments (package-arguments ant/java8)
+     (substitute-keyword-arguments arguments
        ((#:phases phases)
         #~(modify-phases #$phases
             (add-after 'build 'add-empty-etc-directory
@@ -2173,7 +2176,7 @@ build process and its dependencies, whereas Make uses Makefile format.")
 
 (define-public ant-1.10.14
   (package
-    (inherit ant/java8)
+    (inherit ant)
     (name "ant")
     (version "1.10.14")
     (source
@@ -2190,7 +2193,7 @@ build process and its dependencies, whereas Make uses Makefile format.")
                      (find-files "lib/optional" "\\.jar$"))
            #t))))
         (arguments
-     (substitute-keyword-arguments (package-arguments ant/java8)
+     (substitute-keyword-arguments arguments
        ((#:phases phases)
         #~(modify-phases #$phases
             (replace 'remove-scripts
