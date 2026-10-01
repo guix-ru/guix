@@ -30,6 +30,7 @@
 ;;; Copyright © 2026 Anderson Torres <anderson.torres.8519@gmail.com>
 ;;; Copyright © 2026 moksh <mysticmoksh@riseup.net>
 ;;; Copyright © 2026 Sharlatan Hellseher <sharlatanus@gmail.com>
+;;; Copyright © 2026 Maxim Cournoyer <maxim@guixotic.coop>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -714,67 +715,51 @@ configuration files and supports multiple address detection methods.")
 (define-public isc-bind
   (package
     (name "bind")
-    ;; When updating, check whether isc-dhcp's bundled copy should be as well.
-    ;; The BIND release notes are available here:
-    ;; https://www.isc.org/bind/
-    (version "9.19.24")
+    (version "9.21.26")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://ftp.isc.org/isc/bind9/" version
                            "/bind-" version ".tar.xz"))
        (sha256
-        (base32 "171668qgjvf257m3r04lxmbsiz9lnn57djnlmn8plh1lj77fw3nh"))))
-    (build-system gnu-build-system)
+        (base32 "0yrx8qk8v5gx0hxzd66abxp8x22wajvazhpb7ixsk9ga1vc25imy"))))
+    (build-system meson-build-system)
     (outputs `("out" "utils"))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'strip 'move-to-utils
+            (lambda _
+              (for-each
+               (lambda (file)
+                 (let ((src (string-append #$output file))
+                       (target (string-append #$output:utils file)))
+                   (mkdir-p (dirname target))
+                   (link src target)
+                   (delete-file src)))
+               '("/bin/dig"
+                 "/bin/delv"
+                 "/bin/nslookup"
+                 "/bin/host"
+                 "/bin/nsupdate"
+                 "/share/man/man1/dig.1"
+                 "/share/man/man1/host.1"
+                 "/share/man/man1/nslookup.1"
+                 "/share/man/man1/nsupdate.1")))))))
+    (native-inputs (list perl pkg-config))
     (inputs
      ;; It would be nice to add GeoIP and gssapi once there are packages.
      (list libcap
            liburcu
            libuv
            libxml2
+           lmdb
            `(,nghttp2 "lib")
            openssl
            p11-kit
            python
            python-ply))
-    (native-inputs
-     (list perl pkg-config))
-    (arguments
-     `(#:configure-flags
-       (list (string-append "--with-pkcs11="
-                            (assoc-ref %build-inputs "p11-kit")))
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'strip 'move-to-utils
-           (lambda _
-             (for-each
-              (lambda (file)
-                (let ((target  (string-append (assoc-ref %outputs "utils") file))
-                      (src  (string-append (assoc-ref %outputs "out") file)))
-                  (mkdir-p (dirname target))
-                  (link src target)
-                  (delete-file src)))
-              '("/bin/dig" "/bin/delv" "/bin/nslookup" "/bin/host" "/bin/nsupdate"
-                "/share/man/man1/dig.1"
-                "/share/man/man1/host.1"
-                "/share/man/man1/nslookup.1"
-                "/share/man/man1/nsupdate.1"))
-             #t))
-         ;; When and if guix provides user namespaces for the build process,
-         ;; then the following can be uncommented and the subsequent "force-test"
-         ;; will not be necessary.
-         ;;
-         ;;   (add-before 'check 'set-up-loopback
-         ;;     (lambda _
-         ;;          (system "bin/tests/system/ifconfig.sh up")))
-         (replace 'check
-           (lambda _
-             ;; XXX Even ‘make force-test’ tries to create network interfaces
-             ;; and fails.  The only working target is the (trivial) fuzz test.
-             (with-directory-excursion "fuzz"
-               (invoke "make" "check"))
-             #t)))))
     (synopsis "@acronym{DNS, Domain Name System} implementation")
     (description "BIND implements the @acronym{DNS, Domain Name System}
 protocols for the Internet.  It is both a reference implementation of those
@@ -787,7 +772,7 @@ originated in the early 1980s at the University of California at Berkeley.
 The @code{utils} output of this package contains the following command line
 utilities related to DNS name servers:
 
-@table @code
+@table @command
 @item delv
 DNS lookup and validation utility
 @item dig
