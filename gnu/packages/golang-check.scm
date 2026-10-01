@@ -6421,6 +6421,20 @@ into @code{go-structlayout-pretty}.")))
     (description "This package takes @code{go-structlayout}-like JSON and
 prints an ASCII fraphic representing the memory layout.")))
 
+(define-public go-tagalign
+  (package/inherit go-github-com-4meepo-tagalign
+    (name "go-tagalign")
+    (arguments
+     (substitute-keyword-arguments arguments
+       ((#:import-path _) "github.com/4meepo/tagalign/cmd/tagalign")
+       ((#:install-source? _ #t) #f)
+       ((#:skip-build? _ #t) #f)
+       ((#:tests? _ #t) #f)
+       ((#:unpack-path _ "") "github.com/4meepo/tagalign")))
+    (native-inputs (package-propagated-inputs go-github-com-4meepo-tagalign))
+    (inputs '())
+    (propagated-inputs '())))
+
 (define-public go-tenv
   (package/inherit go-github-com-sivchari-tenv
     (name "go-tenv")
