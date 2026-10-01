@@ -3889,24 +3889,23 @@ virtual address space — not physical RAM.")
 (define-public lmdbxx
   (package
     (name "lmdbxx")
-    (version "1.0.0")
+    (version "1.0.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/hoytech/lmdbxx")
-             (commit version)))
+              (url "https://github.com/hoytech/lmdbxx")
+              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "12k5rz74d1l0skcks9apry1svkl96g9lf5dcgylgjmh7v1jm0b7c"))))
+        (base32 "10avwrz8jm1ci3y4qy1nzi3pv8x3ns20ym8g67gadcsqzxx1gkyi"))
+       (patches (search-patches "lmdbxx-lmdb-1.0.patch"))))
     (arguments
-     `(#:make-flags
-       (list (string-append "PREFIX=" (assoc-ref %outputs "out")))
-       #:phases
-       (modify-phases %standard-phases
-         (delete 'configure))))
+     (list #:make-flags #~(list (string-append "PREFIX=" #$output))
+           #:phases #~(modify-phases %standard-phases
+                        (delete 'configure))))
     (build-system gnu-build-system)
-    (inputs (list lmdb-0))  ;see <https://github.com/hoytech/lmdbxx/issues/18>
+    (inputs (list lmdb))
     (home-page "https://github.com/hoytech/lmdbxx")
     (synopsis "C++11 wrapper for the LMDB embedded B+ tree database library")
     (description "@code{lmdbxx} is a comprehensive @code{C++} wrapper for the
