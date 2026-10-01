@@ -3844,7 +3844,7 @@ database.")
             (lambda _
               (mkdir-p (string-append #$output "/lib/pkgconfig"))
               (with-output-to-file (string-append #$output
-                                                  "/lib/pkgconfig/liblmdb.pc")
+                                                  "/lib/pkgconfig/lmdb.pc")
                 (lambda _
                   (format #t "prefix=~a~@
                            exec_prefix=~a~@
