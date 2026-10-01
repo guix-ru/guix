@@ -4441,13 +4441,13 @@ queries.")
 (define-public python-lmdb
   (package
     (name "python-lmdb")
-    (version "1.0.0")
+    (version "2.3.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "lmdb" version))
        (sha256
-        (base32 "1di1gj2agbxwqqwrpk4w58dpfah0kl10ha20s63dlqdd1bgzydj1"))
+        (base32 "02cxdc3j9hs8jyzicb4ir8wzy6ckcmc45a2rs37s6bgf80v483r6"))
        (snippet
         ;; Delete bundled lmdb source files.
         #~(for-each delete-file
@@ -4466,8 +4466,9 @@ queries.")
                         (string-append lmdb "/include"))
                 (setenv "LMDB_LIBDIR"
                         (string-append lmdb "/lib"))))))))
-    (native-inputs (list python-pytest python-setuptools python-wheel))
     (inputs (list lmdb-0)) ;see <https://github.com/jnwatson/py-lmdb/issues/493>
+    (native-inputs (list python-cffi python-patch-ng  python-pytest
+                         python-setuptools))
     (home-page "https://github.com/dw/py-lmdb")
     (synopsis "Python binding for the ‘Lightning’ database (LMDB)")
     (description
