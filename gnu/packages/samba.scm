@@ -591,7 +591,9 @@ many event types, including timers, signals, and the classic file descriptor eve
      (list talloc tdb))
     (inputs
      `(,@(if (target-64bit?)
-             `(("lmdb" ,lmdb))
+             ;; The 'test_ldb_add_special_key_len_gt_max' test fails with lmdb
+             ;; 1.x (see: <https://bugzilla.samba.org/show_bug.cgi?id=16268>).
+             `(("lmdb" ,lmdb-0))
              '())
        ("popt" ,popt)
        ("tevent" ,tevent)))

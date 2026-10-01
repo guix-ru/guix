@@ -3817,39 +3817,36 @@ database.")
 (define-public lmdb
   (package
     (name "lmdb")
-    (version "0.9.29")
+    (version "1.0.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://git.openldap.org/openldap/openldap.git")
-             (commit (string-append "LMDB_" version))))
+              (url "https://git.openldap.org/openldap/openldap.git")
+              (commit (string-append "LMDB_" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0airps4cd0d91nbgy7hgvifa801snxwxzwxyr6pdv61plsi7h8l3"))))
+        (base32 "0l2d66dvfdjj4zhy2jkw22mwb46z3hn32zvwy3n09gj8dg5g9wbx"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:test-target "test"
-       ;; TODO: Make this unconditional on core-updates.
-       ,@(if (%current-target-system)
-             `(#:make-flags `(,(string-append "CC=" ,(cc-for-target))
-                              ,(string-append "AR=" ,(ar-for-target))))
-             '())
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'configure
-           (lambda* (#:key outputs #:allow-other-keys)
-             (chdir "libraries/liblmdb")
-             (substitute* "Makefile"
-               (("/usr/local") (assoc-ref outputs "out")))
-            #t))
-         (add-after 'install 'create-pkg-config-file
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (mkdir-p (string-append out "/lib/pkgconfig"))
-               (with-output-to-file (string-append out "/lib/pkgconfig/liblmdb.pc")
-                 (lambda _
-                   (format #t "prefix=~a~@
+     (list
+      #:test-target "test"
+      #:make-flags #~(list (string-append "CC=" #$(cc-for-target))
+                           (string-append "AR=" #$(ar-for-target)))
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'configure
+            (lambda _
+              (chdir "libraries/liblmdb")
+              (substitute* "Makefile"
+                (("/usr/local") #$output))))
+          (add-after 'install 'create-pkg-config-file
+            (lambda _
+              (mkdir-p (string-append #$output "/lib/pkgconfig"))
+              (with-output-to-file (string-append #$output
+                                                  "/lib/pkgconfig/liblmdb.pc")
+                (lambda _
+                  (format #t "prefix=~a~@
                            exec_prefix=~a~@
                            libdir=~a/lib~@
                            includedir=~a/include~@
@@ -3859,8 +3856,7 @@ database.")
                            Description: Lightning Memory-Mapped Database library~@
                            Libs: -L${libdir} -llmdb~@
                            Cflags: -I${includedir}~%"
-                           out out out out ,version)))
-                 #t))))))
+                          #$output #$output #$output #$output #$version))))))))
     (home-page "https://symas.com/lmdb/")
     (synopsis "Lightning Memory-Mapped Database library")
     (description
@@ -3874,6 +3870,21 @@ disk-based databases with high read performance that scales linearly over
 multiple cores.  The size of each database is limited only by the size of the
 virtual address space — not physical RAM.")
     (license license:openldap2.8)))
+
+(define-public lmdb-0
+  (package
+    (inherit lmdb)
+    (name "lmdb")
+    (version "0.9.36")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://git.openldap.org/openldap/openldap.git")
+              (commit (string-append "LMDB_" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "14kp864ahgkih14ixp9inc7l4jsnmm3i821va22102knli927v48"))))))
 
 (define-public lmdbxx
   (package
@@ -3895,7 +3906,7 @@ virtual address space — not physical RAM.")
        (modify-phases %standard-phases
          (delete 'configure))))
     (build-system gnu-build-system)
-    (inputs (list lmdb))
+    (inputs (list lmdb-0))  ;see <https://github.com/hoytech/lmdbxx/issues/18>
     (home-page "https://github.com/hoytech/lmdbxx")
     (synopsis "C++11 wrapper for the LMDB embedded B+ tree database library")
     (description "@code{lmdbxx} is a comprehensive @code{C++} wrapper for the
@@ -4457,7 +4468,7 @@ queries.")
                 (setenv "LMDB_LIBDIR"
                         (string-append lmdb "/lib"))))))))
     (native-inputs (list python-pytest python-setuptools python-wheel))
-    (inputs (list lmdb))
+    (inputs (list lmdb-0)) ;see <https://github.com/jnwatson/py-lmdb/issues/493>
     (home-page "https://github.com/dw/py-lmdb")
     (synopsis "Python binding for the ‘Lightning’ database (LMDB)")
     (description
