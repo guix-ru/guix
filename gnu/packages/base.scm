@@ -476,7 +476,8 @@ used to apply commands with arbitrarily long arguments.")
         (list perl)))
    (outputs '("out" "debug"))
    (arguments
-    `(#:parallel-build? #f            ; help2man may be called too early
+    `(#:configure-flags (list "--enable-install-program=arch,kill,uptime")
+      #:parallel-build? #f            ; help2man may be called too early
       ,@(if (system-hurd?)
             '(#:make-flags            ; these tests fail deterministically
               (list (string-append "XFAIL_TESTS="
