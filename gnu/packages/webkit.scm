@@ -40,6 +40,7 @@
   #:use-module (gnu packages)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bison)
+  #:use-module (gnu packages build-tools)
   #:use-module (gnu packages c)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages docbook)
@@ -132,13 +133,13 @@ engine that uses Wayland for graphics output.")
 (define-public webkitgtk
   (package
     (name "webkitgtk")
-    (version "2.50.3")
+    (version "2.54.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://www.webkitgtk.org/releases/"
                                   "webkitgtk-" version ".tar.xz"))
               (sha256
-               (base32 "0kymjkskp2ndvs10hvqc0l7i3x19s2hga0g8azhv5djvd6s0d83h"))
+               (base32 "0z9r1bmr5vg53l4f9l1b4c53wnv4crdx6yjf9a3rdifvvc1bn2za"))
               (patches (search-patches
                         "webkitgtk-adjust-bubblewrap-paths.patch"))))
     (build-system cmake-build-system)
@@ -152,10 +153,12 @@ engine that uses Wayland for graphics output.")
       ;; binaries require 20 GiB of memory to link (even with ld.gold or lld)
       ;; and produce 4.6 GiB of debug symbols.
       #:build-type "Release"
+      #:generator "Ninja"
       #:configure-flags
       #~(list "-DPORT=GTK"
               "-DENABLE_INTROSPECTION=ON"
               "-DUSE_GTK4=ON"
+              "-DUSE_LIBRICE=OFF"       ; TODO: Package librice.
               ;; Enable WebRTC.
               "-DENABLE_MEDIA_STREAM=ON"
               "-DENABLE_WEB_RTC=ON"
@@ -238,6 +241,7 @@ engine that uses Wayland for graphics output.")
            `(,glib "bin")               ;for glib-mkenums, etc.
            gobject-introspection
            gperf
+           ninja/pinned
            perl
            pkg-config
            python-wrapper
