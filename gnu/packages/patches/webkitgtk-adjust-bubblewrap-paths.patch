@@ -7,7 +7,7 @@ diff --git a/Source/WebKit/UIProcess/Launcher/glib/BubblewrapLauncher.cpp b/Sour
 index f0a5e4b05dff..88b11f806968 100644
 --- a/Source/WebKit/UIProcess/Launcher/glib/BubblewrapLauncher.cpp
 +++ b/Source/WebKit/UIProcess/Launcher/glib/BubblewrapLauncher.cpp
-@@ -854,27 +854,21 @@ GRefPtr<GSubprocess> bubblewrapSpawn(GSubprocessLauncher* launcher, const Proces
+@@ -854,30 +854,21 @@ GRefPtr<GSubprocess> bubblewrapSpawn(GSubprocessLauncher* launcher, const Proces
          "--ro-bind", "/sys/dev", "/sys/dev",
          "--ro-bind", "/sys/devices", "/sys/devices",
  
@@ -21,6 +21,9 @@ index f0a5e4b05dff..88b11f806968 100644
 -        "--ro-bind-try", "/usr/lib", "/usr/lib",
 -        "--ro-bind-try", "/usr/local/lib", "/usr/local/lib",
          "--ro-bind-try", LIBDIR, LIBDIR,
+-#if defined(WEBKIT_SWIFT_STDLIB_LIBRARY_PATH)
+-        "--ro-bind-try", WEBKIT_SWIFT_STDLIB_LIBRARY_PATH, WEBKIT_SWIFT_STDLIB_LIBRARY_PATH,
+-#endif
 -#if CPU(ADDRESS64)
 -        "--ro-bind-try", "/lib64", "/lib64",
 -        "--ro-bind-try", "/usr/lib64", "/usr/lib64",
@@ -46,4 +49,4 @@ index f0a5e4b05dff..88b11f806968 100644
 +    // Drivers for video hardware acceleration (va-api).
 +    bindPathVar(sandboxArgs, "LIBVA_DRIVERS_PATH");
  
-     if (launchOptions.processType == ProcessLauncher::ProcessType::DBusProxy) {
+     if (enableDebugPermissions()) {
