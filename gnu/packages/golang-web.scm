@@ -3165,7 +3165,7 @@ credentials sources.")
 (define-public go-github-com-aws-aws-sdk-go-v2-feature-ec2-imds
   (package
     (name "go-github-com-aws-aws-sdk-go-v2-feature-ec2-imds")
-    (version "1.18.17")
+    (version "1.20.0")
     (source
      (origin
        (method git-fetch)
@@ -3175,7 +3175,7 @@ credentials sources.")
                                            #:subdir "feature/ec2/imds"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "04cv6g96hhmjl6snql6a909grq4yxyjk95a3dzk6mpihvg79q47p"))
+        (base32 "0ixaqvhblkrrzwzqc6jpqnm2qhnn509cygknrysjz51navqg6s58"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
@@ -3190,16 +3190,13 @@ credentials sources.")
             (delete-all-but "." "feature")
             (delete-all-but "feature" "ec2")
             (delete-all-but "feature/ec2" "imds")
-            ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - github.com/aws/aws-sdk-go-v2/feature/ec2/imds/internal/configtesting
+            ;; Submodules with their own go.mod files and packaged separately.
             (delete-file-recursively "feature/ec2/imds/internal/configtesting")))))
     (build-system go-build-system)
     (arguments
      (list
       #:import-path "github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
-      #:unpack-path "github.com/aws/aws-sdk-go-v2"
-      #:test-flags #~(list "-vet=off")))
+      #:unpack-path "github.com/aws/aws-sdk-go-v2"))
     (propagated-inputs
      (list go-github-com-aws-aws-sdk-go-v2
            go-github-com-aws-smithy-go))
