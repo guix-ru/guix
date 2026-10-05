@@ -3324,7 +3324,7 @@ configuration sources in AWS.")
 (define-public go-github-com-aws-aws-sdk-go-v2-internal-endpoints-v2
   (package
     (name "go-github-com-aws-aws-sdk-go-v2-internal-endpoints-v2")
-    (version "2.7.21")
+    (version "2.8.3")
     (source
      (origin
        (method git-fetch)
@@ -3335,7 +3335,7 @@ configuration sources in AWS.")
                                     #:subdir "internal/endpoints"))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "068yzhxxxdymr1avb1l1pm9m0p7mcd0zlw5an66mcqldgl7hfivg"))
+        (base32 "0ixaqvhblkrrzwzqc6jpqnm2qhnn509cygknrysjz51navqg6s58"))
        (modules '((guix build utils)
                   (ice-9 ftw)
                   (srfi srfi-26)))
