@@ -335,13 +335,13 @@ propagated by default) such as @code{gst-plugins-good} and
   (package
     (inherit webkitgtk)
     (name "wpewebkit")
-    (version "2.50.3")
+    (version "2.54.0")
     (source (origin
               (inherit (package-source webkitgtk))
               (uri (string-append "https://wpewebkit.org/releases/"
                                   name "-" version ".tar.xz"))
               (sha256
-               (base32 "0bzv2h25qr7h0r8likdb8g248qvsilf41cj7prf1avghfr1pzjdg"))))
+               (base32 "0lmlbqsig35r3qv20104y6yirryfkh6p3v0fyn42s749rg1vragg"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:configure-flags flags)
