@@ -4340,14 +4340,13 @@ but it can be adapted to other engines/frameworks.")
     (license license:zlib)))
 
 (define-public tic80
-  (let ((commit "v1.2.0")
-        ;; These C libraries are used in source form by tic80.
-        (3rd/jsmn
+  ;; These C libraries are used in source form by tic80.
+  (let ((3rd/jsmn
          (origin                        ;Expat
            (method git-fetch)
            (uri (git-reference
-                 (url "https://github.com/zserge/jsmn")
-                 (commit "25647e692c7906b96ffd2b05ca54c097948e879c")))
+                  (url "https://github.com/zserge/jsmn")
+                  (commit "25647e692c7906b96ffd2b05ca54c097948e879c")))
            (file-name "jsmn-checkout")
            (sha256
             (base32
@@ -4356,42 +4355,31 @@ but it can be adapted to other engines/frameworks.")
          (origin                        ;LGPL2.1+
            (method git-fetch)
            (uri (git-reference
-                 (url "https://github.com/nesbox/blip-buf")
-                 (commit "330226d9b55ecbeea644e17b5e0f096a165ca07e")))
+                  (url "https://github.com/nesbox/blip-buf")
+                  (commit "330226d9b55ecbeea644e17b5e0f096a165ca07e")))
            (file-name "blip-buf-checkout")
            (sha256
             (base32
-             "0fycffd6pbh9ilmr032dlrwd6dhvpkjp2r9x98r0kmwqpxc4x90d"))))
-        (3rd/msf-gif
-         (origin                        ;Expat or Public Domain
-           (method url-fetch)
-           (uri (string-append
-                 "https://github.com/notnullnotvoid/msf_gif/releases/download/"
-                 "v2.3/msf_gif.h"))
-           (sha256
-            (base32
-             "1ivjwwqxqjfhm8caz1srkp8wx7fpzvpf7s26ifif7cryvqch8vnf")))))
+             "0fycffd6pbh9ilmr032dlrwd6dhvpkjp2r9x98r0kmwqpxc4x90d")))))
     (package
       (name "tic80")
-      (version "1.2.0-2")               ;TODO: drop revision on next release
+      (version "1.3.1")
       (source
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://github.com/nesbox/TIC-80")
-               (commit commit)))
+                (url "https://github.com/nesbox/TIC-80")
+                (commit (string-append "v" version))))
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1wsyhxkjj89s4855nmampls29ri60zczgdwd68m47p8fq0nms6m3"))
+           "1vzk4f9b73mmal2kh4q9yc8hmvmg62am45ds28cq9m27y0z6psj2"))
          (modules '((guix build utils)))
          (snippet
           #~(begin
               (delete-file-recursively "vendor")
               (copy-recursively #$3rd/jsmn "vendor/jsmn")
-              (copy-recursively #$3rd/blip-buf "vendor/blip-buf")
-              (mkdir "vendor/msf_gif")
-              (copy-file #$3rd/msf-gif "vendor/msf_gif/msf_gif.h")))))
+              (copy-recursively #$3rd/blip-buf "vendor/blip-buf")))))
       (build-system cmake-build-system)
       (arguments
        (list #:tests? #f                ;no tests
@@ -4401,7 +4389,7 @@ but it can be adapted to other engines/frameworks.")
                  "-DCMAKE_EXE_LINKER_FLAGS=-lpulse" ;for miniaudio
                  "-DCMAKE_C_FLAGS=-Wno-error=incompatible-pointer-types"
                                                     ;for miniaudio
-                 ;; TODO: moon, python, wren
+                 ;; TODO: moon, python, wren, yue, forth, miniscript
                  "-DBUILD_WITH_FENNEL=ON"
                  "-DBUILD_WITH_JANET=ON"
                  "-DBUILD_WITH_JS=ON"
@@ -4414,6 +4402,10 @@ but it can be adapted to other engines/frameworks.")
              #~(modify-phases %standard-phases
                  (add-after 'unpack 'prepare-sources
                    (lambda _
+                     (substitute* "cmake/version.cmake"
+                       ;; TODO: remove after upstream correct it.
+                       (("VERSION_REVISION 0")
+                        "VERSION_REVISION 1"))
                      (let* ((s7 #$(this-package-input "s7"))
                             (fennel #$(this-package-input "fennel")))
                        (install-file (string-append s7 "/include/s7.h")
