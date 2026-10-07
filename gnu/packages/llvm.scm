@@ -623,7 +623,8 @@ output), and Binutils.")
                  "clang-17.0-link-dsymutil-latomic.patch"))
     ("18.1.8" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))
-    ("19.1.7" . ("clang-18.0-libc-search-path.patch"
+    ("19.1.7" . ("llvm-19-remove-deprecated-struct-termio.patch"
+                 "clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))
     ("20.1.8" . ("clang-18.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))
