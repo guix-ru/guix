@@ -616,7 +616,8 @@ output), and Binutils.")
   '(("14.0.6" . ("clang-14.0-libc-search-path.patch"
                  "clang-runtime-14-glibc-2.36-compat.patch"
                  "clang-14-remove-crypt-interceptors.patch"))
-    ("15.0.7" . ("clang-15.0-libc-search-path.patch"
+    ("15.0.7" . ("llvm-19-remove-deprecated-struct-termio.patch"
+                 "clang-15.0-libc-search-path.patch"
                  "clang-16-remove-crypt-interceptors.patch"))
     ("16.0.6" . ("llvm-19-remove-deprecated-struct-termio.patch"
                  "clang-16.0-libc-search-path.patch"
