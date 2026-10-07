@@ -300,7 +300,8 @@ BUILD_SHARED_LIBS CMake option, which was used until LLVM/Clang 14."
     (arguments
      `(;; TODO: enable tests.
        #:tests? #f
-
+       ; clang need libstdc++, tolerate it.
+       #:disallowed-references ()
        #:configure-flags
        (list "-DCLANG_INCLUDE_TESTS=True"
 
