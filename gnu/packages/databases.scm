@@ -1916,7 +1916,7 @@ PostgreSQL extension, providing automatic partitioning across time and space
 (define-public pgvector
   (package
     (name "pgvector")
-    (version "0.6.0")
+    (version "0.8.7")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -1925,7 +1925,7 @@ PostgreSQL extension, providing automatic partitioning across time and space
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "19zcjrlmyj7gfbn8prh014yq50iy4dg97pirsm7idxsr829vwyc5"))))
+                "0mvykbzkjd76rr6gwf6an56d0bxg9h49h24wlhbadfm27brz71b1"))))
     (build-system gnu-build-system)
     (arguments
      (list
@@ -1947,7 +1947,11 @@ PostgreSQL extension, providing automatic partitioning across time and space
                 (for-each (lambda (file)
                             (install-file file extension))
                           (find-files "sql" "\\.sql$"))
-                (install-file "src/vector.h" headers)))))))
+                (for-each (lambda (header)
+                            (install-file header headers))
+                          '("src/halfvec.h"
+                            "src/sparsevec.h"
+                            "src/vector.h"))))))))
     (inputs (list postgresql))
     (home-page "https://github.com/pgvector/pgvector")
     (synopsis "Vector similarity search for Postgres")
