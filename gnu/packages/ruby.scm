@@ -174,37 +174,37 @@ a focus on simplicity and productivity.")
          "1irh0l7g75p0arnah58ismzixa80qxn99x3qfnalcxg0ys35lhnv"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:test-target "test"
-       #:configure-flags
-       ,(if (%current-target-system)
-            '(list (string-append
-                    "LDFLAGS=-Wl,-rpath="
-                    (assoc-ref %outputs "out") "/lib")
-                   "--enable-shared")
-            ''("--enable-shared")) ; dynamic linking
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'replace-bin-sh-and-remove-libffi
-           (lambda _
-             (substitute* '("configure.ac"
-                            "template/Makefile.in"
-                            "lib/rubygems/installer.rb"
-                            "ext/pty/pty.c"
-                            "io.c"
-                            "lib/mkmf.rb"
-                            "process.c"
-                            "test/rubygems/test_gem_ext_configure_builder.rb"
-                            "test/rdoc/rdoc_parser_test.rb"
-                            "test/ruby/test_rubyoptions.rb"
-                            "test/ruby/test_process.rb"
-                            "test/ruby/test_system.rb"
-                            "tool/rbinstall.rb")
-               (("/bin/sh") (which "sh")))))
-         ,@(if (system-hurd?)
-               '((add-after 'unpack 'skip-tests
-                   (lambda _
-                     (delete-file "bootstraptest/test_ractor.rb"))))
-               '()))))
+     (list #:test-target "test"
+           #:configure-flags
+           #~(list
+              "--enable-shared"    ; dynamic linking
+              #$@(if (%current-target-system)
+                     #~(list
+                        (string-append "LDFLAGS=-Wl,-rpath=" #$output "/lib"))
+                     #~()))
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'configure 'replace-bin-sh-and-remove-libffi
+                 (lambda _
+                   (substitute* '("configure.ac"
+                                  "template/Makefile.in"
+                                  "lib/rubygems/installer.rb"
+                                  "ext/pty/pty.c"
+                                  "io.c"
+                                  "lib/mkmf.rb"
+                                  "process.c"
+                                  "test/rubygems/test_gem_ext_configure_builder.rb"
+                                  "test/rdoc/rdoc_parser_test.rb"
+                                  "test/ruby/test_rubyoptions.rb"
+                                  "test/ruby/test_process.rb"
+                                  "test/ruby/test_system.rb"
+                                  "tool/rbinstall.rb")
+                     (("/bin/sh") (which "sh")))))
+               #$@(if (system-hurd?)
+                      '((add-after 'unpack 'skip-tests
+                          (lambda _
+                            (delete-file "bootstraptest/test_ractor.rb"))))
+                      '()))))
     (native-inputs
      (append (if (%current-target-system)
                  (list this-package)
