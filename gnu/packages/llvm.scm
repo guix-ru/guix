@@ -620,7 +620,8 @@ output), and Binutils.")
                  "clang-16-remove-crypt-interceptors.patch"))
     ("16.0.6" . ("clang-16.0-libc-search-path.patch"
                  "clang-16-remove-crypt-interceptors.patch"))
-    ("17.0.6" . ("clang-17.0-libc-search-path.patch"
+    ("17.0.6" . ("llvm-19-remove-deprecated-struct-termio.patch"
+                 "clang-17.0-libc-search-path.patch"
                  "clang-17.0-link-dsymutil-latomic.patch"))
     ("18.1.8" . ("llvm-19-remove-deprecated-struct-termio.patch"
                  "clang-18.0-libc-search-path.patch"
