@@ -200,6 +200,16 @@ a focus on simplicity and productivity.")
                                   "test/ruby/test_system.rb"
                                   "tool/rbinstall.rb")
                      (("/bin/sh") (which "sh")))))
+               (add-after 'install 'remove-toolchain-references
+                 (lambda _
+                   (delete-file
+                    (string-append
+                     #$output "/lib/ruby/gems/"
+                     #$(version-major+minor
+                        (package-version this-package))
+                     ".0"
+                     ;; This file refers to the complete path of binutils.
+                     "/gems/syslog-0.2.0/ext/syslog/mkmf.log"))))
                #$@(if (system-hurd?)
                       '((add-after 'unpack 'skip-tests
                           (lambda _
