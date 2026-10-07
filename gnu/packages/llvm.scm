@@ -613,7 +613,8 @@ output), and Binutils.")
     ("23.1.1" . "0nyr1k7324qv7xa4r1sn4mvw47y7sswhax6fgmq3lnh4x7qbavnw")))
 
 (define %llvm-patches
-  '(("14.0.6" . ("clang-14.0-libc-search-path.patch"
+  '(("14.0.6" . ("llvm-19-remove-deprecated-struct-termio.patch"
+                 "clang-14.0-libc-search-path.patch"
                  "clang-runtime-14-glibc-2.36-compat.patch"
                  "clang-14-remove-crypt-interceptors.patch"))
     ("15.0.7" . ("llvm-19-remove-deprecated-struct-termio.patch"
