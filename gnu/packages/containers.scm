@@ -152,6 +152,82 @@
 archives as created by Podman, CRI-O and containerd.")
     (license license:asl2.0)))
 
+(define-public go-github-com-compose-spec-compose-go-v2
+  (package
+    (name "go-github-com-compose-spec-compose-go-v2")
+    (version "2.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/compose-spec/compose-go")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "18z626vjd0cbqs130nsqhx0vfr6hxarvwgrw5acydy7hfv594aiq"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            ;; Build fails when this file is kept: Code in directory
+            ;; /tmp/<...>/src/github.com/compose-spec/compose-go/v2 expects
+            ;; import "github.com/compose-spec/compose-go"
+            (delete-file "package.go")))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:skip-build? #t
+      #:embed-files
+      #~(list "applicator"
+              "content"
+              "core"
+              "format"
+              "format-annotation"
+              "format-assertion"
+              "meta-data"
+              "schema"
+              "unevaluated"
+              "validation")
+      #:import-path "github.com/compose-spec/compose-go/v2"
+      #:test-flags
+      #~(list "-skip" (string-join
+                       ;; error decoding 'services[test].environment':
+                       ;; environment variable DEBUG is declared with a
+                       ;; trailing space
+                       (list "TestEnvironmentWhitespace"
+                             ;; ports_test.go:80: assertion failed: expected
+                             ;; error "Invalid ip address: 127.0.1", got
+                             ;; "invalid IP address: 127.0.1"
+                             "Test_transformPorts/invalid_IP"
+                             ;; types_test.go:190: assertion failed: expected
+                             ;; error "Invalid containerPort: 9999999", got
+                             ;; "invalid containerPort: 9999999"
+                             "TestParsePortConfig")
+                       "|"))))
+    (native-inputs
+     (list go-github-com-google-go-cmp
+           go-github-com-stretchr-testify
+           go-gotest-tools-v3))
+    (propagated-inputs
+     (list go-github-com-distribution-reference
+           go-github-com-docker-go-connections
+           go-github-com-docker-go-units
+           go-github-com-go-viper-mapstructure-v2
+           go-github-com-mattn-go-shellwords
+           go-github-com-opencontainers-go-digest
+           go-github-com-santhosh-tekuri-jsonschema-v6
+           go-github-com-sirupsen-logrus
+           go-github-com-xhit-go-str2duration-v2
+           go-go-yaml-in-yaml-v3
+           go-golang-org-x-sync
+           go-golang-org-x-text))
+    (home-page "https://compose-spec.io/")
+    (synopsis "Reference library for parsing and loading Compose YAML files")
+    (description
+     "This package provides a Golang reference library for parsing and
+loading Compose files as specified by the
+@url{https://github.com/compose-spec/compose-spec, Compose specification}.")
+    (license license:asl2.0)))
+
 (define-public go-github-com-containerd-accelerated-container-image
   (package
     (name "go-github-com-containerd-accelerated-container-image")
@@ -511,82 +587,6 @@ robustness, and portability.  It is available as a daemon, which can manage
 the complete container lifecycle of its host system: image transfer and
 storage, container execution and supervision, low-level storage and network
 attachments, etc.")
-    (license license:asl2.0)))
-
-(define-public go-github-com-compose-spec-compose-go-v2
-  (package
-    (name "go-github-com-compose-spec-compose-go-v2")
-    (version "2.9.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-              (url "https://github.com/compose-spec/compose-go")
-              (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "18z626vjd0cbqs130nsqhx0vfr6hxarvwgrw5acydy7hfv594aiq"))
-       (modules '((guix build utils)))
-       (snippet
-        #~(begin
-            ;; Build fails when this file is kept: Code in directory
-            ;; /tmp/<...>/src/github.com/compose-spec/compose-go/v2 expects
-            ;; import "github.com/compose-spec/compose-go"
-            (delete-file "package.go")))))
-    (build-system go-build-system)
-    (arguments
-     (list
-      #:skip-build? #t
-      #:embed-files
-      #~(list "applicator"
-              "content"
-              "core"
-              "format"
-              "format-annotation"
-              "format-assertion"
-              "meta-data"
-              "schema"
-              "unevaluated"
-              "validation")
-      #:import-path "github.com/compose-spec/compose-go/v2"
-      #:test-flags
-      #~(list "-skip" (string-join
-                       ;; error decoding 'services[test].environment':
-                       ;; environment variable DEBUG is declared with a
-                       ;; trailing space
-                       (list "TestEnvironmentWhitespace"
-                             ;; ports_test.go:80: assertion failed: expected
-                             ;; error "Invalid ip address: 127.0.1", got
-                             ;; "invalid IP address: 127.0.1"
-                             "Test_transformPorts/invalid_IP"
-                             ;; types_test.go:190: assertion failed: expected
-                             ;; error "Invalid containerPort: 9999999", got
-                             ;; "invalid containerPort: 9999999"
-                             "TestParsePortConfig")
-                       "|"))))
-    (native-inputs
-     (list go-github-com-google-go-cmp
-           go-github-com-stretchr-testify
-           go-gotest-tools-v3))
-    (propagated-inputs
-     (list go-github-com-distribution-reference
-           go-github-com-docker-go-connections
-           go-github-com-docker-go-units
-           go-github-com-go-viper-mapstructure-v2
-           go-github-com-mattn-go-shellwords
-           go-github-com-opencontainers-go-digest
-           go-github-com-santhosh-tekuri-jsonschema-v6
-           go-github-com-sirupsen-logrus
-           go-github-com-xhit-go-str2duration-v2
-           go-go-yaml-in-yaml-v3
-           go-golang-org-x-sync
-           go-golang-org-x-text))
-    (home-page "https://compose-spec.io/")
-    (synopsis "Reference library for parsing and loading Compose YAML files")
-    (description
-     "This package provides a Golang reference library for parsing and
-loading Compose files as specified by the
-@url{https://github.com/compose-spec/compose-spec, Compose specification}.")
     (license license:asl2.0)))
 
 (define-public go-github-com-containerd-stargz-snapshotter
