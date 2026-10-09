@@ -76,6 +76,7 @@
 ;;; Copyright © 2026 Sughosha <sughosha@disroot.org>
 ;;; Copyright © 2026 bdunahu <bdunahu@operationnull.com>
 ;;; Copyright © 2026 willow xyz <willow@phantoma.online>
+;;; Copyright © 2026 Jani Juhani Sinervo <jani@sinervo.fi>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -1676,6 +1677,14 @@ glyphs from @code{font-nerd-symbols}."))
    #:synopsis "Meslo LG patched with nerd icons"
    #:description
    "This package provides the Meslo LG font with the extra
+glyphs from @code{font-nerd-symbols}."))
+
+(define-public font-nerd-blex-mono
+  (make-nerd-fonts-package
+   "font-nerd-blex-mono" "IBMPlexMono"
+   #:synopsis "IBM Plex Mono patched with nerd icons"
+   #:description
+   "This package provides the IBM Plex Mono font with the extra
 glyphs from @code{font-nerd-symbols}."))
 
 (define-public font-new-computer-modern
