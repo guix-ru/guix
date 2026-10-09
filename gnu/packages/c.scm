@@ -1859,7 +1859,7 @@ directory contents.")
 (define-public libdispatch
   (package
     (name "libdispatch")
-    (version "5.9.2")
+    (version "6.4.0")
     (source
      (origin
        (method git-fetch)
@@ -1869,19 +1869,13 @@ directory contents.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "02k90asz0yxrcmy67mmqqc68n8f16jf445l0n7jryb7nk30bgmm6"))))
+         "1qai86iz8l1badw9vf3r8vypq9j78lid069b1wa9pj5nlpqvvj9w"))))
     (build-system cmake-build-system)
     (arguments
-     (list #:phases
-           #~(modify-phases %standard-phases
-               ;; Use Clang instead of GCC.
-               (add-before 'configure 'prepare-build-environment
-                 (lambda _
-                   (setenv "AR" "llvm-ar")
-                   (setenv "NM" "llvm-nm")
-                   (setenv "CC" "clang")
-                   (setenv "CXX" "clang++"))))))
-    (native-inputs (list clang-13 llvm-13))
+     (list
+      #:configure-flags #~(list "-DCMAKE_C_COMPILER=clang"
+                                "-DCMAKE_CXX_COMPILER=clang++")))
+    (native-inputs (list clang llvm))
     (home-page "https://apple.github.io/swift-corelibs-libdispatch/")
     (synopsis "Concurrent code execution on multicore hardware")
     (description
