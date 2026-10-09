@@ -1,0 +1,225 @@
+Upstream status: https://lists.gnu.org/archive/html/bug-hurd/2026-10/msg00131.html
+
+This fixes seteuids and setgroups unexpectedly changing the current euid/egid.
+
+Fixes guix/guix#10460.
+
+From 9ca6e677dd9b4e307cd175b9a1a86cd700354f96 Mon Sep 17 00:00:00 2001
+From: Yelninei <yelninei@tutamail.com>
+Date: Fri, 9 Oct 2026 17:48:26 +0000
+Subject: [PATCH 1/4] hurd: seteuids: Specify MACH_MSG_TYPE_COPY_SEND.
+
+This prevents a EMIG_BAD_ARGUMENTS error.
+---
+ hurd/seteuids.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hurd/seteuids.c b/hurd/seteuids.c
+index 0a1e533bb3..ea93e0c51e 100644
+--- a/hurd/seteuids.c
++++ b/hurd/seteuids.c
+@@ -39,7 +39,7 @@ retry:
+     {
+       /* Get a new auth port using those IDs.  */
+       err = __USEPORT (AUTH,
+-		       __auth_makeauth (port, NULL, 0, 0,
++		       __auth_makeauth (port, NULL, MACH_MSG_TYPE_COPY_SEND, 0,
+ 					new, n,
+ 					_hurd_id.aux.uids, _hurd_id.aux.nuids,
+ 					_hurd_id.gen.gids, _hurd_id.gen.ngids,
+-- 
+2.54.0
+
+From c6b2ee6ba7ecc7c8aef565d0fe3d7a7b00a05870 Mon Sep 17 00:00:00 2001
+From: Yelninei <yelninei@tutamail.com>
+Date: Fri, 9 Oct 2026 17:48:33 +0000
+Subject: [PATCH 2/4] hurd: seteuids: Change size argument to size_t.
+
+setuids is analogous to setgroups so make it match signatures.
+
+This changes ABI on 64b, but this function is essentially unused for
+now, better fix its ABI already.
+---
+ hurd/hurd.h     | 2 +-
+ hurd/seteuids.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hurd/hurd.h b/hurd/hurd.h
+index 05674a93bb..3f1865c57b 100644
+--- a/hurd/hurd.h
++++ b/hurd/hurd.h
+@@ -177,7 +177,7 @@ extern int _hurd_change_directory_port_from_fd (struct hurd_port *portcell,
+ 
+ /* Get and set the effective UID set.  */
+ extern int geteuids (int __n, uid_t *__uidset);
+-extern int seteuids (int __n, const uid_t *__uidset);
++extern int seteuids (size_t __n, const uid_t *__uidset);
+ 
+ 
+ /* Split FILE into a directory and a name within the directory.  The
+diff --git a/hurd/seteuids.c b/hurd/seteuids.c
+index ea93e0c51e..3be772ae8b 100644
+--- a/hurd/seteuids.c
++++ b/hurd/seteuids.c
+@@ -20,11 +20,11 @@
+ 
+ /* Set the uid set for the current user to UIDS (N of them).  */
+ int
+-seteuids (int n, const uid_t *uids)
++seteuids (size_t n, const uid_t *uids)
+ {
+   error_t err;
+   auth_t newauth;
+-  int i;
++  size_t i;
+   gid_t new[n];
+ 
+   /* Fault before taking locks.  */
+-- 
+2.54.0
+
+From 4e5627b5b9bbbc78ca7323966ce6fd4943754747 Mon Sep 17 00:00:00 2001
+From: Yelninei <yelninei@tutamail.com>
+Date: Fri, 9 Oct 2026 17:48:38 +0000
+Subject: [PATCH 3/4] hurd: Preserve the euid/egid in seteuids/setgroups.
+
+By convention the first uid/gid is the euid/egid. Ensure that the
+first uid/gid in the array passed to auth_makeauth is the egid/egid to
+not unexpectedly overwrite it.
+---
+ hurd/seteuids.c               | 17 +++++++++++++----
+ sysdeps/mach/hurd/setgroups.c | 17 +++++++++++++----
+ 2 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/hurd/seteuids.c b/hurd/seteuids.c
+index 3be772ae8b..8c4f5f2c20 100644
+--- a/hurd/seteuids.c
++++ b/hurd/seteuids.c
+@@ -15,6 +15,7 @@
+    License along with the GNU C Library; if not, see
+    <https://www.gnu.org/licenses/>.  */
+ 
++#include <unistd.h>
+ #include <hurd.h>
+ #include <hurd/id.h>
+ 
+@@ -24,12 +25,20 @@ seteuids (size_t n, const uid_t *uids)
+ {
+   error_t err;
+   auth_t newauth;
+-  size_t i;
+-  gid_t new[n];
++  size_t i, start;
++  uid_t euid;
++  uid_t new[n + 1];
+ 
++  start = 0;
++  euid = geteuid ();
++  if (euid != (uid_t) -1 && (n == 0 || (n > 0 && euid != uids[0])))
++    {
++      new[0] = euid;
++      start = 1;
++    }
+   /* Fault before taking locks.  */
+   for (i = 0; i < n; ++i)
+-    new[i] = uids[i];
++    new[i + start] = uids[i];
+ 
+ retry:
+   HURD_CRITICAL_BEGIN;
+@@ -40,7 +49,7 @@ retry:
+       /* Get a new auth port using those IDs.  */
+       err = __USEPORT (AUTH,
+ 		       __auth_makeauth (port, NULL, MACH_MSG_TYPE_COPY_SEND, 0,
+-					new, n,
++					new, n + start,
+ 					_hurd_id.aux.uids, _hurd_id.aux.nuids,
+ 					_hurd_id.gen.gids, _hurd_id.gen.ngids,
+ 					_hurd_id.aux.gids, _hurd_id.aux.ngids,
+diff --git a/sysdeps/mach/hurd/setgroups.c b/sysdeps/mach/hurd/setgroups.c
+index 5d71d89011..ddfed7cac5 100644
+--- a/sysdeps/mach/hurd/setgroups.c
++++ b/sysdeps/mach/hurd/setgroups.c
+@@ -17,6 +17,7 @@
+ 
+ #include <errno.h>
+ #include <sys/types.h>
++#include <unistd.h>
+ #include <grp.h>
+ #include <hurd.h>
+ #include <hurd/id.h>
+@@ -27,12 +28,20 @@ setgroups (size_t n, const gid_t *groups)
+ {
+   error_t err;
+   auth_t newauth;
+-  size_t i;
+-  gid_t new[n];
++  size_t i, start;
++  gid_t egid;
++  gid_t new[n + 1];
+ 
++  start = 0;
++  egid = getegid ();
++  if (egid != (gid_t) -1 && (n == 0 || (n > 0 && egid != groups[0])))
++    {
++      new[0] = egid;
++      start = 1;
++    }
+   /* Fault before taking locks.  */
+   for (i = 0; i < n; ++i)
+-    new[i] = groups[i];
++    new[i + start] = groups[i];
+ 
+ retry:
+   HURD_CRITICAL_BEGIN;
+@@ -45,7 +54,7 @@ retry:
+ 		       __auth_makeauth (port, NULL, MACH_MSG_TYPE_COPY_SEND, 0,
+ 					_hurd_id.gen.uids, _hurd_id.gen.nuids,
+ 					_hurd_id.aux.uids, _hurd_id.aux.nuids,
+-					new, n,
++					new, n + start,
+ 					_hurd_id.aux.gids, _hurd_id.aux.ngids,
+ 					&newauth));
+     }
+-- 
+2.54.0
+
+From 002a9d79d102fd65e6a277281a6cfd04bea5fc46 Mon Sep 17 00:00:00 2001
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Sat, 10 Oct 2026 21:43:23 +0200
+Subject: [PATCH 4/4] hurd: Fix extra localplt
+
+---
+ hurd/seteuids.c               | 2 +-
+ sysdeps/mach/hurd/setgroups.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hurd/seteuids.c b/hurd/seteuids.c
+index 8c4f5f2c20..8c9d0dab68 100644
+--- a/hurd/seteuids.c
++++ b/hurd/seteuids.c
+@@ -30,7 +30,7 @@ seteuids (size_t n, const uid_t *uids)
+   uid_t new[n + 1];
+ 
+   start = 0;
+-  euid = geteuid ();
++  euid = __geteuid ();
+   if (euid != (uid_t) -1 && (n == 0 || (n > 0 && euid != uids[0])))
+     {
+       new[0] = euid;
+diff --git a/sysdeps/mach/hurd/setgroups.c b/sysdeps/mach/hurd/setgroups.c
+index ddfed7cac5..0aa1d3fe06 100644
+--- a/sysdeps/mach/hurd/setgroups.c
++++ b/sysdeps/mach/hurd/setgroups.c
+@@ -33,7 +33,7 @@ setgroups (size_t n, const gid_t *groups)
+   gid_t new[n + 1];
+ 
+   start = 0;
+-  egid = getegid ();
++  egid = __getegid ();
+   if (egid != (gid_t) -1 && (n == 0 || (n > 0 && egid != groups[0])))
+     {
+       new[0] = egid;
+-- 
+2.54.0
+
