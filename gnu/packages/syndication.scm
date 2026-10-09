@@ -172,14 +172,14 @@ by embedding the summary of their latest posts extracted from their web feed.")
 (define-public newsboat
   (package
     (name "newsboat")
-    (version "2.43")
+    (version "2.45")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://newsboat.org/releases/" version
                            "/newsboat-" version ".tar.xz"))
        (sha256
-        (base32 "1x9pgmgk90rk9gin3hgy7799j5p69yzhsjc5kwn46k7slnw0fl9j"))))
+        (base32 "0gabwdwpa46ygldk9ahh7x79isahhxg1dac02wjc9wqq4lyk1zny"))))
     (build-system cargo-build-system)
     (native-inputs
      (append
