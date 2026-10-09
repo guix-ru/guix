@@ -1524,6 +1524,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/glibc-hurd-mach-print.patch		\
   %D%/packages/patches/glibc-hurd-unsupported-ioctls.patch 	\
   %D%/packages/patches/glibc-hurd-signal-sa-siginfo.patch	\
+  %D%/packages/patches/glibc-hurd-setgroups.patch		\
   %D%/packages/patches/glibc-hurd64-gcc-14.2-tls-bug.patch	\
   %D%/packages/patches/glibc-ldd-powerpc.patch			\
   %D%/packages/patches/glibc-ldd-x86_64.patch			\
