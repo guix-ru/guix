@@ -7450,12 +7450,12 @@ Bluetooth audio output devices like headphones or loudspeakers.")
                       AC_PROG_CC_PIE
                       AC_PROG_INSTALL
                       AC_PROG_LIBTOOL
-                    	PKG_CHECK_MODULES(SNDFILE, sndfile, dummy=yes,
-                    				AC_MSG_ERROR(sndfile library is required))
-                    	AC_SUBST(SNDFILE_LIBS)
-                    	AC_CONFIG_FILES([Makefile])
-                    	AC_OUTPUT
-                    	AC_MSG_RESULT([$PACKAGE_NAME $VERSION])
+                        PKG_CHECK_MODULES(SNDFILE, sndfile, dummy=yes,
+                                                AC_MSG_ERROR(sndfile library is required))
+                        AC_SUBST(SNDFILE_LIBS)
+                        AC_CONFIG_FILES([Makefile])
+                        AC_OUTPUT
+                        AC_MSG_RESULT([$PACKAGE_NAME $VERSION])
                       ~%"
                      #$(package-version sbc))))
                 (with-output-to-file "Makefile.am"
@@ -8546,7 +8546,7 @@ from that to the system kernel's @file{/dev/random} machinery.")
                    (substitute* "bench/Makefile"
                      (("\\$\\(CC\\) -o") "$(CC) $(LDFLAGS) -o")))))))
     (native-inputs (list gettext-minimal
-		         which))        ;to find gettext
+                         which))        ;to find gettext
     (inputs (list pciutils))
     (home-page (package-home-page linux-libre))
     (synopsis "CPU frequency and voltage scaling tools for Linux")
