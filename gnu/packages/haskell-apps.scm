@@ -657,13 +657,13 @@ and mIRC chat codes.")
 (define-public lhs2tex
   (package
     (name "lhs2tex")
-    (version "1.25")
+    (version "1.26")
     (source
      (origin
        (method url-fetch)
        (uri (hackage-uri "lhs2tex" version))
        (sha256
-        (base32 "0cf66z6mgadgqd1xs5b6gw8l9rkwgbfsc5czwdiapn7ichi26qyj"))))
+        (base32 "19f6x07bl2pj824l394zpv7dy1677n6f24iy6nps2w9f39fsb8r6"))))
     (build-system haskell-build-system)
     (properties '((upstream-name . "lhs2tex")))
     (inputs (list ghc-regex-compat))
