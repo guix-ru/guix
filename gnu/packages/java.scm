@@ -2085,8 +2085,18 @@ OpenJDK.")
               (modules '((guix build utils)))
               (snippet
                '(begin
-                  (for-each delete-file
-                            (find-files "lib/optional" "\\.jar$"))))))
+                  (for-each
+                   delete-file
+                   (append
+                    (find-files "." "\\.jar$")
+                    ;; These tests depend on pre-existing JAR-files:
+                    (find-files
+                     "src/tests/junit/org/apache/tools/ant/taskdefs/condition"
+                     "(IsFileSelectedTest|IsSignedTest)\\.java$")
+                    (list
+                     (string-append
+                      "src/tests/junit/org/apache/tools/ant"
+                      "/types/selectors/SignedSelectorTest.java"))))))))
     (build-system ant-build-system)
     (arguments
      (list
