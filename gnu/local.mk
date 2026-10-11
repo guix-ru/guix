@@ -1698,6 +1698,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/inkscape-poppler-26-2.patch		\
   %D%/packages/patches/inkscape-poppler-26-3.patch		\
   %D%/packages/patches/instead-use-games-path.patch		\
+  %D%/packages/patches/itstool-fix-segfault.patch	\
   %D%/packages/patches/intltool-perl-compatibility.patch	\
   %D%/packages/patches/insight-toolkit-fix-build.patch			\
   %D%/packages/patches/irrlicht-use-system-libs.patch		\

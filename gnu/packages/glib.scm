@@ -714,7 +714,9 @@ The intltool collection can be used to do these things:
                                  version ".tar.bz2"))
              (sha256
               (base32
-               "1jl7gsr7aclb9nvqazr039m86y7f7ivfhl2pixcrbfqjkb97r6kb"))))
+               "1jl7gsr7aclb9nvqazr039m86y7f7ivfhl2pixcrbfqjkb97r6kb"))
+             (patches
+              (search-patches "itstool-fix-segfault.patch"))))
     (build-system gnu-build-system)
     (inputs
      (list bash-minimal libxml2 python))
