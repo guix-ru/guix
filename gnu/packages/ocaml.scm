@@ -225,20 +225,6 @@ OCaml and can effectively bootstrap OCaml 4.07.
 This package produces a native @command{ocamlc} and a bytecode @command{ocamllex}.")
       (license license:expat))))
 
-(define-public ocaml-5.4
-  (package
-    (inherit ocaml-5.0)
-    (version "5.4.1")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/ocaml/ocaml")
-                    (commit version)))
-              (file-name (git-file-name "ocaml" version))
-              (sha256
-               (base32
-                "0bpfwdfc7j53hb57arb6nxdj0ahkcxzkbj2ax90nvkjcyr96xcr3"))))))
-
 (define-public ocaml-4.14
   (package
     (name "ocaml")
