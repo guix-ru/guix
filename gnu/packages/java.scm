@@ -2074,14 +2074,14 @@ OpenJDK.")
 (define-public ant
   (package
     (name "ant")
-    (version "1.10.17")
+    (version "1.10.18")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://apache/ant/source/apache-ant-"
                                   version "-src.tar.gz"))
               (sha256
                (base32
-                "0p34pqknp2rbk5wk6zw8m6jfn7rkk7fyv3yvk9zhfxhhxrf0lfgh"))
+                "0cyv540r82zlzf95p9id9hx700jazx5b0r5qg8nxqbc1y46w85d6"))
               (modules '((guix build utils)))
               (snippet
                '(begin
