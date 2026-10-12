@@ -90442,7 +90442,7 @@ fn main() {
                                         rust-anstyle-parse-0.2.6
                                         rust-anstyle-query-1.1.2
                                         rust-anstyle-wincon-3.0.7
-                                        rust-bindgen-0.71.1
+                                        rust-bindgen-0.72.1
                                         rust-bitflags-2.9.0
                                         rust-cexpr-0.6.0
                                         rust-cfg-if-1.0.0
