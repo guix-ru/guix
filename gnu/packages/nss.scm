@@ -103,7 +103,7 @@ in the Mozilla clients.")
 (define-public nss
   (package
     (name "nss")
-    (version "3.112.5")                 ;update to latest ESR release
+    (version "3.125")                 ;update to latest ESR release
     (source (origin
               (method url-fetch)
               (uri (let ((version-with-underscores
@@ -114,7 +114,7 @@ in the Mozilla clients.")
                       "nss-" version ".tar.gz")))
               (sha256
                (base32
-                "03chsv0bjd2fi8lab241grbyqd4blapll5lbrpraddpd5mc8rjx4"))
+                "0vb0j4yqk8757m3mf6kl7w1vrjr89p2fqh7m07n8vid71pql3m8s"))
               ;; Create nss.pc and nss-config.
               (patches (search-patches "nss-3.56-pkgconfig.patch"
                                        "nss-getcwd-nonnull.patch"
