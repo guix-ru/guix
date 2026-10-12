@@ -3506,19 +3506,21 @@ support, watch support (like @command{top}) and a tree view.")
         (base32 "0jdbxmn5h5nlr4bifx85gny309djv5djs9q78fa1d7sj0wdw2sys"))))
     (inputs (cargo-inputs 'rust-cbindgen-0.26))))
 
+;; Note: this is a dependency for mesa on x86_64.
 (define-public rust-cbindgen rust-cbindgen-0.29)
 
+;; Note: this is a dependency for mesa on x86_64.
 (define-public rust-bindgen-cli
   (package
     (name "rust-bindgen-cli")
-    (version "0.71.1")
+    (version "0.72.1")
     (source
      (origin
        (method url-fetch)
        (uri (crate-uri "bindgen-cli" version))
        (file-name (string-append name "-" version ".tar.gz"))
        (sha256
-        (base32 "1p2lmkl7vfhpr8gnav11p1jrwrqsmrqwr2fgwp5x1bsn17511vgx"))))
+        (base32 "1ql71sdf5vpdyfa26kdq0hx59qr3wa8gjjxgrva7pgr0rc7qqh4a"))))
     (build-system cargo-build-system)
     (arguments
      `(#:install-source? #f
