@@ -4502,6 +4502,7 @@ tablets.
         (base32 "05w6rmlc0d2xicmp7dkjvbgz95cjkp0525qq8dfqpq5xcdy3xws6"))))
     (build-system node-build-system)
     (native-inputs (list
+      node-chalk
       node-dprint-formatter ; 0.x
       node-esbuild ; 0.x
       node-fast-xml-parser ; 4.x
@@ -4540,7 +4541,6 @@ tablets.
               "c8"
               "chai"
               "chokidar"
-              "chalk"
               "diff"
               "dprint"
               "eslint"
