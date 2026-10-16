@@ -5784,7 +5784,7 @@ bindings for C++ libraries.")
 (define-public python-shiboken
   (package
     (inherit python-shiboken-generator)
-    (version "6.11.2")
+    (version "6.12.0")
     (name "python-shiboken")
     (inputs
      (list clang
