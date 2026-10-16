@@ -1733,6 +1733,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/libde265-CVE-2026-33164-CVE-2026-33165.patch	\
   %D%/packages/patches/libde265-CVE-2026-49295.patch		\
   %D%/packages/patches/libeb-gcc-14.patch			\
+  %D%/packages/patches/libfive-quaternion-header.patch          \
   %D%/packages/patches/libftdi-fix-paths-when-FTDIPP-set.patch	\
   %D%/packages/patches/libgeotiff-fix-tests-with-proj-9.1.1.patch	\
   %D%/packages/patches/libgeotiff-fix-tests-with-proj-9.3.0.patch	\
