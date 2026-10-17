@@ -4204,7 +4204,8 @@ linux/libcurl_wrapper.h"
                     "enable_widevine=false"
                     ;; Link pulseaudio directly instead of using dlopen.
                     "link_pulseaudio=true")
-                  "\n"))))))))
+                  "\n"))))))
+       (patches (search-patches "qtwebengine-with-qt-6.12.patch"))))
     (build-system cmake-build-system)
     (arguments
      (list
