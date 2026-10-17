@@ -3530,14 +3530,14 @@ astronomy and astrophysics.")
   (package
     (inherit python-astropy)
     (name "python-astropy")
-    (version "7.2.2")
+    (version "7.2.3")
     (source
      (origin
        (inherit (package-source python-astropy))
        (method url-fetch)
        (uri (pypi-uri "astropy" version))
        (sha256
-        (base32 "1kamyh9xndli5a2ia8af83dbcqam6h0rqfv0jh2k78bgccjn13fl"))))
+        (base32 "0s5mv46q32dd70m87537i684jx98iadjx9r5zasan6ik6wcbbshx"))))
     (arguments
      (substitute-keyword-arguments arguments
        ((#:test-flags test-flags #~(list))
