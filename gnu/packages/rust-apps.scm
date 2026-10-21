@@ -2928,6 +2928,49 @@ is being designed to work with Podman but is also applicable for other OCI
 container management applications.")
     (license license:asl2.0)))
 
+(define-public numbat
+  (package
+    (name "numbat")
+    (version "1.24.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/sharkdp/numbat")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0kgchj1yaig8d1ff7hjhj1j9vwi9k0pgqqfj31f9dpg0swq87vbg"))
+       (snippet
+        #~(begin (use-modules (guix build utils))
+                 ;; use system CA root certs instead of vendoring them
+                 (substitute* "numbat-exchange-rates/Cargo.toml"
+                   (("tls-rustls-webpki-roots")
+                    "tls-rustls-native-roots"))))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:cargo-install-paths ''("numbat-cli")
+      #:cargo-test-flags
+      ;; test_datetime_runtime_errors failed from changes to rust-jiff
+      ''("--" "--skip=test_datetime_runtime_errors")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-tzdir
+            (lambda* (#:key inputs #:allow-other-keys)
+              (setenv "TZDIR"
+                      (search-input-directory inputs "share/zoneinfo")))))))
+    (inputs (cargo-inputs 'numbat))
+    (native-inputs (list tzdata-for-tests))
+    (home-page "https://numbat.dev/")
+    (synopsis
+     "Statically typed programming language for scientific computations")
+    (description
+     "Numbat is a statically typed programming language for scientific
+computations with first class support for physical dimensions and units.")
+    (license (list license:expat license:asl2.0))))
+
 (define-public onefetch
   (package
     (name "onefetch")
