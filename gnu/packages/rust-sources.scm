@@ -33,6 +33,7 @@
   #:use-module (gnu packages assembly)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages javascript)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages perl)
@@ -41,7 +42,8 @@
   #:use-module (gnu packages regex)
   #:use-module (gnu packages rust)
   #:use-module (gnu packages statistics)
-  #:use-module (gnu packages virtualization))
+  #:use-module (gnu packages virtualization)
+  #:use-module (gnu packages web))
 
 ;;;
 ;;; Cargo workspaces and Rust libraries requiring external inputs to unbundle.
@@ -774,6 +776,72 @@ UTF-32 support.")
      (synopsis "Python environment tools")
      (description
       "This package provides Python environment tools.")
+     (license license:expat))))
+
+(define %plotly-js-for-rust-plotly
+  ;; this is a build artifact checked into the upstream plotly repo.
+  ;; ideally we would be building js-plotly from source, but this
+  ;; is very involved. pulling the bundled file from upstream instead
+  ;; of vendoring in rust-plotly is better than nothing.
+  (let ((version "2.12.1"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://raw.githubusercontent.com/plotly/plotly.js/v"
+            version "/dist/plotly.js"))
+      (sha256
+       (base32 "1fd6xw172fc54a8wywqdc90r2l60mw1ahx5df7457v7ml0isbmg5")))))
+
+(define-public rust-plotly-0.12.1
+  (hidden-package
+   (package
+     (name "rust-plotly")
+     (version "0.12.1")
+     (source (origin
+               (method git-fetch)
+               (uri (git-reference
+                     (url "https://github.com/plotly/plotly.rs")
+                     (commit version)))
+               (file-name (git-file-name "rust-plotly" version))
+               (sha256
+                (base32 "18wxdsk3vdwy0fccq2ilb15q3w52q5lnjs9hr6rxfsyb1mq07835"))
+               (modules '((guix build utils)))
+               (snippet
+                #~(begin
+                    (for-each delete-file
+                              '("plotly/templates/tex-svg-3.2.2.js"
+                                "plotly/templates/tex-mml-chtml-3.2.0.js"
+                                "plotly/templates/plotly.min.js"
+                                "docs/book/plotly.min.js"))))))
+     (build-system cargo-build-system)
+     (arguments
+      (list
+       #:skip-build? #t
+       #:cargo-package-crates ''("plotly_derive" "plotly_kaleido" "plotly")
+       #:phases
+       #~(modify-phases %standard-phases
+           (add-after 'unpack 'unvendor-js
+             (lambda* (#:key inputs #:allow-other-keys)
+               (symlink
+                (search-input-file
+                 inputs "/share/javascript/mathjax/es5/tex-mml-chtml.js")
+                "plotly/templates/tex-mml-chtml-3.2.0.js")
+               (symlink
+                (search-input-file
+                 inputs "/share/javascript/mathjax/es5/tex-svg.js")
+                "plotly/templates/tex-svg-3.2.2.js")
+               (invoke "esbuild" #$%plotly-js-for-rust-plotly
+                       "--minify" "--outfile=plotly/templates/plotly.min.js")
+               (copy-file "plotly/templates/plotly.min.js"
+                          "docs/book/plotly.min.js"))))))
+     (inputs (cargo-inputs 'rust-plotly-0.12.1))
+     (native-inputs
+      (list esbuild
+            js-mathjax-3))
+     (home-page "https://github.com/plotly/plotly.rs")
+     (synopsis "Plotting library powered by Plotly.js")
+     (description
+      "This package provides a plotting library powered by Plotly.js.")
      (license license:expat))))
 
 (define-public rust-ring-0.17
