@@ -1637,7 +1637,7 @@ and high-availability (HA).")
     (arguments
      (list
       #:configure-flags
-      #~(list "--with-uuid=e2fs" "--with-openssl"
+      #~(list "--with-uuid=e2fs" "--with-openssl" "--with-lz4"
               (string-append "--mandir=" #$output "/share/man")
               ;; PostgreSQL installs its own Makefile (should it?).
               ;; Prevent it from retaining needless references to
@@ -1674,7 +1674,7 @@ and high-availability (HA).")
            pkg-config
            texinfo))
     (inputs
-     (list icu4c readline `(,util-linux "lib") zlib))
+     (list icu4c lz4 readline `(,util-linux "lib") zlib))
     (propagated-inputs (list openssl))  ;in Requires.private of libpq.pc
     (home-page "https://www.postgresql.org/")
     (synopsis "Powerful object-relational database system")
@@ -1748,8 +1748,6 @@ pictures, sounds, or video.")
                 "1d13qckpslfqamdmp23q3rbzxlp1rqwszylilyllpsp3gzwhvpqi"))
               (patches (search-patches
                         "postgresql-disable-resolve_symlinks.patch"))))
-    (native-inputs (modify-inputs native-inputs
-                     (delete "pkg-config")))
     (inputs (modify-inputs inputs
               (delete "icu4c")))))
 
