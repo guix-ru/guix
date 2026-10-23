@@ -1609,11 +1609,11 @@ blacklisted.certs.pem"
    openjdk23 "24.0.1"
    "0h6sbzbjyqg85iml41pswdh2z3d7h2hhb0sd5yll37r1mj5lsxmx"
    (arguments
-    (substitute-keyword-arguments (package-arguments base)
+    (substitute-keyword-arguments arguments
       ((#:configure-flags flags #~(list))
        (if (target-x86-32?)
            #~(cons* "--enable-deprecated-ports=yes" #$flags)
-          flags))))))
+           flags))))))
 
 (define-public openjdk25
   (make-openjdk
