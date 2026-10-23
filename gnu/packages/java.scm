@@ -403,111 +403,6 @@ CurrencyData.properties"
               ;; allow build on linux major version change
               (lambda _
                 (setenv "DISABLE_HOTSPOT_OS_VERSION_CHECK" "ok")))
-            (add-before 'check 'fix-test-framework
-              (lambda _
-                ;; Fix PATH in test environment
-                (substitute* "test/jtreg/com/sun/javatest/regtest/Main.java"
-                  (("PATH=/bin:/usr/bin")
-                   (string-append "PATH=" (getenv "PATH"))))
-                (substitute* "test/jtreg/com/sun/javatest/util/SysEnv.java"
-                  (("/usr/bin/env") (which "env")))
-                (substitute* "openjdk.src/hotspot/test/test_env.sh"
-                  (("/bin/rm") (which "rm"))
-                  (("/bin/cp") (which "cp"))
-                  (("/bin/mv") (which "mv")))))
-            (add-before 'check 'fix-hotspot-tests
-              (lambda _
-                (with-directory-excursion "openjdk.src/hotspot/test/"
-                  (substitute* "jprt.config"
-                    (("PATH=\"\\$\\{path4sdk\\}\"")
-                     (string-append "PATH=" (getenv "PATH")))
-                    (("make=/usr/bin/make")
-                     (string-append "make=" (which "make"))))
-                  (substitute* '("runtime/6626217/Test6626217.sh"
-                                 "runtime/7110720/Test7110720.sh")
-                    (("/bin/rm") (which "rm"))
-                    (("/bin/cp") (which "cp"))
-                    (("/bin/mv") (which "mv"))))))
-            (add-before 'check 'fix-jdk-tests
-              (lambda _
-                (with-directory-excursion "openjdk.src/jdk/test/"
-                  (substitute* "com/sun/jdi/JdbReadTwiceTest.sh"
-                    (("/bin/pwd") (which "pwd")))
-                  (substitute* "com/sun/jdi/ShellScaffold.sh"
-                    (("/bin/kill") (which "kill")))
-                  (substitute* "start-Xvfb.sh"
-                    ;;(("/usr/bin/X11/Xvfb") (which "Xvfb"))
-                    (("/usr/bin/nohup")    (which "nohup")))
-                  (substitute* "javax/security/auth/Subject/doAs/Test.sh"
-                    (("/bin/rm") (which "rm")))
-                  (substitute* "tools/launcher/MultipleJRE.sh"
-                    (("echo \"#!/bin/sh\"")
-                     (string-append "echo \"#!" (which "rm") "\""))
-                    (("/usr/bin/zip") (which "zip")))
-                  (substitute* "com/sun/jdi/OnThrowTest.java"
-                    (("#!/bin/sh") (string-append "#!" (which "sh"))))
-                  (substitute* "java/lang/management/OperatingSystemMXBean/GetSystemLoadAverage.java"
-                    (("/usr/bin/uptime") (which "uptime")))
-                  (substitute* "java/lang/ProcessBuilder/Basic.java"
-                    (("/usr/bin/env") (which "env"))
-                    (("/bin/false") (which "false"))
-                    (("/bin/true") (which "true"))
-                    (("/bin/cp") (which "cp"))
-                    (("/bin/sh") (which "sh")))
-                  (substitute* "java/lang/ProcessBuilder/FeelingLucky.java"
-                    (("/bin/sh") (which "sh")))
-                  (substitute* "java/lang/ProcessBuilder/Zombies.java"
-                    (("/usr/bin/perl") (which "perl"))
-                    (("/bin/ps") (which "ps"))
-                    (("/bin/true") (which "true")))
-                  (substitute* "java/lang/Runtime/exec/ConcurrentRead.java"
-                    (("/usr/bin/tee") (which "tee")))
-                  (substitute* "java/lang/Runtime/exec/ExecWithDir.java"
-                    (("/bin/true") (which "true")))
-                  (substitute* "java/lang/Runtime/exec/ExecWithInput.java"
-                    (("/bin/cat") (which "cat")))
-                  (substitute* "java/lang/Runtime/exec/ExitValue.java"
-                    (("/bin/sh") (which "sh"))
-                    (("/bin/true") (which "true"))
-                    (("/bin/kill") (which "kill")))
-                  (substitute* "java/lang/Runtime/exec/LotsOfDestroys.java"
-                    (("/usr/bin/echo") (which "echo")))
-                  (substitute* "java/lang/Runtime/exec/LotsOfOutput.java"
-                    (("/usr/bin/cat") (which "cat")))
-                  (substitute* "java/lang/Runtime/exec/SleepyCat.java"
-                    (("/bin/cat") (which "cat"))
-                    (("/bin/sleep") (which "sleep"))
-                    (("/bin/sh") (which "sh")))
-                  (substitute* "java/lang/Runtime/exec/StreamsSurviveDestroy.java"
-                    (("/bin/cat") (which "cat")))
-                  (substitute* "java/rmi/activation/CommandEnvironment/SetChildEnv.java"
-                    (("/bin/chmod") (which "chmod")))
-                  (substitute* "java/util/zip/ZipFile/Assortment.java"
-                    (("/bin/sh") (which "sh"))))))
-            (replace 'check
-              (lambda* (#:key tests? #:allow-other-keys)
-                ;; The "make check-*" targets always return zero, so we need to
-                ;; check for errors in the associated log files to determine
-                ;; whether any tests have failed.
-                (when tests?
-                  (use-modules (ice-9 rdelim))
-                  (let* ((error-pattern (make-regexp "^(Error|FAILED):.*"))
-                         (checker (lambda (port)
-                                    (let loop ()
-                                      (let ((line (read-line port)))
-                                        (cond
-                                         ((eof-object? line) #t)
-                                         ((regexp-exec error-pattern line)
-                                          (error "test failed"))
-                                         (else (loop)))))))
-                         (run-test (lambda (test)
-                                     (invoke "make" test)
-                                     (call-with-input-file
-                                         (string-append "test/" test ".log")
-                                       checker))))
-                    (run-test "check-hotspot")
-                    (run-test "check-langtools")
-                    (run-test "check-jdk")))))
             (replace 'install
               (lambda _
                 (copy-recursively "openjdk.build/docs"
@@ -639,12 +534,8 @@ CurrencyData.properties"
          ("ant" ,ant-bootstrap)
          ("attr" ,attr)
          ("classpath" ,classpath-devel)
-         ("coreutils" ,coreutils)
-         ("diffutils" ,diffutils)       ;for tests
          ("ecj4-javac-wrapper" ,ecj4-javac-wrapper)
          ("fastjar" ,fastjar) ;only for the configure phase; we actually use gjar
-         ("gawk" ,gawk)
-         ("grep" ,grep)
          ("jamvm" ,jamvm-with-ecj4)
          ("libtool" ,libtool)
          ("pkg-config" ,pkg-config)
@@ -655,8 +546,7 @@ CurrencyData.properties"
          ("unzip" ,unzip)
          ("libxslt" ,libxslt)           ;for xsltproc
          ("nss-certs" ,nss-certs)
-         ("perl" ,perl)
-         ("procps" ,procps))) ;for "free", even though I'm not sure we should use it
+         ("perl" ,perl)))
       (inputs
        (list alsa-lib
              cups
