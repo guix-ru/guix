@@ -1442,51 +1442,6 @@ new Date();"))))
                field
                ...)))))))
 
-(define-public openjdk12
-  (make-openjdk
-   openjdk11 "12.33" "0pi2gwib3j2imi4l623iaywrmvfh9rqzh82lj2gxqbrmg55swvjf"
-   (source
-    (origin
-      (method url-fetch)
-      (uri "http://hg.openjdk.java.net/jdk/jdk/archive/0276cba45aac.tar.bz2")
-      (file-name (string-append name "-" version ".tar.bz2"))
-      (sha256
-       (base32
-        "0pi2gwib3j2imi4l623iaywrmvfh9rqzh82lj2gxqbrmg55swvjf"))
-      (modules '((guix build utils)))
-      (snippet
-       '(for-each delete-file (find-files "." "\\.(bin|exe|jar)$")))
-      (patches (search-patches "openjdk-10-setsignalhandler.patch"))))
-   (arguments
-    (substitute-keyword-arguments (package-arguments openjdk11)
-      ((#:phases phases)
-       #~(modify-phases #$phases
-           #$@(if (target-aarch64?)
-                #~((add-after 'unpack 'patch-for-aarch64
-                    (lambda _
-                      (substitute* "src/hotspot/cpu/aarch64/interp_masm_aarch64.hpp"
-                        ;; This line is duplicated, so remove both occurrences,
-                        ;; then add back one occurrence by substituting a
-                        ;; comment that occurs once.
-                        (("using MacroAssembler::call_VM_leaf_base;") "")
-                        (("Interpreter specific version of call_VM_base")
-                         (string-append "Interpreter specific version of call_VM_base\n"
-                                        "  using MacroAssembler::call_VM_leaf_base;"))))))
-                #~())
-           (replace 'remove-timestamping
-             (lambda _
-               (substitute* "src/hotspot/share/runtime/vm_version.cpp"
-                (("__DATE__") "")
-                (("__TIME__") ""))))
-           (replace 'fix-java-shebangs
-             (lambda _
-               ;; 'blocked' was renamed to 'blacklisted' in this version for
-               ;; some reason.
-               (substitute* "make/data/blacklistedcertsconverter/\
-blacklisted.certs.pem"
-                 (("^#!.*")
-                  "#! java BlacklistedCertsConverter SHA-256\n"))))))))))
-
 (define-public openjdk13
   (make-openjdk
    openjdk11 "13.0.14" "1v92i5rhahqkjw8mz09c9qasnxqc67ygy0y266kdmm534z0da755"
