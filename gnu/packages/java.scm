@@ -1620,7 +1620,7 @@ blacklisted.certs.pem"
    openjdk24 "25.0.2"
    "03aa34lscr3qbdl6qz3gqyp0nzkqfj02362mzmpkiq3y2g5xdnrj"
    (arguments
-    (substitute-keyword-arguments (package-arguments base)
+    (substitute-keyword-arguments arguments
       ((#:configure-flags flags #~(list))
        (if (target-x86-32?)
            ;; Full builds on 32-bit x86 architectures are not supported as of
