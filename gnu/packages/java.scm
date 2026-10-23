@@ -1560,8 +1560,22 @@ blacklisted.certs.pem"
                (setenv "SOURCE_DATE_EPOCH" "1234567890")))))))))
 
 (define-public openjdk20
-  (make-openjdk openjdk19 "20.0.2"
-                "1af1v2c3d8x4c6shzl6cv9qwq7a4hn5map5pjh9vjcky0hkzd489"))
+  (make-openjdk
+   openjdk17 "20.0.2"
+   "1af1v2c3d8x4c6shzl6cv9qwq7a4hn5map5pjh9vjcky0hkzd489"
+   (arguments
+    (substitute-keyword-arguments arguments
+      ((#:phases phases)
+       #~(modify-phases #$phases
+           (replace 'fix-java-shebangs
+             (lambda _
+               ;; Update file path.
+               (substitute* "src/java.base/share/data/blockedcertsconverter/blocked.certs.pem"
+                 (("^#!.*") "#! java BlockedCertsConverter SHA-256\n"))))
+           (add-before 'configure 'define-java-environment-variables
+             (lambda* (#:key inputs #:allow-other-keys)
+               ;; Fix for "valid range 1980-01-01T00:00:02Z to 2099-12-31T23:59:59Z".
+               (setenv "SOURCE_DATE_EPOCH" "1234567890")))))))))
 
 (define-public openjdk21
   (make-openjdk openjdk20 "21.0.2"
