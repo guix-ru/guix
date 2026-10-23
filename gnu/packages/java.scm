@@ -1081,8 +1081,7 @@ new Date();"))))
            libxt
            libxtst))
     (native-inputs
-     (list icedtea-8
-           `(,icedtea-8 "jdk")
+     (list `(,icedtea-8 "jdk")
            ;; XXX: The build system fails with newer versions of GNU Make.
            gnu-make-4.2
            nss-certs
