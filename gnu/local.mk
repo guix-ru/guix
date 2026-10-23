@@ -2174,6 +2174,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-clarabel-blas.patch		\
   %D%/packages/patches/python-daemon-relax-lockfile.patch	\
   %D%/packages/patches/python-docrepr-fix-tests.patch		\
+  %D%/packages/patches/python-dicomweb-client-pillow-13.patch	\
   %D%/packages/patches/python-hdmedians-replace-nose.patch	\
   %D%/packages/patches/python-holodeck-cython-3-compat.patch	\
   %D%/packages/patches/python-jinja2-fragments-modify-conftest-py.patch	\
