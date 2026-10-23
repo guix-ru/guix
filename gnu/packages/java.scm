@@ -1542,10 +1542,6 @@ blacklisted.certs.pem"
                (substitute* "make/data/blockedcertsconverter/blocked.certs.pem"
                  (("^#!.*") "#! java BlockedCertsConverter SHA-256\n"))))))))))
 
-(define-public openjdk18
-  (make-openjdk openjdk17 "18.0.2.1"
-                "0zxanjzz4p3psqahlidh55vx1ldanq70c2ygk3gcfn9a94vnr9rg"))
-
 (define-public openjdk19
   (make-openjdk openjdk17 "19.0.2"
                 "08kvx7n8qhhfl25pig966881j5h4x7y0pf4brq16x0283fc0f4d4"
