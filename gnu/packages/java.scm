@@ -1582,7 +1582,7 @@ blacklisted.certs.pem"
    openjdk21 "22.0.2"
    "1nj414yj6v9qrlm48yv5llr4jmgj9g20v6zsd39xrdx4x4x4p3b6"
    (arguments
-    (substitute-keyword-arguments (package-arguments base)
+    (substitute-keyword-arguments arguments
       ((#:phases phases)
        #~(modify-phases #$phases
            (add-after 'unpack 'do-not-disable-new-dtags
