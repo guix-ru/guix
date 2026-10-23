@@ -1217,9 +1217,9 @@ new Date();"))))
                (search-patches "openjdk-10-module3-reproducibility.patch"
                                "openjdk-10-module4-reproducibility.patch"
                                "openjdk-10-char-reproducibility.patch"
-                               "openjdk-11-classlist-reproducibility.patch"
                                "openjdk-10-jar-reproducibility.patch"
                                "openjdk-10-jtask-reproducibility.patch"
+                               "openjdk-11-classlist-reproducibility.patch"
                                "openjdk-currency-time-bomb2.patch"))))
     (build-system gnu-build-system)
     (outputs '("out" "jdk" "doc"))
@@ -1241,6 +1241,10 @@ new Date();"))))
       ;; TODO package jtreg
       #:configure-flags
       #~(list
+         (string-append "--with-boot-jdk="
+                        (dirname
+                         (dirname
+                          (search-input-file %build-inputs "bin/javac"))))
          "--disable-hotspot-gtest"      ;not currently running tests
          ;; Add flags for compilation with gcc >= 10.
          #$(string-append "--with-extra-cflags=-fcommon"
@@ -1271,6 +1275,20 @@ new Date();"))))
                         #$(this-package-input "freetype") "/lib"))
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'adjust-for-bootstrap-version
+            (lambda _
+              ;; This allows building with non-standard bootstrap versions.
+              (let ((bootstrap-version #$(version-major
+                                          (package-version
+                                           (this-package-native-input
+                                            "openjdk")))))
+                (substitute* "make/autoconf/version-numbers"
+                  (("^(DEFAULT_ACCEPTABLE_BOOT_VERSIONS)=.*" _ var)
+                   (format #f "~a=~a~%" var bootstrap-version)))
+                (substitute* "make/autoconf/boot-jdk.m4"
+                  (("^(\\s*BOOT_JDK_SOURCETARGET)=.*" _ var)
+                   (format #f "~a=\"-source ~a -target ~a\"~%"
+                           var bootstrap-version bootstrap-version))))))
           (add-after 'patch-source-shebangs 'fix-java-shebangs
             (lambda _
               ;; This file was "fixed" by patch-source-shebangs, but it requires
@@ -1465,7 +1483,7 @@ new Date();"))))
            libxtst))
     (native-inputs
      (list autoconf
-           `(,openjdk10 "jdk")
+           `(,openjdk9 "jdk")
            pkg-config
            unzip
            which
@@ -1657,10 +1675,20 @@ blacklisted.certs.pem"
              (inherit (package-source base))
              (patches (search-patches "openjdk-15-xcursor-no-dynamic.patch"))))
    (arguments
-    (substitute-keyword-arguments (package-arguments base)
+    (substitute-keyword-arguments arguments
       ((#:implicit-inputs? _ #t) #t)    ;restore default
-      ((#:phases phases)
+      ((#:phases phases '%standard-phases)
        #~(modify-phases #$phases
+           (replace 'adjust-for-bootstrap-version
+             (lambda _
+               ;; This allows building with non-standard bootstrap versions.
+               (let ((bootstrap-version #$(version-major
+                                           (package-version
+                                            (this-package-native-input
+                                             "openjdk")))))
+                 (substitute* "make/conf/version-numbers.conf"
+                   (("^(DEFAULT_ACCEPTABLE_BOOT_VERSIONS)=.*" _ var)
+                    (format #f "~a=~a~%" var bootstrap-version))))))
            (replace 'fix-java-shebangs
              (lambda _
                ;; 'blacklisted' was renamed back to 'blocked'.
