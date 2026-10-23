@@ -261,8 +261,7 @@
         ;; openjdk and dependent packages are only
         ;; available on x86_64 currently.
         ((or "x86_64-linux")
-         ;; No unversioned openjdk available.
-         (list `(,openjdk12 "jdk")
+         (list `(,openjdk11 "jdk")
                enjarify))
         (_ '()))))
     (home-page "https://diffoscope.org/")
