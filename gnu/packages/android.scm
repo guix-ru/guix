@@ -1334,7 +1334,7 @@ emulator inside the comfort of Emacs.")
               (when tests?
                 (invoke "python" "-m" "enjarify.runtests")))))))
     (native-inputs
-     (list openjdk12
+     (list openjdk11
            python-setuptools))
     (home-page "https://github.com/Storyyeller/enjarify")
     (synopsis "Translate Dalvik bytecode to equivalent Java bytecode")
