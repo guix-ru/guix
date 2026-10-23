@@ -1565,10 +1565,10 @@ blacklisted.certs.pem"
                 "0d1g3wnzr5whjpq8gvxq0h7kd7lxd3xgc6bh3kg8vzz096asn0kj"
    (source (origin
              (inherit (package-source base))
-             (patches (search-patches "openjdk-21-fix-rpath.patch"
-                                      "openjdk-15-xcursor-no-dynamic.patch"))))
+             (patches (search-patches "openjdk-15-xcursor-no-dynamic.patch"
+                                      "openjdk-21-fix-rpath.patch"))))
    (arguments
-    (substitute-keyword-arguments (package-arguments base)
+    (substitute-keyword-arguments arguments
       ((#:phases phases)
        #~(modify-phases #$phases
            (replace 'fix-java-shebangs
