@@ -1480,7 +1480,7 @@ blacklisted.certs.pem"
 
 (define-public openjdk14
   (make-openjdk
-   openjdk13 "14.0.2"
+   openjdk11 "14.0.2"
    "07k9bsbxwyf2z2n50z96nvhsdai916mxdxcr5lm44jz7f6xrwfq6"
    (source (origin
              (inherit (package-source base))
@@ -1493,7 +1493,34 @@ blacklisted.certs.pem"
                  (for-each delete-file (find-files "." "\\.(bin|exe|jar)$"))))
              (patches (search-patches "openjdk-10-setsignalhandler.patch"
                                       "openjdk-10-jtask-reproducibility.patch"
-                                      "openjdk-13-classlist-reproducibility.patch"))))))
+                                      "openjdk-13-classlist-reproducibility.patch"))))
+   (arguments
+    (substitute-keyword-arguments arguments
+      ((#:phases phases)
+       #~(modify-phases #$phases
+           (add-after 'unpack 'patch-for-aarch64
+             (lambda _
+               (substitute* "src/hotspot/cpu/aarch64/interp_masm_aarch64.hpp"
+                 ;; This line is duplicated, so remove both occurrences,
+                 ;; then add back one occurrence by substituting a
+                 ;; comment that occurs once.
+                 (("using MacroAssembler::call_VM_leaf_base;") "")
+                 (("Interpreter specific version of call_VM_base")
+                  (string-append "Interpreter specific version of call_VM_base\n"
+                                 "  using MacroAssembler::call_VM_leaf_base;")))))
+           (replace 'remove-timestamping
+             (lambda _
+               (substitute* "src/hotspot/share/runtime/abstract_vm_version.cpp"
+                 (("__DATE__") "")
+                 (("__TIME__") ""))))
+           (replace 'fix-java-shebangs
+             (lambda _
+               ;; 'blocked' was renamed to 'blacklisted' in version 13 for
+               ;; some reason.
+               (substitute* "make/data/blacklistedcertsconverter/\
+blacklisted.certs.pem"
+                 (("^#!.*")
+                  "#! java BlacklistedCertsConverter SHA-256\n"))))))))   ))
 
 (define-public openjdk15
   (make-openjdk
