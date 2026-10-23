@@ -106,8 +106,8 @@ an implementation of the ISO standard 13751.")
           (base32 "1hnrq0mlff6b9c9129afphcnmzd05wdyyfs905n421diyd5xa0il"))
         (file-name (git-file-name name version))))
     (build-system gnu-build-system)
-    (inputs (list bash-minimal openjdk18))
-    (native-inputs (list `(,openjdk18 "jdk") zip))
+    (inputs (list bash-minimal openjdk))
+    (native-inputs (list `(,openjdk "jdk") zip))
     (arguments
      (list
        #:imported-modules `(,@%default-gnu-imported-modules
