@@ -2353,6 +2353,7 @@ build process and its dependencies, whereas Make uses Makefile format.")
                                                     (basename file))))
                           (find-files (assoc-ref inputs "java-commons-bcel")
                                       "\\.jar$"))))
+            (delete 'fix-executables-paths)
             (add-after 'build 'install
               (lambda _
                 (let ((share (string-append #$output "/share/java"))
