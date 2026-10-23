@@ -1464,11 +1464,7 @@ new Date();"))))
            libxtst))
     (native-inputs
      (list autoconf
-           bash                         ; not bash-minimal, needs ulimit
-           openjdk10
            `(,openjdk10 "jdk")
-           gnu-make-4.2
-           nss-certs
            pkg-config
            unzip
            which
