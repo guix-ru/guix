@@ -406,6 +406,7 @@ Design spec without sacrificing ease of use or application performance.")
               (url "https://github.com/ManimCommunity/manim")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
+       (patches (search-patches "manim-pillow-13.patch"))
        (sha256
         (base32 "1ifgcsz9dhb7qyqsi60q840wqcqfmqxf19r8qlncakziyqlfmwxd"))))
     (build-system pyproject-build-system)

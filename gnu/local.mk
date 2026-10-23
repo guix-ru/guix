@@ -1918,6 +1918,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/mate-common-honor-aclocal.patch		\
   %D%/packages/patches/mactelnet-remove-init.patch		\
   %D%/packages/patches/mailutils-variable-lookup.patch		\
+  %D%/packages/patches/manim-pillow-13.patch	\
   %D%/packages/patches/mandoc-support-zstd-compression.patch	\
   %D%/packages/patches/mantid-openmp-cleanup.patch		\
   %D%/packages/patches/make-impure-dirs.patch			\
