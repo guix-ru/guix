@@ -2034,6 +2034,14 @@ SRC_HC_OPTS += -optc-mno-outline-atomics
                        `("install"
                          ,@make-flags
                          ,(string-append "--prefix=" #$output)))))
+           (add-after 'install 'move-doc
+             (lambda* (#:key outputs #:allow-other-keys)
+               (let* ((out (assoc-ref outputs "out"))
+                      (doc (assoc-ref outputs "doc")))
+                 (mkdir-p (string-append doc "/share"))
+                 (rename-file
+                   (string-append out "/share/doc")
+                   (string-append doc "/share/doc")))))
            (add-after 'install 'remove-unnecessary-references
              (lambda* (#:key outputs #:allow-other-keys)
                (substitute* (find-files (string-append (assoc-ref outputs "out") "/lib/")
