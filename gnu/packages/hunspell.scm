@@ -30,6 +30,7 @@
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages gettext)
   #:use-module (gnu packages m4)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages textutils))
@@ -50,7 +51,7 @@
           "0qxlkd012r45ppd21kldbq9k5ac5nmxz290z6m2kch9l56v768k1"))))
     (build-system gnu-build-system)
     (native-inputs
-     (list autoconf automake libtool))
+     (list autoconf automake libtool gettext-minimal))
     (inputs
      (list perl))
     (native-search-paths (list (search-path-specification
