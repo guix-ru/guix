@@ -238,8 +238,7 @@ driver is known to work with these printers:
                                   #$(this-package-input "ghostscript-with-cups")
                                   "/bin/gsc")
                    (string-append "--with-shell="
-                                  (assoc-ref %build-inputs "bash")
-                                  "/bin/bash")
+                                  (search-input-file %build-inputs "/bin/bash"))
                    (string-append "--with-rcdir="
                                   #$output "/etc/rc.d")
                    ;; QPDF headers include C++17 libraries such as
