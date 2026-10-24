@@ -950,7 +950,8 @@ Library.")
    llvm-13
    "1z2xr9nn4mgc3hn9ark2k5y4wznpk47xppkp63bcbagr6589acvv"
    '("clang-runtime-13-glibc-2.36-compat.patch"
-     "clang-13-remove-crypt-interceptors.patch")))
+     "clang-13-remove-crypt-interceptors.patch"
+     "compiler-rt-13-remove-deprecated-struct-termio.patch")))
 
 (define-public clang-13
   (clang-from-llvm llvm-13 clang-runtime-13
