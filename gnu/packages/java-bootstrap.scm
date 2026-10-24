@@ -595,7 +595,7 @@ machine.")))
            (add-after 'install 'install-data
              (lambda _ (invoke "make" "install-data"))))))
       (native-inputs
-       (list autoconf automake libltdl libtool gettext-minimal texinfo
+       (list autoconf-2.73 automake libltdl libtool gettext-minimal texinfo
              pkg-config
              classpath-jamvm-wrappers  ;for javah
              ecj-bootstrap ecj-javac-wrapper fastjar
