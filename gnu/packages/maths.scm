@@ -2385,7 +2385,7 @@ extremely large and complex data collections.")
                       inputs "/lib/m2/org/slf4j/slf4j-nop/1.7.25/slf4j-nop-1.7.25.jar"))
                     (junit
                      (search-input-file
-                      inputs "/lib/m2/junit/junit/4.12/junit-4.12.jar"))
+                      inputs "/lib/m2/junit/junit/4.13.2/junit-4.13.2.jar"))
                     (hamcrest
                      (search-input-file
                       inputs "/lib/m2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar")))
@@ -2429,7 +2429,7 @@ extremely large and complex data collections.")
                    (search-input-file inputs "/bin/uname")))
                 (substitute* (find-files "java/test/testfiles/" ".*\\.txt$")
                   (("JUnit version 4.13.2")
-                   "JUnit version 4.12-SNAPSHOT")))))
+                   "JUnit version 4.13.2-SNAPSHOT")))))
           (add-after 'unpack 'patch-trace-shebang
             (lambda _
               (for-each patch-shebang
