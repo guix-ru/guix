@@ -52,6 +52,11 @@
      ;; Thus, build sequentially.
      (list #:parallel-build? #f
            #:parallel-tests? #f
+           #:configure-flags
+           #~(list
+              (string-append
+               "--with-installbuilddir=" #$output
+               "/lib/apr-1/build"))
            #:disallowed-references '()
            #:phases
            #~(modify-phases %standard-phases
