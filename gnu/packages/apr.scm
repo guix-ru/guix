@@ -50,27 +50,27 @@
      ;; Sometimes we end up with two processes concurrently trying to make
      ;; 'libmod_test.la': <http://hydra.gnu.org/build/60266/nixlog/2/raw>.
      ;; Thus, build sequentially.
-     `(#:parallel-build? #f
-       #:parallel-tests? #f
-       #:disallowed-references ()
-       #:phases
-       (modify-phases %standard-phases
-         ,@(if (target-ppc32?)
-               `((add-after 'unpack 'patch-sources
-                   (lambda* (#:key inputs native-inputs #:allow-other-keys)
-                     (invoke "patch" "-p1" "--force" "--input"
-                             (assoc-ref (or native-inputs inputs)
-                                        "atomics-patch")))))
-               '())
-         (add-after 'install 'patch-libxcrypt-reference
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (define out (assoc-ref outputs "out"))
-             (define libxcrypt
-               (dirname (search-input-file inputs "/lib/libcrypt.so.1")))
-             (substitute* (list (string-append out "/bin/apr-1-config")
-                                (string-append out "/lib/pkgconfig/apr-1.pc"))
-               (("-lcrypt")
-                (string-append "-L" libxcrypt " -lcrypt"))))))))
+     (list #:parallel-build? #f
+           #:parallel-tests? #f
+           #:disallowed-references '()
+           #:phases
+           #~(modify-phases %standard-phases
+               #$@(if (target-ppc32?)
+                      #~((add-after 'unpack 'patch-sources
+                           (lambda* (#:key inputs native-inputs #:allow-other-keys)
+                             (invoke "patch" "-p1" "--force" "--input"
+                                     (assoc-ref (or native-inputs inputs)
+                                                "atomics-patch")))))
+                      #~())
+               (add-after 'install 'patch-libxcrypt-reference
+                 (lambda* (#:key inputs outputs #:allow-other-keys)
+                   (define out (assoc-ref outputs "out"))
+                   (define libxcrypt
+                     (dirname (search-input-file inputs "/lib/libcrypt.so.1")))
+                   (substitute* (list (string-append out "/bin/apr-1-config")
+                                      (string-append out "/lib/pkgconfig/apr-1.pc"))
+                     (("-lcrypt")
+                      (string-append "-L" libxcrypt " -lcrypt"))))))))
     (inputs (list perl libltdl libxcrypt))
     (native-inputs
      `(,@(if (target-ppc32?)
