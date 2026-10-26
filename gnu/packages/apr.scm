@@ -52,6 +52,7 @@
      ;; Thus, build sequentially.
      `(#:parallel-build? #f
        #:parallel-tests? #f
+       #:disallowed-references ()
        #:phases
        (modify-phases %standard-phases
          ,@(if (target-ppc32?)
