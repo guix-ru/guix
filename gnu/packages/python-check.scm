@@ -2222,7 +2222,7 @@ Pydantic models, msgspec Struct's and more.")
 (define-public python-psleak
   (package
     (name "python-psleak")
-    (version "0.1.5")
+    (version "0.1.6")
     (source
      (origin
        (method git-fetch)
@@ -2231,7 +2231,7 @@ Pydantic models, msgspec Struct's and more.")
              (commit (string-append "release-" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0ifysg0j0qh4h06l3xqlk97kdf4sj5mlg5c9dwigakjg9ydnkdv6"))))
+        (base32 "1yhiyvvcnnn1fdz9bn5bw03gdkdfw1wc3vn97pfvymkagha9wyyc"))))
     (build-system pyproject-build-system)
     (arguments
      (list
