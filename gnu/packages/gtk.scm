@@ -817,9 +817,11 @@ images.")
                  (with-directory-excursion (string-append "../at-spi2-core-"
                                                           #$version "")
                    (invoke "dbus-run-session" "--" "ci/run-registryd-tests.sh")
-                   (substitute* "tests/atspi/meson.build"
-                     ;; Remove a timeout that caused aarch64 build failures.
-                     ((", timeout: [0-9]+") ""))
+                   (substitute* '("tests/at-spi2-atk/meson.build"
+                                  "tests/atspi/meson.build")
+                     ;; Remove timeouts that caused build failures on highly
+                     ;; loaded machines.
+                     ((", timeout: [[:digit:]]+") ""))
                    (substitute* "ci/run-tests.sh"
                      (("ps auxwww") "")   ;avoid a dependency on procps
                      (("meson test -C _build")
