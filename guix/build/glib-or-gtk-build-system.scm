@@ -219,7 +219,7 @@ file name if one was created else #f."
   (let* ((loaders (append-map
                    (lambda (dir)
                      (find-files (in-vicinity dir %gdk-pixbuf-loaders-directory) "^.*.so$"))
-                   directories))
+                   (delete-duplicates directories)))
          (outputs* (map (cut string-append <> "/"
                              %gdk-pixbuf-loaders-cache-file)
                         outputs))
