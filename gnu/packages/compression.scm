@@ -2365,20 +2365,17 @@ timestamps in the file header with a fixed time (1 January 2008).
 (define-public libzip
   (package
     (name "libzip")
-    (version "1.9.2")
+    (version "1.12.1")
     (source (origin
               (method url-fetch)
               (uri (string-append
                     "https://libzip.org/download/libzip-" version ".tar.xz"))
               (sha256
                (base32
-                "0dsrpb1faywhm0j8akx21gp7cn99wpz3h543jw8r7p5jnx99hgn9"))))
-    (native-inputs
-     (list perl pkg-config))
-    (inputs
-     (list gnutls xz openssl zlib
-           `(,zstd "lib")))
+                "04w9xsdqn3dczjpf7zvbgk6wx5r2g5q613ylfc2whqqr58164064"))))
     (build-system cmake-build-system)
+    (native-inputs (list nihtest perl pkg-config))
+    (inputs (list gnutls xz openssl zlib `(,zstd "lib")))
     (home-page "https://libzip.org")
     (synopsis "C library for reading, creating, and modifying zip archives")
     (description "Libzip is a C library for reading, creating, and modifying
