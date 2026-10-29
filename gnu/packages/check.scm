@@ -1510,6 +1510,33 @@ syntax validation, ...
 ")
     (license license:expat)))
 
+(define-public nihtest
+  (package
+    (name "nihtest")
+    (version "1.11.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/nih-at/nihtest")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "17j19n0f3dmnymdmkpd56h1dmqhhrwbh2086krn6vn6xqfcrckr9"))))
+    (build-system pyproject-build-system)
+    ;; XXX: The test suite requires cmake, and can be made to run in Guix
+    ;; easily.
+    (arguments (list #:tests? #f))
+    (native-inputs (list python-setuptools))
+    (home-page "https://github.com/nih-at/nihtest")
+    (synopsis "Testing tool for command line utilities")
+    (description "This package provides a testing tool for command line
+utilities.  Tests are run in a sandbox directory to guarantee a clean
+separation of the test.  It checks that exit code, standard and error outputs
+are as expected and compares the files in the sandbox after the run with the
+expected results.")
+    (license license:bsd-3)))
+
 (define-public python-parameterized
   (package
     (name "python-parameterized")
