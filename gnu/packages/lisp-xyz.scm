@@ -10317,7 +10317,13 @@ relational database engine.")
   (sbcl-package->cl-source-package sbcl-cl-sqlite))
 
 (define-public ecl-cl-sqlite
-  (sbcl-package->ecl-package sbcl-cl-sqlite))
+  (let ((pkg (sbcl-package->ecl-package sbcl-cl-sqlite)))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments arguments
+         ;; Tests take forever with ECL.
+         ((#:tests? _ #f) #f))))))
 
 (define-public sbcl-cl+ssl
   (let ((commit "17d5cdd65405f1d26e26f3e875e70027d0c8eedb")
