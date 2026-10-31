@@ -724,7 +724,7 @@ an interpreter, a compiler, a debugger, and much more.")
 (define-public ecl
   (package
     (name "ecl")
-    (version "24.5.10")
+    (version "26.5.5")
     (source
      (origin
        (method url-fetch)
@@ -732,7 +732,7 @@ an interpreter, a compiler, a debugger, and much more.")
              "https://ecl.common-lisp.dev/static/files/release/"
              name "-" version ".tgz"))
        (sha256
-        (base32 "0av2prf474cg0glr37fgsfb4w0dxfg38pykb72ay9q3132xnbsp4"))))
+        (base32 "0d9lcgqmgfy37hn7ib8xmav5vv2z7v8lyjd3vmckxdy5m36mn6m0"))))
     (build-system gnu-build-system)
     ;; src/configure uses 'which' to confirm the existence of 'gzip'.
     (native-inputs
