@@ -19961,13 +19961,13 @@ function @emph{prototypes} that a valid implementation must implement.")
   (sbcl-package->ecl-package sbcl-interface))
 
 (define-public sbcl-introspect-environment
-  (let ((commit "8fb20a1a33d29637a22943243d1482a20c32d6ae")
-        (revision "2"))
+  (let ((commit "e6c6e7ebe28dc639f01ca73ba61c56a910752106")
+        (revision "3"))
     (package
       (name "sbcl-introspect-environment")
       (build-system asdf-build-system/sbcl)
       (version (git-version "0.1" revision commit))
-      (home-page "https://github.com/Bike/introspect-environment")
+      (home-page "https://github.com/sharplispers/introspect-environment")
       (source
        (origin
          (method git-fetch)
@@ -19976,7 +19976,7 @@ function @emph{prototypes} that a valid implementation must implement.")
                (commit commit)))
          (file-name (git-file-name "cl-introspect-environment" version))
          (sha256
-          (base32 "1p48jnr1im47529w0ciyar4hfwbivqi57zgllkmfrav09ffigk9s"))))
+          (base32 "062kffrrj4c1li6bgyc2phxzm92gnxx2yrzk1y1pw6y4y71dgx84"))))
       (native-inputs
        (list sbcl-fiveam))
       (synopsis "Common Lisp environment introspection portability layer")
