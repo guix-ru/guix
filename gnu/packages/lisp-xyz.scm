@@ -29235,8 +29235,8 @@ data-frames.")
   (sbcl-package->ecl-package sbcl-select))
 
 (define-public sbcl-serapeum
-  (let ((commit "71f35c994b6d84c83157e15365156271b2213ad7")
-        (revision "13"))
+  (let ((commit "541acbc3d2bc9fc06efce50d07766c7243b5f2b1")
+        (revision "14"))
     (package
       (name "sbcl-serapeum")
       (version (git-version "0.0.0" revision commit))
@@ -29249,7 +29249,7 @@ data-frames.")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1rmvl3ipw9dz0gxj5k86911fjpin7n6k8k1r6g1z94nd9rw4cgzy"))))
+          (base32 "1fwvl67d6zzg9m48hxbisrqy1b3d74wbcak0ljv9ywl9vrz0hj3n"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-alexandria
