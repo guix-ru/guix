@@ -831,7 +831,7 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
 (define-public cmocka
   (package
     (name "cmocka")
-    (version "1.1.5")
+    (version "2.0.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://cmocka.org/files/"
@@ -839,7 +839,7 @@ a multi-paradigm automated test framework for C++ and Objective-C.")
                                   version ".tar.xz"))
               (sha256
                (base32
-                "1dm8pdvkyfa8dsbz9bpq7wwgixjij4sii9bbn5sgvqjm5ljdik7h"))))
+                "05pl1sgkya0kvrjpsv3kgsgnrpsjbi55p9sdmw11lgyzdcv2zy9r"))))
     (build-system cmake-build-system)
     (arguments
      `(#:tests? #f))                    ; no test target
