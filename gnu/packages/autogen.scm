@@ -62,6 +62,9 @@
        ;; “Something went wrong bootstrapping makefile fragments for
        ;;  automatic dependency tracking.  Try re-running configure with […]”
        (list "--disable-dependency-tracking")
+       ;; Fix build with glibc 2.42+
+       #:make-flags
+       (list "CFLAGS=-g -O2 -Wno-discarded-qualifiers")
 
        ;; XXX: Parallel tests may cause an indefinite hang with GNU Make 4.3.
        #:parallel-tests? #f
