@@ -1464,14 +1464,14 @@ be built as a stand-alone REPL interpreter.")
 (define-public sbcl
   (package
     (name "sbcl")
-    (version "2.6.4")
+    (version "2.6.10")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://sourceforge/sbcl/sbcl/" version "/sbcl-"
                            version "-source.tar.bz2"))
        (sha256
-        (base32 "0yym01a6a2vp9cns46vi3ikg4q2jdnfijrh4yp2bgzk09djkx99v"))
+        (base32 "0z5ic598wmx1knwkfzql2vi5qvw13g4z6hdpgvfhmbm918fsqgn2"))
        (modules '((guix build utils)))
        (snippet
         '(begin
@@ -1617,11 +1617,10 @@ be built as a stand-alone REPL interpreter.")
                                          `("clisp")))
                      (string-append "--prefix="
                                     (assoc-ref outputs "out"))
-                     ,@(if (or (target-ppc32?)
-                               (target-x86-32?))
-                         ;; 3072 is too much for these architectures.
-                         `("--dynamic-space-size=2048")
-                         `("--dynamic-space-size=3072"))
+                     ,@(if (target-32bit?)
+                           ;; 3072 is too much for these architectures.
+                           `("--dynamic-space-size=2048")
+                           `("--dynamic-space-size=3072"))
                      "--with-sb-core-compression"
                      "--with-sb-xref-for-internals"
                      ;; SB-SIMD will only be built on x86_64 CPUs supporting
