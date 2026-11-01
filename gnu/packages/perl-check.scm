@@ -1463,14 +1463,14 @@ errors (such as memory leaks) in an arbitrary binary executable.")
 (define-public perl-test-script
   (package
     (name "perl-test-script")
-    (version "1.20")
+    (version "1.31")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://cpan/authors/id/P/PL/PLICEASE/"
                                   "Test-Script-" version ".tar.gz"))
               (sha256
                (base32
-                "1msavbi6przkxq3npm90nv925v58iym9jrk677wn46x19whwzwzm"))))
+                "0iykrhl4qlgjirlwbm5kmw3fba8v1fnbbnxxkhcqh0av78c3n1a4"))))
     (build-system perl-build-system)
     (propagated-inputs
      (list perl-capture-tiny perl-probe-perl))
