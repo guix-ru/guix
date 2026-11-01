@@ -1704,6 +1704,16 @@ are better handled by external tools.")
                      (nu-completions-dir
                        (string-append share "/nushell/vendor/autoload")))
                 (install-file "assets/yazi.desktop" applications)
+                (for-each
+                 (lambda (size)
+                   (let* ((size-str (number->string size))
+                          (dimensions (string-append size-str "x" size-str))
+                          (icon-dir (string-append share "/icons/hicolor/"
+                                                   dimensions "/apps")))
+                     (mkdir-p icon-dir)
+                     (invoke "convert" "assets/logo.png" "-resize" dimensions
+                             (string-append icon-dir "/yazi.png"))))
+                 '(16 24 32 48 64 128 256 512))
                 (for-each mkdir-p (list bash-completions-dir
                                         elv-completions-dir
                                         fish-completions-dir
@@ -1721,7 +1731,7 @@ are better handled by external tools.")
               (wrap-program (string-append #$output "/bin/yazi")
                 `("PATH" ":" prefix
                   (,(string-append #$(this-package-input "file") "/bin")))))))))
-    (native-inputs (list pkg-config))
+    (native-inputs (list imagemagick pkg-config))
     (inputs (cons* file
                    jemalloc
                    lua-5.5
