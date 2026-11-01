@@ -487,7 +487,7 @@ is the subpackage in charge of the statistical and diagnostics computations.")
 (define r-with-tests
   (package
     (name "r-with-tests")
-    (version "4.6.1")
+    (version "4.6.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "mirror://cran/src/base/R-"
@@ -495,7 +495,7 @@ is the subpackage in charge of the statistical and diagnostics computations.")
                                   version ".tar.xz"))
               (sha256
                (base32
-                "10spzsmyh32pkg124slbq19g9qm19ki7ar6xbsyg3wsiw60ra574"))))
+                "0i4nh9280dddwh819737ngxgakal1hh9ax1l0jhrdswyvjg5d3am"))))
     (build-system gnu-build-system)
     (arguments
      (list
