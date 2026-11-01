@@ -5600,7 +5600,7 @@ to answer a question.  Xmessage can also exit after a specified time.")
 (define-public xterm
   (package
     (name "xterm")
-    (version "397")
+    (version "412")
     (source
      (origin
        (method url-fetch)
@@ -5610,7 +5610,7 @@ to answer a question.  Xmessage can also exit after a specified time.")
              (string-append "ftp://ftp.invisible-island.net/xterm/"
                             "xterm-" version ".tgz")))
        (sha256
-        (base32 "0ql6mvs2amjfdarpqwzi4dcnvkgn6wr52kh7b3nfqi5skhmp96rf"))
+        (base32 "19k5mmfmxd98pr8dcq39hyan1bqj6xcpx7r6i5nlzhfbq60cg2xl"))
        (patches
          (search-patches "xterm-370-explicit-xcursor.patch"))))
     (build-system gnu-build-system)
@@ -5624,7 +5624,7 @@ to answer a question.  Xmessage can also exit after a specified time.")
               "--enable-doublechars"
               "--enable-luit"
               "--enable-mini-luit"
-              "X_EXTRA_LIBS=-lXcursor")
+              "X_EXTRA_LIBS=-lXcursor -ltinfo")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'build 'patch-file-names
