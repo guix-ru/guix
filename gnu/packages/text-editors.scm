@@ -45,6 +45,7 @@
 ;;; Copyright © 2025 benjamin wil <hey@benjaminwil.info>
 ;;; Copyright © 2025 Janneke Nieuwenhuizen <janneke@gnu.org>
 ;;; Copyright © 2026 Ignatius Menzies <ignatius.menzies@gmail.com>
+;;; Copyright © 2026 Untrusem <mysticmoksh@riseup.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -991,6 +992,56 @@ Wordstar-, EMACS-, Pico, Nedit or vi-like key bindings.  e3 can be used on
 \"broadly\" compatible.  This is a portable version of the mg maintained by the
 OpenBSD team.")
     (license license:public-domain)))
+
+(define-public natto
+  ;; no releases we take version from manpage
+  (let ((commit "cd994d7ffd5354790fdfdf7ae0a36a011312662f")
+        (revision "0"))
+    (package
+      (name "natto")
+      (version (git-version "0.020261030" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.sr.ht/~niaa/natto")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1rx0rfbv2h05y8i1p9fyk3lay5vsphcyi5awbjv95c67f38jkqar"))))
+      (build-system gnu-build-system)
+      (arguments
+       (list
+        #:tests? #f ;no tests
+        #:make-flags
+        #~(list "MANDIR=/share/man"
+                (string-append "CC="
+                               #$(cc-for-target))
+                (string-append "PREFIX="
+                               #$output))
+        #:phases
+        #~(modify-phases %standard-phases
+            (replace 'configure
+              (lambda _
+                (substitute* "makefile"
+                  (("-lcurses")
+                   "-lncurses")))))))
+      (inputs (list ncurses))
+      (home-page "https://sr.ht/~niaa/natto")
+      (synopsis "modeless and small emacs-style text editor")
+      (description
+       "This package provides a modeless screen-based text editor similar to
+@command{nano} or @command{emacs}. @command{natto} is based on
+@url{https://github.com/hughbarney/atto, atto} and is 48KB in size.
+
+@command{natto} includes the following extra features over atto:
+@itemize
+@item A menu operated with the cursor keys, similar to the MS-DOS editor included with
+Windows.
+@item Support for non-ANSI terminals via libcurses key translation.
+@item @url{https://man.netbsd.org/natto.1, A manual page.}
+@end itemize")
+      (license (list license:public-domain license:bsd-0)))))
 
 (define-public nano
   (package
