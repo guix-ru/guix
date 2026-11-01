@@ -23449,14 +23449,14 @@ about a real-valued functional of the multinomial probabilities.")
 (define-public r-xts
   (package
     (name "r-xts")
-    (version "0.14.2")
+    (version "0.14.3")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "xts" version))
        (sha256
         (base32
-         "0vyw284fwb17ih25swpvbd419gxr6swnrbsh70b68imnna28bdnl"))
+         "0da7abnhklzl0i6x2k55ld1c3vf1a81sggbzkn6dpyzm1n1l69hm"))
        (modules '((guix build utils)))
        (snippet
         '(with-directory-excursion "inst/doc"
