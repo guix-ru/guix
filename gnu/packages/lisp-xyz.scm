@@ -35590,6 +35590,15 @@ Service (S3) and CloudFront service from Common Lisp.")
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-alexandria))
+      (arguments
+       (list #:phases
+             #~(modify-phases %standard-phases
+                 (add-after 'unpack 'fix-build
+                   (lambda _
+                     ;; The following type declaration causes the build
+                     ;; to fail with sbcl 2.6.10.
+                     (substitute* "merge-sort.lisp"
+                       (("\\(type ,type ,sequence\\)") "")))))))
       (home-page "https://github.com/jorgetavares/zsort")
       (synopsis "Collection of portable sorting algorithms in Common Lisp")
       (description
