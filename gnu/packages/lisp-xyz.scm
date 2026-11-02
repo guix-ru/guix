@@ -7758,8 +7758,8 @@ as possible).")
   (sbcl-package->ecl-package sbcl-cl-json-pointer))
 
 (define-public sbcl-cl-ledger
-  (let ((commit "b0174f5634e389fb022ae72cc527a13b719655bd")
-        (revision "2"))
+  (let ((commit "fe589ae3a56e2f518cb6233f4c9ca773e8f59a9a")
+        (revision "3"))
     (package
       (name "sbcl-cl-ledger")
       (version (git-version "4.0.0" revision commit))
@@ -7771,7 +7771,7 @@ as possible).")
                (commit commit)))
          (file-name (git-file-name "cl-ledger" version))
          (sha256
-          (base32 "02zg53j8d7lpyafif9kplp6clchz4id429j0dc5w80wvcwfal123"))))
+          (base32 "1f3p5rk7hba9p4h8s1vl5xbd46kszh19c9xcym3ns43qflvc26nr"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-cambl
