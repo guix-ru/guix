@@ -321,6 +321,12 @@ following features:
        #:make-flags #~(list "TEST_OPTIONS=--quick") ;some tests are very long
        #:phases
        #~(modify-phases %standard-phases
+           (add-after 'unpack 'fix-ncurses-link
+             (lambda _
+               ;; Fix: regedit.c.36.o: undefined reference to symbol 'cbreak'
+               (substitute* "source3/utils/wscript_build"
+                 (("ncurses")
+                  "ncurses tinfo"))))
            (add-before 'configure 'setup-docbook-stylesheets
              (lambda* (#:key inputs #:allow-other-keys)
                ;; Append Samba's own DTDs to XML_CATALOG_FILES
@@ -389,7 +395,7 @@ following features:
             tdb))
      (propagated-inputs
       ;; In Requires or Requires.private of pkg-config files.
-      (list ldb talloc tevent))
+      (list talloc tevent))
      (native-inputs
       (append
        (list perl-parse-yapp
