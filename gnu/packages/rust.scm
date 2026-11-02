@@ -2486,11 +2486,11 @@ ge13ca993e8ccb9ba9847cc330696e02839f328f7/jemalloc"))
                       '("fn net_err_suggests_fetch_with_cli")))))
              (add-after 'unpack 'patch-process-tests
                (lambda* (#:key inputs #:allow-other-keys)
-                 (let ((bash (assoc-ref inputs "bash")))
+                 (let ((sh (which "sh")))
                    (with-directory-excursion "library/std/src"
                      (substitute* "process/tests.rs"
                        (("\"/bin/sh\"")
-                        (string-append "\"" bash "/bin/sh\"")))
+                        (string-append "\"" sh "\"")))
                      ;; The three tests which are known to fail upstream on QEMU
                      ;; emulation on aarch64 and riscv64 also fail on x86_64 in
                      ;; Guix's build system.  Skip them on all builds.
