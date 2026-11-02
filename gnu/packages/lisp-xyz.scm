@@ -27802,31 +27802,31 @@ immediately loaded.")
   (sbcl-package->ecl-package sbcl-quickproject))
 
 (define-public sbcl-quicksearch
-  (let ((commit "fb02ecf7c876ec580ab18c7d2c8c7814c06af599"))
+  (let ((commit "75c4a022ad18b0ffd9f626d43fd5a44a27255de8")
+        (revision "2"))
     (package
       (name "sbcl-quicksearch")
-      (version (git-version "0.01.04" "1" commit))
+      (version (git-version "0.01.04" revision commit))
       (source
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://github.com/tkych/quicksearch/")
+               (url "https://github.com/lisp-maintainers/quicksearch")
                (commit commit)))
-         (file-name (git-file-name name version))
+         (file-name (git-file-name "cl-quicksearch" version))
          (sha256
-          (base32 "16k19zjkhh7r64vjq371k5jwjs7cdfjz83flh561n4h4v1z89fps"))))
+          (base32 "0swcj1w8p07vc783whwjsshkhbl51v46z26bhqxpka31f7v65ww2"))))
       (build-system asdf-build-system/sbcl)
       (inputs
-       (list sbcl-bordeaux-threads
-             sbcl-iterate
-             sbcl-alexandria
+       (list sbcl-alexandria
              sbcl-anaphora
+             sbcl-bordeaux-threads
              sbcl-cl-ppcre
-             sbcl-drakma
-             sbcl-html-entities
-             sbcl-yason
+             sbcl-dexador
+             sbcl-do-urlencode
              sbcl-flexi-streams
-             sbcl-do-urlencode))
+             sbcl-html-entities
+             sbcl-yason))
       (home-page "https://github.com/tkych/quicksearch/")
       (synopsis "Search Engine Interface for Common Lisp packages")
       (description "Quicksearch is a search-engine-interface for Common Lisp.
