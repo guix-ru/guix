@@ -1,0 +1,44 @@
+From ba465ed5ac2787109e8b710bfc26762773b8bb20 Mon Sep 17 00:00:00 2001
+From: Guillaume Le Vaillant <glv@posteo.net>
+Date: Tue, 3 Nov 2026 14:27:24 +0100
+Subject: [PATCH] Add make-eval-lambda function for sbcl
+
+---
+ src/cl-jupyter/kernel.lisp | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/src/cl-jupyter/kernel.lisp b/src/cl-jupyter/kernel.lisp
+index 05ac782..f6a6de8 100644
+--- a/src/cl-jupyter/kernel.lisp
++++ b/src/cl-jupyter/kernel.lisp
+@@ -568,6 +568,18 @@
+                 (return-from update-breakpoints))))))))
+ 
+ 
++#+sbcl
++(defun make-eval-lambda (expr)
++  (let ((lambda (if (typep expr '(cons (eql function) (cons t null)))
++                    (cadr expr)
++                    expr)))
++    (if (typep lambda '(cons (member lambda named-lambda)))
++        (values lambda nil)
++        (values `(lambda ()
++                   ,(if (and (consp expr) (eq (car expr) 'declare))
++                        `(progn ,expr)
++                        expr))
++                t))))
+ 
+ (defun eval-and-print (form aux-form breakpoints)
+   (setf common-lisp-user::- form)
+@@ -583,7 +595,7 @@
+                    #+sbcl
+                    (handler-bind ((sb-c::compiler-note #'muffle-warning))
+                      (let* ((sb-c::*source-paths* (make-hash-table :test 'eq))
+-                            (lambda (sb-impl::make-eval-lambda form))
++                            (lambda (make-eval-lambda form))
+                             (sb-c::*source-form-context-alist*
+                               (acons lambda form
+                                      sb-c::*source-form-context-alist*)))
+-- 
+2.55.0
+
