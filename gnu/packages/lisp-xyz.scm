@@ -13505,8 +13505,8 @@ or cl-launch for portable processing of command-line arguments.")
   (sbcl-package->cl-source-package sbcl-common-html))
 
 (define-public sbcl-common-lisp-jupyter
-  (let ((commit "3555a009f6d8734751bda1feadc8a09e7b0099b6")
-        (revision "0"))
+  (let ((commit "c7d29e6a1775613b810ce7ac9c00f6de3ef8940d")
+        (revision "1"))
     (package
       (name "sbcl-common-lisp-jupyter")
       (version (git-version "1.0" revision commit))
@@ -13518,7 +13518,9 @@ or cl-launch for portable processing of command-line arguments.")
                (commit commit)))
          (file-name (git-file-name "cl-common-lisp-jupyter" commit))
          (sha256
-          (base32 "05nj171jad9819iq137i7vxgxyxz1sr3p4qxgr2k7z1ihq5kb0gw"))))
+          (base32 "16i1lahymdkz39g05w29iw4bwqxvlx6vhd0m3r0ww5vnb3qn19vs"))
+         (patches
+          (search-patches "sbcl-common-lisp-jupiter-with-sbcl-2.6.10.patch"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-alexandria
