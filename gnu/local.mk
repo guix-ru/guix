@@ -2531,6 +2531,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/sbcl-clml-fix-loop.patch			\
   %D%/packages/patches/sbcl-cl-posix-mqueue-mqattr-size.patch	\
   %D%/packages/patches/sbcl-cl-redis-replace-sbcl-specific-calls.patch	\
+  %D%/packages/patches/sbcl-common-lisp-jupiter-with-sbcl-2.6.10.patch	\
   %D%/packages/patches/sbcl-eazy-gnuplot-skip-path-check.patch	\
   %D%/packages/patches/sbcl-lack-fix-tests.patch		\
   %D%/packages/patches/sbcl-png-fix-sbcl-compatibility.patch	\
