@@ -13065,8 +13065,8 @@ be usable from multi-threaded programs.")
   (sbcl-package->ecl-package sbcl-cmd))
 
 (define-public sbcl-cm
-  (let ((commit "4b72b9e17eccc012b5dd78e61c828b08c4530e7b")
-        (revision "0"))
+  (let ((commit "fbb325a33c8b263df845d422e23d4706b1795e89")
+        (revision "1"))
     (package
       (name "sbcl-cm")
       (version (git-version "2.12.0" revision commit))
@@ -13078,10 +13078,10 @@ be usable from multi-threaded programs.")
                 (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0578j1xmhgfch4rp2dvkwn0dfhiy7kdd1i1p84f56vfdmzb540qx"))))
+          (base32 "0h0kcrfaans5bzzx0ai0ldjjcn200lp098cwdv7013z06kh3axv2"))))
       (build-system asdf-build-system/sbcl)
       (inputs (list sbcl-alexandria))
-      (synopsis " Algorithmic music composition system")
+      (synopsis "Algorithmic music composition system")
       (description "Common Music (CM) is a real-time music composition system.")
       (home-page "http://www.sourceforge.net/projects/commonmusic")
       (license license:llgpl))))
