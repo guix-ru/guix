@@ -8361,6 +8361,14 @@ easily compiled into a target markup language like HTML.")
        (list sbcl-lift))
       (inputs
        (list sbcl-cl-containers sbcl-metatilities-base))
+      (arguments
+       (list #:phases
+             #~(modify-phases %standard-phases
+                 (add-after 'unpack 'fix-build
+                   (lambda _
+                     (substitute* "dev/basic-statistics.lisp"
+                       (("apply #'reduce data")
+                        "apply #'reduce-elements data")))))))
       (home-page "https://github.com/hraban/cl-mathstats")
       (synopsis "Common Lisp collection of mathematical routines")
       (description
