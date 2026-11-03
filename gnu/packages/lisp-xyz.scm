@@ -34044,16 +34044,16 @@ the abstraction and portability layer as thin as possible.")
 (define-public sbcl-alive-lsp
  (package
   (name "sbcl-alive-lsp")
-  (version "0.2.11")
+  (version "0.4.6")
   (source
    (origin
     (method git-fetch)
     (uri (git-reference
           (url "https://github.com/nobody-famous/alive-lsp")
           (commit (string-append "v" version))))
-    (file-name (git-file-name "sbcl-alive-lsp" version))
+    (file-name (git-file-name "cl-alive-lsp" version))
     (sha256
-     (base32 "1dmgglrg7294vx8qacc5d2hkhfrids1iacihj2l8czrvwc3i19yz"))))
+     (base32 "071skg3czp40xcv5cwd4nnijhwpvjqy18a8aklf0lnm2k6rd62vy"))))
   (build-system asdf-build-system/sbcl)
   (inputs
    (list sbcl-usocket
