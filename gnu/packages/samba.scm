@@ -65,6 +65,7 @@
   #:use-module (gnu packages gnupg)
   #:use-module (gnu packages kerberos)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages networking)
   #:use-module (gnu packages onc-rpc)
   #:use-module (gnu packages openldap)
   #:use-module (gnu packages perl)
@@ -314,7 +315,17 @@ following features:
         (uri (string-append "https://download.samba.org/pub/samba/stable/"
                             "samba-" version ".tar.gz"))
         (sha256
-         (base32 "1y2z4rl88mfmj5187bmgqxdlda6cxx35k3lqp5m65v318fmm2b6z"))))
+         (base32 "1y2z4rl88mfmj5187bmgqxdlda6cxx35k3lqp5m65v318fmm2b6z"))
+        (modules '((guix build utils)))
+        (snippet
+         '(begin
+            (for-each
+             (lambda (file)
+               (unless (or (string-prefix? "third_party/quic" file)
+                           (string-prefix? "third_party/waf" file)
+                           (string-suffix? "wscript" file))
+                 (delete-file file)))
+             (find-files "third_party"))))))
      (build-system gnu-build-system)
      (arguments
       (list
@@ -351,6 +362,8 @@ following features:
                                 '("--enable-selftest")
                                 '())
                          "--enable-fhs"
+                         ;; TODO: Package libquic
+                         "--bundled-libraries=libquic,NONE"
                          (string-append "--prefix=" #$output)
                          "--sysconfdir=/etc"
                          "--localstatedir=/var"
@@ -387,6 +400,7 @@ following features:
             linux-pam
             lmdb
             mit-krb5
+            ngtcp2
             openldap
             perl
             python
@@ -406,7 +420,12 @@ following features:
        (if (member (%current-system)
                    (package-transitive-supported-systems
                     python-cryptography))
-           (list python-cryptography)
+           (list python-cryptography
+                 socket-wrapper
+                 nss-wrapper
+                 pam-wrapper
+                 resolv-wrapper
+                 uid-wrapper)
            '())
        (list python-dnspython-minimal
              python-iso8601/pinned
