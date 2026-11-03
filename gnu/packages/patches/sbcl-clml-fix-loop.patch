@@ -1,0 +1,28 @@
+From fd7bea22e5fb2e4439fb4f0724ba9a492615ae26 Mon Sep 17 00:00:00 2001
+From: Guillaume Le Vaillant <glv@posteo.net>
+Date: Tue, 3 Nov 2026 11:06:51 +0100
+Subject: [PATCH] Fix loop for sbcl 2.6.10
+
+---
+ statistics/src/math.lisp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/statistics/src/math.lisp b/statistics/src/math.lisp
+index a96275e..6296ea6 100644
+--- a/statistics/src/math.lisp
++++ b/statistics/src/math.lisp
+@@ -562,9 +562,9 @@ Series \(not very large B):
+                 (+ (log bx) +euler-gamma+)))
+          (tolerance (* double-float-epsilon 5.0d0 (abs (+ c tt)))))
+     (loop
+-       for tt = tt then (* tt (/ (- x bx) j))
++       for ttt = tt then (* ttt (/ (- x bx) j))
+        for j upfrom 1
+-       for change = (/ tt j)
++       for change = (/ ttt j)
+        sum change into s
+        while (> (abs change) tolerance)
+        finally (return (* (- a) (+ c s))))))
+-- 
+2.55.0
+

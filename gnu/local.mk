@@ -2528,7 +2528,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/sbcl-aserve-fix-rfe12668.patch	\
   %D%/packages/patches/sbcl-ciel-repl.patch			\
   %D%/packages/patches/sbcl-cl-brotli-enable-asdf-test-op.patch	\
-  %D%/packages/patches/sbcl-clml-fix-types.patch		\
+  %D%/packages/patches/sbcl-clml-fix-loop.patch			\
   %D%/packages/patches/sbcl-cl-posix-mqueue-mqattr-size.patch	\
   %D%/packages/patches/sbcl-cl-redis-replace-sbcl-specific-calls.patch	\
   %D%/packages/patches/sbcl-eazy-gnuplot-skip-path-check.patch	\
