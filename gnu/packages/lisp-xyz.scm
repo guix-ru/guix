@@ -12278,8 +12278,8 @@ lQuery.")
   (sbcl-package->ecl-package sbcl-clip))
 
 (define-public sbcl-clml
-  (let ((commit "95505b54c8c7b4b27f500c3be97fa5732f4b51a8")
-        (revision "0"))
+  (let ((commit "c34cc7a7c041d3f99e5d3bc5b4abf5caaedfd1dd")
+        (revision "1"))
     (package
       (name "sbcl-clml")
       (version (git-version "0.0.0" revision commit))
@@ -12291,9 +12291,9 @@ lQuery.")
                (commit commit)))
          (file-name (git-file-name "clml" version))
          (sha256
-          (base32 "006pii59nmpc61n7p7h8ha5vjg6x0dya327i58z0rnvxs249h345"))
+          (base32 "0m3w59c74z3wdj1g26122svljiq192xhvmx7b2lkb7bxnf4778m1"))
          ;; TODO: Remove this when the patch has been merged upstream.
-         (patches (search-patches "sbcl-clml-fix-types.patch"))))
+         (patches (search-patches "sbcl-clml-fix-loop.patch"))))
       (build-system asdf-build-system/sbcl)
       (inputs
        (list sbcl-alexandria
