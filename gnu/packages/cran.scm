@@ -31,7 +31,7 @@
 ;;; Copyright © 2020 Antoine Côté <antoine.cote@posteo.net>
 ;;; Copyright © 2020, 2026 Arun Isaac <arunisaac@systemreboot.net>
 ;;; Copyright © 2020 Magali Lemes <magalilemes00@gmail.com>
-;;; Copyright © 2020-2023, 2025 Simon Tournier <zimon.toutoune@gmail.com>
+;;; Copyright © 2020-2023, 2025, 2026 Simon Tournier <zimon.toutoune@gmail.com>
 ;;; Copyright © 2020 Aniket Patil <aniket112.patil@gmail.com>
 ;;; Copyright © 2021 Marcel Schilling <marcel.schilling@uni-luebeck.de>
 ;;; Copyright © 2021 Guillaume Le Vaillant <glv@posteo.net>
@@ -41655,6 +41655,28 @@ microarrays.")
      "This package provides tools for shrunken centroids regularized
 discriminant analysis for the purpose of classifying high dimensional data.")
     (license license:gpl2+)))
+
+(define-public r-rdtools
+  (package
+    (name "r-rdtools")
+    (version "0.1.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "rdtools" version))
+       (sha256
+        (base32 "0jq9dk3dj4glrdn1n6nmgi1w4a20ig303d7lfv525lwaqzqaxzch"))))
+    (properties `((upstream-name . "rdtools")))
+    (build-system r-build-system)
+    (native-inputs (list r-testthat r-withr))
+    (home-page "https://rdtools.r-lib.org")
+    (synopsis "Efficient Manipulation of 'Rd' Files and Help Topics")
+    (description
+     "This package provides fast, cached lookup of help topics and aliases
+across installed, source, and in-development packages, plus efficient
+retrieval of parsed @code{Rd} objects.  Per-package indexes are built once and
+cached, making repeated retrieval cheap enough to call in a tight loop.")
+    (license license:expat)))
 
 (define-public r-ggvis
   (package
