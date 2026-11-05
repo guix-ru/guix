@@ -22420,6 +22420,47 @@ predictions, residuals and cluster assignments; and @code{glance}, which
 provides a one-row summary of model-level statistics.")
     (license license:expat)))
 
+(define-public r-broom-mixed
+  (package
+    (name "r-broom-mixed")
+    (version "0.2.9.7")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (cran-uri "broom.mixed" version))
+       (sha256
+        (base32 "0hcnp9p9412a38n0q49yvmsbv6wzbwdwv825cgj0rpf3a8izmf11"))))
+    (properties `((upstream-name . "broom.mixed")))
+    (build-system r-build-system)
+    (propagated-inputs (list r-broom
+                             r-coda
+                             r-dplyr
+                             r-forcats
+                             r-furrr
+                             r-nlme
+                             r-purrr
+                             r-stringr
+                             r-tibble
+                             r-tidyr))
+    (native-inputs (list r-gamlss-data
+                         r-glmmtmb
+                         r-knitr
+                         r-lme4
+                         r-mice
+                         r-rstan
+                         r-testthat))
+    (home-page "https://github.com/bbolker/broom.mixed")
+    (synopsis "Tidying Methods for Mixed Models")
+    (description
+     "Convert fitted objects from various R mixed-model packages into tidy
+data frames along the lines of the broom package.  The package provides three
+S3 generics for each model: @code{tidy()}, which summarizes a model's
+statistical findings such as coefficients of a regression; @code{augment()},
+which adds columns to the original data such as predictions, residuals and
+cluster assignments; and @code{glance()}, which provides a one-row summary of
+model-level statistics.")
+    (license license:gpl3)))
+
 (define-public r-recipes
   (package
     (name "r-recipes")
