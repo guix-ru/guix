@@ -11649,14 +11649,14 @@ multiple breakpoints are allowed.")
 (define-public r-sfsmisc
   (package
     (name "r-sfsmisc")
-    (version "1.1-24")
+    (version "1.1-26")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "sfsmisc" version))
        (sha256
         (base32
-         "06l0jh4hpyk6axcqca651jm9wd5jzkf8mpslx4kizp36dar3cccc"))))
+         "0hbj6zf8za494703kqp2na3xamg3qzvq7hijy0vb4mjzvy13lkzp"))))
     (properties
      '((updater-extra-propagated-inputs . ("procps"))))
     (build-system r-build-system)
