@@ -9924,17 +9924,15 @@ size and can be easily tested locally before being sent to a remote.")
 (define-public r-class
   (package
     (name "r-class")
-    (version "7.3-23")
+    (version "7.3-24")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "class" version))
        (sha256
         (base32
-         "1wci521c81q500rwcsm8q1s307fxfx8pjvai85bg2ig0x89dn6jd"))))
+         "1q87qmsv4myycf822ywldiyvvxsmkc6ml4zzdznlq8glwdbnxip8"))))
     (build-system r-build-system)
-    (propagated-inputs
-     (list r-mass))
     (home-page "https://www.stats.ox.ac.uk/pub/MASS4/")
     (synopsis "R functions for classification")
     (description
