@@ -26959,13 +26959,13 @@ the package and its design philosophy see Chalmers and Adkins (2020)
 (define-public r-simplermarkdown
   (package
     (name "r-simplermarkdown")
-    (version "0.0.6")
+    (version "0.1.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "simplermarkdown" version))
        (sha256
-        (base32 "0lffwsrhsdqcqhklh24v0y0x6w4vq9jch93m330kfdv2amab1l06"))))
+        (base32 "1pdmpyrmjbmlylpb9dbsfmvvgfz46cbvchikdvanrhiigjgbzy5m"))))
     (properties `((upstream-name . "simplermarkdown")))
     (build-system r-build-system)
     (propagated-inputs
