@@ -42768,14 +42768,14 @@ offers access to an XPath \"interpreter\".")
 (define-public r-xml2
   (package
     (name "r-xml2")
-    (version "1.5.2")
+    (version "1.6.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "xml2" version))
        (sha256
         (base32
-         "1ash9ya3av2a38k9p42dyl4blrhs1rxwyqw952cc7r7rg2jcz1zd"))))
+         "0ygmicqq0cm30r8s4xv5zl070jadqlhlgm6c1im8cfd8n3d0wrmh"))))
     (properties
      ;; Avoid dependency cycle.
      '((updater-ignored-native-inputs . ("r-httr"))))
