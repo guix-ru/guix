@@ -33340,14 +33340,14 @@ repositories.")
 (define-public r-gh
   (package
     (name "r-gh")
-    (version "1.6.0")
+    (version "1.6.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "gh" version))
        (sha256
         (base32
-         "1r1vxxjk6wzdxa51x3hhadaw4mpbdpxgxcvlkc5ysd88s5gy3lwi"))))
+         "18rgpmlscfdbz1ivvm7j1vk3z9k0wpqa8yd61kscvmgs66p2mbdm"))))
     (properties
      '((updater-ignored-native-inputs . ("r-connectcreds"))))
     (build-system r-build-system)
