@@ -1795,13 +1795,13 @@ additions (tooltips, bipartite diagram type).")
 (define-public r-chron
   (package
     (name "r-chron")
-    (version "2.3-62")
+    (version "2.3-63")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "chron" version))
               (sha256
                (base32
-                "18dyy4fn48d4m7azqbqpazhvy9mwl1k494zl7gxckfrx4ivjrb87"))))
+                "13qjqjgdl46zirhddvbl9jdlynghnph58gd4bcwy48zckxs20da7"))))
     (build-system r-build-system)
     (home-page "https://cran.r-project.org/web/packages/chron")
     (synopsis "Chronological R objects which can handle dates and times")
