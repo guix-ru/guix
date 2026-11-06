@@ -10209,13 +10209,13 @@ proposals for count data.")
 (define-public r-zoo
   (package
     (name "r-zoo")
-    (version "1.8-15")
+    (version "1.9-1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "zoo" version))
               (sha256
                (base32
-                "1sk131fi9sxia6h3jgn461jz56hhfvyq53dw0a1g5r6ysfvkklf0"))))
+                "0fh578mrjqxsr65g840dga457pxjwjcr0i5g43yqwllvd9r9ind2"))))
     (properties
      '((updater-ignored-native-inputs . ("r-strucchange" "r-tseries"))))
     (build-system r-build-system)
@@ -10231,10 +10231,10 @@ proposals for count data.")
     (propagated-inputs
      (list r-lattice))
     (native-inputs (list r-chron
+                         r-knitr
                          r-mondate
                          r-quantreg
                          r-timedate
-                         r-timeseries
                          r-tis))
     (home-page "https://zoo.R-Forge.R-project.org/")
     (synopsis "S3 infrastructure for regular and irregular time series")
