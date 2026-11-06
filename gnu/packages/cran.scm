@@ -42872,14 +42872,14 @@ provides tools to compute this metric.")
 (define-public r-lintr
   (package
     (name "r-lintr")
-    (version "3.3.0-1")
+    (version "3.4.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "lintr" version))
        (sha256
         (base32
-         "01nazxffg7kwakg9xymg150hmr83w630bwcax4sx4xyddz268adi"))))
+         "1p491b0mgdmzi0gdqcn0a7fivkgs1v8chkzdgvzyv282nxl4w52l"))))
     (properties `((upstream-name . "lintr")))
     (build-system r-build-system)
     (arguments
@@ -42899,8 +42899,7 @@ provides tools to compute this metric.")
          (add-after 'unpack 'set-HOME
            (lambda _ (setenv "HOME" "/tmp"))))))
     (propagated-inputs
-     (list r-backports
-           r-cli
+     (list r-cli
            r-codetools
            r-digest
            r-glue
