@@ -1493,13 +1493,13 @@ and creating new Analysis Results Data objects.")
 (define-public r-cardx
   (package
     (name "r-cardx")
-    (version "0.3.3")
+    (version "0.3.4")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "cardx" version))
        (sha256
-        (base32 "1zn9kqb51ag5ydamb82qmxa34f8pszlxq1k65c0ljvgkz6gm1qj4"))))
+        (base32 "1b7ms2kcsmiwdnsirynfh2n6qyiw3513kgdl56jsry0mqd2xbhd6"))))
     (properties
      '((upstream-name . "cardx")
        (updater-ignored-native-inputs . ("r-mixed"))))
@@ -1512,6 +1512,7 @@ and creating new Analysis Results Data objects.")
                              r-rlang
                              r-tidyr))
     (native-inputs (list r-broom
+                         r-broom-mixed
                          r-effectsize
                          r-emmeans
                          r-geepack
