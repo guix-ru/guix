@@ -6745,13 +6745,13 @@ options and registries, vignette, unit test and bibtex related utilities.")
 (define-public r-plotly
   (package
     (name "r-plotly")
-    (version "4.12.0")
+    (version "4.12.1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "plotly" version))
               (sha256
                (base32
-                "1kvsf8rf1v6yz28aq91d3j0n4hb5pg0x2hnm27gcc2amwkbdpxpr"))
+                "1x4rmkjb7hjkq6qdp2b6wjl8bh2da0gn1b72nramg3bqxjbdgiqn"))
               (modules '((guix build utils)))
               (snippet
                '(with-directory-excursion "inst/htmlwidgets/lib/"
