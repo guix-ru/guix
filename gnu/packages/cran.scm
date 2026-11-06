@@ -11911,14 +11911,14 @@ standard R subsetting and Kronecker products.")
 (define-public r-spatial
   (package
     (name "r-spatial")
-    (version "7.3-18")
+    (version "7.3-19")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "spatial" version))
        (sha256
         (base32
-         "0m9hljg8xz996rr2a3fwd7gna62fxslffmxmjpnghnkld4ynjinc"))))
+         "1p5rm4kas28mbpj9fc0vzmjfxnz9r7w1vcx37d2xmmq98yk2d7bd"))))
     (build-system r-build-system)
     (home-page "https://www.stats.ox.ac.uk/pub/MASS4/")
     (synopsis "Functions for kriging and point pattern analysis")
