@@ -18531,13 +18531,13 @@ XML.  To learn more about the Abbyy OCR API, see @url{http://ocrsdk.com/}.")
 (define-public r-colorspace
   (package
     (name "r-colorspace")
-    (version "2.1-2")
+    (version "2.1-4")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "colorspace" version))
        (sha256
-        (base32 "0ghm9cjql5q1083immms790nxq1r0qrbhn9kzfvp4pgg6ffljwgc"))))
+        (base32 "0b66x4ia74k322rva75kx9v56l4nil0dlcsrs48kzg3jjz0nic9v"))))
     (build-system r-build-system)
     ;; Tests require r-vcd, which depends on this package.
     (arguments (list #:tests? #false))
