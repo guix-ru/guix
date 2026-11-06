@@ -41419,16 +41419,17 @@ self-intersections from polygon data.")
 (define-public r-urlchecker
   (package
     (name "r-urlchecker")
-    (version "1.0.1")
+    (version "2.0.0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "urlchecker" version))
               (sha256
                (base32
-                "06034lb94krbzawqg5xklwcksvyyzl3qy355f66baj5pw7dms5k2"))))
+                "139p2n72a3bz1wrmfmyfgv9j52aap0fcj2kyj9fvxifivqvn37ks"))))
     (properties `((upstream-name . "urlchecker")))
     (build-system r-build-system)
-    (propagated-inputs (list r-cli r-curl r-xml2))
+    (propagated-inputs (list r-cli r-curl r-gitcreds r-rlang r-xml2))
+    (native-inputs (list r-testthat r-webfakes r-withr))
     (home-page "https://github.com/r-lib/urlchecker")
     (synopsis "Run CRAN URL checks from older R versions")
     (description
