@@ -16751,14 +16751,14 @@ Markdown documents.  More generally, icons can be inserted in any
 (define-public r-bslib
   (package
     (name "r-bslib")
-    (version "0.11.0")
+    (version "0.12.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "bslib" version))
        (sha256
         (base32
-         "1frh4cf900j695dh3rc85ms3k3d459gpxssmplwlr0nbb62lgpz4"))
+         "1la6ajgq3wsslg3avjz5qah7mi19iiiivz6jv3bcrzf17mwi3z16"))
        (snippet
         '(for-each delete-file
                    '("inst/components/dist/components.min.js"
