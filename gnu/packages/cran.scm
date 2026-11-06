@@ -24607,14 +24607,14 @@ vectors.")
 (define-public r-tinytex
   (package
     (name "r-tinytex")
-    (version "0.59")
+    (version "0.61")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "tinytex" version))
        (sha256
         (base32
-         "0gklyckh5s3654m3b3j7z74d86y7n56z5pjzxcc16pxxbxmmr18f"))))
+         "1016mxp7qd7x0id0xvc6g338flj5pz1jbqpv7vgcf49r2v30sc3q"))))
     (build-system r-build-system)
     (arguments
      (list
@@ -24632,6 +24632,8 @@ vectors.")
            ;; are needed by r-biocstyle.  It is easier to just provide them
            ;; here
            texlive-bera
+           texlive-biber
+           texlive-biblatex
            texlive-caption
            texlive-changepage
            texlive-enumitem
@@ -24658,6 +24660,8 @@ vectors.")
     (native-inputs (list r-testit
                          (texlive-local-tree
                           (list texlive-bera
+                                texlive-biber
+                                texlive-biblatex
                                 texlive-caption
                                 texlive-changepage
                                 texlive-enumitem
