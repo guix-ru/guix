@@ -7953,13 +7953,13 @@ the performance across splits.")
 (define-public r-rlang
   (package
     (name "r-rlang")
-    (version "1.2.0")
+    (version "1.3.0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "rlang" version))
               (sha256
                (base32
-                "0ms3hyiqab9m4jckxfp4pvak0kbx9bdjqjka3gc3gfn1yva8m04g"))))
+                "1717ckqcn0xm31jhhwp5lp587xca28v8jpm18gs6a8p795ym7al0"))))
     (properties
      ;; We can't have r-testthat among the inputs here to avoid a dependency
      ;; cycle.
