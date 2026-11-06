@@ -24336,13 +24336,13 @@ iVAT).")
 (define-public r-xfun
   (package
     (name "r-xfun")
-    (version "0.58")
+    (version "0.62")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "xfun" version))
        (sha256
-        (base32 "09l2wxxfnb2swz5hzxrghxc0c0xavn7c3kcm3ljbq560vkjkimzx"))))
+        (base32 "1bsbm535wg37fs3kpzqbddnmv4zmdw0h7cnz8q2fz4bz6hi2442n"))))
     (build-system r-build-system)
     (properties
      ;; knitr itself depends on xfun
