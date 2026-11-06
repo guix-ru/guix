@@ -2960,14 +2960,14 @@ to the interface.")
 (define-public r-dbplyr
   (package
     (name "r-dbplyr")
-    (version "2.5.2")
+    (version "2.6.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "dbplyr" version))
        (sha256
         (base32
-         "129vdppqgflnbwnjadwlaxs73paz30bai1hh76lmxdfzpilyhni1"))))
+         "1n1b46fg9jppsq8cg5m7phsh5r9izgafbp27qni3h0kz7zvxlwin"))))
     (properties
      '((updater-extra-native-inputs . ("tzdata-for-tests"))))
     (build-system r-build-system)
