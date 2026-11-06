@@ -39578,13 +39578,13 @@ standard regular expressions.")
 (define-public r-unitizer
   (package
     (name "r-unitizer")
-    (version "1.4.23")
+    (version "1.4.24")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "unitizer" version))
        (sha256
-        (base32 "0ivbp4k6g8d7iir5lh4kphr7a1hsxppwdh6fapvhivq0gk461y38"))))
+        (base32 "014fcwfyd6wrb95pyfs3shy8406r348mg4slhhvh68kjplskgx26"))))
     (properties `((upstream-name . "unitizer")))
     (build-system r-build-system)
     (propagated-inputs (list r-crayon r-diffobj))
