@@ -18964,13 +18964,13 @@ value for each cluster in a dendrogram.")
 (define-public r-rcpp
   (package
     (name "r-rcpp")
-    (version "1.1.1-1.1")
+    (version "1.1.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "Rcpp" version))
        (sha256
-        (base32 "1qgvymjra31r0078cbp900cpldm6xb1p86zk2niqq308wkzdbr9j"))))
+        (base32 "1wzlwwr7nkhp5xbm8mrysd75cm2vj5l8yp5z9nlg1rc8n4pwyii7"))))
     (build-system r-build-system)
     ;; The vignettes use a weird hack to install PDF files as is.  This fails
     ;; for unknown reasons.
