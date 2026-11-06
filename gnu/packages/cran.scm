@@ -14940,16 +14940,14 @@ and SHAKE256 extendable-output functions (XOF).")
 (define-public r-selectr
   (package
     (name "r-selectr")
-    (version "0.5-1")
+    (version "0.8-0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "selectr" version))
        (sha256
-        (base32 "0rgicw997gk3vf3pjg4p45f9n50jn5257pb9ibgyz4cbrksg39p8"))))
+        (base32 "1nj9mrfm4wy6vd58piv3bbfr77zy2g8as6gzg7sh0pdwb6aq6pfw"))))
     (build-system r-build-system)
-    (propagated-inputs
-     (list r-r6 r-stringr))
     (native-inputs (list r-testthat r-xml r-xml2))
     (home-page "https://sjp.co.nz/projects/selectr/")
     (synopsis "Translate CSS selectors to XPath expressions")
