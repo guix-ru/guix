@@ -15280,17 +15280,22 @@ it has been in the first iteration.")
 (define-public r-readxl
   (package
     (name "r-readxl")
-    (version "1.5.0")
+    (version "1.6.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "readxl" version))
        (sha256
         (base32
-         "1rsc07jpr1pz9vpgyb1ydf8zsv0nasb63c605psacns5gz94g0wh"))))
+         "1l9n5dvqy8xf26lhsw9n1vw56ilkclh7np26ka0lk10qsn3pa1qn"))))
     (build-system r-build-system)
     (propagated-inputs
-     (list r-cellranger r-cpp11 r-progress r-tibble))
+     (list r-cellranger
+           r-cli
+           r-cpp11
+           r-progress
+           r-rlang
+           r-tibble))
     (native-inputs
      (list r-knitr r-testthat r-withr r-writexls))
     (home-page "https://readxl.tidyverse.org")
