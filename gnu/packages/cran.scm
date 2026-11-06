@@ -5905,14 +5905,14 @@ belong to the Generalized Empirical Likelihood family of estimators (Smith
 (define-public r-googledrive
   (package
     (name "r-googledrive")
-    (version "2.1.2")
+    (version "2.2.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "googledrive" version))
        (sha256
         (base32
-         "1alliln7gdmfcddcjkngqchmpxhlh0chyy2frbk81srkhd6yl29q"))))
+         "0xw4dcsnyr8xaswwr1xyz9bva3rg6n2gvcg8xvadfhvfgsbx21sh"))))
     (properties
      '((upstream-name . "googledrive")
        (updater-extra-native-inputs . ("r-mockr"))))
@@ -5935,10 +5935,7 @@ belong to the Generalized Empirical Likelihood family of estimators (Smith
     (native-inputs
      (list r-curl
            r-dplyr
-           r-here
-           r-knitr
            r-mockr
-           r-pkgload
            r-spelling
            r-testthat))
     (home-page "https://googledrive.tidyverse.org")
