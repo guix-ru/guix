@@ -1104,13 +1104,13 @@ D.V. Hinkley (1997, CUP), originally written by Angelo Canty for S.")
 (define-public r-box
   (package
     (name "r-box")
-    (version "1.2.2")
+    (version "1.2.3")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "box" version))
        (sha256
-        (base32 "0yrxqkq0c10k85rnp64154dyakf06apy2rm6q8f7x5zk7kkfs9mf"))))
+        (base32 "004bb688n9x2nc66904fr11pk596hnsxqmvk0ns7fcf78ki18r8c"))))
     (properties `((upstream-name . "box")))
     (arguments
      ;; Tests don't work because of this error:
