@@ -3367,14 +3367,14 @@ effects of different types of color-blindness.")
 (define-public r-diffobj
   (package
     (name "r-diffobj")
-    (version "0.3.6")
+    (version "0.3.9")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "diffobj" version))
        (sha256
         (base32
-         "11qjwm58lf9r3qy33z89jy801dlss1r2i8wvygkrrcbpf71xj5mk"))))
+         "1gckasg4j1phfrzpmf4pd6kfwziyjw51l1h9rp98vcipzfwh4mdc"))))
     (properties `((upstream-name . "diffobj")))
     (build-system r-build-system)
     (propagated-inputs (list r-crayon))
