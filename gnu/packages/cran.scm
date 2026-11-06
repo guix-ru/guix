@@ -8261,13 +8261,13 @@ based on their size or the date of the last backup; inspired by the utility
 (define-public r-roxygen2
   (package
     (name "r-roxygen2")
-    (version "8.0.0")
+    (version "8.1.1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "roxygen2" version))
               (sha256
                (base32
-                "1s1lp8hbhh636nisv9b8pvxb14144jvqbfal49szam2mlbrnp0bm"))))
+                "08gd50vy9x75kw0njkrf9z8nb352903crs78mvsk3zzir27p2iwn"))))
     (build-system r-build-system)
     (propagated-inputs
      (list r-brew
@@ -8279,6 +8279,7 @@ based on their size or the date of the last backup; inspired by the utility
            r-lifecycle
            r-pkgload
            r-r6
+           r-rdtools
            r-rlang
            r-withr
            r-xml2))
