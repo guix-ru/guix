@@ -13167,13 +13167,13 @@ inference.  Details can be found in Arel-Bundock, Greifer, and Heiss (2024)
 (define-public r-markdown
   (package
     (name "r-markdown")
-    (version "2.0")
+    (version "2.1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "markdown" version))
               (sha256
                (base32
-                "0hcmpy4x2rwq061ybq1xyqxbc76jm0zfzgzy70g90y38zdsxwq55"))))
+                "1jx64rq3ax3ppwyn8r9kz1d7cjxx813gn6xdh44sfif9hpwpbb6v"))))
     (build-system r-build-system)
     ;; Skip check phase because the tests require the r-knitr package to be
     ;; installed. This prevents installation failures. Knitr normally
