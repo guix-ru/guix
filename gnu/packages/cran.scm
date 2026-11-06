@@ -25047,13 +25047,13 @@ Institute of Standards and Technology}, USA.")
 (define-public r-nlme
   (package
     (name "r-nlme")
-    (version "3.1-169")
+    (version "3.1-172")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "nlme" version))
        (sha256
-        (base32 "1f7xwyhb6gln966i6q51flb4w2d90nmmv5kqaj8vabixahdjzfai"))))
+        (base32 "1w7f8xpsvnb0gkwl0jnhi3n05089dpha7hhckwkghswdn1q5vxgf"))))
     (build-system r-build-system)
     (arguments
      ;; Enable tests to pass, there's a floating point inequality without this
