@@ -36381,14 +36381,14 @@ inventor of the SOM.")
 (define-public r-nnet
   (package
     (name "r-nnet")
-    (version "7.3-20")
+    (version "7.3-21")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "nnet" version))
        (sha256
         (base32
-         "0mdmnafhjas0cd5ac5c2pb6nzii3m9dqgr7y3fycyqdi1rzf2cwg"))))
+         "0nw92djzq0q3g7rpgy30bg6l7z3hc08gl35nmzvjvk6jiwmlx4f3"))))
     (build-system r-build-system)
     (home-page "https://www.stats.ox.ac.uk/pub/MASS4/")
     (synopsis "Feed-forward neural networks and multinomial log-linear models")
