@@ -4744,16 +4744,17 @@ There is also a Shiny app as a user interface in this package.")
 (define-public r-formula
   (package
     (name "r-formula")
-    (version "1.2-5")
+    (version "1.2-6")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "Formula" version))
        (sha256
         (base32
-         "0p1m9pqcn8ns0sn67js53677q8gwxgbl4bymcn5y2r0dc1s4c9c6"))))
+         "0dzx7gii5shg55qgk61pcx11j004a7z94p90lq0f2if0f71ilqby"))))
     (properties `((upstream-name . "Formula")))
     (build-system r-build-system)
+    (native-inputs (list r-knitr))
     (home-page "https://cran.r-project.org/web/packages/Formula")
     (synopsis "Extended model formulas")
     (description
