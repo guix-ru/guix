@@ -6088,13 +6088,13 @@ graphics for R.")
 (define-public r-gridextra
   (package
     (name "r-gridextra")
-    (version "2.3")
+    (version "2.3.1")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "gridExtra" version))
               (sha256
                (base32
-                "0fwfk3cdwxxim7nd55pn7m31bcaqj48y06j7an2k1v1pybk0rdl1"))))
+                "10jw8i93wg0qasbz03b1ij3nn3lv7rqdf67w1yyp0sicmh0yahny"))))
     (properties `((upstream-name . "gridExtra")))
     (build-system r-build-system)
     (propagated-inputs
