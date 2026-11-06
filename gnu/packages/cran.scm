@@ -10075,14 +10075,14 @@ components, and rounding.")
 (define-public r-cluster
   (package
     (name "r-cluster")
-    (version "2.1.8.2")
+    (version "2.1.8.3")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "cluster" version))
        (sha256
         (base32
-         "118mnkykvr6irdi1bnasv0dk4gvjw6dyx81sncxqipmaifjrij2c"))))
+         "1sg2bhmf50p5jk52wiiz9jg3y0n97pfavmsccygrspx85azbwh72"))))
     (properties
      '((updater-extra-native-inputs . ("r-matrix"))))
     (build-system r-build-system)
