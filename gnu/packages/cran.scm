@@ -6420,14 +6420,14 @@ data.")
 (define-public r-googlesheets4
   (package
     (name "r-googlesheets4")
-    (version "1.1.2")
+    (version "1.1.3")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "googlesheets4" version))
        (sha256
         (base32
-         "1ndd9y8sd6mp5vrjwj5ikx7lgj6y5g0my7flyrx5lh0s0pfxbabv"))))
+         "07in75jbn9p1kgd3hjnx30311h7gzrq8ghbv9h5qq382658b6cgy"))))
     (properties `((upstream-name . "googlesheets4")))
     (build-system r-build-system)
     (propagated-inputs
@@ -6439,7 +6439,6 @@ data.")
            r-googledrive
            r-httr
            r-ids
-           r-lifecycle
            r-magrittr
            r-purrr
            r-rematch2
