@@ -15938,13 +15938,13 @@ functions make it easy to control additional request components.")
 (define-public r-httr2
   (package
     (name "r-httr2")
-    (version "1.2.2")
+    (version "1.3.0")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "httr2" version))
               (sha256
                (base32
-                "1qa5bk674d0cdhah2mhb2jkarbvz5i0njaawv0wkh23fwa7i5rx5"))))
+                "0x9wf2qgpn3shymw3f5qaqj2pfvkdih6j0wipfj9siw22hqr0683"))))
     (properties
      `((upstream-name . "httr2")
        ;; r-nanonext isn't needed; adding paws-common leads to a dependency cycle.
@@ -15968,11 +15968,12 @@ functions make it easy to control additional request components.")
            r-magrittr
            r-openssl
            r-r6
-           r-rappdirs
            r-rlang
            r-vctrs
            r-withr))
-    (native-inputs (list r-clipr
+    (native-inputs (list r-bit64
+                         r-clipr
+                         r-digest
                          r-docopt
                          r-httpuv
                          r-httr
@@ -15981,6 +15982,7 @@ functions make it easy to control additional request components.")
                          r-later
                          r-otel
                          r-promises
+                         r-rappdirs
                          r-testthat
                          r-webfakes
                          r-xml2))
