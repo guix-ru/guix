@@ -36666,14 +36666,14 @@ and manipulating sets of ontological terms.")
 (define-public r-gargle
   (package
     (name "r-gargle")
-    (version "1.6.1")
+    (version "1.7.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "gargle" version))
        (sha256
         (base32
-         "0p0fhllvlzhir0iwcc9zsicx98d1mxa4c8jgdpdxk2j4bq7ccwhc"))))
+         "1j3j8a2yh4vn0vnmkciyxjbmbpczry0877wa2bgrya9mqwfddws1"))))
     (properties
      ;; Avoid dependency cycles.
      '((updater-ignored-native-inputs
@@ -36688,6 +36688,7 @@ and manipulating sets of ontological terms.")
            r-jsonlite
            r-lifecycle
            r-openssl
+           r-r6
            r-rappdirs
            r-rlang
            r-withr))
