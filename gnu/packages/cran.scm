@@ -38504,13 +38504,13 @@ R objects.")
 (define-public r-testit
   (package
     (name "r-testit")
-    (version "1.0")
+    (version "1.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "testit" version))
        (sha256
-        (base32 "0lky2vk7d4v6sbj2mbmsg2zfzx189zfis5whbv45dz19pacxgl0w"))))
+        (base32 "0gmalcxj7p5p32qzgq7crwk0b12fhk1wm42niifs4grhdb0822d2"))))
     (properties `((upstream-name . "testit")))
     (build-system r-build-system)
     (arguments
