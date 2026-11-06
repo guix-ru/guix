@@ -14917,13 +14917,13 @@ scraping tasks, inspired by libraries like @code{BeautifulSoup}.")
 (define-public r-secretbase
   (package
     (name "r-secretbase")
-    (version "1.3.0")
+    (version "1.3.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "secretbase" version))
        (sha256
-        (base32 "1piiqnfdkfzq841rdw4jv0nf9pjm8h97jq3vbdx5s4z70hx6jlwg"))))
+        (base32 "0pqbm99nbz8v9ff9r1pwbxfh73jx1r30zzgs567kcisnf5zvn207"))))
     (properties `((upstream-name . "secretbase")))
     (build-system r-build-system)
     (arguments
