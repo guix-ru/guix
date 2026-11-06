@@ -12032,14 +12032,14 @@ dispersion modeling and Tweedie power-law families.")
 (define-public r-stringi
   (package
     (name "r-stringi")
-    (version "1.8.7")
+    (version "1.8.9")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "stringi" version))
        (sha256
         (base32
-         "1in8sn7d7lxm2zcpzm7xlrmvcb2c752nkadcg0ic9ds1rp6xw9h5"))))
+         "0css4y9rnhc7sjr19a13lyad6vap0w45xrycpr8ahzhx52ywwzs2"))))
     (build-system r-build-system)
     (inputs (list icu4c))
     (native-inputs (list pkg-config))
