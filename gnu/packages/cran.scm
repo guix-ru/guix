@@ -13982,13 +13982,13 @@ Munsell colour system.")
 (define-public r-mvtnorm
   (package
     (name "r-mvtnorm")
-    (version "1.4-1")
+    (version "1.4-2")
     (source (origin
               (method url-fetch)
               (uri (cran-uri "mvtnorm" version))
               (sha256
                (base32
-                "0dn20wp8kwyqpracq4jzhi1blzv4rbd7pspr83nhp7prpfr7za6d"))))
+                "0vjb61xiykp5kd092afy3da98iryi5vzcnyqhh9x21lkijh04qs6"))))
     (build-system r-build-system)
     ;; Some tests time out on the build farm but pass on my laptop.
     (arguments
