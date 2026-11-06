@@ -8001,13 +8001,13 @@ components/nonparametric terms for models fit with @code{nlme::lme()},
 (define-public r-rmarkdown
   (package
     (name "r-rmarkdown")
-    (version "2.31")
+    (version "2.32")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "rmarkdown" version))
        (sha256
-        (base32 "1g7w26i9rndwm2nscpn4lqgsx2xiwvfx553pa0ajyaa7lkaawnqc"))))
+        (base32 "1vmcqal987yh8cj55i3p3l4c8rdmfm11xl892jws860dcypbiypp"))))
     (properties
      `((upstream-name . "rmarkdown")
        (updater-extra-propagated-inputs . ("pandoc"))
@@ -8032,7 +8032,6 @@ components/nonparametric terms for models fit with @code{nlme::lme()},
            r-data-table
            r-knitr
            r-testthat
-           r-withr
            r-xml2))
     (home-page "https://rmarkdown.rstudio.com")
     (synopsis "Convert R Markdown documents into a variety of formats")
