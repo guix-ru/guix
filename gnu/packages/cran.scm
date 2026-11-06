@@ -6506,13 +6506,13 @@ Jacobi symbols, some divisor functions, Euler's Phi function, etc.")
 (define-public r-pak
   (package
     (name "r-pak")
-    (version "0.10.0")
+    (version "0.11.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "pak" version))
        (sha256
-        (base32 "0nnsmnzhwkl20yxj68g3z2qwns170w4lrp88nxi04nr6m9xiz423"))))
+        (base32 "16arn7ahlynygm1jn4a87572b0yyq93chnbq45dbxk6jqanchbkn"))))
     (properties `((upstream-name . "pak")))
     (build-system r-build-system)
     (inputs (list curl))
