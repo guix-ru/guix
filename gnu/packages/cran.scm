@@ -33505,14 +33505,14 @@ User credentials are shared with command line git through the
 (define-public r-usethis
   (package
     (name "r-usethis")
-    (version "3.2.1")
+    (version "3.2.2")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "usethis" version))
        (sha256
         (base32
-         "0xrbfyx4yzkmbds6zld3k2s65b0bbjh8ii03zryyzhhcbg9kkg25"))))
+         "0zm6jr9c7jhib7gg7ghc22m70igax6xy0nc5jz176n3yhj09hga2"))))
     (properties
      `((upstream-name . "usethis")
        (updater-extra-native-inputs . ("r-roxygen2"))
@@ -33546,6 +33546,7 @@ User credentials are shared with command line git through the
            r-glue
            r-jsonlite
            r-lifecycle
+           r-pak
            r-purrr
            r-rappdirs
            r-rlang
@@ -33560,8 +33561,7 @@ User credentials are shared with command line git through the
                          r-rmarkdown
                          r-roxygen2
                          r-spelling
-                         r-testthat
-                         r-tibble))
+                         r-testthat))
     (home-page "https://github.com/r-lib/usethis")
     (synopsis "Automate R package and project setup")
     (description
