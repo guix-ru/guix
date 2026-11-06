@@ -13214,14 +13214,14 @@ Applied Statistics with S\" (4th edition, 2002) by Venables and Ripley.")
 (define-public r-matrix
   (package
     (name "r-matrix")
-    (version "1.7-5")
+    (version "1.7-6")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "Matrix" version))
        (sha256
         (base32
-         "10wazaaya930rsqxzfm5jj66bcv6iv4wxi8cnn5kl0nbggfhx2rh"))))
+         "0hzi3ih1d878qh0dz0y2fx4xjszlax8zk6m475nrsrbywkdkjhk9"))))
     (properties
      `((upstream-name . "Matrix")
        ;; Needed for vignettes.
