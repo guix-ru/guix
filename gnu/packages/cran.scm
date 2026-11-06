@@ -40842,14 +40842,14 @@ and a QP solver.")
 (define-public r-kernsmooth
   (package
     (name "r-kernsmooth")
-    (version "2.23-26")
+    (version "2.23-27")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "KernSmooth" version))
        (sha256
         (base32
-         "0gm79nfaypvpxg7j9jdi6k0w5dyi0fp14m32grwalzvz36nbsrdl"))))
+         "03f75kmcvcp5z0y1rz563wkb6qh8p5n5az6fs6byx6wmcdm0c0fm"))))
     (properties `((upstream-name . "KernSmooth")))
     (build-system r-build-system)
     (native-inputs
