@@ -56605,14 +56605,14 @@ in output to the equivalent HTML.")
 (define-public r-pkgdown
   (package
     (name "r-pkgdown")
-    (version "2.2.0")
+    (version "2.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "pkgdown" version))
        (sha256
         (base32
-         "07hrk9npx4fxmx22gdq1kxwyy70nvr73qzz85df4bygd1qr6x5bi"))))
+         "075i5p78wa7risv0d387bf24khwvbhg5sk20y7vskpyxzf5s0lwj"))))
     (properties
      '((upstream-name . "pkgdown")
        (updater-ignored-native-inputs . ("r-diffviewer"))))
@@ -56648,12 +56648,10 @@ in output to the equivalent HTML.")
      (list r-htmltools
            r-htmlwidgets
            r-knitr
-           r-learnr
            r-magick
            r-pkgload
            r-quarto
-           r-testthat
-           r-viridislite))
+           r-testthat))
     (home-page "https://pkgdown.r-lib.org")
     (synopsis "Make static HTML documentation for an R package")
     (description
