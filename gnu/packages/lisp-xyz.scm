@@ -1426,6 +1426,26 @@ Common Lisp.")
              sbcl-simple-date-time
              sbcl-symbol-munger
              sbcl-trivia))
+      (arguments
+       (list #:asd-systems ''("april"
+                              "april-lib.dfns.array"
+                              "april-lib.dfns.graph"
+                              "april-lib.dfns.numeric"
+                              "april-lib.dfns.power"
+                              "april-lib.dfns.string"
+                              "april-lib.dfns.tree")
+             #:phases
+             #~(modify-phases %standard-phases
+                 (add-after 'unpack 'fix-build
+                   (lambda _
+                     (substitute* "varray/base.lisp"
+                       ;; Remove a type declaration that sbcl 2.6.10 doesn't
+                       ;; like (sbcl compiler bug?).
+                       ((":for fx :of-type \\(unsigned-byte \\+rank-width\\+\\)")
+                        ":for fx")
+                       ;; Fix a type declaration.
+                       (("simple-array \\(unsigned-byte 62\\) \\(\\+rank-plus\\+\\)")
+                        "simple-array (unsigned-byte 32) (+rank-plus+)")))))))
       (home-page "https://github.com/phantomics/april")
       (synopsis "Array Programming Re-Imagined in Lisp")
       (description
@@ -1439,9 +1459,8 @@ APL.")
 (define-public cl-april
   (sbcl-package->cl-source-package sbcl-april))
 
-;; TODO: Build fails.
-;; (define-public ecl-april
-;;   (sbcl-package->ecl-package sbcl-april))
+(define-public ecl-april
+  (sbcl-package->ecl-package sbcl-april))
 
 (define-public sbcl-archive
   (let ((commit "631271c091ed02994bec3980cb288a2cf32c7cdc")
