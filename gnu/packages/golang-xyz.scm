@@ -21016,7 +21016,7 @@ structure.  It's a stable fork of https://github.com/mndrix/ps.")
 (define-public go-github-com-lanrat-extsort
   (package
     (name "go-github-com-lanrat-extsort")
-    (version "1.4.2")
+    (version "1.5.0")
     (source
      (origin
        (method git-fetch)
@@ -21025,7 +21025,7 @@ structure.  It's a stable fork of https://github.com/mndrix/ps.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1rryjcvamiivh8fhwzw0xllbhzi1s272w082yqqn3z8ji3d0lrzj"))))
+        (base32 "1cknjm7qflficfld2lv259h0y3b7jzl177hbl7kidd5rkw22qp3l"))))
     (build-system go-build-system)
     (arguments
      (list
