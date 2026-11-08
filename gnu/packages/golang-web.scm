@@ -12835,35 +12835,23 @@ priority and bandwidth.")
 (define-public go-github-com-internxt-rclone-adapter
   (package
     (name "go-github-com-internxt-rclone-adapter")
-    (version "0.0.0-20260904121407-404a75f3d031")
+    (version "0.1.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/internxt/rclone-adapter")
-              (commit (go-version->git-ref version))))
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0xpqgidscznbmy8na9pflbv1l9wabcgah8i4jzjral3v2zk7l88s"))))
+        (base32 "083f804fls4iaz5wvv45l412isq67w1ld5ijbmrlb3nmg8i9bzd2"))))
     (build-system go-build-system)
     (arguments
      (list
       #:skip-build? #t
-      #:import-path "github.com/internxt/rclone-adapter"
-      #:test-flags
-      #~(list "-skip" (string-join
-                       ;; Network access is required for the tests.
-                       (list "TestDownloadFile"
-                             "TestGenerateFileKey"
-                             "TestFinishUpload"
-                             "TestRefreshToken"
-                             "TestFinishMultipartUpload"
-                             "TestStartUpload")
-                       "|"))))
+      #:import-path "github.com/internxt/rclone-adapter"))
     (propagated-inputs
-     (list go-github-com-tyler-smith-go-bip39
-           go-golang-org-x-crypto
-           go-golang-org-x-image))
+     (list go-golang-org-x-crypto go-golang-org-x-image))
     (home-page "https://github.com/internxt/rclone-adapter")
     (synopsis "Internxt Drive API in Go")
     (description
