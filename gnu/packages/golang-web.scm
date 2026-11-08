@@ -13402,7 +13402,7 @@ geared towards parsing MIME encoded emails.")
 (define-public go-github-com-jlaffaye-ftp
   (package
     (name "go-github-com-jlaffaye-ftp")
-    (version "0.2.0")
+    (version "0.2.4")
     (source
      (origin
        (method git-fetch)
@@ -13411,12 +13411,11 @@ geared towards parsing MIME encoded emails.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0z9d1dxhx351158a22a08qbnfql7a1cajg6v3zm82m2rnp17ahir"))))
+        (base32 "13zj5fxzlfx26zjrdgsmy65ijaxv58v1l69bl7l889kv7k67523g"))))
     (build-system go-build-system)
     (arguments
      (list
-      #:import-path "github.com/jlaffaye/ftp"
-      #:test-flags #~(list "-vet=off")))
+      #:import-path "github.com/jlaffaye/ftp"))
     (native-inputs
      (list go-github-com-stretchr-testify))
     (propagated-inputs
