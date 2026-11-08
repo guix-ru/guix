@@ -2415,9 +2415,10 @@ bar writers can be supplied for alternate environments.")
     (license license:expat)))
 
 (define-public go-github-com-anacrolix-dms
+  ;; TODO: Move (gnu packages golang-web).
   (package
     (name "go-github-com-anacrolix-dms")
-    (version "1.7.2")
+    (version "1.8.0")
     (source
      (origin
        (method git-fetch)
@@ -2426,27 +2427,23 @@ bar writers can be supplied for alternate environments.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1kv1xldlyxnn1f89763v8d3r9f96lgxb50dhf8n3vy99yildqm8b"))))
+        (base32 "1vfgqpyi6rd9hc93m623vzznw8dzkgvyyyhs2zqalf8ydlyabs2r"))))
     (build-system go-build-system)
     (arguments
      (list
-      ;; "non-constant format string in call to github.com/anacrolix/dms/upnp.Errorf"
-      #:test-flags
-      #~(list "-vet=off")
       #:import-path "github.com/anacrolix/dms"))
     (propagated-inputs
      (list go-github-com-anacrolix-ffprobe
-           go-github-com-anacrolix-log
            go-github-com-nfnt-resize
            go-golang-org-x-net
            go-golang-org-x-sys))
     (home-page "https://github.com/anacrolix/dms")
     (synopsis "Terminal-based digital media server")
     (description
-     "This package is a UPnP DLNA Digital Media Server.  It runs from the terminal,
-and serves content directly from the filesystem from the working directory, or
-the path given.  The SSDP component will broadcast and respond to requests on
-all available network interfaces.")
+     "This package is a UPnP DLNA Digital Media Server.  It runs from the
+terminal,and serves content directly from the filesystem from the working
+directory, or the path given.  The SSDP component will broadcast and respond
+to requests on all available network interfaces.")
     (license license:bsd-3)))
 
 (define-public go-github-com-anacrolix-ffprobe
