@@ -2533,16 +2533,16 @@ to requests on all available network interfaces.")
 (define-public go-github-com-anacrolix-log
   (package
     (name "go-github-com-anacrolix-log")
-    (version "0.16.0")
+    (version "0.17.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/anacrolix/log")
-             (commit (string-append "v" version))))
+              (url "https://github.com/anacrolix/log")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0pbvg15rrsh2gv10vsdqak8r572kkjlhil1g0gngnzbcyifqmca0"))))
+        (base32 "1c6a5s9az6hipz07mmw4vjpxal3l5vfvshl4br89fgkxyj8wmhkf"))))
     (build-system go-build-system)
     (arguments
      (list
