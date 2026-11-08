@@ -19826,7 +19826,7 @@ clone of @url{https://github.com/henrybear327/go-proton-api}.")
 (define-public go-github-com-rclone-gofakes3
   (package
     (name "go-github-com-rclone-gofakes3")
-    (version "0.0.9")
+    (version "0.0.12")
     (source
      (origin
        (method git-fetch)
@@ -19835,7 +19835,7 @@ clone of @url{https://github.com/henrybear327/go-proton-api}.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1yk04jsq56bqgwma2ifj14kd4vrv447ivf6x7k3kaiiyzb9xf31d"))))
+        (base32 "0fvj2srp9qrl9j17jgpzmqvzsmgmpmfdbivjyj9cdfrx1hq7bb7n"))))
     (build-system go-build-system)
     (arguments
      (list
