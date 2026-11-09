@@ -8082,7 +8082,7 @@ Filen}, an encrypted cloud storage, for Go.")
 (define-public go-github-com-files-com-files-sdk-go-v3
   (package
     (name "go-github-com-files-com-files-sdk-go-v3")
-    (version "3.3.95")
+    (version "3.3.353")
     (source
      (origin
        (method git-fetch)
@@ -8091,7 +8091,7 @@ Filen}, an encrypted cloud storage, for Go.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "19mxsybv9lyq57nf5xvll41g7f6z90lq9hrdx1p4w20mj0f51wyj"))))
+        (base32 "1mlk2zll71xb0l9nds8fbxbmlwfqhm96w5ab6hldqfj11dcr1z06"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -8111,14 +8111,14 @@ Filen}, an encrypted cloud storage, for Go.")
            go-github-com-dustin-go-humanize
            go-github-com-hashicorp-go-retryablehttp
            go-github-com-hashicorp-golang-lru-v2
-           go-github-com-lpar-date
+           go-github-com-lpar-calendar
            go-github-com-panjf2000-ants-v2
+           go-github-com-quic-go-quic-go
            go-github-com-sabhiram-go-gitignore
            go-github-com-samber-lo
            go-github-com-winfsp-cgofuse
            go-golang-org-x-sync
            go-golang-org-x-sys
-           go-golang-org-x-text
            go-moul-io-http2curl-v2))
     (home-page "https://github.com/Files-com/files-sdk-go")
     (synopsis "Files.com Go Client")
