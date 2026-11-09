@@ -17555,14 +17555,14 @@ missing values and weighting where appropriate.")
 (define-public r-biocsingular
   (package
     (name "r-biocsingular")
-    (version "1.28.0")
+    (version "1.28.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "BiocSingular" version))
        (sha256
         (base32
-         "1n6r72m7bpnbcvpnass26zjdgbbxcqmjba0favl54855fc5spcrp"))))
+         "04ln3vwsc3prfx4mqkma4k4rw9phwnv9qqrkhhr5kcvv2qdhgf6y"))))
     (properties `((upstream-name . "BiocSingular")))
     (build-system r-build-system)
     (arguments
