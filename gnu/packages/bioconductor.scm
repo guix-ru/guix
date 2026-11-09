@@ -8837,13 +8837,13 @@ objects.")
 (define-public r-biostrings
   (package
     (name "r-biostrings")
-    (version "2.80.1")
+    (version "2.80.2")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "Biostrings" version))
               (sha256
                (base32
-                "0sfhnjkm9krqp9qqdi36046spz2v7csmkl12xxblzbi66wmxhmkn"))))
+                "054cxkrc30r4qmqraqkrrj131nfgfki8f93f760pa08h4562d6vn"))))
     (properties
      `((upstream-name . "Biostrings")))
     (build-system r-build-system)
