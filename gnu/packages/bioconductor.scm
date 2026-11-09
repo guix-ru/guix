@@ -5955,13 +5955,13 @@ usage.")
 (define-public r-bandits
   (package
     (name "r-bandits")
-    (version "1.28.0")
+    (version "1.28.1")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "BANDITS" version))
               (sha256
                (base32
-                "0pq8rjc0xgv8jmy284ci0g7kml6ynhs91mzknj02inxr72ad148j"))))
+                "1h4zjkkff594jxhwj4mxill3ixlkm33h6bp9y1wax3mzlyi3s68z"))))
     (properties
      '((upstream-name . "BANDITS")
        (updater-extra-native-inputs . ("r-tximport"))))
@@ -5971,7 +5971,6 @@ usage.")
            r-data-table
            r-doparallel
            r-dorng
-           r-drimseq
            r-foreach
            r-ggplot2
            r-mass
