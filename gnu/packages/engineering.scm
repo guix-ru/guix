@@ -680,9 +680,9 @@ and their physical or non-physical properties for electromagnetics simulations."
               (chdir "./python")
               (setenv "CSXCAD_INSTALL_PATH"
                       #$(this-package-input "csxcad")))))))
-    (native-inputs (list python-minimal python-cython python-numpy
-                         python-setuptools))
-    (inputs (list csxcad fparser hdf5 python-numpy tinyxml))
+    (native-inputs (list python-cython python-setuptools))
+    (propagated-inputs (list python-numpy python-matplotlib))
+    (inputs (list csxcad fparser hdf5 tinyxml))
     (synopsis "Python bindings for @code{csxcad}")
     (description "Library for describing geometrical objects and their
 physical and non-physical properties.")
