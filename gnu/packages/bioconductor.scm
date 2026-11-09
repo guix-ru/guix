@@ -12039,14 +12039,14 @@ containers.")
 (define-public r-msnbase
   (package
     (name "r-msnbase")
-    (version "2.37.0")
+    (version "2.38.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "MSnbase" version))
        (sha256
         (base32
-         "04bcz27ssbljdd2ds1ch52zgaywxl4srs0ggl8pqjkgf6gkjj1s5"))))
+         "1g9h0r72sx31r14f24xgwg8yg555z0d9cc3bfy4d3cbfypqaavsh"))))
     (properties
      `((upstream-name . "MSnbase")
        ;; Avoid dependency cycle.
@@ -12067,8 +12067,6 @@ containers.")
          "MzTab reading and writing"
          "MzTab-M reading and writing"
          "Conversion to MSnSetList")
-        ("test_MzTab_09.R"
-         "read MzTab data v 0.9 and 1.0")
         ("test_fileNames.R"
          "fileNames accessor MzTab")
         ;; Fails with: unable to find an inherited method for function
@@ -12114,6 +12112,7 @@ containers.")
            r-plyr
            r-protgenerics
            r-psmatch
+           r-ptmods
            r-rcpp
            r-s4vectors
            r-scales
@@ -12121,11 +12120,10 @@ containers.")
     (native-inputs
      (list r-knitr
            r-msdata
-           r-rpx
+           r-msdatahub
            r-spectra
            r-summarizedexperiment
-           r-testthat
-           r-xml))
+           r-testthat))
     (home-page "https://github.com/lgatto/MSnbase")
     (synopsis "Base functions and classes for MS-based proteomics")
     (description
