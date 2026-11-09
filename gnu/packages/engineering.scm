@@ -610,7 +610,7 @@ multipole-accelerated algorithm.")
 (define-public csxcad
   (package
     (name "csxcad")
-    (version "0.6.3")
+    (version "0.7.0")
     (source
      (origin
        (method git-fetch)
@@ -619,7 +619,7 @@ multipole-accelerated algorithm.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1c383zsv4fp40kmpawamfi9zg3b8x3d4m091ldwk15mii3467hp3"))))
+        (base32 "0iqg2bpd1jw2qv5xkdh3qrm9312p3f0zmqvzmzj5cvv2rhdr4v78"))))
     (build-system cmake-build-system)
     (arguments
      (list
