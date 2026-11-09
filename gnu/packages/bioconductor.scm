@@ -28582,14 +28582,14 @@ help unravel disease regulatory trajectory.")
 (define-public r-biotmle
   (package
     (name "r-biotmle")
-    (version "1.36.0")
+    (version "1.36.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "biotmle" version))
        (sha256
         (base32
-         "1ivdz6ahzfpb23d7pchqfxi6ggifdsgpz9ghnpkl1zingcyysccw"))))
+         "0whgyrk9fzl08y3mi3gv7kbf33an5qsrvxvqapj0m42pli8pbb20"))))
     (properties `((upstream-name . "biotmle")))
     (build-system r-build-system)
     ;; Two tests fail with "BiocParallel errors".
@@ -28605,7 +28605,6 @@ help unravel disease regulatory trajectory.")
            r-limma
            r-s4vectors
            r-summarizedexperiment
-           r-superheat
            r-tibble))
     (native-inputs
      (list r-biotmledata r-knitr r-superlearner r-testthat))
