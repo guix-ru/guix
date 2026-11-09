@@ -26242,13 +26242,13 @@ of other packages.")
 (define-public r-scater
   (package
     (name "r-scater")
-    (version "1.40.1")
+    (version "1.40.2")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "scater" version))
               (sha256
                (base32
-                "0kd72ba3nbrrmbphlznrhm937jz9l7lav7qrrvawlp7xlrpq6izf"))))
+                "0ra4pkm7ikdd8w3kgb5dqv2di3yw0p4wsizqna55c17g3ila14cm"))))
     (build-system r-build-system)
     (properties
      '((updater-extra-native-inputs
@@ -26265,7 +26265,6 @@ of other packages.")
            r-delayedarray
            r-ggbeeswarm
            r-ggplot2
-           r-ggrastr
            r-ggrepel
            r-matrix
            r-matrixgenerics
