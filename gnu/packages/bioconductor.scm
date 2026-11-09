@@ -4164,13 +4164,13 @@ datasets.")
 (define-public r-alabaster-base
   (package
     (name "r-alabaster-base")
-    (version "1.12.0")
+    (version "1.12.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "alabaster.base" version))
        (sha256
-        (base32 "08bs3jiv355035kdzsjwn8zd0lwdlz0jy3l33y70j1pjq2ss0zzb"))))
+        (base32 "114q6vcy45w8y5ir7x0wwzd27l2n2sn041z38vnd9641ih0pw1xc"))))
     (properties
      '((upstream-name . "alabaster.base")))
     (build-system r-build-system)
