@@ -21559,14 +21559,14 @@ interpretation.")
 (define-public r-rhisat2
   (package
     (name "r-rhisat2")
-    (version "1.28.0")
+    (version "1.28.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "Rhisat2" version))
        (sha256
         (base32
-         "04095x4yh1fj3hs1vk6bc2qrcqc8xib61dsjz55gj69igj3xp0ks"))))
+         "0amnsppqnk92hjza1h964lgx6ssrlzj8z2diqpajcswcs8qz3sj5"))))
     (properties `((upstream-name . "Rhisat2")))
     (build-system r-build-system)
     (arguments
