@@ -37977,20 +37977,25 @@ them in distributed compute environments.")
 (define-public r-parallelly
   (package
     (name "r-parallelly")
-    (version "1.47.0")
+    (version "1.50.0")
     (source
      (origin
        (method url-fetch)
        (uri (cran-uri "parallelly" version))
        (sha256
         (base32
-         "1i4pfy3y7dhzywnmx270cl442k2xlpd8ix127c6fgpvibi8z9h48"))))
+         "0zkcpiav6c0q6k5q77ymzwz5p12sgy9y2w2011sx3nc29wq2pwx2"))))
     (properties `((upstream-name . "parallelly")))
     (build-system r-build-system)
     (arguments
      (list
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-tests
+            (lambda _
+              (substitute* "inst/testme/test-makeNodePSOCK.R"
+                (("#! /bin/sh")
+                 (string-append "#! " (which "sh"))))))
           (add-before 'check 'pre-check
             (lambda _
               ;; dont depend on openssh
