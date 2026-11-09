@@ -21953,6 +21953,30 @@ Printf/Sprintf etc.")
     (native-inputs
      (list go-github-com-stretchr-testify))))
 
+(define-public go-github-com-lpar-calendar
+  (package
+    (name "go-github-com-lpar-calendar")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/lpar/calendar")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0p2134n64x4fxdn4shhgs4h3r4fgklfyhz2jvp931cjznnlg1mjb"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/lpar/calendar"))
+    (home-page "https://github.com/lpar/calendar")
+    (synopsis "Calendar dates in Go")
+    (description
+     "This package provides Go calendar Date (only), clock Time (only), and
+nullable versions of same, with sensible JSON and SQL behavior.")
+    (license license:bsd-3)))
+
 (define-public go-github-com-lpar-date
   (package
     (name "go-github-com-lpar-date")
