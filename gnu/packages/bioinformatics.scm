@@ -22376,13 +22376,13 @@ frames with arbitrary sets of columns.")
 (define-public r-zarrarray
   (package
     (name "r-zarrarray")
-    (version "1.0.0")
+    (version "1.0.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "ZarrArray" version))
        (sha256
-        (base32 "1ny91qg257kgb1hz2h4jvb0rna9cwyw7fqyj5axv52r3b98xn040"))))
+        (base32 "1v5z6ripnb8p6as9zcmqlajxs43ssqyl06d89nqabs0pvqsxf425"))))
     (properties `((upstream-name . "ZarrArray")))
     (build-system r-build-system)
     (propagated-inputs (list r-biocgenerics
