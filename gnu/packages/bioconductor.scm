@@ -25416,13 +25416,13 @@ array-like semantic.  It also provides:
 (define-public r-s4vectors
   (package
     (name "r-s4vectors")
-    (version "0.50.1")
+    (version "0.50.3")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "S4Vectors" version))
               (sha256
                (base32
-                "03k9kk6w6z1ri2yi8izb7b2v9lmhmdbsniqsa03bq92lcagaqpd8"))))
+                "1p8ab4bfgwd84kccx4k79swzdd4j4pzzrrkmpmmrmipjsqkabb1g"))))
     (properties
      '((upstream-name . "S4Vectors")
        (updater-ignored-native-inputs
