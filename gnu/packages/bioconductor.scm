@@ -21071,14 +21071,14 @@ based on @dfn{Continuous Wavelet Transform} (CWT).")
 (define-public r-xcms
   (package
     (name "r-xcms")
-    (version "4.10.0")
+    (version "4.10.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "xcms" version))
        (sha256
         (base32
-         "0hawwzr1115c4k8hf9i5m5pajpr195zpc26cv9hc1cp23qr5pyz4"))))
+         "1yfhfb8l3pnglmnc43qhxwkbwaf7g5iz6qmjaxbl5k3g97mfaapw"))))
     (properties
      '((upstream-name . "xcms")
        ;; Avoid dependency cycle.
