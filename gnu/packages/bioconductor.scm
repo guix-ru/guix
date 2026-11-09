@@ -17487,14 +17487,14 @@ data.")
 (define-public r-ggtree
   (package
     (name "r-ggtree")
-    (version "4.2.0")
+    (version "4.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "ggtree" version))
        (sha256
         (base32
-         "1vm5k8w04h1s009ga6j1w4yp2v67vdkfnz2nv97k8k4lmxjmrm32"))))
+         "1h3wzwnjp87h7pywf7yvvzk083dplmxc79xf46285magbw3hc594"))))
     (properties `((upstream-name . "ggtree")))
     (build-system r-build-system)
     (propagated-inputs
