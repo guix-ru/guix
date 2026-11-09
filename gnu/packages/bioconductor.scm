@@ -19382,14 +19382,14 @@ semantics of the two frameworks.")
 (define-public r-gosemsim
   (package
     (name "r-gosemsim")
-    (version "2.38.0")
+    (version "2.38.3")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "GOSemSim" version))
        (sha256
         (base32
-         "1bfrxb6zm9lms264wb4xzxdb50py97zdr6lh3mharzxnngbri4d7"))))
+         "0i6nkhplfwim60qxs3f5n8pr5fz1pslw09f278vgc0sj6wy6q9b7"))))
     (properties
      '((upstream-name . "GOSemSim")
        (updater-extra-native-inputs . ("r-org-hs-eg-db"))))
