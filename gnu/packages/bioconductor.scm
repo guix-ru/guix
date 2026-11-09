@@ -11965,13 +11965,13 @@ remote MS data sets.")
 (define-public r-msdatahub
   (package
     (name "r-msdatahub")
-    (version "1.12.0")
+    (version "1.12.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "MsDataHub" version))
        (sha256
-        (base32 "06qpfnrn4fizh51c9nahd1bf5z7jinxdyqj3lwla9ry2cd3w2qw8"))))
+        (base32 "0ijlnzak24d01n5xmfhdyl5bq4949ycjqfi9pyfxjvgdn119c347"))))
     (properties `((upstream-name . "MsDataHub")))
     (build-system r-build-system)
     (arguments
