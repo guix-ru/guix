@@ -691,7 +691,7 @@ physical and non-physical properties.")
 (define-public qcsxcad
   (package
     (name "qcsxcad")
-    (version "0.6.3")
+    (version "0.7.0")
     (source
      (origin
        (method git-fetch)
@@ -700,7 +700,7 @@ physical and non-physical properties.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0ag1shyhsmfsvqm35fi2kfnbcngmln8rjsv88f97gyx9wiqc808y"))))
+        (base32 "1nnwlnrkk59lj8m44wvd1apsk1193cc01igyygr7wbkln1rcqivp"))))
     (build-system qt-build-system)
     (arguments
      (list
