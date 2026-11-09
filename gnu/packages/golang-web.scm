@@ -17478,7 +17478,7 @@ Go.  @url{https://zipkin.io/, Zipkin} is a distributed tracing system.")
 (define-public go-github-com-oracle-oci-go-sdk-v65
   (package
     (name "go-github-com-oracle-oci-go-sdk-v65")
-    (version "65.104.1")
+    (version "65.129.0")
     (source
      (origin
        (method git-fetch)
@@ -17487,22 +17487,21 @@ Go.  @url{https://zipkin.io/, Zipkin} is a distributed tracing system.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1d8mpawbk29s28pb269fkmgqgdv4ypwk3a26hmm2amgn4vsaaqj2"))
+        (base32 "1wsi4dbfbf0nyvc1yvpcridl4hkzwq6xlvcaxzzljaf41686l4h4"))
        (modules '((guix build utils)))
        (snippet
         #~(begin
-            ;; Submodules with their own go.mod files and packaged separately:
-            ;;
-            ;; - example.com/faas/test-go-func
-            (delete-file-recursively "example/example_resource_principal_function")))))
+            ;; Submodules with their own go.mod files and packaged separately.
+            (delete-file-recursively
+             "example/example_resource_principal_function")))))
     (build-system go-build-system)
     (arguments
      (list
       #:import-path "github.com/oracle/oci-go-sdk/v65"
       #:test-flags
-      #~(list "-vet=off" ;Go@1.24 forces vet, but tests are not ready yet.
-              ;; panic: runtime error: invalid memory address or nil
-              ;; pointer dereference
+      #~(list "-vet=off"
+              ;; panic: runtime error: invalid memory address or nil pointer
+              ;; dereference
               "-skip" "TestUpload.*")
       #:phases
       #~(modify-phases %standard-phases
@@ -17531,7 +17530,8 @@ Go.  @url{https://zipkin.io/, Zipkin} is a distributed tracing system.")
      (list go-github-com-stretchr-testify))
     (propagated-inputs
      (list go-github-com-gofrs-flock
-           go-github-com-sony-gobreaker
+           go-github-com-sony-gobreaker-v2
+           go-github-com-thalesgroup-crypto11
            go-github-com-youmark-pkcs8))
     (home-page "https://github.com/oracle/oci-go-sdk")
     (synopsis "Oracle Cloud Infrastructure Golang SDK")
