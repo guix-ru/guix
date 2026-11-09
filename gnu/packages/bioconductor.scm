@@ -25379,13 +25379,13 @@ routines.")
 (define-public r-s4arrays
   (package
     (name "r-s4arrays")
-    (version "1.12.0")
+    (version "1.12.1")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "S4Arrays" version))
               (sha256
                (base32
-                "0f73c47dp8gj248h9mgzf3blnclf4hvdzpqfwxxb2d8w9r8y3x26"))))
+                "09z80hbf236wgynp1a3afrgdvv9fr87v3n2fpzlmljcz1gxvl4bs"))))
     (properties
      '((upstream-name . "S4Arrays")
        (updater-ignored-native-inputs . ("r-delayedarray"))))
