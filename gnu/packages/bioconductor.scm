@@ -25841,13 +25841,13 @@ provided for direct creation of an in-memory tatami matrix from a HDF5 file.")
 (define-public r-beadarray
   (package
     (name "r-beadarray")
-    (version "2.62.0")
+    (version "2.62.2")
     (source (origin
               (method url-fetch)
               (uri (bioconductor-uri "beadarray" version))
               (sha256
                (base32
-                "1p20ny7ykhjkrgsjb7p4py394fl58xijxiww62drjr38dc8nbd64"))))
+                "0phhdqglcgg12f0nn48jh11vrv1i46dfvjvqyxwfq91sbfgqs9cl"))))
     (properties `((upstream-name . "beadarray")))
     (build-system r-build-system)
     (propagated-inputs (list r-annotationdbi
