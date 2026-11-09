@@ -16009,14 +16009,14 @@ signal in the input, that lead to spurious peaks during peak calling.")
 (define-public r-diffbind
   (package
     (name "r-diffbind")
-    (version "3.22.1")
+    (version "3.22.2")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "DiffBind" version))
        (sha256
         (base32
-         "0dzpn84nc4rn84axzx06r78gwpgva20ji05h33cr09da52xbwlly"))))
+         "0l9pam8kiskp9z9fw80nh3lwwwjwf13pb8alxih4xyznk1kwss19"))))
     (properties
      `((upstream-name . "DiffBind")
        (updater-extra-native-inputs
@@ -16050,8 +16050,10 @@ signal in the input, that lead to spurious peaks during peak calling.")
            r-systempiper))
     (native-inputs
      (list r-biocstyle
+           r-biocstyle
            r-csaw
            r-deseq
+           r-edger
            r-edger
            r-genomeinfodb
            r-testthat
