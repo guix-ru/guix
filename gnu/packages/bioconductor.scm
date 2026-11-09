@@ -10869,13 +10869,13 @@ DNA methylation data at the genome scale.")
 (define-public r-rpx
   (package
     (name "r-rpx")
-    (version "2.20.0")
+    (version "2.20.2")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "rpx" version))
        (sha256
-        (base32 "1p3a2dz65ykkk23iwjl2f7g57cbi05fw0sk8p0mqxrzavw1agv57"))))
+        (base32 "1w3zqnmv4fjd3bb09s65xfa8c6hpdiazfcgp8ih8qcrkjs001f2m"))))
     (properties `((upstream-name . "rpx")))
     (build-system r-build-system)
     ;; Tests require Internet access.
