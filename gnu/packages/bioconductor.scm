@@ -20347,14 +20347,14 @@ these files at JHPCE.")
 (define-public r-atacseqqc
   (package
     (name "r-atacseqqc")
-    (version "1.36.0")
+    (version "1.36.1")
     (source
      (origin
        (method url-fetch)
        (uri (bioconductor-uri "ATACseqQC" version))
        (sha256
         (base32
-         "1flikjhvjml25hwwhmm67ymch0ppmgxx12dl43rfw5y8bzb1gm7p"))))
+         "0pyfmr0r9vr9y76qf22h5lwqkdli29l7897fsn72p5fwdd2qnz2a"))))
     (properties `((upstream-name . "ATACseqQC")))
     (build-system r-build-system)
     (propagated-inputs
@@ -20372,7 +20372,7 @@ these files at JHPCE.")
            r-kernsmooth
            r-limma
            r-motifstack
-           r-preseqr
+           r-polynom
            r-randomforest
            r-rsamtools
            r-rtracklayer
