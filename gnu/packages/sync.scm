@@ -595,7 +595,7 @@ Feature:
 (define-public rclone
   (package
     (name "rclone")
-    (version "1.75.1")
+    (version "1.76.0")
     (source
      (origin
        (method git-fetch)
@@ -604,7 +604,7 @@ Feature:
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "178v39d53lwdyrffdl34n43wmwvx14b62ns6mpkzx5b9sk3qcrbp"))))
+        (base32 "0d3cvfg9gp8jpjaj7wihzcsn12bcqhjv342g814qdbw50jla4ya0"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -617,24 +617,22 @@ Feature:
       #:embed-files
       #~(list "Linux.gitignore"
               "Windows.gitignore"
-              "macOS.gitignore"
-              "common.gitignore"
               "children"
+              "common.gitignore"
+              "macOS.gitignore"
               "nodes"
+              "path_comparison.json.gz"
               "text")
       #:test-flags
       #~(list "-skip" (string-join
                        ;; Requires Docker.
                        (list "TestDockerPluginMountUnix"
+                             "TestStartWrapped"
                              ;; Network access is required.
-                             "TestAddPlugin"
                              "TestDockerPluginMountTCP"
                              "TestGetVersion"
                              "TestInstallOnLinux"
-                             "TestRemovePlugin"
                              "TestZenodoRemote"
-                             ;; sorter: mkdir /var: permission denied.
-                             "TestSorterExt"
                              ;; Requires mount perms
                              "TestMount"
                              ;; rsync is required.
@@ -653,7 +651,7 @@ Feature:
               (setenv "PATH" (string-append #$output "/bin" ":"
                                             (getenv "PATH")))
               ;; As seen in go.mod
-              (setenv "GODEBUG" "x509negativeserial=1")
+              (setenv "GODEBUG" "x509negativeserial=1,multipathtcp=0")
               ;; As seen in Makefile
               (setenv "RCLONE_CONFIG" "/notfound"))))))
     (native-inputs
@@ -667,11 +665,8 @@ Feature:
             go-github-com-a1ex3-zstd-seekable-format-go-pkg
             go-github-com-a8m-tree
             go-github-com-aalpar-deheap
-            go-github-com-abbot-go-http-auth
             go-github-com-adrg-xdg
             go-github-com-anacrolix-dms
-            go-github-com-anacrolix-log
-            go-github-com-apache-arrow-go-v18
             go-github-com-atotto-clipboard
             go-github-com-aws-aws-sdk-go-v2
             go-github-com-aws-aws-sdk-go-v2-config
@@ -697,14 +692,14 @@ Feature:
             go-github-com-filenclouddienste-filen-sdk-go
             go-github-com-files-com-files-sdk-go-v3
             go-github-com-gabriel-vasile-mimetype
-            go-github-com-gdamore-tcell-v2
+            go-github-com-gdamore-tcell-v3
             go-github-com-go-chi-chi-v5
             ;; go-github-com-go-darwin-apfs                        ;macOS only
             go-github-com-go-git-go-billy-v5
-            go-github-com-golang-jwt-jwt-v4
             go-github-com-golang-jwt-jwt-v5
             go-github-com-google-uuid
             go-github-com-hanwen-go-fuse-v2
+            go-github-com-hashicorp-golang-lru-v2
             go-github-com-ibm-go-sdk-core-v5
             go-github-com-internxt-rclone-adapter
             go-github-com-jcmturner-gokrb5-v8
