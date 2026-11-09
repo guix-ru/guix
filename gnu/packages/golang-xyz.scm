@@ -34222,7 +34222,7 @@ XOR, as in kademlia.")
 (define-public go-github-com-winfsp-cgofuse
   (package
     (name "go-github-com-winfsp-cgofuse")
-    (version "1.5.0")
+    (version "1.6.0")
     (source
      (origin
        (method git-fetch)
@@ -34231,19 +34231,26 @@ XOR, as in kademlia.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0wqxn3plbp6rabmyfyxamjl0ilm0n5pkiwhsvnbrx9pcpmlc1b0p"))))
+        (base32 "0ayvrp0gxjmwmvbcqrmapga6bdr05g65jmw3wylndq6zrwm32ars"))))
     (build-system go-build-system)
     (arguments
      (list
       #:skip-build? #t
-      #:tests? #f ;XXX: panic: cgofuse: cannot find FUSE
+      #:tests? #f          ;fuse: device not found, try 'modprobe fuse' first
       #:import-path "github.com/winfsp/cgofuse"
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'remove-examples
             (lambda* (#:key import-path #:allow-other-keys)
               (delete-file-recursively
-               (string-append "src/" import-path "/examples")))))))
+               (string-append "src/" import-path "/examples"))))
+          (add-after 'unpack 'patch-paths
+            (lambda* (#:key inputs import-path #:allow-other-keys)
+              (substitute* (string-append "src/" import-path
+                                          "/fuse/host_cgo.go")
+                (("\"libfuse.so.2\"")
+                 (format #f "~s"
+                         (search-input-file inputs "/lib/libfuse.so.2")))))))))
     (propagated-inputs
      (list fuse fuse-2))
     (home-page "https://github.com/winfsp/cgofuse")
