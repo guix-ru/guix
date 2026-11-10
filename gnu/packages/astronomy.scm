@@ -14651,7 +14651,7 @@ frequency.")
 (define-public stellarium
   (package
     (name "stellarium")
-    (version "26.2")
+    (version "26.3")
     (source
      (origin
        (method git-fetch)
@@ -14660,7 +14660,7 @@ frequency.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1n3dkfrp35qn3m4r7wfgb2brwpy792ps1riixblnvv2cmgsvpncq"))))
+        (base32 "14kfsn77jphvfla45h2r51s2xcj98x51njsap9d6a5qbnjwvjjkq"))))
     (build-system qt-build-system)
     (arguments
      (list
@@ -14681,7 +14681,7 @@ frequency.")
            eigen
            glm
            gpsd
-           indi-2.2.1
+           indi
            libnova
            md4c
            nlopt
