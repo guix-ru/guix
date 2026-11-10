@@ -875,7 +875,7 @@ they exist.")
     (propagated-inputs
      (list python-alembic
            python-greenlet
-           python-sqlalchemy-2
+           python-sqlalchemy
            python-typing-extensions))
     (home-page "https://advanced-alchemy.litestar.dev/latest/")
     (synopsis "Ready-to-go SQLAlchemy concoctions")
@@ -4598,39 +4598,6 @@ on localhost.")
 (define-public python-sqlalchemy
   (package
     (name "python-sqlalchemy")
-    (version "1.4.54")
-    (source
-     (origin
-      (method url-fetch)
-      (uri (pypi-uri "SQLAlchemy" version))
-      (sha256
-       (base32 "06n36zs280iahxj34fvq1iwq3zjlmvsalfcanwhdqdcc13nznw24"))))
-    (build-system pyproject-build-system)
-    (native-inputs
-     (list python-cython ; for C extensions
-           python-pytest python-mock python-pytest-xdist ; for tests
-           python-setuptools python-wheel))
-    (propagated-inputs
-     (list python-greenlet))
-    (arguments
-     (list
-      #:test-flags
-      '(list ;; The memory usage tests are very expensive and run in sequence;
-             ;; skip them.
-             "-k" "not test_memusage.py")))
-    (home-page "https://www.sqlalchemy.org")
-    (synopsis "Database abstraction library")
-    (description
-     "SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that
-gives application developers the full power and flexibility of SQL.  It
-provides a full suite of well known enterprise-level persistence patterns,
-designed for efficient and high-performing database access, adapted into a
-simple and Pythonic domain language.")
-    (license license:x11)))
-
-(define-public python-sqlalchemy-2
-  (package
-    (name "python-sqlalchemy")
     (version "2.0.45")
     (source
      (origin
@@ -4656,14 +4623,17 @@ simple and Pythonic domain language.")
      (list python-greenlet
            python-typing-extensions))
     (home-page "https://www.sqlalchemy.org")
-    (synopsis "SQL toolkit and object relational mapper")
+    (synopsis "Database abstraction library")
     (description
-     "SQLAlchemy is the Python SQL toolkit and @acronym{ORM, Object Relational
-Mapper} that gives application developers the full power and flexibility of
-SQL.  It provides a full suite of well known enterprise-level persistence
-patterns, designed for efficient and high-performing database access, adapted
-into a simple and Pythonic domain language.")
-    (license license:expat)))
+     "SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that
+gives application developers the full power and flexibility of SQL.  It
+provides a full suite of well known enterprise-level persistence patterns,
+designed for efficient and high-performing database access, adapted into a
+simple and Pythonic domain language.")
+    (license license:x11)))
+
+;; Deprecated on <2026-11-10>.
+(define-public python-sqlalchemy-2 python-sqlalchemy)
 
 (define-public python-sqlalchemy-utils
   (package
@@ -4796,7 +4766,7 @@ this library provides functions to facilitate such comparisons.")
            python-tzdata))
     (propagated-inputs
      (list python-mako
-           python-sqlalchemy-2
+           python-sqlalchemy
            python-tomli
            python-typing-extensions))
     (home-page "https://github.com/sqlalchemy/alembic")
@@ -5618,7 +5588,7 @@ is designed to have a low barrier to entry.")
               "-k" "not test_select_gen")))
     (propagated-inputs
      (list python-pydantic
-           python-sqlalchemy-2
+           python-sqlalchemy
            python-typing-extensions))
     (native-inputs
      (list python-dirty-equals
@@ -5644,7 +5614,7 @@ annotations, and powered by Pydantic and SQLAlchemy.")
     (native-inputs
      (list python-pdm-backend))
     (propagated-inputs
-     (list python-pydantic python-sqlalchemy-2 python-typing-extensions))))
+     (list python-pydantic python-sqlalchemy python-typing-extensions))))
 
 (define-public python-sqlparse
   (package
