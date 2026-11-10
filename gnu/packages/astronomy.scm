@@ -411,7 +411,7 @@ rendering of the atmosphere model and examine its properties.
 (define-public casacore
   (package
     (name "casacore")
-    (version "3.8.1")
+    (version "3.8.2")
     (source
      (origin
        (method git-fetch)
@@ -420,7 +420,7 @@ rendering of the atmosphere model and examine its properties.
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "13h1vkm64fhmdxyc9nnysj12wk5cjghs5pkmdrar6myqfazis2p0"))))
+        (base32 "04xwcran7dg5yfribl2kmf69kznsamj0v5qcj08q2q1w3l1x3ikk"))))
     (build-system cmake-build-system)
     (arguments
      (list
