@@ -2415,7 +2415,7 @@ Main features:
 (define-public python-asdf
   (package
     (name "python-asdf")
-    (version "5.3.1")
+    (version "6.0.0")
     (source
      (origin
        (method git-fetch)
@@ -2424,11 +2424,10 @@ Main features:
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0dbzpqmi38z6iab52f3mlsx4xq1kld6dag5l6msq9z5m7lr4kcnb"))))
+        (base32 "1d7pq903gkr037xv4sp2nkqqjsgs8n4v68fvw0g6pbr9h1saqrb2"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 2150 passed, 2 xfailed
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count))))
       #:phases
