@@ -14974,7 +14974,7 @@ replacement, which is called @code{*let}).")
        "This is a system to help you easily and quickly deploy standalone
 common lisp applications as binaries.  Specifically it is geared towards
 applications with foreign library dependencies that run some kind of GUI.")
-      (license license:artistic2.0))))
+      (license license:zlib))))
 
 (define-public cl-deploy
   (sbcl-package->cl-source-package sbcl-deploy))
