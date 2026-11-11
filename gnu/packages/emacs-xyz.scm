@@ -5949,6 +5949,30 @@ or unexpected behavior inside an elisp configuration file (typically
 @file{init.el} or @file{.emacs}).")
       (license license:gpl3+))))
 
+(define-public emacs-lazy-guard
+  ; no release, we take version from source
+  (let ((commit "b374aadb9a8c2f6c28346ccd17d66fa89816acc6")
+        (revision "0"))
+  (package
+    (name "emacs-lazy-guard")
+    (version "1.2.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://codeberg.org/vifon/lazy-guard")
+                     (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32 "0l13wkkyj027sg878ch9i5ih7y3ib86cv8six244mnyk286s9jvn"))))
+    (build-system emacs-build-system)
+    (home-page "https://codeberg.org/vifon/lazy-guard")
+    (synopsis "Helper for validating Emacs configurations")
+    (description "Lazy Guard helps validating Emacs configurations.  As its
+first step it loads Emacs as usual but in batch mode, reporting any errors
+encountered.  As its second step, it forcefully evaluates the lazy parts of the
+config that would not be immediately checked otherwise.")
+    (license license:gpl3+))))
+
 (define-public emacs-w3m
   ;; Emacs-w3m follows a "rolling release" model.
   (let ((commit "ec18c21418bf7c1be159bd3cf7e79a370d4be1f3")
