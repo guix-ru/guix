@@ -27059,6 +27059,42 @@ corresponding OS system functions are called.")
 (define-public cl-ppath
   (sbcl-package->cl-source-package sbcl-ppath))
 
+(define-public sbcl-precise-time
+  (let ((commit "93ea6aea74aa2ea8860e8581e67997636320e841")
+        (revision "0"))
+    (package
+      (name "sbcl-precise-time")
+      (version (git-version "1.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://codeberg.org/shinmera/precise-time")
+               (commit commit)))
+         (file-name (git-file-name "precise-time" version))
+         (sha256
+          (base32
+           "0gj98hvmzvay27rbdjnz65izcs0dr0rq1g11aac04c0w12xp1rq5"))))
+      (build-system asdf-build-system/sbcl)
+      (native-inputs
+       (list sbcl-parachute))
+      (inputs
+       (list sbcl-cffi
+             sbcl-trivial-features))
+      (synopsis "Precise time measurement library for Common Lisp")
+      (description
+       "This is a small library hooking into the operating system to give more
+precise timing information than Common Lisp implementations usually provide
+via @code{get-universal-time} or @code{get-internal-real-time}.")
+      (home-page "https://codeberg.org/shinmera/precise-time")
+      (license license:zlib))))
+
+(define-public cl-precise-time
+  (sbcl-package->cl-source-package sbcl-precise-time))
+
+(define-public ecl-precise-time
+  (sbcl-package->ecl-package sbcl-precise-time))
+
 (define-public sbcl-print-licenses
   (let ((commit "3949663318fb736f4ee660e3aa810875187d531c")
         (revision "0"))
