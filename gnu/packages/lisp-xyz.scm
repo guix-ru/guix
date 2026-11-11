@@ -3072,6 +3072,42 @@ purpose of financial calculations.")
 (define-public ecl-cambl
   (sbcl-package->ecl-package sbcl-cambl))
 
+(define-public sbcl-cl-cancel
+  (package
+    (name "sbcl-cl-cancel")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/atgreen/cl-cancel")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name "cl-cancel" version))
+       (sha256
+        (base32
+         "1qjh94wrbmypziwayhzh1nbr9319pwdi722i95lc8qcrvvb1brrk"))))
+    (build-system asdf-build-system/sbcl)
+    (native-inputs
+     (list sbcl-fiveam))
+    (inputs
+     (list sbcl-atomics
+           sbcl-bordeaux-threads
+           sbcl-precise-time))
+    (synopsis "Cancellation propagation library for Common Lisp with deadlines
+and timeouts")
+    (description
+     "This library provides hierarchical cancellation with deadlines and
+timeouts for Common Lisp applications.  When a parent operation is cancelled,
+all child operations are automatically cancelled too.")
+    (home-page "https://github.com/atgreen/cl-cancel")
+    (license license:expat)))
+
+(define-public cl-cancel
+  (sbcl-package->cl-source-package sbcl-cl-cancel))
+
+(define-public ecl-cl-cancel
+  (sbcl-package->ecl-package sbcl-cl-cancel))
+
 (define-public sbcl-canonicalized-initargs
   (package
     (name "sbcl-canonicalized-initargs")
