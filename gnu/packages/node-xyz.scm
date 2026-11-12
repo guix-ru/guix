@@ -27,10 +27,15 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages node-xyz)
+  #:use-module (gnu packages)
   #:use-module (gnu packages base) ; sed
+  #:use-module (gnu packages llvm)
   #:use-module (gnu packages sqlite)
+  #:use-module (gnu packages node)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages rust)
   #:use-module (gnu packages web) ; node-esbuild
+  #:use-module (guix build-system cargo)
   #:use-module (guix build-system copy)
   #:use-module (guix build-system node)
   #:use-module ((guix build-system pyproject) #:select (pypi-uri))
@@ -4246,52 +4251,83 @@ connection.")))
 (define-public node-source-map
   (package
     (name "node-source-map")
-    (version "0.6.1")
+    (version "0.7.6")
     (source (origin
       (method git-fetch)
       (uri (git-reference
         (url "https://github.com/mozilla/source-map")
-        (commit version)))
+        (commit version)
+        ;; Download cargo submodule to compile mappings.wasm
+        ;; Also download submodules for test, they are WIP
+        (recursive? #t)))
       (file-name (git-file-name name version))
       (sha256
-        (base32 "0q8qaddi05387y8f58q0xlj7fjxf4mkymmir7wd9c5imqqs378md"))
-      (modules '((guix build utils)))
-      (snippet #~(begin
-        (delete-file-recursively "dist")))))
-    (build-system node-build-system)
-    (native-inputs (list esbuild))
-    (arguments (list
-      #:modules '((guix build node-build-system)
-                  (guix build json-utils)
-                  (guix build utils)
-                  (ice-9 match)
-                  (json))
-      #:phases #~(modify-phases %standard-phases
-        (add-before 'patch-dependencies 'modify-package (lambda _
-          (modify-json
-            (delete-dev-dependencies)
-            (replace-json-fields
-             (list (cons "scripts.test" "node test/run-tests.js"))))))
-        (replace 'build (lambda _
-          (for-each
-            (match-lambda ((name parameters)
-              (apply invoke (append
-                (list
-                  "esbuild"
-                  "source-map.js"
-                  "--bundle"
-                  "--format=iife"
-                  "--global-name=sourceMap"
-                  (string-append "--outfile=dist/source-map" name ".js"))
-                parameters))))
-            (list
-              (list "" (list))
-              (list ".min" (list "--sourcemap" "--minify")))))))))
+       (base32 "1l07f5389wr64nn2mdv05jgf5ng78ksa7vbw42s9drlix8biddl6"))
+      (patches
+       (search-patches "node-source-map-fix-mapping-callback.patch"))))
+    (build-system cargo-build-system)
+    (arguments
+     (list
+      #:install-source? #f
+      #:imported-modules (append %copy-build-system-modules
+                                 %cargo-build-system-modules)
+      #:modules '((guix build cargo-build-system)
+                  ((guix build copy-build-system) #:prefix copy:)
+                  (guix build utils))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir-to-wasm-api
+            (lambda _
+              (chdir "wasm-mappings/source-map-mappings-wasm-api")))
+          (add-after 'configure 'configure-target
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let ((sysroot
+                     (assoc-ref inputs
+                                "rust-sysroot-for-wasm32-unknown-unknown")))
+                (mkdir-p ".cargo")
+                (with-atomic-file-replacement ".cargo/config"
+                  (lambda (in out)
+                    (display (string-append "\
+[target.wasm32-unknown-unknown]
+linker = 'lld'
+
+[build]
+target = ['wasm32-unknown-unknown']
+") out)
+                    (dump-port in out)))
+                (setenv "RUSTFLAGS" (string-append "--sysroot " sysroot)))))
+          (replace 'build
+            (lambda _
+              (invoke "python3" "./build.py"
+                      "--no-wasm-gc"
+                      "--no-wasm-snip"
+                      "-o" "../../lib/mappings.wasm")))
+          (replace 'check
+            (lambda _
+              (chdir "../../")
+              (invoke "node" "test/run-tests.js")))
+          (replace 'install
+            (lambda args
+              (apply (assoc-ref copy:%standard-phases 'install)
+                     #:install-plan
+                     `(("lib" "lib/node_modules/source-map/lib")
+                       ("source-map.js" "lib/node_modules/source-map/")
+                       ("source-map.d.ts" "lib/node_modules/source-map/")
+                       ("package.json" "lib/node_modules/source-map/")
+                       ("LICENSE" "lib/node_modules/source-map/"))
+                     args))))))
+    (native-inputs
+     (list binaryen
+           lld
+           node
+           python
+           rust-sysroot-for-wasm32-unknown-unknown))
+    (inputs (cargo-inputs 'source-map-mappings-wasm-api))
+    (home-page "https://github.com/mozilla/source-map")
     (synopsis "Generates and consumes source maps")
     (description "This is a library to generate and consume the source map format\
  @uref{https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k\
 /edit, described here}.")
-    (home-page (git-reference-url (origin-uri source)))
     (license license:bsd-3)))
 
 (define-public node-source-map-support

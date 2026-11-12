@@ -104342,6 +104342,17 @@ fn main() {
                        rust-zvariant-5.10.0
                        rust-zvariant-derive-5.10.0
                        rust-zvariant-utils-3.3.0))
+ (source-map-mappings-wasm-api =>
+                               (list rust-fuchsia-cprng-0.1.1
+                                     rust-libc-0.2.191
+                                     rust-rand-0.4.6
+                                     rust-rand-core-0.3.2
+                                     rust-rand-core-0.4.3
+                                     rust-rdrand-0.4.0
+                                     rust-vlq-0.5.1
+                                     rust-winapi-0.3.9
+                                     rust-winapi-i686-pc-windows-gnu-0.4.0
+                                     rust-winapi-x86-64-pc-windows-gnu-0.4.0))
  (speakersafetyd =>
                  (list rust-alsa-0.9.1
                        rust-alsa-sys-0.3.1

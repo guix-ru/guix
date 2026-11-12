@@ -1,0 +1,19 @@
+Author: Max Gilmour <max.gilm...@canonical.com>
+Bug: https://github.com/mozilla/source-map/issues/530
+Bug-Debian: https://bugs.debian.org/1142614
+Forwarded: https://github.com/mozilla/source-map/pull/531
+Last-Update: 2026-07-22
+---
+--- a/wasm-mappings/source-map-mappings-wasm-api/src/lib.rs
++++ b/wasm-mappings/source-map-mappings-wasm-api/src/lib.rs
+@@ -251,6 +251,10 @@
+     mappings.as_mut().unwrap()
+ }
+ 
++// Since Rust 1.96 (rust-lang/rust#149868), wasm-ld is no longer invoked with
++// `--allow-undefined`. As the PR states, importing from `env` must now be
++// declared with the following line.
++#[link(wasm_import_module = "env")]
+ extern "C" {
+     fn mapping_callback(
+         // These two parameters are always valid.
