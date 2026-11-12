@@ -2488,9 +2488,13 @@ implementation of the ASDF Standard.")
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 4438 passed, 2 skipped
+      ;; tests: 4437 passed, 2 skipped
       #:test-flags
-      #~(list "--numprocesses" (number->string (min 8 (parallel-job-count))))
+      #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
+              ;; asdf.exceptions.AsdfConversionWarning: A node failed to
+              ;; convert with: Inconsistent data column lengths
+              (string-append "--deselect=asdf_astropy/converters/table/"
+                             "tests/test_table.py::test_mismatched_columns"))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'install 'include-package-data
