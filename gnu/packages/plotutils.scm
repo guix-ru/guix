@@ -71,14 +71,14 @@
 (define-public asymptote
   (package
     (name "asymptote")
-    (version "3.12")
+    (version "3.15")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://sourceforge/asymptote/"
                            version "/asymptote-" version ".src.tgz"))
        (sha256
-        (base32 "06wgkff6ah0jp5icj0wliy0v0y1llxkd9263jfii7wiy8sbixv7a"))
+        (base32 "13aypwd6sspwmcq117wjjnmzyab21qndza8sk2r4xsw3zky689x3"))
        (modules '((guix build utils)))))
     (build-system gnu-build-system)
     ;; Note: The 'asy' binary retains a reference to docdir for use with its
