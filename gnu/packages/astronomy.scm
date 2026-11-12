@@ -2544,16 +2544,21 @@ Astropy objects.")
 (define-public python-asdf-compression
   (package
     (name "python-asdf-compression")
-    (version "0.1.0")
+    ;; 0.1.0 (2025-11-10); to obtain compatibility with ASDF 6+.
+    (properties '((commit . "44e70a01ca5ebb10648a81351b193061ed3318fc")
+                  (revision . "0")))
+    (version (git-version "0.1.0"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/asdf-format/asdf-compression")
-              (commit version)))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0fd2d5raglp1nwjy0hr3kckk518xrph451zymlw58jgwg5l1vq3m"))))
+        (base32 "0qp1dbxw3z0anfhgajrnkr32bxn0v48k34s9fxrpdwr6nbsf599d"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-numpy
@@ -2562,7 +2567,9 @@ Astropy objects.")
            python-setuptools-scm))
     (propagated-inputs
      (list python-asdf
+           ;; [optional]
            python-blosc
+           python-blosc2
            python-lz4
            python-zstandard))
     (home-page "https://github.com/asdf-format/asdf-compression")
