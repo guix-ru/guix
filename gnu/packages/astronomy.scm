@@ -13497,7 +13497,7 @@ files through one convenient interface.")
 (define-public python-tweakwcs
   (package
     (name "python-tweakwcs")
-    (version "0.9.2")
+    (version "0.9.3")
     (source
      (origin
        (method git-fetch)
@@ -13506,7 +13506,7 @@ files through one convenient interface.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x1f6d7rw51hgg3bpb8dy7v57mnf4vhr7b1m1fz2yl1j0bx8zvlp"))))
+        (base32 "0jhn9mnh5lckdd6xpi7l4w0kc8pfiirh3fflcvqcbvlnhxlivc81"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-pytest
