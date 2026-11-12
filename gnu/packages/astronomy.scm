@@ -12101,7 +12101,14 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
               ;; ~500MiB of data.
               (string-append "--deselect=tests/jwst/datamodels/"
                              "test_schema_against_crds.py"
-                             "::test_crds_selectors_vs_datamodel"))
+                             "::test_crds_selectors_vs_datamodel")
+              ;; asdf.exceptions.AsdfFutureWarning: In the future failed node
+              ;; conversion will by default generate a warning instead of an
+              ;; error. Set AsdfConfig.warn_on_failed_conversion to True to
+              ;; opt-in to the new behavior, or to False to silence this
+              ;; warning.
+              (string-append "--deselect=tests/jwst/transforms/"
+                             "test_unsupported.py::test_load_unsupported"))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-manifest.in
