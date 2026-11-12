@@ -88,7 +88,7 @@
      (list autoconf-2.71
            automake
            bison
-           boost-1.83
+           boost
            cmake-minimal
            emacs-minimal
            flex
@@ -129,7 +129,8 @@
            python
            python-cson
            python-numpy
-           python-pyqt
+           python-pyside-6
+           python-pyqt-6
            readline
            spirv-tools
            vulkan-loader
