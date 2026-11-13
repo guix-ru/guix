@@ -452,7 +452,7 @@ other theme.")
 (define-public glances
   (package
     (name "glances")
-    (version "4.5.8")
+    (version "4.5.9")
     (source
      (origin
        (method git-fetch)
@@ -461,7 +461,7 @@ other theme.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0nif1y83s9kkyj84iw66xjppyg0hmwisp08wz9pm9hxxrkj641f0"))))
+        (base32 "030z4v3in2y3bizas5rdq0p4ff3wlrqxmm9fqkap9idx1lczvx0a"))))
     (build-system pyproject-build-system)
     (arguments
      (list
