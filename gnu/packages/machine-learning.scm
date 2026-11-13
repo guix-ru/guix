@@ -636,8 +636,8 @@ distributions.")
 
 (define-public fann
   ;; The last release is 14 years old.
-  (let ((commit "1783cbf6239a597c4d29f694e227e22b8d4f4bf6")
-        (revision "2"))
+  (let ((commit "1ac003a62a5186a662ddab430fa479ab81e55cbd")
+        (revision "3"))
     (package
       (name "fann")
       (version (git-version "2.2.0" revision commit))
@@ -651,8 +651,7 @@ distributions.")
          (snippet #~(delete-file-recursively "lib/googletest"))
          (file-name (git-file-name name version))
          (sha256
-          (base32
-           "0jlcxl0czlr3982mak3935mb08i2f368f0jsxca91ppgfd596ldr"))))
+          (base32 "13c3yncgyjaajjvy8mi8095gikl80p9cg8knap14vvz4ldmfcl18"))))
       (build-system cmake-build-system)
       (arguments
        (list
