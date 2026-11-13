@@ -9415,7 +9415,7 @@ to setup.")
 (define-public sbcl-cl-ppcre
   (package
     (name "sbcl-cl-ppcre")
-    (version "2.1.1")
+    (version "2.1.2")
     (source
      (origin
        (method git-fetch)
@@ -9424,7 +9424,9 @@ to setup.")
              (commit (string-append "v" version))))
        (file-name (git-file-name "cl-ppcre" version))
        (sha256
-        (base32 "0dwvr29diqzcg5n6jvbk2rnd90i05l7n828hhw99khmqd0kz7xsi"))))
+        (base32 "0aw7lh79wgn18c75v29md2x8irl8v7f96lj1mfkp7x0mkqsb0cs8"))
+       ;; Patch for clasp from https://github.com/edicl/cl-ppcre/pull/64.
+       (patches (search-patches "sbcl-cl-ppcre-fix-loops.patch"))))
     (build-system asdf-build-system/sbcl)
     (native-inputs
      (list sbcl-flexi-streams))
@@ -9436,8 +9438,7 @@ to setup.")
            ;; to work around the circular dependency between edicl/cl-ppcre
            ;; and edicl/cl-unicode.
            (lambda _
-             (delete-file "cl-ppcre-unicode.asd")
-             #t)))))
+             (delete-file "cl-ppcre-unicode.asd"))))))
     (synopsis "Portable regular expression library for Common Lisp")
     (description "CL-PPCRE is a portable regular expression library for Common
 Lisp, which is compatible with perl.  It is pretty fast, thread-safe, and

@@ -1,0 +1,67 @@
+From 1807e8edcfbe9c6d0eeec8422bc4d0beb98b3d21 Mon Sep 17 00:00:00 2001
+From: Chris Schafmeister <chris.schaf@verizon.net>
+Date: Sat, 12 Sep 2026 19:41:45 +0000
+Subject: [PATCH] Fix lazy repetition endpoint matching across LOOP
+ implementations
+
+Track the cursor explicitly in bounded and unbounded non-greedy
+constant-length matchers instead of relying on an arithmetic LOOP
+variable's value in FINALLY.
+
+Clasp's LOOP uses Khazern, a portable LOOP implementation written by
+Robert Strandh and Tarn Burton, originally developed as part of SICL.
+See Robert Strandh, "A modern implementation of the LOOP macro,"
+European Lisp Symposium, 2016:
+https://metamodular.com/SICL/loop.pdf
+
+The Khazern version in which this problem was observed leaves the
+arithmetic iteration variable at the last in-range position, causing
+the endpoint check to fail for patterns such as "^.+?$".
+Explicit advancement preserves the intended matching behavior
+without depending on this disputed LOOP interpretation.
+
+I found the source code responsible for the problem
+with ChatGPT Astra.
+
+Clasp returned the wrong result for:
+(cl-ppcre:scan-to-strings "^.+?$" "Foo") --> NIL
+It should return "Foo"
+---
+ repetition-closures.lisp | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/repetition-closures.lisp b/repetition-closures.lisp
+index 1bcb08b..5a2ff9a 100644
+--- a/repetition-closures.lisp
++++ b/repetition-closures.lisp
+@@ -376,22 +376,24 @@ repetition matches at CURR-POS."
+                                     (the fixnum (* len maximum))))))
+         ;; move forward by LEN and always try NEXT-FN first, then
+         ;; CHECK-CUR-POS
+-        (loop for curr-pos of-type fixnum from start-pos
+-                                          below target-end-pos
+-                                          by len
++        ;; Advance explicitly so FINALLY sees the endpoint independently
++        ;; of LOOP's arithmetic iteration variable semantics.
++        (loop with curr-pos of-type fixnum = start-pos
++              while (< curr-pos target-end-pos)
+               thereis (funcall next-fn curr-pos)
+               while ,check-curr-pos
++              do (incf curr-pos len)
+               finally (return (funcall next-fn curr-pos)))))
+   ;; basically the same code; it's just a bit easier because we're
+   ;; not bounded by MAXIMUM
+   (lambda (start-pos)
+     (declare (fixnum start-pos))
+     (let ((target-end-pos (1+ (- *end-pos* len min-rest))))
+-      (loop for curr-pos of-type fixnum from start-pos
+-                                        below target-end-pos
+-                                        by len
++      (loop with curr-pos of-type fixnum = start-pos
++            while (< curr-pos target-end-pos)
+             thereis (funcall next-fn curr-pos)
+             while ,check-curr-pos
++            do (incf curr-pos len)
+             finally (return (funcall next-fn curr-pos)))))))
+ 
+ (defgeneric create-non-greedy-constant-length-matcher (repetition next-fn)
