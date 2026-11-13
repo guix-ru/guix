@@ -32,6 +32,7 @@
 
 (define-module (gnu packages lisp-check)
   #:use-module (gnu packages)
+  #:use-module (guix gexp)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (gnu packages lisp-xyz)
   #:use-module (guix packages)
@@ -637,7 +638,13 @@ with a focus on interactive development.")
       (build-system asdf-build-system/sbcl)
       (arguments
        ;; The tests require a debugger, but we run with the debugger disabled.
-       '(#:tests? #f))
+       (list #:tests? #f
+             #:phases #~(modify-phases %standard-phases
+                          (add-after 'unpack 'fix-for-clasp-3
+                            (lambda _
+                              (substitute* "dev/port.lisp"
+                                (("core:btcl")
+                                 "clasp-debug:print-backtrace")))))))
       (synopsis "LIsp Framework for Testing")
       (description
        "The LIsp Framework for Testing (LIFT) is a unit and system test tool for LISP.
@@ -653,6 +660,9 @@ supports randomized testing, benchmarking, profiling, and reporting.")
 
 (define-public ecl-lift
   (sbcl-package->ecl-package sbcl-lift))
+
+(define-public clasp-lift
+  (sbcl-package->clasp-package sbcl-lift))
 
 (define-public sbcl-lisp-unit
   (let ((commit "89653a232626b67400bf9a941f9b367da38d3815"))
