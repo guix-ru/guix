@@ -541,6 +541,9 @@ interactive development model in mind.")
 (define-public ecl-fiveam
   (sbcl-package->ecl-package sbcl-fiveam))
 
+(define-public clasp-fiveam
+  (sbcl-package->clasp-package sbcl-fiveam))
+
 (define-public sbcl-hamcrest
   (let ((commit "a54553e59a70dc5a539b683e79bfcdb0e8bae5c8")
         (revision "0"))
