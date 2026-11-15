@@ -94,7 +94,7 @@ renderer.")
     (arguments
      '(#:install-plan
        '(("." "share/ucd/"))))
-    (home-page "https://www.unicode.org")
+    (home-page "https://home.unicode.org")
     (synopsis "Unicode Character Database")
     (description
      "The @dfn{Unicode Character Database} (UCD) consists of a number of data
@@ -155,7 +155,7 @@ test data for conformance to several important Unicode algorithms.")
         ,(unicode-emoji-file
           "zwj-sequences" version
           "0mqfzcz1ka78jjk8gk6bfywq4ldmj26rri08zsdqzkfgr8ys0xls"))))
-    (home-page "https://www.unicode.org")
+    (home-page "https://home.unicode.org")
     (synopsis "Unicode Emoji data")
     (description
      "This package includes data files listing characters and sequences, that
@@ -222,7 +222,7 @@ Unicode Technological Standard #51.")
     (arguments
      '(#:install-plan
        '(("common" "share/unicode/cldr/"))))
-    (home-page "https://www.unicode.org")
+    (home-page "https://home.unicode.org")
     (synopsis "Locale data repository")
     (description
      "The Unicode Common Locale Data Repository (CLDR) is a large repository
