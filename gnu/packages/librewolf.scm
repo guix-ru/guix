@@ -633,7 +633,7 @@
                   libjpeg-turbo
                   libnotify
                   libpciaccess
-                  libpng-apng-next
+                  libpng-apng
                   libva
                   libvpx
                   libwebp
