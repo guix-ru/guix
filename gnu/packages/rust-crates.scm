@@ -4767,6 +4767,10 @@ fn main() {
   (crate-source "cdp-types" "0.3.0"
                 "00prc9m7rhj7aq01f81k7vp86qvfbg3ad6jz4h5dhhz1i1da0b1k"))
 
+(define rust-cdshealpix-0.10.1
+  (crate-source "cdshealpix" "0.10.1"
+                "1r99a3fkpdwdq254l53ab37ak290hpnqnv62sh6nskz92514f0qm"))
+
 (define rust-cdshealpix-0.9.1
   (crate-source "cdshealpix" "0.9.1"
                 "0yc48wpcpwxnf918azy2grqnvpg8qnb2iyin36m51qzx9cpg2hwg"))
@@ -24116,6 +24120,10 @@ fn main() {
 (define rust-numpy-0.27.1
   (crate-source "numpy" "0.27.1"
                 "05xs7gz5wsaz12s8sfvppg19d4f7h6dw6hxdjahgys24drm2xb3s"))
+
+(define rust-numpy-0.29.0
+  (crate-source "numpy" "0.29.0"
+                "1x4nx6nnzihdkaq2wwd97rq68n9s1lsf3l5filvrxwsz7bb1anva"))
 
 (define rust-numtoa-0.1.0
   (crate-source "numtoa" "0.1.0"
@@ -88071,23 +88079,23 @@ fn main() {
                           rust-base64-0.22.1
                           rust-bincode-1.3.3
                           rust-bitflags-1.3.2
-                          rust-bumpalo-3.20.3
+                          rust-bumpalo-3.20.4
                           rust-byteorder-1.5.0
-                          rust-cc-1.4.5
-                          rust-cdshealpix-0.9.1
-                          rust-cfg-if-1.0.4
+                          rust-cc-1.11.2
+                          rust-cdshealpix-0.10.1
+                          rust-cfg-if-1.0.5
                           rust-chrono-0.4.45
                           rust-colorous-1.0.16
                           rust-core-foundation-sys-0.8.7
-                          rust-crc32fast-1.5.1
+                          rust-crc32fast-1.5.5
                           rust-crossbeam-deque-0.8.8
                           rust-crossbeam-epoch-0.9.21
                           rust-crossbeam-utils-0.8.23
-                          rust-either-1.18.0
-                          rust-equivalent-1.0.2
+                          rust-either-1.19.0
+                          rust-equivalent-1.0.3
                           rust-fdeflate-0.3.7
-                          rust-find-msvc-tools-0.1.12
-                          rust-flate2-1.1.10
+                          rust-find-msvc-tools-0.1.15
+                          rust-flate2-1.1.11
                           rust-futures-core-0.3.34
                           rust-futures-task-0.3.34
                           rust-futures-util-0.3.34
@@ -88096,17 +88104,15 @@ fn main() {
                           rust-iana-time-zone-0.1.65
                           rust-iana-time-zone-haiku-0.1.2
                           rust-indexmap-2.14.2
-                          rust-indoc-2.0.7
                           rust-itertools-0.14.0
-                          rust-js-sys-0.3.105
+                          rust-js-sys-0.3.107
                           rust-katex-doc-0.1.0
-                          rust-libc-0.2.189
-                          rust-log-0.4.34
+                          rust-libc-0.2.191
+                          rust-log-0.4.35
                           rust-mapproj-0.4.0
                           rust-matrixmultiply-0.3.11
                           rust-memchr-2.8.3
-                          rust-memmap2-0.9.11
-                          rust-memoffset-0.9.1
+                          rust-memmap2-0.9.12
                           rust-miniz-oxide-0.8.9
                           rust-miniz-oxide-0.9.1
                           rust-ndarray-0.17.2
@@ -88117,18 +88123,18 @@ fn main() {
                           rust-num-iter-0.1.46
                           rust-num-rational-0.4.2
                           rust-num-traits-0.2.19
-                          rust-numpy-0.27.1
+                          rust-numpy-0.29.0
                           rust-once-cell-1.21.4
                           rust-pin-project-lite-0.2.17
                           rust-png-0.17.16
                           rust-portable-atomic-1.15.0
                           rust-portable-atomic-util-0.2.8
                           rust-proc-macro2-1.0.107
-                          rust-pyo3-0.27.2
-                          rust-pyo3-build-config-0.27.2
-                          rust-pyo3-ffi-0.27.2
-                          rust-pyo3-macros-0.27.2
-                          rust-pyo3-macros-backend-0.27.2
+                          rust-pyo3-0.29.3
+                          rust-pyo3-build-config-0.29.3
+                          rust-pyo3-ffi-0.29.3
+                          rust-pyo3-macros-0.29.3
+                          rust-pyo3-macros-backend-0.29.3
                           rust-quote-1.0.47
                           rust-rawpointer-0.2.1
                           rust-rayon-1.12.0
@@ -88143,20 +88149,19 @@ fn main() {
                           rust-simd-adler32-0.3.10
                           rust-slab-0.4.12
                           rust-syn-2.0.119
-                          rust-syn-3.0.5
-                          rust-target-lexicon-0.13.5
-                          rust-thiserror-2.0.20
-                          rust-thiserror-impl-2.0.20
+                          rust-syn-3.0.10
+                          rust-target-lexicon-0.13.6
+                          rust-thiserror-2.0.21
+                          rust-thiserror-impl-2.0.21
                           rust-toml-0.8.23
                           rust-toml-datetime-0.6.11
                           rust-toml-edit-0.22.27
                           rust-toml-write-0.1.2
-                          rust-unicode-ident-1.0.24
-                          rust-unindent-0.2.4
-                          rust-wasm-bindgen-0.2.128
-                          rust-wasm-bindgen-macro-0.2.128
-                          rust-wasm-bindgen-macro-support-0.2.128
-                          rust-wasm-bindgen-shared-0.2.128
+                          rust-unicode-ident-1.0.27
+                          rust-wasm-bindgen-0.2.130
+                          rust-wasm-bindgen-macro-0.2.130
+                          rust-wasm-bindgen-macro-support-0.2.130
+                          rust-wasm-bindgen-shared-0.2.130
                           rust-windows-core-0.62.2
                           rust-windows-implement-0.60.2
                           rust-windows-interface-0.59.3
@@ -88164,7 +88169,7 @@ fn main() {
                           rust-windows-result-0.4.1
                           rust-windows-strings-0.5.1
                           rust-winnow-0.7.15
-                          rust-zlib-rs-0.6.7))
+                          rust-zlib-rs-0.6.8))
  (python-clarabel =>
                   (list rust-amd-0.2.2
                         rust-autocfg-1.4.0
