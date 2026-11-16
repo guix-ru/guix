@@ -14821,7 +14821,7 @@ any arbitrary astrometric projection defined in the WCS standard.")
 (define-public tangos
   (package
     (name "tangos")
-    (version "1.12.0")
+    (version "1.13.0")
     (source
      (origin
        (method git-fetch)
@@ -14830,7 +14830,7 @@ any arbitrary astrometric projection defined in the WCS standard.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "11ypqxglls9cb80k40h4rwbdgwwsng915rxg0nc6wz89m35r7bfk"))))
+        (base32 "1cwi6p6jr6rsm9dy33cn1ss5ilxj31xj97xm6kazmyp15cynxrxy"))))
     (build-system pyproject-build-system)
     (arguments
      (list
