@@ -8199,13 +8199,13 @@ on:
 (define-public python-mocpy
   (package
     (name "python-mocpy")
-    (version "0.20.0")
+    (version "0.21.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "mocpy" version))
        (sha256
-        (base32 "0xzl25widay8zzylnwawdjp5csmcb2rch7qmr8sidygf52g534x5"))))
+        (base32 "1vci26az3jslwrbfn29qc02jbdz04sd90nrgxmghgpdf6rf7i2af"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -8214,12 +8214,12 @@ on:
       #:modules '(((guix build cargo-build-system) #:prefix cargo:)
                   (guix build pyproject-build-system)
                   (guix build utils))
-      ;; tests: 204 passed, 32 deselected, 1 warning
       #:test-flags
       #~(list "--pyargs" "mocpy"
               ;; Network access is required to fetch test data.
               "--deselect=moc/moc.py::mocpy.moc.moc.MOC.from_ivorn"
               "--deselect=moc/moc.py::mocpy.moc.moc.MOC.from_vizier_table"
+              "--deselect=moc/moc.py::mocpy.moc.moc.MOC.query_vizier_table"
               #$@(map (lambda (test) (string-append "--deselect=tests/"
                                                     test))
                       (list "test_abstract_moc.py::test_write"
