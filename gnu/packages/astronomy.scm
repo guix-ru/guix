@@ -6051,6 +6051,29 @@ intensity in relation to the total stellar intensity of @code{1.0}.  It is
 ideal for ray-tracing simulations of stars and planetary transits.")
     (license license:expat)))
 
+(define-public python-g3read
+  (package
+    (name "python-g3read")
+    (version "1.0.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "g3read" version))
+       (sha256
+        (base32 "0yz3xvk4b087j08rlnymbqahl4amsy32vlrhk0wlhrzkcwvrvdhg"))))
+    (build-system pyproject-build-system)
+    (arguments (list #:tests? #f))             ;custom tests with remote data
+    (native-inputs (list python-setuptools))
+    (home-page "https://aragagnin.github.io")
+    (synopsis "Read Gadget2/3 snapshots, large simulations and catalogues")
+    (description
+     "This package provides a collection of tools to read and post-process
+large Gadget2 and Gadget3 files (including key files).  The core
+routines (g3read.py) are a composition compbining some pynbody and a porting
+of some legacy Klaus' IDL routines. to send batch jobs to the c2pap web
+portaland to convert gadget files to HDF5.")
+    (license license:gpl3)))
+
 (define-public python-gala
   (package
     (name "python-gala")
