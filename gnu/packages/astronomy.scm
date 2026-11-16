@@ -2232,13 +2232,16 @@ API, or a code-based plotting API, with no alteration.")
 (define-public python-ads
   (package
     (name "python-ads")
-    (version "0.12.7")
+    (version "0.13.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "ads" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/andycasey/ads/")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "156y3zp0nm77976rwsxjjdh7yvggas8s6m0nm523khvn4lq8f9n0"))))
+        (base32 "13rdiaifskchhs5qwfcz60h38gddbl4s5jlv4haxfxyi1wy70lan"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -2259,13 +2262,13 @@ API, or a code-based plotting API, with no alteration.")
     (propagated-inputs
      (list python-mock
            python-requests
-           python-six
+           python-six          ;hard dependency
            python-werkzeug))
-    (home-page "http://www.github.com/andycasey/ads/")
+    (home-page "https://github.com/andycasey/ads/")
     (synopsis "Python client to NASA's Astrophysics Data System")
     (description
      "This package provides a Python Module to Interact with NASA's
-@acronym{Astrophysics Data System,ADS}.")
+@acronym{Astrophysics Data System, ADS}.")
     (license license:expat)))
 
 (define-public python-aiapy
