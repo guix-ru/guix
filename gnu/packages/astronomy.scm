@@ -4257,7 +4257,7 @@ find,download, and read the data files.")
 (define-public python-cdflib
   (package
     (name "python-cdflib")
-    (version "1.3.14")
+    (version "1.3.16")
     (source
      (origin
        (method git-fetch)
@@ -4266,7 +4266,7 @@ find,download, and read the data files.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01jyzjgbblci5m03kk6l2dyh9zyzyal09mlr3653fska4ryivdpm"))))
+        (base32 "0pjwmvqfiki7jsfq91mfcvcg3grfw902swh1ahj7m1n7qf6064ky"))))
     (build-system pyproject-build-system)
     (arguments
      (list
