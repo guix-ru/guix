@@ -14206,7 +14206,7 @@ It can be used to calculate the trajectory of satellites.")
 (define-public siril
   (package
     (name "siril")
-    (version "1.4.4")
+    (version "1.4.5")
     (source
      (origin
        (method git-fetch)
@@ -14214,7 +14214,7 @@ It can be used to calculate the trajectory of satellites.")
              (url "https://gitlab.com/free-astro/siril")
              (commit version)))
        (sha256
-        (base32 "00js51nnb5kwm6p9lp2s8yl0y2cjiy1zbddxsq4y8mccydwvy0aj"))
+        (base32 "0fyngx46i5cd0n8n091irg82mh1df5mw01ah0ad9vr3qdq73bydl"))
        (file-name (git-file-name name version))
        (modules '((guix build utils)))
        (snippet
@@ -14230,8 +14230,8 @@ It can be used to calculate the trajectory of satellites.")
                             ;; TODO: Package kplot - Cairo plotting library
                             ;; <https://github.com/kristapsdz/kplot>.
                             ;; "subprojects/kplot"
-                            "subprojects/wcslib"
                             "subprojects/librtprocess"
+                            "subprojects/wcslib"
                             "subprojects/yyjson"))))))
     (build-system meson-build-system)
     (arguments
