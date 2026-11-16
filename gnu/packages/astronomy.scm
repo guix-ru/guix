@@ -1184,26 +1184,20 @@ pick/FWHM, thumbnails, etc.")
 (define-public glnemo2
   (package
     (name "glnemo2")
-    (version "1.21.0")
+    (version "2.0.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://gitlab.lam.fr/jclamber/glnemo2")
-              (commit version)))
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1jmmxszh8d2jmfghig36nhykff345mqnpssfa64d0r7l9cnfp3cn"))))
+        (base32 "03ql9wiih2ymiszyiran8n2s7p1832w9lig8gvv350llrzgn2391"))))
     (build-system cmake-build-system)
     (arguments
      (list
       #:tests? #f        ; No test target
-      #:configure-flags
-      #~(list "CPPFLAGS=-fcommon"
-              (string-append "-DCMAKE_C_FLAGS="
-                             " -Wno-error=implicit-function-declaration"
-                             " -Wno-error=implicit-int"
-                             " -Wno-error=int-conversion"))
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-libraries-paths
@@ -1228,11 +1222,12 @@ pick/FWHM, thumbnails, etc.")
     (inputs
      (list ccfits
            cfitsio
+           freetype
            glm
            glu
            hdf5
            libtirpc
-           qtbase-5
+           qtbase
            zlib))
     (home-page "https://projets.lam.fr/projects/glnemo2/wiki/Wiki")
     (synopsis "3D interactive visualization program for n-body like particles")
