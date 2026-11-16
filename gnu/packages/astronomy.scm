@@ -4305,7 +4305,7 @@ attempting to maintain ISTP compliance
 (define-public python-cdshealpix
   (package
     (name "python-cdshealpix")
-    (version "0.8.1")
+    (version "0.9.0")
     (source
      (origin
        (method git-fetch)
@@ -4314,7 +4314,7 @@ attempting to maintain ISTP compliance
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1168w75bq7xhrdd4wrhr84ffdkw8xfwi7pngv6kv4dpc5c5p729y"))))
+        (base32 "1rh68h6mg8z5lnb1qagadmb3zacxfh10592116p83dl83cchk9sp"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -4323,31 +4323,8 @@ attempting to maintain ISTP compliance
       #:modules '(((guix build cargo-build-system) #:prefix cargo:)
                   (guix build pyproject-build-system)
                   (guix build utils))
-      ;; tests: 137 passed, 18 deselected, 18 warnings
       #:test-flags
-      #~(list "--pyargs" "cdshealpix"
-              #$@(map (lambda (test) (string-append "--deselect=tests/"
-                                                    "test_benchmark_healpix.py"
-                                                    test))
-                      ;; Benchmark tests.
-                      (list "::test_lonlat_to_healpix_broadcast"
-                            "::test_lonlat_to_healpix_broadcast_multithread"
-                            "::test_lonlat_to_healpix_astropy_broadcast"
-                            "::test_lonlat_to_healpix"
-                            "::test_lonlat_to_healpix_multithread"
-                            "::test_lonlat_to_healpix_astropy"
-                            "::test_healpix_to_lonlat_broadcast"
-                            "::test_healpix_to_lonlat_broadcast_multithread"
-                            "::test_healpix_to_lonlat_astropy_broadcast"
-                            "::test_healpix_to_lonlat"
-                            "::test_healpix_to_lonlat_multithread"
-                            "::test_healpix_to_lonlat_astropy"
-                            "::test_healpix_vertices_lonlat"
-                            "::test_healpix_vertices_lonlat_multithread"
-                            "::test_healpix_vertices_lonlat_astropy"
-                            "::test_healpix_neighbours"
-                            "::test_cone_search"
-                            "::test_cone_search_astropy")))
+      #~(list "--pyargs" "cdshealpix")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'prepare-cargo-build-system
@@ -4371,6 +4348,7 @@ attempting to maintain ISTP compliance
            python-astropy-healpix
            python-matplotlib
            python-pytest
+           python-pytest-benchmark
            rust
            (list rust "cargo")))
     (inputs
