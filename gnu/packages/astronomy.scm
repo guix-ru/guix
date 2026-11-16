@@ -1961,25 +1961,6 @@ PixInsight}.  It implements
 1.0 specification}.")
     (license license:gpl3+)))
 
-(define-public libxisf-for-tenmon
-  ;; This is an exact commit required for tenmon git submodule.
-  (let ((commit "556bb22d2675ee6072c6224fef3da0fb5d93db41")
-        (revision "0"))
-    (hidden-package
-     (package
-       (inherit libxisf)
-       (name "libxisf")
-       (version (git-version "0.2.13" revision commit))
-       (source
-        (origin
-          (method git-fetch)
-          (uri (git-reference
-                 (url "https://gitea.nouspiro.space/nou/libXISF")
-                 (commit commit)))
-          (file-name (git-file-name name version))
-          (sha256
-           (base32 "037dijy0ql1mwm8nddwawlf3ms6w30kxdlkrjjprfsss80ssn30k"))))))))
-
 (define-public missfits
   (package
     (name "missfits")
@@ -15019,7 +15000,7 @@ See related paper
 (define-public tenmon
   (package
     (name "tenmon")
-    (version "20260913")
+    (version "20261023")
     (source
      (origin
        (method git-fetch)
@@ -15028,7 +15009,7 @@ See related paper
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1yqbgw07l0madvq89dwpjgvdfa8qpf68vdgrvzjd0nc702zidq4g"))))
+        (base32 "10a95y8zdaw8lfbi8qb87ynznk6z5ydvyl1ak3v8x3jahznzirv9"))))
     (build-system qt-build-system)
     (arguments
      (list
@@ -15045,7 +15026,7 @@ See related paper
                        (string-append (getcwd) "/libXISF")))))))
     (native-inputs
      (list git-minimal/pinned
-           libxisf-for-tenmon
+           libxisf
            pkg-config ))
     (inputs
      (list cfitsio
