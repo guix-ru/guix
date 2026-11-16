@@ -3135,7 +3135,7 @@ simulated Astronomical data in Python.")
 (define-public python-astromartini
   (package
     (name "python-astromartini")
-    (version "3.0.0")
+    (version "3.0.1")
     (source
      (origin
        (method git-fetch)
@@ -3144,7 +3144,7 @@ simulated Astronomical data in Python.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0d3dqvfplhk9jbsczw3871qzds28hfld37a9nhpa8wcibwz41c0d"))))
+        (base32 "0i9qj6a3ravx6ibbxg04chlv5rjcpkg9zqgpj4l6aa3595d67xp8"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -3170,7 +3170,7 @@ simulated Astronomical data in Python.")
            python-tqdm
            ;; [optional]
            python-eaglesqltools
-           ;; python-g3read                         ;not packaged yet in Guix
+           python-g3read
            python-gizmo-analysis
            python-h5py
            python-halo-analysis
