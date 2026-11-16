@@ -5290,7 +5290,12 @@ user-space processes.")
                                 "fuse-glibc-2.34.patch"))))
     (build-system gnu-build-system)
     (native-inputs
-     (list autoconf automake gettext-minimal libtool))
+     (list
+      ;; Fix: error: possibly undefined macro: AM_ICONV
+      autoconf-2.73
+      automake
+      gettext-minimal
+      libtool))
     (arguments
      '(#:configure-flags (list (string-append "MOUNT_FUSE_PATH="
                                               (assoc-ref %outputs "out")
