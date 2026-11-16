@@ -724,7 +724,7 @@ of user-specified directories similar to how shells look up executables.")
                      (string-append "File.join(\"" ptex "\"")))
                   (invoke "ruby" "generate-ptex-patterns.rb"))))))))
     (native-inputs
-     (list ruby
+     (list ruby/pinned
            ruby-hydra-minimal
            ;; Build phase requires "docstrip.tex" from TEXLIVE-LATEX.
            ;; However, adding this package to native inputs would initiate

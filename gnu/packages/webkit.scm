@@ -241,7 +241,7 @@ engine that uses Wayland for graphics output.")
            pkg-config
            python-wrapper
            gi-docgen
-           ruby
+           ruby/pinned
            unifdef))
     (propagated-inputs
      (list gtk libsoup))

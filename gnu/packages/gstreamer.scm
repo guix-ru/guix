@@ -1239,7 +1239,7 @@ think twice about shipping them.")
        (sha256
         (base32 "0sqqk41j6660g9f58ga8nhyjr9hl5krqqafjj44ahwh9lwgz4gab"))))
     (build-system meson-build-system)
-    (native-inputs (list perl pkg-config python-wrapper ruby))
+    (native-inputs (list perl pkg-config python-wrapper ruby/pinned))
     (inputs (list ffmpeg))
     (propagated-inputs (list gstreamer gst-plugins-base))
     (synopsis "GStreamer plugins and helper libraries")

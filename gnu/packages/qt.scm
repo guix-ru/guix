@@ -808,7 +808,7 @@ qgenericunixservices.cpp")
            pkg-config
            python
            vulkan-headers
-           ruby-3.4))
+           ruby/pinned))
     (inputs
      (list alsa-lib
            cups
@@ -3790,7 +3790,7 @@ linux/libcurl_wrapper.h")
            python-beautifulsoup4
            python-six
            python-wrapper
-           ruby))
+           ruby/pinned))
     (inputs
      (list alsa-lib
            at-spi2-core
@@ -4384,7 +4384,7 @@ libdrm/BUILD.gn"
            python-beautifulsoup4
            python-html5lib
            python-wrapper
-           ruby))
+           ruby/pinned))
     (inputs
      (list alsa-lib
            at-spi2-core

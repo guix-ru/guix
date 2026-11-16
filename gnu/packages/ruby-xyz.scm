@@ -4248,6 +4248,7 @@ two hashes.")
       (build-system ruby-build-system)
       (arguments
        (list
+        #:ruby ruby/pinned
         #:tests? #f)) ;avoid rspec dependency.
       (synopsis "Ruby hyphenation patterns")
       (description

@@ -150,7 +150,7 @@ the Linux kernel CIFS client.")
                                 (symlink x (string-append #$output "/include/" (basename x))))
                               (find-files (string-append #$output "/include/iniparser")
                                           ".*\\.h")))))))
-    (native-inputs (list pkg-config doxygen ruby unity-test))
+    (native-inputs (list pkg-config doxygen ruby/pinned unity-test))
     (home-page "https://gitlab.com/iniparser/iniparser")
     (synopsis "Simple @file{.ini} configuration file parsing library")
     (description

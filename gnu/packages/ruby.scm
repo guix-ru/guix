@@ -87,7 +87,8 @@
   #:use-module (guix build-system gnu)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages web)
-  #:use-module (guix build-system ruby))
+  #:use-module (guix build-system ruby)
+  #:use-module (srfi srfi-1))
 
 (define-public ruby-4.0
   (package
@@ -159,8 +160,75 @@ a focus on simplicity and productivity.")
     (home-page "https://www.ruby-lang.org")
     (license license:ruby)))
 
+(define-public ruby/pinned
+  (hidden-package
+   (package
+     (name "ruby")
+     (version "3.4.7")
+     (source
+      (origin
+        (method url-fetch)
+        (uri (string-append "http://cache.ruby-lang.org/pub/ruby/"
+                            (version-major+minor version)
+                            "/ruby-" version ".tar.xz"))
+        (sha256
+         (base32
+          "1irh0l7g75p0arnah58ismzixa80qxn99x3qfnalcxg0ys35lhnv"))))
+     (build-system gnu-build-system)
+     (arguments
+      `(#:test-target "test"
+        #:configure-flags
+        ,(if (%current-target-system)
+             '(list (string-append
+                     "LDFLAGS=-Wl,-rpath="
+                     (assoc-ref %outputs "out") "/lib")
+                    "--enable-shared")
+             ''("--enable-shared")) ; dynamic linking
+        #:phases
+        (modify-phases %standard-phases
+          (add-before 'configure 'replace-bin-sh-and-remove-libffi
+            (lambda _
+              (substitute* '("configure.ac"
+                             "template/Makefile.in"
+                             "lib/rubygems/installer.rb"
+                             "ext/pty/pty.c"
+                             "io.c"
+                             "lib/mkmf.rb"
+                             "process.c"
+                             "test/rubygems/test_gem_ext_configure_builder.rb"
+                             "test/rdoc/rdoc_parser_test.rb"
+                             "test/ruby/test_rubyoptions.rb"
+                             "test/ruby/test_process.rb"
+                             "test/ruby/test_system.rb"
+                             "tool/rbinstall.rb")
+                (("/bin/sh") (which "sh")))))
+          ,@(if (system-hurd?)
+                '((add-after 'unpack 'skip-tests
+                    (lambda _
+                      (delete-file "bootstraptest/test_ractor.rb"))))
+                '()))))
+     (native-inputs
+      (append (if (%current-target-system)
+                  (list this-package)
+                  '())
+              (list autoconf libyaml)))
+     (inputs
+      (list readline openssl libffi gdbm))
+     (propagated-inputs
+      (list zlib))
+     (native-search-paths
+      (list (search-path-specification
+              (variable "GEM_PATH")
+              (files (list (string-append "lib/ruby/vendor_ruby"))))))
+     (synopsis "Programming language interpreter")
+     (description "Ruby is a dynamic object-oriented programming language with
+a focus on simplicity and productivity.")
+     (home-page "https://www.ruby-lang.org")
+     (license license:ruby))))
+
 (define-public ruby-3.4
   (package
+    (inherit ruby/pinned)
     (name "ruby")
     (version "3.4.7")
     (source
@@ -172,57 +240,8 @@ a focus on simplicity and productivity.")
        (sha256
         (base32
          "1irh0l7g75p0arnah58ismzixa80qxn99x3qfnalcxg0ys35lhnv"))))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:test-target "test"
-       #:configure-flags
-       ,(if (%current-target-system)
-            '(list (string-append
-                    "LDFLAGS=-Wl,-rpath="
-                    (assoc-ref %outputs "out") "/lib")
-                   "--enable-shared")
-            ''("--enable-shared")) ; dynamic linking
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'replace-bin-sh-and-remove-libffi
-           (lambda _
-             (substitute* '("configure.ac"
-                            "template/Makefile.in"
-                            "lib/rubygems/installer.rb"
-                            "ext/pty/pty.c"
-                            "io.c"
-                            "lib/mkmf.rb"
-                            "process.c"
-                            "test/rubygems/test_gem_ext_configure_builder.rb"
-                            "test/rdoc/rdoc_parser_test.rb"
-                            "test/ruby/test_rubyoptions.rb"
-                            "test/ruby/test_process.rb"
-                            "test/ruby/test_system.rb"
-                            "tool/rbinstall.rb")
-               (("/bin/sh") (which "sh")))))
-         ,@(if (system-hurd?)
-               '((add-after 'unpack 'skip-tests
-                   (lambda _
-                     (delete-file "bootstraptest/test_ractor.rb"))))
-               '()))))
-    (native-inputs
-     (append (if (%current-target-system)
-                 (list this-package)
-                 '())
-             (list autoconf libyaml)))
-    (inputs
-     (list readline openssl libffi gdbm))
-    (propagated-inputs
-     (list zlib))
-    (native-search-paths
-     (list (search-path-specification
-            (variable "GEM_PATH")
-            (files (list (string-append "lib/ruby/vendor_ruby"))))))
-    (synopsis "Programming language interpreter")
-    (description "Ruby is a dynamic object-oriented programming language with
-a focus on simplicity and productivity.")
-    (home-page "https://www.ruby-lang.org")
-    (license license:ruby)))
+    (properties
+     (alist-delete 'hidden? (package-properties ruby/pinned)))))
 
 (define-public ruby-3.3
   (package

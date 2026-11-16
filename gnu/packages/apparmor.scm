@@ -94,7 +94,7 @@
            perl
            python-minimal
            python-setuptools
-           ruby
+           ruby/pinned
            swig-4.4
            which))
     (home-page "https://apparmor.net")
