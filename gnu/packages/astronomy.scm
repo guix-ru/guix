@@ -12236,7 +12236,7 @@ impulse response of given physical events (e.g. reverberation).
 (define-public python-stpipe
   (package
     (name "python-stpipe")
-    (version "1.1.0")
+    (version "2.0.0")
     (source
      (origin
        (method git-fetch)
@@ -12245,63 +12245,31 @@ impulse response of given physical events (e.g. reverberation).
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "019nk4kqwk3346mhagfcnlcrlplly4km1hhvjwzqm59whgq42h3b"))
-       (modules '((guix build utils)))
-       (snippet
-        #~(begin
-            ;; Replace reference to external configobj.
-            (substitute* (find-files "." "\\.py$")
-              (("from astropy.extern import configobj")
-               "import configobj")
-              (("from astropy.extern.configobj import validate")
-               "import validate")
-              (("from astropy.extern.configobj.configobj import ")
-               "from configobj import ")
-              (("from astropy.extern.configobj.validate import ")
-               "from validate import "))))))
+        (base32 "1ks8j6nlinfqf6mvl9j62aismlibmli6b4rrb7vgq0bjc8ml76r3"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 285 passed, 25 deselected
-      #:test-flags
-      #~(list #$@(map (lambda (test)
-                        (string-append "--deselect=tests/test_step.py::"
-                                       test))
-                      ;; FileNotFoundError: Unable to fetch schema from
-                      ;; non-file URL:
-                      ;; http://stsci.edu/schemas/stpipe/step_config-1.1.0
-                      (list "test_build_config_pipe_config_file"
-                            "test_build_config_pipe_kwarg"
-                            "test_build_config_step_config_file"
-                            "test_build_config_step_kwarg"
-                            "test_step_from_commandline_par_precedence"
-                            "test_step_list_args"))
-              #$@(map (lambda (test)
-                        (string-append "--deselect=tests/"
-                                       "test_asdf_parameters.py::"
-                                       test))
-                      (list "test_asdf_from_call"
-                            "test_asdf_roundtrip_pipeline"
-                            "test_export_config[step_obj0-expected0]"
-                            "test_from_command_line"
-                            "test_from_command_line_override"
-                            "test_reftype"
-                            "test_saving_pars"
-                            "test_step_from_asdf"
-                            "test_step_from_asdf_api_override"
-                            "test_step_from_asdf_noname"))
-              "--deselect=tests/test_config.py::test_step_config_from_asdf"
-              "--deselect=tests/test_config.py::test_step_config_from_legacy_asdf"
-              "--deselect=tests/test_config.py::test_step_config_to_asdf")))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-manifest.in
+            ;; See: <https://codeberg.org/guix/guix/issues/4393>.
+            (lambda* (#:key name source inputs #:allow-other-keys)
+              (let ((port (open-file "MANIFEST.in" "w")))
+                (for-each
+                 (lambda (file)
+                   (display "include " port)
+                   (display file port)
+                   (display "\n" port))
+                 (find-files "src"))
+                (close port)))))))
     (native-inputs
      (list python-pytest
            python-pytest-doctestplus
            python-setuptools
-           python-setuptools-scm
-           python-stdatamodels))
+           python-setuptools-scm))
     (propagated-inputs
      (list python-asdf
-           python-astropy
+           python-configobj
            python-crds
            python-importlib-metadata
            python-pyyaml))
