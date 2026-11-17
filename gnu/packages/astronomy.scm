@@ -4861,7 +4861,7 @@ Spectrograph}.")
 (define-public python-crds
   (package
     (name "python-crds")
-    (version "14.0.3")
+    (version "14.0.6")
     (source
      (origin
        (method git-fetch)
@@ -4870,7 +4870,7 @@ Spectrograph}.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1vb4dhj73azfcswsczwh5zh02p30frybxkjj0iix40haaww9vbhg"))))
+        (base32 "0c6x371l3jrjz0v9wpq6bafgygiam6r72a2fhrdndf1jdwa55lvn"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -4881,8 +4881,8 @@ Spectrograph}.")
       ;; updates, see:
       ;; <https://github.com/spacetelescope/crds/blob/13.1.1/TESTING>.
       #~(list "-m" (string-join
-                    (list "not bestrefs" "cmdline" "core" "jwst" "hst" "rmap" "roman"
-                          "special" "synphot")
+                    (list "not bestrefs" "cmdline" "core" "jwst" "hst" "rmap"
+                          "roman" "special" "synphot")
                     " and not ")
               "--ignore=test/core/test_locking.py")))
     (native-inputs
@@ -4896,12 +4896,12 @@ Spectrograph}.")
            python-stdatamodels-minimal
            python-stsynphot))
     (propagated-inputs
-     (list python-astropy
-           python-numpy
+     (list python-asdf
+           python-astropy
            python-filelock
-           python-asdf
-           python-requests
+           python-numpy
            python-parsley
+           python-requests
            ;; [optional]
            python-beautifulsoup4
            ;; python-jwst
