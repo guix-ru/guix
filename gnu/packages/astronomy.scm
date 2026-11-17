@@ -12011,21 +12011,18 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
     (license license:bsd-3)))
 
 (define-public python-stcal
-  ;; 1.20.0 (2026-08-13); to support drizzle >= 3 and tweakwcs >= 9.
-  (let ((commit "0d7730acb4d9831ae40787d5a916701d2eb4498f")
-        (revision "1"))
   (package
     (name "python-stcal")
-    (version (git-version "1.20.0" revision commit))
+    (version "1.21.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/spacetelescope/stcal")
-              (commit commit)))
+              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0bs3zmkml382fiz82k8i8ia9sz6fhvjmn8m714265msx7l3p53a7"))))
+        (base32 "0b5pxakbn830gpxhzdb934lmvljv1a9cf04xxa9npvizphdi6703"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -12070,7 +12067,7 @@ and CAS statistics), as well as fitting 2D Sérsic profiles.")
     (home-page "https://github.com/spacetelescope/stcal")
     (synopsis "STScI tools and algorithms used in calibration pipelines")
     (description "STScI tools and algorithms used in calibration pipelines.")
-    (license license:bsd-3))))
+    (license license:bsd-3)))
 
 (define-public python-stdatamodels
   (package
