@@ -10842,7 +10842,7 @@ Coronagraph technology demonstration (Coronagraph).")
 (define-public python-romancal
   (package
     (name "python-romancal")
-    (version "1.2.0rc1")
+    (version "1.2.0")
     (source
      (origin
        (method git-fetch)
@@ -10851,20 +10851,12 @@ Coronagraph technology demonstration (Coronagraph).")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0w0yrr7wdgxpqgpvqv34a22z6b7arpvx27mpyp9gw62z1yxig16x"))))
+        (base32 "1bfrp3daq88fakhigd8rilhvh7q9cnzj47nj1v64d6c6lz59l1lh"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       ;; Tests fail during collection, requiring access to CRDS server.
-      #:tests? #f
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'relax-requirements
-            (lambda _
-              (substitute* "pyproject.toml"
-                (("drizzle>=2.2.0,<2.3.0") "drizzle")
-                (("roman_datamodels>=1.1,<1.2") "roman_datamodels")
-                (("romanisim>=0.14,<0.15") "romanisim")))))))
+      #:tests? #f))
     (native-inputs
      (list python-setuptools
            python-setuptools-scm))
