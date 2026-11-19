@@ -32293,22 +32293,32 @@ It adds a simple and readable way to print stuff during development.")
 (define-public python-dateparser
   (package
     (name "python-dateparser")
-    (version "1.2.2")
+    (version "1.5.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "dateparser" version))
        (sha256
         (base32
-         "1xzcqmvqg82cq4vx3cbgbdrgq4pgqlkk0mnfm0zc5kdqgkqicqwq"))))
+         "0rj3d8i3clhb0csv9jamz4agrpvab5a5p562vxd62kagidb4lg8w"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 23811 passed, 18 skipped, 1 deselected, 1 warning
+      ;; tests: 25476 passed, 24 skipped, 10 deselected, 4 xfailed
       #:test-flags
       #~(list (string-join '("--deselect=tests/test_search.py"
                              "TestTranslateSearch"
                              "test_search_dates_with_prepositions")
+                           "::")
+              ;; Timing-based tests fail on slower build machines.
+              (string-join '("--deselect=tests/test_locale_token_alignment.py"
+                             "TestAlignmentLinearTime")
+                           "::")
+              (string-join '("--deselect=tests/test_translate_space_runs.py"
+                             "test_translate_run_of_separators_then_skip_words_is_linear")
+                           "::")
+              (string-join '("--deselect=tests/test_translate_space_runs.py"
+                             "test_parse_run_of_separators_then_skip_words_is_linear")
                            "::"))))
     (propagated-inputs
      (list python-dateutil
