@@ -3442,15 +3442,16 @@ Fenix.")
     (inherit bennu-game-development)
     (name "bennu-game-development-modules")
     (arguments
-     '(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-conflicting-definitions
-           (lambda _
-             (with-fluids ((%default-port-encoding #f))
-               (substitute* "core/include/fmath.h"
-                 (("extern fixed fmul\\( int x, int y \\);") "")
-                 (("extern fixed fdiv\\( int x, int y \\);") "")))
-             (chdir "modules"))))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-conflicting-definitions
+            (lambda _
+              (with-fluids ((%default-port-encoding #f))
+                  (substitute* "core/include/fmath.h"
+                    (("extern fixed fmul\\( int x, int y \\);") "")
+                    (("extern fixed fdiv\\( int x, int y \\);") "")))
+              (chdir "modules"))))))
     (inputs (list zlib libpng openssl sdl-mixer bennu-game-development))
     (synopsis "Modules for the Bennu Game Development programming language")
     (description "This package contains a collection of modules for the Bennu
