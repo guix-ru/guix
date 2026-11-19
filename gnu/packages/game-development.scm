@@ -3399,8 +3399,8 @@ that parenthetically inclined game developers need to make 2D (and eventually
     (source (origin
               (method svn-fetch)
               (uri (svn-reference
-                    (url "http://svn.code.sf.net/p/bennugd/code")
-                    (revision (string->number version))))
+                     (url "http://svn.code.sf.net/p/bennugd/code")
+                     (revision (string->number version))))
               (file-name (string-append name "-" version))
               (sha256
                (base32
@@ -3411,23 +3411,23 @@ that parenthetically inclined game developers need to make 2D (and eventually
                   (delete-file-recursively "3rdparty") #t))))
     (build-system gnu-build-system)
     (arguments
-     '(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-configure-to-use-openssl
-           (lambda* (#:key outputs #:allow-other-keys)
-             (chdir "core")
-             (delete-file "configure")
-             (substitute* "configure.in"
-               (("i\\*86\\)")
-                "*)
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'patch-configure-to-use-openssl
+            (lambda* (#:key outputs #:allow-other-keys)
+              (chdir "core")
+              (delete-file "configure")
+              (substitute* "configure.in"
+                (("i\\*86\\)")
+                 "*)
                 COMMON_CFLAGS=\"$COMMON_CFLAGS -DUSE_OPENSSL\"
                 COMMON_LDFLAGS=\"$COMMON_LDFLAGS\"
                 LIBSSL=\"crypto\"
                 USE_OPENSSL=yes
                 ;;
 
-            i*86)"))
-               #t)))))
+            i*86)")))))))
     (inputs (list openssl zlib))
     (native-inputs (list pkg-config autoconf automake libtool))
     (synopsis "Programming language to create games")
