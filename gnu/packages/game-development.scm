@@ -3443,6 +3443,8 @@ Fenix.")
     (name "bennu-game-development-modules")
     (arguments
      (list
+      #:configure-flags
+      #~(list "CFLAGS=-g -O2 -Wno-error=incompatible-pointer-types")
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-conflicting-definitions
