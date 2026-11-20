@@ -4061,8 +4061,8 @@ in fast modern Fortran.")
     (name "python-casa-cube")
     ;; PyPI lacks documentations, Git has no tags, use the latest commit from
     ;; master HEAD.
-    (properties '((commit . "57c9dbc7130da236aff65a355047fcaa1a282292")
-                  (revision . "0")))
+    (properties '((commit . "87a74008bbfdd0f0023c56de2401b3668ba066bb")
+                  (revision . "1")))
     (version (git-version "0.1.0"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -4074,7 +4074,7 @@ in fast modern Fortran.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1g6d7ilvgl4fwj8gi4j7fwwasccycjd1m45fycf7aqzdwpnfi664"))))
+        (base32 "1abrn4gksb59irnr1hlc6sqzzz94gg3h8l6i8zld8kqczhhgx7qv"))))
     (outputs '("out" "doc"))
     (build-system pyproject-build-system)
     (arguments
