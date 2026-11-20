@@ -3661,7 +3661,7 @@ Navigation Satellite System.")
            libpng
            libtiff
            luajit
-           nng-1.5
+           nng
            portaudio
            rtl-sdr
            volk
