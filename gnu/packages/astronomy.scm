@@ -6504,7 +6504,7 @@ astronomy-specific functionality")
 (define-public python-glue-core
   (package
     (name "python-glue-core")
-    (version "1.27.0")
+    (version "1.28.0")
     (source
      (origin
        (method git-fetch)
@@ -6513,14 +6513,20 @@ astronomy-specific functionality")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1a0ycvnnm610jj75f07bi10f4riahvdzi1l59w32s5zzqxnhpqpn"))))
+        (base32 "1wh2q8k32njy85r1134ahyqbss9s1s5zvnx0l8yk03dqy9qb5fjf"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 1661 passed, 1 deselected, 6 xfailed, 1 xpassed, 35 warnings
+      ;; tests: 1686 passed, 1 deselected, 6 xfailed, 1 xpassed, 37 warnings
       #:test-flags
-      ;; XXX: This test is flaky, it can fail if the CI system is slow.
-      #~(list "-k" "not test_combine_slices_hypot")))
+      #~(list "--pyargs" "glue"
+              ;; XXX: This test is flaky, it can fail if the CI system is slow.
+              "-k" "not test_combine_slices_hypot")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'remove-local-source
+            (lambda _
+              (delete-file-recursively "glue"))))))
     (native-inputs
      (list python-pytest
            python-pytest-mpl
@@ -6538,7 +6544,6 @@ astronomy-specific functionality")
            python-numpy
            python-openpyxl
            python-pandas
-           python-scipy
            python-shapely
            python-xlrd
            ;; [optional]
@@ -6546,6 +6551,7 @@ astronomy-specific functionality")
            python-pillow
            python-pyavm
            python-scikit-image
+           python-scipy
            python-spectral-cube))
     (home-page "http://glueviz.org")
     (synopsis "Multidimensional data visualization project")
