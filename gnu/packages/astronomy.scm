@@ -12334,13 +12334,13 @@ implementing calibration pipeline software.")
 (define-public python-stpreview
   (package
     (name "python-stpreview")
-    (version "0.6.0")
+    (version "1.1.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "stpreview" version))
        (sha256
-        (base32 "1z7zpqyg7rl2sf311idzwckdshm86mkbbpknvq90gkxmqdaqas9q"))))
+        (base32 "1x8ykq6rs1kwj2lgrbh4x4kgjhz1rl2ryj997r09qwrz1hgvr8ry"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f)) ;depends on python-roman-datamodels@0.28
