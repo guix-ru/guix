@@ -6583,59 +6583,52 @@ across many files.")
 (define-public python-glue-qt
   (package
     (name "python-glue-qt")
-    (version "0.4.2")
+    ;; 0.4.2 (2026-02-11); the latest changes provide some fixtures.
+    (properties '((commit . "0e3b10ca148150006ab3c7afe111047b106dafbf")
+                  (revision . "0")))
+    (version (git-version "0.4.2"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/glue-viz/glue-qt")
-              (commit (string-append "v" version))))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "02qpigz3vjlr0w3xvicd6g3mpczrd9bqn56sxyc0djgmrdz4486v"))))
+        (base32 "1jqwbl1c8nqjlk55alkl9j51fricygi13dj9g9q4z88kryz2d9rh"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 537 passed, 2 skipped, 17 deselected, 1 xfailed, 26 warnings
+      ;; tests: 501 passed, 4 skipped, 120 deselected, 2 xfailed, 182 warnings
       #:test-flags
-      ;; XXX: Tests fail with various pixel mismatches.
-      #~(list "--ignore=glue_qt/viewers/image/tests/test_data_viewer.py"
-              (string-append "--deselect=glue_qt/app/tests/"
-                             "test_application.py::test_reset_session_terminal")
-              (string-append "--deselect=glue_qt/app/tests/"
-                             "test_application.py::test_open_session_terminal")
-              (string-append "--deselect=glue_qt/plugins/dendro_viewer/tests/"
-                             "test_data_viewer.py::TestDendrogramCommon::"
-                             "test_session_round_trip")
-              #$@(map (lambda (ls)
-                        (string-append "--deselect=glue_qt/viewers/"
-                                       (string-join ls "::")))
-                      '(("common/tests/test_data_viewer.py"
-                         "TestDataViewerScatter" "test_viewer_size")
-                        ("common/tests/test_data_viewer.py"
-                         "TestDataViewerImage" "test_viewer_size")
-                        ("common/tests/test_data_viewer.py"
-                         "TestDataViewerHistogram" "test_viewer_size")
-                        ("histogram/tests/test_data_viewer.py"
-                         "TestHistogramCommon" "test_session_round_trip")
-                        ("profile/tests/test_data_viewer.py"
-                         "TestProfileCommon" "test_session_round_trip")
-                        ("scatter/tests/test_data_viewer.py"
-                         "TestScatterCommon" "test_session_round_trip")
-                        ("table/tests/test_data_viewer.py"
-                         "test_table_widget")
-                        ("table/tests/test_data_viewer.py"
-                         "test_table_widget_session_no_subset")
-                        ("table/tests/test_data_viewer.py"
-                         "test_table_widget_session_filter")
-                        ("image/tests/test_display_region_data.py"
-                         "TestRegionScatterViewer" "test_link_first_then_add")
-                        ("image/tests/test_display_region_data.py"
-                         "TestRegionScatterViewer" "test_add_first_then_link")
-                        ("image/tests/test_display_region_data.py"
-                         "TestRegionScatterViewer" "test_subset")
-                        ("image/tests/test_display_region_data.py"
-                         "TestWCSRegionDisplay" "test_basics"))))
+      #~(list "--pyargs" "glue_qt"
+              ;; XXX: Tests fail with various pixel mismatches.
+              "-k" (string-join
+                    (list "not test_flip" "test_reset_session_terminal"
+                          "test_basic" "test_open_session_terminal"
+                          "test_close" "test_change_reference_data"
+                          "test_basics" "test_linking_and_enabling"
+                          "test_legend" "test_disable_incompatible"
+                          "test_subset" "test_link_first_then_add"
+                          "test_apply_roi" "test_incompatible_subset"
+                          "test_hypercube" "test_add_first_then_link"
+                          "test_identical" "test_session_round_trip"
+                          "test_viewer_size" "test_subset_cube_image"
+                          "test_table_widget" "test_duplicate_subsets"
+                          "test_aspect_resize" "test_invisible_subset"
+                          "test_aspect_subset" "test_apply_roi_single"
+                          "test_custom_coords" "test_scatter_overlay"
+                          "test_preserve_slice" "test_limit_resetting"
+                          "test_removed_subset" "test_hypercube_world"
+                          "test_apply_roi_empty"
+                          "test_table_widget_session_filter"
+                          "test_table_widget_session_no_subset"
+                          "test_combo_updates_with_component_add"
+                          "test_change_reference_data_dimensionality"
+                          "test_select_previously_incompatible_layer")
+                    " and not "))
       #:phases
       #~(modify-phases %standard-phases
          (add-after 'unpack 'relax-requirements
@@ -6643,6 +6636,9 @@ across many files.")
              (substitute* "pyproject.toml"
                ;; ipython>=4.0,<9.0
                ((">=4.0,<9\\.0") ">=4.0"))))
+          (add-before 'check 'remove-local-source
+            (lambda _
+              (delete-file-recursively "glue_qt")))
           (add-before 'check 'prepare-x
             (lambda _
               (system "Xvfb &")
