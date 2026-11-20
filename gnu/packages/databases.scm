@@ -1620,17 +1620,17 @@ and high-availability (HA).")
     (license license:gpl2)))                  ;'COPYING' says "version 2" only
 
 ;; Don't forget to update the other postgresql packages when upgrading this one.
-(define-public postgresql-18
+(define-public postgresql-19
   (package
     (name "postgresql")
-    (version "18.6")
+    (version "19.0")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://ftp.postgresql.org/pub/source/v"
                                   version "/postgresql-" version ".tar.bz2"))
               (sha256
                (base32
-                "17qxi3xcaa6313ikxqp0smb6inbrq8jzrlxplmnk3r2k9p110mjm"))
+                "0bb99rdyjfsj0rwxraawkq6ifc5gwdr4i3gdvg3hhsmdzc7dg7x8"))
               (patches (search-patches
                         "postgresql-disable-normalize_exec_path.patch"))))
     (build-system gnu-build-system)
@@ -1686,6 +1686,21 @@ types, including INTEGER, NUMERIC, BOOLEAN, CHAR, VARCHAR, DATE, INTERVAL, and
 TIMESTAMP.  It also supports storage of binary large objects, including
 pictures, sounds, or video.")
     (license (license:x11-style "file://COPYRIGHT"))))
+
+(define-public postgresql-18
+  (package
+    (inherit postgresql-19)
+    (name "postgresql")
+    (version "18.6")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://ftp.postgresql.org/pub/source/v"
+                                  version "/postgresql-" version ".tar.bz2"))
+              (sha256
+               (base32
+                "17qxi3xcaa6313ikxqp0smb6inbrq8jzrlxplmnk3r2k9p110mjm"))
+              (patches (search-patches
+                        "postgresql-disable-normalize_exec_path.patch"))))))
 
 (define-public postgresql-17
   (package
