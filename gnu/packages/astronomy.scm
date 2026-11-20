@@ -12034,21 +12034,16 @@ over many parameters:
     (license (list license:gpl3+ license:bsd-3))))
 
 (define-public python-statmorph
-  ;; 0.7.2 (2026-02-10); the project might be not compatible with
-  ;; python-photutils@3.1.1, there are not updates or available patches.
-  ;; See: <https://github.com/vrodgom/statmorph/issues/18>.
   (package
     (name "python-statmorph")
-    (version "0.7.2")
+    (version "0.7.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "statmorph" version))
        (sha256
-        (base32 "1hab5yq0xjc3fzyd177bwsgainqzaxpdw423r73nzc5yqiqz9ji4"))))
+        (base32 "1v6hkqngy67jdrrkrhq624hcaaasmh0iy0rh21ybw23zdh8bhdnp"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list #:tests? #f))
     (native-inputs
      (list python-pytest
            python-setuptools))
