@@ -10961,7 +10961,7 @@ observations from the Nancy Grace Roman Space Telescope.")
 (define-public python-romanisim
   (package
     (name "python-romanisim")
-    (version "0.15.0")
+    (version "0.16.0")
     (source
      (origin
        (method git-fetch)
@@ -10970,7 +10970,7 @@ observations from the Nancy Grace Roman Space Telescope.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "16zksyi0qgybx1v7fxa175f7k1xqwsqsdshi7izl9mh0gjqhgpfv"))))
+        (base32 "1mfc9v0n55np376mbbn2aqmd09mbwcyi8vyvbr9w7s1b0ghywz4v"))))
     (build-system pyproject-build-system)
     (arguments
      (list
