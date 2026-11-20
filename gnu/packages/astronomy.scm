@@ -5746,7 +5746,7 @@ Euclid Consortium should be used.")
 (define-public python-extinction
   (package
     (name "python-extinction")
-    (version "0.4.9")
+    (version "0.4.10")
     (source
      (origin
        (method git-fetch)
@@ -5755,7 +5755,7 @@ Euclid Consortium should be used.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "19cq9dfmiwm77c928104jrzynga7h1y6x62z495d2qf0qji6v2d6"))))
+        (base32 "0kycnrciizr07wkyg8dy5mbqmb7ci8h32f7mc2nnin1lm9ds3d3q"))))
     (build-system pyproject-build-system)
     (native-inputs
      (list python-cython
