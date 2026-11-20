@@ -13824,24 +13824,26 @@ Telescope} (XRT) on the Hinode spacecraft.")
     (license license:bsd-2)))
 
 (define-public python-yt
+  ;; XXX: Maybe move to (gnu packages python-science) module.
   (package
     (name "python-yt")
-    (version "4.4.2")
+    (version "4.4.4")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "yt" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/yt-project/yt")
+              (commit (string-append "yt-" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "02rvs1555y482vf54ivl5wjiziskybnmbxbq6xn46fslqa4km270"))))
+        (base32 "120nj7zv239fl11pxvv9fpd7gqa3vlnzcz4n7c8i0pdr164lrx5s"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:build-backend "setuptools.build_meta"
+      ;; tests: 838 passed, 61 skipped, 1 xfailed
       #:test-flags
-      #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
-              ;; Failed: 'yield' keyword is allowed in fixtures, but not in
-              ;; tests (test_recipe)
-              "--ignore=doc/source/cookbook/tests/test_cookbook.py"
+      #~(list "--pyargs" "yt"
+              "--numprocesses" (number->string (min 8 (parallel-job-count)))
               "-k" (string-join
                     ;; Tests requiring networking.
                     (list "not test_load_sample_timeout"
@@ -13858,10 +13860,12 @@ Telescope} (XRT) on the Hinode spacecraft.")
                     " and not "))
       #:phases
       #~(modify-phases %standard-phases
-          (add-before 'check 'prepare-test-environment
+          (add-before 'check 'pre-sanity-check
             (lambda _
-              (setenv "HOME" "/tmp")
-              (invoke "python" "setup.py" "build_ext" "--inplace"))))))
+              (setenv "HOME" "/tmp")))
+          (add-before 'check 'remove-local-source
+            (lambda _
+              (delete-file-recursively "yt"))))))
     (native-inputs
      (list nss-certs-for-test
            python-cython
@@ -13874,7 +13878,6 @@ Telescope} (XRT) on the Hinode spacecraft.")
     (propagated-inputs
      (list python-cmyt
            python-ewah-bool-utils
-           python-ipywidgets
            python-matplotlib
            python-more-itertools
            python-numpy
@@ -13887,7 +13890,8 @@ Telescope} (XRT) on the Hinode spacecraft.")
            ;; python-arm-pyart ; not packed yet
            ;; python-f90nml
            ;; python-firefly
-           ;; python-miniball
+           ;; python-libconf
+           ;; python-miniballcpp
            ;; python-pyx
            ;; python-ratarmount
            python-astropy
@@ -13897,17 +13901,19 @@ Telescope} (XRT) on the Hinode spacecraft.")
            python-netcdf4
            python-pandas
            python-pooch
+           python-pykdtree
            python-regions
            python-requests
+           python-scipy
            python-xarray))
     (home-page "http://yt-project.org/")
     (synopsis "Analyzing and visualizing volumetric data framework")
     (description
      "This package provides a structured, variable-resolution meshes,
- unstructured meshes, and discrete or sampled data such as particles.  Focused on
- driving physically-meaningful inquiry, it has been applied in domains such as
- astrophysics, seismology, nuclear engineering, molecular dynamics, and
- oceanography.")
+unstructured meshes, and discrete or sampled data such as particles.  Focused
+on driving physically-meaningful inquiry, it has been applied in domains such
+as astrophysics, seismology, nuclear engineering, molecular dynamics, and
+oceanography.")
     (license (list
               ;; COPYING.txt: for Python code.
               ;;
