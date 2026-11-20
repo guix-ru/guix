@@ -10296,7 +10296,7 @@ memory usage, improving performance and run in parallel with MPI.")
 (define-public python-pyspedas
   (package
     (name "python-pyspedas")
-    (version "2.1.4")
+    (version "2.2.2")
     (source
      (origin
        (method git-fetch)
@@ -10305,7 +10305,7 @@ memory usage, improving performance and run in parallel with MPI.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1ifgbrswn829dqqjrz61qr52xd04s90rnd9ixz7yvrwj0kf72hxv"))))
+        (base32 "1hibibixzkglw9xb4sxj5l11k0pv6b1ch1wxrgq7py2cp8j4q64z"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -10313,6 +10313,11 @@ memory usage, improving performance and run in parallel with MPI.")
       #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
+          (add-after 'unpack 'relax-dependencies
+            (lambda _
+              (substitute* "pyproject.toml"
+                (("certifi>=2026.10.19") "certifi")
+                (("tomli>=2.4.1") "tomli"))))
           (add-before 'sanity-check 'set-HOME
             (lambda _
               (setenv "HOME" "/tmp"))))))
@@ -10321,8 +10326,10 @@ memory usage, improving performance and run in parallel with MPI.")
     (propagated-inputs
      (list python-aioboto3
            python-astropy
+           python-bottleneck
            python-cdasws
            python-cdflib
+           python-certifi
            python-fsspec
            python-geopack
            python-hapiclient
@@ -10330,12 +10337,14 @@ memory usage, improving performance and run in parallel with MPI.")
            python-netcdf4
            python-numpy
            python-pandas
+           python-platformdirs
            python-pywavelets
            python-requests
            python-s3fs
            python-scipy
-           python-setuptools
            python-spacepy
+           python-tomli
+           python-tomlkit
            python-xarray))
     (home-page "https://spedas.org")
     (synopsis "Python Space Physics Environment Data Analysis Software")
