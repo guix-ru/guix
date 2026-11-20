@@ -13324,8 +13324,8 @@ package.")
   (package
     (name "python-synthesizar")
     ;; Not released yet, recommended installation method via git clone.
-    (properties '((commit . "77aab1767e25bc10a200e1b26270da1de20922c2")
-                  (revision . "0")))
+    (properties '((commit . "9b7f18f1d5375d13daa77820eb82a2119cc1d51a")
+                  (revision . "1")))
     (version (git-version "0.0.0"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -13337,7 +13337,7 @@ package.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1yakp5bpjws0x9y35wv16q378bgz02jmsk9vrzwqw2003r4vnw1n"))))
+        (base32 "1nxabpqcy9nr1ybs7h07qc1s3wj274j5ah15hzczkhhg97in0wkb"))))
     (build-system pyproject-build-system)
     (arguments
      (list
