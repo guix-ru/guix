@@ -13274,8 +13274,8 @@ in @code{SWIFT} snapshots to enable efficient reading of sub-regions.")
     (name "python-swiftsimsoap")
     ;; There is not correct version tag or PyPI release, use the latest commit
     ;; from master HEAD.
-    (properties '((commit . "15e5299ae48cf095c35653f3f450e71b22328089")
-                  (revision . "3")))
+    (properties '((commit . "31cc02c52ffcadd296bb32a9f8ce05448f5b1b36")
+                  (revision . "4")))
     (version (git-version "1.0.0"
                           (assoc-ref properties 'revision)
                           (assoc-ref properties 'commit)))
@@ -13287,13 +13287,14 @@ in @code{SWIFT} snapshots to enable efficient reading of sub-regions.")
               (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1lnhv5zl7xa8irbkf6q4491lq0h5rfrrlr2fgyxskr5z0ns91x76"))))
+        (base32 "17nam93svgk5cxvj0cv4qwviga9riixjvksxakdnv3j81h8pb4ha"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
       ;; Tests need wget, potentially to download remove data.
       #~(list "--ignore=tests/test_read_vr.py"
+              "--ignore=tests/test_read_swift_fof.py"
               "--ignore=tests/test_subhalo_rank.py")))
     (native-inputs
      (list python-pytest
@@ -13307,7 +13308,9 @@ in @code{SWIFT} snapshots to enable efficient reading of sub-regions.")
            python-psutil
            python-scipy
            python-unyt
-           python-virgodc))
+           python-virgodc
+           ;; [optional]
+           python-healpy))
     (home-page "https://github.com/SWIFTSIM/SOAP")
     (synopsis "Spherical Overdensity Aperture Processor")
     (description
