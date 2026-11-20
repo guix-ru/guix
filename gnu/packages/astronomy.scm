@@ -9786,7 +9786,7 @@ N-Chilada and RAMSES AMR outputs.")
 (define-public python-pypeit
   (package
     (name "python-pypeit")
-    (version "2.0.1")
+    (version "3.0.0")
     (source
      (origin
        (method git-fetch)
@@ -9795,7 +9795,7 @@ N-Chilada and RAMSES AMR outputs.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "14szspwxmf7mks6lr4n7l0nlfcipf9w2fzg4643c64x6lhy36qpf"))))
+        (base32 "1mbip92q4fl49yjryk3w8ny2s7gmjf0whz4m647z4czgasmybr84"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -9807,12 +9807,6 @@ N-Chilada and RAMSES AMR outputs.")
       #:phases
       #~(modify-phases %standard-phases
           (delete 'sanity-check)
-          ;; XXX: See: <https://github.com/pypeit/PypeIt/issues/1786>.
-          (add-after 'unpack 'remove-missing-scripts-entry-points
-            (lambda _
-              (substitute* "pyproject.toml"
-                ((".*pypeit_install_ql_calibs.*") "")
-                ((".*pypeit_ql_multislit.*") ""))))
           (add-after 'unpack 'relax-requirements
             (lambda _
               (substitute* "pyproject.toml"
@@ -9833,7 +9827,8 @@ N-Chilada and RAMSES AMR outputs.")
               (setenv "MPLBACKEND" "agg"))))))
     (native-inputs
      (list python-cython
-           python-specutils))
+           python-setuptools
+           python-setuptools-scm))
     (propagated-inputs
      (list python-astropy
            python-bottleneck
@@ -9844,6 +9839,8 @@ N-Chilada and RAMSES AMR outputs.")
            python-matplotlib
            python-numpy
            python-packaging
+           python-pillow
+           python-pydantic
            python-pyerfa
            python-pygithub
            python-pyqt-6
@@ -9851,7 +9848,9 @@ N-Chilada and RAMSES AMR outputs.")
            python-qtpy
            python-scikit-learn
            python-scipy
+           python-threadpoolctl
            ;; [optional]
+           python-photutils
            python-scikit-image
            python-specutils))
     (home-page "https://github.com/pypeit/PypeIt")
