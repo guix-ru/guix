@@ -5211,7 +5211,7 @@ Cesium.")
 (define-public python-dkist
   (package
     (name "python-dkist")
-    (version "1.18.1")
+    (version "1.19.0")
     (source
      (origin
        (method git-fetch)
@@ -5220,11 +5220,11 @@ Cesium.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0fqnww18lbyj1jmhx0kj4avxkk3rg6wik4irhdx462s73p48zs0f"))))
+        (base32 "0c40m4cs7r6w5a6aa5qz8bbcnxj58sag6apik77zngdda40b1mlr"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 492 passed, 7 skipped
+      ;; tests: 566 passed, 16 skipped
       #:test-flags
       #~(list "--numprocesses" (number->string (min 8 (parallel-job-count)))
               ;; When python-pytest-benchmark is added: Benchmarks are
@@ -5236,6 +5236,10 @@ Cesium.")
               "--deselect=dkist/net/tests/test_client.py::test_fetch_with_headers")
       #:phases
       #~(modify-phases %standard-phases
+         (add-after 'unpack 'relax-requirements
+           (lambda _
+             (substitute* "pyproject.toml"
+               (("tqdm>=4.68") "tqdm"))))
           (add-before 'sanity-check 'set-home-env
             (lambda _
               (setenv "HOME" "/tmp"))))))
