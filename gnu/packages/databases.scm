@@ -1691,14 +1691,14 @@ pictures, sounds, or video.")
   (package
     (inherit postgresql-19)
     (name "postgresql")
-    (version "18.6")
+    (version "18.7")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://ftp.postgresql.org/pub/source/v"
                                   version "/postgresql-" version ".tar.bz2"))
               (sha256
                (base32
-                "17qxi3xcaa6313ikxqp0smb6inbrq8jzrlxplmnk3r2k9p110mjm"))
+                "1z8v87858niy5giamwa0q4qhgysr0pw7dy754l23xbhc53jgl7a4"))
               (patches (search-patches
                         "postgresql-disable-normalize_exec_path.patch"))))))
 
