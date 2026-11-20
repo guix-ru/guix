@@ -971,7 +971,7 @@ an ethernet or PPP interface, looking for special \"knock\" sequences of @dfn{po
 at the link-layer level.")
     (license license:gpl2+)))
 
-(define-public nng-1.11
+(define-public nng
   (package
     (name "nng")
     (version "1.11")
@@ -1026,9 +1026,12 @@ publish/subscribe, RPC-style request/reply, or service discovery.")
     (home-page "https://nng.nanomsg.org/")
     (license license:expat)))
 
+;; Deprecated on 2026-11-20.
+(define-deprecated-package nng-1.11 nng)
+
 (define-public nng-1.5
   (package
-    (inherit nng-1.11)
+    (inherit nng)
     (name "nng")
     (version "1.5.2")
     (source
