@@ -8656,6 +8656,34 @@ profiles.  In particular, PetroFit includes tools for performing accurate
 photometry, segmentations, Petrosian profiling, and Sérsic fitting.")
     (license license:bsd-3)))
 
+(define-public python-photerr
+  (package
+    (name "python-photerr")
+    (version "1.6.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jfcrenshaw/photerr")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1hmrpxzcgwzvw6s3nlinyj9p5fhas0wjnyr58y19ikcpmg3c5yl5"))))
+    (build-system pyproject-build-system)
+    (native-inputs
+     (list python-hatchling python-matplotlib python-pytest))
+    (propagated-inputs (list python-numpy python-pandas))
+    (home-page "https://github.com/jfcrenshaw/photerr")
+    (synopsis "Photometric error model for astronomical imaging surveys")
+    (description
+     "PhotErr is a photometric error model for astronomical imaging surveys.
+It implements a generalization of the high-SNR point-source error model from
+@url{https://arxiv.org/abs/0805.2366 Ivezic (2019)} that is more accurate in
+the low SNR regime and includes errors for extended sources, using the models
+from @url{http://arxiv.org/abs/2007.01846, van den Busch (2020)} and
+@url{https://arxiv.org/abs/1902.11265, Kuijken (2019)}.")
+    (license license:expat)))
+
 (define-public python-photutils
   (package
     (name "python-photutils")
