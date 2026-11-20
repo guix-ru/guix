@@ -8403,23 +8403,21 @@ Carlo.")
 (define-public python-ndcube
   (package
     (name "python-ndcube")
-    (version "2.4.2")
+    (version "2.4.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "ndcube" version))
        (sha256
-        (base32 "0h422z2c87yvcwkjmwlg5zvg4x3vbf4ifhc9459pq4ckidibhh59"))))
+        (base32 "0p6k0rf7j7ryw5aiia8zswp8yyfgnsnnhmrn7r5nd0yj2nvzk1i7"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 555 passed, 9 skipped, 27 deselected, 10 xfailed, 2 warnings
+      ;; tests: 622 passed, 9 skipped, 27 deselected, 10 xfailed, 2 warnings
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'sanity-check 'set-home-env
             (lambda _
-              ;; Tests require HOME to be set.
-              ;;  Permission denied: '/homeless-shelter'
               (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list nss-certs-for-test
