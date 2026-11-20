@@ -1026,7 +1026,7 @@ publish/subscribe, RPC-style request/reply, or service discovery.")
     (home-page "https://nng.nanomsg.org/")
     (license license:expat)))
 
-(define-public nng
+(define-public nng-1.5
   (package
     (inherit nng-1.11)
     (name "nng")
