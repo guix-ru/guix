@@ -12654,8 +12654,8 @@ Telescope, HST}).")
 
 (define-public python-sunkit-dem
   ;; It is not released and has no git tags either.
-  (let ((commit "fdb2fa245f047cfac0fda34624e521bef71c8fa6")
-        (revision "0"))
+  (let ((commit "5fa50b206b89310a1caf9999d61b854ce5bff70f")
+        (revision "1"))
     (package
       (name "python-sunkit-dem")
       (version (git-version "0.0.0" revision commit))
@@ -12667,7 +12667,7 @@ Telescope, HST}).")
                 (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1gaja95r96nv5n998v8frjjz5kry9vp8isk59fr1ky311yrxpdjd"))))
+          (base32 "0x7jx24bk2nckvfa3ygcpi5hbiv0s7gfvrg43qw8pjp7h75wq2a0"))))
       (build-system pyproject-build-system)
       (arguments
        (list
