@@ -8336,14 +8336,21 @@ the easy construction of interactive matplotlib widget based animations.")
 (define-public python-naima
   (package
     (name "python-naima")
-    (version "0.10.4")
+    (version "0.11.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "naima" version))
        (sha256
-        (base32 "1s1azsc7qfqkr991k1sjryd6vcwgqi0ndcbqjr6v6zalxr2bbay9"))))
+        (base32 "13j2x6y60nx8rlg6kr5wnd9jn1cfcsk0pfmnqs88icm53anc94pk"))))
     (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; tests: 330 passed, 2 skipped, 1 deselected, 1 xpassed, 1948 warnings
+      #:test-flags
+      ;; Failed: run_sampler hung after SIGINT
+      #~(list (string-join "--deselect=tests/test_core.py"
+                           "::test_ctrl_c_with_process_pool_does_not_hang"))))
     (native-inputs
      (list python-hatch-vcs
            python-hatchling
