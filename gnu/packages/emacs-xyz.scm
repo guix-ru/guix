@@ -772,6 +772,32 @@ supported algorithm is chosen to ensure interoperability with
 @code{openssl}.")
     (license license:gpl3+)))
 
+(define-public emacs-kdl-mode
+  ;; No public release. Version taken from `kdl-mode.el'.
+  (let ((commit "e966ed4b53f8a72b88a016e61bcadec42f317e39")
+        (revision "1"))
+    (package
+      (name "emacs-kdl-mode")
+      (version (git-version "0.0.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/taquangtrung/emacs-kdl-mode")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "070ngannx77m39hwvsdr4pk17ki1l4nzsi746w21q5mfbp8gl9w1"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list #:tests? #f))              ; No tests.
+      (home-page "https://github.com/taquangtrung/emacs-kdl-mode")
+      (synopsis "KDL mode for Emacs")
+      (description
+       "This package provides an Emacs major mode for editing files in the KDL
+document language.")
+      (license license:gpl3+))))
+
 (define-public emacs-elchacha
   (package
     (name "emacs-elchacha")
