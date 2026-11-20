@@ -6905,13 +6905,13 @@ ConsistentTrees).")
 (define-public python-halotools
   (package
     (name "python-halotools")
-    (version "0.9.4")
+    (version "0.9.5")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "halotools" version))
        (sha256
-        (base32 "1zwa2pbfk944kf415s3bdyq4cql9alicls56dw82gvwd8mkg9567"))))
+        (base32 "1dddfdf24l3skmvznbaflfaqachkpiawfk6jahj02yg1kf9b21s4"))))
     (build-system pyproject-build-system)
     (arguments
      (list
