@@ -1016,7 +1016,7 @@ at the link-layer level.")
              (substitute* "src/sp/transport/tls/CMakeLists.txt"
                (("nng_test_if\\(NNG_ENABLE_TLS tls_tran_test\\)") "")))))))
     (native-inputs (list oksh))
-    (inputs (list mbedtls-lts))
+    (inputs (list mbedtls-3))
     (synopsis "Lightweight messaging library")
     (description "NNG project is a rewrite of the scalability protocols library
 known as libnanomsg, and adds significant new capabilities, while retaining
