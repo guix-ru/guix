@@ -1721,14 +1721,14 @@ pictures, sounds, or video.")
   (package
     (inherit postgresql-17)
     (name "postgresql")
-    (version "16.14")
+    (version "16.16")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://ftp.postgresql.org/pub/source/v"
                                   version "/postgresql-" version ".tar.bz2"))
               (sha256
                (base32
-                "0w9lgsn03m4k0v3m622v7fk3gqbfbjvwv34mrrc0i4ip4wa7gl7n"))
+                "06l8hy7v22z8lnqrhw64agmnlpinnz34k5ymsm05gds361ixhp4x"))
               (patches (search-patches
                         "postgresql-disable-normalize_exec_path.patch"))))
     (arguments
