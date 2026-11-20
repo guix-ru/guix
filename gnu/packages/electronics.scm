@@ -1430,7 +1430,7 @@ characterization result in a liberty library file.")
                   libsecret
                   libsm
                   mesa
-                  nng-1.5
+                  nng
                   opencascade-occt
                   openssl
                   poppler
