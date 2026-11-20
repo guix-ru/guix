@@ -6121,7 +6121,7 @@ optimized low-level code (primarily C) for fast computations.")
 (define-public python-galpy
   (package
     (name "python-galpy")
-    (version "1.12.0")
+    (version "1.12.1")
     (source
      (origin
        (method git-fetch)
@@ -6130,7 +6130,7 @@ optimized low-level code (primarily C) for fast computations.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0jqwnvldb2pzjh0nbb9h7jfswwznzl6s9j542mf33a3xakghvbdl"))))
+        (base32 "0xcpvvswvxbhwmy6j4xsxgj1dwmxvdxf50qzv9c9h052xjkqq4jd"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -6142,6 +6142,9 @@ optimized low-level code (primarily C) for fast computations.")
               ;; Network access is required to access the capabilities endpointt
               ;; at <https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities>.
               "--deselect=tests/test_orbit.py::test_from_name_errors"
+              "--deselect=tests/test_orbit.py::test_from_name_simbad_connection_lost"
+              "--deselect=tests/test_orbit.py::test_from_name_simbad_mirror_fallback"
+              "--deselect=tests/test_orbit.py::test_from_name_simbad_not_found_inside_handler"
               "--deselect=tests/test_orbit.py::test_from_name_values"
               "--deselect=tests/test_orbits.py::test_from_name_values")
       #:phases
