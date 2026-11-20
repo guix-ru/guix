@@ -10345,7 +10345,7 @@ spectra, and data.")
 (define-public python-pyvo
   (package
     (name "python-pyvo")
-    (version "1.9.1")
+    (version "1.10.0")
     (source
      (origin
        (method git-fetch)
@@ -10354,11 +10354,10 @@ spectra, and data.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x9qwcvhap7bw86j1y3hfsdyw3kvsax8sglj6wgb4p3mgzkr82cv"))))
+        (base32 "08l41204db0fz0gqd7mgisrl7sq01g4aix2iy4afgj368nz8ammq"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 483 passed, 59 skipped, 1 xfailed
       #:test-flags
       #~(list "--pyargs" "pyvo")
       #:phases
