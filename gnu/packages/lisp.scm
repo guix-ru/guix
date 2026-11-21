@@ -1545,35 +1545,37 @@ be built as a stand-alone REPL interpreter.")
            ;; ASDF with the version packaged into Guix.
            ;; [1] - https://bugs.launchpad.net/sbcl/+bug/1823442
            (lambda* (#:key inputs #:allow-other-keys)
-             (let* ((cl-asdf (assoc-ref inputs "cl-asdf"))
-                    (guix-asdf (string-append
-                                cl-asdf
+             (let* ((guix-asdf (search-input-file
+                                inputs
                                 "/share/common-lisp/source/asdf/asdf.lisp"))
                     (contrib-asdf "contrib/asdf/asdf.lisp"))
                (copy-file guix-asdf contrib-asdf))))
          (add-before 'build 'patch-unix-tool-paths
            (lambda* (#:key outputs inputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out"))
-                   (bash (assoc-ref inputs "bash"))
-                   (coreutils (assoc-ref inputs "coreutils"))
-                   (ed (assoc-ref inputs "ed")))
-               (define (quoted-path input path)
-                 (string-append "\"" input path "\""))
+             (let ((out (assoc-ref outputs "out")))
+               (define (quoted-path input)
+                 (string-append "\"" input "\""))
                ;; Patch absolute paths in string literals.  Note that this
                ;; occurs in some .sh files too (which contain Lisp code).  Use
                ;; ISO-8859-1 because some of the files are ISO-8859-1 encoded.
                (with-fluids ((%default-port-encoding #f))
-                 ;; The removed file is utf-16-be encoded, which gives substitute*
-                 ;; trouble. It does not contain references to the listed programs.
-                 (substitute* (delete
-                               "./tests/data/compile-file-pos-utf16be.lisp"
-                               (find-files "." "\\.(lisp|sh)$"))
-                   (("\"/bin/sh\"") (quoted-path bash "/bin/sh"))
-                   (("\"/usr/bin/env\"") (quoted-path coreutils "/usr/bin/env"))
-                   (("\"/bin/cat\"") (quoted-path coreutils "/bin/cat"))
-                   (("\"/bin/ed\"") (quoted-path ed "/bin/ed"))
-                   (("\"/bin/echo\"") (quoted-path coreutils "/bin/echo"))
-                   (("\"/bin/uname\"") (quoted-path coreutils "/bin/uname"))))
+                   ;; The removed file is utf-16-be encoded, which gives substitute*
+                   ;; trouble. It does not contain references to the listed programs.
+                   (substitute* (delete
+                                 "./tests/data/compile-file-pos-utf16be.lisp"
+                                 (find-files "." "\\.(lisp|sh)$"))
+                     (("\"/bin/sh\"") (quoted-path (search-input-file
+                                                    inputs "/bin/sh")))
+                     (("\"/usr/bin/env\"") (quoted-path (search-input-file
+                                                         inputs "/bin/env")))
+                     (("\"/bin/cat\"") (quoted-path (search-input-file
+                                                     inputs "/bin/cat")))
+                     (("\"/bin/ed\"") (quoted-path (search-input-file
+                                                    inputs "/bin/ed")))
+                     (("\"/bin/echo\"") (quoted-path (search-input-file
+                                                      inputs "/bin/echo")))
+                     (("\"/bin/uname\"") (quoted-path (search-input-file
+                                                       inputs "/bin/uname") ))))
                ;; This one script has a non-string occurrence of /bin/sh.
                (substitute* '("tests/foreign.test.sh")
                  ;; Leave whitespace so we don't match the shebang.
@@ -1584,7 +1586,7 @@ be built as a stand-alone REPL interpreter.")
                ;; the shebang and the reference to "sbcl", tying the generated
                ;; executables to the exact SBCL package that generated them.
                (substitute* '("contrib/sb-executable/sb-executable.lisp")
-                 (("/bin/sh") (string-append bash "/bin/sh"))
+                 (("/bin/sh") (search-input-file inputs "/bin/sh"))
                  (("exec sbcl") (string-append "exec " out "/bin/sbcl")))
                ;; Disable some tests that fail in our build environment.
                (substitute* '("contrib/sb-bsd-sockets/tests.lisp")
@@ -1599,14 +1601,12 @@ be built as a stand-alone REPL interpreter.")
                   (string-append "#+nil ;disabled by Guix\n" all))))))
          (add-before 'build 'fix-contrib-library-path
            (lambda* (#:key inputs #:allow-other-keys)
-             (let ((gmp (assoc-ref inputs "gmp"))
-                   (mpfr (assoc-ref inputs "mpfr")))
-               (substitute* '("contrib/sb-gmp/gmp.lisp")
-                 (("\"libgmp\\.so")
-                  (string-append "\"" gmp "/lib/libgmp.so")))
-               (substitute* '("contrib/sb-mpfr/mpfr.lisp")
-                 (("\"libmpfr\\.so")
-                  (string-append "\"" mpfr "/lib/libmpfr.so"))))))
+             (substitute* '("contrib/sb-gmp/gmp.lisp")
+               (("\"libgmp\\.so")
+                (string-append "\"" (search-input-file inputs "/lib/libgmp.so"))))
+             (substitute* '("contrib/sb-mpfr/mpfr.lisp")
+               (("\"libmpfr\\.so")
+                (string-append "\"" (search-input-file inputs "/lib/libmpfr.so"))))))
          (replace 'build
            (lambda* (#:key outputs #:allow-other-keys)
              (setenv "CC" "gcc")
