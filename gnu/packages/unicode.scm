@@ -102,6 +102,18 @@ files listing Unicode character properties and related data.  It also includes
 test data for conformance to several important Unicode algorithms.")
     (license unicode)))
 
+(define-public ucd-17
+  (package
+    (inherit ucd)
+    (version "17.0.0")
+    (source
+     (origin
+       (sha256
+        (base32 "13njcfr7wnsgy6s98z20z0zfl228xv0a2b89rqb3ka9fkf8d2ri0"))
+       (method url-fetch/zipbomb)
+       (uri (string-append "https://www.unicode.org/Public/" version
+                           "/UCD.zip"))))))
+
 (define (unicode-emoji-file name version hash)
   (origin
     (method url-fetch)
