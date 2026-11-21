@@ -3619,7 +3619,7 @@ astronomy and astrophysics.")
   (hidden-package
    (package
      (name "python-astropy-iers-data-primary")
-     (version "0.2026.7.6.1.1.20")
+     (version "0.2026.11.16.0.37.44")
      (source
       (origin
         (method git-fetch)
@@ -3628,7 +3628,7 @@ astronomy and astrophysics.")
                (commit (string-append "v" version))))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "0apwrw8r5bvhmih11ffa8ja6adi66fvjfi9k0w8ilhv2f88b970g"))))
+         (base32 "161f9svk4sdy8jppfcmmm0i8aagp995lkhij2xzap56mrx7cryva"))))
      (build-system pyproject-build-system)
      (native-inputs
       (list python-hatch-vcs
