@@ -13269,7 +13269,7 @@ tools to iterate efficiently over multiple galaxies are also provided.")
 (define-public python-swiftsimio
   (package
     (name "python-swiftsimio")
-    (version "12.1.4")
+    (version "12.4.0")
     (source
      (origin
        (method git-fetch)
@@ -13278,7 +13278,7 @@ tools to iterate efficiently over multiple galaxies are also provided.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17vjmg94mj3wwiv7jb1ngq9vyyywz3073pz1gcn7riy8y3q24a8j"))))
+        (base32 "00r8vifqv31kg1pikrl84bs7qan77hqzm5p6mz6l4hz9jn9kjl37"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f)) ;tests need to download remote datasets
