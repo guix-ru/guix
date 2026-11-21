@@ -6712,15 +6712,14 @@ docs dependency in support of other libraries.")
 (define-public python-unyt
   (package
     (name "python-unyt")
-    (version "3.1.0")
+    (version "3.2.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "unyt" version))
        (sha256
-        (base32 "07g5rasgikp8a4x0cylz8xxzgh3536djdjppcadiqlhygyl845bp"))))
+        (base32 "0hn8zgilfqpvid8g14b998ndy3h8rxvkk3sl4hqcnqwz44wpqv06"))))
     (build-system pyproject-build-system)
-    ;; tests: 764 passed, 37 skipped, 2 xfailed
     (native-inputs
      (list python-flit-core
            python-pytest))
