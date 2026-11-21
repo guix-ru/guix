@@ -3395,13 +3395,13 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
 (define-public python-astropy
   (package
     (name "python-astropy")
-    (version "8.0.1")
+    (version "8.0.3")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "astropy" version))
        (sha256
-        (base32 "1nji4flblxsq9mgiahx3r3wyfkdr5nir2iqab76r98hzp7ak3jj5"))
+        (base32 "0gwyp9mgbllhrcpccfzypbz88d6r5gjcw8bx3rhw2i8s55df4qdc"))
        (modules '((guix build utils)))
        (patches
         ;; Do not download updated iers data on the fly.  Refresh the
@@ -3434,7 +3434,7 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 32008 passed, 355 skipped, 261 xfailed
+      ;; tests: 32215 passed, 365 skipped, 263 xfailed
       #:test-flags
       #~(list "--pyargs" "astropy"
               ;; XXX: Tests are not thread save when they are more than 8.
@@ -3500,9 +3500,7 @@ constraints (i.e., altitude, airmass, moon separation/illumination, etc.)
            specification-astropy-data))
     (inputs
      (list expat
-           ;; XXX: One test fails with WCSLIB@8.8: ValueError: ERROR 5 in
-           ;; wcsset() at line 2895 of file wcs.c.
-           wcslib-8.6))
+           wcslib))
     (propagated-inputs
      (list python-astropy-iers-data-primary
            python-configobj      ;to replace custom module
