@@ -612,6 +612,61 @@ matrices, and polynomials over the integers and over finite fields.")
                               ; binary de facto gpl3+.
    (home-page "https://shoup.net/ntl/")))
 
+(define-public python-pyfftw
+  (package
+    (name "python-pyfftw")
+    (version "0.15.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/pyFFTW/pyFFTW")
+              (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1xlp9l1nmfrd1zkil7ddbm3arjbp1jdgbv22nkqhrisf11nxj7v8"))))
+    (build-system pyproject-build-system)
+    (arguments
+     (list
+      ;; tests: 597 passed, 916 skipped, 2 deselected, 1 warning
+      #:test-flags
+      ;; Depends on SciPy.
+      #~(list "--ignore=tests/test_pyfftw_scipy_interface.py"
+              ;; Assertions are not equal.
+              (string-append "--deselect=tests/test_pyfftw_partial.py"
+                             "::FFTWPartialTest::test_conversion")
+              "--deselect=tests/test_pyfftw_version.py::test_fftw_cc")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'remove-local-source
+            (lambda _
+              (delete-file-recursively "pyfftw"))))))
+    (native-inputs
+     (list python-cython
+           python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (inputs (list fftwf))
+    (propagated-inputs (list python-numpy))
+    (home-page "http://pyfftw.readthedocs.io/en/latest/")
+    (synopsis "Pythonic Python wrapper around FFTW")
+    (description
+     "This package provides a pythonic wrapper around FFTW, the FFT library,
+presenting a unified interface for all the supported transforms.")
+    (license (list
+              ;; All the code in pyfftw (except for fftw3.h) is released under
+              ;; the 3-clause BSD license.
+              license:bsd-3
+              ;; fftw3.h is released under the 2-clause BSD license.
+              license:bsd-2
+              ;; If you intend to use the GPLed FFTW3 library, your code must
+              ;; also be GPL licensed. If you do not wish to comply with the
+              ;; terms of the GPL, you have to buy a FFTW3 license from the
+              ;; copyright holder MIT, see
+              ;; http://www.fftw.org/doc/License-and-Copyright.html for more
+              ;; information.
+              license:gpl2+))))
+
 (define-public singular
   (package
    (name "singular")
