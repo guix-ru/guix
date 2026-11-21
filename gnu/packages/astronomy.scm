@@ -12598,7 +12598,7 @@ Institute, STScI} utility functions.")
 (define-public python-stsynphot
   (package
     (name "python-stsynphot")
-    (version "1.5.1")
+    (version "1.7.0")
     (source
      (origin
        (method git-fetch)
@@ -12607,7 +12607,7 @@ Institute, STScI} utility functions.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15jxb2b1172xlh041bvs8316qmqbg26nxjgfyxvl8280zwyqiwvh"))))
+        (base32 "141rni1iji8imkc8yx9ppvmniszc41i1gxr0i1k051b5pxbzmdlb"))))
     (build-system pyproject-build-system)
     (arguments
      (list
