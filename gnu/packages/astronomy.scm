@@ -13223,19 +13223,26 @@ use with the @url{http://swift.dur.ac.uk/, SWIFT} simulation code.")
 (define-public python-swiftgalaxy
   (package
     (name "python-swiftgalaxy")
-    (version "3.0.2")
+    (version "3.1.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/SWIFTSIM/swiftgalaxy")
-             (commit (string-append "v" version))))
+              (url "https://github.com/SWIFTSIM/swiftgalaxy")
+              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1k82fz3m7kjygv111z6n9i5ippkz5x98b3rkz8am76mdkm8hgvl8"))))
+        (base32 "05mc2cfmcwhm4qfbrggk7cy1fmili7k6hpyfk33dz1pldh3ij8lb"))))
     (build-system pyproject-build-system)
     (arguments
-     (list #:tests? #f)) ;tests need to download remote datasets
+     (list
+      #:tests? #f  ;tests need to download remote datasets
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'sanity-check 'pre-sanity-check
+            (lambda _
+              (setenv "HOME" "/tmp")
+              (setenv "NUMBA_CACHE_DIR" "/tmp"))))))
     (native-inputs
      (list python-setuptools
            python-setuptools-scm))
