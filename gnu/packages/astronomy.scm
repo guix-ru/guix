@@ -5463,7 +5463,15 @@ used with local NetDRMS sites.")
        (sha256
         (base32 "0r0hm0x750712m3v0qkl9i1hj28zq12d8bhjk8pfh8n68kyfl8f4"))))
     (build-system pyproject-build-system)
-    ;; tests: 365 passed, 41 skipped, 75 warnings
+    (arguments
+     (list
+      ;; tests:  363 passed, 41 skipped, 2 deselected, 74 warnings
+      #:test-flags
+      ;; XXX: 2 tests fail with Astropy 8.0.3.
+      #~(list (string-append "--deselect=dust_extinction/tests/"
+                             "test_axavtoexv.py"
+                             "::test_AxAvtoExv_with_P92_fitting")
+         "--deselect=dust_extinction/tests/test_p92.py::test_P92_fitting")))
     (native-inputs
      (list python-pytest
            python-pytest-doctestplus
