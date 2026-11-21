@@ -1029,44 +1029,6 @@ publish/subscribe, RPC-style request/reply, or service discovery.")
 ;; Deprecated on 2026-11-20.
 (define-deprecated-package nng-1.11 nng)
 
-(define-public nng-1.5
-  (package
-    (inherit nng)
-    (name "nng")
-    (version "1.5.2")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/nanomsg/nng")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1sap0iny3z9lhmaiassv8jc399md1307y32xxx3mrr74jcpcrf59"))))
-    (arguments
-     `(#:configure-flags
-       (list "-DNNG_ENABLE_COVERAGE=ON"
-             "-DNNG_ENABLE_TLS=ON"
-             "-DBUILD_SHARED_LIBS=ON")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'disable-failing-tests
-           (lambda _
-             ;; These tests require network access.
-             (substitute* "tests/CMakeLists.txt"
-               (("add_nng_test1\\(httpclient 60 NNG_SUPP_HTTP\\)") "")
-               (("add_nng_test\\(tls 60\\)") ""))
-             (substitute* "src/platform/CMakeLists.txt"
-               (("nng_test\\(platform_test\\)") "")
-               (("nng_test\\(resolver_test\\)") ""))
-             (substitute* "src/sp/transport/tcp/CMakeLists.txt"
-               (("nng_test\\(tcp_test\\)") ""))
-             (substitute* "src/sp/transport/ws/CMakeLists.txt"
-               (("nng_test_if\\(WS_ON ws_test\\)") ""))
-             (substitute* "src/supplemental/websocket/CMakeLists.txt"
-               (("nng_test\\(wssfile_test\\)") "")))))))
-    (inputs (list mbedtls-lts))))
-
 (define-public nanomsg
   (package
     (name "nanomsg")
