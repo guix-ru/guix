@@ -8711,7 +8711,7 @@ from @url{http://arxiv.org/abs/2007.01846, van den Busch (2020)} and
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 7942 passed, 27 skipped
+      ;; tests: 7945 passed, 26 skipped
       #:test-flags
       #~(list "--pyargs" "photutils"
               "--numprocesses" (number->string (min 8 (parallel-job-count)))
@@ -8728,7 +8728,10 @@ from @url{http://arxiv.org/abs/2007.01846, van den Busch (2020)} and
                      "test_refinement_excludes_failed_fits"
                      "test_refinement_progress_bar"
                      "test_refinement_steps"
-                     "test_smoothing_kernel")
+                     "test_smoothing_kernel"
+                     ;; XXX: Fails with Astropy 8.0.3: ValueError: M must be a
+                     ;; scalar or an array with shape (4, 4), got (1,).
+                     "test_unsupported_inputs_fall_back")
                " and not "))
       #:phases
       #~(modify-phases %standard-phases
