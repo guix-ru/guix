@@ -7351,20 +7351,25 @@ observationally-derived galaxy merger catalogs.")
 (define-public python-irispy-lmsal
   (package
     (name "python-irispy-lmsal")
-    (version "0.9.1")
+    ;; 0.9.1 (2026-09-28); to support Astropy 8.0.3+
+    (properties '((commit . "3889c5fc6e2ec5823099e7e1ecebd0101acd2308")
+                  (revision . "0")))
+    (version (git-version "0.9.1"
+                          (assoc-ref properties 'revision)
+                          (assoc-ref properties 'commit)))
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
               (url "https://github.com/LM-SAL/irispy")
-              (commit (string-append "v" version))))
+              (commit (assoc-ref properties 'commit))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x9gbc9yq8y3fk74lr1cjgarxa1knv1qri76z176dxfms3mvhdsl"))))
+        (base32 "1555ys9i9hy0gv55d3xzjzrw2xgchnsmqxhw66m8qaf6nbj2daal"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      ;; tests: 281 passed, 1 skipped, 15 deselected
+      ;; tests: 909 passed, 14 skipped, 17 deselected
       #:test-flags
       ;; Skip one test reqruiting optional python-rsliding.
       #~(list (string-append "--deselect=irispy/utils/tests/"
@@ -7388,19 +7393,17 @@ observationally-derived galaxy merger catalogs.")
     (propagated-inputs
      (list python-astropy
            python-dask
-           python-dkist
+           python-filelock
            python-gwcs
            python-mpl-animators
            python-ndcube
-           python-pandas
            python-scipy
            python-sunpy
            python-sunraster
            ;; [optional]
            python-astroscrappy
            python-colorsynth
-           ;; python-rsliding   ;not packaged yet in Guix
-           python-fiasco))
+           #;python-rsliding))   ;not packaged yet in Guix
     (home-page "https://iris.lmsal.com/")
     (synopsis "Tools to read and analyze data from the IRIS solar-observing satellite")
     (description
