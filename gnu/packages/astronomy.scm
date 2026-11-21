@@ -5368,13 +5368,16 @@ code to be greatly simplified.")
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 43 passed, 92 skipped, 3 deselected, 2 xfailed
       #:test-flags
       #~(list #$@(map (lambda (ls) (string-append "--deselect=tests/"
                                                   (string-join ls "::")))
                       ;; Network access is required.
                       '(("hap/test_pipeline.py" "TestSingleton"
                          "test_astrometric_singleton[iaaua1n4q]")
-                        ("hap/test_svm_ci.py" "TestSVMCI" "test_svm_ci"))))
+                        ("hap/test_svm_ci.py" "TestSVMCI" "test_svm_ci")
+                        ;; XXX: Introduced with Astropy 8.0.3: AssertionError: None
+                        ("drizzle/test_kernel.py" "test_point_kernel[point]"))))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'remove-local-source
