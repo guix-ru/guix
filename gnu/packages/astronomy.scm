@@ -262,9 +262,9 @@ reused in several astronomical applications, such as @code{wsclean},
            boost
            pkg-config
            python
-           pybind11-2))
+           pybind11))
     (inputs
-     (list casacore
+     (list casacore-for-aoflagger
            cfitsio
            fftw
            gsl
@@ -539,6 +539,22 @@ made to get a better separation of core libraries and applications.
     (synopsis "Measures data for Casacore")
     (description "Westerbork Synthesis Radio Telescope (WSRT) measures data.")
     (license license:public-domain)))
+
+(define-public casacore-for-aoflagger
+  (hidden-package
+   (package
+     (inherit casacore)
+     (name "casacore")
+     (version "3.8.1")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/casacore/casacore")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "13h1vkm64fhmdxyc9nnysj12wk5cjghs5pkmdrar6myqfazis2p0")))))))
 
 (define-public ccfits
   (package
