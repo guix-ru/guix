@@ -12363,13 +12363,13 @@ implementing calibration pipeline software.")
 (define-public python-stpsf
   (package
     (name "python-stpsf")
-    (version "2.2.0")
+    (version "2.3.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "stpsf" version))
        (sha256
-        (base32 "0vrrx7zjj4zpachj2zn92rgn7lfnzps32hyhkbxlmg043aq3a1pj"))))
+        (base32 "0wj5p6rjgifbhlya3dx00iqklrs43nyzyb847lx3cysr4al6qfaq"))))
     (build-system pyproject-build-system)
     (arguments
      (list
@@ -12379,13 +12379,7 @@ implementing calibration pipeline software.")
        ;;
        ;; See: <https://stpsf.readthedocs.io/en/stable/installation.html>,
        ;; <https://github.com/spacetelescope/stpsf/issues/76>.
-      #:tests? #f
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'unpack 'relax-requirements
-            (lambda _
-              (substitute* "pyproject.toml"
-                (("numpy>=1.21.6,<2.4.0") "numpy")))))))
+      #:tests? #f))
     (native-inputs
      (list python-setuptools
            python-setuptools-scm))
