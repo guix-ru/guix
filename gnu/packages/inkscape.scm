@@ -33,7 +33,6 @@
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix utils)
-  #:use-module (guix deprecation)
   #:use-module (guix build-system cmake)
   #:use-module (gnu packages)
   #:use-module (gnu packages algebra)
@@ -354,8 +353,6 @@ endif()~%~%"
 apart is its use of Scalable Vector Graphics (SVG), an XML-based W3C standard,
 as the native format.")
      (license license:gpl3+))))           ;see the file COPYING
-
-(define-deprecated/public-alias inkscape/stable inkscape/pinned)
 
 ;;; The Inkscape release year used in the about dialog.  Please keep it sync
 ;;; when updating the package!
