@@ -972,7 +972,15 @@ void DerivationGoal::outputsSubstituted()
     /*  If the substitutes form an incomplete closure, then we should
         build the dependencies of this derivation, but after that, we
         can still use the substitutes for this derivation itself. */
-    if (nrIncompleteClosure > 0 && !retrySubstitution) retrySubstitution = true;
+    if (nrIncompleteClosure > 0) {
+	if (retrySubstitution) {
+	    trace("already retried substitution; not retrying");
+	    retrySubstitution = false;
+	} else {
+	    trace("will retry substitution");
+	    retrySubstitution = true;
+	};
+    }
 
     nrFailed = nrNoSubstituters = nrIncompleteClosure = 0;
 

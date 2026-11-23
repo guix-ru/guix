@@ -1335,6 +1335,39 @@ System: x86_64-linux~%"
       (ensure-path s item)
       (path-info-nar-size (query-path-info s item)))))
 
+(test-assert "substitute, one output not substitutable"
+  ;; Create a derivation with two outputs: "out" and "lib".  "out" is
+  ;; substitutable and has a reference on "lib", but "lib" is not
+  ;; substitutable.  Consequently, the derivation must be built from source.
+  ;; This used to cause an infinite loop:
+  ;; <https://codeberg.org/guix/cuirass/issues/127#issuecomment-28390269>.
+  (with-store store
+    (let* ((text (random-text))
+           (drv  (build-expression->derivation
+                  store "substitute-one-of-my-outputs"
+                  `(begin
+                     (call-with-output-file (assoc-ref %outputs "lib")
+                       (lambda (p)
+                         (display ,text p)))
+                     (mkdir (assoc-ref %outputs "out"))
+                     (symlink (assoc-ref %outputs "lib")
+                              (string-append (assoc-ref %outputs "out")
+                                             "/lib")))
+                  #:outputs '("out" "lib")
+                  #:guile-for-build
+                  (package-derivation store %bootstrap-guile (%current-system))))
+           (out (derivation->output-path drv))
+           (lib (derivation->output-path drv "lib")))
+      ;; Create a substitute only for "out", with a reference to "lib".
+      (with-derivation-substitute drv text
+        (references => (list lib))
+        (set-build-options store #:use-substitutes? #t
+                           #:substitute-urls (%test-substitute-urls)
+                           #:verbosity 4)
+        (and (build-derivations store (list drv))
+             (string=? (readlink (string-append out "/lib")) lib)
+             (equal? text (call-with-input-file lib get-string-all)))))))
+
 (test-assert "export/import several paths"
   (let* ((texts (unfold (cut >= <> 10)
                         (lambda _ (random-text))

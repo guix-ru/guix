@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2013-2022, 2025 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013-2022, 2025-2026 Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -415,6 +415,10 @@ CONTENTS."
     ((_ drv contents (sha256 => hash) body ...)
      (with-derivation-substitute drv contents
        (sha256 => hash) (references => '())
+       body ...))
+    ((_ drv contents (references => refs) body ...)
+     (with-derivation-substitute drv contents
+       (sha256 => #f) (references => refs)
        body ...))
     ((_ drv contents body ...)
      (call-with-derivation-substitute drv contents
