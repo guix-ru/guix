@@ -23319,7 +23319,7 @@ addresses go to @file{/etc/resolv.conf}.
 If true, this should be a list of symbols for the Shepherd service
 corresponding to this network configuration.
 
-@item @code{requirement} (default @code{'()})
+@item @code{requirement} (default: @code{'()})
 The list of Shepherd services depended on.
 @end table
 @end deftp
@@ -25789,36 +25789,36 @@ This data type represents the configuration of an AutoSSH service.
 
 @table @asis
 
-@item @code{user} (default @code{"autossh"})
+@item @code{user} (default: @code{"autossh"})
 The user as which the AutoSSH service is to be run.
 This assumes that the specified user exists.
 
-@item @code{poll} (default @code{600})
+@item @code{poll} (default: @code{600})
 Specifies the connection poll time in seconds.
 
-@item @code{first-poll} (default @code{#f})
+@item @code{first-poll} (default: @code{#f})
 Specifies how many seconds AutoSSH waits before the first connection
 test.  After this first test, polling is resumed at the pace defined in
 @code{poll}.  When set to @code{#f}, the first poll is not treated
 specially and will also use the connection poll specified in
 @code{poll}.
 
-@item @code{gate-time} (default @code{30})
+@item @code{gate-time} (default: @code{30})
 Specifies how many seconds an SSH connection must be active before it is
 considered successful.
 
-@item @code{log-level} (default @code{1})
+@item @code{log-level} (default: @code{1})
 The log level, corresponding to the levels used by syslog---so @code{0}
 is the most silent while @code{7} is the chattiest.
 
-@item @code{max-start} (default @code{#f})
+@item @code{max-start} (default: @code{#f})
 The maximum number of times SSH may be (re)started before AutoSSH exits.
 When set to @code{#f}, no maximum is configured and AutoSSH may restart indefinitely.
 
-@item @code{message} (default @code{""})
+@item @code{message} (default: @code{""})
 The message to append to the echo message sent when testing connections.
 
-@item @code{port} (default @code{"0"})
+@item @code{port} (default: @code{"0"})
 The ports used for monitoring the connection.  When set to @code{"0"},
 monitoring is disabled.  When set to @code{"@var{n}"} where @var{n} is
 a positive integer, ports @var{n} and @var{n}+1 are used for
@@ -25829,12 +25829,12 @@ integers, the ports @var{n} and @var{m} are used for monitoring the
 connection, such that port @var{n} is the base monitoring port and
 @var{m} is the echo port.
 
-@item @code{ssh-options} (default @code{'()})
+@item @code{ssh-options} (default: @code{'()})
 The list of command-line arguments to pass to @command{ssh} when it is
 run.  Options @option{-f} and @option{-M} are reserved for AutoSSH and
 may cause undefined behaviour.
 
-@item @code{auto-start?} (default @code{#t})
+@item @code{auto-start?} (default: @code{#t})
 Whether this service should be started automatically by the Shepherd.  If it
 is @code{#f}, the service has to be started manually with @command{herd start}.
 
@@ -26426,7 +26426,7 @@ When @code{auto-login?} is false, GDM presents a log-in screen.
 When @code{auto-login?} is true, GDM logs in directly as
 @code{default-user}.
 
-@item @code{auto-suspend?} (default @code{#t})
+@item @code{auto-suspend?} (default: @code{#t})
 When true, GDM will automatically suspend to RAM when nobody is
 physically connected.  When a machine is used via remote desktop or SSH,
 this should be set to false to avoid GDM interrupting remote sessions or
@@ -26532,13 +26532,13 @@ your user profile.  Failing to do that, if @code{auto-login-session} is
 false, you will be unable to log in.
 @end quotation
 
-@item @code{xorg-configuration} (default @code{(xorg-configuration)})
+@item @code{xorg-configuration} (default: @code{(xorg-configuration)})
 Configuration of the Xorg graphical server.
 
-@item @code{display} (default @code{":0"})
+@item @code{display} (default: @code{":0"})
 The display on which to start the Xorg graphical server.
 
-@item @code{vt} (default @code{"vt7"})
+@item @code{vt} (default: @code{"vt7"})
 The VT on which to start the Xorg graphical server.
 
 @item @code{xauth} (default: @code{xauth})
@@ -26594,10 +26594,10 @@ Select display server to use for the greeter.  Valid values are
 @item @code{numlock} (default: "on")
 Valid values are @samp{"on"}, @samp{"off"} or @samp{"none"}.
 
-@item @code{halt-command} (default @code{#~(string-append #$shepherd "/sbin/halt")})
+@item @code{halt-command} (default: @code{#~(string-append #$shepherd "/sbin/halt")})
 Command to run when halting.
 
-@item @code{reboot-command} (default @code{#~(string-append #$shepherd "/sbin/reboot")})
+@item @code{reboot-command} (default: @code{#~(string-append #$shepherd "/sbin/reboot")})
 Command to run when rebooting.
 
 @item @code{theme} (default "maldives")
@@ -26628,28 +26628,28 @@ Remember last session.
 @item @code{hide-users} (default "")
 Usernames to hide from SDDM greeter.
 
-@item @code{hide-shells} (default @code{#~(string-append #$shadow "/sbin/nologin")})
+@item @code{hide-shells} (default: @code{#~(string-append #$shadow "/sbin/nologin")})
 Users with shells listed will be hidden from the SDDM greeter.
 
-@item @code{session-command} (default @code{#~(string-append #$sddm "/share/sddm/scripts/wayland-session")})
+@item @code{session-command} (default: @code{#~(string-append #$sddm "/share/sddm/scripts/wayland-session")})
 Script to run before starting a wayland session.
 
 @item @code{sessions-directory} (default "/run/current-system/profile/share/wayland-sessions")
 Directory to look for desktop files starting wayland sessions.
 
-@item @code{xorg-configuration} (default @code{(xorg-configuration)})
+@item @code{xorg-configuration} (default: @code{(xorg-configuration)})
 Configuration of the Xorg graphical server.
 
-@item @code{xauth-path} (default @code{#~(string-append #$xauth "/bin/xauth")})
+@item @code{xauth-path} (default: @code{#~(string-append #$xauth "/bin/xauth")})
 Path to xauth.
 
-@item @code{xephyr-path} (default @code{#~(string-append #$xorg-server "/bin/Xephyr")})
+@item @code{xephyr-path} (default: @code{#~(string-append #$xorg-server "/bin/Xephyr")})
 Path to Xephyr.
 
-@item @code{xdisplay-start} (default @code{#~(string-append #$sddm "/share/sddm/scripts/Xsetup")})
+@item @code{xdisplay-start} (default: @code{#~(string-append #$sddm "/share/sddm/scripts/Xsetup")})
 Script to run after starting xorg-server.
 
-@item @code{xdisplay-stop} (default @code{#~(string-append #$sddm "/share/sddm/scripts/Xstop")})
+@item @code{xdisplay-stop} (default: @code{#~(string-append #$sddm "/share/sddm/scripts/Xstop")})
 Script to run before stopping xorg-server.
 
 @item @code{xsession-command} (default: @code{xinitrc})
@@ -29666,7 +29666,7 @@ This is the schedule of database updates, expressed as a string in
 traditional cron syntax or as a gexp evaluating to a Shepherd calendar
 event (@pxref{Timers,,, shepherd, The GNU Shepherd Manual}).
 
-@item @code{excluded-directories} (default @code{%default-file-database-excluded-directories})
+@item @code{excluded-directories} (default: @code{%default-file-database-excluded-directories})
 List of regular expressions of directories to ignore when building the
 file database.  By default, this includes @file{/tmp} and @file{/gnu/store};
 the latter should instead be indexed by @command{guix locate} (@pxref{Invoking
@@ -37987,20 +37987,20 @@ Must be one of:
 @item @code{<php-fpm-static-process-manager-configuration>}
 @item @code{<php-fpm-on-demand-process-manager-configuration>}
 @end table
-@item @code{display-errors} (default @code{#f})
+@item @code{display-errors} (default: @code{#f})
 Determines whether php errors and warning should be sent to clients
 and displayed in their browsers.
 This is useful for local php development, but a security risk for public sites,
 as error messages can reveal passwords and personal data.
-@item @code{timezone} (default @code{#f})
+@item @code{timezone} (default: @code{#f})
 Specifies @code{php_admin_value[date.timezone]} parameter.
-@item @code{workers-logfile} (default @code{(string-append "/var/log/php" (version-major (package-version php)) "-fpm.www.log")})
+@item @code{workers-logfile} (default: @code{(string-append "/var/log/php" (version-major (package-version php)) "-fpm.www.log")})
 This file will log the @code{stderr} outputs of php worker processes.
 Can be set to @code{#f} to disable logging.
-@item @code{file} (default @code{#f})
+@item @code{file} (default: @code{#f})
 An optional override of the whole configuration.
 You can use the @code{mixed-text-file} function or an absolute filepath for it.
-@item @code{php-ini-file} (default @code{#f})
+@item @code{php-ini-file} (default: @code{#f})
 An optional override of the default php settings.
 It may be any ``file-like'' object (@pxref{G-Expressions, file-like objects}).
 You can use the @code{mixed-text-file} function or an absolute filepath for it.
@@ -40087,7 +40087,7 @@ The strongSwan package to use for this service.
 The file name of your @file{ipsec.conf}.  If not @code{#f}, then this and
 @code{ipsec-secrets} must both be strings.
 
-@item @code{ipsec-secrets} (default @code{#f})
+@item @code{ipsec-secrets} (default: @code{#f})
 The file name of your @file{ipsec.secrets}.  If not @code{#f}, then this and
 @code{ipsec-conf} must both be strings.
 
@@ -48138,22 +48138,22 @@ This is the data type representing the configuration for the zram-device
 service.
 
 @table @asis
-@item @code{size} (default @code{"1G"})
+@item @code{size} (default: @code{"1G"})
 This is the amount of space you wish to provide for the zram device.  It
 accepts a string and can be a number of bytes or use a suffix, eg.:
 @code{"512M"} or @code{1024000}.
-@item @code{compression-algorithm} (default @code{'lzo})
+@item @code{compression-algorithm} (default: @code{'lzo})
 This is the compression algorithm you wish to use.  It is difficult to
 list all the possible compression options, but common ones supported by
 Guix's Linux Libre Kernel include @code{'lzo}, @code{'lz4} and @code{'zstd}.
-@item @code{memory-limit} (default @code{0})
+@item @code{memory-limit} (default: @code{0})
 This is the maximum amount of memory which the zram device can use.
 Setting it to '0' disables the limit.  While it is generally expected
 that compression will be 2:1, it is possible that uncompressable data
 can be written to swap and this is a method to limit how much memory can
 be used.  It accepts a string and can be a number of bytes or use a
 suffix, eg.: @code{"2G"}.
-@item @code{priority} (default @code{#f})
+@item @code{priority} (default: @code{#f})
 This is the priority of the swap device created from the zram device.
 @xref{Swap Space} for a description of swap priorities.  You might want
 to set a specific priority for the zram device, otherwise it could end
@@ -48176,7 +48176,7 @@ This is the data type representing the configuration for the fwupd
 service.
 
 @table @asis
-@item @code{fwupd} (default @code{fwupd})
+@item @code{fwupd} (default: @code{fwupd})
 The fwupd package that will be installed in the system profile.
 @end table
 
@@ -48575,7 +48575,7 @@ This is the data type representing the configuration of containerd.
 @item @code{containerd} (default: @code{containerd})
 The containerd daemon package to use.
 
-@item @code{debug?} (default @code{#f})
+@item @code{debug?} (default: @code{#f})
 Enable or disable debug output.
 
 @item @code{environment-variables} (default: @code{'()})
@@ -48622,13 +48622,13 @@ This field is deprecated in favor of @code{containerd-service-type} service.
 @item @code{proxy} (default @var{docker-libnetwork-cmd-proxy})
 The Docker user-land networking proxy package to use.
 
-@item @code{enable-proxy?} (default @code{#t})
+@item @code{enable-proxy?} (default: @code{#t})
 Enable or disable the use of the Docker user-land networking proxy.
 
-@item @code{debug?} (default @code{#f})
+@item @code{debug?} (default: @code{#f})
 Enable or disable debug output.
 
-@item @code{enable-iptables?} (default @code{#t})
+@item @code{enable-iptables?} (default: @code{#t})
 Enable or disable the addition of iptables rules.
 
 @item @code{environment-variables} (default: @code{'()})
@@ -49455,7 +49455,7 @@ This is the data type representing the configuration of rshiny.
 @item @code{package} (default: @code{r-shiny})
 The package to use.
 
-@item @code{binary} (default @code{"rshiny"})
+@item @code{binary} (default: @code{"rshiny"})
 The name of the binary or shell script located at @code{package/bin/} to
 run when the service is run.
 
