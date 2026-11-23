@@ -47,6 +47,18 @@
 (channel-news
  (version 0)
 
+ (entry (commit "1aa75f08e1cc35c89044f73708e5f42d2fc1172c")
+        (title
+         (en "@command{guix pull} reworked to speed up its initial steps"))
+        (body
+         (en "The @command{guix pull} command has been reworked in a way that
+reduces the amount of content it needs to fetch from the channels and
+simplifies the initial computations that it needs to perform on these
+retrieved content.
+
+The command can now be optionally passed @option{--full} to fallback to the
+old behavior.")))
+
  (entry (commit "741ff81f59a17b4a89591aaafbf880d8f1ba96fa")
         (title
           (en "hyperfine updated to 2.0.0")
