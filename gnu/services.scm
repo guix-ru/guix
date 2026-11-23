@@ -267,6 +267,8 @@ service type: ~S"
              (&error-location
               (location (source-properties->location properties))))
             (formatted-message
+             ;; TRANSLATORS: The first 'service' in quotes is the name of the
+             ;; Scheme function, so it should not be translated.
              (G_ "first argument to 'service' (~s) is not a service type")
              obj)
             '())))
