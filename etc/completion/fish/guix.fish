@@ -1008,7 +1008,7 @@ complete -x -c guix -n "__fish_guix_using_command $guix_command" -s L -l load-pa
 
 set -l guix_command style
 complete -x -c guix -n "__fish_guix_using_command $guix_command" -s S -l styling=              -d "apply RULE, a styling rule" -a "$guix_style_stylings"
-complete -x -c guix -n "__fish_guix_using_command $guix_command"      -l parameter=            -d "use PARAM, e.g. package name, as a parmeter for the styling RULE supporting it"
+complete -x -c guix -n "__fish_guix_using_command $guix_command"      -l parameter=            -d "use PARAM, e.g. package name, as a parameter for the styling RULE supporting it"
 complete -f -c guix -n "__fish_guix_using_command $guix_command"      -l list-stylings         -d "display the list of available style rules"
 complete -f -c guix -n "__fish_guix_using_command $guix_command" -s n -l dry-run               -d "display files that would be edited but do nothing"
 complete -x -c guix -n "__fish_guix_using_command $guix_command" -s L -l load-path=            -d "prepend DIR to the package module search path" -a "(__fish_complete_directories)"

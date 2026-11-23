@@ -541,7 +541,7 @@ values: list of output lines returned by CMD and its exit code."
          (hetzner-api-primary-ips api #:params `(("name" . ,name))))
 
    (raise-exception
-    (formatted-message (G_ "primary ip '~a' does not exist.")
+    (formatted-message (G_ "primary IP '~a' does not exist.")
                        name))))
 
 (define temporary-ssh-key-file

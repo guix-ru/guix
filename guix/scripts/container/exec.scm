@@ -84,7 +84,7 @@ and the other containing arguments for the command to be executed."
                                       '("TERM"))))
 
         (unless pid
-          (leave (G_ "no pid specified~%")))
+          (leave (G_ "no PID specified~%")))
 
         (when (null? command)
           (leave (G_ "no command specified~%")))

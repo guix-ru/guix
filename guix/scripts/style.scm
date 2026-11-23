@@ -835,7 +835,7 @@ Update package definitions to the latest style.\n"))
   (display (G_ "
   -S, --styling=RULE     apply RULE, a styling rule"))
   (display (G_ "
-      --parameter=PARAM  use PARAM, e.g. package name, as a parmeter for
+      --parameter=PARAM  use PARAM, e.g. package name, as a parameter for
                          the styling RULE supporting it"))
   (display (G_ "
   -l, --list-stylings    display the list of available style rules"))

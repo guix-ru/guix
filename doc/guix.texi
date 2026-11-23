@@ -14910,7 +14910,7 @@ To use package transformations at the level of the entire system,
 @pxref{operating-system-transformation, the @code{transformation} field
 of @code{operating-system}}.  @xref{home-environment-transformation, the
 @code{transformation} field of @code{home-environment}}, for how to do
-it at the level of the home environment
+it at the level of the home environment.
 
 @node Additional Build Options
 @subsection Additional Build Options
@@ -23828,7 +23828,7 @@ it does not matter whether the previously connected services are in
 that will be kept connected.  A service connected by the user will be
 used until going out of network coverage.  With this setting enabled
 applications will notice more network breaks than normal.  Note this
-options can't be used with VPNs.  Default value is @code{#f}.
+option cannot be used with VPNs.  Default value is @code{#f}.
 
 @item @code{tethering-technologies} (type: maybe-list)
 List of technologies that are allowed to enable tethering.  The default
@@ -24243,7 +24243,7 @@ List of permit and/or deny rules used by OpenDoas. Defaults to @code{(list (open
  Wheter sucessful command execution should be logged.
 
 @item @code{persist?} (default: @code{#f}) (type: boolean)
- When true, ther after the user sucessfully authenticates, do not ask for
+ When true, then after the user sucessfully authenticates, do not ask for
 a password again for some time.
 
 @item @code{keepenv?} (default: @code{#f}) (type: boolean)
@@ -24495,7 +24495,7 @@ List of host names used as the default NTP servers.  These are servers of the
 @end defvar
 
 @deftp {Data Type} ntp-server
-The data type representing the configuration of a NTP server.
+The data type representing the configuration of an NTP server.
 
 @table @asis
 @item @code{type} (default: @code{'server})
@@ -24547,7 +24547,7 @@ Chrony package.
 @item @code{command-port} (default: @code{0}) (type: maybe-integer)
 Port that is used for run-time monitoring.
 
-@item @code{drift-file} (default: @code{"/var/lib/chronyd/drift"}) (type: maybe-)
+@item @code{drift-file} (default: @code{"/var/lib/chronyd/drift"}) (type: maybe-string)
 File where @command{chronyd} stores rate information.
 
 @item @code{makestep} (type: maybe-list-of-numbers)
@@ -25035,7 +25035,7 @@ place as when the daemon was run as @code{root}.
 @item @code{gid} (default: @code{"rsyncd"})
 Group name or group ID that will be used when accessing the module.
 
-@item @code{modules} (default: @code{'())})
+@item @code{modules} (default: @code{'()})
 List of ``modules''---i.e., directories exported over rsync.  Each
 element must be a @code{rsync-module} record, as described below.
 @end table
@@ -25181,7 +25181,7 @@ daemon.
 The default here is the same as Syncthing's default.  The value should
 be a list of @code{syncthing-folder}s.
 
-@item @code{devices} (default: @code{'()}
+@item @code{devices} (default: @code{'()})
 This should be a list of @code{syncthing-device}s.  Guix will
 automatically add any devices specified in any `folders' to this list.
 There are instances when you want to connect to a device despite not
@@ -27865,7 +27865,7 @@ support (@pxref{Networking Services, @code{modem-manager-service-type}}),
 energy and color management services, the @code{elogind} login and seat
 manager, the Polkit privilege service, the GeoClue location service, the
 AccountsService daemon that allows authorized users change system passwords,
-a NTP client (@pxref{Networking Services}) and the Avahi daemon.
+an NTP client (@pxref{Networking Services}) and the Avahi daemon.
 @end defvar
 
 The @code{%desktop-services} variable can be used as the @code{services}

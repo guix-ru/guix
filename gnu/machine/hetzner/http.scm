@@ -639,7 +639,7 @@ initial system provisioning phase, before Guix System takes over."
   (if (zero? (length ids))
       (raise-exception
        (formatted-message
-        (G_ "expected at least one action id, but got '~a'")
+        (G_ "expected at least one action ID, but got '~a'")
         (length ids)))
       (hetzner-api-list
        api "/actions" "actions" json->hetzner-action
