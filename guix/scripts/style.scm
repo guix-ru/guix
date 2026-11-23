@@ -96,10 +96,6 @@
 Pass EDIT-EXPRESSION further to `transform-package-field'.  POLICY is
 currently ignored."
   (let* ((get-field (assq-ref %field-accessors field))
-         ;; All current %field-accessors are plural.
-         (formatted-field (string-drop-right
-                           (symbol->string field)
-                           1))
          (to-remove-list
           ((match-lambda
              ((? package? package)
@@ -115,10 +111,19 @@ currently ignored."
                                 (_                 #f))
                               (get-field package))
                          (info location
-                               (G_ "~a: removing ~a '~a'~%")
+                               ;; TRANSLATORS: This message is displayed by the
+                               ;; linter, when it removes a package from one of
+                               ;; the input fields. The first argument is the
+                               ;; name of the package being linted. The second
+                               ;; argument is the name of the input being
+                               ;; removed. The third argument is the name of
+                               ;; the field (inputs, native-inputs or
+                               ;; propagated-inputs). E.g. "gcc: removing
+                               ;; 'glibc' from native-inputs".
+                               (G_ "~a: removing '~a' from ~a~%")
                                (package-full-name package)
-                               formatted-field
-                               (string-join (delete "out" to-remove-list) ":"))))))
+                               (string-join (delete "out" to-remove-list) ":")
+                               field)))))
     (transform-package-field package
                              field
                              (lambda (items)
