@@ -3169,7 +3169,7 @@ without worrying about platform-specific details.")
 (define-public go-github-com-arduino-go-properties-orderedmap
   (package
     (name "go-github-com-arduino-go-properties-orderedmap")
-    (version "1.8.1")
+    (version "1.9.1")
     (source
      (origin
        (method git-fetch)
@@ -3178,7 +3178,7 @@ without worrying about platform-specific details.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "11vrrj9ymkjjcjfaz078np1pa42rl041axxlsrd9iw3jzxx8jkrj"))))
+        (base32 "06yg32g9zddci8sdj6fyhrnawhpnra5kg9i8frpsdf6x4ggml04j"))))
     (build-system go-build-system)
     (arguments
      (list
