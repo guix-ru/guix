@@ -1731,7 +1731,7 @@ developed at MIT to model electromagnetic systems.")
      '((release-commit . "01f3d4f2ba7c2eaafb5dc710c8a1903af7762fea")
        (release-date . "2026-06-05T09:39:33Z")))
     (name "arduino-cli")
-    (version "1.5.1")
+    (version "1.6.0")
     (source
      (origin
        (method git-fetch)
@@ -1740,7 +1740,7 @@ developed at MIT to model electromagnetic systems.")
               (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15iqly4clwxp8l3kd7gfnmszbyq1586rjymc6a4zi6bh2q8zm59i"))))
+        (base32 "05n8xkvwx470pzp3cs2fm8qfi5jmmgyq79nj225n4bfyilqdbdwp"))))
     (build-system go-build-system)
     (arguments
      (list
@@ -1852,8 +1852,10 @@ developed at MIT to model electromagnetic systems.")
             go-github-com-djherbis-nio-v3
             go-github-com-fatih-color
             go-github-com-go-git-go-git-v5
+            go-github-com-goccy-go-json
             go-github-com-gofrs-uuid-v5
             go-github-com-leonelquinteros-gotext
+            go-github-com-mailru-easyjson
             go-github-com-marcinbor85-gohex
             go-github-com-mattn-go-colorable
             go-github-com-mattn-go-isatty
@@ -1866,7 +1868,6 @@ developed at MIT to model electromagnetic systems.")
             go-github-com-spf13-viper
             go-github-com-stretchr-testify
             go-github-com-xeipuuv-gojsonschema
-            go-go-bug-st-cleanup
             go-go-bug-st-downloader
             go-go-bug-st-f
             go-go-bug-st-relaxed-semver
@@ -1877,8 +1878,7 @@ developed at MIT to model electromagnetic systems.")
             go-google-golang-org-genproto-googleapis-rpc
             go-google-golang-org-grpc
             go-google-golang-org-protobuf
-            go-gopkg-in-yaml-v3
-            go-github-com-mailru-easyjson)))
+            go-gopkg-in-yaml-v3)))
     (home-page "https://github.com/arduino/arduino-cli")
     (synopsis "Tools to manage Arduino compatible boards")
     (description
