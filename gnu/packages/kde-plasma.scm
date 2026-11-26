@@ -386,7 +386,7 @@ Breeze is the default theme for the KDE Plasma desktop.")
     (native-inputs (list extra-cmake-modules pkg-config))
     ;; TODO: Add packagekit-qt6 when a guix backend for packagekit will be
     ;; available.
-    (inputs (list appstream-qt6
+    (inputs (list appstream-qt
                   attica
                   fwupd ; optional
                   flatpak ; optional
@@ -2124,7 +2124,7 @@ the KDE Plasma 6 desktop.")
     (inputs (list packagekit-qt6
                   signond-qt6
                   attica
-                  appstream-qt6
+                  appstream-qt
                   baloo
                   breeze
                   breeze-icons
@@ -2844,7 +2844,7 @@ sensors, process information and other system resources.")
     ;; LibNotificationManagerConfig.cmake.
     (propagated-inputs (list kitemmodels))
     (inputs (list appmenu-gtk-module
-                  appstream-qt6
+                  appstream-qt
                   baloo
                   breeze
                   breeze-icons

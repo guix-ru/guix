@@ -5000,7 +5000,7 @@ applications.")
     (native-inputs
      (list extra-cmake-modules pkg-config))
     (inputs (list packagekit-qt6
-                  appstream-qt6
+                  appstream-qt
                   kconfig
                   kconfigwidgets
                   kcoreaddons
