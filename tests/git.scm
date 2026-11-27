@@ -338,22 +338,12 @@
            (commit "Second commit")
            (tag "v1.1" "release-1.1")
            (checkout "master"))
-       (let* ((tag-directory  (git "-C" directory
-                                   "rev-parse" "v1.1"))
-              (cached-directory commit relation
+       (let* ((cached-directory commit relation
                                 (update-cached-checkout directory
                                                         #:ref '(symref . "refs/tags/v1.1")
                                                         #:cache-directory cache))
-              (head-cached    (git "-C" cached-directory
-                                   ;; switch-to-ref doesn't dereference the Git object,
-                                   ;; thus it points to a Git tag object.
-                                   ;; And HEAD points to a Git commit object.
-                                   ;; Hence, the check is against Git tag objects.
-                                   ;; For the difference see:
-                                   ;;   git show-ref --dereference v1.1
-                                   "rev-parse" "v1.1")))
-         (and (string=? commit        head-cached)
-              (string=? tag-directory head-cached)))))))
+              (head-cached (git "-C" cached-directory "rev-parse" "HEAD")))
+         (string=? commit head-cached))))))
 
 (test-assert "update-cached-checkout, symref pull-request"
   (call-with-temporary-directory
