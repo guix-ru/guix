@@ -27564,13 +27564,13 @@ Week instances stringify to this form.")
 (define-public bpython
   (package
     (name "bpython")
-    (version "0.25")
+    (version "0.26")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "bpython" version))
        (sha256
-        (base32 "0ny6cqhpil7z36djc4ixakri65kb1rdn3d4ckmpc5p7nks8gqin2"))))
+        (base32 "0cvl6aygigkk79dnz6jg1m6wp751scfsv54rkjsfjfvjwghq747p"))))
     (build-system pyproject-build-system)
     (arguments
      (list
