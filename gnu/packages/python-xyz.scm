@@ -23023,15 +23023,16 @@ graphviz.")
     (license license:expat)))
 
 (define-public python-gevent
+  ;; TODO: Move to (gnu packages python-web).
   (package
     (name "python-gevent")
-    (version "24.11.1")
+    (version "26.9.0")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "gevent" version))
               (sha256
                (base32
-                "1jhs1k49nfhv59c0li6bcpvkr6pzmxkdgfm56gns7r792j8l3lcb"))
+                "1cgh3rylhps90am9qm471jqyad19m11wvxcx3in4aykkf4yp1m2d"))
               (modules '((guix build utils)))
               (snippet
                '(begin
