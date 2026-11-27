@@ -131,34 +131,45 @@ machines.")
     (license license:expat)))
 
 (define-public clikan
-  (let ((commit "55ab29e68263c6fed2844aef96fbebacda3eba9b")
-        (revision "1"))
+  ;; XXX: The project is no longer maintained, upstream suggests to look for
+  ;; alternative, see <https://github.com/kitplummer/clikan/issues/72>.
+  (let ((commit "da55a7e87bc25b0de8cc5adbb064bfff79ebbc15")
+        (revision "0"))
     (package
       (name "clikan")
       (version
-       (git-version "0.2.1" revision commit))
+       (git-version "0.4.4" revision commit))
       (source
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://github.com/kitplummer/clikan")
-               (commit commit)))
+                (url "https://github.com/kitplummer/clikan")
+                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1nyx80z53xxlbhpb5k22jnv4jajxqhjm0gz7qb18w9pqqlrvkqd4"))))
+          (base32 "1r1sldysvhpqng0r6ra4f5hk2v3yk9wi38nh0jnqkh9vcyn9rhh1"))))
       (build-system pyproject-build-system)
       (arguments
        (list
         #:phases
         #~(modify-phases %standard-phases
+            (add-after 'unpack 'fix-compatibility
+              ;; See: <https://github.com/kitplummer/clikan/issues/72>.
+              (lambda _
+                (substitute* "clikan.py"
+                  (("import importlib")
+                   "import importlib_metadata")
+                  (("importlib\\.metadata")
+                   "importlib_metadata"))))
             (add-before 'check 'configure-tests
               (lambda _
                 (setenv "HOME" (getenv "TEMP")))))))
       (native-inputs
-       (list python-pytest python-click python-setuptools))
+       (list python-pytest python-setuptools))
       (inputs
        (list python-click
              python-click-default-group
+             python-importlib-metadata
              python-pyyaml
              python-rich))
       (home-page "https://github.com/kitplummer/clikan")
