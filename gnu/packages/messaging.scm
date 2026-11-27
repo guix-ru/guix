@@ -1682,14 +1682,14 @@ default.")
 (define-public prosody
   (package
     (name "prosody")
-    (version "13.0.6")
+    (version "13.0.8")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://prosody.im/downloads/source/"
                                   "prosody-" version ".tar.gz"))
               (sha256
                (base32
-                "03q5jdywcjsjzkfgv4m3d57crv8wdarkyzdh0i5azhv2ynf6ysgc"))))
+                "09k2kkmjzq42wz533ff59jx2x15vk50g8pwi6kphx3g3d5rxmn0l"))))
     (build-system gnu-build-system)
     (arguments
      (list
