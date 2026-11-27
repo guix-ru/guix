@@ -1970,16 +1970,23 @@ and REV-END, two git revision strings."
                 (_ #\-))
               (symbol->string id)))
 
+(define (regexp->codeowners-pattern regexp)
+  "Return a 'CODEOWNERS' pattern matching the file names in which REGEXP is
+found.  Forgejo compiles each pattern as \"^PATTERN$\", so it must match the
+whole file name."
+  (string-append (if (string-prefix? "^" regexp)
+                     (string-drop regexp 1)
+                     (string-append ".*" regexp))
+                 (if (string-suffix? "$" regexp)
+                     ""
+                     ".*")))
+
 (define (team->codeowners-snippet team)
   (string-join (map (lambda (scope)
                       (format #f "~50a @guix/~a"
                               (if (regexp*? scope)
-                                  (let ((regexp (regexp*-pattern scope)))
-                                    ;; Caret may not match as expected in
-                                    ;; 'CODEOWNERS' so drop it.
-                                    (if (string-prefix? "^" regexp)
-                                        (string-drop regexp 1)
-                                        regexp))
+                                  (regexp->codeowners-pattern
+                                   (regexp*-pattern scope))
                                   (regexp-quote scope))
                               (team-id->forgejo-id (team-id team))))
                     (team-scope team))

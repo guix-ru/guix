@@ -130,10 +130,10 @@ guix/ui\.scm                                       @guix/core
 guix/upstream\.scm                                 @guix/core
 guix/utils\.scm                                    @guix/core
 guix/workers\.scm                                  @guix/core
-guix/platforms/                                    @guix/core
-guix/scripts/                                      @guix/core
-guix/store/                                        @guix/core
-nix/                                               @guix/core
+guix/platforms/.*                                  @guix/core
+guix/scripts/.*                                    @guix/core
+guix/store/.*                                      @guix/core
+nix/.*                                             @guix/core
 
 gnu/packages/base\.scm                             @guix/core-packages
 gnu/packages/bootstrap\.scm                        @guix/core-packages
@@ -161,7 +161,7 @@ gnu/packages/vpn\.scm                              @guix/crypto
 
 gnu/packages/debian\.scm                           @guix/debian
 
-\.texi$                                            @guix/documentation
+.*\.texi$                                          @guix/documentation
 doc/build\.scm                                     @guix/documentation
 gnu/system/examples/bare-bones\.tmpl               @guix/documentation
 gnu/system/examples/lightweight-desktop\.tmpl      @guix/documentation
@@ -201,7 +201,7 @@ gnu/services/games\.scm                            @guix/games
 gnu/tests/games\.scm                               @guix/games
 guix/build/luanti-build-system\.scm                @guix/games
 
-etc/teams/gnome                                    @guix/gnome
+.*etc/teams/gnome.*                                @guix/gnome
 gnu/packages/glib\.scm                             @guix/gnome
 gnu/packages/gstreamer\.scm                        @guix/gnome
 gnu/packages/gtk\.scm                              @guix/gnome
@@ -214,7 +214,7 @@ guix/build/glib-or-gtk-build-system\.scm           @guix/gnome
 guix/build/meson-build-system\.scm                 @guix/gnome
 
 gnu/packages/configuration-management\.scm         @guix/go
-gnu/packages/golang(-.+|)\.scm$                    @guix/go
+.*gnu/packages/golang(-.+|)\.scm$                  @guix/go
 gnu/packages/syncthing\.scm                        @guix/go
 gnu/packages/terraform\.scm                        @guix/go
 guix/build-system/go\.scm                          @guix/go
@@ -245,7 +245,7 @@ guix/import/hackage\.scm                           @guix/haskell
 guix/import/stackage\.scm                          @guix/haskell
 guix/scripts/import/hackage\.scm                   @guix/haskell
 
-(gnu|guix/scripts)/home(\.scm$|/)                  @guix/home
+(gnu|guix/scripts)/home(\.scm$|/).*                @guix/home
 tests/guix-home\.sh                                @guix/home
 tests/home-import\.scm                             @guix/home
 tests/home-services\.scm                           @guix/home
@@ -269,7 +269,7 @@ gnu/build/hurd-boot\.scm                           @guix/hurd
 gnu/services/hurd\.scm                             @guix/hurd
 gnu/packages/hurd\.scm                             @guix/hurd
 
-gnu/installer(\.scm$|/)                            @guix/installer
+gnu/installer(\.scm$|/).*                          @guix/installer
 
 gnu/packages/clojure\.scm                          @guix/java
 gnu/packages/java(-.+|)\.scm$                      @guix/java
@@ -280,7 +280,7 @@ guix/build/clojure-build-system\.scm               @guix/java
 guix/build/clojure-utils\.scm                      @guix/java
 guix/build/java-utils\.scm                         @guix/java
 guix/build/maven-build-system\.scm                 @guix/java
-guix/build/maven/                                  @guix/java
+guix/build/maven/.*                                @guix/java
 guix/build-system/ant\.scm                         @guix/java
 guix/build-system/clojure\.scm                     @guix/java
 guix/build-system/maven\.scm                       @guix/java
@@ -404,7 +404,7 @@ gnu/packages/racket\.scm                           @guix/racket
 
 NEWS                                               @guix/release
 etc/manifests/release-.+\.scm$                     @guix/release
-etc/teams/release/                                 @guix/release
+etc/teams/release/.*                               @guix/release
 
 gnu/packages/diffoscope\.scm                       @guix/reproduciblebuilds
 
@@ -487,13 +487,13 @@ gnu/tests/samba\.scm                               @guix/sysadmin
 gnu/tests/virtualization\.scm                      @guix/sysadmin
 gnu/tests/vnc\.scm                                 @guix/sysadmin
 
-gnu/system                                         @guix/system
-gnu/services                                       @guix/system
-gnu/tests                                          @guix/system
-gnu/build                                          @guix/system
-gnu/bootloader                                     @guix/system
-gnu/machine                                        @guix/system
-tests/services                                     @guix/system
+gnu/system.*                                       @guix/system
+gnu/services.*                                     @guix/system
+gnu/tests.*                                        @guix/system
+gnu/build.*                                        @guix/system
+gnu/bootloader.*                                   @guix/system
+gnu/machine.*                                      @guix/system
+tests/services.*                                   @guix/system
 tests/file-systems\.scm                            @guix/system
 tests/guix-system\.sh                              @guix/system
 tests/system\.scm                                  @guix/system
@@ -516,7 +516,7 @@ guix/scripts/import/texlive\.scm                   @guix/tex
 tests/import/texlive\.scm                          @guix/tex
 
 etc/news\.scm                                      @guix/translations
-po/                                                @guix/translations
+po/.*                                              @guix/translations
 
 gnu/packages/version-control\.scm                  @guix/vcs
 gnu/services/version-control\.scm                  @guix/vcs
