@@ -24154,10 +24154,6 @@ fn main() {
   (crate-source "num-bigint" "0.5.1"
                 "1h77ycws79m3j1s68jq5pvaiifi9z4b76cjhwqw042m8q05q5rwk"))
 
-(define rust-num-bigint-0.5.1
-  (crate-source "num-bigint" "0.5.1"
-                "1h77ycws79m3j1s68jq5pvaiifi9z4b76cjhwqw042m8q05q5rwk"))
-
 (define rust-num-bigint-dig-0.8.5
   (crate-source "num-bigint-dig" "0.8.5"
                 "0yv4gf3whrxba2n3hkc7iq6pc6n89h867waydwmzhjsxq0arriw2"))
