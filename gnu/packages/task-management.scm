@@ -37,6 +37,7 @@
   #:use-module (guix packages)
   #:use-module (gnu packages)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages check)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages freedesktop)
@@ -746,7 +747,7 @@ scheduling and background process execution.")
 (define-public vit
   (package
     (name "vit")
-    (version "2.3.4")
+    (version "2.3.5")
     (source
      (origin
        (method git-fetch)
@@ -755,18 +756,18 @@ scheduling and background process execution.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0045zys5iy08ijlfc92vd54x5x0kq5hy0pn4iqh2bbypfs46h5rb"))))
+        (base32 "0wmr5s2h4r53r35i2q063r0gmvf5mnk9y55kx5am9c132qh9nflr"))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:test-backend #~'unittest
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'sanity-check 'set-environment-variables
             (lambda* (#:key inputs #:allow-other-keys)
               (setenv "TERM" "xterm"))))))
     (inputs (list python-tasklib python-urwid))
-    (native-inputs (list ncurses python-setuptools))
+    (native-inputs
+     (list ncurses python-pytest python-setuptools tzdata-for-tests))
     (home-page "https://github.com/vit-project/vit")
     (synopsis "Visual Interactive Taskwarrior full-screen terminal interface")
     (description
