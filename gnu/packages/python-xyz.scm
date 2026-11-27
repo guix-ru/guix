@@ -31728,7 +31728,7 @@ cryptographically signed ones).")
 (define-public python-dictdiffer
   (package
     (name "python-dictdiffer")
-    (version "0.9.0")
+    (version "0.10.0")
     (source
      (origin
        (method git-fetch)
@@ -31737,20 +31737,20 @@ cryptographically signed ones).")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1rc5jhjxzphip43frrlplcayng2cah1bzbzv6hpxnnjhg6rqy34m"))))
+        (base32 "02k21gdz8zbc1ag990bwvaxg519r3kizg51g1zcbmp4lmj91ydp6"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'relax-requirements
+          (add-after 'unpack 'fix-pytest-config
+            ;; Drop --isort --pydocstyle --doctest-glob="*.rst"
+            ;; --doctest-modules --cov=dictdiffer --cov-report=term-missing.
             (lambda _
-              (delete-file "pytest.ini")
-              (substitute* "setup.py"
-                (("'pytest-runner.*',")
-                 "'pytest',")))))))
+              (substitute* "pyproject.toml"
+                (("addopts = .*") "")))))))
     (native-inputs
-     (list python-pytest python-setuptools python-setuptools-scm))
+     (list python-hatch-vcs python-hatchling python-pytest))
     (home-page "https://github.com/inveniosoftware/dictdiffer")
     (synopsis "Diff and patch Python dictionary objects")
     (description
