@@ -1756,8 +1756,8 @@ protocols.")
     (license license:x11)))
 
 (define (prosody-module module-name)
-  (let ((changeset "15a7749c7acb")
-        (revision "4")
+  (let ((changeset "493849d17e9a")
+        (revision "5")
         (package-name (string-append
                        "prosody-"
                        (string-replace-substring
@@ -1776,7 +1776,7 @@ protocols.")
                 (file-name (string-append name "-" version "-checkout"))
                 (sha256
                  (base32
-                  "06wqazdb5zn0aw8g006grv9pl63wryjsdqg145qhqxqclrblzy26"))))
+                  "18885w4ngj3hydj8q6ccmqm28s5xb9pfm00di4fj4sh1m5hsfl77"))))
       (build-system copy-build-system)
       (arguments
        `(#:install-plan '((,(string-append module-name "/") "."))))
