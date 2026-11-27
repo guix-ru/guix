@@ -215,6 +215,18 @@ do
     kill "$daemon_pid"
 done
 
+# Make sure '--chroot-directory' can be given more than once.
+
+guix-daemon --listen="$socket" --disable-chroot \
+	    --chroot-directory=/foo --chroot-directory=/bar &
+daemon_pid=$!
+
+GUIX_DAEMON_SOCKET="$socket" guile -c '
+  (use-modules (guix))
+  (with-store store
+    (exit (string? (add-text-to-store store "chroot-directory" "!"))))'
+kill "$daemon_pid"
+
 # Make sure garbage collection from a TCP connection does not work.
 
 tcp_socket="127.0.0.1:9998"
