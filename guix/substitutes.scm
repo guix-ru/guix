@@ -122,7 +122,7 @@ entry is stored in a sub-directory specific to CACHE-URL."
 given TTL (a number of seconds or #f).  NARINFO may be #f, in which case it
 indicates that PATH is unavailable at CACHE-URL."
   (define now
-    (current-time time-monotonic))
+    (current-time time-utc))
 
   (define (cache-entry cache-uri narinfo)
     `(narinfo (version 2)
@@ -333,7 +333,7 @@ Return two values: a Boolean indicating whether we have valid cached info, and
 that info, which may be either #f (when PATH is unavailable) or the narinfo
 for PATH."
   (define now
-    (current-time time-monotonic))
+    (current-time time-utc))
 
   (define cache-file
     (narinfo-cache-file cache-url path))
