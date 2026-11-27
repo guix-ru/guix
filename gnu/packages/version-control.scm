@@ -67,6 +67,7 @@
 ;;; Copyright © 2025 Tomas Volf <~@wolfsden.cz>
 ;;; Copyright © 2025 Matthew Elwin <elwin@northwestern.edu>
 ;;; Copyright © 2025 Roman Scherer <roman@burningswell.com>
+;;; Copyright © 2026 Anderson Torres <anderson.torres.8519@gmail.com>
 ;;; Copyright © 2026 Ingar <ingar@onionmail.info>
 ;;; Copyright © 2026 Nguyễn Gia Phong <cnx@loang.net>
 ;;; Copyright © 2026 Luca Kredel <luca.kredel@web.de>
@@ -2491,6 +2492,41 @@ scripts difficult.  shFlags instead provides an API that doesn't change across
 shell and OS versions so the script writer can be confident that the script
 will work.")
     (license license:lgpl2.1)))
+
+(define-public swh-git
+  ;; No public release.
+  (let ((commit "488ca40a885505ecb9fa73497270f64ff6cd61ea")
+        (revision "0"))
+    (package
+      (name "swh-git")
+      (version (git-version "0.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+                (url "https://github.com/andrew/swh-git")
+                (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1kkg6x9jq5vcpai5q8zl5pcx0z4g601pil0xnxs9x5b267949382"))))
+      (build-system go-build-system)
+      (arguments
+       (list
+        #:go go-1.27
+        #:import-path "github.com/andrew/swh-git/..."
+        #:unpack-path "github.com/andrew/swh-git"
+        #:install-source? #f))
+      (home-page "https://github.com/andrew/swh-git")
+      (synopsis "Clone archived repositories from Software Heritage via git")
+      (description
+       "This package provides two executables:
+@itemize
+@item @command{git-remote-swh}: Git subcommand that clones archived
+repositories from @url{https://www.softwareheritage.org/, Software Heritage},
+recognizing @emph{swh::} addresses;
+@item @command{swh-git}: HTTP proxy with the same functionality as above.
+@end itemize")
+      (license license:expat))))
 
 (define-public trac
   (package
