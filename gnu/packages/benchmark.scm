@@ -67,6 +67,7 @@
   #:use-module (gnu packages lua)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages maths)
+  #:use-module (gnu packages messaging)
   #:use-module (gnu packages mpi)
   #:use-module (gnu packages opencl)
   #:use-module (gnu packages perl)
@@ -477,93 +478,41 @@ with the benchmarking host.")
 (define-public python-locust
   (package
     (name "python-locust")
-    (version "2.33.2")
-    ;; The archive on Pypi has no tests.
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/locustio/locust")
-                    (commit version)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "055is6plxjajzp7v5q108n90j5mvdaylpna98kw9zsqn7mvfq7ms"))))
+    (version "2.47.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/locustio/locust")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "05n8wdq785y3zx4yyjk8v6xn3vhc3i6vp4ad77cshk0idd6cxkv5"))))
     (build-system pyproject-build-system)
     (arguments
      (list
+      ;; tests: 341 passed, 33 skipped, 188 deselected, 2 xfailed, 4 warnings,
+      ;;        9 subtests passed
       #:test-flags
-      '(list "--pyargs" "locust/test"
-             "-k" (string-join
-                   '( ;; These tests return "non-zero exit status 1".
-                     "not test_default_headless_spawn_options"
-                     "not test_default_headless_spawn_options_with_shape"
-                     "not test_headless_spawn_options_wo_run_time"
-                     ;; Fails because of timezone discrepancy, even when TZDIR
-                     ;; is set.
-                     "not test_format_utc_timestamp"
-                     ;; These tests fail with a HTTP return code of
-                     ;; 500 instead of 200, for unknown reasons.
-                     "not test_autostart_mutliple_locustfiles_with_shape"
-                     "not test_autostart_w_load_shape"
-                     "not test_autostart_wo_run_time"
-                     "not test_percentile_parameter"
-                     "not test_percentiles_to_statistics"
-                     "not test_autostart_multiple_locustfiles_with_shape"
-                     "not test_graceful_exit_when_keyboard_interrupt"
-                     "not test_host_value_from_multiple_user_classes"
-                     "not test_host_value_from_multiple_user_classes_different_hosts"
-                     "not test_host_value_from_user_class"
-                     "not test_html_stats_report"
-                     "not test_index"
-                     "not test_index_with_spawn_options"
-                     "not test_report_download"
-                     "not test_report_exceptions"
-                     "not test_report_host"
-                     "not test_report_host2"
-                     "not test_report_page"
-                     "not test_report_page_empty_stats"
-                     "not test_index_with_web_login_enabled_no_user"
-                     "not test_index_with_web_login_enabled_valid_user"
-                     "not test_index_with_https"
-                     "not test_ssl_request_insecure"
-                     ;; Fails because of unavailable IPv6
-                     "not test_constructor"
-                     ;; Process fails to terminate, which breaks following tests
-                     "not test_processes_ctrl_c"
-                     ;; These tests depend on networking.
-                     "not test_html_report_option"
-                     "not test_json_schema"
-                     "not test_locustfile_from_url"
-                     "not test_web_options"
-                     ;; These tests fail because of the warning
-                     ;; "System open file limit '1024' is below
-                     ;; minimum setting '10000'".
-                     "not test_autostart_w_run_time"
-                     "not test_skip_logging"
-                     ;; On some (slow?) machines, the following tests
-                     ;; fail, with the processes returning exit code
-                     ;; -15 instead of the expected 42 and 0,
-                     ;; respectively (see:
-                     ;; https://github.com/locustio/locust/issues/1708).
-                     "not test_custom_exit_code"
-                     "not test_webserver"
-                     ;; These fail on the build farm for unknown reasons.  I
-                     ;; suspect the test suite is just really picky and
-                     ;; stateful.
-                     "not test_workers_shut_down_if_master_is_gone"
-                     "not test_custom_arguments_in_file"
-                     "not test_custom_arguments"
-                     ;; These are time critical and can fail on busy machines.
-                     "not test_distribute_users"
-                     "not test_ramp_down_from_100_000_to_0_users_with_50_user_classes_and_1000_workers_and_5000_spawn_rate"
-                     "not test_ramp_up_from_0_to_100_000_users_with_50_user_classes_and_1000_workers_and_5000_spawn_rate"
-                     ;; This test fails with "AssertionError:
-                     ;; 'stopped' != 'stopping'".
-                     "not test_distributed_shape"
-                     ;; This test fails with AssertionError:
-                     ;; "locust [...] != .locust-real"
-                     "not test_invalid_stop_timeout_string"
-                     ) " and "))
+      #~(list "--pyargs" "locust/test"
+              ;; To prevent adding python-retry.
+              "--ignore=locust/test/test_runners.py"
+              "--ignore=locust/test/test_stats.py"
+              ;; Tests excluded individually consist of more than 60 items,
+              ;; this is an exclusion by groups which fail the most: requiring
+              ;; network access, time sensitive or underministic.
+              "-k" (string-join
+                    (list "not TestFastHttpSsl"
+                          "TestHttpSession"
+                          "TestLoadLocustfile"
+                          "StandaloneIntegrationTests"
+                          "DistributedIntegrationTests"
+                          "TelemetryTests"
+                          "TestWebUI"
+                          "TestWebUIAuth"
+                          "TestWebUIWithTLS"
+                          "ZMQRPC_tests")
+                    " and not "))
       #:phases
       #~(modify-phases %standard-phases
           (add-before 'check 'increase-resource-limits
@@ -582,6 +531,7 @@ with the benchmarking host.")
                             soft (if hard (min hard 2048) 2048))))))))))
     (propagated-inputs
      (list python-configargparse
+           python-engineio
            python-flask
            python-flask-cors
            python-flask-login
@@ -589,19 +539,27 @@ with the benchmarking host.")
            python-geventhttpclient
            python-msgpack
            python-psutil
+           python-pytest     ;listed in dependencies
            python-pyzmq
            python-requests
-           python-setuptools
-           python-tomli
+           python-socketio
            python-typing-extensions
-           python-werkzeug))
+           python-werkzeug
+           ;; [optional]
+           ;; python-opentelemetry-exporter-otlp-proto-grpc
+           ;; python-opentelemetry-exporter-otlp-proto-http
+           ;; python-opentelemetry-instrumentation-requests
+           ;; python-opentelemetry-instrumentation-urllib3
+           ;; python-pymilvus
+           ;; python-qdrant-client
+           python-dnspython
+           python-opentelemetry-sdk
+           python-paho-mqtt))
     (native-inputs
      (list nss-certs-for-test
            python-hatchling
-           python-hatch-vcs
            python-pyquery
-           python-pytest
-           python-retry))
+           python-hatch-vcs))
     (home-page "https://locust.io/")
     (synopsis "Distributed load testing framework")
     (description "Locust is a performance testing tool that aims to be easy to
