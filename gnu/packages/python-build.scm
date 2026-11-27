@@ -298,7 +298,7 @@ platform-specific directories, e.g. the ``user data dir''.")
 (define-public python-pluggy
   (package
     (name "python-pluggy")
-    (version "1.6.0")
+    (version "1.7.0")
     (source
      (origin
        (method git-fetch)
@@ -307,7 +307,7 @@ platform-specific directories, e.g. the ``user data dir''.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01q2cmzdfi8sgyl1indbpl75142csizz9s8cryk2a0cjkcy26i56"))))
+        (base32 "1vfhzxaciadcswsjqh788kpy4c8c8zjbidns0ljlcabxfq8zvfcs"))))
     (build-system pyproject-build-system)
     (arguments
      (list #:tests? #f)) ;to break cycle with pytest
