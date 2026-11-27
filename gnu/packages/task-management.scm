@@ -846,39 +846,31 @@ them via CalDAV using, for example, @code{vdirsyncer}.")
 (define-public watson
   (package
     (name "watson")
-    (version "2.1.0")
+    (version "3.0.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/tailordev/watson")
-             (commit version)))
+              ;; Redirects from <https://github.com/tailordev/watson>.
+             (url "https://github.com/jmaupetit/Watson")
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0j0gqnxf0smjs0sy7ipryj1sk0s59wrh4qwr7h55zdr4wdhi407w"))))
+        (base32 "0kw666ykyd9xq5584hfnaj7s5490y9q2pjn3gvy7bdjs8320wiz4"))))
     (build-system pyproject-build-system)
-    (arguments
-     (list
-      #:phases
-      #~(modify-phases %standard-phases
-          ;; FIXME This is an edge case to fix in the build system.
-          ;; The issue seems that sanity-check is unable to handle
-          ;; the case where the module and package have different names.
-          (delete 'sanity-check))))
     (native-inputs
-     (list python-mock
+     (list python-hatchling
+           python-mock
            python-pytest
            python-pytest-datafiles
-           python-pytest-mock
-           python-setuptools
-           python-wheel))
+           python-pytest-mock))
     (propagated-inputs
      (list python-arrow
            python-click
            python-click-didyoumean
            python-colorama
            python-requests))
-    (home-page "https://tailordev.github.io/Watson/")
+    (home-page "https://jmaupetit.github.io/Watson/")
     (synopsis "Command-line time tracker")
     (description
      "Watson is command-line interface to manage your time.  It supports
