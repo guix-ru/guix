@@ -523,22 +523,26 @@ build-system level.")
 (define-public python-tomli
   (package
     (name "python-tomli")
-    (version "2.2.1")
+    (version "2.5.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "tomli" version))
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/hukkin/tomli")
+              (commit version)))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1zq58p2bplyf0xpi9fnyn4w6vc1fkw8whkj0yxhcwdf8g7ff2ifd"))))
+        (base32 "06aa6rj5rw6rxj6g34dpji4fb23jc5l0735ajzcn0qx1mwzgj7n3"))))
     (build-system pyproject-build-system)
     (arguments
-     `(#:tests? #f))                      ;disabled to avoid extra dependencies
+     (list #:test-backend #~'unittest))
     (native-inputs (list python-flit-core-bootstrap))
     (home-page "https://github.com/hukkin/tomli")
     (synopsis "Small and fast TOML parser")
-    (description "Tomli is a minimal TOML parser that is fully compatible with
-@url{https://toml.io/en/v1.0.0,TOML v1.0.0}.  It is about 2.4 times as fast as
-@code{python-toml}.")
+    (description
+     "Tomli is a minimal TOML parser that is fully compatible with
+@url{https://toml.io/en/v1.0.0, TOML v1.0.0}.  It is about 2.4 times as fast
+as @code{python-toml}.")
     (license license:expat)))
 
 (define-public python-trove-classifiers
