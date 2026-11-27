@@ -812,41 +812,40 @@ on arbitrary tasks.  All the time data is saved in files residing in the
 (define-public todoman
   (package
     (name "todoman")
-    (version "4.4.0")
+    (version "4.7.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "todoman" version))
        (sha256
-        (base32 "1dlxmw919jvjxycf315vzs4f5q64gdjrp3988y8jkyivqywfwyqb"))))
+        (base32 "179q5g0i5z7yc76navzg7r4zp1nvnnzjs1bbl149q15a1ss6vwjr"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
-      #~(list "--hypothesis-profile=ci"
-              "tests" "-k"
-              (string-append
-               ;; Test expects wrong output string.
-               "not test_bad_start_date "
-               ;; Unknown failure
-               "and not test_default_command_args"))))
+      #~(list "--hypothesis-profile=ci")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'set-home
+            (lambda _
+              (setenv "HOME" "/tmp"))))))
     (native-inputs
      (list python-freezegun
            python-hypothesis
            python-pytest
            python-pytz
-           python-setuptools
-           python-wheel))
+           python-setuptools))
     (propagated-inputs
-     (list python-atomicwrites
-           python-click
+     (list python-click
            python-click-log
            python-dateutil
            python-humanize
            python-icalendar
            python-parsedatetime
            python-pyxdg
-           python-urwid))
+           python-urwid
+           ;; [optional]
+           python-click-repl))
     (home-page "https://todoman.readthedocs.io/")
     (synopsis "CalDav-based todo manager")
     (description "Todoman is a simple, standards-based, cli todo (aka: task)
