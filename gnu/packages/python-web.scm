@@ -5410,41 +5410,41 @@ Protocol, WAMP}
 (define-public python-geventhttpclient
   (package
     (name "python-geventhttpclient")
-    (version "2.3.9")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/geventhttpclient/geventhttpclient")
-                    (commit version)
-                    (recursive? #true)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "1diq6n9sr92rsqbpxlbhbn1d22hrlzp6swykz9bfzh7sxpywa6j8"))))
+    (version "2.6.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url "https://github.com/geventhttpclient/geventhttpclient")
+              (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1r8i7j5xflssgi6bkfz6y1kz01acw8j2v1cvqr61qyylx3j7rkk7"))))
     (build-system pyproject-build-system)
     (arguments
      (list
       #:test-flags
-      ;; Disable network tests.
-      '(list "-k"
-             (string-append "not test_client_simple"
-                            " and not test_client_ssl"
-                            " and not test_client_with_default_headers"
-                            " and not test_client_without_leading_slash"
-                            " and not test_download"
-                            " and not test_fail_invalid_ca_certificate"
-                            " and not test_httpbin_multipart"
-                            " and not test_multi_queries_greenlet_safe"
-                            " and not test_no_form_encode_header"
-                            " and not test_no_form_encoded_header"
-                            " and not test_request_with_headers"
-                            " and not test_response_context_manager"
-                            " and not test_urllib_request"))))
-    (native-inputs (list nss-certs-for-test
-                         python-dpkt python-pytest python-requests
-                         python-setuptools python-wheel))
-    (propagated-inputs (list python-brotli python-certifi python-gevent
-                             python-urllib3))
+      #~(list "-m" "not network")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'build 'substitute-git-submodules
+            (lambda _
+              (rmdir "llhttp")
+              (symlink #$(package-source (this-package-input "llhttp"))
+                       "llhttp"))))))
+    (native-inputs
+     (list nss-certs-for-test
+           python-dpkt
+           python-httplib2
+           python-pytest
+           python-setuptools
+           python-setuptools-scm))
+    (inputs
+     (list llhttp))
+    (propagated-inputs
+     (list python-brotli
+           python-certifi
+           python-gevent))
     (home-page "https://github.com/geventhttpclient/geventhttpclient")
     (synopsis "HTTP client library for gevent")
     (description "@code{python-geventhttpclient} is a high performance,
