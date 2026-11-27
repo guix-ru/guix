@@ -49,7 +49,9 @@
 
  (entry (commit "1aa75f08e1cc35c89044f73708e5f42d2fc1172c")
         (title
-         (en "@command{guix pull} reworked to speed up its initial steps"))
+         (en "@command{guix pull} reworked to speed up its initial steps")
+         (de "@command{guix pull} für schnellere Ausführung initialer Schritte
+             überarbeitet "))
         (body
          (en "The @command{guix pull} command has been reworked in a way that
 reduces the amount of content it needs to fetch from the channels and
@@ -57,7 +59,14 @@ simplifies the initial computations that it needs to perform on these
 retrieved content.
 
 The command can now be optionally passed @option{--full} to fallback to the
-old behavior.")))
+old behavior.")
+         (de "Der Befehl @command{guix pull} wurde dahingehend überarbeitet,
+dass er weniger Inhalte beim Holen von Kanälen herunterladen muss und die
+initialen Berechungen, welche er auf diesen Inhalten durchführen muss,
+vereinfacht wurden.
+
+Das ursprüngliche Verhalten des Befehls @command{guix pull} kann mit
+@option{--full} wiederhergestellt werden.")))
 
  (entry (commit "741ff81f59a17b4a89591aaafbf880d8f1ba96fa")
         (title
