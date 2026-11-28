@@ -62,7 +62,7 @@ The command can now be optionally passed @option{--full} to fallback to the
 old behavior.")
          (de "Der Befehl @command{guix pull} wurde dahingehend überarbeitet,
 dass er weniger Inhalte beim Holen von Kanälen herunterladen muss und die
-initialen Berechungen, welche er auf diesen Inhalten durchführen muss,
+initialen Berechnungen, welche er auf diesen Inhalten durchführen muss,
 vereinfacht wurden.
 
 Das ursprüngliche Verhalten des Befehls @command{guix pull} kann mit
