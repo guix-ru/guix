@@ -37179,7 +37179,7 @@ generator for Python.")
 (define-public python-misc-utils
   (package
     (name "python-misc-utils")
-    (version "0.28")
+    (version "0.31")
     (source
      (origin
        (method git-fetch)
@@ -37188,16 +37188,33 @@ generator for Python.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0zk3lr9xviqqsvag0is91p2f70w8qlmvk25pp2xprrh30fhxfa9g"))))
+        (base32 "0yyvks91jliw7kqm2zp169cnicphlrybdw4xfcqzn1dncmscd2b5"))
+       (modules '((guix build utils)))
+       (snippet
+        #~(begin
+            (for-each delete-file
+                      ;; Missing / broken dependencies.
+                      '("tests/test_ftp_fs.py"
+                        "tests/test_gcs_fs.py"
+                        "tests/test_http_async_fetcher.py"
+                        "tests/test_http_fs.py"
+                        "tests/test_img_utils.py"
+                        "tests/test_s3_fs.py"
+                        "tests/test_stream_dataframe.py"
+                        "tests/test_date_utils.py"
+                        "tests/test_gfs.py"
+                        "tests/test_url_fetcher.py"))))))
     (build-system pyproject-build-system)
     (arguments
      (list
-      #:tests? #f        ; see https://github.com/davidel/py_misc_utils/issues/1
-      #:test-backend #~'custom
-      #:test-flags #~(list "test/test_runner.py")))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'set-home-env
+            (lambda _ (setenv "HOME" "/tmp"))))))
     (propagated-inputs
-     (list python-numpy python-pandas python-psutil python-pyyaml))
-    (native-inputs (list python-setuptools))
+     (list python-numpy python-pandas python-psutil python-pytz python-pyyaml))
+    (native-inputs
+     (list python-setuptools python-pytest python-msgpack python-requests))
     (home-page "https://github.com/davidel/py_misc_utils")
     (synopsis "Collection of Python utilities")
     (description "This package provides a collection of Python miscellaneous
