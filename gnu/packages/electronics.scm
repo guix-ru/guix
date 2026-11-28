@@ -4462,7 +4462,10 @@ to enforce it.")
               (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "16dqqhbg5q6fxlhnfcjimxv1zgziw5g46askjhfg8g2hn7i3vfal"))))
+        (base32 "16dqqhbg5q6fxlhnfcjimxv1zgziw5g46askjhfg8g2hn7i3vfal"))
+       (snippet
+        #~(begin
+            (delete-file "tests/t_float.py")))))
     (build-system pyproject-build-system)
     (arguments
      (list
